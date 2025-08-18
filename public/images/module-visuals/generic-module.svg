@@ -1,0 +1,80 @@
+<svg width="400" height="225" viewBox="0 0 400 225" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="generic-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="generic-card" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#f8fafc;stop-opacity:0.95" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="225" fill="url(#generic-bg)" rx="12"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="80" cy="80" r="20" fill="white" opacity="0.1"/>
+  <circle cx="320" cy="90" r="15" fill="white" opacity="0.08"/>
+  <circle cx="350" cy="150" r="22" fill="white" opacity="0.06"/>
+  
+  <!-- Main interface card -->
+  <rect x="40" y="30" width="320" height="165" fill="url(#generic-card)" rx="16" filter="url(#shadow)"/>
+  
+  <!-- Dashboard area -->
+  <rect x="60" y="50" width="280" height="120" fill="#f8fafc" rx="8" stroke="#e2e8f0" stroke-width="1"/>
+  
+  <!-- Header section -->
+  <rect x="70" y="60" width="260" height="25" fill="#f1f5f9" rx="4"/>
+  <rect x="80" y="67" width="100" height="4" fill="#64748b" rx="2"/>
+  <rect x="80" y="74" width="60" height="3" fill="#94a3b8" rx="1.5"/>
+  
+  <!-- Content grid -->
+  <rect x="70" y="95" width="80" height="60" fill="#f1f5f9" rx="4"/>
+  <rect x="80" y="105" width="60" height="8" fill="#e2e8f0" rx="2"/>
+  <rect x="80" y="115" width="40" height="8" fill="#e2e8f0" rx="2"/>
+  <rect x="80" y="125" width="50" height="8" fill="#e2e8f0" rx="2"/>
+  <rect x="80" y="135" width="30" height="8" fill="#e2e8f0" rx="2"/>
+  
+  <rect x="160" y="95" width="80" height="60" fill="#f1f5f9" rx="4"/>
+  <rect x="170" y="105" width="60" height="8" fill="#dbeafe" rx="2"/>
+  <rect x="170" y="115" width="40" height="8" fill="#dbeafe" rx="2"/>
+  <rect x="170" y="125" width="50" height="8" fill="#dbeafe" rx="2"/>
+  <rect x="170" y="135" width="30" height="8" fill="#dbeafe" rx="2"/>
+  
+  <rect x="250" y="95" width="80" height="60" fill="#f1f5f9" rx="4"/>
+  <rect x="260" y="105" width="60" height="8" fill="#fef3c7" rx="2"/>
+  <rect x="260" y="115" width="40" height="8" fill="#fef3c7" rx="2"/>
+  <rect x="260" y="125" width="50" height="8" fill="#fef3c7" rx="2"/>
+  <rect x="260" y="135" width="30" height="8" fill="#fef3c7" rx="2"/>
+  
+  <!-- Action buttons -->
+  <rect x="70" y="165" width="60" height="25" fill="#3b82f6" rx="4"/>
+  <text x="100" y="181" font-family="Inter, sans-serif" font-size="10" fill="white" font-weight="600" text-anchor="middle">Start</text>
+  
+  <rect x="140" y="165" width="60" height="25" fill="#10b981" rx="4"/>
+  <text x="170" y="181" font-family="Inter, sans-serif" font-size="10" fill="white" font-weight="600" text-anchor="middle">Config</text>
+  
+  <rect x="210" y="165" width="60" height="25" fill="#8b5cf6" rx="4"/>
+  <text x="240" y="181" font-family="Inter, sans-serif" font-size="10" fill="white" font-weight="600" text-anchor="middle">Tools</text>
+  
+  <rect x="280" y="165" width="50" height="25" fill="#f59e0b" rx="4"/>
+  <text x="305" y="181" font-family="Inter, sans-serif" font-size="10" fill="white" font-weight="600" text-anchor="middle">Help</text>
+  
+  <!-- Floating elements -->
+  <circle cx="320" cy="65" r="3" fill="#3b82f6" opacity="0.8"/>
+  <circle cx="330" cy="80" r="4" fill="#10b981" opacity="0.6"/>
+  <circle cx="315" cy="95" r="2" fill="#8b5cf6" opacity="0.7"/>
+  
+  <!-- Title overlay -->
+  <rect x="0" y="0" width="400" height="225" fill="url(#generic-bg)" opacity="0" rx="12"/>
+</svg>
+
+
+
+
+

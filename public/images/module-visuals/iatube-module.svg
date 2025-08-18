@@ -1,0 +1,73 @@
+<svg width="400" height="225" viewBox="0 0 400 225" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="iatube-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ee5a24;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="iatube-card" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#f8fafc;stop-opacity:0.95" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="225" fill="url(#iatube-bg)" rx="12"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="80" cy="80" r="20" fill="white" opacity="0.1"/>
+  <circle cx="320" cy="90" r="15" fill="white" opacity="0.08"/>
+  <circle cx="350" cy="150" r="22" fill="white" opacity="0.06"/>
+  
+  <!-- Main video interface card -->
+  <rect x="40" y="30" width="320" height="165" fill="url(#iatube-card)" rx="16" filter="url(#shadow)"/>
+  
+  <!-- Video player area -->
+  <rect x="60" y="50" width="280" height="120" fill="#f8fafc" rx="8" stroke="#e2e8f0" stroke-width="1"/>
+  
+  <!-- Video thumbnail -->
+  <rect x="70" y="60" width="200" height="90" fill="#f1f5f9" rx="6"/>
+  
+  <!-- Play button overlay -->
+  <circle cx="170" cy="105" r="20" fill="#ff0000" opacity="0.9"/>
+  <polygon points="165,95 165,115 185,105" fill="white"/>
+  
+  <!-- Video info -->
+  <rect x="280" y="60" width="50" height="90" fill="#f1f5f9" rx="4"/>
+  
+  <!-- Video duration -->
+  <rect x="285" y="65" width="40" height="15" fill="#e2e8f0" rx="2"/>
+  <text x="305" y="76" font-family="Inter, sans-serif" font-size="8" fill="#6b7280" font-weight="500" text-anchor="middle">12:34</text>
+  
+  <!-- Download button -->
+  <rect x="285" y="85" width="40" height="25" fill="#10b981" rx="4"/>
+  <text x="305" y="101" font-family="Inter, sans-serif" font-size="9" fill="white" font-weight="600" text-anchor="middle">MP4</text>
+  
+  <!-- Audio button -->
+  <rect x="285" y="115" width="40" height="25" fill="#8b5cf6" rx="4"/>
+  <text x="305" y="131" font-family="Inter, sans-serif" font-size="9" fill="white" font-weight="600" text-anchor="middle">MP3</text>
+  
+  <!-- URL input -->
+  <rect x="70" y="160" width="200" height="25" fill="white" rx="4" stroke="#d1d5db" stroke-width="1"/>
+  <text x="80" y="175" font-family="Inter, sans-serif" font-size="10" fill="#6b7280" font-weight="400">https://youtube.com/watch?v=...</text>
+  
+  <!-- Download button -->
+  <rect x="280" y="160" width="60" height="25" fill="#ff0000" rx="4"/>
+  <text x="310" y="175" font-family="Inter, sans-serif" font-size="10" fill="white" font-weight="600" text-anchor="middle">Download</text>
+  
+  <!-- Floating elements -->
+  <circle cx="320" cy="60" r="3" fill="#ff0000" opacity="0.8"/>
+  <circle cx="330" cy="75" r="4" fill="#10b981" opacity="0.6"/>
+  <circle cx="315" cy="90" r="2" fill="#8b5cf6" opacity="0.7"/>
+  
+  <!-- Title overlay -->
+  <rect x="0" y="0" width="400" height="225" fill="url(#iatube-bg)" opacity="0" rx="12"/>
+</svg>
+
+
+
+
+

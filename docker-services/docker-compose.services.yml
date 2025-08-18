@@ -1,0 +1,165 @@
+version: '3.8'
+
+services:
+  # Service Stirling-PDF
+  stirling-pdf:
+    image: frooodle/s-pdf:latest
+    container_name: stirling-pdf
+    restart: unless-stopped
+    ports:
+      - "8081:8080"  # Port principal de Stirling-PDF
+    environment:
+      - DOCKER_ENABLE_SECURITY=false  # Désactiver la sécurité pour un accès sans authentification
+      - DOCKER_ENABLE_UPDATE_CHECK=false  # Désactiver les vérifications de mise à jour
+      - DOCKER_ENABLE_CORS=true  # Activer CORS pour l'intégration web
+      - DOCKER_ENABLE_LOGGING=true  # Activer les logs
+      - DOCKER_ENABLE_DEBUG=false  # Désactiver le mode debug en production
+    volumes:
+      - ./pdf-data:/usr/share/tesseract-ocr/4.00/tessdata  # Données OCR
+      - ./pdf-uploads:/usr/share/tesseract-ocr/4.00/tessdata  # Dossier d'upload
+      - ./pdf-temp:/tmp  # Dossier temporaire
+    networks:
+      - services-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.stirling-pdf.rule=Host(`pdf.regispailler.fr`)"
+      - "traefik.http.routers.stirling-pdf.entrypoints=websecure"
+      - "traefik.http.routers.stirling-pdf.tls=true"
+      - "traefik.http.services.stirling-pdf.loadbalancer.server.port=8080"
+      - "traefik.http.routers.stirling-pdf-http.rule=Host(`pdf.regispailler.fr`)"
+      - "traefik.http.routers.stirling-pdf-http.entrypoints=web"
+      - "traefik.http.routers.stirling-pdf-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+  # Service MeTube
+  metube:
+    image: alexta69/metube:latest
+    container_name: metube
+    restart: unless-stopped
+    ports:
+      - "8082:8081"  # Port pour MeTube
+    volumes:
+      - ./metube-downloads:/downloads
+    networks:
+      - services-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.metube.rule=Host(`metube.regispailler.fr`)"
+      - "traefik.http.routers.metube.entrypoints=websecure"
+      - "traefik.http.routers.metube.tls=true"
+      - "traefik.http.services.metube.loadbalancer.server.port=8081"
+
+  # Service LibreSpeed (test de vitesse)
+  librespeed:
+    image: linuxserver/librespeed:latest
+    container_name: librespeed
+    restart: unless-stopped
+    ports:
+      - "8083:80"  # Port pour LibreSpeed
+    environment:
+      - TITLE=LibreSpeed Regispailler
+      - TELEMETRY=false
+      - ENABLE_IDLE_MODE=true
+      - REDIRECT_HTTPS=false
+    networks:
+      - services-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.librespeed.rule=Host(`librespeed.regispailler.fr`)"
+      - "traefik.http.routers.librespeed.entrypoints=websecure"
+      - "traefik.http.routers.librespeed.tls=true"
+      - "traefik.http.services.librespeed.loadbalancer.server.port=80"
+      - "traefik.http.routers.librespeed-http.rule=Host(`librespeed.regispailler.fr`)"
+      - "traefik.http.routers.librespeed-http.entrypoints=web"
+      - "traefik.http.routers.librespeed-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+  # Service PSITransfer
+  psitransfer:
+    image: psitrax/psitransfer:latest
+    container_name: psitransfer
+    restart: unless-stopped
+    ports:
+      - "8084:3000"  # Port pour PSITransfer
+    environment:
+      - PSITRANSFER_ADMIN_EMAIL=admin@iahome.fr
+      - PSITRANSFER_SITE_NAME=IAHome Transfer
+    volumes:
+      - ./psitransfer-data:/var/lib/psitransfer
+    networks:
+      - services-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.psitransfer.rule=Host(`psitransfer.regispailler.fr`)"
+      - "traefik.http.routers.psitransfer.entrypoints=websecure"
+      - "traefik.http.routers.psitransfer.tls=true"
+      - "traefik.http.services.psitransfer.loadbalancer.server.port=3000"
+      - "traefik.http.routers.psitransfer-http.rule=Host(`psitransfer.regispailler.fr`)"
+      - "traefik.http.routers.psitransfer-http.entrypoints=web"
+      - "traefik.http.routers.psitransfer-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+
+
+  # Service Polr (raccourcissement d'URL)
+  polr:
+    image: ajanvier/polr:latest
+    container_name: polr
+    restart: unless-stopped
+    ports:
+      - "8086:80"  # Port pour Polr
+    environment:
+      - DB_HOST=polr-db
+      - DB_DATABASE=polr
+      - DB_USERNAME=polr
+      - DB_PASSWORD=polr_password
+      - APP_NAME=QRCode Regispailler
+      - APP_ADDRESS=http://qrcode.regispailler.fr
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=admin123
+      - SETTING_PUBLIC_INTERFACE=true
+      - SETTING_SHORTEN_PERMISSION=true
+      - SETTING_INDEX_REDIRECT=https://qrcode.regispailler.fr
+    volumes:
+      - ./polr-data:/app/.env
+    networks:
+      - services-network
+    depends_on:
+      - polr-db
+
+  # Base de données pour Polr
+  polr-db:
+    image: mysql:5.7
+    container_name: polr-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=polr
+      - MYSQL_USER=polr
+      - MYSQL_PASSWORD=polr_password
+      - MYSQL_ROOT_PASSWORD=root_password
+    volumes:
+      - ./polr-db-data:/var/lib/mysql
+    networks:
+      - services-network
+
+networks:
+  services-network:
+    driver: bridge
+
+volumes:
+  pdf-data:
+  pdf-uploads:
+  pdf-temp:
+  metube-downloads:
+  psitransfer-data:
+  polr-data:
+  polr-db-data:
