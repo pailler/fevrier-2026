@@ -876,6 +876,7 @@ export default function CardDetailPage() {
             </div>
 
             {/* Sidebar */}
+            {!isLibrespeed && (
             <div className="space-y-8">
               {/* Carte d'action */}
               <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
@@ -1266,6 +1267,7 @@ export default function CardDetailPage() {
                 </div>
               )}
             </div>
+            )}
           </div>
         </div>
       </main>
