@@ -163,22 +163,39 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             </div>
           )}
           
-          {/* Style spécial pour librespeed - informations visibles en permanence */}
-          {isLibrespeed ? (
-            <>
-              {/* Badge catégorie en haut à gauche */}
-              <div className="absolute top-3 left-3 z-20">
-                <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                  {module.category}
-                </span>
-              </div>
-              
-              {/* Badge prix en haut à droite */}
-              <div className="absolute top-3 right-3 z-20">
-                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
-                </span>
-              </div>
+                     {/* Style spécial pour librespeed - informations visibles en permanence */}
+           {isLibrespeed ? (
+             <>
+               {/* Badge catégorie en haut à gauche */}
+               <div className="absolute top-3 left-3 z-20">
+                 <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                   {module.category}
+                 </span>
+               </div>
+               
+               {/* Logo librespeed en haut à droite */}
+               <div className="absolute top-3 right-3 z-20">
+                 <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                   {/* Icône speedomètre/gauge */}
+                   <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <circle cx="12" cy="12" r="10" strokeWidth="2" className="text-gray-300"/>
+                     <path 
+                       d="M12 2v10l8 4" 
+                       strokeWidth="2" 
+                       strokeLinecap="round" 
+                       className="text-blue-600"
+                     />
+                     <circle cx="12" cy="12" r="2" fill="currentColor" className="text-blue-600"/>
+                   </svg>
+                 </div>
+               </div>
+               
+               {/* Badge prix en haut à droite, décalé vers la gauche */}
+               <div className="absolute top-3 right-16 z-20">
+                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                   {formatPrice(module.price)}
+                 </span>
+               </div>
               
               {/* Overlay avec titre et sous-titre en bas - visible en permanence */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
