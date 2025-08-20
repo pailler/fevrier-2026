@@ -789,16 +789,6 @@ export default function CardDetailPage() {
                      )}
                    </div>
                  </div>
-
-                 ) : (
-                   <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center">
-                     <div className="text-center p-8">
-                       <div className="text-6xl mb-4">🎥</div>
-                       <h3 className="text-xl font-semibold text-gray-700 mb-2">Démonstration vidéo</h3>
-                       <p className="text-gray-500">Vidéo temporairement indisponible</p>
-                     </div>
-                   </div>
-                 )}
               </div>
             </div>
 
