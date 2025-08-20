@@ -643,7 +643,7 @@ export default function CardDetailPage() {
                    // Bouton d'accès gratuit pour les modules gratuits (uniquement si connecté)
                    <>
                      <button 
-                       className="w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                       className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                        onClick={async () => {
                          if (!session) {
                            alert('Connectez-vous pour accéder à ce module');
@@ -670,7 +670,7 @@ export default function CardDetailPage() {
                    <div className="space-y-4">
                      {!['PSitransfer', 'PDF+', 'Librespeed'].includes(card.title) && (
                        <button 
-                         className={`w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
+                         className={`w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
                            isCardSelected(card.id)
                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
                              : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
@@ -685,7 +685,7 @@ export default function CardDetailPage() {
                      {/* Bouton "Activer la sélection" pour les modules payants */}
                      {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && (
                        <button 
-                         className="w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                          onClick={async () => {
                            if (!session) {
                              window.location.href = '/login';
@@ -734,7 +734,7 @@ export default function CardDetailPage() {
                      {/* Bouton JWT - visible seulement si l'utilisateur a accès au module */}
                      {session && userSubscriptions[`module_${card.id}`] && (
                        <button 
-                         className="w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                          onClick={async () => {
                            // Pour tous les modules, utiliser la fonction générique
                            await accessModuleWithJWT(card.title, card.id);
