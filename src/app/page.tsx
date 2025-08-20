@@ -349,32 +349,39 @@ export default function Home() {
 
       return matchesSearch && matchesPrice && matchesProfession && matchesCategory;
     })
-    .sort((a, b) => {
-      // Tri principal : modules gratuits en premier, puis modules payants
-      const aIsFree = a.price === '0';
-      const bIsFree = b.price === '0';
-      
-      if (aIsFree && !bIsFree) return -1; // a (gratuit) avant b (payant)
-      if (!aIsFree && bIsFree) return 1;  // b (gratuit) avant a (payant)
-      
-      // Si les deux modules ont le même type (gratuit ou payant), appliquer le tri secondaire
-      switch (sortBy) {
-        case 'most_used':
-          return (b.usage_count || 0) - (a.usage_count || 0);
-        case 'least_used':
-          return (a.usage_count || 0) - (b.usage_count || 0);
-        case 'price_high':
-          return (b.price || 0) - (a.price || 0);
-        case 'price_low':
-          return (a.price || 0) - (b.price || 0);
-        case 'name_az':
-          return a.title.localeCompare(b.title);
-        case 'name_za':
-          return b.title.localeCompare(a.title);
-        default:
-          return 0;
-      }
-    });
+         .sort((a, b) => {
+       // Tri spécial : librespeed toujours en premier
+       const aIsLibrespeed = a.title.toLowerCase().includes('librespeed') || a.id === 'librespeed';
+       const bIsLibrespeed = b.title.toLowerCase().includes('librespeed') || b.id === 'librespeed';
+       
+       if (aIsLibrespeed && !bIsLibrespeed) return -1; // librespeed en premier
+       if (!aIsLibrespeed && bIsLibrespeed) return 1;  // librespeed en premier
+       
+       // Tri principal : modules gratuits en premier, puis modules payants
+       const aIsFree = a.price === '0';
+       const bIsFree = b.price === '0';
+       
+       if (aIsFree && !bIsFree) return -1; // a (gratuit) avant b (payant)
+       if (!aIsFree && bIsFree) return 1;  // b (gratuit) avant a (payant)
+       
+       // Si les deux modules ont le même type (gratuit ou payant), appliquer le tri secondaire
+       switch (sortBy) {
+         case 'most_used':
+           return (b.usage_count || 0) - (a.usage_count || 0);
+         case 'least_used':
+           return (a.usage_count || 0) - (b.usage_count || 0);
+         case 'price_high':
+           return (b.price || 0) - (a.price || 0);
+         case 'price_low':
+           return (a.price || 0) - (b.price || 0);
+         case 'name_az':
+           return a.title.localeCompare(b.title);
+         case 'name_za':
+           return b.title.localeCompare(a.title);
+         default:
+           return 0;
+       }
+     });
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
