@@ -529,6 +529,9 @@ export default function CardDetailPage() {
                 <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
                   Testez votre vitesse internet en temps réel
                 </h1>
+                <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
+                  {card.category?.toUpperCase() || 'WEB TOOLS'}
+                </span>
                 <p className="text-xl text-blue-100 mb-6">
                   LibreSpeed vous offre une analyse précise et détaillée de vos performances réseau avec une interface moderne et intuitive.
                 </p>
@@ -772,9 +775,6 @@ export default function CardDetailPage() {
               <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
                                  <div className="mb-8">
                    <div className="flex-1">
-                     <span className="inline-block px-4 py-2 bg-gradient-to-r from-green-400 to-emerald-500 text-white text-sm font-bold rounded-full mb-6 shadow-lg">
-                       {card.category?.toUpperCase() || 'IA ASSISTANT'}
-                     </span>
                      {!isLibrespeed && (
                        <>
                          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-2 leading-tight">
