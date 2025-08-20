@@ -13,9 +13,9 @@ COPY package*.json ./
 # Installer toutes les dépendances (nécessaires pour le build)
 RUN npm ci
 
-# Copier les fichiers d'environnement pour le build
-COPY env.production ./.env.production
-COPY env.production ./.env.local
+# Copier les fichiers d'environnement pour le build (optionnel)
+COPY env.production.local ./.env.production
+COPY env.production.local ./.env.local
 
 # Copier le code source
 COPY . .

@@ -10,16 +10,50 @@ export default function CommunityPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Article Header */}
-      <div className="article-header">
-        <div className="header-image">
-          <img src="/images/communaute-ia-interface.svg" alt="Communauté IA collaborative" className="hero-image" />
+      {/* Section héros */}
+      <section className="bg-gradient-to-br from-yellow-100 via-green-50 to-green-200 py-16 relative overflow-hidden">
+        {/* Effet de particules en arrière-plan */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-2 h-2 bg-yellow-400/30 rounded-full animate-pulse"></div>
+          <div className="absolute top-20 right-20 w-1 h-1 bg-green-400/25 rounded-full animate-bounce"></div>
+          <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-yellow-500/20 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-green-500/30 rounded-full animate-bounce"></div>
+          <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-yellow-600/15 rounded-full animate-pulse"></div>
         </div>
-        <div className="header-overlay">
-          <h1 className="hero-title">Construire une communauté IA engagée</h1>
-          <p className="hero-subtitle">Créez et animez une communauté dynamique qui accélère l'adoption de l'IA</p>
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+            {/* Contenu texte */}
+            <div className="flex-1 max-w-2xl">
+              <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
+                Construire une communauté IA engagée
+              </h1>
+              <p className="text-xl text-gray-700 mb-6">
+                Créez et animez une communauté dynamique qui accélère l'adoption de l'IA
+              </p>
+            </div>
+            
+            {/* Illustration */}
+            <div className="flex-1 flex justify-center">
+              <div className="relative w-80 h-64">
+                {/* Formes géométriques abstraites */}
+                <div className="absolute top-0 left-0 w-24 h-24 bg-red-400 rounded-full opacity-60 animate-pulse"></div>
+                <div className="absolute top-16 right-0 w-20 h-20 bg-yellow-400 rounded-lg opacity-60 animate-bounce"></div>
+                <div className="absolute bottom-0 left-16 w-20 h-20 bg-green-400 transform rotate-45 opacity-60 animate-pulse"></div>
+                <div className="absolute bottom-16 right-16 w-16 h-16 bg-blue-400 rounded-full opacity-60 animate-bounce"></div>
+                
+                {/* Éléments centraux */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-left">
+                    <div className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-green-700 bg-clip-text text-transparent mb-3">IAHome</div>
+                    <div className="text-xs text-gray-600">Intelligence Artificielle</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* Article Content */}
       <div className="max-w-4xl mx-auto px-4 py-8">

@@ -187,9 +187,9 @@ export default function Header() {
             
             {/* Boutons à droite - Desktop */}
             <div className="hidden md:flex items-center space-x-4">
-              <button className="text-gray-700 font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-                Contact commercial
-              </button>
+              <Link href="/contact" className="text-gray-700 font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors">
+                Contact
+              </Link>
             </div>
 
             {/* Menu mobile */}
@@ -218,9 +218,9 @@ export default function Header() {
                 
                 {/* Boutons mobile */}
                 <div className="flex flex-col space-y-2 pt-3 border-t border-gray-200">
-                  <button className="text-gray-700 font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-left">
-                    Contact commercial
-                  </button>
+                  <Link href="/contact" className="text-gray-700 font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-left">
+                    Contact
+                  </Link>
                 </div>
               </div>
             </div>

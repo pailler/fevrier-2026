@@ -202,25 +202,52 @@ export default function BlogPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex-1"></div>
-            <div className="flex-1 text-center">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+      {/* Section héros */}
+      <section className="bg-gradient-to-br from-yellow-100 via-green-50 to-green-200 py-16 relative overflow-hidden">
+        {/* Effet de particules en arrière-plan */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-2 h-2 bg-yellow-400/30 rounded-full animate-pulse"></div>
+          <div className="absolute top-20 right-20 w-1 h-1 bg-green-400/25 rounded-full animate-bounce"></div>
+          <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-yellow-500/20 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-green-500/30 rounded-full animate-bounce"></div>
+          <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-yellow-600/15 rounded-full animate-pulse"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+            {/* Contenu texte */}
+            <div className="flex-1 max-w-2xl">
+              <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
                 Blog IAHome
               </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              <p className="text-xl text-gray-700 mb-6">
                 L'intelligence artificielle : les outils, les ressources et les meilleures pratiques
               </p>
             </div>
-            <div className="flex-1 flex justify-end">
-              {/* Bouton supprimé - redondant avec le bouton flottant */}
+            
+            {/* Illustration */}
+            <div className="flex-1 flex justify-center">
+              <div className="relative w-80 h-64">
+                {/* Formes géométriques abstraites */}
+                <div className="absolute top-0 left-0 w-24 h-24 bg-red-400 rounded-full opacity-60 animate-pulse"></div>
+                <div className="absolute top-16 right-0 w-20 h-20 bg-yellow-400 rounded-lg opacity-60 animate-bounce"></div>
+                <div className="absolute bottom-0 left-16 w-20 h-20 bg-green-400 transform rotate-45 opacity-60 animate-pulse"></div>
+                <div className="absolute bottom-16 right-16 w-16 h-16 bg-blue-400 rounded-full opacity-60 animate-bounce"></div>
+                
+                {/* Éléments centraux */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-left">
+                    <div className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-green-700 bg-clip-text text-transparent mb-3">IAHome</div>
+                    <div className="text-xs text-gray-600">Intelligence Artificielle</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+      </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 
         {/* Filtres */}
         <div className="mb-8">

@@ -68,3 +68,14 @@ next-env.d.ts
 # OS
 Thumbs.db
 .DS_Store
+
+# Docker services data
+docker-services/*/mysql.sock
+docker-services/*/ib_buffer_pool
+docker-services/*/ib_logfile*
+docker-services/*/auto.cnf
+docker-services/pdf-temp/
+docker-services/polr-db-data/
+docker-services/portainer-data/
+docker-services/psitransfer-data/
+docker-services/metube-downloads/

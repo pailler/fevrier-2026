@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '../../../utils/supabaseClient';
 import Link from 'next/link';
@@ -43,12 +43,17 @@ export default function CardDetailPage() {
   const [quickAccessAttempted, setQuickAccessAttempted] = useState(false);
 
   // Vérifier si c'est le module librespeed pour appliquer un style spécial
-  const isLibrespeed = card?.title.toLowerCase().includes('librespeed') || card?.id === 'librespeed';
+  const isLibrespeed = Boolean(card?.title?.toLowerCase().includes('librespeed') || card?.id === 'librespeed');
 
   // Fonction pour accéder aux modules avec JWT
-  const accessModuleWithJWT = async (moduleTitle: string, moduleId: string) => {
+  const accessModuleWithJWT = useCallback(async (moduleTitle: string, moduleId: string) => {
     if (!session?.user?.id) {
       alert('Vous devez être connecté pour accéder aux modules');
+      return;
+    }
+
+    if (!moduleTitle || !moduleId) {
+      console.error('❌ Paramètres manquants:', { moduleTitle, moduleId });
       return;
     }
 
@@ -56,11 +61,8 @@ export default function CardDetailPage() {
       // Gestion spéciale pour Metube avec lien direct
       if (moduleTitle.toLowerCase().includes('metube') || moduleTitle.toLowerCase().includes('me tube')) {
         console.log('🔑 Accès direct à Metube via iframe');
-        
-        // Utiliser directement l'URL de Metube dans l'iframe
         const metubeUrl = 'https://metube.regispailler.fr';
         console.log('🔗 URL d\'accès Metube directe:', metubeUrl);
-        
         setIframeModal({
           isOpen: true,
           url: metubeUrl,
@@ -72,11 +74,8 @@ export default function CardDetailPage() {
       // Gestion spéciale pour PDF avec lien direct
       if (moduleTitle.toLowerCase().includes('pdf') || moduleTitle.toLowerCase().includes('pdf+')) {
         console.log('🔑 Accès direct à PDF via iframe');
-        
-        // Utiliser directement l'URL de PDF dans l'iframe
         const pdfUrl = 'https://pdf.regispailler.fr';
         console.log('🔗 URL d\'accès PDF directe:', pdfUrl);
-        
         setIframeModal({
           isOpen: true,
           url: pdfUrl,
@@ -88,114 +87,11 @@ export default function CardDetailPage() {
       // Gestion spéciale pour LibreSpeed avec lien direct
       if (moduleTitle.toLowerCase().includes('librespeed') || moduleTitle.toLowerCase().includes('speed')) {
         console.log('🔑 Accès direct à LibreSpeed via iframe');
-        
-        // Utiliser directement l'URL de LibreSpeed dans l'iframe
         const librespeedUrl = 'https://librespeed.regispailler.fr';
         console.log('🔗 URL d\'accès LibreSpeed directe:', librespeedUrl);
-        
         setIframeModal({
           isOpen: true,
           url: librespeedUrl,
-          title: moduleTitle
-        });
-        return;
-      }
-
-      // Gestion spéciale pour PSITransfer avec lien direct
-      if (moduleTitle.toLowerCase().includes('psitransfer') || moduleTitle.toLowerCase().includes('transfer')) {
-        console.log('🔑 Accès direct à PSITransfer via iframe');
-        
-        // Utiliser directement l'URL de PSITransfer dans l'iframe
-        const psitransferUrl = 'https://psitransfer.regispailler.fr';
-        console.log('🔗 URL d\'accès PSITransfer directe:', psitransferUrl);
-        
-        setIframeModal({
-          isOpen: true,
-          url: psitransferUrl,
-          title: moduleTitle
-        });
-        return;
-      }
-
-      // Gestion spéciale pour RuinedFooocus avec tokens Gradio
-      if (moduleTitle.toLowerCase() === 'ruinedfooocus') {
-        console.log('🔑 Génération du token Gradio pour RuinedFooocus');
-        
-        const response = await fetch('/api/generate-gradio-token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session?.access_token}`
-          },
-          body: JSON.stringify({
-            moduleId: moduleId,
-            moduleTitle: moduleTitle
-          }),
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
-        }
-        
-        const { token: gradioToken, expiresAt } = await response.json();
-        console.log('✅ Token Gradio généré avec succès');
-        
-        // Construire l'URL sécurisée avec le token
-        const secureUrl = `/api/gradio-secure?token=${gradioToken}`;
-        console.log('🔗 URL d\'accès Gradio sécurisée:', secureUrl);
-        
-        setIframeModal({
-          isOpen: true,
-          url: secureUrl,
-          title: moduleTitle
-        });
-        return;
-      }
-
-      // Gestion spéciale pour les adresses locales
-      if (moduleTitle.toLowerCase().includes('local') || moduleTitle.toLowerCase().includes('192.168')) {
-        console.log('🔑 Génération du token local pour:', moduleTitle);
-        
-        // Déterminer l'URL locale basée sur le titre du module
-        let targetUrl = 'http://192.168.1.150:7870'; // URL par défaut
-        
-        if (moduleTitle.toLowerCase().includes('192.168.1.150')) {
-          targetUrl = 'http://192.168.1.150:7870';
-        } else if (moduleTitle.toLowerCase().includes('192.168.1.100')) {
-          targetUrl = 'http://192.168.1.100:8080';
-        } else if (moduleTitle.toLowerCase().includes('192.168.1.200')) {
-          targetUrl = 'http://192.168.1.200:3000';
-        }
-        
-        const response = await fetch('/api/generate-local-token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session?.access_token}`
-          },
-          body: JSON.stringify({
-            targetUrl: targetUrl,
-            moduleTitle: moduleTitle,
-            moduleId: moduleId
-          }),
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
-        }
-        
-        const { token: localToken, expiresAt } = await response.json();
-        console.log('✅ Token local généré avec succès');
-        
-        // Construire l'URL sécurisée avec le token
-        const secureUrl = `/api/local-proxy?token=${localToken}`;
-        console.log('🔗 URL d\'accès local sécurisée:', secureUrl);
-        
-        setIframeModal({
-          isOpen: true,
-          url: secureUrl,
           title: moduleTitle
         });
         return;
@@ -210,7 +106,7 @@ export default function CardDetailPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`
+          'Authorization': `Bearer ${session?.access_token || ''}`
         },
         body: JSON.stringify({
           moduleId: moduleId,
@@ -220,45 +116,57 @@ export default function CardDetailPage() {
       });
       
       if (!response.ok) {
-        const errorData = await response.json();
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = { error: `Erreur HTTP ${response.status}` };
+        }
         throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
       }
       
-      const { accessToken, moduleName } = await response.json();
+      let responseData;
+      try {
+        responseData = await response.json();
+      } catch (error) {
+        throw new Error('Erreur lors du parsing de la réponse');
+      }
+      
+      const { accessToken, moduleName } = responseData;
       console.log('✅ Token JWT généré avec succès');
       
       const moduleUrls: { [key: string]: string } = {
         'stablediffusion': 'https://stablediffusion.regispailler.fr',
         'iaphoto': 'https://iaphoto.regispailler.fr', 
-        'metube': 'https://metube.regispailler.fr', // Mise à jour pour utiliser l'URL directe
-        'ia metube': 'https://metube.regispailler.fr', // Mise à jour pour utiliser l'URL directe
+        'metube': 'https://metube.regispailler.fr',
+        'ia metube': 'https://metube.regispailler.fr',
         'chatgpt': 'https://chatgpt.regispailler.fr',
-        'librespeed': 'https://librespeed.regispailler.fr', // Mise à jour pour utiliser l'URL directe
+        'librespeed': 'https://librespeed.regispailler.fr',
         'psitransfer': 'https://psitransfer.regispailler.fr',
-        'pdf+': 'https://pdf.regispailler.fr', // Mise à jour pour utiliser l'URL directe
-        'pdf': 'https://pdf.regispailler.fr', // Ajout de l'alias PDF
+        'pdf+': 'https://pdf.regispailler.fr',
+        'pdf': 'https://pdf.regispailler.fr',
         'aiassistant': 'https://aiassistant.regispailler.fr',
         'cogstudio': 'https://cogstudio.regispailler.fr',
         'ruinedfooocus': '/api/gradio-secure',
         'invoke': 'https://invoke.regispailler.fr'
       };
-      // Normaliser le nom de module pour l'indexation
+
       const normalizedName = (moduleName || '').toLowerCase().replace(/\s+/g, '');
       let baseUrl = moduleUrls[normalizedName];
+      
       if (!baseUrl) {
-        // Essayer à partir du titre de la carte si présent
         const titleKey = (moduleTitle || '').toLowerCase().replace(/\s+/g, '');
         baseUrl = moduleUrls[titleKey];
       }
-      // Dernier recours: si c'est Librespeed, forcer l'URL directe
+      
       if (!baseUrl && ((moduleName || '').toLowerCase().includes('librespeed') || (moduleTitle || '').toLowerCase().includes('librespeed'))) {
         baseUrl = 'https://librespeed.regispailler.fr';
       }
-      // Fallback par défaut si rien trouvé
+      
       if (!baseUrl) {
-        baseUrl = 'https://metube.regispailler.fr'; // Mise à jour du fallback
+        baseUrl = 'https://metube.regispailler.fr';
       }
-      // Pour les modules proxy internes, ne pas ajouter le token dans l'URL
+      
       const isProxyModule = baseUrl.startsWith('/api/');
       const accessUrl = isProxyModule ? baseUrl : `${baseUrl}?token=${accessToken}`;
       console.log('🔗 URL d\'accès:', accessUrl);
@@ -272,7 +180,7 @@ export default function CardDetailPage() {
       console.error('❌ Erreur lors de l\'accès:', error);
       alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
-  };
+  }, [session, setIframeModal]);
 
   // Vérifier la session
   useEffect(() => {
@@ -303,14 +211,12 @@ export default function CardDetailPage() {
       }
 
       try {
-        // Essayer d'abord avec module_access (table plus courante)
         let { data: accessData, error: accessError } = await supabase
           .from('module_access')
           .select('*')
           .eq('user_id', session.user.id)
           .eq('access_type', 'active');
 
-        // Si module_access n'existe pas, essayer access_modules
         if (accessError) {
           console.log('⚠️ Table module_access non trouvée, essai avec access_modules...');
           const { data: altData, error: altError } = await supabase
@@ -339,7 +245,6 @@ export default function CardDetailPage() {
         
         for (const access of accessData || []) {
           try {
-            // Créer une clé simple basée sur l'ID du module
             const moduleKey = `module_${access.module_id}`;
             subscriptions[moduleKey] = {
               module_id: access.module_id,
@@ -371,12 +276,14 @@ export default function CardDetailPage() {
 
   // Charger les modules sélectionnés depuis le localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('selectedCards');
-    if (saved) {
-      try {
-        setSelectedCards(JSON.parse(saved));
-      } catch {
-        setSelectedCards([]);
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('selectedCards');
+      if (saved) {
+        try {
+          setSelectedCards(JSON.parse(saved));
+        } catch {
+          setSelectedCards([]);
+        }
       }
     }
   }, []);
@@ -401,7 +308,6 @@ export default function CardDetailPage() {
 
         if (data) {
           setCard(data);
-          // Debug info
           console.log('🔍 Debug card:', data.title, 'price:', data.price, 'price type:', typeof data.price, 'session:', !!session);
         }
       } catch (error) {
@@ -418,22 +324,18 @@ export default function CardDetailPage() {
   // Gérer l'accès rapide
   useEffect(() => {
     const handleQuickAccess = async () => {
-      // Vérifier si on a un paramètre quick_access dans l'URL
       const urlParams = new URLSearchParams(window.location.search);
       const quickAccess = urlParams.get('quick_access');
       
       if (quickAccess === 'true' && card && session && !quickAccessAttempted) {
         setQuickAccessAttempted(true);
         
-        // Vérifier si le module est gratuit
         if (card.price === 0 || card.price === '0') {
           console.log('🚀 Accès rapide demandé pour:', card.title);
           
-          // Attendre un peu pour que la page se charge complètement
           setTimeout(async () => {
             try {
               await accessModuleWithJWT(card.title, card.id);
-              // Nettoyer l'URL
               window.history.replaceState({}, document.title, window.location.pathname);
             } catch (error) {
               console.error('Erreur lors de l\'accès rapide:', error);
@@ -446,9 +348,14 @@ export default function CardDetailPage() {
     if (card && session) {
       handleQuickAccess();
     }
-  }, [card, session, quickAccessAttempted]);
+  }, [card, session, quickAccessAttempted, accessModuleWithJWT]);
 
   const handleSubscribe = (card: Card) => {
+    if (!card?.id) {
+      console.error('❌ Carte invalide:', card);
+      return;
+    }
+
     const isSelected = selectedCards.some(c => c.id === card.id);
     let newSelectedCards;
     
@@ -462,11 +369,15 @@ export default function CardDetailPage() {
     
     console.log('Nouveaux modules sélectionnés:', newSelectedCards);
     setSelectedCards(newSelectedCards);
-    localStorage.setItem('selectedCards', JSON.stringify(newSelectedCards));
-    console.log('localStorage mis à jour');
+    
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('selectedCards', JSON.stringify(newSelectedCards));
+      console.log('localStorage mis à jour');
+    }
   };
 
   const isCardSelected = (cardId: string) => {
+    if (!cardId) return false;
     return selectedCards.some(card => card.id === cardId);
   };
 
@@ -508,20 +419,21 @@ export default function CardDetailPage() {
         </div>
       </div>
 
-             {/* Bannière spéciale pour librespeed */}
-       {isLibrespeed && (
-         <section className="bg-gradient-to-br from-yellow-400 via-blue-500 via-indigo-500 to-emerald-600 py-8 relative overflow-hidden">
-           {/* Effet de particules animées */}
-           <div className="absolute inset-0">
-             <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
-             <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
-             <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
-             <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
-             <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
-           </div>
-           
-           {/* Effet de vague en bas */}
-           <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
+      {/* Bannière spéciale pour librespeed */}
+      {isLibrespeed && (
+        <section className="bg-gradient-to-br from-yellow-400 via-blue-500 via-indigo-500 to-emerald-600 py-8 relative overflow-hidden">
+          {/* Effet de particules animées */}
+          <div className="absolute inset-0">
+            <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+            <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
+            <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
+            <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
+            <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
+          </div>
+          
+          {/* Effet de vague en bas */}
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
+          
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
               {/* Contenu texte */}
@@ -530,7 +442,7 @@ export default function CardDetailPage() {
                   Testez votre vitesse internet en temps réel
                 </h1>
                 <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
-                  {card.category?.toUpperCase() || 'WEB TOOLS'}
+                  {(card?.category || 'WEB TOOLS').toUpperCase()}
                 </span>
                 <p className="text-xl text-blue-100 mb-6">
                   LibreSpeed vous offre une analyse précise et détaillée de vos performances réseau avec une interface moderne et intuitive.
@@ -612,97 +524,96 @@ export default function CardDetailPage() {
               </div>
             </div>
           </div>
-                 </section>
-       )}
+        </section>
+      )}
 
-       {/* Vidéo LibreSpeed - Zone séparée après la bannière */}
-       {isLibrespeed && (
-         <div className="max-w-7xl mx-auto px-6 py-8">
-           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-             {/* Colonne 1 - Vidéo */}
-             <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
-               <iframe
-                 className="w-full h-full rounded-2xl"
-                 src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&modestbranding=1"
-                 title="Démonstration LibreSpeed"
-                 frameBorder="0"
-                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                 allowFullScreen
-               ></iframe>
-             </div>
-             
-             {/* Colonne 2 - Système de boutons */}
-             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-               <div className="text-left mb-8">
-                 <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                   <div className="text-4xl font-bold mb-1">
-                     {card.price === 0 || card.price === '0' ? 'Free' : `€${card.price}`}
-                   </div>
-                   <div className="text-sm opacity-90">
-                     {card.price === 0 || card.price === '0' ? 'Gratuit' : 'par mois'}
-                   </div>
-                 </div>
-               </div>
+      {/* Vidéo LibreSpeed - Zone séparée après la bannière */}
+      {isLibrespeed && (
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {/* Colonne 1 - Vidéo */}
+            <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
+              <iframe
+                className="w-full h-full rounded-2xl"
+                src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&modestbranding=1"
+                title="Démonstration LibreSpeed"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            
+            {/* Colonne 2 - Système de boutons */}
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
+              <div className="text-left mb-8">
+                <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
+                  <div className="text-4xl font-bold mb-1">
+                    {card.price === 0 || card.price === '0' ? 'Free' : `€${card.price}`}
+                  </div>
+                  <div className="text-sm opacity-90">
+                    {card.price === 0 || card.price === '0' ? 'Gratuit' : 'par mois'}
+                  </div>
+                </div>
+              </div>
 
-               <div className="space-y-6">
-                 {/* Boutons d'action */}
-                 {(card.price === 0 || card.price === '0') && session ? (
-                   // Bouton d'accès gratuit pour les modules gratuits (uniquement si connecté)
-                   <>
-                     <button 
-                       className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                       onClick={async () => {
-                         if (!session) {
-                           alert('Connectez-vous pour accéder à ce module');
-                           return;
-                         }
+              <div className="space-y-6">
+                {/* Boutons d'action */}
+                {(card.price === 0 || card.price === '0') && session ? (
+                  // Bouton d'accès gratuit pour les modules gratuits (uniquement si connecté)
+                  <>
+                    <button 
+                      className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                      onClick={async () => {
+                        if (!session) {
+                          alert('Connectez-vous pour accéder à ce module');
+                          return;
+                        }
 
-                         // Utiliser l'accès JWT pour tous les modules gratuits (sécurisé)
-                         console.log('🔍 Ouverture du module gratuit', card.title, 'avec token JWT');
-                         await accessModuleWithJWT(card.title, card.id);
-                       }}
-                     >
-                       <span className="text-xl">🆓</span>
-                       <span>Accéder gratuitement</span>
-                     </button>
-                   </>
-                 ) : (card.price === 0 || card.price === '0') && !session ? (
-                   // Message pour les modules gratuits quand l'utilisateur n'est pas connecté
-                   <a 
-                     href="/login"
-                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
-                   >
-                     <span className="text-xl">🔒</span>
-                     <span>Connectez-vous pour accéder</span>
-                   </a>
-                 ) : (
-                   // Boutons pour les modules payants
-                   <div className="space-y-4">
-                     {!['PSitransfer', 'PDF+', 'Librespeed'].includes(card.title) && (
-                       <button 
-                         className={`w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
-                           isCardSelected(card.id)
-                             ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
-                             : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
-                         }`}
-                         onClick={() => handleSubscribe(card)}
-                       >
-                         <span className="text-xl">🔐</span>
-                         <span>{isCardSelected(card.id) ? 'Sélectionné' : 'Choisir'}</span>
-                       </button>
-                     )}
-                     
-                     {/* Bouton "Activer la sélection" pour les modules payants */}
-                     {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && (
-                       <button 
-                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                         onClick={async () => {
-                           if (!session) {
-                             window.location.href = '/login';
-                             return;
-                           }
+                        console.log('🔍 Ouverture du module gratuit', card.title, 'avec token JWT');
+                        await accessModuleWithJWT(card.title, card.id);
+                      }}
+                    >
+                      <span className="text-xl">🆓</span>
+                      <span>Accéder gratuitement</span>
+                    </button>
+                  </>
+                ) : (card.price === 0 || card.price === '0') && !session ? (
+                  // Message pour les modules gratuits quand l'utilisateur n'est pas connecté
+                  <a 
+                    href="/login"
+                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
+                  >
+                    <span className="text-xl">🔒</span>
+                    <span>Connectez-vous pour accéder</span>
+                  </a>
+                ) : (
+                  // Boutons pour les modules payants
+                  <div className="space-y-4">
+                    {!['PSitransfer', 'PDF+', 'Librespeed'].includes(card.title) && (
+                      <button 
+                        className={`w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
+                          isCardSelected(card.id)
+                            ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
+                            : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
+                        }`}
+                        onClick={() => handleSubscribe(card)}
+                      >
+                        <span className="text-xl">🔐</span>
+                        <span>{isCardSelected(card.id) ? 'Sélectionné' : 'Choisir'}</span>
+                      </button>
+                    )}
+                    
+                    {/* Bouton "Activer la sélection" pour les modules payants */}
+                    {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && (
+                      <button 
+                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                        onClick={async () => {
+                          if (!session) {
+                            window.location.href = '/login';
+                            return;
+                          }
 
-                           try {
+                                                     try {
                              const response = await fetch('/api/create-payment-intent', {
                                method: 'POST',
                                headers: {
@@ -710,169 +621,342 @@ export default function CardDetailPage() {
                                },
                                body: JSON.stringify({
                                  items: [card],
-                                 customerEmail: user?.email,
+                                 customerEmail: user?.email || '',
                                  type: 'payment',
                                }),
                              });
 
-                             if (!response.ok) {
-                               throw new Error(`Erreur HTTP ${response.status}`);
-                             }
+                            if (!response.ok) {
+                              throw new Error(`Erreur HTTP ${response.status}`);
+                            }
 
-                             const { url, error } = await response.json();
+                            const { url, error } = await response.json();
 
-                             if (error) {
-                               throw new Error(`Erreur API: ${error}`);
-                             }
+                            if (error) {
+                              throw new Error(`Erreur API: ${error}`);
+                            }
 
-                             if (url) {
-                               window.location.href = url;
-                             } else {
-                               throw new Error('URL de session Stripe manquante.');
-                             }
-                           } catch (error) {
-                             console.error('Erreur lors de l\'activation:', error);
-                             alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
-                           }
-                         }}
-                       >
-                         <span className="text-xl">⚡</span>
-                         <span>Activer {card.title}</span>
-                       </button>
-                     )}
+                            if (url) {
+                              window.location.href = url;
+                            } else {
+                              throw new Error('URL de session Stripe manquante.');
+                            }
+                          } catch (error) {
+                            console.error('Erreur lors de l\'activation:', error);
+                            alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                          }
+                        }}
+                      >
+                        <span className="text-xl">⚡</span>
+                        <span>Activer {card.title}</span>
+                      </button>
+                    )}
 
-                     {/* Bouton JWT - visible seulement si l'utilisateur a accès au module */}
-                     {session && userSubscriptions[`module_${card.id}`] && (
-                       <button 
-                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                         onClick={async () => {
-                           // Pour tous les modules, utiliser la fonction générique
-                           await accessModuleWithJWT(card.title, card.id);
-                         }}
-                       >
-                         <span className="text-xl">🔑</span>
-                         <span>Accéder à {card.title}</span>
-                       </button>
-                     )}
-                   </div>
-                 )}
-
-
-               </div>
-             </div>
-           </div>
-         </div>
-       )}
-
-       {/* Contenu principal */}
-      <main className="max-w-7xl mx-auto px-6 py-12">
-        <div className="space-y-12">
-          {/* Grille principale */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Colonne principale */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* En-tête de la carte */}
-              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-                                 <div className="mb-8">
-                   <div className="flex-1">
-                     {!isLibrespeed && (
-                       <>
-                         <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-2 leading-tight">
-                           {card.title}
-                         </h1>
-                         {card.subtitle && (
-                           <p className="text-xl text-gray-500 italic mb-6 leading-relaxed max-w-2xl">
-                             {card.subtitle}
-                           </p>
-                         )}
-                       </>
-                     )}
-                   </div>
-                 </div>
-              </div>
-            </div>
-
-
-
-
-          </div>
-        </div>
-      </main>
-
-      {/* Section LibreSpeed en pleine largeur */}
-      {isLibrespeed && (
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 py-20">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-4">
-                Découvrez LibreSpeed
-              </h2>
-              <p className="text-xl text-gray-700 leading-relaxed max-w-4xl mx-auto">
-                LibreSpeed est un outil de test de vitesse internet open-source qui vous permet de mesurer 
-                précisément les performances de votre connexion. Avec une interface moderne et intuitive, 
-                il vous donne accès à des métriques détaillées pour optimiser votre expérience en ligne.
-              </p>
-            </div>
-            
-            {/* Fonctionnalités principales - Largeur réduite */}
-            <div className="max-w-4xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-blue-100 shadow-lg hover:shadow-xl transition-all duration-300">
-                  <div className="flex items-center space-x-4 mb-3">
-                    <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                      <span className="text-xl">⚡</span>
-                    </div>
-                    <h4 className="text-lg font-bold text-blue-900">Test de vitesse précis</h4>
+                    {/* Bouton JWT - visible seulement si l'utilisateur a accès au module */}
+                    {session && userSubscriptions[`module_${card.id}`] && (
+                      <button 
+                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                        onClick={async () => {
+                          await accessModuleWithJWT(card.title, card.id);
+                        }}
+                      >
+                        <span className="text-xl">🔑</span>
+                        <span>Accéder à {card.title}</span>
+                      </button>
+                    )}
                   </div>
-                  <p className="text-gray-700 text-sm">
-                    Mesurez votre débit descendant, montant et votre latence avec une précision exceptionnelle. 
-                    Les tests sont optimisés pour donner des résultats fiables et reproductibles.
-                  </p>
-                </div>
-
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-green-100 shadow-lg hover:shadow-xl transition-all duration-300">
-                  <div className="flex items-center space-x-4 mb-3">
-                    <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
-                      <span className="text-xl">📊</span>
-                    </div>
-                    <h4 className="text-lg font-bold text-green-900">Statistiques avancées</h4>
-                  </div>
-                  <p className="text-gray-700 text-sm">
-                    Visualisez vos résultats avec des graphiques détaillés et des métriques avancées. 
-                    Suivez l'évolution de vos performances dans le temps.
-                  </p>
-                </div>
-
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-purple-100 shadow-lg hover:shadow-xl transition-all duration-300">
-                  <div className="flex items-center space-x-4 mb-3">
-                    <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
-                      <span className="text-xl">🔒</span>
-                    </div>
-                    <h4 className="text-lg font-bold text-purple-900">Sécurité et confidentialité</h4>
-                  </div>
-                  <p className="text-gray-700 text-sm">
-                    Vos données restent privées. LibreSpeed ne collecte aucune information personnelle 
-                    et respecte votre vie privée.
-                  </p>
-                </div>
-
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-100 shadow-lg hover:shadow-xl transition-all duration-300">
-                  <div className="flex items-center space-x-4 mb-3">
-                    <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                      <span className="text-xl">🌐</span>
-                    </div>
-                    <h4 className="text-lg font-bold text-orange-900">Interface moderne</h4>
-                  </div>
-                  <p className="text-gray-700 text-sm">
-                    Une interface utilisateur intuitive et responsive qui s'adapte à tous les appareils. 
-                    Testez votre vitesse depuis n'importe quel navigateur.
-                  </p>
-                </div>
+                )}
               </div>
             </div>
           </div>
         </div>
+      )}
 
+      {/* Contenu principal - seulement pour les modules non-LibreSpeed */}
+      {!isLibrespeed && (
+        <main className="max-w-7xl mx-auto px-6 py-12">
+          <div className="space-y-12">
+            {/* Grille principale */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+              {/* Colonne principale */}
+              <div className="lg:col-span-2 space-y-8">
+                {/* En-tête de la carte */}
+                <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
+                  <div className="mb-8">
+                    <div className="flex-1">
+                      <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-2 leading-tight">
+                        {card.title}
+                      </h1>
+                      {card.subtitle && (
+                        <p className="text-xl text-gray-500 italic mb-6 leading-relaxed max-w-2xl">
+                          {card.subtitle}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      )}
+
+      {/* Section "À propos de" en pleine largeur maximale */}
+      <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8 w-full relative overflow-hidden">
+        {/* Effet de particules en arrière-plan */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-2 h-2 bg-blue-400/20 rounded-full animate-pulse"></div>
+          <div className="absolute top-20 right-20 w-1 h-1 bg-indigo-400/30 rounded-full animate-bounce"></div>
+          <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-purple-400/25 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-blue-400/20 rounded-full animate-bounce"></div>
+          <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-indigo-400/15 rounded-full animate-pulse"></div>
+        </div>
+        
+        <div className="w-full px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-white/50 p-8 sm:p-12 lg:p-16 hover:shadow-3xl transition-all duration-300">
+            <div className="prose max-w-none">
+              <div className="text-center mb-12">
+                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent mb-4">
+                  À propos de {card.title}
+                </h3>
+                <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
+              </div>
+              
+              <div className="space-y-8 sm:space-y-12 text-gray-700">
+                {/* Description principale */}
+                <div className="text-center max-w-5xl mx-auto">
+                  <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
+                    {card.description}
+                  </p>
+                  {card.subtitle && (
+                    <p className="text-base sm:text-lg text-gray-600 italic mb-8">
+                      {card.subtitle}
+                    </p>
+                  )}
+                </div>
+
+                {/* Description détaillée en plusieurs chapitres */}
+                <div className="max-w-6xl mx-auto space-y-8">
+                  {/* Chapitre 1: Qu'est-ce que LibreSpeed */}
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-8 rounded-2xl border border-blue-200 shadow-lg">
+                    <div className="flex items-center mb-6">
+                      <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                        <span className="text-white text-xl font-bold">1</span>
+                      </div>
+                      <h4 className="text-2xl font-bold text-blue-900">Qu'est-ce que LibreSpeed ?</h4>
+                    </div>
+                    <div className="space-y-4 text-gray-700">
+                      <p className="text-lg leading-relaxed">
+                        LibreSpeed est un outil de test de débit Internet open-source et gratuit qui vous permet de mesurer 
+                        précisément les performances de votre connexion. Contrairement aux services traditionnels de test de vitesse, 
+                        LibreSpeed se distingue par son approche respectueuse de la vie privée et son absence totale de publicités.
+                      </p>
+                      <p className="text-base leading-relaxed">
+                        Développé par une communauté de passionnés, cet outil offre une alternative éthique aux géants du web 
+                        qui collectent vos données personnelles à des fins commerciales. LibreSpeed vous donne accès à des métriques 
+                        précises sans compromettre votre confidentialité.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Chapitre 2: Pourquoi choisir LibreSpeed */}
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-8 rounded-2xl border border-green-200 shadow-lg">
+                    <div className="flex items-center mb-6">
+                      <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                        <span className="text-white text-xl font-bold">2</span>
+                      </div>
+                      <h4 className="text-2xl font-bold text-green-900">Pourquoi choisir LibreSpeed ?</h4>
+                    </div>
+                    <div className="space-y-4 text-gray-700">
+                      <p className="text-lg leading-relaxed">
+                        <strong>Respect total de la vie privée :</strong> Aucune donnée personnelle n'est collectée, aucun cookie 
+                        de tracking n'est installé, et aucune publicité n'est affichée. Vos tests restent strictement privés.
+                      </p>
+                      <p className="text-lg leading-relaxed">
+                        <strong>Précision exceptionnelle :</strong> Les algorithmes de test sont optimisés pour fournir des résultats 
+                        fiables et reproductibles, vous donnant une image fidèle de vos performances réseau réelles.
+                      </p>
+                      <p className="text-lg leading-relaxed">
+                        <strong>Interface moderne et intuitive :</strong> Une expérience utilisateur soignée qui s'adapte à tous les 
+                        appareils, des smartphones aux écrans 4K, avec des graphiques en temps réel et des animations fluides.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Chapitre 3: Fonctionnalités avancées */}
+                  <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-8 rounded-2xl border border-purple-200 shadow-lg">
+                    <div className="flex items-center mb-6">
+                      <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                        <span className="text-white text-xl font-bold">3</span>
+                      </div>
+                      <h4 className="text-2xl font-bold text-purple-900">Fonctionnalités avancées</h4>
+                    </div>
+                    <div className="space-y-4 text-gray-700">
+                      <p className="text-lg leading-relaxed">
+                        <strong>Tests complets :</strong> Mesurez votre débit descendant (download), montant (upload), et votre latence 
+                        (ping) avec une précision au milliseconde près. Les tests sont optimisés pour différents types de connexions.
+                      </p>
+                      <p className="text-lg leading-relaxed">
+                        <strong>Statistiques détaillées :</strong> Visualisez vos résultats avec des graphiques interactifs, 
+                        suivez l'évolution de vos performances dans le temps, et exportez vos données pour analyse approfondie.
+                      </p>
+                      <p className="text-lg leading-relaxed">
+                        <strong>Compatibilité universelle :</strong> Fonctionne sur tous les navigateurs modernes (Chrome, Firefox, 
+                        Safari, Edge) et s'adapte automatiquement aux connexions lentes comme aux fibres optiques ultra-rapides.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Chapitre 4: Cas d'usage */}
+                  <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-8 rounded-2xl border border-orange-200 shadow-lg">
+                    <div className="flex items-center mb-6">
+                      <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                        <span className="text-white text-xl font-bold">4</span>
+                      </div>
+                      <h4 className="text-2xl font-bold text-orange-900">Cas d'usage et applications</h4>
+                    </div>
+                    <div className="space-y-4 text-gray-700">
+                      <p className="text-lg leading-relaxed">
+                        <strong>Particuliers :</strong> Vérifiez que votre fournisseur d'accès respecte ses engagements, 
+                        diagnostiquez les problèmes de connexion, et optimisez votre configuration réseau pour de meilleures performances.
+                      </p>
+                      <p className="text-lg leading-relaxed">
+                        <strong>Professionnels :</strong> Testez la qualité de votre connexion professionnelle, validez les performances 
+                        avant des réunions importantes, et documentez les problèmes pour vos fournisseurs de services.
+                      </p>
+                      <p className="text-lg leading-relaxed">
+                        <strong>Développeurs :</strong> Intégrez LibreSpeed dans vos applications pour offrir des tests de vitesse 
+                        intégrés, ou utilisez l'API pour créer des outils de monitoring personnalisés.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Chapitre 5: Sécurité et confidentialité */}
+                  <div className="bg-gradient-to-r from-red-50 to-pink-50 p-8 rounded-2xl border border-red-200 shadow-lg">
+                    <div className="flex items-center mb-6">
+                      <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                        <span className="text-white text-xl font-bold">5</span>
+                      </div>
+                      <h4 className="text-2xl font-bold text-red-900">Sécurité et confidentialité</h4>
+                    </div>
+                    <div className="space-y-4 text-gray-700">
+                      <p className="text-lg leading-relaxed">
+                        <strong>Données locales :</strong> Tous les calculs sont effectués localement dans votre navigateur. 
+                        Aucune information n'est envoyée à des serveurs tiers ou stockée sans votre consentement explicite.
+                      </p>
+                      <p className="text-lg leading-relaxed">
+                        <strong>Code open-source :</strong> Le code source est entièrement transparent et auditable par la communauté. 
+                        Vous pouvez vérifier par vous-même qu'aucune fonction de tracking n'est présente.
+                      </p>
+                      <p className="text-lg leading-relaxed">
+                        <strong>Conformité RGPD :</strong> LibreSpeed respecte strictement les réglementations européennes sur la 
+                        protection des données, garantissant que vos informations restent sous votre contrôle total.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Fonctionnalités principales */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 my-12">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 sm:p-8 rounded-2xl border border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <span className="text-2xl">⚡</span>
+                      </div>
+                      <h4 className="font-bold text-blue-900 mb-3 text-lg">Performance</h4>
+                      <p className="text-gray-700 text-sm">Optimisé pour des performances exceptionnelles et une expérience utilisateur fluide.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 sm:p-8 rounded-2xl border border-green-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <span className="text-2xl">🔒</span>
+                      </div>
+                      <h4 className="font-bold text-green-900 mb-3 text-lg">Sécurité</h4>
+                      <p className="text-gray-700 text-sm">Protection des données et respect de la vie privée garantis.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 sm:p-8 rounded-2xl border border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <span className="text-2xl">🌐</span>
+                      </div>
+                      <h4 className="font-bold text-purple-900 mb-3 text-lg">Accessibilité</h4>
+                      <p className="text-gray-700 text-sm">Compatible avec tous les navigateurs et appareils modernes.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 sm:p-8 rounded-2xl border border-orange-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <span className="text-2xl">📊</span>
+                      </div>
+                      <h4 className="font-bold text-orange-900 mb-3 text-lg">Analytics</h4>
+                      <p className="text-gray-700 text-sm">Statistiques détaillées et métriques avancées pour optimiser vos résultats.</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Informations pratiques */}
+                <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-8 sm:p-12 rounded-2xl border border-gray-200">
+                  <h4 className="text-2xl font-bold text-gray-900 mb-6 text-center">Informations pratiques</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <span className="text-white text-sm font-bold">€</span>
+                      </div>
+                      <div>
+                        <h5 className="font-semibold text-gray-900">Prix</h5>
+                        <p className="text-gray-600 text-sm">
+                          {card.price === 0 || card.price === '0' ? 'Gratuit' : `€${card.price} par mois`}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <span className="text-white text-sm">📱</span>
+                      </div>
+                      <div>
+                        <h5 className="font-semibold text-gray-900">Compatibilité</h5>
+                        <p className="text-gray-600 text-sm">Tous les navigateurs modernes</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <span className="text-white text-sm">⚙️</span>
+                      </div>
+                      <div>
+                        <h5 className="font-semibold text-gray-900">Configuration</h5>
+                        <p className="text-gray-600 text-sm">Aucune installation requise</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Call to action */}
+                <div className="text-center pt-8">
+                  <p className="text-lg sm:text-xl text-gray-700 mb-6 max-w-4xl mx-auto">
+                    Prêt à découvrir {card.title} ? Commencez dès maintenant et profitez de toutes ses fonctionnalités !
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <Link href="/register" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                      <span className="text-xl mr-2">🚀</span>
+                      Commencer maintenant
+                    </Link>
+                    <span className="text-sm text-gray-500">
+                      Accès instantané juste après inscription
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Modal pour l'iframe */}
       {iframeModal.isOpen && (
@@ -908,9 +992,9 @@ export default function CardDetailPage() {
                       : 'allow-scripts allow-forms allow-popups allow-modals allow-same-origin';
                 return (
                   <iframe
-                    src={iframeModal.url}
+                    src={iframeModal.url || ''}
                     className="w-full h-full border-0 rounded"
-                    title={iframeModal.title}
+                    title={iframeModal.title || 'Module'}
                     allowFullScreen
                     sandbox={sandbox}
                     referrerPolicy="no-referrer"

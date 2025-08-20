@@ -132,6 +132,10 @@ export default function Home() {
           console.error('Hint:', modulesError.hint);
         } else {
           console.log('Modules chargés avec succès:', modulesData);
+          console.log('=== DEBUG PRIX DES MODULES ===');
+          modulesData.forEach((module: any) => {
+            console.log(`${module.title}: prix = "${module.price}" (type: ${typeof module.price})`);
+          });
           
           // Traiter les modules avec la structure simple
           const modulesWithRoles = (modulesData || []).map(module => {
@@ -334,10 +338,11 @@ export default function Home() {
           cat.toLowerCase().includes(search.toLowerCase())
         );
 
-      // Filtre de prix
+      // Filtre de prix - Amélioré pour gérer différents formats
+      const isModuleFree = module.price === '0' || module.price === 0 || module.price === 'Gratuit' || module.price === 'gratuit' || module.price === 'FREE' || module.price === 'free';
       const matchesPrice = priceFilter === 'all' || 
-        (priceFilter === 'free' && module.price === '0') ||
-        (priceFilter === 'paid' && module.price !== '0');
+        (priceFilter === 'free' && isModuleFree) ||
+        (priceFilter === 'paid' && !isModuleFree);
 
       // CHANGÉ : matchesExperience -> matchesProfession
       const matchesProfession = professionFilter === 'all' || 
@@ -358,8 +363,8 @@ export default function Home() {
        if (!aIsLibrespeed && bIsLibrespeed) return 1;  // librespeed en premier
        
        // Tri principal : modules gratuits en premier, puis modules payants
-       const aIsFree = a.price === '0';
-       const bIsFree = b.price === '0';
+       const aIsFree = a.price === '0' || a.price === 0 || a.price === 'Gratuit' || a.price === 'gratuit' || a.price === 'FREE' || a.price === 'free';
+       const bIsFree = b.price === '0' || b.price === 0 || b.price === 'Gratuit' || b.price === 'gratuit' || b.price === 'FREE' || b.price === 'free';
        
        if (aIsFree && !bIsFree) return -1; // a (gratuit) avant b (payant)
        if (!aIsFree && bIsFree) return 1;  // b (gratuit) avant a (payant)
@@ -437,16 +442,25 @@ export default function Home() {
       <Breadcrumb />
 
       {/* Section héros */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 py-16">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="bg-gradient-to-br from-yellow-100 via-green-50 to-green-200 py-16 relative overflow-hidden">
+        {/* Effet de particules en arrière-plan */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-2 h-2 bg-yellow-400/30 rounded-full animate-pulse"></div>
+          <div className="absolute top-20 right-20 w-1 h-1 bg-green-400/25 rounded-full animate-bounce"></div>
+          <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-yellow-500/20 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-green-500/30 rounded-full animate-bounce"></div>
+          <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-yellow-600/15 rounded-full animate-pulse"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
-              <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Accès direct à la puissance et aux outils IA
+              <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
+                Accès directs à la puissance GPU, IA et outils essentiels
               </h1>
-              <p className="text-xl text-blue-100 mb-6">
-                L'essentiel de l'IA réuni pour une utilisation simple et directe.
+              <p className="text-xl text-gray-700 mb-6">
+                Le numérique à portée de main, pour une utilisation simple et directe.
               </p>
               
               {/* Barre de recherche et bouton Mes applis */}
@@ -455,16 +469,16 @@ export default function Home() {
                   <input
                     type="text"
                     placeholder="Applis"
-                    className="w-full px-6 py-4 pl-12 pr-16 rounded-xl border-2 border-white/20 bg-white/10 backdrop-blur-sm text-white placeholder-white/70 focus:outline-none focus:border-white focus:ring-4 focus:ring-white/20 transition-all"
+                    className="w-full px-6 py-4 pl-12 pr-16 rounded-xl border-2 border-green-200 bg-white/80 backdrop-blur-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-200 transition-all"
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                   />
                   <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-white/70">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-gray-500">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
                     </svg>
                   </div>
-                  <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors font-medium">
+                  <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-yellow-500 to-green-600 text-white px-4 py-2 rounded-lg hover:from-yellow-600 hover:to-green-700 transition-all font-medium">
                     Rechercher
                   </button>
                 </div>
@@ -487,16 +501,16 @@ export default function Home() {
             <div className="flex-1 flex justify-center">
               <div className="relative w-80 h-64">
                 {/* Formes géométriques abstraites */}
-                <div className="absolute top-0 left-0 w-24 h-24 bg-red-400 rounded-full opacity-80 animate-pulse"></div>
-                <div className="absolute top-16 right-0 w-20 h-20 bg-yellow-400 rounded-lg opacity-80 animate-bounce"></div>
-                <div className="absolute bottom-0 left-16 w-20 h-20 bg-green-400 transform rotate-45 opacity-80 animate-pulse"></div>
-                <div className="absolute bottom-16 right-16 w-16 h-16 bg-white rounded-full opacity-80 animate-bounce"></div>
+                <div className="absolute top-0 left-0 w-24 h-24 bg-red-400 rounded-full opacity-60 animate-pulse"></div>
+                <div className="absolute top-16 right-0 w-20 h-20 bg-yellow-400 rounded-lg opacity-60 animate-bounce"></div>
+                <div className="absolute bottom-0 left-16 w-20 h-20 bg-green-400 transform rotate-45 opacity-60 animate-pulse"></div>
+                <div className="absolute bottom-16 right-16 w-16 h-16 bg-blue-400 rounded-full opacity-60 animate-bounce"></div>
                 
                 {/* Éléments centraux */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-left">
-                    <div className="text-5xl font-bold text-white/30 mb-3">AI</div>
-                    <div className="text-xs text-white/70">Intelligence Artificielle</div>
+                    <div className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-green-700 bg-clip-text text-transparent mb-3">IAHome</div>
+                    <div className="text-xs text-gray-600">Intelligence Artificielle</div>
                   </div>
                 </div>
               </div>

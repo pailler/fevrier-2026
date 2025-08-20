@@ -12,8 +12,6 @@ services:
       - .env.production
     ports:
       - "3000:3000"  # Application Next.js
-    expose:
-      - "3000"
     volumes:
       - ./logs:/app/logs
     networks:
