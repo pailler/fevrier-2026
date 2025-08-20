@@ -504,7 +504,7 @@ export default function CardDetailPage() {
 
              {/* Bannière spéciale pour librespeed */}
        {isLibrespeed && (
-         <section className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 py-8 relative overflow-hidden">
+         <section className="bg-gradient-to-br from-yellow-400 via-blue-500 via-indigo-500 to-emerald-600 py-8 relative overflow-hidden">
            {/* Effet de particules animées */}
            <div className="absolute inset-0">
              <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
@@ -1132,18 +1132,29 @@ export default function CardDetailPage() {
 
       {/* Zones de contenu en pleine largeur avec design moderne */}
       
-      {/* Fonctionnalités - Pleine largeur */}
-      {card.features && card.features.length > 0 && (
-        <div className="bg-gradient-to-br from-white to-blue-50/50 border-t border-gray-200/50 py-20">
+             {/* Fonctionnalités - Pleine largeur */}
+       {card.features && card.features.length > 0 && (
+         <div className="bg-gradient-to-br from-yellow-400 via-blue-500 via-indigo-500 to-emerald-600 py-20 relative overflow-hidden">
+           {/* Effet de particules animées */}
+           <div className="absolute inset-0">
+             <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+             <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
+             <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
+             <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
+             <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
+           </div>
+           
+           {/* Effet de vague en bas */}
+           <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
           <div className="max-w-7xl mx-auto px-6">
-            <div className="text-left mb-16">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-4">
-                Fonctionnalités principales
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Découvrez toutes les fonctionnalités avancées de {card.title}
-              </p>
-            </div>
+                         <div className="text-left mb-16">
+               <h2 className="text-4xl font-bold text-white mb-4">
+                 Fonctionnalités principales
+               </h2>
+               <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+                 Découvrez toutes les fonctionnalités avancées de {card.title}
+               </p>
+             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {card.features.map((feature, index) => (
                 <div key={index} className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
@@ -1162,18 +1173,29 @@ export default function CardDetailPage() {
         </div>
       )}
 
-      {/* Exemples d'utilisation - Pleine largeur */}
-      {card.usage_examples && card.usage_examples.length > 0 && (
-        <div className="bg-gradient-to-br from-gray-50 to-indigo-50/30 py-20">
+             {/* Exemples d'utilisation - Pleine largeur */}
+       {card.usage_examples && card.usage_examples.length > 0 && (
+         <div className="bg-gradient-to-br from-yellow-400 via-blue-500 via-indigo-500 to-emerald-600 py-20 relative overflow-hidden">
+           {/* Effet de particules animées */}
+           <div className="absolute inset-0">
+             <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+             <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
+             <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
+             <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
+             <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
+           </div>
+           
+           {/* Effet de vague en bas */}
+           <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
           <div className="max-w-7xl mx-auto px-6">
-            <div className="text-left mb-16">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-4">
-                Exemples d'utilisation
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Voyez comment {card.title} peut transformer votre workflow
-              </p>
-            </div>
+                         <div className="text-left mb-16">
+               <h2 className="text-4xl font-bold text-white mb-4">
+                 Exemples d'utilisation
+               </h2>
+               <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+                 Voyez comment {card.title} peut transformer votre workflow
+               </p>
+             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               {card.usage_examples.map((example, index) => (
                 <div key={index} className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
@@ -1193,18 +1215,29 @@ export default function CardDetailPage() {
         </div>
       )}
 
-      {/* Étapes d'installation - Pleine largeur */}
-      {card.installation_steps && card.installation_steps.length > 0 && (
-        <div className="bg-gradient-to-br from-white to-blue-50/50 py-20">
+             {/* Étapes d'installation - Pleine largeur */}
+       {card.installation_steps && card.installation_steps.length > 0 && (
+         <div className="bg-gradient-to-br from-yellow-400 via-blue-500 via-indigo-500 to-emerald-600 py-20 relative overflow-hidden">
+           {/* Effet de particules animées */}
+           <div className="absolute inset-0">
+             <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+             <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
+             <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
+             <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
+             <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
+           </div>
+           
+           {/* Effet de vague en bas */}
+           <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
           <div className="max-w-7xl mx-auto px-6">
-            <div className="text-left mb-16">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-4">
-                Installation
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Guide d'installation simple et rapide
-              </p>
-            </div>
+                         <div className="text-left mb-16">
+               <h2 className="text-4xl font-bold text-white mb-4">
+                 Installation
+               </h2>
+               <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+                 Guide d'installation simple et rapide
+               </p>
+             </div>
             <div className="max-w-5xl mx-auto">
               <div className="space-y-8">
                 {card.installation_steps.map((step, index) => (
