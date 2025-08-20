@@ -79,3 +79,18 @@ docker-services/polr-db-data/
 docker-services/portainer-data/
 docker-services/psitransfer-data/
 docker-services/metube-downloads/
+
+# Build and dependencies (can be regenerated)
+node_modules/
+.next/
+build/
+dist/
+
+# Logs
+logs/
+*.log
+
+# IDE
+.cursor/
+.vscode/
+.idea/
