@@ -303,15 +303,35 @@ export default function CardDetailPage() {
       }
 
       try {
-        // Utiliser une requête plus simple sans jointure complexe
-        const { data: accessData, error: accessError } = await supabase
-          .from('access_modules')
+        // Essayer d'abord avec module_access (table plus courante)
+        let { data: accessData, error: accessError } = await supabase
+          .from('module_access')
           .select('*')
           .eq('user_id', session.user.id)
-          .eq('is_active', true);
+          .eq('access_type', 'active');
+
+        // Si module_access n'existe pas, essayer access_modules
+        if (accessError) {
+          console.log('⚠️ Table module_access non trouvée, essai avec access_modules...');
+          const { data: altData, error: altError } = await supabase
+            .from('access_modules')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .eq('is_active', true);
+
+          if (altError) {
+            console.log('⚠️ Table access_modules non trouvée non plus, pas d\'abonnements actifs');
+            setUserSubscriptions({});
+            return;
+          }
+          
+          accessData = altData;
+          accessError = null;
+        }
 
         if (accessError) {
           console.error('❌ Erreur chargement accès:', accessError);
+          setUserSubscriptions({});
           return;
         }
 
@@ -342,6 +362,7 @@ export default function CardDetailPage() {
         setUserSubscriptions(subscriptions);
       } catch (error) {
         console.error('❌ Erreur chargement abonnements:', error);
+        setUserSubscriptions({});
       }
     };
 
