@@ -145,7 +145,8 @@ export default function EncoursPage() {
 
         if (moduleAccessError) {
           console.error('❌ Erreur chargement modules utilisateur:', moduleAccessError);
-          throw new Error(`Erreur lors du chargement des modules: ${moduleAccessError.message || 'Erreur inconnue'}`);
+          const errorMessage = moduleAccessError.message || moduleAccessError.details || moduleAccessError.hint || JSON.stringify(moduleAccessError) || 'Erreur inconnue';
+          throw new Error(`Erreur lors du chargement des modules: ${errorMessage}`);
         }
 
         // Récupérer les tokens d'accès créés manuellement pour cet utilisateur
@@ -184,8 +185,8 @@ export default function EncoursPage() {
 
         if (tokensError) {
           console.error('❌ Erreur chargement tokens:', tokensError);
-          // Ne pas faire échouer complètement si seuls les tokens échouent
-          console.warn('⚠️ Continuation sans les tokens d\'accès');
+          const errorMessage = tokensError.message || tokensError.details || tokensError.hint || JSON.stringify(tokensError) || 'Erreur inconnue';
+          console.warn('⚠️ Continuation sans les tokens d\'accès. Erreur:', errorMessage);
         }
 
         console.log('✅ Modules utilisateur chargés:', moduleAccessData?.length || 0);
