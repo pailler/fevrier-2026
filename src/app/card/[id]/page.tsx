@@ -1238,17 +1238,18 @@ export default function CardDetailPage() {
       )}
 
       {/* Zone de détails du module - Pleine largeur */}
-      <div className="bg-gradient-to-br from-gray-50 to-indigo-50/30 border-t border-gray-200/50 py-20">
-        <div className="max-w-7xl mx-auto px-6">
-                     <div className="text-left mb-16">
-             <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-4">
-               {card.subtitle || card.title}
-             </h2>
-             <div 
-               className="text-xl text-gray-600 max-w-4xl mx-auto"
-               dangerouslySetInnerHTML={{ __html: card.description }}
-             />
-           </div>
+      {!isLibrespeed && (
+        <div className="bg-gradient-to-br from-gray-50 to-indigo-50/30 border-t border-gray-200/50 py-20">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-left mb-16">
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-4">
+                {card.subtitle || card.title}
+              </h2>
+              <div 
+                className="text-xl text-gray-600 max-w-4xl mx-auto"
+                dangerouslySetInnerHTML={{ __html: card.description }}
+              />
+            </div>
           
 
           {/* Avantages clés */}
@@ -1323,6 +1324,7 @@ export default function CardDetailPage() {
 
         </div>
       </div>
+      )}
 
       {/* Modal pour l'iframe */}
       {iframeModal.isOpen && (
