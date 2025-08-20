@@ -645,6 +645,15 @@ export default function CardDetailPage() {
                        </p>
                      </div>
                      
+                     {/* Vidéo réduite */}
+                     <div className="w-full max-w-2xl mx-auto aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center mb-8">
+                       <div className="text-center p-8">
+                         <div className="text-6xl mb-4">🎥</div>
+                         <h3 className="text-xl font-semibold text-gray-700 mb-2">Démonstration LibreSpeed</h3>
+                         <p className="text-gray-500">Vidéo temporairement indisponible</p>
+                       </div>
+                     </div>
+                     
                      {/* Fonctionnalités principales */}
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-blue-100">
