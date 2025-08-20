@@ -173,11 +173,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                  </span>
                </div>
                
-                               {/* Logo librespeed en haut à droite */}
-                <div className="absolute top-3 right-3 z-20">
-                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
-                    {/* Logo speedomètre librespeed fidèle au design original */}
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                               {/* Logo librespeed au centre */}
+                <div className="absolute inset-0 flex items-center justify-center z-20">
+                  <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-blue-500/20">
+                    {/* Logo speedomètre librespeed fidèle au design original - plus grand */}
+                    <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
                       {/* Cercle extérieur gris */}
                       <circle cx="12" cy="12" r="10" stroke="#9CA3AF" strokeWidth="2" fill="none"/>
                       
@@ -224,12 +224,12 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   </div>
                 </div>
                
-               {/* Badge prix en haut à droite, décalé vers la gauche */}
-               <div className="absolute top-3 right-16 z-20">
-                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                   {formatPrice(module.price)}
-                 </span>
-               </div>
+                               {/* Badge prix en haut à droite */}
+                <div className="absolute top-3 right-3 z-20">
+                  <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                    {formatPrice(module.price)}
+                  </span>
+                </div>
               
               {/* Overlay avec titre et sous-titre en bas - visible en permanence */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
