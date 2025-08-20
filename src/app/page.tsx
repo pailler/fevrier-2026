@@ -72,8 +72,7 @@ export default function Home() {
           .from('module_access')
           .select(`
             module_id,
-            expires_at,
-            modules(title)
+            expires_at
           `)
           .eq('user_id', user.id)
           .eq('access_type', 'active')
@@ -81,10 +80,9 @@ export default function Home() {
         
         if (!error && data) {
           const subscriptions: {[key: string]: boolean} = {};
+          // Pour l'instant, on marque juste que l'utilisateur a des accès actifs
           data.forEach(sub => {
-            if (sub.modules && sub.modules.length > 0) {
-              subscriptions[sub.modules[0].title] = true;
-            }
+            subscriptions[`module_${sub.module_id}`] = true;
           });
           setUserSubscriptions(subscriptions);
           console.log('✅ Sélections actives:', subscriptions);
@@ -118,15 +116,10 @@ export default function Home() {
         
         console.log('Tentative de chargement des modules depuis Supabase...');
         
-        // Récupérer les modules avec leurs catégories multiples
+        // Récupérer les modules (structure simple sans jointure)
         const { data: modulesData, error: modulesError } = await supabase
           .from('modules')
-          .select(`
-            *,
-            module_categories (
-              category
-            )
-          `);
+          .select('*');
         
         console.log('Réponse Supabase complète:', { modulesData, modulesError });
         
@@ -140,24 +133,21 @@ export default function Home() {
         } else {
           console.log('Modules chargés avec succès:', modulesData);
           
-          // Traiter les modules avec leurs catégories multiples
+          // Traiter les modules avec la structure simple
           const modulesWithRoles = (modulesData || []).map(module => {
-            // Extraire les catégories depuis la relation module_categories
-            const categories = module.module_categories?.map((mc: any) => mc.category) || [];
-            
-            // Garder la catégorie principale pour la compatibilité
-            const primaryCategory = module.category || categories[0] || 'Non classé';
+            // Utiliser la catégorie directement depuis la table modules
+            const primaryCategory = module.category || 'Non classé';
             
             return {
               ...module,
-              // Catégorie principale (pour compatibilité)
+              // Catégorie principale
               category: cleanCategory(primaryCategory),
-              // Nouvelles catégories multiples
-              categories: categories.map(cleanCategory),
+              // Catégories multiples (utiliser la même catégorie pour compatibilité)
+              categories: [cleanCategory(primaryCategory)],
               // Ajouter des données aléatoires seulement pour l'affichage (pas stockées en DB)
               role: getRandomRole(),
               usage_count: Math.floor(Math.random() * 1000) + 1,
-              profession: getModuleProfession(module.title, primaryCategory) // CHANGÉ : attribution intelligente
+              profession: getModuleProfession(module.title, primaryCategory)
             };
           });
           
