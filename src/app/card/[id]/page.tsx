@@ -615,12 +615,15 @@ export default function CardDetailPage() {
        {/* Vidéo LibreSpeed - Zone séparée après la bannière */}
        {isLibrespeed && (
          <div className="max-w-7xl mx-auto px-6 py-8">
-           <div className="w-full max-w-4xl mx-auto aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center">
-             <div className="text-center p-8">
-               <div className="text-6xl mb-4">🎥</div>
-               <h3 className="text-xl font-semibold text-gray-700 mb-2">Démonstration LibreSpeed</h3>
-               <p className="text-gray-500">Vidéo temporairement indisponible</p>
-             </div>
+           <div className="w-full max-w-4xl mx-auto aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
+             <iframe
+               className="w-full h-full rounded-2xl"
+               src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&modestbranding=1"
+               title="Démonstration LibreSpeed"
+               frameBorder="0"
+               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+               allowFullScreen
+             ></iframe>
            </div>
          </div>
        )}
