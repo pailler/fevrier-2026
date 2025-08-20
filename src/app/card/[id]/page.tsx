@@ -615,15 +615,149 @@ export default function CardDetailPage() {
        {/* Vidéo LibreSpeed - Zone séparée après la bannière */}
        {isLibrespeed && (
          <div className="max-w-7xl mx-auto px-6 py-8">
-           <div className="w-full max-w-4xl mx-auto aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
-             <iframe
-               className="w-full h-full rounded-2xl"
-               src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&modestbranding=1"
-               title="Démonstration LibreSpeed"
-               frameBorder="0"
-               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-               allowFullScreen
-             ></iframe>
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+             {/* Colonne 1 - Vidéo */}
+             <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
+               <iframe
+                 className="w-full h-full rounded-2xl"
+                 src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&modestbranding=1"
+                 title="Démonstration LibreSpeed"
+                 frameBorder="0"
+                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                 allowFullScreen
+               ></iframe>
+             </div>
+             
+             {/* Colonne 2 - Système de boutons */}
+             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
+               <div className="text-left mb-8">
+                 <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
+                   <div className="text-4xl font-bold mb-1">€{card.price}</div>
+                   <div className="text-sm opacity-90">par mois</div>
+                 </div>
+               </div>
+
+               <div className="space-y-6">
+                 {/* Boutons d'action */}
+                 {(card.price === 0 || card.price === '0') && session ? (
+                   // Bouton d'accès gratuit pour les modules gratuits (uniquement si connecté)
+                   <>
+                     <button 
+                       className="w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                       onClick={async () => {
+                         if (!session) {
+                           alert('Connectez-vous pour accéder à ce module');
+                           return;
+                         }
+
+                         // Utiliser l'accès JWT pour tous les modules gratuits (sécurisé)
+                         console.log('🔍 Ouverture du module gratuit', card.title, 'avec token JWT');
+                         await accessModuleWithJWT(card.title, card.id);
+                       }}
+                     >
+                       <span className="text-xl">🆓</span>
+                       <span>Accéder gratuitement</span>
+                     </button>
+                   </>
+                 ) : (card.price === 0 || card.price === '0') && !session ? (
+                   // Message pour les modules gratuits quand l'utilisateur n'est pas connecté
+                   <div className="text-left p-4 bg-gray-100 rounded-lg">
+                     <p className="text-gray-600 mb-2">Module gratuit</p>
+                     <p className="text-sm text-gray-500">Connectez-vous pour accéder à ce module</p>
+                   </div>
+                 ) : (
+                   // Boutons pour les modules payants
+                   <div className="space-y-4">
+                     {!['PSitransfer', 'PDF+', 'Librespeed'].includes(card.title) && (
+                       <button 
+                         className={`w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
+                           isCardSelected(card.id)
+                             ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
+                             : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
+                         }`}
+                         onClick={() => handleSubscribe(card)}
+                       >
+                         <span className="text-xl">🔐</span>
+                         <span>{isCardSelected(card.id) ? 'Sélectionné' : 'Choisir'}</span>
+                       </button>
+                     )}
+                     
+                     {/* Bouton "Activer la sélection" pour les modules payants */}
+                     {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && (
+                       <button 
+                         className="w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                         onClick={async () => {
+                           if (!session) {
+                             window.location.href = '/login';
+                             return;
+                           }
+
+                           try {
+                             const response = await fetch('/api/create-payment-intent', {
+                               method: 'POST',
+                               headers: {
+                                 'Content-Type': 'application/json',
+                               },
+                               body: JSON.stringify({
+                                 items: [card],
+                                 customerEmail: user?.email,
+                                 type: 'payment',
+                               }),
+                             });
+
+                             if (!response.ok) {
+                               throw new Error(`Erreur HTTP ${response.status}`);
+                             }
+
+                             const { url, error } = await response.json();
+
+                             if (error) {
+                               throw new Error(`Erreur API: ${error}`);
+                             }
+
+                             if (url) {
+                               window.location.href = url;
+                             } else {
+                               throw new Error('URL de session Stripe manquante.');
+                             }
+                           } catch (error) {
+                             console.error('Erreur lors de l\'activation:', error);
+                             alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                           }
+                         }}
+                       >
+                         <span className="text-xl">⚡</span>
+                         <span>Activer {card.title}</span>
+                       </button>
+                     )}
+
+                     {/* Bouton JWT - visible seulement si l'utilisateur a accès au module */}
+                     {session && userSubscriptions[`module_${card.id}`] && (
+                       <button 
+                         className="w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                         onClick={async () => {
+                           // Pour tous les modules, utiliser la fonction générique
+                           await accessModuleWithJWT(card.title, card.id);
+                         }}
+                       >
+                         <span className="text-xl">🔑</span>
+                         <span>Accéder à {card.title}</span>
+                       </button>
+                     )}
+                   </div>
+                 )}
+
+                 {!session && (
+                   <div className="bg-gray-50 rounded-xl p-4 text-center">
+                     <p className="text-sm text-gray-600">
+                       <Link href="/login" className="text-blue-600 hover:text-blue-800 font-medium">
+                         Connectez-vous
+                       </Link> {card.price === 0 ? 'pour accéder' : 'pour utiliser le module'}
+                     </p>
+                   </div>
+                 )}
+               </div>
+             </div>
            </div>
          </div>
        )}
