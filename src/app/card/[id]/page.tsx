@@ -609,10 +609,23 @@ export default function CardDetailPage() {
               </div>
             </div>
           </div>
-        </section>
-      )}
+                 </section>
+       )}
 
-      {/* Contenu principal */}
+       {/* Vidéo LibreSpeed - Zone séparée après la bannière */}
+       {isLibrespeed && (
+         <div className="max-w-7xl mx-auto px-6 py-8">
+           <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center">
+             <div className="text-center p-8">
+               <div className="text-6xl mb-4">🎥</div>
+               <h3 className="text-xl font-semibold text-gray-700 mb-2">Démonstration LibreSpeed</h3>
+               <p className="text-gray-500">Vidéo temporairement indisponible</p>
+             </div>
+           </div>
+         </div>
+       )}
+
+       {/* Contenu principal */}
       <main className="max-w-7xl mx-auto px-6 py-12">
         <div className="space-y-12">
           {/* Grille principale */}
@@ -655,14 +668,7 @@ export default function CardDetailPage() {
                        </p>
                      </div>
                      
-                     {/* Vidéo en pleine largeur sur mobile */}
-                     <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center mb-8">
-                       <div className="text-center p-8">
-                         <div className="text-6xl mb-4">🎥</div>
-                         <h3 className="text-xl font-semibold text-gray-700 mb-2">Démonstration LibreSpeed</h3>
-                         <p className="text-gray-500">Vidéo temporairement indisponible</p>
-                       </div>
-                     </div>
+
                      
                      {/* Fonctionnalités principales */}
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
