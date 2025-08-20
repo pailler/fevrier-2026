@@ -665,12 +665,9 @@ export default function CardDetailPage() {
                    </>
                  ) : (card.price === 0 || card.price === '0') && !session ? (
                    // Message pour les modules gratuits quand l'utilisateur n'est pas connecté
-                   <div className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg">
+                   <div className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer">
                      <span className="text-xl">🔒</span>
-                     <div className="text-center">
-                       <div className="text-sm font-medium">Module gratuit</div>
-                       <div className="text-xs opacity-90">Connectez-vous pour accéder</div>
-                     </div>
+                     <span>Connectez-vous pour accéder</span>
                    </div>
                  ) : (
                    // Boutons pour les modules payants
@@ -991,12 +988,9 @@ export default function CardDetailPage() {
                     </>
                   ) : (card.price === 0 || card.price === '0') && !session ? (
                     // Message pour les modules gratuits quand l'utilisateur n'est pas connecté
-                    <div className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg">
+                    <div className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer">
                       <span className="text-xl">🔒</span>
-                      <div className="text-center">
-                        <div className="text-sm font-medium">Module gratuit</div>
-                        <div className="text-xs opacity-90">Connectez-vous pour accéder</div>
-                      </div>
+                      <span>Connectez-vous pour accéder</span>
                     </div>
                   ) : (
                     // Boutons pour les modules payants
