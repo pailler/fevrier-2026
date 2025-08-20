@@ -665,9 +665,12 @@ export default function CardDetailPage() {
                    </>
                  ) : (card.price === 0 || card.price === '0') && !session ? (
                    // Message pour les modules gratuits quand l'utilisateur n'est pas connecté
-                   <div className="text-left p-4 bg-gray-100 rounded-lg">
-                     <p className="text-gray-600 mb-2">Module gratuit</p>
-                     <p className="text-sm text-gray-500">Connectez-vous pour accéder à ce module</p>
+                   <div className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg">
+                     <span className="text-xl">🔒</span>
+                     <div className="text-center">
+                       <div className="text-sm font-medium">Module gratuit</div>
+                       <div className="text-xs opacity-90">Connectez-vous pour accéder</div>
+                     </div>
                    </div>
                  ) : (
                    // Boutons pour les modules payants
@@ -988,9 +991,12 @@ export default function CardDetailPage() {
                     </>
                   ) : (card.price === 0 || card.price === '0') && !session ? (
                     // Message pour les modules gratuits quand l'utilisateur n'est pas connecté
-                    <div className="text-left p-4 bg-gray-100 rounded-lg">
-                      <p className="text-gray-600 mb-2">Module gratuit</p>
-                      <p className="text-sm text-gray-500">Connectez-vous pour accéder à ce module</p>
+                    <div className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg">
+                      <span className="text-xl">🔒</span>
+                      <div className="text-center">
+                        <div className="text-sm font-medium">Module gratuit</div>
+                        <div className="text-xs opacity-90">Connectez-vous pour accéder</div>
+                      </div>
                     </div>
                   ) : (
                     // Boutons pour les modules payants
