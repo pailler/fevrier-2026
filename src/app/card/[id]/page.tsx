@@ -665,10 +665,13 @@ export default function CardDetailPage() {
                    </>
                  ) : (card.price === 0 || card.price === '0') && !session ? (
                    // Message pour les modules gratuits quand l'utilisateur n'est pas connecté
-                   <div className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer">
+                   <a 
+                     href="/login"
+                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
+                   >
                      <span className="text-xl">🔒</span>
                      <span>Connectez-vous pour accéder</span>
-                   </div>
+                   </a>
                  ) : (
                    // Boutons pour les modules payants
                    <div className="space-y-4">
@@ -751,15 +754,7 @@ export default function CardDetailPage() {
                    </div>
                  )}
 
-                 {!session && (
-                   <div className="bg-gray-50 rounded-xl p-4 text-center">
-                     <p className="text-sm text-gray-600">
-                       <Link href="/login" className="text-blue-600 hover:text-blue-800 font-medium">
-                         Connectez-vous
-                       </Link> {card.price === 0 ? 'pour accéder' : 'pour utiliser le module'}
-                     </p>
-                   </div>
-                 )}
+
                </div>
              </div>
            </div>
@@ -988,10 +983,13 @@ export default function CardDetailPage() {
                     </>
                   ) : (card.price === 0 || card.price === '0') && !session ? (
                     // Message pour les modules gratuits quand l'utilisateur n'est pas connecté
-                    <div className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer">
+                    <a 
+                      href="/login"
+                      className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
+                    >
                       <span className="text-xl">🔒</span>
                       <span>Connectez-vous pour accéder</span>
-                    </div>
+                    </a>
                   ) : (
                     // Boutons pour les modules payants
                     <div className="space-y-4">
@@ -1195,15 +1193,7 @@ export default function CardDetailPage() {
                     </div>
                   )}
 
-                  {!session && (
-                    <div className="bg-gray-50 rounded-xl p-4 text-center">
-                      <p className="text-sm text-gray-600">
-                        <Link href="/login" className="text-blue-600 hover:text-blue-800 font-medium">
-                          Connectez-vous
-                        </Link> {card.price === 0 ? 'pour accéder' : 'pour utiliser le module'}
-                      </p>
-                    </div>
-                  )}
+
                 </div>
               </div>
 
