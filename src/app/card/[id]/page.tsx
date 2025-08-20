@@ -615,21 +615,25 @@ export default function CardDetailPage() {
             <div className="lg:col-span-2 space-y-8">
               {/* En-tête de la carte */}
               <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-                <div className="mb-8">
-                  <div className="flex-1">
-                    <span className="inline-block px-4 py-2 bg-gradient-to-r from-green-400 to-emerald-500 text-white text-sm font-bold rounded-full mb-6 shadow-lg">
-                      {card.category?.toUpperCase() || 'IA ASSISTANT'}
-                    </span>
-                    <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-2 leading-tight">
-                      {card.title}
-                    </h1>
-                    {card.subtitle && (
-                      <p className="text-xl text-gray-500 italic mb-6 leading-relaxed max-w-2xl">
-                        {card.subtitle}
-                      </p>
-                    )}
-                  </div>
-                </div>
+                                 <div className="mb-8">
+                   <div className="flex-1">
+                     <span className="inline-block px-4 py-2 bg-gradient-to-r from-green-400 to-emerald-500 text-white text-sm font-bold rounded-full mb-6 shadow-lg">
+                       {card.category?.toUpperCase() || 'IA ASSISTANT'}
+                     </span>
+                     {!isLibrespeed && (
+                       <>
+                         <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-2 leading-tight">
+                           {card.title}
+                         </h1>
+                         {card.subtitle && (
+                           <p className="text-xl text-gray-500 italic mb-6 leading-relaxed max-w-2xl">
+                             {card.subtitle}
+                           </p>
+                         )}
+                       </>
+                     )}
+                   </div>
+                 </div>
 
                                  {/* Zone vidéo/description - Contenu personnalisé pour librespeed */}
                  {isLibrespeed ? (
@@ -645,111 +649,81 @@ export default function CardDetailPage() {
                        </p>
                      </div>
                      
-                                           {/* Vidéo réduite */}
-                      <div className="w-full max-w-2xl mx-auto aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center mb-8">
-                        <div className="text-center p-8">
-                          <div className="text-6xl mb-4">🎥</div>
-                          <h3 className="text-xl font-semibold text-gray-700 mb-2">Démonstration LibreSpeed</h3>
-                          <p className="text-gray-500">Vidéo temporairement indisponible</p>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center">
-                      <div className="text-center p-8">
-                        <div className="text-6xl mb-4">🎥</div>
-                        <h3 className="text-xl font-semibold text-gray-700 mb-2">Démonstration vidéo</h3>
-                        <p className="text-gray-500">Vidéo temporairement indisponible</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                     {/* Vidéo réduite */}
+                     <div className="w-full max-w-2xl mx-auto aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center mb-8">
+                       <div className="text-center p-8">
+                         <div className="text-6xl mb-4">🎥</div>
+                         <h3 className="text-xl font-semibold text-gray-700 mb-2">Démonstration LibreSpeed</h3>
+                         <p className="text-gray-500">Vidéo temporairement indisponible</p>
+                       </div>
+                     </div>
+                     
+                     {/* Fonctionnalités principales */}
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                       <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-blue-100">
+                         <div className="flex items-center space-x-4 mb-3">
+                           <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                             <span className="text-xl">⚡</span>
+                           </div>
+                           <h4 className="text-lg font-bold text-blue-900">Test de vitesse précis</h4>
+                         </div>
+                         <p className="text-gray-700 text-sm">
+                           Mesurez votre débit descendant, montant et votre latence avec une précision exceptionnelle. 
+                           Les tests sont optimisés pour donner des résultats fiables et reproductibles.
+                         </p>
+                       </div>
 
-                {/* Section fonctionnalités séparée pour librespeed */}
-                {isLibrespeed && (
-                  <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-                    <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-6 text-center">
-                      Fonctionnalités principales
-                    </h3>
-                    
-                    {/* Fonctionnalités principales */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-blue-100">
-                        <div className="flex items-center space-x-4 mb-3">
-                          <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                            <span className="text-xl">⚡</span>
-                          </div>
-                          <h4 className="text-lg font-bold text-blue-900">Test de vitesse précis</h4>
-                        </div>
-                        <p className="text-gray-700 text-sm">
-                          Mesurez votre débit descendant, montant et votre latence avec une précision exceptionnelle. 
-                          Les tests sont optimisés pour donner des résultats fiables et reproductibles.
-                        </p>
-                      </div>
+                       <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-green-100">
+                         <div className="flex items-center space-x-4 mb-3">
+                           <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                             <span className="text-xl">📊</span>
+                           </div>
+                           <h4 className="text-lg font-bold text-green-900">Statistiques avancées</h4>
+                         </div>
+                         <p className="text-gray-700 text-sm">
+                           Visualisez vos résultats avec des graphiques détaillés et des métriques avancées. 
+                           Suivez l'évolution de vos performances dans le temps.
+                         </p>
+                       </div>
 
-                      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-green-100">
-                        <div className="flex items-center space-x-4 mb-3">
-                          <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
-                            <span className="text-xl">📊</span>
-                          </div>
-                          <h4 className="text-lg font-bold text-green-900">Statistiques avancées</h4>
-                        </div>
-                        <p className="text-gray-700 text-sm">
-                          Visualisez vos résultats avec des graphiques détaillés et des métriques avancées. 
-                          Suivez l'évolution de vos performances dans le temps.
-                        </p>
-                      </div>
+                       <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-purple-100">
+                         <div className="flex items-center space-x-4 mb-3">
+                           <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                             <span className="text-xl">🔒</span>
+                           </div>
+                           <h4 className="text-lg font-bold text-purple-900">Sécurité et confidentialité</h4>
+                         </div>
+                         <p className="text-gray-700 text-sm">
+                           Vos données restent privées. LibreSpeed ne collecte aucune information personnelle 
+                           et respecte votre vie privée.
+                         </p>
+                       </div>
 
-                      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-purple-100">
-                        <div className="flex items-center space-x-4 mb-3">
-                          <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
-                            <span className="text-xl">🔒</span>
-                          </div>
-                          <h4 className="text-lg font-bold text-purple-900">Sécurité et confidentialité</h4>
-                        </div>
-                        <p className="text-gray-700 text-sm">
-                          Vos données restent privées. LibreSpeed ne collecte aucune information personnelle 
-                          et respecte votre vie privée.
-                        </p>
-                      </div>
+                       <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-100">
+                         <div className="flex items-center space-x-4 mb-3">
+                           <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+                             <span className="text-xl">🌐</span>
+                           </div>
+                           <h4 className="text-lg font-bold text-orange-900">Interface moderne</h4>
+                         </div>
+                         <p className="text-gray-700 text-sm">
+                           Une interface utilisateur intuitive et responsive qui s'adapte à tous les appareils. 
+                           Testez votre vitesse depuis n'importe quel navigateur.
+                         </p>
+                       </div>
+                     </div>
 
-                      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-100">
-                        <div className="flex items-center space-x-4 mb-3">
-                          <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                            <span className="text-xl">🌐</span>
-                          </div>
-                          <h4 className="text-lg font-bold text-orange-900">Interface moderne</h4>
-                        </div>
-                        <p className="text-gray-700 text-sm">
-                          Une interface utilisateur intuitive et responsive qui s'adapte à tous les appareils. 
-                          Testez votre vitesse depuis n'importe quel navigateur.
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Avantages techniques */}
-                    <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200">
-                      <h4 className="text-xl font-bold text-gray-900 mb-4 text-center">Avantages techniques</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="text-center">
-                          <div className="text-2xl mb-2">🚀</div>
-                          <h5 className="font-semibold text-gray-900 mb-1">Performance</h5>
-                          <p className="text-xs text-gray-600">Tests rapides et précis</p>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl mb-2">🛡️</div>
-                          <h5 className="font-semibold text-gray-900 mb-1">Sécurité</h5>
-                          <p className="text-xs text-gray-600">Aucune collecte de données</p>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl mb-2">📱</div>
-                          <h5 className="font-semibold text-gray-900 mb-1">Responsive</h5>
-                          <p className="text-xs text-gray-600">Compatible tous appareils</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                     
+                   </div>
+                 ) : (
+                   <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center">
+                     <div className="text-center p-8">
+                       <div className="text-6xl mb-4">🎥</div>
+                       <h3 className="text-xl font-semibold text-gray-700 mb-2">Démonstration vidéo</h3>
+                       <p className="text-gray-500">Vidéo temporairement indisponible</p>
+                     </div>
+                   </div>
+                 )}
               </div>
             </div>
 
@@ -1151,29 +1125,29 @@ export default function CardDetailPage() {
 
       {/* Zones de contenu en pleine largeur avec design moderne */}
       
-      {/* Fonctionnalités - Pleine largeur */}
-      {card.features && card.features.length > 0 && (
-        <div className="bg-gradient-to-br from-yellow-400 via-blue-500 via-indigo-500 to-emerald-600 py-20 relative overflow-hidden">
-          {/* Effet de particules animées */}
-          <div className="absolute inset-0">
-            <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
-            <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
-            <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
-            <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
-            <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
-          </div>
-          
-          {/* Effet de vague en bas */}
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
+             {/* Fonctionnalités - Pleine largeur */}
+       {card.features && card.features.length > 0 && (
+         <div className="bg-gradient-to-br from-yellow-400 via-blue-500 via-indigo-500 to-emerald-600 py-20 relative overflow-hidden">
+           {/* Effet de particules animées */}
+           <div className="absolute inset-0">
+             <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+             <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
+             <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
+             <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
+             <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
+           </div>
+           
+           {/* Effet de vague en bas */}
+           <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
           <div className="max-w-7xl mx-auto px-6">
-            <div className="text-left mb-16">
-              <h2 className="text-4xl font-bold text-white mb-4">
-                Fonctionnalités principales
-              </h2>
-              <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-                Découvrez toutes les fonctionnalités avancées de {card.title}
-              </p>
-            </div>
+                         <div className="text-left mb-16">
+               <h2 className="text-4xl font-bold text-white mb-4">
+                 Fonctionnalités principales
+               </h2>
+               <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+                 Découvrez toutes les fonctionnalités avancées de {card.title}
+               </p>
+             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {card.features.map((feature, index) => (
                 <div key={index} className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
@@ -1192,29 +1166,29 @@ export default function CardDetailPage() {
         </div>
       )}
 
-      {/* Exemples d'utilisation - Pleine largeur */}
-      {card.usage_examples && card.usage_examples.length > 0 && (
-        <div className="bg-gradient-to-br from-yellow-400 via-blue-500 via-indigo-500 to-emerald-600 py-20 relative overflow-hidden">
-          {/* Effet de particules animées */}
-          <div className="absolute inset-0">
-            <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
-            <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
-            <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
-            <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
-            <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
-          </div>
-          
-          {/* Effet de vague en bas */}
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
+             {/* Exemples d'utilisation - Pleine largeur */}
+       {card.usage_examples && card.usage_examples.length > 0 && (
+         <div className="bg-gradient-to-br from-yellow-400 via-blue-500 via-indigo-500 to-emerald-600 py-20 relative overflow-hidden">
+           {/* Effet de particules animées */}
+           <div className="absolute inset-0">
+             <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+             <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
+             <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
+             <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
+             <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
+           </div>
+           
+           {/* Effet de vague en bas */}
+           <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
           <div className="max-w-7xl mx-auto px-6">
-            <div className="text-left mb-16">
-              <h2 className="text-4xl font-bold text-white mb-4">
-                Exemples d'utilisation
-              </h2>
-              <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-                Voyez comment {card.title} peut transformer votre workflow
-              </p>
-            </div>
+                         <div className="text-left mb-16">
+               <h2 className="text-4xl font-bold text-white mb-4">
+                 Exemples d'utilisation
+               </h2>
+               <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+                 Voyez comment {card.title} peut transformer votre workflow
+               </p>
+             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               {card.usage_examples.map((example, index) => (
                 <div key={index} className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
@@ -1234,29 +1208,29 @@ export default function CardDetailPage() {
         </div>
       )}
 
-      {/* Étapes d'installation - Pleine largeur */}
-      {card.installation_steps && card.installation_steps.length > 0 && (
-        <div className="bg-gradient-to-br from-yellow-400 via-blue-500 via-indigo-500 to-emerald-600 py-20 relative overflow-hidden">
-          {/* Effet de particules animées */}
-          <div className="absolute inset-0">
-            <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
-            <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
-            <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
-            <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
-            <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
-          </div>
-          
-          {/* Effet de vague en bas */}
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
+             {/* Étapes d'installation - Pleine largeur */}
+       {card.installation_steps && card.installation_steps.length > 0 && (
+         <div className="bg-gradient-to-br from-yellow-400 via-blue-500 via-indigo-500 to-emerald-600 py-20 relative overflow-hidden">
+           {/* Effet de particules animées */}
+           <div className="absolute inset-0">
+             <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+             <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
+             <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
+             <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
+             <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
+           </div>
+           
+           {/* Effet de vague en bas */}
+           <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
           <div className="max-w-7xl mx-auto px-6">
-            <div className="text-left mb-16">
-              <h2 className="text-4xl font-bold text-white mb-4">
-                Installation
-              </h2>
-              <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-                Guide d'installation simple et rapide
-              </p>
-            </div>
+                         <div className="text-left mb-16">
+               <h2 className="text-4xl font-bold text-white mb-4">
+                 Installation
+               </h2>
+               <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+                 Guide d'installation simple et rapide
+               </p>
+             </div>
             <div className="max-w-5xl mx-auto">
               <div className="space-y-8">
                 {card.installation_steps.map((step, index) => (
