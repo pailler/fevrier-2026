@@ -42,6 +42,9 @@ export default function CardDetailPage() {
   });
   const [quickAccessAttempted, setQuickAccessAttempted] = useState(false);
 
+  // Vérifier si c'est le module librespeed pour appliquer un style spécial
+  const isLibrespeed = card?.title.toLowerCase().includes('librespeed') || card?.id === 'librespeed';
+
   // Fonction pour accéder aux modules avec JWT
   const accessModuleWithJWT = async (moduleTitle: string, moduleId: string) => {
     if (!session?.user?.id) {
@@ -498,6 +501,99 @@ export default function CardDetailPage() {
           />
         </div>
       </div>
+
+      {/* Bannière spéciale pour librespeed */}
+      {isLibrespeed && (
+        <section className="bg-gradient-to-r from-blue-600 to-blue-800 py-16">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+              {/* Contenu texte */}
+              <div className="flex-1 max-w-2xl">
+                <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
+                  Testez votre vitesse internet en temps réel
+                </h1>
+                <p className="text-xl text-blue-100 mb-6">
+                  LibreSpeed vous offre une analyse précise et détaillée de vos performances réseau avec une interface moderne et intuitive.
+                </p>
+                
+                {/* Badges de fonctionnalités */}
+                <div className="flex flex-wrap gap-3 mb-6">
+                  <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
+                    ⚡ Test de vitesse
+                  </span>
+                  <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
+                    📊 Statistiques détaillées
+                  </span>
+                  <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
+                    🔒 Sécurisé et privé
+                  </span>
+                </div>
+              </div>
+              
+              {/* Logo librespeed animé */}
+              <div className="flex-1 flex justify-center">
+                <div className="relative w-80 h-64">
+                  {/* Formes géométriques abstraites */}
+                  <div className="absolute top-0 left-0 w-24 h-24 bg-red-400 rounded-full opacity-80 animate-pulse"></div>
+                  <div className="absolute top-16 right-0 w-20 h-20 bg-yellow-400 rounded-lg opacity-80 animate-bounce"></div>
+                  <div className="absolute bottom-0 left-16 w-20 h-20 bg-green-400 transform rotate-45 opacity-80 animate-pulse"></div>
+                  <div className="absolute bottom-16 right-16 w-16 h-16 bg-white rounded-full opacity-80 animate-bounce"></div>
+                  
+                  {/* Logo speedomètre centré */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-white/95 backdrop-blur-sm rounded-full p-6 shadow-2xl border-2 border-blue-500/20">
+                      <svg className="w-20 h-20" viewBox="0 0 24 24" fill="none">
+                        {/* Cercle extérieur gris */}
+                        <circle cx="12" cy="12" r="10" stroke="#9CA3AF" strokeWidth="2" fill="none"/>
+                        
+                        {/* Graduations du speedomètre */}
+                        <path d="M12 2 L12 4" stroke="#9CA3AF" strokeWidth="1"/>
+                        <path d="M12 20 L12 22" stroke="#9CA3AF" strokeWidth="1"/>
+                        <path d="M2 12 L4 12" stroke="#9CA3AF" strokeWidth="1"/>
+                        <path d="M20 12 L22 12" stroke="#9CA3AF" strokeWidth="1"/>
+                        
+                        {/* Arc coloré orange/rouge pour la zone critique */}
+                        <path 
+                          d="M12 2 A10 10 0 0 1 20 12" 
+                          stroke="url(#gradient)" 
+                          strokeWidth="3" 
+                          fill="none"
+                          strokeLinecap="round"
+                        />
+                        
+                        {/* Aiguille bleue */}
+                        <path 
+                          d="M12 12 L18 8" 
+                          stroke="#2563EB" 
+                          strokeWidth="2" 
+                          strokeLinecap="round"
+                        />
+                        
+                        {/* Point central */}
+                        <circle cx="12" cy="12" r="2" fill="#2563EB"/>
+                        
+                        {/* Indicateurs digitaux en bas */}
+                        <rect x="8" y="16" width="1" height="1" fill="#9CA3AF"/>
+                        <rect x="10" y="16" width="1" height="1" fill="#9CA3AF"/>
+                        <rect x="12" y="16" width="1" height="1" fill="#9CA3AF"/>
+                        <rect x="14" y="16" width="1" height="1" fill="#9CA3AF"/>
+                        
+                        {/* Gradient pour l'arc coloré */}
+                        <defs>
+                          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor="#F59E0B"/>
+                            <stop offset="100%" stopColor="#EF4444"/>
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Contenu principal */}
       <main className="max-w-7xl mx-auto px-6 py-12">
@@ -1109,6 +1205,103 @@ export default function CardDetailPage() {
               </div>
             </div>
           </div>
+
+          {/* Section détaillée pour librespeed */}
+          {isLibrespeed && (
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-12 mt-12">
+              <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-8 text-center">
+                Découvrez LibreSpeed
+              </h3>
+              
+              <div className="max-w-4xl mx-auto space-y-8">
+                {/* Description détaillée */}
+                <div className="text-center mb-12">
+                  <p className="text-xl text-gray-700 leading-relaxed">
+                    LibreSpeed est un outil de test de vitesse internet open-source qui vous permet de mesurer 
+                    précisément les performances de votre connexion. Avec une interface moderne et intuitive, 
+                    il vous donne accès à des métriques détaillées pour optimiser votre expérience en ligne.
+                  </p>
+                </div>
+
+                {/* Fonctionnalités principales */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100">
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                        <span className="text-2xl">⚡</span>
+                      </div>
+                      <h4 className="text-xl font-bold text-blue-900">Test de vitesse précis</h4>
+                    </div>
+                    <p className="text-gray-700">
+                      Mesurez votre débit descendant, montant et votre latence avec une précision exceptionnelle. 
+                      Les tests sont optimisés pour donner des résultats fiables et reproductibles.
+                    </p>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-100">
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                        <span className="text-2xl">📊</span>
+                      </div>
+                      <h4 className="text-xl font-bold text-green-900">Statistiques avancées</h4>
+                    </div>
+                    <p className="text-gray-700">
+                      Visualisez vos résultats avec des graphiques détaillés et des métriques avancées. 
+                      Suivez l'évolution de vos performances dans le temps.
+                    </p>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 border border-purple-100">
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
+                        <span className="text-2xl">🔒</span>
+                      </div>
+                      <h4 className="text-xl font-bold text-purple-900">Sécurité et confidentialité</h4>
+                    </div>
+                    <p className="text-gray-700">
+                      Vos données restent privées. LibreSpeed ne collecte aucune information personnelle 
+                      et respecte votre vie privée.
+                    </p>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-8 border border-orange-100">
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center">
+                        <span className="text-2xl">🌐</span>
+                      </div>
+                      <h4 className="text-xl font-bold text-orange-900">Interface moderne</h4>
+                    </div>
+                    <p className="text-gray-700">
+                      Une interface utilisateur intuitive et responsive qui s'adapte à tous les appareils. 
+                      Testez votre vitesse depuis n'importe quel navigateur.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Avantages techniques */}
+                <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-8 border border-gray-200">
+                  <h4 className="text-2xl font-bold text-gray-900 mb-6 text-center">Avantages techniques</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="text-center">
+                      <div className="text-3xl mb-2">🚀</div>
+                      <h5 className="font-semibold text-gray-900 mb-2">Performance</h5>
+                      <p className="text-sm text-gray-600">Tests rapides et précis</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-3xl mb-2">🛡️</div>
+                      <h5 className="font-semibold text-gray-900 mb-2">Sécurité</h5>
+                      <p className="text-sm text-gray-600">Aucune collecte de données</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-3xl mb-2">📱</div>
+                      <h5 className="font-semibold text-gray-900 mb-2">Responsive</h5>
+                      <p className="text-sm text-gray-600">Compatible tous appareils</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
