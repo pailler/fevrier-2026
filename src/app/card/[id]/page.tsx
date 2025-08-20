@@ -303,24 +303,10 @@ export default function CardDetailPage() {
       }
 
       try {
+        // Utiliser une requête plus simple sans jointure complexe
         const { data: accessData, error: accessError } = await supabase
           .from('access_modules')
-          .select(`
-            id, 
-            created_at, 
-            access_type, 
-            expires_at, 
-            module_id,
-            current_usage,
-            max_usage,
-            is_active,
-            modules (
-              id,
-              title,
-              price,
-              category
-            )
-          `)
+          .select('*')
           .eq('user_id', session.user.id)
           .eq('is_active', true);
 
@@ -333,21 +319,20 @@ export default function CardDetailPage() {
         
         for (const access of accessData || []) {
           try {
-            // Utiliser les données du module déjà jointes
-            if (access.modules && access.modules.length > 0) {
-              subscriptions[access.modules[0].title] = {
-                ...access.modules[0],
-                access: {
-                  id: access.id,
-                  created_at: access.created_at,
-                  access_type: access.access_type,
-                  expires_at: access.expires_at,
-                  current_usage: access.current_usage,
-                  max_usage: access.max_usage,
-                  is_active: access.is_active
-                }
-              };
-            }
+            // Créer une clé simple basée sur l'ID du module
+            const moduleKey = `module_${access.module_id}`;
+            subscriptions[moduleKey] = {
+              module_id: access.module_id,
+              access: {
+                id: access.id,
+                created_at: access.created_at,
+                access_type: access.access_type,
+                expires_at: access.expires_at,
+                current_usage: access.current_usage,
+                max_usage: access.max_usage,
+                is_active: access.is_active
+              }
+            };
           } catch (error) {
             console.error(`❌ Exception traitement module ${access.module_id}:`, error);
             continue;
@@ -902,7 +887,7 @@ export default function CardDetailPage() {
                       )}
 
                       {/* Bouton JWT - visible seulement si l'utilisateur a accès au module */}
-                      {session && userSubscriptions[card.title] && (
+                      {session && userSubscriptions[`module_${card.id}`] && (
                         <>
                           {card.title.toLowerCase() === 'ruinedfooocus' ? (
                             <button
