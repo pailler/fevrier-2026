@@ -645,91 +645,111 @@ export default function CardDetailPage() {
                        </p>
                      </div>
                      
-                     {/* Vidéo réduite */}
-                     <div className="w-full max-w-2xl mx-auto aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center mb-8">
-                       <div className="text-center p-8">
-                         <div className="text-6xl mb-4">🎥</div>
-                         <h3 className="text-xl font-semibold text-gray-700 mb-2">Démonstration LibreSpeed</h3>
-                         <p className="text-gray-500">Vidéo temporairement indisponible</p>
-                       </div>
-                     </div>
-                     
-                     {/* Fonctionnalités principales */}
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                       <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-blue-100">
-                         <div className="flex items-center space-x-4 mb-3">
-                           <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                             <span className="text-xl">⚡</span>
-                           </div>
-                           <h4 className="text-lg font-bold text-blue-900">Test de vitesse précis</h4>
-                         </div>
-                         <p className="text-gray-700 text-sm">
-                           Mesurez votre débit descendant, montant et votre latence avec une précision exceptionnelle. 
-                           Les tests sont optimisés pour donner des résultats fiables et reproductibles.
-                         </p>
-                       </div>
+                                           {/* Vidéo réduite */}
+                      <div className="w-full max-w-2xl mx-auto aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center mb-8">
+                        <div className="text-center p-8">
+                          <div className="text-6xl mb-4">🎥</div>
+                          <h3 className="text-xl font-semibold text-gray-700 mb-2">Démonstration LibreSpeed</h3>
+                          <p className="text-gray-500">Vidéo temporairement indisponible</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center">
+                      <div className="text-center p-8">
+                        <div className="text-6xl mb-4">🎥</div>
+                        <h3 className="text-xl font-semibold text-gray-700 mb-2">Démonstration vidéo</h3>
+                        <p className="text-gray-500">Vidéo temporairement indisponible</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-                       <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-green-100">
-                         <div className="flex items-center space-x-4 mb-3">
-                           <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
-                             <span className="text-xl">📊</span>
-                           </div>
-                           <h4 className="text-lg font-bold text-green-900">Statistiques avancées</h4>
-                         </div>
-                         <p className="text-gray-700 text-sm">
-                           Visualisez vos résultats avec des graphiques détaillés et des métriques avancées. 
-                           Suivez l'évolution de vos performances dans le temps.
-                         </p>
-                       </div>
+                {/* Section fonctionnalités séparée pour librespeed */}
+                {isLibrespeed && (
+                  <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
+                    <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-6 text-center">
+                      Fonctionnalités principales
+                    </h3>
+                    
+                    {/* Fonctionnalités principales */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-blue-100">
+                        <div className="flex items-center space-x-4 mb-3">
+                          <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                            <span className="text-xl">⚡</span>
+                          </div>
+                          <h4 className="text-lg font-bold text-blue-900">Test de vitesse précis</h4>
+                        </div>
+                        <p className="text-gray-700 text-sm">
+                          Mesurez votre débit descendant, montant et votre latence avec une précision exceptionnelle. 
+                          Les tests sont optimisés pour donner des résultats fiables et reproductibles.
+                        </p>
+                      </div>
 
-                       <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-purple-100">
-                         <div className="flex items-center space-x-4 mb-3">
-                           <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
-                             <span className="text-xl">🔒</span>
-                           </div>
-                           <h4 className="text-lg font-bold text-purple-900">Sécurité et confidentialité</h4>
-                         </div>
-                         <p className="text-gray-700 text-sm">
-                           Vos données restent privées. LibreSpeed ne collecte aucune information personnelle 
-                           et respecte votre vie privée.
-                         </p>
-                       </div>
+                      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-green-100">
+                        <div className="flex items-center space-x-4 mb-3">
+                          <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                            <span className="text-xl">📊</span>
+                          </div>
+                          <h4 className="text-lg font-bold text-green-900">Statistiques avancées</h4>
+                        </div>
+                        <p className="text-gray-700 text-sm">
+                          Visualisez vos résultats avec des graphiques détaillés et des métriques avancées. 
+                          Suivez l'évolution de vos performances dans le temps.
+                        </p>
+                      </div>
 
-                       <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-100">
-                         <div className="flex items-center space-x-4 mb-3">
-                           <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                             <span className="text-xl">🌐</span>
-                           </div>
-                           <h4 className="text-lg font-bold text-orange-900">Interface moderne</h4>
-                         </div>
-                         <p className="text-gray-700 text-sm">
-                           Une interface utilisateur intuitive et responsive qui s'adapte à tous les appareils. 
-                           Testez votre vitesse depuis n'importe quel navigateur.
-                         </p>
-                       </div>
-                     </div>
+                      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-purple-100">
+                        <div className="flex items-center space-x-4 mb-3">
+                          <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                            <span className="text-xl">🔒</span>
+                          </div>
+                          <h4 className="text-lg font-bold text-purple-900">Sécurité et confidentialité</h4>
+                        </div>
+                        <p className="text-gray-700 text-sm">
+                          Vos données restent privées. LibreSpeed ne collecte aucune information personnelle 
+                          et respecte votre vie privée.
+                        </p>
+                      </div>
 
-                     {/* Avantages techniques */}
-                     <div className="mt-8 bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200">
-                       <h4 className="text-xl font-bold text-gray-900 mb-4 text-center">Avantages techniques</h4>
-                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                         <div className="text-center">
-                           <div className="text-2xl mb-2">🚀</div>
-                           <h5 className="font-semibold text-gray-900 mb-1">Performance</h5>
-                           <p className="text-xs text-gray-600">Tests rapides et précis</p>
-                         </div>
-                         <div className="text-center">
-                           <div className="text-2xl mb-2">🛡️</div>
-                           <h5 className="font-semibold text-gray-900 mb-1">Sécurité</h5>
-                           <p className="text-xs text-gray-600">Aucune collecte de données</p>
-                         </div>
-                         <div className="text-center">
-                           <div className="text-2xl mb-2">📱</div>
-                           <h5 className="font-semibold text-gray-900 mb-1">Responsive</h5>
-                           <p className="text-xs text-gray-600">Compatible tous appareils</p>
-                         </div>
-                       </div>
-                     </div>
+                      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-100">
+                        <div className="flex items-center space-x-4 mb-3">
+                          <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+                            <span className="text-xl">🌐</span>
+                          </div>
+                          <h4 className="text-lg font-bold text-orange-900">Interface moderne</h4>
+                        </div>
+                        <p className="text-gray-700 text-sm">
+                          Une interface utilisateur intuitive et responsive qui s'adapte à tous les appareils. 
+                          Testez votre vitesse depuis n'importe quel navigateur.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Avantages techniques */}
+                    <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200">
+                      <h4 className="text-xl font-bold text-gray-900 mb-4 text-center">Avantages techniques</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="text-center">
+                          <div className="text-2xl mb-2">🚀</div>
+                          <h5 className="font-semibold text-gray-900 mb-1">Performance</h5>
+                          <p className="text-xs text-gray-600">Tests rapides et précis</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl mb-2">🛡️</div>
+                          <h5 className="font-semibold text-gray-900 mb-1">Sécurité</h5>
+                          <p className="text-xs text-gray-600">Aucune collecte de données</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl mb-2">📱</div>
+                          <h5 className="font-semibold text-gray-900 mb-1">Responsive</h5>
+                          <p className="text-xs text-gray-600">Compatible tous appareils</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
                    </div>
                  ) : (
                    <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center">
