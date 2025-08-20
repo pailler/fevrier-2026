@@ -792,78 +792,7 @@ export default function CardDetailPage() {
               </div>
             </div>
 
-            {/* Section LibreSpeed en pleine largeur */}
-            {isLibrespeed && (
-              <div className="w-full bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 p-8 mb-8">
-                <div className="text-center mb-8">
-                  <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-4">
-                    Découvrez LibreSpeed
-                  </h3>
-                  <p className="text-xl text-gray-700 leading-relaxed max-w-4xl mx-auto">
-                    LibreSpeed est un outil de test de vitesse internet open-source qui vous permet de mesurer 
-                    précisément les performances de votre connexion. Avec une interface moderne et intuitive, 
-                    il vous donne accès à des métriques détaillées pour optimiser votre expérience en ligne.
-                  </p>
-                </div>
-                
-                {/* Fonctionnalités principales - Largeur réduite */}
-                <div className="max-w-4xl mx-auto">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-blue-100">
-                      <div className="flex items-center space-x-4 mb-3">
-                        <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                          <span className="text-xl">⚡</span>
-                        </div>
-                        <h4 className="text-lg font-bold text-blue-900">Test de vitesse précis</h4>
-                      </div>
-                      <p className="text-gray-700 text-sm">
-                        Mesurez votre débit descendant, montant et votre latence avec une précision exceptionnelle. 
-                        Les tests sont optimisés pour donner des résultats fiables et reproductibles.
-                      </p>
-                    </div>
 
-                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-green-100">
-                      <div className="flex items-center space-x-4 mb-3">
-                        <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
-                          <span className="text-xl">📊</span>
-                        </div>
-                        <h4 className="text-lg font-bold text-green-900">Statistiques avancées</h4>
-                      </div>
-                      <p className="text-gray-700 text-sm">
-                        Visualisez vos résultats avec des graphiques détaillés et des métriques avancées. 
-                        Suivez l'évolution de vos performances dans le temps.
-                      </p>
-                    </div>
-
-                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-purple-100">
-                      <div className="flex items-center space-x-4 mb-3">
-                        <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
-                          <span className="text-xl">🔒</span>
-                        </div>
-                        <h4 className="text-lg font-bold text-purple-900">Sécurité et confidentialité</h4>
-                      </div>
-                      <p className="text-gray-700 text-sm">
-                        Vos données restent privées. LibreSpeed ne collecte aucune information personnelle 
-                        et respecte votre vie privée.
-                      </p>
-                    </div>
-
-                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-100">
-                      <div className="flex items-center space-x-4 mb-3">
-                        <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                          <span className="text-xl">🌐</span>
-                        </div>
-                        <h4 className="text-lg font-bold text-orange-900">Interface moderne</h4>
-                      </div>
-                      <p className="text-gray-700 text-sm">
-                        Une interface utilisateur intuitive et responsive qui s'adapte à tous les appareils. 
-                        Testez votre vitesse depuis n'importe quel navigateur.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Sidebar */}
             {!isLibrespeed && (
@@ -1261,6 +1190,81 @@ export default function CardDetailPage() {
           </div>
         </div>
       </main>
+
+      {/* Section LibreSpeed en pleine largeur */}
+      {isLibrespeed && (
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 py-20">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-4">
+                Découvrez LibreSpeed
+              </h2>
+              <p className="text-xl text-gray-700 leading-relaxed max-w-4xl mx-auto">
+                LibreSpeed est un outil de test de vitesse internet open-source qui vous permet de mesurer 
+                précisément les performances de votre connexion. Avec une interface moderne et intuitive, 
+                il vous donne accès à des métriques détaillées pour optimiser votre expérience en ligne.
+              </p>
+            </div>
+            
+            {/* Fonctionnalités principales - Largeur réduite */}
+            <div className="max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-blue-100 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center space-x-4 mb-3">
+                    <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                      <span className="text-xl">⚡</span>
+                    </div>
+                    <h4 className="text-lg font-bold text-blue-900">Test de vitesse précis</h4>
+                  </div>
+                  <p className="text-gray-700 text-sm">
+                    Mesurez votre débit descendant, montant et votre latence avec une précision exceptionnelle. 
+                    Les tests sont optimisés pour donner des résultats fiables et reproductibles.
+                  </p>
+                </div>
+
+                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-green-100 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center space-x-4 mb-3">
+                    <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                      <span className="text-xl">📊</span>
+                    </div>
+                    <h4 className="text-lg font-bold text-green-900">Statistiques avancées</h4>
+                  </div>
+                  <p className="text-gray-700 text-sm">
+                    Visualisez vos résultats avec des graphiques détaillés et des métriques avancées. 
+                    Suivez l'évolution de vos performances dans le temps.
+                  </p>
+                </div>
+
+                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-purple-100 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center space-x-4 mb-3">
+                    <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                      <span className="text-xl">🔒</span>
+                    </div>
+                    <h4 className="text-lg font-bold text-purple-900">Sécurité et confidentialité</h4>
+                  </div>
+                  <p className="text-gray-700 text-sm">
+                    Vos données restent privées. LibreSpeed ne collecte aucune information personnelle 
+                    et respecte votre vie privée.
+                  </p>
+                </div>
+
+                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-100 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center space-x-4 mb-3">
+                    <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+                      <span className="text-xl">🌐</span>
+                    </div>
+                    <h4 className="text-lg font-bold text-orange-900">Interface moderne</h4>
+                  </div>
+                  <p className="text-gray-700 text-sm">
+                    Une interface utilisateur intuitive et responsive qui s'adapte à tous les appareils. 
+                    Testez votre vitesse depuis n'importe quel navigateur.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Zones de contenu en pleine largeur avec design moderne */}
       
