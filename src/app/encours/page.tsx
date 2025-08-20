@@ -108,7 +108,7 @@ export default function EncoursPage() {
         setLoading(true);
         console.log('🔍 Chargement des modules pour utilisateur:', user.id);
         
-        // Récupérer les modules souscrits via user_applications avec jointure modules
+        // Récupérer les modules souscrits via user_applications (sans jointure)
         console.log('🔍 Récupération des modules utilisateur depuis user_applications...');
         let moduleAccessData: any[] | null = null;
         let moduleAccessError: any = null;
@@ -119,18 +119,11 @@ export default function EncoursPage() {
             .select(`
               id,
               module_id,
+              module_title,
               access_level,
               expires_at,
               is_active,
-              created_at,
-              modules (
-                id,
-                title,
-                description,
-                category,
-                url,
-                price
-              )
+              created_at
             `)
             .eq('user_id', user.id)
             .eq('is_active', true)
@@ -235,19 +228,14 @@ export default function EncoursPage() {
           })
           .map(access => {
             try {
-              // Extraire les données du module depuis la jointure
-              const moduleData = access.modules && Array.isArray(access.modules) && access.modules.length > 0
-                ? access.modules[0]
-                : (access.modules && !Array.isArray(access.modules) ? access.modules : null);
-              
               return {
                 id: access.id || 'unknown',
                 module_id: access.module_id || 'unknown',
-                module_title: moduleData?.title || `Module ${access.module_id || 'unknown'}`,
-                module_description: moduleData?.description || 'Description non disponible',
-                module_category: moduleData?.category || 'Catégorie inconnue',
-                module_url: moduleData?.url || '',
-                access_type: access.access_level || 'standard',
+                module_title: access.module_title || `Module ${access.module_id || 'unknown'}`,
+                module_description: 'Module activé via souscription',
+                module_category: 'Module souscrit',
+                module_url: '', // Pas d'URL directe pour les modules souscrits
+                access_type: access.access_level || 'basic',
                 expires_at: access.expires_at || null,
                 is_active: access.is_active !== undefined ? access.is_active : true,
                 created_at: access.created_at || new Date().toISOString(),
@@ -328,6 +316,25 @@ export default function EncoursPage() {
     }
   }, [user, sessionChecked]);
 
+  // Mapping des modules vers leurs URLs directes
+  const getModuleUrl = (moduleId: string): string => {
+    const moduleUrls: { [key: string]: string } = {
+      'metube': 'https://metube.regispailler.fr',
+      'librespeed': 'https://librespeed.regispailler.fr',
+      'pdf': 'https://pdf.regispailler.fr',
+      'psitransfer': 'https://psitransfer.regispailler.fr',
+      'qrcodes': 'https://qrcodes.regispailler.fr',
+      'stablediffusion': 'https://stablediffusion.regispailler.fr',
+      'ruinedfooocus': 'https://ruinedfooocus.regispailler.fr',
+      'invoke': 'https://invoke.regispailler.fr',
+      'comfyui': 'https://comfyui.regispailler.fr',
+      'cogstudio': 'https://cogstudio.regispailler.fr',
+      'sdnext': 'https://sdnext.regispailler.fr'
+    };
+    
+    return moduleUrls[moduleId] || '';
+  };
+
   // Fonction pour accéder à un module
   const accessModule = async (module: UserModule) => {
     try {
@@ -344,16 +351,26 @@ export default function EncoursPage() {
         return;
       }
       
-      // Vérifier si le module a une URL
-      if (module.module_url) {
-        // Ouvrir dans un iframe modal
-        setIframeModal({
-          isOpen: true,
-          url: module.module_url,
-          title: module.module_title
-        });
+      // Obtenir l'URL directe du module
+      const moduleUrl = getModuleUrl(module.module_id);
+      
+      if (moduleUrl) {
+        // Liste des modules qui doivent s'ouvrir en iframe
+        const iframeModules = ['metube', 'psitransfer', 'librespeed', 'pdf'];
+        
+        if (iframeModules.includes(module.module_id)) {
+          // Ouvrir en iframe
+          setIframeModal({
+            isOpen: true,
+            url: moduleUrl,
+            title: module.module_title
+          });
+        } else {
+          // Ouvrir l'application dans un nouvel onglet pour les autres modules
+          window.open(moduleUrl, '_blank');
+        }
       } else {
-        // Rediriger vers la page du module
+        // Si pas d'URL directe, rediriger vers la page du module
         router.push(`/card/${module.module_id}`);
       }
     } catch (error) {
@@ -366,24 +383,17 @@ export default function EncoursPage() {
   const refreshData = async () => {
     setRefreshing(true);
     
-    // Recharger les modules depuis user_applications avec jointure modules
+    // Recharger les modules depuis user_applications (sans jointure)
     const { data: userModulesData, error: modulesError } = await supabase
       .from('user_applications')
       .select(`
         id,
         module_id,
+        module_title,
         access_level,
         expires_at,
         is_active,
-        created_at,
-        modules (
-          id,
-          title,
-          description,
-          category,
-          url,
-          price
-        )
+        created_at
       `)
       .eq('user_id', user.id)
       .eq('is_active', true)
@@ -418,27 +428,20 @@ export default function EncoursPage() {
           if (!access.expires_at) return true;
           return new Date(access.expires_at) > new Date();
         })
-        .map(access => {
-          // Extraire les données du module depuis la jointure
-          const moduleData = access.modules && Array.isArray(access.modules) && access.modules.length > 0
-            ? access.modules[0]
-            : (access.modules && !Array.isArray(access.modules) ? access.modules : null);
-          
-          return {
-            id: access.id,
-            module_id: access.module_id,
-            module_title: moduleData?.title || `Module ${access.module_id}`,
-            module_description: moduleData?.description || 'Description non disponible',
-            module_category: moduleData?.category || 'Catégorie inconnue',
-            module_url: moduleData?.url || '',
-            access_type: access.access_level,
-            expires_at: access.expires_at,
-            is_active: access.is_active,
-            created_at: access.created_at,
-            current_usage: 0, // user_applications n'a pas de current_usage
-            max_usage: undefined // user_applications n'a pas de max_usage
-          };
-        });
+        .map(access => ({
+          id: access.id,
+          module_id: access.module_id,
+          module_title: access.module_title || `Module ${access.module_id}`,
+          module_description: 'Module activé via souscription',
+          module_category: 'Module souscrit',
+          module_url: '',
+          access_type: access.access_level,
+          expires_at: access.expires_at,
+          is_active: access.is_active,
+          created_at: access.created_at,
+          current_usage: 0,
+          max_usage: undefined
+        }));
 
       // Transformer les tokens d'accès
       const transformedTokens: UserModule[] = (accessTokensData || [])
@@ -486,8 +489,6 @@ export default function EncoursPage() {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
   };
-
-
 
   const formatTimeRemaining = (endDate: string) => {
     const days = getDaysRemaining(endDate);
@@ -647,6 +648,74 @@ export default function EncoursPage() {
                 </div>
               </div>
             </div>
+
+            {/* Section Tokens Premium */}
+            {userModules.filter(m => m.module_category === 'Token d\'accès' && m.access_type.includes('premium')).length > 0 && (
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl shadow-sm border border-purple-200 p-6 mb-6">
+                <h2 className="text-xl font-bold text-purple-900 mb-4 flex items-center">
+                  <span className="text-2xl mr-2">🔑</span>
+                  Tokens Premium - Statistiques détaillées
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {userModules
+                    .filter(m => m.module_category === 'Token d\'accès' && m.access_type.includes('premium'))
+                    .map((token) => {
+                      const usagePercentage = token.max_usage ? ((token.current_usage || 0) / token.max_usage) * 100 : 0;
+                      const remainingUsage = token.max_usage ? token.max_usage - (token.current_usage || 0) : 0;
+                      
+                      return (
+                        <div key={token.id} className="bg-white rounded-lg p-4 shadow-sm border border-purple-200">
+                          <div className="flex items-center justify-between mb-3">
+                            <h3 className="font-semibold text-purple-900 text-sm truncate">
+                              {token.module_title.replace('Premium ', '').replace(` - ${user?.email}`, '')}
+                            </h3>
+                            <span className="px-2 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800">
+                              PREMIUM
+                            </span>
+                          </div>
+                          
+                          {/* Barre de progression des utilisations */}
+                          <div className="mb-3">
+                            <div className="flex justify-between text-xs text-gray-600 mb-1">
+                              <span>Utilisations</span>
+                              <span>{token.current_usage}/{token.max_usage}</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div 
+                                className={`h-2 rounded-full transition-all duration-300 ${
+                                  usagePercentage > 80 ? 'bg-red-500' : 
+                                  usagePercentage > 60 ? 'bg-yellow-500' : 'bg-green-500'
+                                }`}
+                                style={{ width: `${Math.min(usagePercentage, 100)}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                          
+                          {/* Statistiques */}
+                          <div className="space-y-2 text-xs">
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Restantes:</span>
+                              <span className="font-semibold text-purple-700">{remainingUsage}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Expire:</span>
+                              <span className="font-semibold text-purple-700">
+                                {token.expires_at ? formatTimeRemaining(token.expires_at) : 'Permanent'}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Créé:</span>
+                              <span className="font-semibold text-purple-700">
+                                {formatDate(token.created_at)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
 
             {/* Grille des modules */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -69,21 +69,21 @@ function SelectionsContent() {
       
       try {
         const { data, error } = await supabase
-          .from('module_access')
+          .from('user_applications')
           .select(`
             module_id,
             expires_at,
-            modules(title)
+            module_title
           `)
           .eq('user_id', user.id)
-          .eq('access_type', 'active')
+          .eq('is_active', true)
           .gt('expires_at', new Date().toISOString());
         
         if (!error && data) {
           const subscriptions: {[key: string]: boolean} = {};
           data.forEach(sub => {
-            if (sub.modules && sub.modules.length > 0) {
-              subscriptions[sub.modules[0].title] = true;
+            if (sub.module_title) {
+              subscriptions[sub.module_title] = true;
             }
           });
           setUserSubscriptions(subscriptions);
@@ -343,6 +343,10 @@ function SelectionsContent() {
                         onClick={async () => {
                           try {
                             // Activer tous les modules sélectionnés
+                            const activationResults = [];
+                            let hasNewActivations = false;
+                            let hasAlreadyActivated = false;
+
                             for (const module of modules) {
                               const response = await fetch('/api/activate-module', {
                                 method: 'POST',
@@ -363,15 +367,45 @@ function SelectionsContent() {
                               
                               if (!result.success) {
                                 console.error('Erreur activation module:', module.title, result.error);
+                                activationResults.push({
+                                  module: module.title,
+                                  status: 'error',
+                                  message: result.error || 'Erreur lors de l\'activation'
+                                });
                               } else {
                                 console.log('✅ Module activé:', module.title);
+                                
+                                if (result.message === 'Module déjà activé') {
+                                  hasAlreadyActivated = true;
+                                  activationResults.push({
+                                    module: module.title,
+                                    status: 'already_activated',
+                                    message: 'Module déjà activé'
+                                  });
+                                } else {
+                                  hasNewActivations = true;
+                                  activationResults.push({
+                                    module: module.title,
+                                    status: 'success',
+                                    message: 'Module activé avec succès'
+                                  });
+                                }
                               }
                             }
 
-                                                         // Nettoyer le localStorage et rediriger vers la page de validation
-                             localStorage.removeItem('selectedModules');
-                             setModules([]);
-                             router.push('/validation?success=true');
+                            // Afficher un résumé des résultats
+                            if (hasAlreadyActivated && hasNewActivations) {
+                              alert(`✅ Activation terminée !\n\nNouveaux modules activés : ${activationResults.filter(r => r.status === 'success').length}\nModules déjà activés : ${activationResults.filter(r => r.status === 'already_activated').length}`);
+                            } else if (hasAlreadyActivated && !hasNewActivations) {
+                              alert(`ℹ️ Tous les modules sélectionnés sont déjà activés !\n\nVous pouvez les retrouver dans vos applications sur la page "Mes Applications".`);
+                            } else {
+                              alert(`✅ Tous les modules ont été activés avec succès !`);
+                            }
+
+                            // Nettoyer le localStorage et rediriger vers la page de validation
+                            localStorage.removeItem('selectedModules');
+                            setModules([]);
+                            router.push('/validation?success=true');
                           } catch (error) {
                             console.error('Erreur lors de l\'activation:', error);
                             alert('Erreur lors de l\'activation des modules');

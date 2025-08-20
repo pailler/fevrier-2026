@@ -69,13 +69,13 @@ export default function Home() {
       
       try {
         const { data, error } = await supabase
-          .from('module_access')
+          .from('user_applications')
           .select(`
             module_id,
             expires_at
           `)
           .eq('user_id', user.id)
-          .eq('access_type', 'active')
+          .eq('is_active', true)
           .gt('expires_at', new Date().toISOString());
         
         if (!error && data) {

@@ -2,45 +2,45 @@ version: '3.8'
 
 services:
   iahome-app:
-    image: iahome:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: iahome-app
     restart: unless-stopped
     environment:
       - NODE_ENV=production
       - RUINEDFOOOCUS_INTERNAL_URL=${RUINEDFOOOCUS_INTERNAL_URL:-http://matrix-stability:7870}
     env_file:
-      - .env.production
+      - env.production.local
     ports:
       - "3000:3000"  # Application Next.js
     volumes:
       - ./logs:/app/logs
     networks:
       - iahome-network
-    # healthcheck:
-    #   test: ["CMD-SHELL", "node -e \"require('http').get('https://iahome.fr/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))\" || exit 1"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
-    #   start_period: 40s
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.iahome.rule=Host(`iahome.fr`) || Host(`www.iahome.fr`)"
       - "traefik.http.routers.iahome.entrypoints=websecure"
       - "traefik.http.routers.iahome.tls=true"
       - "traefik.http.services.iahome.loadbalancer.server.port=3000"
+      - "traefik.http.routers.iahome.middlewares=security-headers,compress"
       - "traefik.http.routers.iahome-http.rule=Host(`iahome.fr`) || Host(`www.iahome.fr`)"
       - "traefik.http.routers.iahome-http.entrypoints=web"
       - "traefik.http.routers.iahome-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
-
-      # Router spécifique: sécuriser l'accès au proxy RuinedFooocus par IP + token
-      - "traefik.http.routers.iahome-rf.rule=Host(`iahome.fr`) && PathPrefix(`/api/proxy-ruinedfooocus`)"
-      - "traefik.http.routers.iahome-rf.entrypoints=websecure"
-      - "traefik.http.routers.iahome-rf.tls=true"
-      - "traefik.http.routers.iahome-rf.service=iahome"
-      - "traefik.http.middlewares.rf-ip.ipwhitelist.sourcerange=90.90.226.59/32"
-      - "traefik.http.routers.iahome-rf.middlewares=rf-ip"
+      - "traefik.http.middlewares.security-headers.headers.customresponseheaders.Strict-Transport-Security=max-age=31536000; includeSubDomains"
+      - "traefik.http.middlewares.security-headers.headers.customresponseheaders.X-Content-Type-Options=nosniff"
+      - "traefik.http.middlewares.security-headers.headers.customresponseheaders.X-Frame-Options=DENY"
+      - "traefik.http.middlewares.security-headers.headers.customresponseheaders.X-XSS-Protection=1; mode=block"
+      - "traefik.http.middlewares.compress.compress=true"
 
   # iahome-nginx:
   #   image: nginx:alpine
@@ -79,15 +79,26 @@ services:
       - "--providers.file.watch=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--log.level=DEBUG"
+      - "--certificatesresolvers.letsencrypt.acme.email=admin@iahome.fr"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--log.level=INFO"
     ports:
+      - "80:80"
+      - "443:443"
       - "8080:8080"  # Dashboard Traefik (pour debug)
-      # Pas de ports 80/443 - géré par le NAS
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/dynamic:/etc/traefik/dynamic:ro
+      - ./letsencrypt:/letsencrypt
     networks:
       - iahome-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.iahome.fr`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
 
 networks:
   iahome-network:

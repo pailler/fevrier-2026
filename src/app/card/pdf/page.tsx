@@ -298,21 +298,54 @@ export default function PDFPage() {
               {session ? (
                 // Bouton d'accès gratuit pour les modules gratuits (uniquement si connecté)
                 <button 
-                  onClick={() => openIframeModal('https://pdf.regispailler.fr', 'PDF+')}
+                  onClick={async () => {
+                    if (session?.user?.id) {
+                      try {
+                        // Générer le token premium automatiquement
+                        const response = await fetch('/api/generate-premium-token', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            moduleName: 'PDF+',
+                            userId: session.user.id
+                          })
+                        });
+                        
+                        if (response.ok) {
+                          console.log('✅ Token premium généré pour PDF+');
+                          // Rediriger vers la page de transition
+                          router.push('/token-generated?module=PDF+');
+                        } else {
+                          console.error('❌ Erreur génération token premium');
+                          // En cas d'erreur, ouvrir directement l'iframe
+                          openIframeModal('https://pdf.regispailler.fr', 'PDF+');
+                        }
+                      } catch (error) {
+                        console.error('❌ Erreur lors de la génération du token:', error);
+                        // En cas d'erreur, ouvrir directement l'iframe
+                        openIframeModal('https://pdf.regispailler.fr', 'PDF+');
+                      }
+                    } else {
+                      // Si pas connecté, ouvrir directement l'iframe
+                      openIframeModal('https://pdf.regispailler.fr', 'PDF+');
+                    }
+                  }}
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">🆓</span>
-                  <span>Accéder à l'application</span>
+                  <span>Activer l'application PDF+</span>
                 </button>
               ) : (
                 // Message pour les modules gratuits quand l'utilisateur n'est pas connecté
-                <button 
-                  onClick={() => openIframeModal('https://pdf.regispailler.fr', 'PDF+')}
+                <a 
+                  href="/login"
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
                 >
-                  <span className="text-xl">🆓</span>
-                  <span>Accéder à l'application</span>
-                </button>
+                  <span className="text-xl">🔒</span>
+                  <span>Connectez-vous pour accéder</span>
+                </a>
               )}
             </div>
           </div>

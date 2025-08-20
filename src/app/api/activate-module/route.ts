@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       .from('user_applications')
       .select('id')
       .eq('user_id', userId)
-      .eq('module_id', parseInt(moduleId))
+      .eq('module_id', moduleId)
       .eq('is_active', true)
       .single();
 
@@ -60,7 +60,8 @@ export async function POST(request: NextRequest) {
       .from('user_applications')
       .insert({
         user_id: userId,
-        module_id: parseInt(moduleId),
+        module_id: moduleId,
+        module_title: moduleTitle,
         access_level: 'basic',
         is_active: true,
         expires_at: expiresAt.toISOString(),
@@ -79,38 +80,14 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Accès module créé avec succès:', accessData.id);
 
-    // Créer aussi un token d'accès pour cet utilisateur
-    const { data: tokenData, error: tokenError } = await supabase
-      .from('access_tokens')
-      .insert({
-        name: `Token ${moduleTitle}`,
-        description: `Accès automatique à ${moduleTitle}`,
-        module_id: parseInt(moduleId),
-        module_name: moduleTitle,
-        created_by: userId,
-        access_level: 'basic',
-        permissions: ['access'],
-        max_usage: 1000,
-        current_usage: 0,
-        is_active: true,
-        expires_at: expiresAt.toISOString(),
-        created_at: new Date().toISOString()
-      })
-      .select()
-      .single();
-
-    if (tokenError) {
-      console.error('❌ Erreur création token:', tokenError);
-      // On continue même si le token n'est pas créé
-    } else {
-      console.log('✅ Token d\'accès créé:', tokenData.id);
-    }
+    // Note: La création automatique de token est désactivée car il y a une incohérence
+    // entre les types de module_id (string dans modules vs integer dans access_tokens)
+    // Les tokens d'accès doivent être créés manuellement par les administrateurs
 
     return NextResponse.json({
       success: true,
       message: 'Module activé avec succès',
       accessId: accessData.id,
-      tokenId: tokenData?.id,
       expiresAt: expiresAt.toISOString()
     });
 

@@ -69,21 +69,21 @@ export default function Home() {
       
       try {
         const { data, error } = await supabase
-          .from('module_access')
+          .from('user_applications')
           .select(`
             module_id,
             expires_at,
-            modules(title)
+            module_title
           `)
           .eq('user_id', user.id)
-          .eq('access_type', 'active')
+          .eq('is_active', true)
           .gt('expires_at', new Date().toISOString());
         
         if (!error && data) {
           const subscriptions: {[key: string]: boolean} = {};
           data.forEach(sub => {
-            if (sub.modules && sub.modules.length > 0) {
-              subscriptions[sub.modules[0].title] = true;
+            if (sub.module_title) {
+              subscriptions[sub.module_title] = true;
             }
           });
           setUserSubscriptions(subscriptions);

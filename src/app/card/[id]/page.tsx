@@ -41,9 +41,37 @@ export default function CardDetailPage() {
     title: ''
   });
   const [quickAccessAttempted, setQuickAccessAttempted] = useState(false);
+  const [alreadyActivatedModules, setAlreadyActivatedModules] = useState<string[]>([]);
+  const [checkingActivation, setCheckingActivation] = useState(false);
 
   // Vérifier si c'est le module librespeed pour appliquer un style spécial
   const isLibrespeed = Boolean(card?.title?.toLowerCase().includes('librespeed') || card?.id === 'librespeed');
+
+  // Fonction pour vérifier si un module est déjà activé
+  const checkModuleActivation = useCallback(async (moduleId: string) => {
+    if (!session?.user?.id || !moduleId) return false;
+    
+    try {
+      const response = await fetch('/api/check-module-activation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          moduleId: moduleId,
+          userId: session.user.id
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        return result.isActivated || false;
+      }
+    } catch (error) {
+      console.error('Erreur lors de la vérification d\'activation:', error);
+    }
+    return false;
+  }, [session?.user?.id]);
 
   // Fonction pour accéder aux modules avec JWT
   const accessModuleWithJWT = useCallback(async (moduleTitle: string, moduleId: string) => {
@@ -202,41 +230,24 @@ export default function CardDetailPage() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Récupérer les abonnements de l'utilisateur
+  // Récupérer les abonnements de l'utilisateur et vérifier l'activation du module
   useEffect(() => {
-    const fetchUserSubscriptions = async () => {
+    const fetchUserData = async () => {
       if (!session?.user?.id) {
         setUserSubscriptions({});
         return;
       }
 
       try {
+        // Vérifier les souscriptions existantes
         let { data: accessData, error: accessError } = await supabase
-          .from('module_access')
+          .from('user_applications')
           .select('*')
           .eq('user_id', session.user.id)
-          .eq('access_type', 'active');
+          .eq('is_active', true);
 
         if (accessError) {
-          console.log('⚠️ Table module_access non trouvée, essai avec access_modules...');
-          const { data: altData, error: altError } = await supabase
-            .from('access_modules')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .eq('is_active', true);
-
-          if (altError) {
-            console.log('⚠️ Table access_modules non trouvée non plus, pas d\'abonnements actifs');
-            setUserSubscriptions({});
-            return;
-          }
-          
-          accessData = altData;
-          accessError = null;
-        }
-
-        if (accessError) {
-          console.error('❌ Erreur chargement accès:', accessError);
+          console.log('⚠️ Table user_applications non trouvée, pas d\'abonnements actifs');
           setUserSubscriptions({});
           return;
         }
@@ -251,10 +262,8 @@ export default function CardDetailPage() {
               access: {
                 id: access.id,
                 created_at: access.created_at,
-                access_type: access.access_type,
+                access_level: access.access_level,
                 expires_at: access.expires_at,
-                current_usage: access.current_usage,
-                max_usage: access.max_usage,
                 is_active: access.is_active
               }
             };
@@ -265,14 +274,25 @@ export default function CardDetailPage() {
         }
 
         setUserSubscriptions(subscriptions);
+
+        // Vérifier si le module actuel est déjà activé dans user_applications
+        if (card?.id) {
+          setCheckingActivation(true);
+          const isActivated = await checkModuleActivation(card.id);
+          if (isActivated) {
+            setAlreadyActivatedModules(prev => [...prev, card.id]);
+          }
+          setCheckingActivation(false);
+        }
       } catch (error) {
-        console.error('❌ Erreur chargement abonnements:', error);
+        console.error('❌ Erreur chargement données utilisateur:', error);
         setUserSubscriptions({});
+        setCheckingActivation(false);
       }
     };
 
-    fetchUserSubscriptions();
-  }, [session?.user?.id]);
+    fetchUserData();
+  }, [session?.user?.id, card?.id, checkModuleActivation]);
 
   // Charger les modules sélectionnés depuis le localStorage
   useEffect(() => {
@@ -569,6 +589,33 @@ export default function CardDetailPage() {
                           return;
                         }
 
+                        // Générer le token premium automatiquement pour les modules gratuits
+                        if (session?.user?.id && (card.price === 0 || card.price === '0')) {
+                          try {
+                            const response = await fetch('/api/generate-premium-token', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({
+                                moduleName: card.title,
+                                userId: session.user.id
+                              })
+                            });
+                            
+                            if (response.ok) {
+                              console.log('✅ Token premium généré pour', card.title);
+                              // Rediriger vers la page de transition
+                              router.push(`/token-generated?module=${encodeURIComponent(card.title)}`);
+                              return;
+                            } else {
+                              console.error('❌ Erreur génération token premium');
+                            }
+                          } catch (error) {
+                            console.error('❌ Erreur lors de la génération du token:', error);
+                          }
+                        }
+
                         console.log('🔍 Ouverture du module gratuit', card.title, 'avec token JWT');
                         await accessModuleWithJWT(card.title, card.id);
                       }}
@@ -589,7 +636,29 @@ export default function CardDetailPage() {
                 ) : (
                   // Boutons pour les modules payants
                   <div className="space-y-4">
-                    {!['PSitransfer', 'PDF+', 'Librespeed'].includes(card.title) && (
+                    {/* Message si le module est déjà activé */}
+                    {alreadyActivatedModules.includes(card.id) && (
+                      <div className="w-3/4 mx-auto bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
+                        <div className="flex items-center justify-center space-x-3 text-green-800">
+                          <span className="text-2xl">✅</span>
+                          <div className="text-center">
+                            <p className="font-semibold">Module déjà activé !</p>
+                            <p className="text-sm opacity-80">Vous pouvez accéder à ce module depuis vos applications</p>
+                          </div>
+                        </div>
+                        <div className="mt-3 text-center">
+                          <button
+                            onClick={() => router.push('/encours')}
+                            className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                          >
+                            <span className="mr-2">📱</span>
+                            Voir mes applications
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {!['PSitransfer', 'PDF+', 'Librespeed'].includes(card.title) && !alreadyActivatedModules.includes(card.id) && (
                       <button 
                         className={`w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
                           isCardSelected(card.id)
@@ -604,7 +673,7 @@ export default function CardDetailPage() {
                     )}
                     
                     {/* Bouton "Activer la sélection" pour les modules payants */}
-                    {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && (
+                    {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (
                       <button 
                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                         onClick={async () => {
@@ -613,18 +682,24 @@ export default function CardDetailPage() {
                             return;
                           }
 
-                                                     try {
-                             const response = await fetch('/api/create-payment-intent', {
-                               method: 'POST',
-                               headers: {
-                                 'Content-Type': 'application/json',
-                               },
-                               body: JSON.stringify({
-                                 items: [card],
-                                 customerEmail: user?.email || '',
-                                 type: 'payment',
-                               }),
-                             });
+                          // Vérifier si le module est déjà activé avant de procéder au paiement
+                          if (alreadyActivatedModules.includes(card.id)) {
+                            alert(`ℹ️ Le module ${card.title} est déjà activé ! Vous pouvez l'utiliser depuis vos applications.`);
+                            return;
+                          }
+
+                          try {
+                            const response = await fetch('/api/create-payment-intent', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({
+                                items: [card],
+                                customerEmail: user?.email || '',
+                                type: 'payment',
+                              }),
+                            });
 
                             if (!response.ok) {
                               throw new Error(`Erreur HTTP ${response.status}`);

@@ -295,21 +295,54 @@ export default function MeTubePage() {
               {session ? (
                 // Bouton d'accès gratuit pour les modules gratuits (uniquement si connecté)
                 <button 
-                  onClick={() => openIframeModal('https://metube.regispailler.fr', 'MeTube')}
+                  onClick={async () => {
+                    if (session?.user?.id) {
+                      try {
+                        // Générer le token premium automatiquement
+                        const response = await fetch('/api/generate-premium-token', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            moduleName: 'MeTube',
+                            userId: session.user.id
+                          })
+                        });
+                        
+                        if (response.ok) {
+                          console.log('✅ Token premium généré pour MeTube');
+                          // Rediriger vers la page de transition
+                          router.push('/token-generated?module=MeTube');
+                        } else {
+                          console.error('❌ Erreur génération token premium');
+                          // En cas d'erreur, rediriger quand même vers la page de transition
+                          router.push('/token-generated?module=MeTube');
+                        }
+                      } catch (error) {
+                        console.error('❌ Erreur lors de la génération du token:', error);
+                        // En cas d'erreur, rediriger quand même vers la page de transition
+                        router.push('/token-generated?module=MeTube');
+                      }
+                    } else {
+                      // Si pas connecté, rediriger vers la page de transition
+                      router.push('/token-generated?module=MeTube');
+                    }
+                  }}
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">🆓</span>
-                  <span>Accéder à l'application</span>
+                  <span>Activer l'application MeTube</span>
                 </button>
               ) : (
                 // Message pour les modules gratuits quand l'utilisateur n'est pas connecté
-                <button 
-                  onClick={() => openIframeModal('https://metube.regispailler.fr', 'MeTube')}
+                <a 
+                  href="/login"
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
                 >
-                  <span className="text-xl">🆓</span>
-                  <span>Accéder à l'application</span>
-                </button>
+                  <span className="text-xl">🔒</span>
+                  <span>Connectez-vous pour accéder</span>
+                </a>
               )}
             </div>
           </div>

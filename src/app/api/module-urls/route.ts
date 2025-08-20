@@ -5,13 +5,19 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const moduleName = searchParams.get('module');
 
-    // Configuration des URLs des modules
+    // Configuration des URLs des modules (URLs externes directes)
     const moduleUrls: { [key: string]: string } = {
-      'IAmetube': '/api/proxy-metube',
-      // Ajouter d'autres modules ici quand ils seront disponibles
-      // 'IAphoto': 'https://iaphoto.regispailler.fr',
-      // 'IAvideo': 'https://iavideo.regispailler.fr',
-      // 'IAassistant': 'https://iaassistant.regispailler.fr',
+      'metube': 'https://metube.regispailler.fr',
+      'librespeed': 'https://librespeed.regispailler.fr',
+      'pdf': 'https://pdf.regispailler.fr',
+      'psitransfer': 'https://psitransfer.regispailler.fr',
+      'qrcodes': 'https://qrcodes.regispailler.fr',
+      'stablediffusion': 'https://stablediffusion.regispailler.fr',
+      'ruinedfooocus': 'https://ruinedfooocus.regispailler.fr',
+      'invoke': 'https://invoke.regispailler.fr',
+      'comfyui': 'https://comfyui.regispailler.fr',
+      'cogstudio': 'https://cogstudio.regispailler.fr',
+      'sdnext': 'https://sdnext.regispailler.fr'
     };
 
     if (moduleName) {
