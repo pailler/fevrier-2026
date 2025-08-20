@@ -615,7 +615,154 @@ export default function CardDetailPage() {
                  </section>
        )}
 
+       {/* Vidéo LibreSpeed - Zone séparée après la bannière */}
+       {isLibrespeed && (
+         <div className="max-w-7xl mx-auto px-6 py-8">
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+             {/* Colonne 1 - Vidéo */}
+             <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
+               <iframe
+                 className="w-full h-full rounded-2xl"
+                 src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&modestbranding=1"
+                 title="Démonstration LibreSpeed"
+                 frameBorder="0"
+                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                 allowFullScreen
+               ></iframe>
+             </div>
+             
+             {/* Colonne 2 - Système de boutons */}
+             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
+               <div className="text-left mb-8">
+                 <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
+                   <div className="text-4xl font-bold mb-1">
+                     {card.price === 0 || card.price === '0' ? 'Free' : `€${card.price}`}
+                   </div>
+                   <div className="text-sm opacity-90">
+                     {card.price === 0 || card.price === '0' ? 'Gratuit' : 'par mois'}
+                   </div>
+                 </div>
+               </div>
 
+               <div className="space-y-6">
+                 {/* Boutons d'action */}
+                 {(card.price === 0 || card.price === '0') && session ? (
+                   // Bouton d'accès gratuit pour les modules gratuits (uniquement si connecté)
+                   <>
+                     <button 
+                       className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                       onClick={async () => {
+                         if (!session) {
+                           alert('Connectez-vous pour accéder à ce module');
+                           return;
+                         }
+
+                         // Utiliser l'accès JWT pour tous les modules gratuits (sécurisé)
+                         console.log('🔍 Ouverture du module gratuit', card.title, 'avec token JWT');
+                         await accessModuleWithJWT(card.title, card.id);
+                       }}
+                     >
+                       <span className="text-xl">🆓</span>
+                       <span>Accéder gratuitement</span>
+                     </button>
+                   </>
+                 ) : (card.price === 0 || card.price === '0') && !session ? (
+                   // Message pour les modules gratuits quand l'utilisateur n'est pas connecté
+                   <a 
+                     href="/login"
+                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
+                   >
+                     <span className="text-xl">🔒</span>
+                     <span>Connectez-vous pour accéder</span>
+                   </a>
+                 ) : (
+                   // Boutons pour les modules payants
+                   <div className="space-y-4">
+                     {!['PSitransfer', 'PDF+', 'Librespeed'].includes(card.title) && (
+                       <button 
+                         className={`w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
+                           isCardSelected(card.id)
+                             ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
+                             : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
+                         }`}
+                         onClick={() => handleSubscribe(card)}
+                       >
+                         <span className="text-xl">🔐</span>
+                         <span>{isCardSelected(card.id) ? 'Sélectionné' : 'Choisir'}</span>
+                       </button>
+                     )}
+                     
+                     {/* Bouton "Activer la sélection" pour les modules payants */}
+                     {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && (
+                       <button 
+                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                         onClick={async () => {
+                           if (!session) {
+                             window.location.href = '/login';
+                             return;
+                           }
+
+                           try {
+                             const response = await fetch('/api/create-payment-intent', {
+                               method: 'POST',
+                               headers: {
+                                 'Content-Type': 'application/json',
+                               },
+                               body: JSON.stringify({
+                                 items: [card],
+                                 customerEmail: user?.email,
+                                 type: 'payment',
+                               }),
+                             });
+
+                             if (!response.ok) {
+                               throw new Error(`Erreur HTTP ${response.status}`);
+                             }
+
+                             const { url, error } = await response.json();
+
+                             if (error) {
+                               throw new Error(`Erreur API: ${error}`);
+                             }
+
+                             if (url) {
+                               window.location.href = url;
+                             } else {
+                               throw new Error('URL de session Stripe manquante.');
+                             }
+                           } catch (error) {
+                             console.error('Erreur lors de l\'activation:', error);
+                             alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                           }
+                         }}
+                       >
+                         <span className="text-xl">⚡</span>
+                         <span>Activer {card.title}</span>
+                       </button>
+                     )}
+
+                     {/* Bouton JWT - visible seulement si l'utilisateur a accès au module */}
+                     {session && userSubscriptions[`module_${card.id}`] && (
+                       <button 
+                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                         onClick={async () => {
+                           // Pour tous les modules, utiliser la fonction générique
+                           await accessModuleWithJWT(card.title, card.id);
+                         }}
+                       >
+                         <span className="text-xl">🔑</span>
+                         <span>Accéder à {card.title}</span>
+                       </button>
+                     )}
+                   </div>
+                 )}
+
+
+               </div>
+             </div>
+           </div>
+         </div>
+       )}
 
        {/* Contenu principal */}
       <main className="max-w-7xl mx-auto px-6 py-12">
@@ -647,399 +794,7 @@ export default function CardDetailPage() {
 
 
 
-            {/* Sidebar */}
-            {!isLibrespeed && (
-            <div className="space-y-8">
-              {/* Carte d'action */}
-              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-                <div className="text-left mb-8">
-                  <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                    <div className="text-4xl font-bold mb-1">
-                      {card.price === 0 || card.price === '0' ? 'Free' : `€${card.price}`}
-                    </div>
-                    <div className="text-sm opacity-90">
-                      {card.price === 0 || card.price === '0' ? 'Gratuit' : 'par mois'}
-                    </div>
-                  </div>
-                </div>
 
-                <div className="space-y-6">
-                  {/* Boutons d'action */}
-                  {(card.price === 0 || card.price === '0') && session ? (
-                    // Bouton d'accès gratuit pour les modules gratuits (uniquement si connecté)
-                    <>
-                                             <button 
-                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                         onClick={async () => {
-                          if (!session) {
-                            alert('Connectez-vous pour accéder à ce module');
-                            return;
-                          }
-
-                          // Utiliser l'accès JWT pour tous les modules gratuits (sécurisé)
-                          console.log('🔍 Ouverture du module gratuit', card.title, 'avec token JWT');
-                          await accessModuleWithJWT(card.title, card.id);
-                        }}
-                      >
-                        <span className="text-xl">🆓</span>
-                        <span>Accéder gratuitement</span>
-                      </button>
-                      
-                                                 {/* Lien direct vers Gradio pour RuinedFooocus gratuit */}
-                           {card.title.toLowerCase() === 'ruinedfooocus' && (
-                             <>
-                               <a 
-                                 href="https://da4be546aab3e23055.gradio.live/"
-                                 target="_blank"
-                                 rel="noopener noreferrer"
-                                 className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                                 title="Accéder directement à l'application RuinedFooocus sur Gradio"
-                               >
-                                 <span className="text-xl">🚀</span>
-                                 <span>Accès direct Gradio</span>
-                               </a>
-                               
-                               {/* Bouton d'accès local pour RuinedFooocus */}
-                               <button 
-                                 className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                                 onClick={async () => {
-                                   if (!session) {
-                                     alert('Connectez-vous pour accéder à cette ressource locale');
-                                     return;
-                                   }
-                                   
-                                   console.log('🔑 Accès local RuinedFooocus demandé');
-                                   
-                                   try {
-                                     const response = await fetch('/api/generate-local-token', {
-                                       method: 'POST',
-                                       headers: {
-                                         'Content-Type': 'application/json',
-                                         'Authorization': `Bearer ${session?.access_token}`
-                                       },
-                                       body: JSON.stringify({
-                                         targetUrl: 'http://192.168.1.150:7870',
-                                         moduleTitle: 'RuinedFooocus Local',
-                                         moduleId: card.id
-                                       }),
-                                     });
-                                     
-                                     if (!response.ok) {
-                                       const errorData = await response.json();
-                                       throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
-                                     }
-                                     
-                                     const { token: localToken } = await response.json();
-                                     console.log('✅ Token local généré avec succès');
-                                     
-                                     // Construire l'URL sécurisée avec le token
-                                     const secureUrl = `/api/local-proxy?token=${localToken}`;
-                                     console.log('🔗 URL d\'accès local sécurisée:', secureUrl);
-                                     
-                                     setIframeModal({
-                                       isOpen: true,
-                                       url: secureUrl,
-                                       title: 'RuinedFooocus Local'
-                                     });
-                                   } catch (error) {
-                                     console.error('❌ Erreur lors de l\'accès local:', error);
-                                     alert(`Erreur lors de l'accès local: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
-                                   }
-                                 }}
-                                 title="Accéder à l'application RuinedFooocus locale (192.168.1.150:7870)"
-                               >
-                                 <span className="text-xl">🏠</span>
-                                 <span>Accès Local (192.168.1.150)</span>
-                               </button>
-                             </>
-                           )}
-                    </>
-                  ) : (card.price === 0 || card.price === '0') && !session && !isLibrespeed ? (
-                    // Message pour les modules gratuits quand l'utilisateur n'est pas connecté (sauf LibreSpeed)
-                    <a 
-                      href="/login"
-                      className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
-                    >
-                      <span className="text-xl">🔒</span>
-                      <span>Connectez-vous pour accéder</span>
-                    </a>
-                  ) : (
-                    // Boutons pour les modules payants
-                    <div className="space-y-4">
-                      {!['PSitransfer', 'PDF+', 'Librespeed'].includes(card.title) && (
-                        <button 
-                          className={`w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
-                            isCardSelected(card.id)
-                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
-                              : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
-                          }`}
-                          onClick={() => handleSubscribe(card)}
-                        >
-                          <span className="text-xl">🔐</span>
-                          <span>{isCardSelected(card.id) ? 'Sélectionné' : 'Choisir'}</span>
-                        </button>
-                      )}
-                      
-                                             {/* Bouton "Activer la sélection" pour les modules payants */}
-                       {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && (
-                        <button 
-                          className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                          onClick={async () => {
-                            if (!session) {
-                              window.location.href = '/login';
-                              return;
-                            }
-
-                            try {
-                              const response = await fetch('/api/create-payment-intent', {
-                                method: 'POST',
-                                headers: {
-                                  'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                  items: [card],
-                                  customerEmail: user?.email,
-                                  type: 'payment',
-                                }),
-                              });
-
-                              if (!response.ok) {
-                                throw new Error(`Erreur HTTP ${response.status}`);
-                              }
-
-                              const { url, error } = await response.json();
-
-                              if (error) {
-                                throw new Error(`Erreur API: ${error}`);
-                              }
-
-                              if (url) {
-                                window.location.href = url;
-                              } else {
-                                throw new Error('URL de session Stripe manquante.');
-                              }
-                            } catch (error) {
-                              console.error('Erreur lors de l\'activation:', error);
-                              alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
-                            }
-                          }}
-                        >
-                          <span className="text-xl">⚡</span>
-                          <span>Activer {card.title}</span>
-                        </button>
-                      )}
-
-                      {/* Bouton JWT - visible seulement si l'utilisateur a accès au module */}
-                      {session && userSubscriptions[`module_${card.id}`] && (
-                        <>
-                          {card.title.toLowerCase() === 'ruinedfooocus' ? (
-                            <button
-                              onClick={async () => {
-                                console.log('🔑 Accès RuinedFooocus via système de tokens');
-                                
-                                try {
-                                  // Utiliser le système de tokens existant mais avec l'URL RuinedFooocus
-                                  const response = await fetch('/api/generate-module-token', {
-                                    method: 'POST',
-                                    headers: {
-                                      'Content-Type': 'application/json',
-                                      'Authorization': `Bearer ${session?.access_token}`
-                                    },
-                                    body: JSON.stringify({
-                                      moduleId: card.id,
-                                      moduleTitle: card.title,
-                                      targetUrl: 'https://ruinedfooocus.regispailler.fr'
-                                    }),
-                                  });
-                                  
-                                  if (!response.ok) {
-                                    const errorData = await response.json();
-                                    throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
-                                  }
-                                  
-                                  const { token, expiresAt, accessUrl } = await response.json();
-                                  console.log('✅ Token généré avec succès pour RuinedFooocus');
-                                  
-                                  // Ouvrir dans une iframe sécurisée
-                                  setIframeModal({
-                                    isOpen: true,
-                                    url: accessUrl,
-                                    title: 'RuinedFooocus'
-                                  });
-                                  
-                                } catch (error) {
-                                  console.error('❌ Erreur lors de la génération du token:', error);
-                                  alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
-                                }
-                              }}
-                              className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                              title={`Accéder à ${card.title} avec authentification`}
-                            >
-                              <span className="text-xl">🔑</span>
-                              <span>Accéder à {card.title}</span>
-                            </button>
-                          ) : (
-                            <button 
-                              className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                              onClick={async () => {
-                                // Pour tous les modules, utiliser la fonction générique
-                                await accessModuleWithJWT(card.title, card.id);
-                              }}
-                            >
-                              <span className="text-xl">🔑</span>
-                              <span>Accéder à {card.title}</span>
-                            </button>
-                          )}
-                          
-                                                     {/* Lien direct vers Gradio pour RuinedFooocus */}
-                           {card.title.toLowerCase() === 'ruinedfooocus' && (
-                             <>
-                               <a 
-                                 href="https://da4be546aab3e23055.gradio.live/"
-                                 target="_blank"
-                                 rel="noopener noreferrer"
-                                 className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                                 title="Accéder directement à l'application RuinedFooocus sur Gradio"
-                               >
-                                 <span className="text-xl">🚀</span>
-                                 <span>Accès direct Gradio</span>
-                               </a>
-                               
-                               {/* Bouton d'accès local pour RuinedFooocus */}
-                               <button 
-                                 className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                                 onClick={async () => {
-                                   if (!session) {
-                                     alert('Connectez-vous pour accéder à cette ressource locale');
-                                     return;
-                                   }
-                                   
-                                   console.log('🔑 Accès local RuinedFooocus demandé (module payant)');
-                                   
-                                   try {
-                                     const response = await fetch('/api/generate-local-token', {
-                                       method: 'POST',
-                                       headers: {
-                                         'Content-Type': 'application/json',
-                                         'Authorization': `Bearer ${session?.access_token}`
-                                       },
-                                       body: JSON.stringify({
-                                         targetUrl: 'http://192.168.1.150:7870',
-                                         moduleTitle: 'RuinedFooocus Local',
-                                         moduleId: card.id
-                                       }),
-                                     });
-                                     
-                                     if (!response.ok) {
-                                       const errorData = await response.json();
-                                       throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
-                                     }
-                                     
-                                     const { token: localToken } = await response.json();
-                                     console.log('✅ Token local généré avec succès');
-                                     
-                                     // Construire l'URL sécurisée avec le token
-                                     const secureUrl = `/api/local-proxy?token=${localToken}`;
-                                     console.log('🔗 URL d\'accès local sécurisée:', secureUrl);
-                                     
-                                     setIframeModal({
-                                       isOpen: true,
-                                       url: secureUrl,
-                                       title: 'RuinedFooocus Local'
-                                     });
-                                   } catch (error) {
-                                     console.error('❌ Erreur lors de l\'accès local:', error);
-                                     alert(`Erreur lors de l'accès local: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
-                                   }
-                                 }}
-                                 title="Accéder à l'application RuinedFooocus locale (192.168.1.150:7870)"
-                               >
-                                 <span className="text-xl">🏠</span>
-                                 <span>Accès Local (192.168.1.150)</span>
-                               </button>
-                             </>
-                           )}
-                        </>
-                      )}
-
-                      {/* Bouton dupliqué supprimé - le bouton est déjà dans la section des modules gratuits */}
-                    </div>
-                  )}
-
-
-                </div>
-              </div>
-
-              {/* Liens utiles */}
-              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-                <h3 className="text-xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-6">Liens utiles</h3>
-                <div className="space-y-4">
-                  {card.documentation_url && (
-                    <a 
-                      href={card.documentation_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-4 text-gray-700 hover:text-blue-600 transition-all duration-200 p-3 rounded-xl hover:bg-blue-50 group"
-                    >
-                      <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-blue-600">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-                        </svg>
-                      </div>
-                      <span className="font-medium">Documentation</span>
-                    </a>
-                  )}
-                  
-                  {card.github_url && (
-                    <a 
-                      href={card.github_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-4 text-gray-700 hover:text-blue-600 transition-all duration-200 p-3 rounded-xl hover:bg-blue-50 group"
-                    >
-                      <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-gray-600">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
-                        </svg>
-                      </div>
-                      <span className="font-medium">Code source</span>
-                    </a>
-                  )}
-                  
-                  {card.demo_url && (
-                    <a 
-                      href={card.demo_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-4 text-gray-700 hover:text-blue-600 transition-all duration-200 p-3 rounded-xl hover:bg-blue-50 group"
-                    >
-                      <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-green-600">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
-                        </svg>
-                      </div>
-                      <span className="font-medium">Démo en ligne</span>
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              {/* Prérequis */}
-              {card.requirements && card.requirements.length > 0 && (
-                <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-                  <h3 className="text-xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-6">Prérequis</h3>
-                  <div className="space-y-4">
-                    {card.requirements.map((requirement, index) => (
-                      <div key={index} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-xl">
-                        <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full mt-1.5 flex-shrink-0"></div>
-                        <span className="text-gray-700 font-medium">{requirement}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-            )}
           </div>
         </div>
       </main>
