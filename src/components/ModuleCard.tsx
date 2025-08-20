@@ -123,8 +123,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     ? "bg-green-100 text-green-800 border-green-200" 
     : "bg-blue-100 text-blue-800 border-blue-200";
 
+  // Vérifier si c'est le module librespeed pour appliquer un style spécial
+  const isLibrespeed = module.title.toLowerCase().includes('librespeed') || module.id === 'librespeed';
+
   return (
-    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''}`}>
       
       {/* Image du module - Cliquable */}
       <Link href={`/card/${module.id}`} className="block">
@@ -148,38 +151,92 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             loading="lazy"
           />
           
-          {/* Overlay au survol */}
-          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white bg-opacity-90 rounded-full p-3">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
+          {/* Overlay au survol - seulement pour les modules non-librespeed */}
+          {!isLibrespeed && (
+            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white bg-opacity-90 rounded-full p-3">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </div>
             </div>
-          </div>
+          )}
           
-          <div className="absolute top-3 left-3">
-            <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-              {module.category}
-            </span>
-          </div>
-          <div className="absolute top-3 right-3">
-            <span className={`${priceStyle} text-sm font-bold px-3 py-1 rounded-full border`}>
-              {formatPrice(module.price)}
-            </span>
-          </div>
+          {/* Style spécial pour librespeed - informations visibles en permanence */}
+          {isLibrespeed ? (
+            <>
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Badge prix en haut à droite */}
+              <div className="absolute top-3 right-3 z-20">
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+              
+              {/* Overlay avec titre et sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                <h3 className="text-white font-bold text-lg leading-tight mb-2 drop-shadow-lg">
+                  {module.title}
+                </h3>
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "FEATURED" pour librespeed */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    ⭐ FEATURED
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Style normal pour les autres modules */}
+              <div className="absolute top-3 left-3">
+                <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                  {module.category}
+                </span>
+              </div>
+              <div className="absolute top-3 right-3">
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1 rounded-full border`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            </>
+          )}
         </div>
       </Link>
 
       {/* Contenu du module */}
       <div className="p-6">
         <Link href={`/card/${module.id}`} className="block group">
-          <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
-            {module.title}
-          </h3>
-          <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
-            {module.subtitle || module.description}
-          </p>
+          {/* Pour librespeed, ne pas afficher le titre dupliqué */}
+          {!isLibrespeed && (
+            <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
+              {module.title}
+            </h3>
+          )}
+          {/* Pour librespeed, afficher seulement la description si pas de sous-titre */}
+          {isLibrespeed ? (
+            !module.subtitle && (
+              <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
+                {module.description}
+              </p>
+            )
+          ) : (
+            <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
+              {module.subtitle || module.description}
+            </p>
+          )}
         </Link>
 
         {/* Boutons d'action */}
