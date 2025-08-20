@@ -631,9 +631,13 @@ export default function CardDetailPage() {
              {/* Colonne 2 - Système de boutons */}
              <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
                <div className="text-left mb-8">
-                 <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                   <div className="text-4xl font-bold mb-1">€{card.price}</div>
-                   <div className="text-sm opacity-90">par mois</div>
+                 <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
+                   <div className="text-4xl font-bold mb-1">
+                     {card.price === 0 || card.price === '0' ? 'Free' : `€${card.price}`}
+                   </div>
+                   <div className="text-sm opacity-90">
+                     {card.price === 0 || card.price === '0' ? 'Gratuit' : 'par mois'}
+                   </div>
                  </div>
                </div>
 
@@ -881,9 +885,13 @@ export default function CardDetailPage() {
               {/* Carte d'action */}
               <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
                 <div className="text-left mb-8">
-                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                    <div className="text-4xl font-bold mb-1">€{card.price}</div>
-                    <div className="text-sm opacity-90">par mois</div>
+                  <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
+                    <div className="text-4xl font-bold mb-1">
+                      {card.price === 0 || card.price === '0' ? 'Free' : `€${card.price}`}
+                    </div>
+                    <div className="text-sm opacity-90">
+                      {card.price === 0 || card.price === '0' ? 'Gratuit' : 'par mois'}
+                    </div>
                   </div>
                 </div>
 
