@@ -502,9 +502,9 @@ export default function CardDetailPage() {
         </div>
       </div>
 
-      {/* Bannière spéciale pour librespeed */}
-      {isLibrespeed && (
-        <section className="bg-gradient-to-r from-blue-600 to-blue-800 py-16">
+             {/* Bannière spéciale pour librespeed */}
+       {isLibrespeed && (
+         <section className="bg-gradient-to-r from-blue-600 to-blue-800 py-12">
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
               {/* Contenu texte */}
