@@ -173,22 +173,56 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                  </span>
                </div>
                
-               {/* Logo librespeed en haut à droite */}
-               <div className="absolute top-3 right-3 z-20">
-                 <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
-                   {/* Icône speedomètre/gauge */}
-                   <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <circle cx="12" cy="12" r="10" strokeWidth="2" className="text-gray-300"/>
-                     <path 
-                       d="M12 2v10l8 4" 
-                       strokeWidth="2" 
-                       strokeLinecap="round" 
-                       className="text-blue-600"
-                     />
-                     <circle cx="12" cy="12" r="2" fill="currentColor" className="text-blue-600"/>
-                   </svg>
-                 </div>
-               </div>
+                               {/* Logo librespeed en haut à droite */}
+                <div className="absolute top-3 right-3 z-20">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                    {/* Logo speedomètre librespeed fidèle au design original */}
+                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                      {/* Cercle extérieur gris */}
+                      <circle cx="12" cy="12" r="10" stroke="#9CA3AF" strokeWidth="2" fill="none"/>
+                      
+                      {/* Graduations du speedomètre */}
+                      <path d="M12 2 L12 4" stroke="#9CA3AF" strokeWidth="1"/>
+                      <path d="M12 20 L12 22" stroke="#9CA3AF" strokeWidth="1"/>
+                      <path d="M2 12 L4 12" stroke="#9CA3AF" strokeWidth="1"/>
+                      <path d="M20 12 L22 12" stroke="#9CA3AF" strokeWidth="1"/>
+                      
+                      {/* Arc coloré orange/rouge pour la zone critique */}
+                      <path 
+                        d="M12 2 A10 10 0 0 1 20 12" 
+                        stroke="url(#gradient)" 
+                        strokeWidth="3" 
+                        fill="none"
+                        strokeLinecap="round"
+                      />
+                      
+                      {/* Aiguille bleue */}
+                      <path 
+                        d="M12 12 L18 8" 
+                        stroke="#2563EB" 
+                        strokeWidth="2" 
+                        strokeLinecap="round"
+                      />
+                      
+                      {/* Point central */}
+                      <circle cx="12" cy="12" r="2" fill="#2563EB"/>
+                      
+                      {/* Indicateurs digitaux en bas */}
+                      <rect x="8" y="16" width="1" height="1" fill="#9CA3AF"/>
+                      <rect x="10" y="16" width="1" height="1" fill="#9CA3AF"/>
+                      <rect x="12" y="16" width="1" height="1" fill="#9CA3AF"/>
+                      <rect x="14" y="16" width="1" height="1" fill="#9CA3AF"/>
+                      
+                      {/* Gradient pour l'arc coloré */}
+                      <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#F59E0B"/>
+                          <stop offset="100%" stopColor="#EF4444"/>
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  </div>
+                </div>
                
                {/* Badge prix en haut à droite, décalé vers la gauche */}
                <div className="absolute top-3 right-16 z-20">
