@@ -504,7 +504,18 @@ export default function CardDetailPage() {
 
              {/* Bannière spéciale pour librespeed */}
        {isLibrespeed && (
-         <section className="bg-gradient-to-r from-blue-600 to-blue-800 py-8">
+         <section className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 py-8 relative overflow-hidden">
+           {/* Effet de particules animées */}
+           <div className="absolute inset-0">
+             <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+             <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
+             <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
+             <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
+             <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
+           </div>
+           
+           {/* Effet de vague en bas */}
+           <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
               {/* Contenu texte */}
