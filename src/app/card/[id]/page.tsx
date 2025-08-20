@@ -634,8 +634,8 @@ export default function CardDetailPage() {
                        </p>
                      </div>
                      
-                     {/* Vidéo réduite */}
-                     <div className="w-full max-w-2xl mx-auto aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center mb-8">
+                     {/* Vidéo en pleine largeur sur mobile */}
+                     <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center mb-8">
                        <div className="text-center p-8">
                          <div className="text-6xl mb-4">🎥</div>
                          <h3 className="text-xl font-semibold text-gray-700 mb-2">Démonstration LibreSpeed</h3>
@@ -1238,18 +1238,17 @@ export default function CardDetailPage() {
       )}
 
       {/* Zone de détails du module - Pleine largeur */}
-      {!isLibrespeed && (
-        <div className="bg-gradient-to-br from-gray-50 to-indigo-50/30 border-t border-gray-200/50 py-20">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-left mb-16">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-4">
-                {card.subtitle || card.title}
-              </h2>
-              <div 
-                className="text-xl text-gray-600 max-w-4xl mx-auto"
-                dangerouslySetInnerHTML={{ __html: card.description }}
-              />
-            </div>
+      <div className="bg-gradient-to-br from-gray-50 to-indigo-50/30 border-t border-gray-200/50 py-20">
+        <div className="max-w-7xl mx-auto px-6">
+                     <div className="text-left mb-16">
+             <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-4">
+               {card.subtitle || card.title}
+             </h2>
+             <div 
+               className="text-xl text-gray-600 max-w-4xl mx-auto"
+               dangerouslySetInnerHTML={{ __html: card.description }}
+             />
+           </div>
           
 
           {/* Avantages clés */}
@@ -1324,7 +1323,6 @@ export default function CardDetailPage() {
 
         </div>
       </div>
-      )}
 
       {/* Modal pour l'iframe */}
       {iframeModal.isOpen && (
