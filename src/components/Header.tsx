@@ -103,21 +103,24 @@ export default function Header() {
           <div className="flex items-center justify-between h-10">
             {/* Mode non connecté */}
             {!session ? (
-              <div className="flex items-center space-x-4 text-sm">
-                <span className="hidden sm:inline">Bienvenue sur IAhome</span>
-                <div className="flex items-center space-x-3">
-                  <button 
-                    className="text-blue-100 hover:text-white transition-colors text-sm"
-                    onClick={() => router.push('/login')}
-                  >
-                    Se connecter
-                  </button>
-                  <button 
-                    className="bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors"
-                    onClick={() => router.push('/register')}
-                  >
-                    Commencer
-                  </button>
+              <div className="flex items-center justify-between w-full">
+                <div></div> {/* Espace vide à gauche */}
+                <div className="flex items-center space-x-4 text-sm">
+                  <span className="hidden sm:inline">Bienvenue sur IAhome</span>
+                  <div className="flex items-center space-x-3">
+                    <button 
+                      className="text-blue-100 hover:text-white transition-colors text-sm"
+                      onClick={() => router.push('/login')}
+                    >
+                      Se connecter
+                    </button>
+                    <button 
+                      className="bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors"
+                      onClick={() => router.push('/register')}
+                    >
+                      Commencer
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
