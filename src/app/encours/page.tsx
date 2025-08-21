@@ -915,7 +915,7 @@ export default function EncoursPage() {
               {userModules.map((module) => {
                 const isExpired = !!(module.expires_at && new Date(module.expires_at) <= new Date());
                 const isExpiringSoon = module.expires_at && getDaysRemaining(module.expires_at) <= 7;
-                const maxUsage = module.max_usage || (module.is_free ? 20 : 1000);
+                                 const maxUsage = module.max_usage || 20;
                 const isQuotaExceeded = (module.current_usage || 0) >= maxUsage;
                 
                 return (
@@ -974,32 +974,32 @@ export default function EncoursPage() {
                       {/* Informations d'utilisation pour tous les modules */}
                       {(module.max_usage || module.is_free) && (
                         <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                          <div className="flex justify-between text-sm text-gray-600 mb-2">
-                            <span>Utilisations : {module.current_usage || 0} / {module.max_usage || 20}</span>
-                            <span>{Math.round(((module.current_usage || 0) / (module.max_usage || 20)) * 100)}%</span>
-                          </div>
+                                                     <div className="flex justify-between text-sm text-gray-600 mb-2">
+                             <span>Utilisations : {module.current_usage || 0} / {maxUsage}</span>
+                             <span>{Math.round(((module.current_usage || 0) / maxUsage) * 100)}%</span>
+                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
-                              className={`h-2 rounded-full transition-all duration-500 ${
-                                isQuotaExceeded ? 'bg-red-500' :
-                                getUsageColor(module.current_usage || 0, module.max_usage || 20).includes('red') ? 'bg-red-500' :
-                                getUsageColor(module.current_usage || 0, module.max_usage || 20).includes('orange') ? 'bg-orange-500' :
-                                getUsageColor(module.current_usage || 0, module.max_usage || 20).includes('yellow') ? 'bg-yellow-500' :
-                                'bg-green-500'
-                              }`}
-                              style={{ width: `${Math.min(((module.current_usage || 0) / (module.max_usage || 20)) * 100, 100)}%` }}
-                            ></div>
+                                                         <div 
+                               className={`h-2 rounded-full transition-all duration-500 ${
+                                 isQuotaExceeded ? 'bg-red-500' :
+                                 getUsageColor(module.current_usage || 0, maxUsage).includes('red') ? 'bg-red-500' :
+                                 getUsageColor(module.current_usage || 0, maxUsage).includes('orange') ? 'bg-orange-500' :
+                                 getUsageColor(module.current_usage || 0, maxUsage).includes('yellow') ? 'bg-yellow-500' :
+                                 'bg-green-500'
+                               }`}
+                               style={{ width: `${Math.min(((module.current_usage || 0) / maxUsage) * 100, 100)}%` }}
+                             ></div>
                           </div>
                           {isQuotaExceeded && (
                             <p className="text-red-600 text-xs mt-2 font-semibold">
                               ⚠️ Quota épuisé
                             </p>
                           )}
-                          {module.is_free && !isQuotaExceeded && (
-                            <p className="text-blue-600 text-xs mt-2 font-semibold">
-                              📊 Module gratuit : 20 utilisations maximum
-                            </p>
-                          )}
+                                                     {!isQuotaExceeded && (
+                             <p className="text-blue-600 text-xs mt-2 font-semibold">
+                               📊 Quota : {maxUsage} utilisations maximum
+                             </p>
+                           )}
                         </div>
                       )}
 

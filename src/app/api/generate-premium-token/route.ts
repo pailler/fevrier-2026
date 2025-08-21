@@ -95,7 +95,9 @@ export async function POST(request: NextRequest) {
         module_title: module.title,
         access_level: 'premium',
         is_active: true,
-        expires_at: expiresAt.toISOString()
+        expires_at: expiresAt.toISOString(),
+        max_usage: maxUsage,
+        usage_count: 0
       })
       .select()
       .single();

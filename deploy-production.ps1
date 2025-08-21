@@ -27,10 +27,10 @@ Write-Host "🔍 Vérification du statut des services..." -ForegroundColor Yello
 docker-compose -f docker-compose.prod.yml ps
 
 # Vérifier les logs
-Write-Host "📋 Logs de l'application:" -ForegroundColor Cyan
+Write-Host "Logs de l'application:" -ForegroundColor Cyan
 docker-compose -f docker-compose.prod.yml logs iahome-app --tail=20
 
-Write-Host "📋 Logs de Traefik:" -ForegroundColor Cyan
+Write-Host "Logs de Traefik:" -ForegroundColor Cyan
 docker-compose -f docker-compose.prod.yml logs traefik --tail=20
 
 # Test de connectivité
