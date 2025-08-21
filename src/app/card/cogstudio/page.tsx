@@ -352,25 +352,25 @@ export default function CogStudioPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Studio de création d'IA avancé
+                Studio de développement IA avancé
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
-                {(card?.category || 'AI STUDIO').toUpperCase()}
+                {(card?.category || 'AI DEVELOPMENT STUDIO').toUpperCase()}
               </span>
               <p className="text-xl text-cyan-100 mb-6">
-                CogStudio vous offre un environnement de développement complet pour créer, entraîner et déployer vos modèles d'intelligence artificielle personnalisés.
+                CogStudio vous offre un environnement de développement complet pour créer, tester et déployer des modèles d'intelligence artificielle avec des outils professionnels.
               </p>
               
               {/* Badges de fonctionnalités */}
               <div className="flex flex-wrap gap-3 mb-6">
                 <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
-                  🧠 Modèles personnalisés
+                  🧠 Développement IA
                 </span>
                 <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
-                  🎯 Entraînement avancé
+                  🔧 Outils avancés
                 </span>
                 <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
-                  🚀 Déploiement rapide
+                  ⚡ Environnement cloud
                 </span>
               </div>
             </div>
@@ -384,36 +384,37 @@ export default function CogStudioPage() {
                 <div className="absolute bottom-0 left-16 w-20 h-20 bg-blue-400 transform rotate-45 opacity-80 animate-pulse"></div>
                 <div className="absolute bottom-16 right-16 w-16 h-16 bg-white rounded-full opacity-80 animate-bounce"></div>
                 
-                {/* Logo studio centré */}
+                {/* Logo studio de développement centré */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="bg-white/95 backdrop-blur-sm rounded-full p-6 shadow-2xl border-2 border-cyan-500/20">
                     <svg className="w-20 h-20" viewBox="0 0 24 24" fill="none">
                       {/* Studio de développement stylisé */}
                       <rect x="2" y="2" width="20" height="20" rx="2" stroke="#0891B2" strokeWidth="2" fill="none"/>
                       
-                      {/* Éléments de studio */}
-                      <circle cx="8" cy="8" r="2" fill="#0891B2" opacity="0.8"/>
-                      <circle cx="16" cy="8" r="2" fill="#0891B2" opacity="0.8"/>
-                      <circle cx="8" cy="16" r="2" fill="#0891B2" opacity="0.8"/>
-                      <circle cx="16" cy="16" r="2" fill="#0891B2" opacity="0.8"/>
-                      <circle cx="12" cy="12" r="2" fill="#0891B2" opacity="0.8"/>
+                      {/* Éléments de développement */}
+                      <rect x="4" y="4" width="6" height="3" fill="#0891B2" opacity="0.8"/>
+                      <rect x="4" y="8" width="6" height="3" fill="#0891B2" opacity="0.8"/>
+                      <rect x="4" y="12" width="6" height="3" fill="#0891B2" opacity="0.8"/>
                       
-                      {/* Connexions de développement */}
-                      <path d="M10 8 L14 12" stroke="#0891B2" strokeWidth="1.5" strokeLinecap="round"/>
-                      <path d="M14 8 L10 12" stroke="#0891B2" strokeWidth="1.5" strokeLinecap="round"/>
-                      <path d="M10 12 L14 16" stroke="#0891B2" strokeWidth="1.5" strokeLinecap="round"/>
-                      <path d="M14 12 L10 16" stroke="#0891B2" strokeWidth="1.5" strokeLinecap="round"/>
+                      <rect x="12" y="4" width="6" height="3" fill="#0891B2" opacity="0.8"/>
+                      <rect x="12" y="8" width="6" height="3" fill="#0891B2" opacity="0.8"/>
+                      <rect x="12" y="12" width="6" height="3" fill="#0891B2" opacity="0.8"/>
                       
-                      {/* Indicateurs de flux de données */}
-                      <circle cx="10" cy="8" r="0.5" fill="#0891B2" className="animate-pulse">
+                      {/* Indicateurs de processus */}
+                      <circle cx="6" cy="6" r="0.5" fill="#0891B2" className="animate-pulse">
                         <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
                       </circle>
-                      <circle cx="14" cy="12" r="0.5" fill="#0891B2" className="animate-pulse">
+                      <circle cx="14" cy="10" r="0.5" fill="#0891B2" className="animate-pulse">
                         <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
                       </circle>
-                      <circle cx="10" cy="16" r="0.5" fill="#0891B2" className="animate-pulse">
+                      <circle cx="6" cy="14" r="0.5" fill="#0891B2" className="animate-pulse">
                         <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
                       </circle>
+                      
+                      {/* Connexions de développement */}
+                      <path d="M10 6 L14 6" stroke="#0891B2" strokeWidth="1" strokeLinecap="round"/>
+                      <path d="M10 10 L14 10" stroke="#0891B2" strokeWidth="1" strokeLinecap="round"/>
+                      <path d="M10 14 L14 14" stroke="#0891B2" strokeWidth="1" strokeLinecap="round"/>
                     </svg>
                   </div>
                 </div>
@@ -493,7 +494,7 @@ export default function CogStudioPage() {
                 {/* Bouton "Activer la sélection" pour les modules payants */}
                 {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (
                   <button 
-                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                     onClick={async () => {
                       if (!session) {
                         window.location.href = '/login';
@@ -588,9 +589,8 @@ export default function CogStudioPage() {
                 {/* Description principale */}
                 <div className="text-center max-w-5xl mx-auto">
                   <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
-                    CogStudio est un environnement de développement complet et professionnel pour créer, entraîner et déployer 
-                    vos modèles d'intelligence artificielle personnalisés. Cette plateforme vous offre tous les outils nécessaires 
-                    pour transformer vos idées en modèles d'IA performants.
+                    CogStudio est un environnement de développement complet pour l'intelligence artificielle 
+                    qui combine outils avancés, infrastructure cloud et interface intuitive pour créer des modèles IA.
                   </p>
                   {card.subtitle && (
                     <p className="text-base sm:text-lg text-gray-600 italic mb-8">
@@ -611,15 +611,14 @@ export default function CogStudioPage() {
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        CogStudio est un studio de développement d'intelligence artificielle complet qui vous permet de créer, 
-                        entraîner et déployer vos propres modèles d'IA. Cette plateforme professionnelle combine des outils 
-                        de développement avancés avec une interface intuitive pour vous accompagner dans tous les aspects 
-                        de votre projet d'IA.
+                        CogStudio est une plateforme de développement d'intelligence artificielle complète qui offre 
+                        un environnement intégré pour créer, entraîner et déployer des modèles IA. Cette solution 
+                        combine des outils de développement avancés avec une infrastructure cloud performante.
                       </p>
                       <p className="text-base leading-relaxed">
-                        Que vous soyez un développeur expérimenté ou un débutant dans le domaine de l'IA, CogStudio vous 
-                        offre un environnement de travail optimisé avec des fonctionnalités avancées pour la gestion de données, 
-                        l'entraînement de modèles et le déploiement en production.
+                        Conçu pour les développeurs, data scientists et chercheurs en IA, CogStudio simplifie 
+                        le processus de développement en fournissant tous les outils nécessaires dans un seul 
+                        environnement unifié et accessible.
                       </p>
                     </div>
                   </div>
@@ -634,16 +633,16 @@ export default function CogStudioPage() {
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Environnement complet :</strong> Tout ce dont vous avez besoin pour développer des modèles d'IA 
-                        dans une seule plateforme intégrée, de la préparation des données au déploiement en production.
+                        <strong>Environnement intégré :</strong> Tous les outils nécessaires au développement IA 
+                        sont disponibles dans une interface unifiée, éliminant la complexité de la configuration.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Outils professionnels :</strong> Accédez à des outils de développement avancés, des frameworks 
-                        modernes et des bibliothèques spécialisées pour optimiser vos modèles d'IA.
+                        <strong>Infrastructure cloud :</strong> Accès à des ressources de calcul puissantes 
+                        sans investissement en matériel coûteux.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Performance optimisée :</strong> Notre infrastructure haute performance garantit des temps 
-                        d'entraînement rapides et une scalabilité pour vos projets les plus ambitieux.
+                        <strong>Collaboration avancée :</strong> Travaillez en équipe avec des outils de 
+                        partage et de versioning intégrés.
                       </p>
                     </div>
                   </div>
@@ -658,16 +657,16 @@ export default function CogStudioPage() {
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Gestion de données avancée :</strong> Outils de préparation, nettoyage et augmentation de données 
-                        pour optimiser la qualité de vos datasets d'entraînement.
+                        <strong>Éditeur de code intelligent :</strong> Support pour Python, R, Julia et autres 
+                        langages avec autocomplétion et débogage intégré.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Entraînement distribué :</strong> Capacité d'entraîner vos modèles sur plusieurs GPU en parallèle 
-                        pour accélérer le processus de développement.
+                        <strong>Gestion des données :</strong> Import, nettoyage et préparation des données 
+                        avec des outils visuels et programmatiques.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Monitoring en temps réel :</strong> Suivez les performances de vos modèles pendant l'entraînement 
-                        avec des métriques détaillées et des visualisations interactives.
+                        <strong>Entraînement distribué :</strong> Entraînez vos modèles sur plusieurs GPU 
+                        et nœuds pour des performances optimales.
                       </p>
                     </div>
                   </div>
@@ -682,22 +681,22 @@ export default function CogStudioPage() {
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Développeurs et chercheurs :</strong> Créez des modèles d'IA personnalisés pour vos projets 
-                        de recherche, développez des solutions innovantes et testez de nouvelles architectures.
+                        <strong>Recherche académique :</strong> Développez et testez de nouveaux algorithmes 
+                        d'IA pour vos projets de recherche.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Entreprises et startups :</strong> Développez des modèles d'IA spécifiques à votre domaine 
-                        d'activité, optimisez vos processus métier et créez des avantages concurrentiels.
+                        <strong>Développement commercial :</strong> Créez des solutions IA pour vos produits 
+                        et services avec des outils professionnels.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Étudiants et apprenants :</strong> Apprenez les concepts d'IA de manière pratique, 
-                        expérimentez avec différents modèles et développez vos compétences techniques.
+                        <strong>Formation et éducation :</strong> Apprenez l'IA avec des environnements 
+                        préconfigurés et des tutoriels intégrés.
                       </p>
                     </div>
                   </div>
 
                   {/* Chapitre 5: Avantages techniques */}
-                  <div className="bg-gradient-to-r from-purple-50 to-cyan-50 p-8 rounded-2xl border border-purple-200 shadow-lg">
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-8 rounded-2xl border border-purple-200 shadow-lg">
                     <div className="flex items-center mb-6">
                       <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                         <span className="text-white text-xl font-bold">5</span>
@@ -706,16 +705,16 @@ export default function CogStudioPage() {
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Architecture modulaire :</strong> Chaque composant est indépendant et réutilisable, permettant 
-                        une maintenance facile et des mises à jour sans interruption de service.
+                        <strong>Performance optimisée :</strong> Infrastructure haute performance avec 
+                        accès aux dernières technologies GPU et TPU.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Scalabilité :</strong> Adaptez vos ressources selon vos besoins, de l'expérimentation 
-                        à la production à grande échelle.
+                        <strong>Scalabilité automatique :</strong> Ressources qui s'adaptent automatiquement 
+                        à vos besoins de calcul.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Sécurité avancée :</strong> Protocoles de sécurité robustes pour protéger vos données 
-                        et vos modèles d'IA sensibles.
+                        <strong>Sécurité avancée :</strong> Environnement sécurisé avec chiffrement 
+                        des données et accès contrôlé.
                       </p>
                     </div>
                   </div>
@@ -728,38 +727,38 @@ export default function CogStudioPage() {
                       <div className="w-16 h-16 bg-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                         <span className="text-2xl">🧠</span>
                       </div>
-                      <h4 className="font-bold text-cyan-900 mb-3 text-lg">Modèles personnalisés</h4>
-                      <p className="text-gray-700 text-sm">Créez et entraînez vos propres modèles d'IA adaptés à vos besoins spécifiques.</p>
+                      <h4 className="font-bold text-cyan-900 mb-3 text-lg">Développement IA</h4>
+                      <p className="text-gray-700 text-sm">Créez et entraînez des modèles d'intelligence artificielle.</p>
                     </div>
                   </div>
                   
                   <div className="bg-gradient-to-br from-teal-50 to-teal-100 p-6 sm:p-8 rounded-2xl border border-teal-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div className="text-center">
                       <div className="w-16 h-16 bg-teal-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl">🎯</span>
+                        <span className="text-2xl">🔧</span>
                       </div>
-                      <h4 className="font-bold text-teal-900 mb-3 text-lg">Entraînement avancé</h4>
-                      <p className="text-gray-700 text-sm">Outils d'entraînement sophistiqués avec monitoring en temps réel.</p>
+                      <h4 className="font-bold text-teal-900 mb-3 text-lg">Outils avancés</h4>
+                      <p className="text-gray-700 text-sm">Accès à tous les outils nécessaires au développement IA.</p>
                     </div>
                   </div>
                   
                   <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 sm:p-8 rounded-2xl border border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div className="text-center">
                       <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl">🚀</span>
+                        <span className="text-2xl">⚡</span>
                       </div>
-                      <h4 className="font-bold text-blue-900 mb-3 text-lg">Déploiement rapide</h4>
-                      <p className="text-gray-700 text-sm">Déployez vos modèles en production rapidement et efficacement.</p>
+                      <h4 className="font-bold text-blue-900 mb-3 text-lg">Environnement cloud</h4>
+                      <p className="text-gray-700 text-sm">Infrastructure cloud performante et scalable.</p>
                     </div>
                   </div>
                   
                   <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 sm:p-8 rounded-2xl border border-indigo-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div className="text-center">
                       <div className="w-16 h-16 bg-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl">⚙️</span>
+                        <span className="text-2xl">🚀</span>
                       </div>
-                      <h4 className="font-bold text-indigo-900 mb-3 text-lg">Outils professionnels</h4>
-                      <p className="text-gray-700 text-sm">Interface complète avec tous les outils nécessaires au développement.</p>
+                      <h4 className="font-bold text-indigo-900 mb-3 text-lg">Déploiement</h4>
+                      <p className="text-gray-700 text-sm">Déployez vos modèles IA en production facilement.</p>
                     </div>
                   </div>
                 </div>
@@ -782,7 +781,7 @@ export default function CogStudioPage() {
                     
                     <div className="flex items-start space-x-3">
                       <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                        <span className="text-white text-sm">📱</span>
+                        <span className="text-white text-sm">🧠</span>
                       </div>
                       <div>
                         <h5 className="font-semibold text-gray-900">Compatibilité</h5>
@@ -805,7 +804,7 @@ export default function CogStudioPage() {
                 {/* Call to action */}
                 <div className="text-center pt-8">
                   <p className="text-lg sm:text-xl text-gray-700 mb-6 max-w-4xl mx-auto">
-                    Prêt à créer vos propres modèles d'IA avec CogStudio ? Commencez dès maintenant et transformez vos idées en intelligence artificielle !
+                    Prêt à développer l'IA de demain ? Commencez dès maintenant avec CogStudio !
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                     <Link href="/register" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-cyan-600 to-teal-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
