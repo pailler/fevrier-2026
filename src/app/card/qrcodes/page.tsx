@@ -352,25 +352,25 @@ export default function QRCodesPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Générateur de QR Codes intelligent
+                Générez des QR codes dynamiques intelligents
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
                 {(card?.category || 'QR CODE GENERATOR').toUpperCase()}
               </span>
               <p className="text-xl text-blue-100 mb-6">
-                Créez des QR codes personnalisés et professionnels en quelques clics. Interface intuitive et options avancées pour tous vos besoins.
+                Créez des QR codes dynamiques avec suivi en temps réel, personnalisation avancée et analytics détaillés pour optimiser vos campagnes marketing.
               </p>
               
               {/* Badges de fonctionnalités */}
               <div className="flex flex-wrap gap-3 mb-6">
                 <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
-                  📱 QR Codes dynamiques
+                  📱 QR codes dynamiques
+                </span>
+                <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
+                  📊 Analytics en temps réel
                 </span>
                 <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
                   🎨 Personnalisation avancée
-                </span>
-                <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
-                  ⚡ Génération rapide
                 </span>
               </div>
             </div>
@@ -391,30 +391,37 @@ export default function QRCodesPage() {
                       {/* QR Code stylisé */}
                       <rect x="2" y="2" width="20" height="20" rx="2" stroke="#3B82F6" strokeWidth="2" fill="none"/>
                       
-                      {/* Éléments du QR Code */}
-                      <rect x="4" y="4" width="3" height="3" fill="#3B82F6"/>
-                      <rect x="8" y="4" width="3" height="3" fill="#3B82F6"/>
-                      <rect x="12" y="4" width="3" height="3" fill="#3B82F6"/>
-                      <rect x="16" y="4" width="3" height="3" fill="#3B82F6"/>
+                      {/* Modules du QR Code */}
+                      <rect x="4" y="4" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="8" y="4" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="12" y="4" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="16" y="4" width="2" height="2" fill="#3B82F6"/>
                       
-                      <rect x="4" y="8" width="3" height="3" fill="#3B82F6"/>
-                      <rect x="12" y="8" width="3" height="3" fill="#3B82F6"/>
-                      <rect x="16" y="8" width="3" height="3" fill="#3B82F6"/>
+                      <rect x="4" y="8" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="8" y="8" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="12" y="8" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="16" y="8" width="2" height="2" fill="#3B82F6"/>
                       
-                      <rect x="4" y="12" width="3" height="3" fill="#3B82F6"/>
-                      <rect x="8" y="12" width="3" height="3" fill="#3B82F6"/>
-                      <rect x="12" y="12" width="3" height="3" fill="#3B82F6"/>
-                      <rect x="16" y="12" width="3" height="3" fill="#3B82F6"/>
+                      <rect x="4" y="12" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="8" y="12" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="12" y="12" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="16" y="12" width="2" height="2" fill="#3B82F6"/>
                       
-                      <rect x="4" y="16" width="3" height="3" fill="#3B82F6"/>
-                      <rect x="8" y="16" width="3" height="3" fill="#3B82F6"/>
-                      <rect x="12" y="16" width="3" height="3" fill="#3B82F6"/>
-                      <rect x="16" y="16" width="3" height="3" fill="#3B82F6"/>
+                      <rect x="4" y="16" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="8" y="16" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="12" y="16" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="16" y="16" width="2" height="2" fill="#3B82F6"/>
                       
-                      {/* Points de détection */}
-                      <rect x="6" y="6" width="1" height="1" fill="white"/>
-                      <rect x="14" y="6" width="1" height="1" fill="white"/>
-                      <rect x="6" y="14" width="1" height="1" fill="white"/>
+                      {/* Indicateurs de scan */}
+                      <circle cx="6" cy="6" r="0.5" fill="#3B82F6" className="animate-pulse">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+                      </circle>
+                      <circle cx="18" cy="6" r="0.5" fill="#3B82F6" className="animate-pulse">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
+                      </circle>
+                      <circle cx="6" cy="18" r="0.5" fill="#3B82F6" className="animate-pulse">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
+                      </circle>
                     </svg>
                   </div>
                 </div>
@@ -477,24 +484,10 @@ export default function QRCodesPage() {
                   </div>
                 )}
 
-                {!alreadyActivatedModules.includes(card.id) && (
+                {/* Bouton d'activation pour les modules gratuits */}
+                {!alreadyActivatedModules.includes(card.id) && (card.price === 0 || card.price === '0') && (
                   <button 
-                    className={`w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
-                      isCardSelected(card.id)
-                        ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
-                        : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
-                    }`}
-                    onClick={() => handleSubscribe(card)}
-                  >
-                    <span className="text-xl">🔐</span>
-                    <span>{isCardSelected(card.id) ? 'Sélectionné' : 'Choisir'}</span>
-                  </button>
-                )}
-                
-                {/* Bouton "Activer l'application" pour les modules gratuits */}
-                {isCardSelected(card.id) && (card.price === 0 || card.price === '0') && !alreadyActivatedModules.includes(card.id) && (
-                  <button 
-                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                     onClick={async () => {
                       if (!session) {
                         window.location.href = '/login';
@@ -571,7 +564,7 @@ export default function QRCodesPage() {
             <div className="prose max-w-none">
               <div className="text-center mb-12">
                 <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent mb-4">
-                  À propos de QR Codes
+                  À propos des QR Codes Dynamiques
                 </h3>
                 <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
               </div>
@@ -580,8 +573,8 @@ export default function QRCodesPage() {
                 {/* Description principale */}
                 <div className="text-center max-w-5xl mx-auto">
                   <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
-                    Notre générateur de QR codes vous permet de créer des codes QR personnalisés et professionnels 
-                    en quelques clics. Interface intuitive, options avancées et résultats de qualité pour tous vos besoins.
+                    Les QR codes dynamiques révolutionnent la façon dont vous connectez le monde physique au numérique. 
+                    Créez des codes intelligents qui s'adaptent, se suivent et s'optimisent automatiquement.
                   </p>
                   {card.subtitle && (
                     <p className="text-base sm:text-lg text-gray-600 italic mb-8">
@@ -592,49 +585,48 @@ export default function QRCodesPage() {
 
                 {/* Description détaillée en plusieurs chapitres */}
                 <div className="max-w-6xl mx-auto space-y-8">
-                  {/* Chapitre 1: Qu'est-ce que QR Codes */}
+                  {/* Chapitre 1: Qu'est-ce que les QR Codes Dynamiques */}
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-8 rounded-2xl border border-blue-200 shadow-lg">
                     <div className="flex items-center mb-6">
                       <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                         <span className="text-white text-xl font-bold">1</span>
                       </div>
-                      <h4 className="text-2xl font-bold text-blue-900">Qu'est-ce que QR Codes ?</h4>
+                      <h4 className="text-2xl font-bold text-blue-900">Qu'est-ce que les QR Codes Dynamiques ?</h4>
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        Notre générateur de QR codes est un outil puissant et intuitif qui vous permet de créer 
-                        des codes QR personnalisés pour tous vos besoins. Que ce soit pour partager des liens, 
-                        des informations de contact, ou des données spécifiques, notre plateforme vous offre 
-                        toutes les options nécessaires.
+                        Les QR codes dynamiques sont des codes QR intelligents qui peuvent être modifiés après leur création 
+                        sans avoir besoin de les régénérer physiquement. Contrairement aux QR codes statiques traditionnels, 
+                        ils redirigent vers une URL qui peut être mise à jour en temps réel.
                       </p>
                       <p className="text-base leading-relaxed">
-                        Les QR codes sont des codes-barres bidimensionnels qui peuvent stocker beaucoup plus 
-                        d'informations qu'un code-barres traditionnel. Ils sont parfaits pour le marketing, 
-                        la communication et le partage d'informations de manière rapide et efficace.
+                        Cette technologie révolutionnaire vous permet de changer la destination, le contenu ou les paramètres 
+                        de vos QR codes instantanément, tout en conservant le même code physique. Idéal pour les campagnes 
+                        marketing, les événements temporaires ou les contenus qui évoluent dans le temps.
                       </p>
                     </div>
                   </div>
 
-                  {/* Chapitre 2: Pourquoi choisir notre générateur */}
+                  {/* Chapitre 2: Pourquoi choisir les QR Codes Dynamiques */}
                   <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-8 rounded-2xl border border-indigo-200 shadow-lg">
                     <div className="flex items-center mb-6">
                       <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                         <span className="text-white text-xl font-bold">2</span>
                       </div>
-                      <h4 className="text-2xl font-bold text-indigo-900">Pourquoi choisir notre générateur ?</h4>
+                      <h4 className="text-2xl font-bold text-indigo-900">Pourquoi choisir les QR Codes Dynamiques ?</h4>
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Interface intuitive :</strong> Une interface claire et facile à utiliser, même pour les débutants, 
-                        avec des options avancées pour les utilisateurs expérimentés.
+                        <strong>Flexibilité maximale :</strong> Modifiez vos destinations, contenus ou paramètres à tout moment 
+                        sans avoir à imprimer de nouveaux codes ou à modifier vos supports physiques.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Personnalisation avancée :</strong> Choisissez les couleurs, la taille, le format et ajoutez 
-                        votre logo pour des QR codes uniques et professionnels.
+                        <strong>Analytics détaillés :</strong> Suivez en temps réel les scans, les localisations, les appareils 
+                        utilisés et bien plus encore pour optimiser vos campagnes marketing.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Génération rapide :</strong> Créez vos QR codes en quelques secondes et téléchargez-les 
-                        immédiatement dans différents formats.
+                        <strong>Personnalisation avancée :</strong> Créez des QR codes uniques avec vos couleurs, logos et 
+                        styles pour renforcer votre identité de marque.
                       </p>
                     </div>
                   </div>
@@ -649,16 +641,16 @@ export default function QRCodesPage() {
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Types de QR codes multiples :</strong> Créez des QR codes pour des URLs, des vCards, 
-                        des coordonnées GPS, des numéros de téléphone, des SMS, et bien plus encore.
+                        <strong>Génération instantanée :</strong> Créez des QR codes en quelques secondes avec notre interface 
+                        intuitive et nos modèles personnalisables.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Personnalisation visuelle :</strong> Modifiez les couleurs, ajoutez des logos, 
-                        choisissez le style et la taille selon vos besoins.
+                        <strong>Gestion centralisée :</strong> Organisez tous vos QR codes dans un tableau de bord unifié 
+                        avec catégorisation, tags et recherche avancée.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Export multi-format :</strong> Téléchargez vos QR codes en PNG, SVG, PDF ou EPS 
-                        pour une utilisation optimale dans tous vos projets.
+                        <strong>Intégrations multiples :</strong> Connectez vos QR codes à vos outils marketing préférés 
+                        pour un workflow optimisé.
                       </p>
                     </div>
                   </div>
@@ -673,40 +665,40 @@ export default function QRCodesPage() {
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Marketing et publicité :</strong> Intégrez des QR codes dans vos supports publicitaires 
-                        pour diriger les clients vers votre site web ou vos réseaux sociaux.
+                        <strong>Marketing et publicité :</strong> Créez des campagnes dynamiques avec des QR codes qui 
+                        s'adaptent aux promotions, événements ou contenus saisonniers.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Cartes de visite :</strong> Ajoutez un QR code à vos cartes de visite pour partager 
-                        facilement vos informations de contact.
+                        <strong>Commerce et retail :</strong> Optimisez l'expérience client avec des QR codes qui redirigent 
+                        vers des pages personnalisées selon le produit ou la localisation.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Événements et conférences :</strong> Utilisez des QR codes pour partager des informations 
-                        d'événement, des programmes ou des présentations.
+                        <strong>Événements et conférences :</strong> Gérez les inscriptions, les programmes et les 
+                        interactions avec des QR codes qui évoluent selon le contexte.
                       </p>
                     </div>
                   </div>
 
-                  {/* Chapitre 5: Avantages techniques */}
+                  {/* Chapitre 5: Analytics et optimisation */}
                   <div className="bg-gradient-to-r from-red-50 to-orange-50 p-8 rounded-2xl border border-red-200 shadow-lg">
                     <div className="flex items-center mb-6">
                       <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                         <span className="text-white text-xl font-bold">5</span>
                       </div>
-                      <h4 className="text-2xl font-bold text-red-900">Avantages techniques</h4>
+                      <h4 className="text-2xl font-bold text-red-900">Analytics et optimisation</h4>
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Haute qualité :</strong> Génération de QR codes haute résolution adaptés à tous les supports, 
-                        du web à l'impression.
+                        <strong>Métriques en temps réel :</strong> Suivez les scans, les conversions, les localisations 
+                        et les appareils utilisés pour optimiser vos performances.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Compatibilité universelle :</strong> QR codes compatibles avec tous les smartphones 
-                        et applications de lecture.
+                        <strong>Rapports détaillés :</strong> Générez des rapports personnalisés avec graphiques, 
+                        exportations et analyses comparatives pour prendre des décisions éclairées.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Sécurité et fiabilité :</strong> Codes QR générés selon les standards internationaux 
-                        pour une lecture fiable et sécurisée.
+                        <strong>Optimisation automatique :</strong> Utilisez les données collectées pour améliorer 
+                        automatiquement vos campagnes et maximiser l'engagement.
                       </p>
                     </div>
                   </div>
@@ -719,38 +711,38 @@ export default function QRCodesPage() {
                       <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                         <span className="text-2xl">📱</span>
                       </div>
-                      <h4 className="font-bold text-blue-900 mb-3 text-lg">QR Codes dynamiques</h4>
-                      <p className="text-gray-700 text-sm">Créez des QR codes pour tous types de contenu et d'applications.</p>
+                      <h4 className="font-bold text-blue-900 mb-3 text-lg">QR Codes Dynamiques</h4>
+                      <p className="text-gray-700 text-sm">Créez et modifiez vos QR codes instantanément sans reimpression.</p>
                     </div>
                   </div>
                   
                   <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 sm:p-8 rounded-2xl border border-indigo-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div className="text-center">
                       <div className="w-16 h-16 bg-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl">🎨</span>
+                        <span className="text-2xl">📊</span>
                       </div>
-                      <h4 className="font-bold text-indigo-900 mb-3 text-lg">Personnalisation avancée</h4>
-                      <p className="text-gray-700 text-sm">Personnalisez couleurs, logos et styles selon vos besoins.</p>
+                      <h4 className="font-bold text-indigo-900 mb-3 text-lg">Analytics en temps réel</h4>
+                      <p className="text-gray-700 text-sm">Suivez les performances et optimisez vos campagnes.</p>
                     </div>
                   </div>
                   
                   <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 sm:p-8 rounded-2xl border border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div className="text-center">
                       <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl">⚡</span>
+                        <span className="text-2xl">🎨</span>
                       </div>
-                      <h4 className="font-bold text-purple-900 mb-3 text-lg">Génération rapide</h4>
-                      <p className="text-gray-700 text-sm">Créez vos QR codes en quelques secondes avec notre interface optimisée.</p>
+                      <h4 className="font-bold text-purple-900 mb-3 text-lg">Personnalisation</h4>
+                      <p className="text-gray-700 text-sm">Designez vos QR codes avec vos couleurs et logos.</p>
                     </div>
                   </div>
                   
                   <div className="bg-gradient-to-br from-pink-50 to-pink-100 p-6 sm:p-8 rounded-2xl border border-pink-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div className="text-center">
                       <div className="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl">📥</span>
+                        <span className="text-2xl">⚡</span>
                       </div>
-                      <h4 className="font-bold text-pink-900 mb-3 text-lg">Export multi-format</h4>
-                      <p className="text-gray-700 text-sm">Téléchargez en PNG, SVG, PDF ou EPS pour tous vos projets.</p>
+                      <h4 className="font-bold text-pink-900 mb-3 text-lg">Performance</h4>
+                      <p className="text-gray-700 text-sm">Génération rapide et gestion centralisée optimisée.</p>
                     </div>
                   </div>
                 </div>
@@ -777,7 +769,7 @@ export default function QRCodesPage() {
                       </div>
                       <div>
                         <h5 className="font-semibold text-gray-900">Compatibilité</h5>
-                        <p className="text-gray-600 text-sm">Tous les navigateurs modernes</p>
+                        <p className="text-gray-600 text-sm">Tous les navigateurs et appareils</p>
                       </div>
                     </div>
                     
@@ -796,10 +788,10 @@ export default function QRCodesPage() {
                 {/* Call to action */}
                 <div className="text-center pt-8">
                   <p className="text-lg sm:text-xl text-gray-700 mb-6 max-w-4xl mx-auto">
-                    Prêt à créer des QR codes professionnels ? Commencez dès maintenant et donnez vie à vos idées !
+                    Prêt à révolutionner vos campagnes avec des QR codes dynamiques ? Commencez dès maintenant et connectez le monde physique au numérique !
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <Link href="/register" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <Link href="/register" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                       <span className="text-xl mr-2">🚀</span>
                       Commencer maintenant
                     </Link>
