@@ -493,7 +493,7 @@ export default function RuinedFooocusPage() {
                 {/* Bouton "Activer la sélection" pour les modules payants */}
                 {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (
                   <button 
-                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-amber-600 to-red-600 hover:from-amber-700 hover:to-red-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                     onClick={async () => {
                       if (!session) {
                         window.location.href = '/login';
@@ -588,9 +588,8 @@ export default function RuinedFooocusPage() {
                 {/* Description principale */}
                 <div className="text-center max-w-5xl mx-auto">
                   <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
-                    RuinedFooocus est un générateur d'images d'intelligence artificielle puissant et intuitif qui vous permet 
-                    de créer des visuels de haute qualité en utilisant des modèles d'IA avancés. Cette plateforme combine 
-                    simplicité d'utilisation et performances exceptionnelles.
+                    RuinedFooocus est une plateforme de génération d'images par intelligence artificielle qui combine 
+                    puissance et simplicité pour créer des visuels uniques et de haute qualité.
                   </p>
                   {card.subtitle && (
                     <p className="text-base sm:text-lg text-gray-600 italic mb-8">
@@ -611,14 +610,14 @@ export default function RuinedFooocusPage() {
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        RuinedFooocus est un générateur d'images d'intelligence artificielle basé sur des modèles avancés 
-                        qui vous permet de créer des visuels de haute qualité à partir de descriptions textuelles. Cette plateforme 
-                        offre une interface intuitive et des outils puissants pour transformer vos idées en images.
+                        RuinedFooocus est un générateur d'images IA révolutionnaire qui utilise les technologies les plus 
+                        avancées de l'intelligence artificielle pour créer des visuels uniques et de haute qualité. 
+                        Basé sur des modèles de diffusion stables, il offre une expérience intuitive et puissante.
                       </p>
                       <p className="text-base leading-relaxed">
-                        Que vous soyez un artiste, un designer, un créateur de contenu ou simplement passionné d'IA, 
-                        RuinedFooocus vous donne accès à des capacités de génération d'images professionnelles avec une 
-                        facilité d'utilisation remarquable.
+                        Cette plateforme combine la simplicité d'utilisation avec la puissance des algorithmes d'IA 
+                        les plus récents, permettant à tous les utilisateurs, des débutants aux professionnels, 
+                        de créer des images exceptionnelles en quelques clics.
                       </p>
                     </div>
                   </div>
@@ -633,16 +632,16 @@ export default function RuinedFooocusPage() {
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Interface intuitive :</strong> Une interface utilisateur claire et facile à prendre en main, 
-                        même pour les débutants, avec des options avancées pour les utilisateurs expérimentés.
+                        <strong>Interface intuitive :</strong> Une interface claire et moderne qui s'adapte à tous les niveaux 
+                        d'expérience, des débutants aux utilisateurs avancés.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Modèles avancés :</strong> Accès à des modèles d'IA de dernière génération pour des résultats 
-                        de qualité professionnelle et une créativité sans limites.
+                        <strong>Modèles avancés :</strong> Accès aux modèles d'IA les plus récents et performants pour 
+                        des résultats de qualité professionnelle.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Performance optimisée :</strong> Génération rapide d'images de haute résolution grâce à 
-                        notre infrastructure haute performance.
+                        <strong>Génération rapide :</strong> Créez vos images en quelques secondes avec des algorithmes 
+                        optimisés pour la vitesse et la qualité.
                       </p>
                     </div>
                   </div>
@@ -658,15 +657,15 @@ export default function RuinedFooocusPage() {
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
                         <strong>Génération par prompt :</strong> Créez des images en décrivant simplement ce que vous voulez 
-                        voir, avec un système de prompts intelligent et flexible.
+                        voir, avec des prompts en langage naturel.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Styles multiples :</strong> Explorez différents styles artistiques, de l'hyperréalisme 
-                        à l'art abstrait, en passant par des styles spécifiques.
+                        <strong>Personnalisation avancée :</strong> Ajustez les paramètres de génération, les styles, 
+                        les ratios d'aspect et bien plus encore.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Personnalisation avancée :</strong> Ajustez les paramètres de génération pour obtenir 
-                        exactement le résultat que vous recherchez.
+                        <strong>Export haute qualité :</strong> Téléchargez vos créations dans différents formats 
+                        et résolutions adaptés à tous vos projets.
                       </p>
                     </div>
                   </div>
@@ -681,22 +680,22 @@ export default function RuinedFooocusPage() {
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Artistes et créateurs :</strong> Générez des concepts artistiques, explorez de nouveaux styles 
-                        et créez des œuvres uniques pour vos projets créatifs.
+                        <strong>Créateurs de contenu :</strong> Générez des visuels uniques pour vos réseaux sociaux, 
+                        blogs, ou projets créatifs personnels.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Designers et marketeurs :</strong> Créez des visuels pour vos campagnes publicitaires, 
-                        vos réseaux sociaux et vos supports de communication.
+                        <strong>Professionnels :</strong> Créez des concepts, des maquettes ou des illustrations 
+                        pour vos projets professionnels.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Développeurs et concepteurs :</strong> Générez des maquettes, des icônes et des éléments 
-                        visuels pour vos applications et sites web.
+                        <strong>Artistes :</strong> Explorez de nouveaux styles et techniques artistiques 
+                        avec l'aide de l'intelligence artificielle.
                       </p>
                     </div>
                   </div>
 
                   {/* Chapitre 5: Avantages techniques */}
-                  <div className="bg-gradient-to-r from-purple-50 to-amber-50 p-8 rounded-2xl border border-purple-200 shadow-lg">
+                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-8 rounded-2xl border border-purple-200 shadow-lg">
                     <div className="flex items-center mb-6">
                       <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                         <span className="text-white text-xl font-bold">5</span>
@@ -705,16 +704,16 @@ export default function RuinedFooocusPage() {
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Haute résolution :</strong> Générez des images en haute résolution adaptées à tous vos besoins, 
-                        du web à l'impression.
+                        <strong>Haute qualité :</strong> Génération d'images haute résolution avec des détails 
+                        fins et des textures réalistes.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Rapidité :</strong> Obtenez vos résultats en quelques secondes grâce à notre infrastructure 
-                        optimisée et nos modèles performants.
+                        <strong>Performance optimisée :</strong> Algorithmes optimisés pour des temps de génération 
+                        rapides sans compromettre la qualité.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Qualité constante :</strong> Des résultats de qualité professionnelle à chaque génération, 
-                        avec une cohérence remarquable.
+                        <strong>Compatibilité universelle :</strong> Fonctionne sur tous les navigateurs modernes 
+                        et s'adapte à tous les appareils.
                       </p>
                     </div>
                   </div>
@@ -728,7 +727,7 @@ export default function RuinedFooocusPage() {
                         <span className="text-2xl">🎨</span>
                       </div>
                       <h4 className="font-bold text-amber-900 mb-3 text-lg">Génération d'images</h4>
-                      <p className="text-gray-700 text-sm">Créez des images uniques à partir de descriptions textuelles détaillées.</p>
+                      <p className="text-gray-700 text-sm">Créez des visuels uniques avec des prompts en langage naturel.</p>
                     </div>
                   </div>
                   
@@ -738,7 +737,7 @@ export default function RuinedFooocusPage() {
                         <span className="text-2xl">🚀</span>
                       </div>
                       <h4 className="font-bold text-orange-900 mb-3 text-lg">Modèles avancés</h4>
-                      <p className="text-gray-700 text-sm">Accédez aux derniers modèles d'IA pour des résultats exceptionnels.</p>
+                      <p className="text-gray-700 text-sm">Accès aux modèles d'IA les plus récents et performants.</p>
                     </div>
                   </div>
                   
@@ -748,17 +747,17 @@ export default function RuinedFooocusPage() {
                         <span className="text-2xl">⚡</span>
                       </div>
                       <h4 className="font-bold text-red-900 mb-3 text-lg">Interface rapide</h4>
-                      <p className="text-gray-700 text-sm">Interface intuitive et réactive pour une expérience utilisateur optimale.</p>
+                      <p className="text-gray-700 text-sm">Génération en quelques secondes avec une interface intuitive.</p>
                     </div>
                   </div>
                   
                   <div className="bg-gradient-to-br from-pink-50 to-pink-100 p-6 sm:p-8 rounded-2xl border border-pink-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div className="text-center">
                       <div className="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl">🎯</span>
+                        <span className="text-2xl">📥</span>
                       </div>
-                      <h4 className="font-bold text-pink-900 mb-3 text-lg">Personnalisation</h4>
-                      <p className="text-gray-700 text-sm">Ajustez tous les paramètres pour obtenir exactement ce que vous voulez.</p>
+                      <h4 className="font-bold text-pink-900 mb-3 text-lg">Export haute qualité</h4>
+                      <p className="text-gray-700 text-sm">Téléchargez vos créations dans différents formats et résolutions.</p>
                     </div>
                   </div>
                 </div>
@@ -781,7 +780,7 @@ export default function RuinedFooocusPage() {
                     
                     <div className="flex items-start space-x-3">
                       <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                        <span className="text-white text-sm">📱</span>
+                        <span className="text-white text-sm">🎨</span>
                       </div>
                       <div>
                         <h5 className="font-semibold text-gray-900">Compatibilité</h5>
@@ -804,7 +803,7 @@ export default function RuinedFooocusPage() {
                 {/* Call to action */}
                 <div className="text-center pt-8">
                   <p className="text-lg sm:text-xl text-gray-700 mb-6 max-w-4xl mx-auto">
-                    Prêt à créer des images d'IA exceptionnelles avec RuinedFooocus ? Commencez dès maintenant et donnez vie à vos idées !
+                    Prêt à créer des images extraordinaires ? Commencez dès maintenant et donnez vie à vos idées !
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                     <Link href="/register" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
