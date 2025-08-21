@@ -324,6 +324,16 @@ export default function CardDetailPage() {
     const fetchCardDetails = async () => {
       if (!params.id) return;
 
+      // Liste des modules qui ont des pages spécifiques
+      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'sdnext', 'invoke', 'cogstudio', 'ruinedfooocus'];
+      
+      // Si c'est un module avec une page spécifique, rediriger
+      if (specificPages.includes(params.id as string)) {
+        console.log(`🔄 Redirection vers la page spécifique pour ${params.id}`);
+        router.push(`/card/${params.id}`);
+        return;
+      }
+
       try {
         const { data, error } = await supabase
           .from('modules')
