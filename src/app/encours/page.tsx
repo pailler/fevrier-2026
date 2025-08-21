@@ -18,6 +18,10 @@ interface UserModule {
   created_at: string;
   current_usage?: number;
   max_usage?: number;
+  user_id?: string;
+  created_by?: string;
+  price?: number | string;
+  is_free?: boolean;
 }
 
 export default function EncoursPage() {
@@ -108,7 +112,7 @@ export default function EncoursPage() {
         setLoading(true);
         console.log('🔍 Chargement des modules pour utilisateur:', user.id);
         
-        // Récupérer les modules souscrits via user_applications (sans jointure)
+        // Récupérer les modules souscrits via user_applications avec jointure vers modules
         console.log('🔍 Récupération des modules utilisateur depuis user_applications...');
         let moduleAccessData: any[] | null = null;
         let moduleAccessError: any = null;
@@ -118,12 +122,15 @@ export default function EncoursPage() {
             .from('user_applications')
             .select(`
               id,
+              user_id,
               module_id,
               module_title,
               access_level,
               expires_at,
               is_active,
-              created_at
+              created_at,
+              usage_count,
+              max_usage
             `)
             .eq('user_id', user.id)
             .eq('is_active', true)
@@ -140,6 +147,40 @@ export default function EncoursPage() {
           console.error('❌ Erreur chargement modules utilisateur:', moduleAccessError);
           const errorMessage = moduleAccessError.message || moduleAccessError.details || moduleAccessError.hint || JSON.stringify(moduleAccessError) || 'Erreur inconnue';
           throw new Error(`Erreur lors du chargement des modules: ${errorMessage}`);
+        }
+
+        // Récupérer les informations des modules séparément
+        console.log('🔍 Récupération des informations des modules...');
+        let modulesData: any[] = [];
+        let modulesError: any = null;
+        
+        if (moduleAccessData && moduleAccessData.length > 0) {
+          const moduleIds = moduleAccessData.map(access => access.module_id).filter(Boolean);
+          if (moduleIds.length > 0) {
+            try {
+              const result = await supabase
+                .from('modules')
+                .select(`
+                  id,
+                  title,
+                  description,
+                  category,
+                  url,
+                  price
+                `)
+                .in('id', moduleIds);
+
+              modulesData = result.data || [];
+              modulesError = result.error;
+            } catch (error) {
+              console.error('❌ Erreur lors de la requête modules:', error);
+              modulesError = error;
+            }
+          }
+        }
+
+        if (modulesError) {
+          console.warn('⚠️ Erreur chargement informations modules:', modulesError);
         }
 
         // Récupérer les tokens d'accès créés manuellement pour cet utilisateur
@@ -228,19 +269,27 @@ export default function EncoursPage() {
           })
           .map(access => {
             try {
+              // Trouver les informations du module correspondant
+              const moduleInfo = modulesData.find(module => module.id.toString() === access.module_id?.toString()) || {};
+              const isFree = moduleInfo.price === 0 || moduleInfo.price === '0' || moduleInfo.price === null;
+              
               return {
                 id: access.id || 'unknown',
                 module_id: access.module_id || 'unknown',
-                module_title: access.module_title || `Module ${access.module_id || 'unknown'}`,
-                module_description: 'Module activé via souscription',
-                module_category: 'Module souscrit',
-                module_url: '', // Pas d'URL directe pour les modules souscrits
+                module_title: access.module_title || moduleInfo.title || `Module ${access.module_id || 'unknown'}`,
+                module_description: moduleInfo.description || 'Module activé via souscription',
+                module_category: 'Module activé',
+                module_url: moduleInfo.url || '',
                 access_type: access.access_level || 'basic',
                 expires_at: access.expires_at || null,
                 is_active: access.is_active !== undefined ? access.is_active : true,
                 created_at: access.created_at || new Date().toISOString(),
-                current_usage: 0, // user_applications n'a pas de current_usage
-                max_usage: undefined // user_applications n'a pas de max_usage
+                current_usage: access.usage_count || 0,
+                max_usage: access.max_usage || undefined,
+                user_id: access.user_id,
+                created_by: access.user_id,
+                price: moduleInfo.price || 0,
+                is_free: isFree
               };
             } catch (error) {
               console.error('❌ Erreur lors de la transformation d\'un module:', error, access);
@@ -272,19 +321,40 @@ export default function EncoursPage() {
           })
           .map(token => {
             try {
+              // Essayer de trouver le module correspondant par nom
+              let moduleInfo: any = {};
+              let moduleId = 'unknown';
+              
+              if (token.module_name) {
+                // Chercher le module par nom dans les modules récupérés
+                const matchingModule = modulesData.find(module => 
+                  module.title.toLowerCase().includes(token.module_name.toLowerCase()) ||
+                  token.module_name.toLowerCase().includes(module.title.toLowerCase())
+                );
+                
+                if (matchingModule) {
+                  moduleInfo = matchingModule;
+                  moduleId = matchingModule.id;
+                }
+              }
+              
               return {
                 id: `token-${token.id || 'unknown'}`,
-                module_id: token.module_id?.toString() || 'unknown',
+                module_id: moduleId,
                 module_title: token.name || token.module_name || `Token ${token.id || 'unknown'}`,
-                module_description: token.description || 'Accès via token',
+                module_description: token.description || 'Accès via token créé par l\'admin',
                 module_category: 'Token d\'accès',
-                module_url: '', // Les tokens n'ont pas d'URL directe
+                module_url: moduleInfo.url || '', // Utiliser l'URL du module si trouvé
                 access_type: `Token (${token.access_level || 'standard'})`,
                 expires_at: token.expires_at || null,
                 is_active: token.is_active !== undefined ? token.is_active : true,
                 created_at: token.created_at || new Date().toISOString(),
                 current_usage: token.current_usage || 0,
-                max_usage: token.max_usage || null
+                max_usage: token.max_usage || null,
+                user_id: token.created_by, // Utiliser created_by comme user_id
+                created_by: token.created_by,
+                price: moduleInfo.price || 0, // Utiliser le prix du module si trouvé
+                is_free: moduleInfo.price === 0 || moduleInfo.price === '0' || !moduleInfo.price
               };
             } catch (error) {
               console.error('❌ Erreur lors de la transformation d\'un token:', error, token);
@@ -351,6 +421,33 @@ export default function EncoursPage() {
         return;
       }
       
+      // Incrémenter le compteur d'utilisation pour les modules activés
+      if (module.module_category === 'Module activé' && user?.id) {
+        try {
+          const response = await fetch('/api/increment-usage', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: user.id,
+              moduleId: module.module_id
+            })
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Usage incrémenté:', result);
+            // Rafraîchir les données pour afficher le nouveau compteur
+            await refreshData();
+          } else {
+            console.error('❌ Erreur incrémentation usage');
+          }
+        } catch (error) {
+          console.error('❌ Erreur lors de l\'incrémentation usage:', error);
+        }
+      }
+      
       // Obtenir l'URL directe du module
       const moduleUrl = getModuleUrl(module.module_id);
       
@@ -383,21 +480,45 @@ export default function EncoursPage() {
   const refreshData = async () => {
     setRefreshing(true);
     
-    // Recharger les modules depuis user_applications (sans jointure)
+    // Recharger les modules depuis user_applications sans jointure
     const { data: userModulesData, error: modulesError } = await supabase
       .from('user_applications')
       .select(`
         id,
+        user_id,
         module_id,
         module_title,
         access_level,
         expires_at,
         is_active,
-        created_at
+        created_at,
+        usage_count,
+        max_usage
       `)
       .eq('user_id', user.id)
       .eq('is_active', true)
       .order('created_at', { ascending: false });
+
+    // Récupérer les informations des modules séparément pour le refresh
+    let refreshModulesData: any[] = [];
+    if (userModulesData && userModulesData.length > 0) {
+      const moduleIds = userModulesData.map(access => access.module_id).filter(Boolean);
+      if (moduleIds.length > 0) {
+        const { data: refreshModules } = await supabase
+          .from('modules')
+          .select(`
+            id,
+            title,
+            description,
+            category,
+            url,
+            price
+          `)
+          .in('id', moduleIds);
+        
+        refreshModulesData = refreshModules || [];
+      }
+    }
 
     // Recharger les tokens d'accès
     const { data: accessTokensData, error: tokensError } = await supabase
@@ -428,20 +549,29 @@ export default function EncoursPage() {
           if (!access.expires_at) return true;
           return new Date(access.expires_at) > new Date();
         })
-        .map(access => ({
-          id: access.id,
-          module_id: access.module_id,
-          module_title: access.module_title || `Module ${access.module_id}`,
-          module_description: 'Module activé via souscription',
-          module_category: 'Module souscrit',
-          module_url: '',
-          access_type: access.access_level,
-          expires_at: access.expires_at,
-          is_active: access.is_active,
-          created_at: access.created_at,
-          current_usage: 0,
-          max_usage: undefined
-        }));
+        .map(access => {
+          const moduleInfo = refreshModulesData.find(module => module.id.toString() === access.module_id?.toString()) || {};
+          const isFree = moduleInfo.price === 0 || moduleInfo.price === '0' || moduleInfo.price === null;
+          
+          return {
+            id: access.id,
+            module_id: access.module_id,
+            module_title: access.module_title || moduleInfo.title || `Module ${access.module_id}`,
+            module_description: moduleInfo.description || 'Module activé via souscription',
+            module_category: 'Module activé',
+            module_url: moduleInfo.url || '',
+            access_type: access.access_level,
+            expires_at: access.expires_at,
+            is_active: access.is_active,
+            created_at: access.created_at,
+            current_usage: access.usage_count || 0,
+            max_usage: access.max_usage || undefined,
+            user_id: access.user_id,
+            created_by: access.user_id,
+            price: moduleInfo.price || 0,
+            is_free: isFree
+          };
+        });
 
       // Transformer les tokens d'accès
       const transformedTokens: UserModule[] = (accessTokensData || [])
@@ -449,20 +579,43 @@ export default function EncoursPage() {
           if (!token.expires_at) return true;
           return new Date(token.expires_at) > new Date();
         })
-        .map(token => ({
-          id: `token-${token.id}`,
-          module_id: token.module_id?.toString() || 'unknown',
-          module_title: token.name || token.module_name || `Token ${token.id}`,
-          module_description: token.description || 'Accès via token',
-          module_category: 'Token d\'accès',
-          module_url: '',
-          access_type: `Token (${token.access_level})`,
-          expires_at: token.expires_at,
-          is_active: token.is_active,
-          created_at: token.created_at,
-          current_usage: token.current_usage || 0,
-          max_usage: token.max_usage || null
-        }));
+        .map(token => {
+          // Essayer de trouver le module correspondant par nom
+          let moduleInfo: any = {};
+          let moduleId = 'unknown';
+          
+          if (token.module_name) {
+            // Chercher le module par nom dans les modules récupérés
+            const matchingModule = refreshModulesData.find(module => 
+              module.title.toLowerCase().includes(token.module_name.toLowerCase()) ||
+              token.module_name.toLowerCase().includes(module.title.toLowerCase())
+            );
+            
+            if (matchingModule) {
+              moduleInfo = matchingModule;
+              moduleId = matchingModule.id;
+            }
+          }
+          
+          return {
+            id: `token-${token.id}`,
+            module_id: moduleId,
+            module_title: token.name || token.module_name || `Token ${token.id}`,
+            module_description: token.description || 'Accès via token créé par l\'admin',
+            module_category: 'Token d\'accès',
+            module_url: moduleInfo.url || '',
+            access_type: `Token (${token.access_level})`,
+            expires_at: token.expires_at,
+            is_active: token.is_active,
+            created_at: token.created_at,
+            current_usage: token.current_usage || 0,
+            max_usage: token.max_usage || null,
+            user_id: token.created_by, // Utiliser created_by comme user_id
+            created_by: token.created_by,
+            price: moduleInfo.price || 0,
+            is_free: moduleInfo.price === 0 || moduleInfo.price === '0' || !moduleInfo.price
+          };
+        });
 
       // Combiner les deux listes
       const allModules = [...transformedModules, ...transformedTokens];
@@ -514,6 +667,36 @@ export default function EncoursPage() {
     if (percentage >= 75) return 'text-orange-600';
     if (percentage >= 50) return 'text-yellow-600';
     return 'text-green-600';
+  };
+
+  const getModuleTypeColor = (module: UserModule) => {
+    if (module.module_category === 'Token d\'accès') {
+      return 'from-purple-600 to-pink-600';
+    }
+    if (module.is_free) {
+      return 'from-green-600 to-emerald-600';
+    }
+    return 'from-blue-600 to-indigo-600';
+  };
+
+  const getModuleTypeIcon = (module: UserModule) => {
+    if (module.module_category === 'Token d\'accès') {
+      return '🔑';
+    }
+    if (module.is_free) {
+      return '🆓';
+    }
+    return '💎';
+  };
+
+  const getModuleTypeLabel = (module: UserModule) => {
+    if (module.module_category === 'Token d\'accès') {
+      return 'Token d\'accès';
+    }
+    if (module.is_free) {
+      return 'Module gratuit';
+    }
+    return 'Module premium';
   };
 
   // Contrôles d'accès
@@ -614,19 +797,25 @@ export default function EncoursPage() {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Statistiques */}
+            {/* Statistiques améliorées */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">📊 Résumé de vos applications</h2>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-blue-600">{userModules.length}</div>
                   <div className="text-sm text-gray-600">Total actifs</div>
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-green-600">
-                    {userModules.filter(m => !m.expires_at).length}
+                    {userModules.filter(m => m.is_free).length}
                   </div>
-                  <div className="text-sm text-gray-600">Accès permanents</div>
+                  <div className="text-sm text-gray-600">Modules gratuits</div>
+                </div>
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {userModules.filter(m => !m.is_free).length}
+                  </div>
+                  <div className="text-sm text-gray-600">Modules premium</div>
                 </div>
                 <div className="bg-orange-50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-orange-600">
@@ -634,8 +823,8 @@ export default function EncoursPage() {
                   </div>
                   <div className="text-sm text-gray-600">Accès temporaires</div>
                 </div>
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-purple-600">
+                <div className="bg-indigo-50 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-indigo-600">
                     {userModules.filter(m => m.module_category === 'Token d\'accès').length}
                   </div>
                   <div className="text-sm text-gray-600">Tokens d'accès</div>
@@ -649,7 +838,7 @@ export default function EncoursPage() {
               </div>
             </div>
 
-            {/* Section Tokens Premium */}
+            {/* Section Tokens Premium avec statistiques détaillées */}
             {userModules.filter(m => m.module_category === 'Token d\'accès' && m.access_type.includes('premium')).length > 0 && (
               <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl shadow-sm border border-purple-200 p-6 mb-6">
                 <h2 className="text-xl font-bold text-purple-900 mb-4 flex items-center">
@@ -662,6 +851,7 @@ export default function EncoursPage() {
                     .map((token) => {
                       const usagePercentage = token.max_usage ? ((token.current_usage || 0) / token.max_usage) * 100 : 0;
                       const remainingUsage = token.max_usage ? token.max_usage - (token.current_usage || 0) : 0;
+                      const isQuotaExceeded = token.max_usage ? (token.current_usage || 0) >= token.max_usage : false;
                       
                       return (
                         <div key={token.id} className="bg-white rounded-lg p-4 shadow-sm border border-purple-200">
@@ -683,6 +873,7 @@ export default function EncoursPage() {
                             <div className="w-full bg-gray-200 rounded-full h-2">
                               <div 
                                 className={`h-2 rounded-full transition-all duration-300 ${
+                                  isQuotaExceeded ? 'bg-red-500' :
                                   usagePercentage > 80 ? 'bg-red-500' : 
                                   usagePercentage > 60 ? 'bg-yellow-500' : 'bg-green-500'
                                 }`}
@@ -695,7 +886,9 @@ export default function EncoursPage() {
                           <div className="space-y-2 text-xs">
                             <div className="flex justify-between">
                               <span className="text-gray-600">Restantes:</span>
-                              <span className="font-semibold text-purple-700">{remainingUsage}</span>
+                              <span className={`font-semibold ${isQuotaExceeded ? 'text-red-600' : 'text-purple-700'}`}>
+                                {isQuotaExceeded ? 'Quota épuisé' : remainingUsage}
+                              </span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-gray-600">Expire:</span>
@@ -717,11 +910,13 @@ export default function EncoursPage() {
               </div>
             )}
 
-            {/* Grille des modules */}
+            {/* Grille des modules améliorée */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {userModules.map((module) => {
                 const isExpired = !!(module.expires_at && new Date(module.expires_at) <= new Date());
                 const isExpiringSoon = module.expires_at && getDaysRemaining(module.expires_at) <= 7;
+                const maxUsage = module.max_usage || (module.is_free ? 20 : 1000);
+                const isQuotaExceeded = (module.current_usage || 0) >= maxUsage;
                 
                 return (
                   <div key={module.id} className={`bg-white rounded-xl shadow-lg border overflow-hidden transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 ${
@@ -732,23 +927,20 @@ export default function EncoursPage() {
                         : 'border-gray-200 hover:border-blue-300'
                   }`}>
                     
-                    {/* En-tête de la carte */}
-                    <div className={`p-6 text-white ${
-                      module.module_category === 'Token d\'accès' 
-                        ? 'bg-gradient-to-r from-purple-600 to-pink-600' 
-                        : 'bg-gradient-to-r from-blue-600 to-indigo-600'
-                    }`}>
+                    {/* En-tête de la carte avec titre en haut */}
+                    <div className={`p-6 text-white bg-gradient-to-r ${getModuleTypeColor(module)}`}>
+                      {/* Titre du module en haut, entièrement visible */}
+                      <h3 className="text-xl font-bold mb-4 break-words leading-tight">
+                        {module.module_title}
+                      </h3>
+                      
+                      {/* Badges et informations */}
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-xl font-bold truncate">
-                          {module.module_title}
-                        </h3>
                         <div className="flex items-center space-x-2">
-                          {/* Badge pour les tokens */}
-                          {module.module_category === 'Token d\'accès' && (
-                            <span className="px-2 py-1 rounded-full text-xs font-bold bg-white/20 text-white">
-                              🔑 Token
-                            </span>
-                          )}
+                          {/* Badge pour le type de module */}
+                          <span className="px-2 py-1 rounded-full text-xs font-bold bg-white/20 text-white">
+                            {getModuleTypeIcon(module)} {getModuleTypeLabel(module)}
+                          </span>
                           {module.expires_at && (
                             <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                               isExpired 
@@ -762,9 +954,13 @@ export default function EncoursPage() {
                           )}
                         </div>
                       </div>
+                      
                       <div className="flex items-center space-x-4 text-sm opacity-90">
                         <span>📱 {module.module_category}</span>
                         <span>🔑 {module.access_type}</span>
+                        {module.price && Number(module.price) > 0 && (
+                          <span>💎 €{module.price}</span>
+                        )}
                       </div>
                     </div>
 
@@ -775,24 +971,35 @@ export default function EncoursPage() {
                         {module.module_description}
                       </p>
 
-                      {/* Informations d'utilisation */}
-                      {module.max_usage && (
+                      {/* Informations d'utilisation pour tous les modules */}
+                      {(module.max_usage || module.is_free) && (
                         <div className="bg-gray-50 rounded-lg p-4 mb-4">
                           <div className="flex justify-between text-sm text-gray-600 mb-2">
-                            <span>Utilisations : {module.current_usage || 0} / {module.max_usage}</span>
-                            <span>{Math.round(((module.current_usage || 0) / module.max_usage) * 100)}%</span>
+                            <span>Utilisations : {module.current_usage || 0} / {module.max_usage || 20}</span>
+                            <span>{Math.round(((module.current_usage || 0) / (module.max_usage || 20)) * 100)}%</span>
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div 
                               className={`h-2 rounded-full transition-all duration-500 ${
-                                getUsageColor(module.current_usage || 0, module.max_usage).includes('red') ? 'bg-red-500' :
-                                getUsageColor(module.current_usage || 0, module.max_usage).includes('orange') ? 'bg-orange-500' :
-                                getUsageColor(module.current_usage || 0, module.max_usage).includes('yellow') ? 'bg-yellow-500' :
+                                isQuotaExceeded ? 'bg-red-500' :
+                                getUsageColor(module.current_usage || 0, module.max_usage || 20).includes('red') ? 'bg-red-500' :
+                                getUsageColor(module.current_usage || 0, module.max_usage || 20).includes('orange') ? 'bg-orange-500' :
+                                getUsageColor(module.current_usage || 0, module.max_usage || 20).includes('yellow') ? 'bg-yellow-500' :
                                 'bg-green-500'
                               }`}
-                              style={{ width: `${Math.min(((module.current_usage || 0) / module.max_usage) * 100, 100)}%` }}
+                              style={{ width: `${Math.min(((module.current_usage || 0) / (module.max_usage || 20)) * 100, 100)}%` }}
                             ></div>
                           </div>
+                          {isQuotaExceeded && (
+                            <p className="text-red-600 text-xs mt-2 font-semibold">
+                              ⚠️ Quota épuisé
+                            </p>
+                          )}
+                          {module.is_free && !isQuotaExceeded && (
+                            <p className="text-blue-600 text-xs mt-2 font-semibold">
+                              📊 Module gratuit : 20 utilisations maximum
+                            </p>
+                          )}
                         </div>
                       )}
 
@@ -815,18 +1022,24 @@ export default function EncoursPage() {
                       {/* Bouton d'accès */}
                       <button 
                         onClick={() => accessModule(module)}
-                        disabled={isExpired}
+                        disabled={isExpired || isQuotaExceeded}
                         className={`w-full px-4 py-3 rounded-lg transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
-                          isExpired
+                          isExpired || isQuotaExceeded
                             ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
                             : 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white'
                         }`}
-                        title={isExpired ? 'Module expiré' : `Accéder à ${module.module_title}`}
+                        title={
+                          isExpired ? 'Module expiré' :
+                          isQuotaExceeded ? 'Quota épuisé' :
+                          `Accéder à ${module.module_title}`
+                        }
                       >
                         <span className="text-xl mr-2">
-                          {isExpired ? '⏰' : '🚀'}
+                          {isExpired ? '⏰' : isQuotaExceeded ? '⚠️' : '🚀'}
                         </span>
-                        {isExpired ? 'Module expiré' : 'Accéder à l\'application'}
+                        {isExpired ? 'Module expiré' :
+                         isQuotaExceeded ? 'Quota épuisé' :
+                         'Accéder à l\'application'}
                       </button>
                     </div>
                   </div>

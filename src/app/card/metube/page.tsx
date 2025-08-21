@@ -305,28 +305,28 @@ export default function MeTubePage() {
                             'Content-Type': 'application/json',
                           },
                           body: JSON.stringify({
-                            moduleName: 'MeTube',
+                            moduleName: 'Metube',
                             userId: session.user.id
                           })
                         });
                         
                         if (response.ok) {
-                          console.log('✅ Token premium généré pour MeTube');
+                          console.log('✅ Token premium généré pour Metube');
                           // Rediriger vers la page de transition
-                          router.push('/token-generated?module=MeTube');
+                          router.push('/token-generated?module=Metube');
                         } else {
                           console.error('❌ Erreur génération token premium');
                           // En cas d'erreur, rediriger quand même vers la page de transition
-                          router.push('/token-generated?module=MeTube');
+                          router.push('/token-generated?module=Metube');
                         }
                       } catch (error) {
                         console.error('❌ Erreur lors de la génération du token:', error);
                         // En cas d'erreur, rediriger quand même vers la page de transition
-                        router.push('/token-generated?module=MeTube');
+                        router.push('/token-generated?module=Metube');
                       }
                     } else {
                       // Si pas connecté, rediriger vers la page de transition
-                      router.push('/token-generated?module=MeTube');
+                      router.push('/token-generated?module=Metube');
                     }
                   }}
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"

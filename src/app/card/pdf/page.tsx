@@ -319,17 +319,17 @@ export default function PDFPage() {
                           router.push('/token-generated?module=PDF+');
                         } else {
                           console.error('❌ Erreur génération token premium');
-                          // En cas d'erreur, ouvrir directement l'iframe
-                          openIframeModal('https://pdf.regispailler.fr', 'PDF+');
+                          // En cas d'erreur, rediriger quand même vers la page de transition
+                          router.push('/token-generated?module=PDF+');
                         }
                       } catch (error) {
                         console.error('❌ Erreur lors de la génération du token:', error);
-                        // En cas d'erreur, ouvrir directement l'iframe
-                        openIframeModal('https://pdf.regispailler.fr', 'PDF+');
+                        // En cas d'erreur, rediriger quand même vers la page de transition
+                        router.push('/token-generated?module=PDF+');
                       }
                     } else {
-                      // Si pas connecté, ouvrir directement l'iframe
-                      openIframeModal('https://pdf.regispailler.fr', 'PDF+');
+                      // Si pas connecté, rediriger vers la page de transition
+                      router.push('/token-generated?module=PDF+');
                     }
                   }}
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
