@@ -372,7 +372,80 @@ export default function EncoursPage() {
 
   // Fonction pour accéder à un module
   const accessModule = async (module: UserModule) => {
+    // TEST SIMPLE - Vérifier que le code s'exécute côté client
+    alert('🔍 TEST: Fonction accessModule exécutée !');
+    console.log('🔍 TEST: Fonction accessModule exécutée !');
+    
     try {
+      console.log('🚀 Accès au module:', module.module_title);
+      console.log('👤 Utilisateur:', user?.email);
+      console.log('🔍 DEBUG: Début de accessModule');
+      console.log('🔍 DEBUG: Module:', module);
+      console.log('🔍 DEBUG: User:', user);
+      
+      // TEST DIAGNOSTIC - Appel API simple pour vérifier que le code s'exécute
+      try {
+        console.log('🔍 DEBUG: Test diagnostic - appel API...');
+        const testResponse = await fetch('/api/test-real-notification', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: user?.email || 'test@test.com',
+            appName: 'Test Diagnostic Client',
+            userName: user?.name || user?.email || 'Testeur'
+          })
+        });
+        
+        if (testResponse.ok) {
+          const testResult = await testResponse.json();
+          console.log('🔍 DEBUG: Test diagnostic réussi:', testResult);
+        } else {
+          console.log('🔍 DEBUG: Test diagnostic échoué:', testResponse.status);
+        }
+      } catch (testError) {
+        console.log('🔍 DEBUG: Erreur test diagnostic:', testError);
+      }
+      
+      // Envoyer une notification d'accès à l'application
+      if (user?.email) {
+        try {
+          console.log('📧 Tentative d\'envoi de notification...');
+          console.log('🔍 DEBUG: Email utilisateur trouvé:', user.email);
+          
+          // Import statique pour éviter les problèmes d'import dynamique
+          const { NotificationService } = await import('../../utils/notificationService');
+          const notificationService = NotificationService.getInstance();
+          
+          console.log('✅ Service de notification chargé');
+          console.log('🔍 DEBUG: Service de notification initialisé');
+          
+          const result = await notificationService.notifyAppAccessed(
+            user.email,
+            module.module_title,
+            user.name || user.email
+          );
+          
+          console.log('📧 Résultat de la notification:', result);
+          console.log('🔍 DEBUG: Résultat détaillé:', result);
+          
+          if (result) {
+            console.log('✅ Notification envoyée avec succès');
+            console.log('🔍 DEBUG: Notification réussie');
+          } else {
+            console.log('❌ Échec de l\'envoi de la notification');
+            console.log('🔍 DEBUG: Notification échouée');
+          }
+        } catch (error) {
+          console.error('❌ Erreur lors de l\'envoi de la notification:', error);
+          console.log('🔍 DEBUG: Erreur détaillée:', error);
+        }
+      } else {
+        console.log('⚠️ Pas d\'email utilisateur disponible pour la notification');
+        console.log('🔍 DEBUG: Email utilisateur manquant');
+      }
+
       // Vérifier si c'est un token d'accès
       if (module.module_category === 'Token d\'accès') {
         // Pour les tokens, rediriger vers la page du module associé

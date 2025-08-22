@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
+import { NotificationServiceClient } from "../../utils/notificationServiceClient";
+import { supabase } from "../../utils/supabaseClient";
 
 interface ModuleConfig {
   name: string;
@@ -24,7 +26,30 @@ export default function ModulesAccess() {
   const [activeModule, setActiveModule] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Vérification de la session utilisateur
+  useEffect(() => {
+    const getSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setUser(session?.user || null);
+      } catch (error) {
+        console.error('Erreur lors de la récupération de la session:', error);
+      }
+    };
+
+    getSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const toggleModule = (moduleKey: string) => {
     setSelectedModules(prev => 
@@ -68,9 +93,18 @@ export default function ModulesAccess() {
     }
   };
 
-  const openModuleDirect = (moduleKey: string) => {
+  const openModuleDirect = async (moduleKey: string) => {
     const module = MODULES.find(m => m.key === moduleKey);
     if (module) {
+      // Envoyer une notification d'accès à l'application
+      try {
+        const notificationService = NotificationServiceClient.getInstance();
+        await notificationService.notifyAppAccessed(user?.email || '', module.name, user?.email?.split('@')[0] || 'Utilisateur');
+        console.log('✅ Notification d\'accès à l\'application envoyée');
+      } catch (notificationError) {
+        console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
+      }
+      
       window.open(module.url, '_blank');
     }
   };

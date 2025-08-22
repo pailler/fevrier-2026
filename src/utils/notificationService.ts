@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient';
-// import { EmailService } from './emailService';
+import { EmailService } from './emailService';
 
 export interface NotificationSetting {
   id: string;
@@ -27,10 +27,10 @@ export interface NotificationLog {
 
 export class NotificationService {
   private static instance: NotificationService;
-  // private emailService: EmailService;
+  private emailService: EmailService;
 
   constructor() {
-    // this.emailService = EmailService.getInstance();
+    this.emailService = EmailService.getInstance();
   }
 
   static getInstance(): NotificationService {
@@ -89,33 +89,62 @@ export class NotificationService {
     eventData: any = {}
   ): Promise<boolean> {
     try {
+      console.log('🔍 DEBUG: Début sendNotification');
+      console.log('🔍 DEBUG: eventType:', eventType);
+      console.log('🔍 DEBUG: userEmail:', userEmail);
+      console.log('🔍 DEBUG: eventData:', eventData);
+      
       // Vérifier si la notification est activée
+      console.log('🔍 DEBUG: Vérification des paramètres de notification...');
       const { data: setting, error: settingError } = await supabase
         .from('notification_settings')
         .select('*')
         .eq('event_type', eventType)
         .single();
 
+      console.log('🔍 DEBUG: setting:', setting);
+      console.log('🔍 DEBUG: settingError:', settingError);
+
       if (settingError || !setting) {
+        console.log('❌ DEBUG: Paramètres de notification non trouvés ou erreur');
         return false;
       }
 
       if (!setting.is_enabled) {
+        console.log('❌ DEBUG: Notification désactivée');
         return false;
       }
 
-      // Envoyer l'email (désactivé temporairement)
-      const emailSent = false; // await this.emailService.sendEmail({
-      //   to: userEmail,
-      //   subject: setting.email_template_subject,
-      //   html: this.generateEmailHtml(setting.email_template_body, eventData)
-      // });
+      console.log('✅ DEBUG: Notification activée, préparation de l\'email...');
+
+      // Envoyer l'email
+      console.log('📧 Tentative d\'envoi d\'email pour:', { eventType, userEmail, subject: setting.email_template_subject });
+      
+      // Remplacer les variables dans le sujet
+      const subject = this.replaceVariables(setting.email_template_subject, eventData);
+      console.log('🔍 DEBUG: Sujet après remplacement:', subject);
+      
+      const emailData = {
+        to: userEmail,
+        subject: subject,
+        html: await this.generateEmailHtml(eventType, eventData)
+      };
+      
+      console.log('📧 Données email:', emailData);
+      
+      console.log('🔍 DEBUG: Appel de emailService.sendEmail...');
+      const emailSent = await this.emailService.sendEmail(emailData);
+      
+      console.log('📧 Résultat envoi email:', emailSent);
 
       // Enregistrer le log
-      await this.logNotification(eventType, userEmail, eventData, emailSent);
+      console.log('🔍 DEBUG: Enregistrement du log...');
+      await this.logNotification(eventType, userEmail, eventData, emailSent, emailSent ? undefined : 'Échec envoi email');
 
+      console.log('✅ DEBUG: Fin sendNotification, résultat:', emailSent);
       return emailSent;
     } catch (error) {
+      console.error('❌ DEBUG: Erreur dans sendNotification:', error);
       await this.logNotification(eventType, userEmail, eventData, false, error instanceof Error ? error.message : 'Erreur inconnue');
       return false;
     }
@@ -163,66 +192,80 @@ export class NotificationService {
     }
   }
 
-  // Générer le HTML de l'email
-  private generateEmailHtml(template: string, eventData: any): string {
-    // Remplacer les variables dans le template
-    let html = template;
-    
-    // Ajouter des variables dynamiques basées sur eventData
-    if (eventData.userName) {
-      html = html.replace('{userName}', eventData.userName);
-    }
-    if (eventData.moduleName) {
-      html = html.replace('{moduleName}', eventData.moduleName);
-    }
-    if (eventData.appName) {
-      html = html.replace('{appName}', eventData.appName);
-    }
-    if (eventData.timestamp) {
-      html = html.replace('{timestamp}', new Date(eventData.timestamp).toLocaleString('fr-FR'));
-    }
+  // Récupérer le template HTML pour un type d'événement
+  private async getEmailTemplate(eventType: string): Promise<string | null> {
+    try {
+      const { data, error } = await supabase
+        .from('notification_settings')
+        .select('email_template_body')
+        .eq('event_type', eventType)
+        .eq('is_enabled', true)
+        .single();
 
-    // Template HTML de base
-    return `
-      <!DOCTYPE html>
-      <html lang="fr">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Notification IAHome</title>
-      </head>
-      <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc;">
-        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-          <div style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); padding: 40px 30px; text-align: center;">
-            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">🔔 Notification IAHome</h1>
-            <p style="color: rgba(255, 255, 255, 0.9); margin: 10px 0 0 0; font-size: 16px;">Système de notifications</p>
-          </div>
-          
-          <div style="padding: 40px 30px;">
-            <div style="background-color: #f3f4f6; padding: 25px; border-radius: 12px; margin: 25px 0;">
-              <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0;">
-                ${html}
-              </p>
-            </div>
-            
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://iahome.fr'}/admin" 
-                 style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
-                Accéder à l'admin
-              </a>
-            </div>
-          </div>
-          
-          <div style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
-            <p style="color: #64748b; font-size: 14px; margin: 0;">
-              L'équipe IAHome<br>
-              <a href="mailto:support@iahome.fr" style="color: #2563eb; text-decoration: none;">support@iahome.fr</a>
-            </p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+      if (error) {
+        console.error('❌ Erreur lors de la récupération du template:', error);
+        return null;
+      }
+
+      return data?.email_template_body || null;
+    } catch (error) {
+      console.error('❌ Erreur lors de la récupération du template:', error);
+      return null;
+    }
+  }
+
+  // Générer le HTML de l'email
+  private async generateEmailHtml(eventType: string, eventData: any): Promise<string> {
+    console.log('🔧 Génération HTML pour:', eventType);
+    console.log('📦 Données événement:', eventData);
+    
+    // Récupérer le template depuis la base de données
+    console.log('🔍 DEBUG: Récupération du template...');
+    const template = await this.getEmailTemplate(eventType);
+    if (!template) {
+      console.error('❌ Template non trouvé pour:', eventType);
+      return '<p>Template non trouvé</p>';
+    }
+    
+    console.log('📄 Template brut:', template);
+    
+    // Remplacer les variables dynamiques
+    console.log('🔍 DEBUG: Remplacement des variables...');
+    let html = this.replaceVariables(template, eventData);
+    
+    // Remplacer aussi les dates hardcodées dans les templates
+    const currentDate = new Date().toLocaleString('fr-FR');
+    html = html.replace(/22\/08\/2025 12:03:29/g, currentDate);
+    html = html.replace(/2025-08-22T12:03:29/g, new Date().toISOString());
+    html = html.replace(/22\/08\/2025 13:04:17/g, currentDate);
+    html = html.replace(/2025-08-22T13:04:17/g, new Date().toISOString());
+    
+    console.log('✅ HTML généré:', html.substring(0, 200) + '...');
+    
+    return html;
+  }
+
+  // Remplacer les variables dans un texte
+  private replaceVariables(text: string, eventData: any): string {
+    // Variables de base
+    const variables: { [key: string]: string } = {
+      '{userName}': eventData.userName || eventData.user_name || 'Utilisateur',
+      '{appName}': eventData.appName || eventData.app_name || 'Application',
+      '{timestamp}': new Date().toLocaleString('fr-FR'),
+      '{date}': new Date().toLocaleDateString('fr-FR'),
+      '{time}': new Date().toLocaleTimeString('fr-FR'),
+      '{ip}': eventData.ip || '[Détectée automatiquement]',
+      '{userId}': eventData.userId || eventData.user_id || 'N/A'
+    };
+    
+    // Remplacer toutes les variables
+    let result = text;
+    Object.entries(variables).forEach(([key, value]) => {
+      const regex = new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+      result = result.replace(regex, value);
+    });
+    
+    return result;
   }
 
   // Méthodes spécifiques pour chaque type d'événement

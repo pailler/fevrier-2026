@@ -294,13 +294,22 @@ function SelectionsContent() {
                       <div className="mt-2">
                         <button 
                           className="px-4 py-2 rounded-lg font-semibold text-sm bg-green-600 hover:bg-green-700 text-white transition-colors"
-                          onClick={() => {
+                          onClick={async () => {
                             // Vérifier si c'est un module qui nécessite un magic link
                             if (module.title === 'iatube' || module.title.toLowerCase().includes('iatube')) {
                               // Pour iatube, on ne peut pas accéder directement depuis cette page
                               alert('Pour accéder à ' + module.title + ', veuillez retourner à la page principale et cliquer sur le bouton d\'accès.');
                               return;
                             } else {
+                              // Envoyer une notification d'accès à l'application
+                              try {
+                                const notificationService = NotificationServiceClient.getInstance();
+                                await notificationService.notifyAppAccessed(user?.email || '', module.title, user?.email?.split('@')[0] || 'Utilisateur');
+                                console.log('✅ Notification d\'accès à l\'application envoyée');
+                              } catch (notificationError) {
+                                console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
+                              }
+                              
                               // Accès direct pour les autres modules
                               const moduleUrls: { [key: string]: string } = {
                                 'IAmetube': '/api/proxy-metube',

@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import { NotificationServiceClient } from "../../utils/notificationServiceClient";
+import { supabase } from "../../utils/supabaseClient";
 
 interface ModuleConfig {
   id: string;
@@ -26,12 +28,47 @@ const MODULES: ModuleConfig[] = [
 export default function SecureAccess() {
   const [activeModule, setActiveModule] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const accessModule = (moduleId: string) => {
+  // Vérification de la session utilisateur
+  useEffect(() => {
+    const getSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setUser(session?.user || null);
+      } catch (error) {
+        console.error('Erreur lors de la récupération de la session:', error);
+      }
+    };
+
+    getSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const accessModule = async (moduleId: string) => {
     try {
       setLoading(true);
       setActiveModule(moduleId);
+
+      // Envoyer une notification d'accès à l'application
+      const module = MODULES.find(m => m.id === moduleId);
+      if (module && user?.email) {
+        try {
+          const notificationService = NotificationServiceClient.getInstance();
+          await notificationService.notifyAppAccessed(user.email, module.name, user.email.split('@')[0] || 'Utilisateur');
+          console.log('✅ Notification d\'accès à l\'application envoyée');
+        } catch (notificationError) {
+          console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
+        }
+      }
 
       // Charger le module via le proxy sécurisé
       if (iframeRef.current) {

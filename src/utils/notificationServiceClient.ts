@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { NotificationService } from './notificationService';
 
 export interface NotificationSetting {
   id: string;
@@ -26,8 +27,11 @@ export interface NotificationLog {
 
 export class NotificationServiceClient {
   private static instance: NotificationServiceClient;
+  private notificationService: NotificationService;
 
-  constructor() {}
+  constructor() {
+    this.notificationService = NotificationService.getInstance();
+  }
 
   static getInstance(): NotificationServiceClient {
     if (!NotificationServiceClient.instance) {
@@ -39,16 +43,7 @@ export class NotificationServiceClient {
   // Récupérer tous les paramètres de notification
   async getNotificationSettings(): Promise<NotificationSetting[]> {
     try {
-      const { data, error } = await supabase
-        .from('notification_settings')
-        .select('*')
-        .order('event_name');
-
-      if (error) {
-        throw error;
-      }
-
-      return data || [];
+      return await this.notificationService.getNotificationSettings();
     } catch (error) {
       return [];
     }
@@ -60,19 +55,7 @@ export class NotificationServiceClient {
     updates: Partial<NotificationSetting>
   ): Promise<boolean> {
     try {
-      const { error } = await supabase
-        .from('notification_settings')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString()
-        })
-        .eq('event_type', eventType);
-
-      if (error) {
-        return false;
-      }
-
-      return true;
+      return await this.notificationService.updateNotificationSetting(eventType, updates);
     } catch (error) {
       return false;
     }
@@ -81,49 +64,36 @@ export class NotificationServiceClient {
   // Récupérer les logs de notification
   async getNotificationLogs(limit: number = 20): Promise<NotificationLog[]> {
     try {
-      const { data, error } = await supabase
-        .from('notification_logs')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(limit);
-
-      if (error) {
-        throw error;
-      }
-
-      return data || [];
+      return await this.notificationService.getNotificationLogs(limit);
     } catch (error) {
       return [];
     }
   }
 
-  // Envoyer une notification via l'API
+  // Envoyer une notification directement via le service
   async sendNotification(
     eventType: string,
     userEmail: string,
     eventData: any = {}
   ): Promise<boolean> {
     try {
-      const response = await fetch('/api/admin/notifications', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          eventType,
-          userEmail,
-          eventData
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      return result.success;
+      return await this.notificationService.sendNotification(eventType, userEmail, eventData);
     } catch (error) {
+      console.error('Erreur lors de l\'envoi de notification:', error);
       return false;
     }
+  }
+
+  // Méthodes spécifiques pour chaque type de notification
+  async notifyUserLogin(userEmail: string, userName?: string): Promise<boolean> {
+    return await this.notificationService.notifyUserLogin(userEmail, userName);
+  }
+
+  async notifyUserLogout(userEmail: string, userName?: string): Promise<boolean> {
+    return await this.notificationService.notifyUserLogout(userEmail, userName);
+  }
+
+  async notifyAppAccessed(userEmail: string, appName: string, userName?: string): Promise<boolean> {
+    return await this.notificationService.notifyAppAccessed(userEmail, appName, userName);
   }
 }

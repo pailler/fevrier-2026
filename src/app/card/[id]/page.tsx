@@ -757,13 +757,7 @@ export default function CardDetailPage() {
                           // Envoyer une notification d'accès à l'application
                           try {
                             const notificationService = NotificationServiceClient.getInstance();
-                            await notificationService.sendNotification('app_accessed', user?.email || '', {
-                              userName: user?.email?.split('@')[0] || 'Utilisateur',
-                              appName: card.title,
-                              appId: card.id,
-                              timestamp: new Date().toISOString(),
-                              userId: user?.id
-                            });
+                            await notificationService.notifyAppAccessed(user?.email || '', card.title, user?.email?.split('@')[0] || 'Utilisateur');
                             console.log('✅ Notification d\'accès à l\'application envoyée');
                           } catch (notificationError) {
                             console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);

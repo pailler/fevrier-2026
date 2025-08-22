@@ -176,15 +176,11 @@ export default function ModulesPage() {
                     // Envoyer une notification d'accès à l'application
                     try {
                       const notificationService = NotificationServiceClient.getInstance();
-                      await notificationService.sendNotification('app_accessed', user?.email || '', {
-                        userName: user?.email?.split('@')[0] || 'Utilisateur',
-                        appName: module.name,
-                        appUrl: module.url,
-                        timestamp: new Date().toISOString(),
-                        userId: user?.id
-                      });
-                      } catch (notificationError) {
-                      }
+                      await notificationService.notifyAppAccessed(user?.email || '', module.name, user?.email?.split('@')[0] || 'Utilisateur');
+                      console.log('✅ Notification d\'accès à l\'application envoyée');
+                    } catch (notificationError) {
+                      console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
+                    }
                     
                     window.open(module.url, '_blank');
                   }}

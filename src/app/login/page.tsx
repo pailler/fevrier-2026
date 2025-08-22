@@ -83,15 +83,24 @@ export default function LoginPage() {
         
         // Envoyer une notification de connexion
         try {
+          console.log('🔍 DEBUG: Tentative d\'envoi de notification de connexion...');
+          console.log('🔍 DEBUG: Email:', email);
+          console.log('🔍 DEBUG: UserName:', email.split('@')[0]);
+          
           const notificationService = NotificationServiceClient.getInstance();
-          await notificationService.sendNotification('user_login', email, {
-            userName: email.split('@')[0],
-            timestamp: new Date().toISOString(),
-            userId: data.user?.id,
-            userRole: userRole
-          });
-          } catch (notificationError) {
+          console.log('🔍 DEBUG: Service de notification chargé');
+          
+          const result = await notificationService.notifyUserLogin(email, email.split('@')[0]);
+          console.log('🔍 DEBUG: Résultat notification:', result);
+          
+          if (result) {
+            console.log('✅ Notification de connexion envoyée avec succès');
+          } else {
+            console.log('❌ Échec de l\'envoi de la notification de connexion');
           }
+        } catch (notificationError) {
+          console.error('❌ Erreur lors de l\'envoi de la notification de connexion:', notificationError);
+        }
         
         // Rediriger vers l'URL spécifiée ou la page d'accueil
         setTimeout(() => {
