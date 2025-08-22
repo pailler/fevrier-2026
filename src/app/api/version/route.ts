@@ -19,7 +19,6 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('❌ Erreur route version:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -37,7 +36,4 @@ export async function OPTIONS() {
     },
   });
 }
-
-
-
 

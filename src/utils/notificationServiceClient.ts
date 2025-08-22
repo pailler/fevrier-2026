@@ -45,13 +45,11 @@ export class NotificationServiceClient {
         .order('event_name');
 
       if (error) {
-        console.error('Erreur lors de la récupération des paramètres de notification:', error);
         throw error;
       }
 
       return data || [];
     } catch (error) {
-      console.error('Erreur inattendue lors de la récupération des paramètres:', error);
       return [];
     }
   }
@@ -71,13 +69,11 @@ export class NotificationServiceClient {
         .eq('event_type', eventType);
 
       if (error) {
-        console.error('Erreur lors de la mise à jour du paramètre:', error);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Erreur inattendue lors de la mise à jour:', error);
       return false;
     }
   }
@@ -92,13 +88,11 @@ export class NotificationServiceClient {
         .limit(limit);
 
       if (error) {
-        console.error('Erreur lors de la récupération des logs:', error);
         throw error;
       }
 
       return data || [];
     } catch (error) {
-      console.error('Erreur inattendue lors de la récupération des logs:', error);
       return [];
     }
   }
@@ -129,7 +123,6 @@ export class NotificationServiceClient {
       const result = await response.json();
       return result.success;
     } catch (error) {
-      console.error('Erreur lors de l\'envoi de notification:', error);
       return false;
     }
   }

@@ -10,8 +10,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const queryString = searchParams.toString();
 
-    console.log(`🔌 Requête Socket.IO: ${queryString}`);
-
     const targetUrl = `${METUBE_CONFIG.url}/socket.io/?${queryString}`;
 
     // Pass-through headers important for Engine.IO
@@ -32,8 +30,6 @@ export async function GET(request: NextRequest) {
 
     const body = response.body ?? (await response.text());
 
-    console.log(`✅ Socket.IO réponse status=${status} content-type=${contentType}`);
-
     return new NextResponse(body as any, {
       status,
       headers: {
@@ -46,7 +42,6 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('❌ Erreur Socket.IO:', error);
     return new NextResponse('Erreur interne du serveur', { status: 500 });
   }
 }
@@ -55,8 +50,6 @@ export async function POST(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const queryString = searchParams.toString();
-
-    console.log(`🔌 Requête Socket.IO POST: ${queryString}`);
 
     const targetUrl = `${METUBE_CONFIG.url}/socket.io/?${queryString}`;
 
@@ -80,8 +73,6 @@ export async function POST(request: NextRequest) {
     const status = response.status;
     const respBody = response.body ?? (await response.text());
 
-    console.log(`✅ Socket.IO POST réponse status=${status} content-type=${contentType}`);
-
     return new NextResponse(respBody as any, {
       status,
       headers: {
@@ -94,7 +85,6 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('❌ Erreur Socket.IO POST:', error);
     return new NextResponse('Erreur interne du serveur', { status: 500 });
   }
 }

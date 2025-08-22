@@ -49,9 +49,7 @@ export default function EncoursPage() {
         setSession(currentSession);
         setUser(currentSession?.user || null);
         setSessionChecked(true);
-        console.log('🔍 Session vérifiée:', !!currentSession);
-      } catch (error) {
-        console.error('Erreur vérification session:', error);
+        } catch (error) {
         setSessionChecked(true);
       }
     };
@@ -60,7 +58,6 @@ export default function EncoursPage() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('🔍 Changement session:', event, !!session);
         setSession(session);
         setUser(session?.user || null);
         setSessionChecked(true);
@@ -87,9 +84,7 @@ export default function EncoursPage() {
         } else {
           setRole('user');
         }
-        console.log('✅ Rôle utilisateur défini:', data?.role || 'user');
-      } catch (error) {
-        console.error('Erreur lors de la récupération du rôle:', error);
+        } catch (error) {
         setRole('user');
       }
     };
@@ -103,17 +98,13 @@ export default function EncoursPage() {
   useEffect(() => {
     const fetchUserModules = async () => {
       if (!user?.id) {
-        console.log('⚠️ Pas d\'utilisateur connecté');
         setLoading(false);
         return;
       }
       
       try {
         setLoading(true);
-        console.log('🔍 Chargement des modules pour utilisateur:', user.id);
-        
         // Récupérer les modules souscrits via user_applications avec jointure vers modules
-        console.log('🔍 Récupération des modules utilisateur depuis user_applications...');
         let moduleAccessData: any[] | null = null;
         let moduleAccessError: any = null;
         
@@ -139,18 +130,15 @@ export default function EncoursPage() {
           moduleAccessData = result.data;
           moduleAccessError = result.error;
         } catch (error) {
-          console.error('❌ Erreur lors de la requête user_applications:', error);
           moduleAccessError = error;
         }
 
         if (moduleAccessError) {
-          console.error('❌ Erreur chargement modules utilisateur:', moduleAccessError);
           const errorMessage = moduleAccessError.message || moduleAccessError.details || moduleAccessError.hint || JSON.stringify(moduleAccessError) || 'Erreur inconnue';
           throw new Error(`Erreur lors du chargement des modules: ${errorMessage}`);
         }
 
         // Récupérer les informations des modules séparément
-        console.log('🔍 Récupération des informations des modules...');
         let modulesData: any[] = [];
         let modulesError: any = null;
         
@@ -173,18 +161,15 @@ export default function EncoursPage() {
               modulesData = result.data || [];
               modulesError = result.error;
             } catch (error) {
-              console.error('❌ Erreur lors de la requête modules:', error);
               modulesError = error;
             }
           }
         }
 
         if (modulesError) {
-          console.warn('⚠️ Erreur chargement informations modules:', modulesError);
-        }
+          }
 
         // Récupérer les tokens d'accès créés manuellement pour cet utilisateur
-        console.log('🔍 Récupération des tokens d\'accès...');
         let accessTokensData: any[] | null = null;
         let tokensError: any = null;
         
@@ -213,36 +198,26 @@ export default function EncoursPage() {
           accessTokensData = result.data;
           tokensError = result.error;
         } catch (error) {
-          console.error('❌ Erreur lors de la requête access_tokens:', error);
           tokensError = error;
         }
 
         if (tokensError) {
-          console.error('❌ Erreur chargement tokens:', tokensError);
           const errorMessage = tokensError.message || tokensError.details || tokensError.hint || JSON.stringify(tokensError) || 'Erreur inconnue';
-          console.warn('⚠️ Continuation sans les tokens d\'accès. Erreur:', errorMessage);
-        }
+          }
 
-        console.log('✅ Modules utilisateur chargés:', moduleAccessData?.length || 0);
-        console.log('✅ Tokens d\'accès chargés:', accessTokensData?.length || 0);
-        
         // Vérifier que les données sont valides
         if (!moduleAccessData) {
-          console.warn('⚠️ Aucune donnée de modules utilisateur reçue');
           moduleAccessData = []; // Initialiser avec un tableau vide
         }
         if (!accessTokensData) {
-          console.warn('⚠️ Aucune donnée de tokens reçue');
           accessTokensData = []; // Initialiser avec un tableau vide
         }
         
         // S'assurer que les données sont des tableaux
         if (!Array.isArray(moduleAccessData)) {
-          console.warn('⚠️ moduleAccessData n\'est pas un tableau:', typeof moduleAccessData);
           moduleAccessData = [];
         }
         if (!Array.isArray(accessTokensData)) {
-          console.warn('⚠️ accessTokensData n\'est pas un tableau:', typeof accessTokensData);
           accessTokensData = [];
         }
         
@@ -251,11 +226,10 @@ export default function EncoursPage() {
           .filter(access => {
             // Vérifier que l'accès est valide
             if (!access || typeof access !== 'object') {
-              console.warn('⚠️ Accès invalide détecté (pas un objet):', access);
+              console.error('Accès invalide:', access);
               return false;
             }
             if (!access.id) {
-              console.warn('⚠️ Accès sans ID détecté:', access);
               return false;
             }
             // Filtrer les accès non expirés
@@ -263,7 +237,6 @@ export default function EncoursPage() {
             try {
               return new Date(access.expires_at) > new Date();
             } catch (error) {
-              console.warn('⚠️ Erreur lors de la vérification de la date d\'expiration:', error);
               return true; // Garder par défaut si erreur de date
             }
           })
@@ -292,7 +265,6 @@ export default function EncoursPage() {
                 is_free: isFree
               };
             } catch (error) {
-              console.error('❌ Erreur lors de la transformation d\'un module:', error, access);
               return null;
             }
           })
@@ -303,11 +275,10 @@ export default function EncoursPage() {
           .filter(token => {
             // Vérifier que le token est valide
             if (!token || typeof token !== 'object') {
-              console.warn('⚠️ Token invalide détecté (pas un objet):', token);
+              console.error('Token invalide:', token);
               return false;
             }
             if (!token.id) {
-              console.warn('⚠️ Token sans ID détecté:', token);
               return false;
             }
             // Filtrer les tokens non expirés
@@ -315,7 +286,6 @@ export default function EncoursPage() {
             try {
               return new Date(token.expires_at) > new Date();
             } catch (error) {
-              console.warn('⚠️ Erreur lors de la vérification de la date d\'expiration du token:', error);
               return true; // Garder par défaut si erreur de date
             }
           })
@@ -357,7 +327,6 @@ export default function EncoursPage() {
                 is_free: moduleInfo.price === 0 || moduleInfo.price === '0' || !moduleInfo.price
               };
             } catch (error) {
-              console.error('❌ Erreur lors de la transformation d\'un token:', error, token);
               return null;
             }
           })
@@ -366,14 +335,10 @@ export default function EncoursPage() {
         // Combiner les deux listes
         const allModules = [...transformedModules, ...transformedTokens];
         
-        console.log('✅ Total modules et tokens:', allModules.length);
-        console.log('🔍 Modules et tokens combinés:', allModules);
         setUserModules(allModules);
         setError(null);
         
       } catch (error) {
-        console.error('❌ Erreur générale:', error);
-        console.error('❌ Stack trace:', error instanceof Error ? error.stack : 'Pas de stack trace');
         setError(`Erreur lors du chargement des modules: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
         setUserModules([]);
       } finally {
@@ -408,8 +373,6 @@ export default function EncoursPage() {
   // Fonction pour accéder à un module
   const accessModule = async (module: UserModule) => {
     try {
-      console.log('🚀 Accès au module:', module.module_title);
-      
       // Vérifier si c'est un token d'accès
       if (module.module_category === 'Token d\'accès') {
         // Pour les tokens, rediriger vers la page du module associé
@@ -437,15 +400,12 @@ export default function EncoursPage() {
 
           if (response.ok) {
             const result = await response.json();
-            console.log('✅ Usage incrémenté:', result);
             // Rafraîchir les données pour afficher le nouveau compteur
             await refreshData();
           } else {
-            console.error('❌ Erreur incrémentation usage');
-          }
+            }
         } catch (error) {
-          console.error('❌ Erreur lors de l\'incrémentation usage:', error);
-        }
+          }
       }
       
       // Obtenir l'URL directe du module
@@ -471,7 +431,6 @@ export default function EncoursPage() {
         router.push(`/card/${module.module_id}`);
       }
     } catch (error) {
-      console.error('❌ Erreur accès module:', error);
       alert('Erreur lors de l\'accès au module');
     }
   };

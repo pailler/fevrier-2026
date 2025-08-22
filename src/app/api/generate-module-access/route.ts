@@ -4,15 +4,10 @@ import { generateMagicLink } from '../../../utils/magicLink';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔐 API generate-module-access appelée');
-    
     const { moduleName, userId, duration = 24 } = await request.json();
-
-    console.log('🔍 Paramètres reçus:', { moduleName, userId, duration });
 
     // Validation des paramètres
     if (!moduleName || !userId) {
-      console.error('❌ Paramètres manquants');
       return NextResponse.json(
         { error: 'Paramètres manquants: moduleName et userId requis' },
         { status: 400 }
@@ -27,7 +22,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (userError || !userData) {
-      console.error('❌ Utilisateur non trouvé:', userError);
       return NextResponse.json(
         { error: 'Utilisateur non trouvé' },
         { status: 404 }
@@ -45,7 +39,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (subscriptionError && subscriptionError.code !== 'PGRST116') {
-      console.error('❌ Erreur vérification abonnement:', subscriptionError);
       return NextResponse.json(
         { error: 'Erreur lors de la vérification de l\'abonnement' },
         { status: 500 }
@@ -53,11 +46,9 @@ export async function POST(request: NextRequest) {
     }
 
     if (!subscriptionData) {
-      console.log('⚠️ Aucun abonnement actif trouvé pour le module:', moduleName, '- Génération de token temporaire autorisée pour les tests');
       // Temporairement, permettre la génération de token même sans abonnement pour les tests
     } else {
-      console.log('✅ Abonnement valide trouvé:', subscriptionData);
-    }
+      }
 
     // Générer un token d'accès sécurisé
     const accessToken = generateMagicLink(userId, moduleName, ['access'], duration);
@@ -75,11 +66,8 @@ export async function POST(request: NextRequest) {
       });
 
     if (accessLogError) {
-      console.error('⚠️ Erreur lors de l\'enregistrement de l\'accès:', accessLogError);
       // Ne pas bloquer la génération du token si l'enregistrement échoue
     }
-
-    console.log('✅ Token d\'accès généré avec succès');
 
     return NextResponse.json({
       success: true,
@@ -94,7 +82,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur generate-module-access:', error);
     return NextResponse.json(
       { error: 'Erreur interne lors de la génération du token d\'accès' },
       { status: 500 }

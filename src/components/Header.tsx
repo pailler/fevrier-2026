@@ -57,7 +57,6 @@ export default function Header() {
           setRole('user');
         }
       } catch (error) {
-        console.error('Erreur lors de la récupération du rôle:', error);
         setRole('user');
       }
     };
@@ -67,8 +66,6 @@ export default function Header() {
 
   // Fonction pour obtenir l'URL d'accès d'un module
   const getModuleAccessUrl = async (moduleName: string) => {
-    console.log('🔐 getModuleAccessUrl appelée pour:', moduleName);
-    
     // Mapping des modules vers leurs pages d'accès sécurisées
     const secureModuleUrls: { [key: string]: string } = {
 
@@ -76,18 +73,13 @@ export default function Header() {
     
     // Vérifier si l'utilisateur est connecté
     if (!user?.id) {
-      console.log('❌ Utilisateur non connecté, redirection vers login');
       router.push('/login');
       return null;
     }
     
-    console.log(`✅ Accès autorisé pour ${moduleName}, redirection vers la page sécurisée`);
-    
     // Rediriger vers la page d'accès sécurisé appropriée
     const secureUrl = secureModuleUrls[moduleName];
-    console.log('🎯 URL de redirection:', secureUrl);
     if (secureUrl) {
-      console.log('🚀 Redirection vers:', secureUrl);
       router.push(secureUrl);
       return null;
     }
@@ -162,10 +154,8 @@ export default function Header() {
                           timestamp: new Date().toISOString(),
                           userId: user?.id
                         });
-                        console.log('✅ Notification de déconnexion envoyée');
-                      } catch (notificationError) {
-                        console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
-                      }
+                        } catch (notificationError) {
+                        }
                       
                       await supabase.auth.signOut(); 
                       router.push('/login'); 

@@ -118,7 +118,6 @@ export default function TokenManagementPage() {
         .single();
       
       if (error) {
-        console.error('Erreur lors de la vérification admin:', error);
         setIsAdmin(false);
         return;
       }
@@ -129,7 +128,6 @@ export default function TokenManagementPage() {
         fetchAllData();
       }
     } catch (err) {
-      console.error('Erreur inattendue lors de la vérification admin:', err);
       setIsAdmin(false);
     } finally {
       setLoading(false);
@@ -147,9 +145,7 @@ export default function TokenManagementPage() {
         .order('title', { ascending: true });
 
       if (modulesError) {
-        console.error('Erreur chargement modules:', modulesError);
-      } else {
-        console.log('Modules chargés:', modulesData);
+        } else {
         setModules(modulesData || []);
       }
 
@@ -160,8 +156,7 @@ export default function TokenManagementPage() {
         .order('email', { ascending: true });
 
       if (usersError) {
-        console.error('Erreur chargement utilisateurs:', usersError);
-      } else {
+        } else {
         setUsers(usersData || []);
       }
 
@@ -178,7 +173,6 @@ export default function TokenManagementPage() {
         .order('created_at', { ascending: false });
 
       if (tokensError) {
-        console.error('Erreur chargement tokens:', tokensError);
         // Fallback avec des tokens fictifs si la table n'existe pas encore
         const mockTokens: TokenConfig[] = [
           {
@@ -214,7 +208,6 @@ export default function TokenManagementPage() {
         ];
         setTokens(mockTokens);
       } else {
-        console.log('Tokens récupérés depuis la base de données:', tokensData);
         const dbTokens = (tokensData || []).map((token: any) => {
           // Calculer la durée d'expiration en heures à partir de expires_at
           let expirationHours = 72; // Valeur par défaut
@@ -248,7 +241,6 @@ export default function TokenManagementPage() {
       
       setLoading(false);
     } catch (error) {
-      console.error('Erreur chargement données:', error);
       setLoading(false);
     }
   };
@@ -276,18 +268,12 @@ export default function TokenManagementPage() {
         return;
       }
       
-      console.log('formData.moduleId:', formData.moduleId);
-      console.log('modules disponibles:', modules);
-      
       const selectedModule = modules.find(m => m.id === parseInt(formData.moduleId));
       
       if (!selectedModule) {
-        console.log('Module non trouvé pour ID:', formData.moduleId);
         alert('Veuillez sélectionner un module valide');
         return;
       }
-      
-      console.log('Module sélectionné:', selectedModule);
       
       // Vérifier que l'utilisateur existe
       const selectedUser = users.find(u => u.id === formData.userId);
@@ -308,7 +294,6 @@ export default function TokenManagementPage() {
         .single();
 
       if (moduleCheckError || !moduleCheck) {
-        console.error('Module non trouvé dans la base de données:', moduleCheckError);
         alert('Le module sélectionné n\'existe pas dans la base de données');
         return;
       }
@@ -327,27 +312,13 @@ export default function TokenManagementPage() {
         expires_at: expiresAt.toISOString()
       };
 
-      console.log('Données du token à insérer:', tokenData);
-
-      console.log('Tentative d\'insertion avec tokenData:', tokenData);
-      
       // Tentative d'insertion simplifiée
       const { data, error } = await supabase
         .from('access_tokens')
         .insert(tokenData)
         .select();
 
-      console.log('Réponse Supabase - data:', data);
-      console.log('Réponse Supabase - error:', error);
-
       if (error) {
-        console.error('Erreur création token:', error);
-        console.error('Détails de l\'erreur:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        });
         alert(`Erreur lors de la création du token: ${error.message || 'Erreur inconnue'}`);
         return;
       }
@@ -377,11 +348,9 @@ export default function TokenManagementPage() {
         resetForm();
         alert('Token créé avec succès !');
       } else {
-        console.error('Aucune donnée retournée après insertion');
         alert('Erreur: Aucune donnée retournée après insertion');
       }
     } catch (error) {
-      console.error('Erreur création token:', error);
       alert('Erreur lors de la création du token');
     }
   };
@@ -435,8 +404,6 @@ export default function TokenManagementPage() {
         expires_at: expiresAt.toISOString()
       };
 
-      console.log('Données du token à mettre à jour:', updateData);
-
       const { data, error } = await supabase
         .from('access_tokens')
         .update(updateData)
@@ -445,7 +412,6 @@ export default function TokenManagementPage() {
         .single();
 
       if (error) {
-        console.error('Erreur mise à jour token:', error);
         alert(`Erreur lors de la mise à jour du token: ${error.message}`);
         return;
       }
@@ -473,16 +439,12 @@ export default function TokenManagementPage() {
         alert('Token mis à jour avec succès !');
       }
     } catch (error) {
-      console.error('Erreur mise à jour token:', error);
       alert('Erreur lors de la mise à jour du token');
     }
   };
 
   const handleDeleteToken = async (tokenId: string) => {
-    console.log('Tentative de suppression du token:', tokenId);
-    
     if (!tokenId) {
-      console.error('ID du token manquant');
       alert('Erreur: ID du token manquant');
       return;
     }
@@ -498,29 +460,21 @@ export default function TokenManagementPage() {
     setShowDeleteConfirm(null);
     
     try {
-      console.log('Suppression du token avec ID:', tokenId);
-      
       const { data, error } = await supabase
         .from('access_tokens')
         .delete()
         .eq('id', tokenId)
         .select();
 
-      console.log('Réponse Supabase - data:', data);
-      console.log('Réponse Supabase - error:', error);
-
       if (error) {
-        console.error('Erreur suppression token:', error);
         alert(`Erreur lors de la suppression du token: ${error.message}`);
         return;
       }
       
-      console.log('Token supprimé avec succès, mise à jour de l\'état local');
       setTokens(prevTokens => prevTokens.filter(t => t.id !== tokenId));
       alert('Token supprimé avec succès !');
       
     } catch (error) {
-      console.error('Erreur inattendue lors de la suppression:', error);
       alert('Erreur lors de la suppression du token');
     }
   };
@@ -530,7 +484,6 @@ export default function TokenManagementPage() {
   };
 
   const handleEditToken = (token: TokenConfig) => {
-    console.log('Édition du token:', token);
     setEditingToken(token);
     setFormData({
       name: token.name,
@@ -980,7 +933,6 @@ export default function TokenManagementPage() {
                         <div className="flex space-x-2">
                           <button
                             onClick={() => {
-                              console.log('Clic sur Modifier pour token:', token.id);
                               handleEditToken(token);
                             }}
                             className="text-blue-600 hover:text-blue-900 px-2 py-1 rounded hover:bg-blue-50"
@@ -989,7 +941,6 @@ export default function TokenManagementPage() {
                           </button>
                           <button
                             onClick={() => {
-                              console.log('Clic sur Supprimer pour token:', token.id);
                               if (token.id) {
                                 handleDeleteToken(token.id);
                               } else {

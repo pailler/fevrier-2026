@@ -33,7 +33,6 @@ export async function GET(request: NextRequest) {
       .limit(1);
 
     if (tableError) {
-      console.error('Table payments non trouvée:', tableError);
       return NextResponse.json({ 
         payments: [],
         stats: {
@@ -60,7 +59,6 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Erreur récupération paiements:', error);
       return NextResponse.json({ error: 'Erreur lors de la récupération des paiements' }, { status: 500 });
     }
 
@@ -84,7 +82,6 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Erreur API paiements:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -132,7 +129,6 @@ export async function POST(request: NextRequest) {
           .eq('id', paymentId);
 
         if (updateError) {
-          console.error('Erreur mise à jour statut paiement:', updateError);
           return NextResponse.json({ error: 'Erreur lors de la mise à jour' }, { status: 500 });
         }
 
@@ -150,8 +146,7 @@ export async function POST(request: NextRequest) {
               }
             });
         } catch (logError) {
-          console.warn('Impossible de logger l\'action admin:', logError);
-        }
+          }
 
         break;
 
@@ -173,12 +168,10 @@ export async function POST(request: NextRequest) {
             });
 
           if (refundError) {
-            console.error('Erreur création remboursement:', refundError);
             return NextResponse.json({ error: 'Erreur lors du remboursement' }, { status: 500 });
           }
         } catch (refundTableError) {
-          console.warn('Table refunds non disponible:', refundTableError);
-        }
+          }
 
         // Mettre à jour le statut du paiement
         await supabase
@@ -204,8 +197,7 @@ export async function POST(request: NextRequest) {
               }
             });
         } catch (logError) {
-          console.warn('Impossible de logger l\'action admin:', logError);
-        }
+          }
 
         break;
 
@@ -223,7 +215,6 @@ export async function POST(request: NextRequest) {
           .order('created_at', { ascending: false });
 
         if (exportError) {
-          console.error('Erreur export paiements:', exportError);
           return NextResponse.json({ error: 'Erreur lors de l\'export' }, { status: 500 });
         }
 
@@ -239,8 +230,7 @@ export async function POST(request: NextRequest) {
               }
             });
         } catch (logError) {
-          console.warn('Impossible de logger l\'action admin:', logError);
-        }
+          }
 
         return NextResponse.json({ 
           success: true, 
@@ -254,7 +244,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Erreur API paiements POST:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 } 

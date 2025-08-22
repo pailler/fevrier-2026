@@ -88,7 +88,6 @@ export default function ChatAI() {
         throw new Error('Erreur lors de la communication avec l\'IA');
       }
     } catch (error) {
-      console.error('Erreur chat:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: "Désolé, je rencontre des difficultés techniques. Pouvez-vous réessayer ?",

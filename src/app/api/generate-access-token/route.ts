@@ -6,8 +6,6 @@ const JWT_SECRET = process.env.JWT_SECRET || 'iahome-super-secret-jwt-key-2025-c
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 Génération de token d\'accès JWT...');
-    
     const { moduleId, moduleName, expirationHours } = await request.json();
     
     if (!moduleId || !moduleName) {
@@ -34,15 +32,11 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error } = await supabase.auth.getUser(token);
     
     if (error || !user) {
-      console.error('❌ Erreur authentification:', error);
       return NextResponse.json(
         { error: 'Utilisateur non authentifié' },
         { status: 401 }
       );
     }
-
-    console.log('✅ Utilisateur authentifié:', user.email);
-    console.log('🔍 Test mode - Génération directe du token JWT');
 
     // Générer le token JWT directement (sans vérifier l'abonnement)
     const payload = {
@@ -58,9 +52,6 @@ export async function POST(request: NextRequest) {
 
     const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: `${hours}h` });
     
-    console.log('✅ Token JWT généré avec succès pour:', moduleName);
-    console.log('🔍 Payload du token:', payload);
-
     // Récupérer les informations du module
     const { data: moduleData, error: moduleError } = await supabase
       .from('modules')
@@ -69,7 +60,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (moduleError) {
-      console.error('❌ Erreur récupération module:', moduleError);
       return NextResponse.json(
         { error: 'Module non trouvé' },
         { status: 404 }
@@ -92,9 +82,6 @@ export async function POST(request: NextRequest) {
       jwt_token: accessToken
     };
 
-    console.log('💾 Stockage du token dans la base de données...');
-    console.log('📋 Données du token:', tokenData);
-    
     const { data: storedToken, error: storeError } = await supabase
       .from('access_tokens')
       .insert([tokenData])
@@ -102,20 +89,11 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (storeError) {
-      console.error('❌ Erreur stockage token:', storeError);
-      console.error('📋 Détails de l\'erreur:', {
-        message: storeError.message,
-        details: storeError.details,
-        hint: storeError.hint,
-        code: storeError.code
-      });
       return NextResponse.json(
         { error: `Erreur lors du stockage du token: ${storeError.message}` },
         { status: 500 }
       );
     }
-
-    console.log('✅ Token stocké avec succès dans la base de données');
 
     return NextResponse.json({
       success: true,
@@ -129,7 +107,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur génération token:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

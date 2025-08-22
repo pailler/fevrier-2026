@@ -47,8 +47,7 @@ export default function ModulesPage() {
           setRole(data.role);
         }
       } catch (error) {
-        console.error('Erreur lors de la récupération du rôle:', error);
-      }
+        }
     };
 
     if (user) {
@@ -184,10 +183,8 @@ export default function ModulesPage() {
                         timestamp: new Date().toISOString(),
                         userId: user?.id
                       });
-                      console.log('✅ Notification d\'accès à l\'application envoyée');
-                    } catch (notificationError) {
-                      console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
-                    }
+                      } catch (notificationError) {
+                      }
                     
                     window.open(module.url, '_blank');
                   }}

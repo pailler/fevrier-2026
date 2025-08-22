@@ -78,7 +78,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Erreur validation token:', error);
     return NextResponse.json({ 
       valid: false, 
       error: 'Erreur interne' 

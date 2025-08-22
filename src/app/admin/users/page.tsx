@@ -75,13 +75,10 @@ export default function AdminUsersPage() {
 
   const fetchUsers = async () => {
     try {
-      console.log('📡 Chargement des utilisateurs...');
-      
       // Récupérer tous les utilisateurs depuis auth.users
       const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
       
       if (authError) {
-        console.error('❌ Erreur lors du chargement des utilisateurs auth:', authError);
         return;
       }
 
@@ -91,7 +88,6 @@ export default function AdminUsersPage() {
         .select('*');
 
       if (profilesError) {
-        console.error('❌ Erreur lors du chargement des profils:', profilesError);
         return;
       }
 
@@ -107,11 +103,9 @@ export default function AdminUsersPage() {
         };
       });
 
-      console.log('✅ Utilisateurs chargés:', usersWithProfiles);
       setUsers(usersWithProfiles);
     } catch (error) {
-      console.error('❌ Erreur inattendue:', error);
-    } finally {
+      } finally {
       setLoading(false);
     }
   };
@@ -123,14 +117,12 @@ export default function AdminUsersPage() {
         .upsert({ id: userId, role: newRole });
 
       if (error) {
-        console.error('❌ Erreur lors de la mise à jour du rôle:', error);
         alert('Erreur lors de la mise à jour du rôle');
       } else {
         alert('Rôle mis à jour avec succès');
         fetchUsers();
       }
     } catch (error) {
-      console.error('❌ Erreur:', error);
       alert('Erreur lors de la mise à jour');
     }
   };

@@ -43,7 +43,6 @@ function verifyLocalToken(token: string): LocalToken | null {
     const decoded = verify(token, JWT_SECRET) as LocalToken;
     return decoded;
   } catch (error) {
-    console.error('❌ Token local invalide:', error);
     return null;
   }
 }
@@ -74,8 +73,6 @@ export async function GET(request: NextRequest) {
     const targetPath = searchParams.get('path') || '';
     
     if (!token) {
-      console.log('❌ Accès local refusé - Pas de token');
-      
       return NextResponse.json(
         { error: 'Token requis pour accéder à la ressource locale' },
         { status: 401 }
@@ -86,8 +83,6 @@ export async function GET(request: NextRequest) {
     const tokenData = verifyLocalToken(token);
     
     if (!tokenData) {
-      console.log('❌ Accès local refusé - Token invalide');
-      
       return NextResponse.json(
         { error: 'Token invalide ou expiré' },
         { status: 401 }
@@ -97,8 +92,6 @@ export async function GET(request: NextRequest) {
     // Vérifier si le token n'a pas expiré
     const now = Math.floor(Date.now() / 1000);
     if (tokenData.expiresAt < now) {
-      console.log(`❌ Accès local refusé - Token expiré pour utilisateur ${tokenData.userId}`);
-      
       return NextResponse.json(
         { error: 'Token expiré' },
         { status: 401 }
@@ -111,10 +104,7 @@ export async function GET(request: NextRequest) {
                     'unknown';
     
     if (tokenData.ip !== clientIP) {
-      console.log(`⚠️  IP différente: Token=${tokenData.ip}, Client=${clientIP}`);
-    }
-    
-    console.log(`✅ Accès local autorisé pour utilisateur ${tokenData.userId} - URL: ${tokenData.targetUrl}`);
+      }
     
     // Construire l'URL cible
     const targetUrl = new URL(targetPath, tokenData.targetUrl);
@@ -125,8 +115,6 @@ export async function GET(request: NextRequest) {
     );
     
     if (!isAllowed) {
-      console.log(`❌ Accès refusé - URL non autorisée: ${targetUrl.href}`);
-      
       return NextResponse.json(
         { error: 'URL locale non autorisée' },
         { status: 403 }
@@ -143,8 +131,6 @@ export async function GET(request: NextRequest) {
     });
     
     if (!response.ok) {
-      console.log(`❌ Erreur de la ressource locale: ${response.status}`);
-      
       return NextResponse.json(
         { error: `Erreur de la ressource locale: ${response.status}` },
         { status: response.status }
@@ -181,8 +167,6 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('❌ Erreur dans le proxy local:', error);
-    
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -205,8 +189,6 @@ export async function POST(request: NextRequest) {
     }
     
     if (!finalToken) {
-      console.log('❌ Accès POST local refusé - Pas de token');
-      
       return NextResponse.json(
         { error: 'Token requis pour accéder à la ressource locale' },
         { status: 401 }
@@ -217,8 +199,6 @@ export async function POST(request: NextRequest) {
     const tokenData = verifyLocalToken(finalToken);
     
     if (!tokenData) {
-      console.log('❌ Accès POST local refusé - Token invalide');
-      
       return NextResponse.json(
         { error: 'Token invalide ou expiré' },
         { status: 401 }
@@ -228,15 +208,11 @@ export async function POST(request: NextRequest) {
     // Vérifier si le token n'a pas expiré
     const now = Math.floor(Date.now() / 1000);
     if (tokenData.expiresAt < now) {
-      console.log(`❌ Accès POST local refusé - Token expiré pour utilisateur ${tokenData.userId}`);
-      
       return NextResponse.json(
         { error: 'Token expiré' },
         { status: 401 }
       );
     }
-    
-    console.log(`✅ Accès POST local autorisé pour utilisateur ${tokenData.userId} - URL: ${tokenData.targetUrl}`);
     
     // Construire l'URL cible
     const targetUrl = new URL(targetPath, tokenData.targetUrl);
@@ -247,8 +223,6 @@ export async function POST(request: NextRequest) {
     );
     
     if (!isAllowed) {
-      console.log(`❌ Accès POST refusé - URL non autorisée: ${targetUrl.href}`);
-      
       return NextResponse.json(
         { error: 'URL locale non autorisée' },
         { status: 403 }
@@ -283,8 +257,6 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('❌ Erreur dans le proxy POST local:', error);
-    
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

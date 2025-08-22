@@ -101,7 +101,6 @@ export default function MenusAdminPage() {
         .single();
       
       if (error) {
-        console.error('Erreur lors de la vérification admin:', error);
         setIsAdmin(false);
         return;
       }
@@ -112,7 +111,6 @@ export default function MenusAdminPage() {
         fetchData();
       }
     } catch (err) {
-      console.error('Erreur inattendue lors de la vérification admin:', err);
       setIsAdmin(false);
     }
   };
@@ -136,8 +134,7 @@ export default function MenusAdminPage() {
       setPages(allPages);
       
     } catch (error) {
-      console.error('Erreur lors du chargement des données:', error);
-    } finally {
+      } finally {
       setLoading(false);
     }
   };
@@ -155,8 +152,7 @@ export default function MenusAdminPage() {
       setMenuForm({ name: '', description: '', is_active: true, position: 0 });
       fetchData();
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde du menu:', error);
-    }
+      }
   };
 
   const handleMenuItemSubmit = async (e: React.FormEvent) => {
@@ -185,8 +181,7 @@ export default function MenusAdminPage() {
       });
       fetchData();
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde de l\'élément de menu:', error);
-    }
+      }
   };
 
   const handlePageSubmit = async (e: React.FormEvent) => {
@@ -211,8 +206,7 @@ export default function MenusAdminPage() {
       });
       fetchData();
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde de la page:', error);
-    }
+      }
   };
 
   const deleteMenu = async (id: string) => {
@@ -221,8 +215,7 @@ export default function MenusAdminPage() {
         await MenuService.deleteMenu(id);
         fetchData();
       } catch (error) {
-        console.error('Erreur lors de la suppression du menu:', error);
-      }
+        }
     }
   };
 
@@ -232,8 +225,7 @@ export default function MenusAdminPage() {
         await MenuService.deleteMenuItem(id);
         fetchData();
       } catch (error) {
-        console.error('Erreur lors de la suppression de l\'élément de menu:', error);
-      }
+        }
     }
   };
 
@@ -243,8 +235,7 @@ export default function MenusAdminPage() {
         await MenuService.deletePage(id);
         fetchData();
       } catch (error) {
-        console.error('Erreur lors de la suppression de la page:', error);
-      }
+        }
     }
   };
 

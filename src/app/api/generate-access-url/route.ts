@@ -35,8 +35,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { module, duration = 30 } = body; // duration en minutes
 
-    console.log('🔐 Génération URL d\'accès pour:', module);
-
     if (!MODULES_CONFIG[module]) {
       return NextResponse.json(
         { error: `Module ${module} non configuré` },
@@ -62,8 +60,6 @@ export async function POST(request: NextRequest) {
     // Générer l'URL d'accès
     const accessUrl = `${request.nextUrl.origin}/access/${token}`;
 
-    console.log('✅ URL d\'accès générée:', accessUrl);
-
     return NextResponse.json({
       success: true,
       accessUrl,
@@ -73,7 +69,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur génération URL:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -92,8 +87,6 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    console.log('🔐 Vérification token:', token);
 
     // Vérifier le token
     const tokenData = accessTokens.get(token);
@@ -128,10 +121,7 @@ export async function GET(request: NextRequest) {
       headers: headers,
     });
 
-    console.log('📡 Réponse module sécurisé:', response.status, response.statusText);
-
     if (!response.ok) {
-      console.error('❌ Erreur module:', response.status, response.statusText);
       return NextResponse.json(
         { error: `Erreur ${module}: ${response.status}` },
         { status: response.status }
@@ -161,7 +151,6 @@ export async function GET(request: NextRequest) {
               // Trouver et soumettre le formulaire
               const form = usernameInputs[0].closest('form') || passwordInputs[0].closest('form');
               if (form) {
-                console.log('🔐 Authentification automatique pour ${module}...');
                 setTimeout(function() {
                   form.submit();
                 }, 500);
@@ -173,8 +162,6 @@ export async function GET(request: NextRequest) {
       </head>
       `
     );
-
-    console.log('✅ HTML modifié avec authentification automatique pour', module);
 
     // Retourner le HTML modifié
     return new NextResponse(modifiedHtml, {
@@ -189,7 +176,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur accès sécurisé:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

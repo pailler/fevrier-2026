@@ -27,11 +27,6 @@ export default function StripeCheckout({ items, customerEmail, onSuccess, onErro
       }
 
       // Créer la session de paiement
-      console.log('Envoi des données vers l\'API:', {
-        itemsCount: items.length,
-        items: items.map(item => ({ id: item.id, title: item.title, price: item.price })),
-        customerEmail
-      });
 
       const response = await fetch('/api/create-payment-intent', {
         method: 'POST',
@@ -47,26 +42,22 @@ export default function StripeCheckout({ items, customerEmail, onSuccess, onErro
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Réponse API non-OK:', response.status, errorText);
         throw new Error(`Erreur HTTP ${response.status}: ${errorText}`);
       }
 
       const { sessionId, url, error, details } = await response.json();
 
       if (error) {
-        console.error('Erreur API:', { error, details });
         throw new Error(`Erreur API: ${error}`);
       }
 
       // Rediriger vers Stripe Checkout en utilisant l'URL directe
       if (url) {
-        console.log('🔗 Redirection vers Stripe Checkout:', url);
         window.location.href = url;
       } else {
         throw new Error('URL de session Stripe manquante.');
       }
     } catch (error) {
-      console.error('Erreur lors du checkout:', error);
       onError?.(error instanceof Error ? error.message : 'Erreur lors du paiement');
     }
   };

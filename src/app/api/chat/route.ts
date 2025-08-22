@@ -21,7 +21,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ response });
   } catch (error) {
-    console.error('Erreur chat API:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -105,7 +104,6 @@ async function generateAIResponse(message: string, conversationHistory: any[]) {
     const data = await response.json();
     return data.choices[0]?.message?.content || 'Désolé, je n\'ai pas pu traiter votre demande.';
   } catch (error) {
-    console.error('Erreur OpenAI:', error);
     // Fallback vers la logique simple en cas d'erreur
     return await generateSimpleResponse(message);
   }
@@ -166,8 +164,7 @@ async function getContextData(message: string) {
     }
 
   } catch (error) {
-    console.error('Erreur lors de la récupération des données contextuelles:', error);
-  }
+    }
 
   return {
     blogArticles: blogArticles || 'Aucun article de blog disponible pour le moment.',
@@ -198,8 +195,7 @@ async function generateSimpleResponse(message: string) {
         return `Nos modules IA disponibles incluent : ${modulesList}. Vous pouvez les trouver dans la section 'Mes applis' de votre tableau de bord.`;
       }
     } catch (error) {
-      console.error('Erreur récupération modules:', error);
-    }
+      }
     return "Nos modules IA sont disponibles dans la section 'Mes applis' de votre tableau de bord.";
   }
   
@@ -215,8 +211,7 @@ async function generateSimpleResponse(message: string) {
         return `Nos tarifs varient ${priceRange} selon les modules. Vous pouvez consulter les détails dans votre espace personnel.`;
       }
     } catch (error) {
-      console.error('Erreur récupération prix:', error);
-    }
+      }
     return "Nos tarifs varient selon les modules. Vous pouvez consulter les détails dans votre espace personnel.";
   }
   
@@ -234,8 +229,7 @@ async function generateSimpleResponse(message: string) {
         return `Nos derniers articles de blog incluent : ${articlesList}. Vous pouvez les consulter dans la section Blog du site.`;
       }
     } catch (error) {
-      console.error('Erreur récupération articles:', error);
-    }
+      }
     return "Nous avons des articles de blog intéressants sur l'IA et nos modules. Consultez la section Blog du site.";
   }
   
@@ -258,9 +252,7 @@ async function saveConversation(userId: string, userMessage: string, aiResponse:
       });
 
     if (error) {
-      console.error('Erreur sauvegarde conversation:', error);
-    }
+      }
   } catch (error) {
-    console.error('Erreur sauvegarde conversation:', error);
-  }
+    }
 } 

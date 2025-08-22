@@ -37,7 +37,6 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('❌ Erreur module-urls:', error);
     return NextResponse.json(
       { error: 'Erreur interne' },
       { status: 500 }

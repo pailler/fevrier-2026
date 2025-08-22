@@ -9,8 +9,6 @@ export async function POST(request: NextRequest) {
   try {
     const { moduleId, userEmail } = await request.json();
 
-    console.log('🔍 Vérification paiement pour:', { moduleId, userEmail });
-
     if (!moduleId || !userEmail) {
       return NextResponse.json(
         { error: 'moduleId et userEmail requis' },
@@ -27,7 +25,6 @@ export async function POST(request: NextRequest) {
       .eq('module_id', moduleId);
 
     if (paymentsError) {
-      console.error('❌ Erreur lors de la vérification des paiements:', paymentsError);
       return NextResponse.json(
         { error: 'Erreur lors de la vérification des paiements' },
         { status: 500 }
@@ -43,7 +40,6 @@ export async function POST(request: NextRequest) {
       .eq('status', 'active');
 
     if (subscriptionsError) {
-      console.error('❌ Erreur lors de la vérification des abonnements:', subscriptionsError);
       return NextResponse.json(
         { error: 'Erreur lors de la vérification des abonnements' },
         { status: 500 }
@@ -57,15 +53,6 @@ export async function POST(request: NextRequest) {
     const hasSubscription = subscriptions && subscriptions.length > 0;
     const hasAccess = hasPayment || hasSubscription || hasSpecialAccess;
 
-    console.log('✅ Résultat vérification paiement:', {
-      hasPayment,
-      hasSubscription,
-      hasSpecialAccess,
-      hasAccess,
-      paymentsCount: payments?.length || 0,
-      subscriptionsCount: subscriptions?.length || 0
-    });
-
     return NextResponse.json({
       hasAccess,
       hasPayment,
@@ -76,7 +63,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur lors de la vérification du paiement:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

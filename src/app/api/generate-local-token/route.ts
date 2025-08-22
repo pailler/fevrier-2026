@@ -34,14 +34,10 @@ export async function POST(request: NextRequest) {
                     request.headers.get('x-real-ip') ||
                     'unknown';
     
-    console.log(`🔑 Demande de token local depuis IP: ${clientIP}`);
-    
     // Vérifier si l'IP est autorisée
     const isIPAllowed = ALLOWED_IPS.includes(clientIP);
     
     if (!isIPAllowed) {
-      console.log(`❌ Demande de token local refusée - IP non autorisée: ${clientIP}`);
-      
       return NextResponse.json(
         { error: 'Accès non autorisé' },
         { status: 403 }
@@ -51,8 +47,6 @@ export async function POST(request: NextRequest) {
     // Vérifier l'authentification
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('❌ Demande de token local refusée - Pas de token d\'authentification');
-      
       return NextResponse.json(
         { error: 'Authentification requise' },
         { status: 401 }
@@ -65,8 +59,6 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
-      console.log('❌ Demande de token local refusée - Token invalide');
-      
       return NextResponse.json(
         { error: 'Token invalide' },
         { status: 401 }
@@ -89,8 +81,6 @@ export async function POST(request: NextRequest) {
     );
     
     if (!isUrlAllowed) {
-      console.log(`❌ Demande de token local refusée - URL non autorisée: ${targetUrl}`);
-      
       return NextResponse.json(
         { error: 'URL locale non autorisée' },
         { status: 403 }
@@ -107,8 +97,6 @@ export async function POST(request: NextRequest) {
         .single();
       
       if (accessError || !accessData) {
-        console.log(`❌ Demande de token local refusée - Utilisateur ${user.id} n'a pas accès au module ${moduleTitle}`);
-        
         return NextResponse.json(
           { error: 'Accès non autorisé à ce module' },
           { status: 403 }
@@ -120,8 +108,6 @@ export async function POST(request: NextRequest) {
         const now = new Date();
         const expiresAt = new Date(accessData.expires_at);
         if (expiresAt <= now) {
-          console.log(`❌ Demande de token local refusée - Accès expiré pour utilisateur ${user.id}`);
-          
           return NextResponse.json(
             { error: 'Accès expiré' },
             { status: 403 }
@@ -146,8 +132,6 @@ export async function POST(request: NextRequest) {
     // Signer le token
     const localToken = sign(localTokenData, JWT_SECRET, { expiresIn: '2h' });
     
-    console.log(`✅ Token local généré pour utilisateur ${user.id} - URL: ${targetUrl}`);
-    
     // Enregistrer l'utilisation dans la base de données
     await supabase
       .from('local_access_logs')
@@ -171,8 +155,6 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('❌ Erreur lors de la génération du token local:', error);
-    
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

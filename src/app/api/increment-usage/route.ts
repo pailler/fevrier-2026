@@ -17,8 +17,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🔍 Incrémentation usage pour:', { userId, moduleId });
-
     // Trouver l'application utilisateur pour ce module
     const { data: application, error: fetchError } = await supabase
       .from('user_applications')
@@ -29,7 +27,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (fetchError || !application) {
-      console.error('❌ Application non trouvée:', fetchError);
       return NextResponse.json(
         { error: 'Application not found' },
         { status: 404 }
@@ -58,14 +55,11 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (updateError) {
-      console.error('❌ Erreur mise à jour usage:', updateError);
       return NextResponse.json(
         { error: 'Failed to update usage count' },
         { status: 500 }
       );
     }
-
-    console.log('✅ Usage incrémenté:', newUsageCount);
 
     return NextResponse.json({
       success: true,
@@ -75,7 +69,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur générale dans increment-usage:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

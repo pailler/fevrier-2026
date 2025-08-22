@@ -80,18 +80,13 @@ export async function middleware(request: NextRequest) {
     }
   }
   
-  console.log('🔐 Middleware - Vérification de la route:', pathname);
-
   // Vérifier si c'est une route protégée
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
   const isProtectedApiRoute = protectedApiRoutes.some(route => pathname.startsWith(route));
 
   if (!isProtectedRoute && !isProtectedApiRoute) {
-    console.log('✅ Route non protégée, accès autorisé');
     return NextResponse.next();
   }
-
-  console.log('🔒 Route protégée détectée, vérification de l\'authentification...');
 
   // Récupérer le token d'authentification
   const authHeader = request.headers.get('authorization');
@@ -107,8 +102,7 @@ export async function middleware(request: NextRequest) {
       session = currentSession;
       user = currentSession?.user || null;
     } catch (error) {
-      console.log('❌ Erreur lors de la récupération de la session:', error);
-    }
+      }
   }
 
   // Si pas de session, vérifier le token d'accès dans l'URL
@@ -117,7 +111,6 @@ export async function middleware(request: NextRequest) {
     const accessToken = url.searchParams.get('token');
     
     if (accessToken) {
-      console.log('🔍 Token d\'accès trouvé dans l\'URL');
       try {
         // Valider le token d'accès (magic link)
         const response = await fetch(`${request.nextUrl.origin}/api/validate-magic-link`, {
@@ -130,8 +123,6 @@ export async function middleware(request: NextRequest) {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('✅ Token d\'accès valide:', data);
-          
           // Ajouter les informations d'authentification aux headers
           const requestHeaders = new Headers(request.headers);
           requestHeaders.set('x-user-id', data.magicLinkData.userId);
@@ -144,18 +135,14 @@ export async function middleware(request: NextRequest) {
             },
           });
         } else {
-          console.log('❌ Token d\'accès invalide');
-        }
+          }
       } catch (error) {
-        console.log('❌ Erreur lors de la validation du token:', error);
-      }
+        }
     }
   }
 
   // Si pas d'authentification valide, rediriger vers la page de connexion
   if (!session && !user) {
-    console.log('❌ Aucune authentification valide, redirection vers login');
-    
     if (isProtectedApiRoute) {
       return NextResponse.json(
         { error: 'Authentification requise' },
@@ -172,16 +159,12 @@ export async function middleware(request: NextRequest) {
   if (user && isProtectedRoute) {
     const moduleName = getModuleNameFromPath(pathname);
     if (moduleName) {
-      console.log('🔍 Vérification de l\'abonnement pour le module:', moduleName);
-      
       try {
         const response = await fetch(`${request.nextUrl.origin}/api/check-subscription?module=${moduleName}&userId=${user.id}`);
         
         if (response.ok) {
           const data = await response.json();
           if (!data.hasActiveSubscription) {
-            console.log('❌ Aucun abonnement actif pour le module:', moduleName);
-            
             if (isProtectedApiRoute) {
               return NextResponse.json(
                 { error: 'Abonnement requis pour accéder à ce module' },
@@ -195,8 +178,7 @@ export async function middleware(request: NextRequest) {
           }
         }
       } catch (error) {
-        console.log('❌ Erreur lors de la vérification de l\'abonnement:', error);
-      }
+        }
     }
   }
 
@@ -211,14 +193,10 @@ export async function middleware(request: NextRequest) {
                     request.headers.get('x-real-ip') ||
                     'unknown';
     
-    console.log(`🔒 Tentative d'accès à ${pathname} depuis IP: ${clientIP}`);
-    
     // Vérifier si l'IP est autorisée
     const isAllowed = ALLOWED_IPS.includes(clientIP);
     
     if (!isAllowed) {
-      console.log(`❌ Accès refusé pour IP: ${clientIP}`);
-      
       // Rediriger vers une page d'erreur ou d'authentification
       const errorUrl = new URL('/access-denied', request.url);
       errorUrl.searchParams.set('reason', 'ip_restricted');
@@ -227,10 +205,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(errorUrl);
     }
     
-    console.log(`✅ Accès autorisé pour IP: ${clientIP}`);
-  }
+    }
 
-  console.log('✅ Authentification et autorisation validées');
   return NextResponse.next();
 }
 

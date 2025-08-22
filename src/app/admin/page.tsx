@@ -130,7 +130,6 @@ export default function AdminPage() {
         .eq('id', userId)
         .single();
       if (error) {
-        console.error('Erreur lors de la vérification admin:', error);
         setIsAdmin(false);
         return;
       }
@@ -140,7 +139,6 @@ export default function AdminPage() {
         fetchAllData();
       }
     } catch (err) {
-      console.error('Erreur inattendue lors de la vérification admin:', err);
       setIsAdmin(false);
     } finally {
       setLoading(false);
@@ -192,14 +190,11 @@ export default function AdminPage() {
         //   .order('created_at', { ascending: false });
         
         // if (appsError) {
-        //   console.log('Table user_applications non disponible:', appsError.message);
-        // } else {
+        //   // } else {
         //   userAppsData = appsData;
         // }
-        console.log('Chargement user_applications temporairement désactivé');
-      } catch (error) {
-        console.log('Erreur lors du chargement des applications utilisateur:', error);
-      }
+        } catch (error) {
+        }
 
       // Charger les tokens d'accès des utilisateurs
       const { data: userTokensData } = await supabase
@@ -215,13 +210,12 @@ export default function AdminPage() {
         setNotificationSettings(settings);
         setNotificationLogs(logs);
       } catch (error) {
-        console.log('Erreur lors du chargement des notifications:', error);
-      }
+        }
 
       // Organiser les applications par utilisateur
       const appsByUser: { [userId: string]: UserApplication[] } = {};
-      if (userAppsData) {
-        userAppsData.forEach(app => {
+      if (userAppsData && Array.isArray(userAppsData)) {
+        (userAppsData as any[]).forEach(app => {
           if (!appsByUser[app.user_id]) {
             appsByUser[app.user_id] = [];
           }
@@ -240,8 +234,8 @@ export default function AdminPage() {
 
       // Organiser les tokens par utilisateur
       const tokensByUser: { [userId: string]: AccessToken[] } = {};
-      if (userTokensData) {
-        userTokensData.forEach(token => {
+      if (userTokensData && Array.isArray(userTokensData)) {
+        (userTokensData as any[]).forEach(token => {
           if (!tokensByUser[token.created_by]) {
             tokensByUser[token.created_by] = [];
           }
@@ -272,8 +266,7 @@ export default function AdminPage() {
         publishedLinkedInPosts
       });
     } catch (error) {
-      console.error('Erreur lors du chargement des données:', error);
-    } finally {
+      } finally {
       setLoading(false);
     }
   };
@@ -308,14 +301,12 @@ export default function AdminPage() {
           .eq('id', moduleId);
         
         if (error) {
-          console.error('Erreur lors de la suppression:', error);
           alert('Erreur lors de la suppression');
         } else {
           fetchAllData();
           alert('Module supprimé avec succès');
         }
       } catch (error) {
-        console.error('Erreur lors de la suppression:', error);
         alert('Erreur lors de la suppression');
       }
     }
@@ -329,7 +320,6 @@ export default function AdminPage() {
         .eq('id', userId);
 
       if (error) {
-        console.error('Erreur lors de la mise à jour du rôle:', error);
         alert('Erreur lors de la mise à jour du rôle');
       } else {
         setUsers(users.map(user => 
@@ -338,7 +328,6 @@ export default function AdminPage() {
         alert('Rôle mis à jour avec succès');
       }
     } catch (error) {
-      console.error('Erreur lors de la mise à jour du rôle:', error);
       alert('Erreur lors de la mise à jour du rôle');
     }
   };
@@ -362,7 +351,6 @@ export default function AdminPage() {
         .eq('id', appId);
 
       if (error) {
-        console.error('Erreur lors de la suppression:', error);
         alert('Erreur lors de la suppression de l\'application');
       } else {
         // Mettre à jour l'état local
@@ -373,7 +361,6 @@ export default function AdminPage() {
         alert('Application supprimée avec succès');
       }
     } catch (error) {
-      console.error('Erreur lors de la suppression:', error);
       alert('Erreur lors de la suppression de l\'application');
     }
   };
@@ -387,7 +374,6 @@ export default function AdminPage() {
         .eq('id', appId);
 
       if (error) {
-        console.error('Erreur lors de la modification:', error);
         alert('Erreur lors de la modification du statut');
       } else {
         // Mettre à jour l'état local
@@ -400,7 +386,6 @@ export default function AdminPage() {
         alert('Statut modifié avec succès');
       }
     } catch (error) {
-      console.error('Erreur lors de la modification:', error);
       alert('Erreur lors de la modification du statut');
     }
   };
@@ -418,7 +403,6 @@ export default function AdminPage() {
         .eq('id', tokenId);
 
       if (error) {
-        console.error('Erreur lors de la suppression du token:', error);
         alert('Erreur lors de la suppression du token');
       } else {
         // Mettre à jour l'état local
@@ -429,7 +413,6 @@ export default function AdminPage() {
         alert('Token supprimé avec succès');
       }
     } catch (error) {
-      console.error('Erreur lors de la suppression du token:', error);
       alert('Erreur lors de la suppression du token');
     }
   };
@@ -455,7 +438,6 @@ export default function AdminPage() {
         alert('Erreur lors de la mise à jour');
       }
     } catch (error) {
-      console.error('Erreur lors de la mise à jour de la notification:', error);
       alert('Erreur lors de la mise à jour');
     } finally {
       setNotificationLoading(false);
@@ -482,7 +464,6 @@ export default function AdminPage() {
         alert('Erreur lors de la mise à jour');
       }
     } catch (error) {
-      console.error('Erreur lors de la mise à jour du template:', error);
       alert('Erreur lors de la mise à jour');
     } finally {
       setNotificationLoading(false);
@@ -511,7 +492,6 @@ export default function AdminPage() {
         alert('Erreur lors de l\'envoi de l\'email de test');
       }
     } catch (error) {
-      console.error('Erreur lors de l\'envoi du test:', error);
       alert('Erreur lors de l\'envoi du test');
     } finally {
       setNotificationLoading(false);

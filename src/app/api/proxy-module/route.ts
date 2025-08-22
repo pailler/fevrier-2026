@@ -30,7 +30,6 @@ export async function GET(request: NextRequest) {
     // Valider le token d'accès
     const accessData = await validateAccessToken(token);
     if (!accessData) {
-      console.error('❌ Token invalide ou expiré:', token);
       return NextResponse.json(
         { error: 'Token invalide ou expiré' },
         { status: 403 }
@@ -39,7 +38,6 @@ export async function GET(request: NextRequest) {
 
     // Vérifier les permissions
     if (!hasPermission(accessData, 'access')) {
-      console.error('❌ Permissions insuffisantes pour le token:', token);
       return NextResponse.json(
         { error: 'Permissions insuffisantes' },
         { status: 403 }
@@ -63,14 +61,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('🔍 Redirection vers:', targetUrl);
-    console.log('🔐 Credentials:', `${credentials.username}/${credentials.password}`);
-
-              // Pour Stable Diffusion, créer une page HTML qui authentifie via fetch
+    // Pour Stable Diffusion, créer une page HTML qui authentifie via fetch
      if (module === 'stablediffusion') {
-       console.log('🔗 Page d\'authentification automatique vers Stable Diffusion');
-       
-               const html = `<!DOCTYPE html>
+       const html = `<!DOCTYPE html>
 <html>
 <head>
     <title>Authentification Stable Diffusion</title>
@@ -146,7 +139,6 @@ export async function GET(request: NextRequest) {
                     throw new Error('Authentification echouee');
                 }
             } catch (error) {
-                console.error('Erreur d\'authentification:', error);
                 statusDiv.innerHTML = '<p class="error">Erreur d\'authentification</p><p>Redirection directe...</p>';
                 
                 // En cas d'echec, essayer la redirection directe
@@ -180,7 +172,6 @@ export async function GET(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('❌ Erreur proxy:', error);
     return NextResponse.json(
       { error: 'Erreur interne du proxy' },
       { status: 500 }

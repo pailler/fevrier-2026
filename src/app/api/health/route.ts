@@ -18,7 +18,6 @@ export async function GET() {
       dbStatus = error ? 'error' : 'ok';
       responseTime = Date.now() - startTime;
     } catch (dbError) {
-      console.warn('Database health check failed:', dbError);
       dbStatus = 'error';
       responseTime = Date.now() - startTime;
     }
@@ -54,8 +53,6 @@ export async function GET() {
     return NextResponse.json(healthStatus, { status: 200 });
     
   } catch (error) {
-    console.error('Health check error:', error);
-    
     return NextResponse.json({
       status: 'unhealthy',
       timestamp: new Date().toISOString(),

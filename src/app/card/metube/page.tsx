@@ -31,15 +31,9 @@ export default function MeTubePage() {
 
   // Vérification de la configuration Supabase
   useEffect(() => {
-    console.log('Configuration Supabase:');
-    console.log('URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-    console.log('Anon Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Présent' : 'Manquant');
-    console.log('Client Supabase:', supabase);
-
     // Récupérer la session actuelle
     const getSession = async () => {
       const { data: { session: currentSession } } = await supabase.auth.getSession();
-      console.log('Session actuelle:', currentSession);
       setSession(currentSession);
       setUser(currentSession?.user || null);
     };
@@ -49,7 +43,6 @@ export default function MeTubePage() {
     // Écouter les changements de session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Changement d\'état d\'auth:', event, session);
         setSession(session);
         setUser(session?.user || null);
       }
@@ -67,7 +60,6 @@ export default function MeTubePage() {
   // Fonction pour accéder au module avec JWT
   const accessModuleWithJWT = useCallback(async () => {
     if (!user?.email) {
-      console.error('Utilisateur non connecté');
       return;
     }
 
@@ -86,25 +78,19 @@ export default function MeTubePage() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Accès généré:', data);
-        
         if (data.accessUrl) {
           window.open(data.accessUrl, '_blank');
         } else if (data.error) {
-          console.error('Erreur d\'accès:', data.error);
-        }
+          }
       } else {
-        console.error('Erreur lors de la génération de l\'accès');
-      }
+        }
     } catch (error) {
-      console.error('Erreur lors de l\'accès au module:', error);
-    }
+      }
   }, [user?.email]);
 
   // Fonction pour gérer l'abonnement
   const handleSubscribe = useCallback(async () => {
     if (!user?.email) {
-      console.error('Utilisateur non connecté');
       return;
     }
 
@@ -123,18 +109,13 @@ export default function MeTubePage() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Payment intent créé:', data);
-        
         if (data.clientSecret) {
           // Rediriger vers Stripe ou ouvrir le modal de paiement
-          console.log('Redirection vers le paiement...');
-        }
+          }
       } else {
-        console.error('Erreur lors de la création du payment intent');
-      }
+        }
     } catch (error) {
-      console.error('Erreur lors de l\'abonnement:', error);
-    }
+      }
   }, [user?.email]);
 
   // Fonction pour ouvrir le modal iframe
@@ -311,16 +292,13 @@ export default function MeTubePage() {
                         });
                         
                         if (response.ok) {
-                          console.log('✅ Token premium généré pour Metube');
                           // Rediriger vers la page de transition
                           router.push('/token-generated?module=Metube');
                         } else {
-                          console.error('❌ Erreur génération token premium');
                           // En cas d'erreur, rediriger quand même vers la page de transition
                           router.push('/token-generated?module=Metube');
                         }
                       } catch (error) {
-                        console.error('❌ Erreur lors de la génération du token:', error);
                         // En cas d'erreur, rediriger quand même vers la page de transition
                         router.push('/token-generated?module=Metube');
                       }

@@ -101,7 +101,6 @@ export default function AdminPaymentsPage() {
         .eq('id', userId)
         .single();
       if (error) {
-        console.error('Erreur lors de la vérification admin:', error);
         setIsAdmin(false);
         return;
       }
@@ -111,7 +110,6 @@ export default function AdminPaymentsPage() {
         fetchPayments();
       }
     } catch (error) {
-      console.error('Erreur vérification admin:', error);
       setIsAdmin(false);
     } finally {
       setLoading(false);
@@ -121,7 +119,6 @@ export default function AdminPaymentsPage() {
   const fetchPayments = async () => {
     try {
       if (!session?.access_token) {
-        console.error('Session non disponible');
         return;
       }
 
@@ -146,7 +143,6 @@ export default function AdminPaymentsPage() {
         totalPayments: 0
       });
     } catch (error) {
-      console.error('Erreur récupération paiements:', error);
       setMessage(`Erreur: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
   };
@@ -180,7 +176,6 @@ export default function AdminPaymentsPage() {
       setRefundReason('');
       alert('Remboursement traité avec succès');
     } catch (error) {
-      console.error('Erreur remboursement:', error);
       alert('Erreur lors du remboursement');
     }
   };
@@ -229,7 +224,6 @@ export default function AdminPaymentsPage() {
       a.click();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Erreur export:', error);
       alert('Erreur lors de l\'export');
     }
   };
@@ -247,8 +241,6 @@ export default function AdminPaymentsPage() {
     
     return matchesStatus && matchesSearch && matchesDateRange;
   });
-
-
 
   if (loading) {
     return (

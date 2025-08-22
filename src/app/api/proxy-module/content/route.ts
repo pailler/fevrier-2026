@@ -31,7 +31,6 @@ export async function GET(request: NextRequest) {
     // Valider le token d'accès
     const accessData = await validateAccessToken(token);
     if (!accessData) {
-      console.error('❌ Token invalide ou expiré:', token);
       return NextResponse.json(
         { error: 'Token invalide ou expiré' },
         { status: 403 }
@@ -40,7 +39,6 @@ export async function GET(request: NextRequest) {
 
     // Vérifier les permissions
     if (!hasPermission(accessData, 'access')) {
-      console.error('❌ Permissions insuffisantes pour le token:', token);
       return NextResponse.json(
         { error: 'Permissions insuffisantes' },
         { status: 403 }
@@ -66,8 +64,6 @@ export async function GET(request: NextRequest) {
 
     // Construire l'URL complète
     const targetUrl = `${baseUrl}${path}`;
-    console.log('🔗 Proxy content vers:', targetUrl);
-
     try {
       // Récupérer le contenu avec authentification
       const response = await fetch(targetUrl, {
@@ -77,7 +73,6 @@ export async function GET(request: NextRequest) {
       });
 
       if (!response.ok) {
-        console.error('❌ Erreur lors de la récupération du contenu:', response.status);
         return NextResponse.json(
           { error: 'Impossible d\'accéder à la ressource' },
           { status: response.status }
@@ -98,7 +93,6 @@ export async function GET(request: NextRequest) {
       });
 
     } catch (error) {
-      console.error('❌ Erreur proxy content:', error);
       return NextResponse.json(
         { error: 'Erreur lors de la récupération de la ressource' },
         { status: 500 }
@@ -106,7 +100,6 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('❌ Erreur proxy content:', error);
     return NextResponse.json(
       { error: 'Erreur interne du proxy content' },
       { status: 500 }

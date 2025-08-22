@@ -96,15 +96,13 @@ export default function BlogPage() {
         .order('published_at', { ascending: false });
 
       if (error) {
-        console.error('Erreur lors du chargement des articles:', error);
         return;
       }
 
-      console.log('Articles publiés chargés:', data); // Debug
+      // Debug
       setArticles(data || []);
     } catch (error) {
-      console.error('Erreur:', error);
-    } finally {
+      } finally {
       setLoading(false);
     }
   };
@@ -147,14 +145,12 @@ export default function BlogPage() {
         .eq('id', articleId);
 
       if (error) {
-        console.error('Erreur lors de la suppression:', error);
         return;
       }
 
       fetchArticles();
     } catch (error) {
-      console.error('Erreur:', error);
-    }
+      }
   };
 
   const handleAddArticle = () => {

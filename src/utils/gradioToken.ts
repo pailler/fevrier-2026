@@ -19,7 +19,6 @@ export function verifyGradioToken(token: string): GradioToken | null {
     const decoded = verify(token, JWT_SECRET) as GradioToken;
     return decoded;
   } catch (error) {
-    console.error('❌ Erreur vérification token Gradio:', error);
     return null;
   }
 }

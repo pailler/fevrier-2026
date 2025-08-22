@@ -3,17 +3,12 @@ import { supabase } from '../../../utils/supabaseClient';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 API check-subscriptions appelée');
-    
     const { searchParams } = new URL(request.url);
     const moduleName = searchParams.get('module');
     const userId = searchParams.get('userId');
 
-    console.log('🔍 Paramètres reçus:', { moduleName, userId });
-
     // Validation des paramètres
     if (!userId) {
-      console.error('❌ Paramètres manquants');
       return NextResponse.json(
         { error: 'Paramètres manquants: userId requis' },
         { status: 400 }
@@ -21,7 +16,6 @@ export async function GET(request: NextRequest) {
     }
 
     // Récupérer les modules depuis user_applications
-    console.log('🔍 Récupération des modules depuis user_applications...');
     const { data: userModules, error: modulesError } = await supabase
       .from('user_applications')
       .select(`
@@ -38,7 +32,6 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (modulesError) {
-      console.error('❌ Erreur user_applications:', modulesError);
       return NextResponse.json(
         { error: 'Erreur lors de la vérification des modules utilisateur' },
         { status: 500 }
@@ -46,7 +39,6 @@ export async function GET(request: NextRequest) {
     }
 
     // Récupérer les tokens d'accès
-    console.log('🔍 Récupération des tokens d\'accès...');
     const { data: accessTokens, error: tokensError } = await supabase
       .from('access_tokens')
       .select(`
@@ -69,7 +61,6 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (tokensError) {
-      console.error('❌ Erreur access_tokens:', tokensError);
       return NextResponse.json(
         { error: 'Erreur lors de la vérification des tokens d\'accès' },
         { status: 500 }
@@ -124,13 +115,6 @@ export async function GET(request: NextRequest) {
     const allAccess = [...transformedModules, ...transformedTokens];
     const hasActiveSubscription = allAccess.length > 0;
 
-    console.log('✅ Résultat vérification:', { 
-      hasActiveSubscription, 
-      modulesCount: transformedModules.length,
-      tokensCount: transformedTokens.length,
-      totalCount: allAccess.length
-    });
-
     return NextResponse.json({
       hasActiveSubscription,
       activeAccess: allAccess,
@@ -140,7 +124,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur check-subscriptions:', error);
     return NextResponse.json(
       { error: 'Erreur interne lors de la vérification' },
       { status: 500 }

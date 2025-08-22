@@ -27,8 +27,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Accès administrateur requis' }, { status: 403 });
     }
 
-    console.log('🗑️ Début du vidage des abonnements par l\'admin:', user.email);
-
     // Compter les enregistrements avant suppression
     const { data: accessCount } = await supabase
       .from('module_access')
@@ -47,47 +45,39 @@ export async function POST(request: NextRequest) {
       .select('id', { count: 'exact' });
 
     // Supprimer dans l'ordre pour éviter les conflits de clés étrangères
-    console.log('🗑️ Suppression des payment_tokens...');
     const { error: paymentTokenError } = await supabase
       .from('payment_tokens')
       .delete()
       .neq('id', '00000000-0000-0000-0000-000000000000'); // Éviter de supprimer un enregistrement système
 
     if (paymentTokenError) {
-      console.error('❌ Erreur suppression payment_tokens:', paymentTokenError);
       return NextResponse.json({ error: 'Erreur lors de la suppression des payment_tokens' }, { status: 500 });
     }
 
-    console.log('🗑️ Suppression des access_tokens...');
     const { error: tokenError } = await supabase
       .from('access_tokens')
       .delete()
       .neq('id', '00000000-0000-0000-0000-000000000000');
 
     if (tokenError) {
-      console.error('❌ Erreur suppression access_tokens:', tokenError);
       return NextResponse.json({ error: 'Erreur lors de la suppression des access_tokens' }, { status: 500 });
     }
 
-    console.log('🗑️ Suppression des module_access...');
     const { error: accessError } = await supabase
       .from('module_access')
       .delete()
       .neq('id', '00000000-0000-0000-0000-000000000000');
 
     if (accessError) {
-      console.error('❌ Erreur suppression module_access:', accessError);
       return NextResponse.json({ error: 'Erreur lors de la suppression des module_access' }, { status: 500 });
     }
 
-    console.log('🗑️ Suppression des module_licenses...');
     const { error: licenseError } = await supabase
       .from('module_licenses')
       .delete()
       .neq('id', '00000000-0000-0000-0000-000000000000');
 
     if (licenseError) {
-      console.error('❌ Erreur suppression module_licenses:', licenseError);
       return NextResponse.json({ error: 'Erreur lors de la suppression des module_licenses' }, { status: 500 });
     }
 
@@ -108,8 +98,6 @@ export async function POST(request: NextRequest) {
       .from('module_licenses')
       .select('id', { count: 'exact' });
 
-    console.log('✅ Vidage des abonnements terminé avec succès');
-
     return NextResponse.json({
       success: true,
       message: 'Tous les abonnements ont été supprimés avec succès',
@@ -128,23 +116,10 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur lors du vidage des abonnements:', error);
     return NextResponse.json({ 
       error: 'Erreur interne du serveur lors du vidage des abonnements',
       details: error instanceof Error ? error.message : 'Erreur inconnue'
     }, { status: 500 });
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
 

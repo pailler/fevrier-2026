@@ -33,8 +33,6 @@ export default function SecureAccess() {
       setLoading(true);
       setActiveModule(moduleId);
 
-      console.log('🔐 Accès module sécurisé:', moduleId);
-
       // Charger le module via le proxy sécurisé
       if (iframeRef.current) {
         iframeRef.current.src = `/api/secure-proxy?id=${moduleId}`;
@@ -46,7 +44,6 @@ export default function SecureAccess() {
       }, 2000);
 
     } catch (error) {
-      console.error('❌ Erreur accès module:', error);
       setLoading(false);
     }
   };

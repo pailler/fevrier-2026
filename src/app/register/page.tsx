@@ -37,8 +37,6 @@ export default function RegisterPage() {
     e.preventDefault();
     setMessage('');
     
-    console.log('Tentative d\'inscription avec:', email);
-    
     // Créer le compte
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -47,8 +45,6 @@ export default function RegisterPage() {
         emailRedirectTo: `${window.location.origin}/login`
       }
     });
-    
-    console.log('Résultat signup:', { data, error });
     
     if (error) {
       setMessage(`Erreur lors de l'inscription: ${error.message}`);
@@ -64,10 +60,8 @@ export default function RegisterPage() {
           timestamp: new Date().toISOString(),
           userId: data.user?.id
         });
-        console.log('✅ Notification de création de compte envoyée');
-      } catch (notificationError) {
-        console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
-      }
+        } catch (notificationError) {
+        }
     }
   }
 

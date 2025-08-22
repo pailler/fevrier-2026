@@ -42,7 +42,6 @@ function verifyJWT(token: string) {
 
     return payload;
   } catch (error) {
-    console.error('❌ Erreur vérification JWT:', error);
     throw error;
   }
 }
@@ -53,9 +52,6 @@ export async function GET(request: NextRequest) {
     const jwt = searchParams.get('jwt');
     const path = searchParams.get('path') || '';
 
-    console.log('🔐 Proxy Stable Diffusion - JWT reçu:', jwt ? 'Oui' : 'Non');
-    console.log('🔐 Chemin demandé:', path);
-
     // Vérifier le JWT
     if (!jwt) {
       return NextResponse.json({ error: 'Token JWT manquant' }, { status: 401 });
@@ -64,15 +60,12 @@ export async function GET(request: NextRequest) {
     let userPayload;
     try {
       userPayload = verifyJWT(jwt);
-      console.log('✅ JWT validé pour:', userPayload.email);
-    } catch (error) {
+      } catch (error) {
       return NextResponse.json({ error: 'Token JWT invalide' }, { status: 401 });
     }
 
     // Construire l'URL de destination
     const targetUrl = `${STABLEDIFFUSION_URL}${path}`;
-    console.log('🔗 Redirection vers:', targetUrl);
-
     // Créer les headers avec authentification HTTP Basic
     const credentials = Buffer.from(`${STABLEDIFFUSION_CREDENTIALS.username}:${STABLEDIFFUSION_CREDENTIALS.password}`).toString('base64');
     
@@ -88,10 +81,7 @@ export async function GET(request: NextRequest) {
       headers: headers,
     });
 
-    console.log('📡 Réponse Stable Diffusion:', response.status, response.statusText);
-
     if (!response.ok) {
-      console.error('❌ Erreur Stable Diffusion:', response.status, response.statusText);
       return NextResponse.json(
         { error: `Erreur Stable Diffusion: ${response.status}` },
         { status: response.status }
@@ -101,8 +91,6 @@ export async function GET(request: NextRequest) {
     // Récupérer le contenu
     const contentType = response.headers.get('content-type') || '';
     const content = await response.text();
-
-    console.log('✅ Contenu récupéré, type:', contentType);
 
     // Retourner le contenu avec les bons headers
     const proxyResponse = new NextResponse(content, {
@@ -118,7 +106,6 @@ export async function GET(request: NextRequest) {
     return proxyResponse;
 
   } catch (error) {
-    console.error('❌ Erreur proxy Stable Diffusion:', error);
     return NextResponse.json(
       { error: 'Erreur interne du proxy' },
       { status: 500 }
@@ -132,9 +119,6 @@ export async function POST(request: NextRequest) {
     const jwt = searchParams.get('jwt');
     const path = searchParams.get('path') || '';
 
-    console.log('🔐 Proxy Stable Diffusion POST - JWT reçu:', jwt ? 'Oui' : 'Non');
-    console.log('🔐 Chemin demandé:', path);
-
     // Vérifier le JWT
     if (!jwt) {
       return NextResponse.json({ error: 'Token JWT manquant' }, { status: 401 });
@@ -143,15 +127,12 @@ export async function POST(request: NextRequest) {
     let userPayload;
     try {
       userPayload = verifyJWT(jwt);
-      console.log('✅ JWT validé pour:', userPayload.email);
-    } catch (error) {
+      } catch (error) {
       return NextResponse.json({ error: 'Token JWT invalide' }, { status: 401 });
     }
 
     // Construire l'URL de destination
     const targetUrl = `${STABLEDIFFUSION_URL}${path}`;
-    console.log('🔗 POST vers:', targetUrl);
-
     // Récupérer le body de la requête
     const body = await request.text();
 
@@ -177,10 +158,7 @@ export async function POST(request: NextRequest) {
       body: body,
     });
 
-    console.log('📡 Réponse POST Stable Diffusion:', response.status, response.statusText);
-
     if (!response.ok) {
-      console.error('❌ Erreur POST Stable Diffusion:', response.status, response.statusText);
       return NextResponse.json(
         { error: `Erreur Stable Diffusion: ${response.status}` },
         { status: response.status }
@@ -190,8 +168,6 @@ export async function POST(request: NextRequest) {
     // Récupérer le contenu
     const responseContentType = response.headers.get('content-type') || '';
     const responseContent = await response.text();
-
-    console.log('✅ Contenu POST récupéré, type:', responseContentType);
 
     // Retourner le contenu avec les bons headers
     const proxyResponse = new NextResponse(responseContent, {
@@ -207,7 +183,6 @@ export async function POST(request: NextRequest) {
     return proxyResponse;
 
   } catch (error) {
-    console.error('❌ Erreur proxy POST Stable Diffusion:', error);
     return NextResponse.json(
       { error: 'Erreur interne du proxy' },
       { status: 500 }

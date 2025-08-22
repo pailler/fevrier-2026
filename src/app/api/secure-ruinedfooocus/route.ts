@@ -42,7 +42,6 @@ async function checkUserAccess(userId: string): Promise<boolean> {
 
     return true;
   } catch (error) {
-    console.error('Erreur vérification accès:', error);
     return false;
   }
 }
@@ -54,14 +53,10 @@ export async function GET(request: NextRequest) {
                     request.headers.get('x-real-ip') ||
                     'unknown';
     
-    console.log(`🔒 Tentative d'accès sécurisé RuinedFooocus depuis IP: ${clientIP}`);
-    
     // Vérifier si l'IP est autorisée
     const isIPAllowed = ALLOWED_IPS.includes(clientIP);
     
     if (!isIPAllowed) {
-      console.log(`❌ Accès refusé - IP non autorisée: ${clientIP}`);
-      
       // Rediriger vers la page d'accès refusé
       const errorUrl = new URL('/access-denied', request.url);
       errorUrl.searchParams.set('reason', 'ip_restricted');
@@ -73,8 +68,6 @@ export async function GET(request: NextRequest) {
     // Vérifier l'authentification
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('❌ Accès refusé - Pas de token d\'authentification');
-      
       return NextResponse.json(
         { error: 'Authentification requise' },
         { status: 401 }
@@ -87,8 +80,6 @@ export async function GET(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
-      console.log('❌ Accès refusé - Token invalide');
-      
       return NextResponse.json(
         { error: 'Token invalide' },
         { status: 401 }
@@ -99,22 +90,16 @@ export async function GET(request: NextRequest) {
     const hasAccess = await checkUserAccess(user.id);
     
     if (!hasAccess) {
-      console.log(`❌ Accès refusé - Utilisateur ${user.id} n'a pas accès à RuinedFooocus`);
-      
       return NextResponse.json(
         { error: 'Accès non autorisé à RuinedFooocus' },
         { status: 403 }
       );
     }
     
-    console.log(`✅ Accès autorisé pour utilisateur ${user.id} depuis IP ${clientIP}`);
-    
     // Rediriger vers l'application RuinedFooocus
     return NextResponse.redirect(RUINEDFOOOCUS_URL);
     
   } catch (error) {
-    console.error('❌ Erreur dans le proxy sécurisé RuinedFooocus:', error);
-    
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -129,14 +114,10 @@ export async function POST(request: NextRequest) {
                     request.headers.get('x-real-ip') ||
                     'unknown';
     
-    console.log(`🔒 Tentative d'accès POST sécurisé RuinedFooocus depuis IP: ${clientIP}`);
-    
     // Vérifier si l'IP est autorisée
     const isIPAllowed = ALLOWED_IPS.includes(clientIP);
     
     if (!isIPAllowed) {
-      console.log(`❌ Accès POST refusé - IP non autorisée: ${clientIP}`);
-      
       return NextResponse.json(
         { error: 'Accès non autorisé' },
         { status: 403 }
@@ -172,8 +153,6 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    console.log(`✅ Accès POST autorisé pour utilisateur ${user.id} depuis IP ${clientIP}`);
-    
     // Récupérer le body de la requête
     const body = await request.text();
     
@@ -201,8 +180,6 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('❌ Erreur dans le proxy POST sécurisé RuinedFooocus:', error);
-    
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

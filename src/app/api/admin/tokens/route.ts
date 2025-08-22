@@ -65,7 +65,6 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (tokensError) {
-      console.error('Erreur récupération tokens:', tokensError);
       return NextResponse.json(
         { error: 'Erreur lors de la récupération des tokens' },
         { status: 500 }
@@ -78,7 +77,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Erreur GET tokens:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -187,7 +185,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (saveError) {
-      console.error('Erreur sauvegarde token:', saveError);
       return NextResponse.json(
         { error: 'Erreur lors de la sauvegarde du token' },
         { status: 500 }
@@ -214,7 +211,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Erreur POST token:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -326,7 +322,6 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (updateError) {
-      console.error('Erreur mise à jour token:', updateError);
       return NextResponse.json(
         { error: 'Erreur lors de la mise à jour du token' },
         { status: 500 }
@@ -352,7 +347,6 @@ export async function PUT(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Erreur PUT token:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -413,7 +407,6 @@ export async function DELETE(request: NextRequest) {
       .eq('id', tokenId);
 
     if (deleteError) {
-      console.error('Erreur suppression token:', deleteError);
       return NextResponse.json(
         { error: 'Erreur lors de la suppression du token' },
         { status: 500 }
@@ -426,7 +419,6 @@ export async function DELETE(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Erreur DELETE token:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

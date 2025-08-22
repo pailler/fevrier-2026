@@ -19,8 +19,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🔍 Ajout des tokens après paiement pour:', userEmail);
-
     // 1. Récupérer l'ID de l'utilisateur depuis la table profiles
     const { data: userProfile, error: profileError } = await supabase
       .from('profiles')
@@ -29,14 +27,11 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (profileError) {
-      console.error('❌ Erreur récupération profil:', profileError);
       return NextResponse.json(
         { error: 'Utilisateur non trouvé' },
         { status: 404 }
       );
     }
-
-    console.log('✅ Profil utilisateur trouvé:', userProfile.id);
 
     // 2. Récupérer les tokens de formateur_tic@hotmail.com
     const { data: formateurProfile, error: formateurProfileError } = await supabase
@@ -46,7 +41,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (formateurProfileError) {
-      console.error('❌ Erreur récupération profil formateur_tic:', formateurProfileError);
       return NextResponse.json(
         { error: 'Profil formateur_tic non trouvé' },
         { status: 404 }
@@ -75,14 +69,11 @@ export async function POST(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (tokensError) {
-      console.error('❌ Erreur récupération tokens formateur_tic:', tokensError);
       return NextResponse.json(
         { error: 'Erreur lors de la récupération des tokens' },
         { status: 500 }
       );
     }
-
-    console.log('✅ Tokens de formateur_tic récupérés:', formateurTokens?.length || 0);
 
     // 4. Créer des copies des tokens pour le nouvel utilisateur
     const newTokens = [];
@@ -123,17 +114,12 @@ export async function POST(request: NextRequest) {
           .single();
 
         if (insertError) {
-          console.error('❌ Erreur insertion token:', insertError);
-        } else {
-          console.log('✅ Token copié avec succès:', insertedToken.id);
+          } else {
           newTokens.push(insertedToken);
         }
       } else {
-        console.log('⚠️ Token déjà existant pour ce module:', token.module_id);
-      }
+        }
     }
-
-    console.log('✅ Total des nouveaux tokens créés:', newTokens.length);
 
     return NextResponse.json({
       success: true,
@@ -146,7 +132,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur générale:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

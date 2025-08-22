@@ -71,7 +71,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
     
   } catch (error) {
-    console.error('Erreur secure-proxy:', error);
     return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
   }
 }

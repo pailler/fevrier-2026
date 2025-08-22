@@ -55,8 +55,6 @@ export async function POST(request: NextRequest) {
     // Générer le magic link avec la durée appropriée
     const magicLinkToken = generateMagicLink(currentUserId, moduleName, permissions || ['access'], accessDurationMinutes);
 
-
-
     // Configuration des URLs de base pour chaque module
           const moduleUrls: { [key: string]: string } = {
         'Metube': '/api/proxy-metube', // Utiliser le proxy sécurisé
@@ -86,7 +84,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur génération magic link:', error);
     return NextResponse.json(
       { error: 'Erreur interne lors de la génération du magic link' },
       { status: 500 }

@@ -11,8 +11,6 @@ export async function GET(request: NextRequest) {
     const token = searchParams.get('token');
     
     if (!token) {
-      console.log('❌ Accès Gradio refusé - Pas de token');
-      
       return NextResponse.json(
         { error: 'Token requis pour accéder à Gradio' },
         { status: 401 }
@@ -23,8 +21,6 @@ export async function GET(request: NextRequest) {
     const tokenData = verifyGradioToken(token);
     
     if (!tokenData) {
-      console.log('❌ Accès Gradio refusé - Token invalide');
-      
       return NextResponse.json(
         { error: 'Token invalide ou expiré' },
         { status: 401 }
@@ -34,8 +30,6 @@ export async function GET(request: NextRequest) {
     // Vérifier si le token n'a pas expiré
     const now = Math.floor(Date.now() / 1000);
     if (tokenData.expiresAt < now) {
-      console.log(`❌ Accès Gradio refusé - Token expiré pour utilisateur ${tokenData.userId}`);
-      
       return NextResponse.json(
         { error: 'Token expiré' },
         { status: 401 }
@@ -48,11 +42,8 @@ export async function GET(request: NextRequest) {
                     'unknown';
     
     if (tokenData.ip !== clientIP) {
-      console.log(`⚠️  IP différente: Token=${tokenData.ip}, Client=${clientIP}`);
       // On peut choisir de bloquer ou juste logger
     }
-    
-    console.log(`✅ Accès Gradio autorisé pour utilisateur ${tokenData.userId} - Module: ${tokenData.moduleTitle}`);
     
     // Rediriger vers Gradio avec le token en paramètre
     const gradioUrl = new URL(RUINEDFOOOCUS_URL);
@@ -63,8 +54,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(gradioUrl.toString());
     
   } catch (error) {
-    console.error('❌ Erreur dans le proxy Gradio sécurisé:', error);
-    
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -87,8 +76,6 @@ export async function POST(request: NextRequest) {
     }
     
     if (!token) {
-      console.log('❌ Accès POST Gradio refusé - Pas de token');
-      
       return NextResponse.json(
         { error: 'Token requis pour accéder à Gradio' },
         { status: 401 }
@@ -99,8 +86,6 @@ export async function POST(request: NextRequest) {
     const tokenData = verifyGradioToken(token);
     
     if (!tokenData) {
-      console.log('❌ Accès POST Gradio refusé - Token invalide');
-      
       return NextResponse.json(
         { error: 'Token invalide ou expiré' },
         { status: 401 }
@@ -110,15 +95,11 @@ export async function POST(request: NextRequest) {
     // Vérifier si le token n'a pas expiré
     const now = Math.floor(Date.now() / 1000);
     if (tokenData.expiresAt < now) {
-      console.log(`❌ Accès POST Gradio refusé - Token expiré pour utilisateur ${tokenData.userId}`);
-      
       return NextResponse.json(
         { error: 'Token expiré' },
         { status: 401 }
       );
     }
-    
-    console.log(`✅ Accès POST Gradio autorisé pour utilisateur ${tokenData.userId} - Module: ${tokenData.moduleTitle}`);
     
     // Récupérer le body de la requête
     const body = await request.text();
@@ -148,8 +129,6 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('❌ Erreur dans le proxy POST Gradio sécurisé:', error);
-    
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

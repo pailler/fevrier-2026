@@ -40,10 +40,7 @@ export async function POST(request: NextRequest) {
       timeRemaining: null
     });
 
-
-
   } catch (error) {
-    console.error('❌ Erreur vérification session:', error);
     return NextResponse.json(
       { error: 'Erreur interne lors de la vérification de l\'accès' },
       { status: 500 }

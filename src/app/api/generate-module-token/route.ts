@@ -68,8 +68,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingToken && !existingTokenError) {
-      console.log('✅ Token existant trouvé, réutilisation');
-      
       // Incrémenter le compteur d'utilisation
       const newUsage = (existingToken.current_usage || 0) + 1;
       const { error: updateError } = await supabase
@@ -81,10 +79,8 @@ export async function POST(request: NextRequest) {
         .eq('id', existingToken.id);
 
       if (updateError) {
-        console.error('❌ Erreur mise à jour usage token:', updateError);
-      } else {
-        console.log(`✅ Usage token mis à jour: ${newUsage}/${existingToken.max_usage}`);
-      }
+        } else {
+        }
       
       // Utiliser l'URL personnalisée si fournie, sinon utiliser l'URL par défaut
       const finalUrl = targetUrl || getModuleUrl(moduleTitle || module.title);
@@ -139,7 +135,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (tokenError) {
-      console.error('Erreur création token:', tokenError);
       return NextResponse.json({ error: 'Erreur lors de la création du token' }, { status: 500 });
     }
 
@@ -157,13 +152,10 @@ export async function POST(request: NextRequest) {
         }]);
 
       if (moduleAccessError) {
-        console.error('Erreur création accès module:', moduleAccessError);
-      } else {
-        console.log('✅ Accès module créé avec succès');
-      }
+        } else {
+        }
     } catch (error) {
-      console.error('Erreur création accès module:', error);
-    }
+      }
 
     // Utiliser l'URL personnalisée si fournie, sinon utiliser l'URL par défaut
     const finalUrl = targetUrl || getModuleUrl(moduleTitle || module.title);
@@ -176,7 +168,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Erreur génération token:', error);
     return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 });
   }
 }

@@ -67,8 +67,7 @@ export default function StableDiffusionPage() {
         return result.isActivated || false;
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification d\'activation:', error);
-    }
+      }
     return false;
   }, [session?.user?.id]);
 
@@ -80,13 +79,10 @@ export default function StableDiffusionPage() {
     }
 
     if (!moduleTitle || !moduleId) {
-      console.error('❌ Paramètres manquants:', { moduleTitle, moduleId });
       return;
     }
 
     try {
-      console.log('🔍 Génération du token JWT pour:', moduleTitle);
-      
       const response = await fetch('/api/generate-access-token', {
         method: 'POST',
         headers: {
@@ -118,19 +114,14 @@ export default function StableDiffusionPage() {
       }
       
       const { accessToken, moduleName } = responseData;
-      console.log('✅ Token JWT généré avec succès');
-      
       const baseUrl = 'https://stablediffusion.regispailler.fr';
       const accessUrl = `${baseUrl}?token=${accessToken}`;
-      console.log('🔗 URL d\'accès:', accessUrl);
-      
       setIframeModal({
         isOpen: true,
         url: accessUrl,
         title: moduleTitle
       });
     } catch (error) {
-      console.error('❌ Erreur lors de l\'accès:', error);
       alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
   }, [session, setIframeModal]);
@@ -172,7 +163,6 @@ export default function StableDiffusionPage() {
           .eq('is_active', true);
 
         if (accessError) {
-          console.log('⚠️ Table user_applications non trouvée, pas d\'abonnements actifs');
           setUserSubscriptions({});
           return;
         }
@@ -193,7 +183,6 @@ export default function StableDiffusionPage() {
               }
             };
           } catch (error) {
-            console.error(`❌ Exception traitement module ${access.module_id}:`, error);
             continue;
           }
         }
@@ -210,7 +199,6 @@ export default function StableDiffusionPage() {
           setCheckingActivation(false);
         }
       } catch (error) {
-        console.error('❌ Erreur chargement données utilisateur:', error);
         setUserSubscriptions({});
         setCheckingActivation(false);
       }
@@ -244,17 +232,14 @@ export default function StableDiffusionPage() {
           .single();
 
         if (error) {
-          console.error('Erreur lors du chargement de la carte:', error);
           router.push('/');
           return;
         }
 
         if (data) {
           setCard(data);
-          console.log('🔍 Debug card:', data.title, 'price:', data.price, 'price type:', typeof data.price, 'session:', !!session);
-        }
+          }
       } catch (error) {
-        console.error('Erreur:', error);
         router.push('/');
       } finally {
         setLoading(false);
@@ -266,7 +251,6 @@ export default function StableDiffusionPage() {
 
   const handleSubscribe = (card: Card) => {
     if (!card?.id) {
-      console.error('❌ Carte invalide:', card);
       return;
     }
 
@@ -275,19 +259,15 @@ export default function StableDiffusionPage() {
     
     if (isSelected) {
       newSelectedCards = selectedCards.filter(c => c.id !== card.id);
-      console.log('Désabonnement de:', card.title);
-    } else {
+      } else {
       newSelectedCards = [...selectedCards, card];
-      console.log('Abonnement à:', card.title);
-    }
+      }
     
-    console.log('Nouveaux modules sélectionnés:', newSelectedCards);
     setSelectedCards(newSelectedCards);
     
     if (typeof window !== 'undefined') {
       localStorage.setItem('selectedCards', JSON.stringify(newSelectedCards));
-      console.log('localStorage mis à jour');
-    }
+      }
   };
 
   const isCardSelected = (cardId: string) => {
@@ -548,7 +528,6 @@ export default function StableDiffusionPage() {
                           throw new Error('URL de session Stripe manquante.');
                         }
                       } catch (error) {
-                        console.error('Erreur lors de l\'activation:', error);
                         alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                       }
                     }}

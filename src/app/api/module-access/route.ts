@@ -67,7 +67,6 @@ async function testUrlAccess(url: string, headers?: Headers): Promise<{ accessib
       content: content
     };
   } catch (error) {
-    console.log(`❌ Erreur d'accès à ${url}:`, error);
     return {
       accessible: false,
       status: 0
@@ -78,8 +77,6 @@ async function testUrlAccess(url: string, headers?: Headers): Promise<{ accessib
 // Fonction pour récupérer les credentials depuis les arguments de lancement
 async function getCredentialsFromLaunchArgs(config: any): Promise<{ username: string; password: string } | null> {
   try {
-    console.log(`🔍 Tentative de récupération des credentials depuis Launch Args...`);
-    
     // Pour StableDiffusion, on peut essayer de récupérer depuis l'API ou les cookies
     if (config.type === 'gradio') {
       // Essayer de récupérer depuis l'API Gradio
@@ -96,8 +93,6 @@ async function getCredentialsFromLaunchArgs(config: any): Promise<{ username: st
       if (response.ok) {
         try {
           const configData = await response.json();
-          console.log(`📋 Config Gradio récupérée:`, configData);
-          
           // Chercher les credentials dans la config
           if (configData.auth && configData.auth.username && configData.auth.password) {
             return {
@@ -106,8 +101,7 @@ async function getCredentialsFromLaunchArgs(config: any): Promise<{ username: st
             };
           }
         } catch (e) {
-          console.log(`❌ Erreur parsing config Gradio:`, e);
-        }
+          }
       }
       
       // Si pas de config, essayer de récupérer depuis les arguments de lancement via l'interface
@@ -127,13 +121,9 @@ async function getCredentialsFromLaunchArgs(config: any): Promise<{ username: st
         const authPathMatch = html.match(/--gradio-auth-path\s+([^\s]+)/);
         
         if (launchArgsMatch) {
-          console.log(`🔍 Arguments de lancement trouvés: ${launchArgsMatch[1]}`);
-          
           // Essayer de récupérer les credentials depuis le fichier d'auth
           if (authPathMatch) {
             const authFilePath = authPathMatch[1];
-            console.log(`🔍 Fichier d'auth trouvé: ${authFilePath}`);
-            
             // Pour l'instant, retourner les credentials par défaut
             // TODO: Implémenter la lecture du fichier d'auth
             return {
@@ -146,14 +136,12 @@ async function getCredentialsFromLaunchArgs(config: any): Promise<{ username: st
     }
     
     // Fallback: retourner les credentials par défaut
-    console.log(`⚠️ Utilisation des credentials par défaut pour Launch Args`);
     return {
       username: config.credentials.username,
       password: config.credentials.password
     };
     
   } catch (error) {
-    console.log(`❌ Erreur récupération Launch Args:`, error);
     return null;
   }
 }
@@ -165,15 +153,10 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
     throw new Error(`Module ${module} non configuré`);
   }
 
-  console.log(`🔐 Tentative d'outrepassement pour ${module} avec méthode ${method}`);
-
   // Test d'accès initial sans authentification
   const initialTest = await testUrlAccess(config.url);
-  console.log(`📡 Test initial ${module}: ${initialTest.status} - ${initialTest.accessible ? 'Accessible' : 'Non accessible'}`);
-
   // Si déjà accessible, retourner directement
   if (initialTest.accessible) {
-    console.log(`✅ ${module} déjà accessible sans authentification`);
     return { 
       success: true, 
       method: 'no-auth-required', 
@@ -186,14 +169,10 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
   // Méthode 1: Authentification via Launch Arguments
   if (method === 'launch-args' || method === 'auto') {
     try {
-      console.log(`🔐 Tentative authentification via Launch Args pour ${module}...`);
-      
       // Récupérer les credentials depuis les arguments de lancement
       const launchCredentials = await getCredentialsFromLaunchArgs(config);
       
       if (launchCredentials) {
-        console.log(`✅ Credentials récupérés depuis Launch Args: ${launchCredentials.username}`);
-        
         // Utiliser les credentials des launch args pour l'authentification
         const launchAuthCredentials = Buffer.from(`${launchCredentials.username}:${launchCredentials.password}`).toString('base64');
         
@@ -207,24 +186,18 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
         const launchArgsTest = await testUrlAccess(config.url, headers);
         
         if (launchArgsTest.accessible) {
-          console.log(`✅ Authentification Launch Args réussie pour ${module}`);
           return { success: true, method: 'launch-args', html: launchArgsTest.content };
         } else {
-          console.log(`❌ Launch Args Auth échoué pour ${module}: ${launchArgsTest.status}`);
-        }
+          }
       } else {
-        console.log(`❌ Impossible de récupérer les credentials depuis Launch Args pour ${module}`);
-      }
+        }
     } catch (error) {
-      console.log(`❌ Erreur Launch Args Auth pour ${module}:`, error);
-    }
+      }
   }
 
   // Méthode 2: Authentification Basic HTTP
   if (method === 'basic-auth' || method === 'auto') {
     try {
-      console.log(`🔐 Tentative Basic Auth pour ${module}...`);
-      
       const headers = new Headers();
       headers.set('Authorization', `Basic ${credentials}`);
       headers.set('User-Agent', 'IAHome-Module-Proxy/1.0');
@@ -235,21 +208,16 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
       const basicAuthTest = await testUrlAccess(config.url, headers);
       
       if (basicAuthTest.accessible) {
-        console.log(`✅ Authentification Basic réussie pour ${module}`);
         return { success: true, method: 'basic-auth', html: basicAuthTest.content };
       } else {
-        console.log(`❌ Basic Auth échoué pour ${module}: ${basicAuthTest.status}`);
-      }
+        }
     } catch (error) {
-      console.log(`❌ Erreur Basic Auth pour ${module}:`, error);
-    }
+      }
   }
 
   // Méthode 2: Connexion directe via POST
   if (method === 'direct-login' || method === 'auto') {
     try {
-      console.log(`🔐 Tentative connexion directe pour ${module}...`);
-      
       // Première requête pour obtenir les cookies et le formulaire
       const initialResponse = await fetch(config.url, {
         method: 'GET',
@@ -283,22 +251,17 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
 
         if (loginResponse.ok) {
           const loginContent = await loginResponse.text();
-          console.log(`✅ Connexion directe réussie pour ${module}`);
           return { success: true, method: 'direct-login', html: loginContent };
         } else {
-          console.log(`❌ Connexion directe échouée pour ${module}: ${loginResponse.status}`);
-        }
+          }
       }
     } catch (error) {
-      console.log(`❌ Erreur connexion directe pour ${module}:`, error);
-    }
+      }
   }
 
   // Méthode 3: Injection de formulaire avec JavaScript ultra-avancé
   if (method === 'form-injection' || method === 'auto') {
     try {
-      console.log(`🔐 Tentative injection de formulaire pour ${module}...`);
-      
       const response = await fetch(config.url, {
         method: 'GET',
         headers: {
@@ -314,9 +277,6 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
         const injectionScript = `
         <script>
           (function() {
-            console.log('🔐 [IAHOME] Démarrage injection automatique pour ${module}...');
-            console.log('🔐 [IAHOME] Credentials: ${config.credentials.username} / ${config.credentials.password}');
-            
             let attempts = 0;
             const maxAttempts = 15;
             let success = false;
@@ -325,8 +285,6 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
             function log(message, type = 'info') {
               const timestamp = new Date().toISOString();
               const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : '🔍';
-              console.log(\`\${prefix} [IAHOME] [\${timestamp}] \${message}\`);
-              
               // Ajouter au DOM pour debug
               const debugDiv = document.getElementById('iahome-debug') || createDebugDiv();
               debugDiv.innerHTML += \`<div class="\${type}">\${prefix} \${message}</div>\`;
@@ -562,15 +520,12 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
         };
       }
     } catch (error) {
-      console.log(`❌ Erreur injection de formulaire pour ${module}:`, error);
-    }
+      }
   }
 
   // Méthode 4: Gestion avancée des cookies de session
   if (method === 'cookie-session' || method === 'auto') {
     try {
-      console.log(`🔐 Tentative gestion cookies pour ${module}...`);
-      
       // Première requête pour obtenir les cookies
       const initialResponse = await fetch(config.url, {
         method: 'GET',
@@ -597,22 +552,17 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
 
         if (authResponse.ok) {
           const authContent = await authResponse.text();
-          console.log(`✅ Authentification par cookies réussie pour ${module}`);
           return { success: true, method: 'cookie-session', html: authContent };
         } else {
-          console.log(`❌ Auth par cookies échouée pour ${module}: ${authResponse.status}`);
-        }
+          }
       }
     } catch (error) {
-      console.log(`❌ Erreur gestion cookies pour ${module}:`, error);
-    }
+      }
   }
 
   // Méthode 5: Authentification Gradio spécifique
   if (method === 'gradio-auth' || method === 'auto') {
     try {
-      console.log(`🔐 Tentative authentification Gradio pour ${module}...`);
-      
       // Première requête pour obtenir la page et les cookies
       const initialResponse = await fetch(config.url, {
         method: 'GET',
@@ -628,8 +578,6 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
         
         // Vérifier si c'est une application Gradio
         if (html.includes('gradio') || html.includes('auth_required')) {
-          console.log('✅ Application Gradio détectée');
-          
           // Tentative d'authentification via l'API Gradio
           const gradioAuthUrl = `${config.url}/login`;
           
@@ -650,8 +598,6 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
             redirect: 'follow'
           });
           
-          console.log(`Status authentification Gradio: ${authResponse.status}`);
-          
           if (authResponse.ok) {
             const authContent = await authResponse.text();
             
@@ -659,8 +605,6 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
             try {
               const authResult = JSON.parse(authContent);
               if (authResult.success) {
-                console.log(`✅ Authentification Gradio réussie pour ${module}`);
-                
                 // Obtenir les cookies de session
                 const sessionCookies = authResponse.headers.get('set-cookie');
                 
@@ -675,18 +619,15 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
                 
                 if (sessionResponse.ok) {
                   const sessionContent = await sessionResponse.text();
-                  console.log(`✅ Accès avec session réussi (${sessionContent.length} caractères)`);
+                  console.log('Session Gradio récupérée avec succès');
                   return { success: true, method: 'gradio-auth', html: sessionContent };
                 }
               } else {
-                console.log(`❌ Authentification Gradio échouée: ${authContent}`);
-              }
+                }
             } catch (e) {
-              console.log(`❌ Erreur parsing réponse Gradio: ${e instanceof Error ? e.message : 'Erreur inconnue'}`);
-            }
+              }
           } else {
-            console.log(`❌ Authentification Gradio échouée: ${authResponse.status}`);
-          }
+            }
           
           // Si l'authentification directe échoue, essayer avec Basic Auth
           const basicAuthResponse = await fetch(config.url, {
@@ -700,21 +641,17 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
           
           if (basicAuthResponse.ok) {
             const basicAuthContent = await basicAuthResponse.text();
-            console.log(`✅ Authentification Gradio + Basic Auth réussie pour ${module}`);
             return { success: true, method: 'gradio-basic-auth', html: basicAuthContent };
           }
         }
       }
     } catch (error) {
-      console.log(`❌ Erreur authentification Gradio pour ${module}:`, error);
-    }
+      }
   }
 
   // Méthode 6: Injection JavaScript avancée pour Gradio
   if (method === 'gradio-injection' || method === 'auto') {
     try {
-      console.log(`🔐 Tentative injection JavaScript Gradio pour ${module}...`);
-      
       const response = await fetch(config.url, {
         method: 'GET',
         headers: {
@@ -730,9 +667,6 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
         const gradioInjectionScript = `
         <script>
           (function() {
-            console.log('🔐 [IAHOME] Démarrage injection Gradio pour ${module}...');
-            console.log('🔐 [IAHOME] Credentials: ${config.credentials.username} / ${config.credentials.password}');
-            
             let attempts = 0;
             const maxAttempts = 20;
             let success = false;
@@ -741,8 +675,6 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
             function log(message, type = 'info') {
               const timestamp = new Date().toISOString();
               const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : '🔍';
-              console.log(\`\${prefix} [IAHOME] [\${timestamp}] \${message}\`);
-              
               // Ajouter au DOM pour debug
               const debugDiv = document.getElementById('iahome-debug') || createDebugDiv();
               debugDiv.innerHTML += \`<div class="\${type}">\${prefix} \${message}</div>\`;
@@ -933,13 +865,10 @@ async function bypassAuthentication(module: string, method: string = 'auto') {
         };
       }
     } catch (error) {
-      console.log(`❌ Erreur injection Gradio pour ${module}:`, error);
-    }
+      }
   }
 
   // Si aucune méthode n'a fonctionné, retourner une page d'erreur avec diagnostic
-  console.log(`❌ Aucune méthode d'authentification n'a fonctionné pour ${module}`);
-  
   const diagnosticHtml = `
     <!DOCTYPE html>
     <html>
@@ -1040,8 +969,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const module = searchParams.get('module');
 
-    console.log('🔐 Accès module GET demandé:', module);
-
     if (!module || !MODULES_CONFIG[module]) {
       return NextResponse.json(
         { error: `Module ${module} non configuré` },
@@ -1063,10 +990,7 @@ export async function GET(request: NextRequest) {
       headers: headers,
     });
 
-    console.log('📡 Réponse module:', response.status, response.statusText);
-
     if (!response.ok) {
-      console.error('❌ Erreur module:', response.status, response.statusText);
       return NextResponse.json(
         { error: `Erreur ${module}: ${response.status}` },
         { status: response.status }
@@ -1096,7 +1020,6 @@ export async function GET(request: NextRequest) {
               // Trouver et soumettre le formulaire
               const form = usernameInputs[0].closest('form') || passwordInputs[0].closest('form');
               if (form) {
-                console.log('🔐 Authentification automatique pour ${module}...');
                 setTimeout(function() {
                   form.submit();
                 }, 500);
@@ -1108,8 +1031,6 @@ export async function GET(request: NextRequest) {
       </head>
       `
     );
-
-    console.log('✅ HTML modifié avec authentification automatique pour', module);
 
     // Retourner le HTML modifié
     return new NextResponse(modifiedHtml, {
@@ -1123,7 +1044,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur accès module GET:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -1135,8 +1055,6 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { module, action = 'proxy' } = body;
-
-    console.log('🔐 Accès module POST demandé:', { module, action });
 
     if (!MODULES_CONFIG[module]) {
       return NextResponse.json(
@@ -1152,7 +1070,6 @@ export async function POST(request: NextRequest) {
       const credentials = Buffer.from(`${config.credentials.username}:${config.credentials.password}`).toString('base64');
       const authUrl = `${config.url.replace('https://', `https://${credentials}@`)}`;
       
-      console.log('🔗 Redirection vers:', authUrl);
       return NextResponse.json({ 
         success: true, 
         redirectUrl: authUrl,
@@ -1172,10 +1089,7 @@ export async function POST(request: NextRequest) {
       headers: headers,
     });
 
-    console.log('📡 Réponse module:', response.status, response.statusText);
-
     if (!response.ok) {
-      console.error('❌ Erreur module:', response.status, response.statusText);
       return NextResponse.json(
         { error: `Erreur ${module}: ${response.status}` },
         { status: response.status }
@@ -1205,7 +1119,6 @@ export async function POST(request: NextRequest) {
               // Trouver et soumettre le formulaire
               const form = usernameInputs[0].closest('form') || passwordInputs[0].closest('form');
               if (form) {
-                console.log('🔐 Authentification automatique pour ${module}...');
                 setTimeout(function() {
                   form.submit();
                 }, 500);
@@ -1217,8 +1130,6 @@ export async function POST(request: NextRequest) {
       </head>
       `
     );
-
-    console.log('✅ HTML modifié avec authentification automatique pour', module);
 
     // Retourner le HTML modifié
     return new NextResponse(modifiedHtml, {
@@ -1232,7 +1143,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur accès module POST:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -1244,8 +1154,6 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
     const { module, method = 'auto', action = 'bypass' } = body;
-
-    console.log('🔐 Accès module PUT demandé:', { module, method, action });
 
     if (!MODULES_CONFIG[module]) {
       return NextResponse.json(
@@ -1290,7 +1198,6 @@ export async function PUT(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('❌ Erreur accès module PUT:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

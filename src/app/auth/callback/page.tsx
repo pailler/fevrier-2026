@@ -11,16 +11,13 @@ export default function AuthCallback() {
       const { data, error } = await supabase.auth.getSession();
       
       if (error) {
-        console.error('Erreur lors de la récupération de la session:', error);
         router.push('/login');
         return;
       }
 
       if (data.session) {
-        console.log('Session trouvée, redirection vers la page d\'accueil');
         router.push('/');
       } else {
-        console.log('Pas de session, redirection vers login');
         router.push('/login');
       }
     };

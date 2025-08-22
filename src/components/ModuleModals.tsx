@@ -121,11 +121,7 @@ export function UnifiedModuleModal({
 
   // Mettre à jour le formulaire quand le module change
   useEffect(() => {
-    console.log('🔍 ModuleModals - Module reçu:', module);
-    console.log('🔍 ModuleModals - ID du module:', module?.id);
-    
-         if (module) {
-       console.log('✅ ModuleModals - Configuration du formulaire avec le module');
+    if (module) {
        setFormData({
          title: module.title || '',
          description: module.description || '',
@@ -137,7 +133,6 @@ export function UnifiedModuleModal({
          image_url: module.image_url || ''
        });
      } else {
-       console.log('🔄 ModuleModals - Configuration du formulaire vide');
        setFormData({
          title: '',
          description: '',
@@ -249,7 +244,6 @@ export function UnifiedModuleModal({
             
                   </select>
                 </div>
-
 
               </div>
             </div>

@@ -58,7 +58,6 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
         currency: 'EUR'
       }).format(numericPrice);
     } catch (error) {
-      console.warn('Erreur lors du formatage du prix:', error);
       // Fallback simple
       const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
       if (numericPrice === 0 || numericPrice === null || numericPrice === undefined || isNaN(numericPrice)) return 'Free';
@@ -979,5 +978,4 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     </div>
   );
 }
-
 

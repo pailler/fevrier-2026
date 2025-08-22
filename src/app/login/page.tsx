@@ -51,7 +51,6 @@ export default function LoginPage() {
     setMessage('');
     
     if (isRegister) {
-      console.log('Tentative d\'inscription avec:', email);
       const { data, error } = await supabase.auth.signUp({ 
         email, 
         password,
@@ -60,7 +59,6 @@ export default function LoginPage() {
         }
       });
       
-      console.log('Résultat signup:', { data, error });
       if (error) {
         setMessage(`Erreur lors de l'inscription: ${error.message}`);
       } else {
@@ -68,13 +66,8 @@ export default function LoginPage() {
         // Le trigger handle_new_user va automatiquement créer le profil
       }
     } else {
-      console.log('Tentative de connexion avec:', email);
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      console.log('Résultat signin:', { data, error });
-      
       if (error) {
-        console.error('Erreur de connexion:', error);
-        
         // Messages d'erreur plus clairs
         if (error.message.includes('Invalid login credentials')) {
           setMessage('❌ Email ou mot de passe incorrect. Vérifiez vos identifiants.');
@@ -84,12 +77,8 @@ export default function LoginPage() {
           setMessage(`❌ Erreur de connexion: ${error.message}`);
         }
       } else {
-        console.log('Connexion réussie, utilisateur:', data.user);
-        console.log('Session créée:', !!data.session);
-        
         // Vérifier le rôle depuis les métadonnées utilisateur
         const userRole = data.user?.user_metadata?.role || 'user';
-        console.log('Rôle utilisateur:', userRole);
         setMessage(`✅ Connexion réussie ! Rôle: ${userRole}`);
         
         // Envoyer une notification de connexion
@@ -101,10 +90,8 @@ export default function LoginPage() {
             userId: data.user?.id,
             userRole: userRole
           });
-          console.log('✅ Notification de connexion envoyée');
-        } catch (notificationError) {
-          console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
-        }
+          } catch (notificationError) {
+          }
         
         // Rediriger vers l'URL spécifiée ou la page d'accueil
         setTimeout(() => {

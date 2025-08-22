@@ -29,7 +29,6 @@ export default function DynamicNavigation({
         const items = await MenuService.getMenuItems(menuName, userRole);
         setMenuItems(items);
       } catch (err) {
-        console.error(`Erreur lors du chargement du menu ${menuName}:`, err);
         setError('Erreur lors du chargement du menu');
       } finally {
         setLoading(false);
@@ -50,7 +49,6 @@ export default function DynamicNavigation({
   }
 
   if (error) {
-    console.warn(`Erreur de menu ${menuName}:`, error);
     return null;
   }
 

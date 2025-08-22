@@ -13,16 +13,6 @@ export async function GET(request: NextRequest) {
     const cookieHeader = request.headers.get('cookie');
     const originalArgs = request.headers.get('x-original-args');
     const originalUri = request.headers.get('x-original-uri');
-    
-    console.log('🔍 Vérification session IAhome:', {
-      hasAuthHeader: !!authHeader,
-      hasCookieHeader: !!cookieHeader,
-      hasOriginalArgs: !!originalArgs,
-      hasOriginalUri: !!originalUri,
-      originalArgs: originalArgs,
-      originalUri: originalUri,
-      userAgent: request.headers.get('user-agent')
-    });
 
     let session = null;
 
@@ -33,8 +23,7 @@ export async function GET(request: NextRequest) {
       
       if (!error && user) {
         session = { user };
-        console.log('✅ Session validée via Bearer token:', user.email);
-      }
+        }
     }
     
     // Méthode 2: Vérifier via cookies de session
@@ -49,8 +38,7 @@ export async function GET(request: NextRequest) {
         
         if (!error && cookieSession?.user) {
           session = cookieSession;
-          console.log('✅ Session validée via cookies:', cookieSession.user.email);
-        }
+          }
       }
     }
 
@@ -64,8 +52,7 @@ export async function GET(request: NextRequest) {
         
         if (!error && user) {
           session = { user };
-          console.log('✅ Session validée via paramètre:', user.email);
-        }
+          }
       }
     }
 
@@ -92,8 +79,7 @@ export async function GET(request: NextRequest) {
             
             if (!error && user) {
               session = { user };
-              console.log('✅ Session validée via paramètres originaux:', user.email);
-            }
+              }
           }
         }
       }
@@ -111,7 +97,6 @@ export async function GET(request: NextRequest) {
         message: 'Accès autorisé'
       });
     } else {
-      console.log('❌ Aucune session valide trouvée');
       return NextResponse.json({
         success: false,
         authenticated: false,
@@ -120,7 +105,6 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('❌ Erreur lors de la vérification de session:', error);
     return NextResponse.json({
       success: false,
       error: 'Erreur interne du serveur'

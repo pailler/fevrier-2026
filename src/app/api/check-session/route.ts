@@ -19,8 +19,6 @@ export async function POST(request: NextRequest) {
 
     const { sessionId } = await request.json();
 
-    console.log('🔍 Vérification de la session Stripe:', sessionId);
-
     if (!sessionId) {
       return NextResponse.json(
         { error: 'sessionId requis' },
@@ -30,15 +28,6 @@ export async function POST(request: NextRequest) {
 
     // Récupérer la session Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-
-    console.log('🔍 Session Stripe récupérée:', {
-      id: session.id,
-      status: session.status,
-      payment_status: session.payment_status,
-      customer_email: session.customer_email,
-      amount_total: session.amount_total,
-      metadata: session.metadata
-    });
 
     if (session.payment_status === 'paid') {
       return NextResponse.json({
@@ -65,8 +54,6 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('❌ Erreur lors de la vérification de la session:', error);
-    
     if (error instanceof Error && error.message.includes('No such checkout.session')) {
       return NextResponse.json(
         { error: 'Session non trouvée' },

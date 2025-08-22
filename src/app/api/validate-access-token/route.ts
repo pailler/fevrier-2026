@@ -15,13 +15,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🔍 Validation du token:', token.substring(0, 50) + '...');
+    console.log('Token reçu:', token ? token.substring(0, 10) + '...' : 'null');
 
     // Vérifier si c'est un token JWT valide
     try {
       const decoded = jwt.verify(token, JWT_SECRET) as any;
-      console.log('✅ Token JWT décodé:', decoded);
-
       // Vérifier l'expiration
       if (decoded.exp && decoded.exp * 1000 < Date.now()) {
         return NextResponse.json(
@@ -39,7 +37,6 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (dbError) {
-        console.log('❌ Erreur base de données:', dbError.message);
         return NextResponse.json(
           { error: 'Erreur base de données' },
           { status: 500 }
@@ -47,9 +44,6 @@ export async function POST(request: NextRequest) {
       }
 
       if (!tokenRecord) {
-        console.log('❌ Token non trouvé dans la base de données');
-        console.log('🔍 Recherche de tokens similaires...');
-        
         // Rechercher des tokens similaires pour le débogage
         const { data: similarTokens, error: similarError } = await supabase
           .from('access_tokens')
@@ -58,9 +52,8 @@ export async function POST(request: NextRequest) {
           .limit(5);
         
         if (!similarError && similarTokens) {
-          console.log('📋 Tokens actifs trouvés:', similarTokens.length);
           similarTokens.forEach((t, i) => {
-            console.log(`${i + 1}. ${t.name} - Token: ${t.jwt_token.substring(0, 30)}...`);
+            console.log(`Token similaire ${i}:`, t.jwt_token ? t.jwt_token.substring(0, 10) + '...' : 'null');
           });
         }
         
@@ -114,8 +107,6 @@ export async function POST(request: NextRequest) {
       });
 
     } catch (jwtError) {
-      console.log('❌ Erreur JWT:', jwtError);
-      
       // Si ce n'est pas un JWT valide, essayer avec l'ancien système de magic links
       const { data: magicLink, error: magicError } = await supabase
         .from('magic_links')
@@ -152,7 +143,6 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('❌ Erreur validation token:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -185,7 +175,6 @@ export async function GET(request: NextRequest) {
     return response;
 
   } catch (error) {
-    console.error('❌ Erreur validation token GET:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

@@ -8,8 +8,6 @@ const STABLEDIFFUSION_CREDENTIALS = {
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔐 Accès direct Stable Diffusion demandé');
-
     // Créer les headers avec authentification HTTP Basic
     const credentials = Buffer.from(`${STABLEDIFFUSION_CREDENTIALS.username}:${STABLEDIFFUSION_CREDENTIALS.password}`).toString('base64');
     
@@ -23,10 +21,7 @@ export async function GET(request: NextRequest) {
       headers: headers,
     });
 
-    console.log('📡 Réponse Stable Diffusion:', response.status, response.statusText);
-
     if (!response.ok) {
-      console.error('❌ Erreur Stable Diffusion:', response.status, response.statusText);
       return NextResponse.json(
         { error: `Erreur Stable Diffusion: ${response.status}` },
         { status: response.status }
@@ -36,8 +31,6 @@ export async function GET(request: NextRequest) {
     // Récupérer le contenu
     const contentType = response.headers.get('content-type') || '';
     const content = await response.text();
-
-    console.log('✅ Contenu récupéré, type:', contentType);
 
     // Retourner le contenu avec les bons headers et CORS
     const proxyResponse = new NextResponse(content, {
@@ -56,7 +49,6 @@ export async function GET(request: NextRequest) {
     return proxyResponse;
 
   } catch (error) {
-    console.error('❌ Erreur accès direct Stable Diffusion:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

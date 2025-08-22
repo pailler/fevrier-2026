@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient';
-import { EmailService } from './emailService';
+// import { EmailService } from './emailService';
 
 export interface NotificationSetting {
   id: string;
@@ -27,10 +27,10 @@ export interface NotificationLog {
 
 export class NotificationService {
   private static instance: NotificationService;
-  private emailService: EmailService;
+  // private emailService: EmailService;
 
   constructor() {
-    this.emailService = EmailService.getInstance();
+    // this.emailService = EmailService.getInstance();
   }
 
   static getInstance(): NotificationService {
@@ -49,13 +49,11 @@ export class NotificationService {
         .order('event_name');
 
       if (error) {
-        console.error('Erreur lors de la récupération des paramètres de notification:', error);
         throw error;
       }
 
       return data || [];
     } catch (error) {
-      console.error('Erreur inattendue lors de la récupération des paramètres:', error);
       return [];
     }
   }
@@ -75,13 +73,11 @@ export class NotificationService {
         .eq('event_type', eventType);
 
       if (error) {
-        console.error('Erreur lors de la mise à jour du paramètre:', error);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Erreur inattendue lors de la mise à jour:', error);
       return false;
     }
   }
@@ -101,29 +97,26 @@ export class NotificationService {
         .single();
 
       if (settingError || !setting) {
-        console.error('Paramètre de notification non trouvé:', eventType);
         return false;
       }
 
       if (!setting.is_enabled) {
-        console.log('Notification désactivée pour:', eventType);
         return false;
       }
 
-      // Envoyer l'email
-      const emailSent = await this.emailService.sendEmail({
-        to: userEmail,
-        subject: setting.email_template_subject,
-        html: this.generateEmailHtml(setting.email_template_body, eventData)
-      });
+      // Envoyer l'email (désactivé temporairement)
+      const emailSent = false; // await this.emailService.sendEmail({
+      //   to: userEmail,
+      //   subject: setting.email_template_subject,
+      //   html: this.generateEmailHtml(setting.email_template_body, eventData)
+      // });
 
       // Enregistrer le log
       await this.logNotification(eventType, userEmail, eventData, emailSent);
 
       return emailSent;
     } catch (error) {
-      console.error('Erreur lors de l\'envoi de la notification:', error);
-      await this.logNotification(eventType, userEmail, eventData, false, error.message);
+      await this.logNotification(eventType, userEmail, eventData, false, error instanceof Error ? error.message : 'Erreur inconnue');
       return false;
     }
   }
@@ -148,8 +141,7 @@ export class NotificationService {
           email_error: emailError
         });
     } catch (error) {
-      console.error('Erreur lors de l\'enregistrement du log:', error);
-    }
+      }
   }
 
   // Récupérer les logs de notification
@@ -162,13 +154,11 @@ export class NotificationService {
         .limit(limit);
 
       if (error) {
-        console.error('Erreur lors de la récupération des logs:', error);
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Erreur inattendue lors de la récupération des logs:', error);
       return [];
     }
   }

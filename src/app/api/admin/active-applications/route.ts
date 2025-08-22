@@ -38,7 +38,6 @@ export async function GET(request: NextRequest) {
       .limit(1);
 
     if (tableError) {
-      console.error('Table active_applications non trouvée:', tableError);
       return NextResponse.json({ 
         applications: []
       });
@@ -59,13 +58,11 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Erreur récupération applications:', error);
       return NextResponse.json({ error: 'Erreur lors de la récupération des données' }, { status: 500 });
     }
 
     return NextResponse.json({ applications: applications || [] });
   } catch (error) {
-    console.error('Erreur API applications actives:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -114,7 +111,6 @@ export async function POST(request: NextRequest) {
           .eq('id', applicationId);
 
         if (updateError) {
-          console.error('Erreur mise à jour statut:', updateError);
           return NextResponse.json({ error: 'Erreur lors de la mise à jour' }, { status: 500 });
         }
 
@@ -133,8 +129,7 @@ export async function POST(request: NextRequest) {
               }
             });
         } catch (logError) {
-          console.warn('Impossible de logger l\'action admin:', logError);
-        }
+          }
 
         break;
 
@@ -153,7 +148,6 @@ export async function POST(request: NextRequest) {
           .in('id', applicationIds);
 
         if (bulkError) {
-          console.error('Erreur mise à jour en lot:', bulkError);
           return NextResponse.json({ error: 'Erreur lors de la mise à jour en lot' }, { status: 500 });
         }
 
@@ -171,8 +165,7 @@ export async function POST(request: NextRequest) {
               }
             });
         } catch (logError) {
-          console.warn('Impossible de logger l\'action admin en lot:', logError);
-        }
+          }
 
         break;
 
@@ -187,7 +180,6 @@ export async function POST(request: NextRequest) {
           .eq('id', applicationId);
 
         if (deleteError) {
-          console.error('Erreur suppression:', deleteError);
           return NextResponse.json({ error: 'Erreur lors de la suppression' }, { status: 500 });
         }
 
@@ -201,8 +193,7 @@ export async function POST(request: NextRequest) {
               target_id: applicationId
             });
         } catch (logError) {
-          console.warn('Impossible de logger l\'action admin de suppression:', logError);
-        }
+          }
 
         break;
 
@@ -212,7 +203,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Erreur API applications actives POST:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 } 

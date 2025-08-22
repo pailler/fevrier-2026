@@ -104,7 +104,6 @@ export default function ActiveApplicationsPage() {
         .eq('id', userId)
         .single();
       if (error) {
-        console.error('Erreur lors de la vérification admin:', error);
         setIsAdmin(false);
         return;
       }
@@ -118,7 +117,6 @@ export default function ActiveApplicationsPage() {
         }, 500);
       }
     } catch (error) {
-      console.error('Erreur vérification admin:', error);
       setIsAdmin(false);
     } finally {
       setLoading(false);
@@ -129,7 +127,6 @@ export default function ActiveApplicationsPage() {
     try {
       const token = accessToken || session?.access_token;
       if (!token) {
-        console.error('Aucun token d\'accès disponible');
         return;
       }
 
@@ -146,15 +143,13 @@ export default function ActiveApplicationsPage() {
       const data = await response.json();
       setApplications(data.applications || []);
     } catch (error) {
-      console.error('Erreur récupération applications:', error);
-    }
+      }
   };
 
   const fetchAccessLogs = async (accessToken?: string) => {
     try {
       const token = accessToken || session?.access_token;
       if (!token) {
-        console.error('Aucun token d\'accès disponible');
         return;
       }
 
@@ -171,8 +166,7 @@ export default function ActiveApplicationsPage() {
       const data = await response.json();
       setAccessLogs(data.logs || []);
     } catch (error) {
-      console.error('Erreur récupération logs:', error);
-    }
+      }
   };
 
   const handleStatusUpdate = async () => {
@@ -206,7 +200,6 @@ export default function ActiveApplicationsPage() {
       setAdminNotes('');
       setOverrideReason('');
     } catch (error) {
-      console.error('Erreur mise à jour statut:', error);
       alert('Erreur lors de la mise à jour du statut');
     }
   };
@@ -236,7 +229,6 @@ export default function ActiveApplicationsPage() {
       fetchApplications();
       setSelectedApplications([]);
     } catch (error) {
-      console.error('Erreur mise à jour en lot:', error);
       alert('Erreur lors de la mise à jour en lot');
     }
   };
@@ -263,7 +255,6 @@ export default function ActiveApplicationsPage() {
 
       fetchApplications();
     } catch (error) {
-      console.error('Erreur suppression:', error);
       alert('Erreur lors de la suppression');
     }
   };

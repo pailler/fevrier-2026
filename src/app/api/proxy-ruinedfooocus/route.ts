@@ -18,14 +18,10 @@ export async function GET(request: NextRequest) {
                     request.headers.get('x-real-ip') ||
                     'unknown';
     
-    console.log(`🔒 Tentative d'accès au proxy RuinedFooocus depuis IP: ${clientIP}`);
-    
     // Vérifier si l'IP est autorisée
     const isAllowed = ALLOWED_IPS.includes(clientIP);
     
     if (!isAllowed) {
-      console.log(`❌ Accès refusé au proxy pour IP: ${clientIP}`);
-      
       // Rediriger vers la page d'accès refusé
       const errorUrl = new URL('/access-denied', request.url);
       errorUrl.searchParams.set('reason', 'ip_restricted');
@@ -34,14 +30,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(errorUrl);
     }
     
-    console.log(`✅ Accès autorisé au proxy pour IP: ${clientIP}`);
-    
     // Rediriger vers l'application RuinedFooocus
     return NextResponse.redirect(RUINEDFOOOCUS_URL);
     
   } catch (error) {
-    console.error('❌ Erreur dans le proxy RuinedFooocus:', error);
-    
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -56,21 +48,15 @@ export async function POST(request: NextRequest) {
                     request.headers.get('x-real-ip') ||
                     'unknown';
     
-    console.log(`🔒 Tentative d'accès POST au proxy RuinedFooocus depuis IP: ${clientIP}`);
-    
     // Vérifier si l'IP est autorisée
     const isAllowed = ALLOWED_IPS.includes(clientIP);
     
     if (!isAllowed) {
-      console.log(`❌ Accès POST refusé au proxy pour IP: ${clientIP}`);
-      
       return NextResponse.json(
         { error: 'Accès non autorisé' },
         { status: 403 }
       );
     }
-    
-    console.log(`✅ Accès POST autorisé au proxy pour IP: ${clientIP}`);
     
     // Récupérer le body de la requête
     const body = await request.text();
@@ -99,8 +85,6 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('❌ Erreur dans le proxy POST RuinedFooocus:', error);
-    
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -118,5 +102,4 @@ export async function OPTIONS(request: NextRequest) {
     },
   });
 }
-
 

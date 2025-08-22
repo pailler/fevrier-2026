@@ -26,15 +26,9 @@ export default function Home() {
 
   // Vérification de la configuration Supabase
   useEffect(() => {
-    console.log('Configuration Supabase:');
-    console.log('URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-    console.log('Anon Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Présent' : 'Manquant');
-    console.log('Client Supabase:', supabase);
-
     // Récupérer la session actuelle
     const getSession = async () => {
       const { data: { session: currentSession } } = await supabase.auth.getSession();
-      console.log('Session actuelle:', currentSession);
       setSession(currentSession);
       setUser(currentSession?.user || null);
     };
@@ -44,7 +38,6 @@ export default function Home() {
     // Écouter les changements de session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Changement d\'état d\'auth:', event, session);
         setSession(session);
         setUser(session?.user || null);
       }
@@ -55,12 +48,7 @@ export default function Home() {
 
   // Effet pour surveiller les changements de session
   useEffect(() => {
-    console.log('🔍 Session changée:', { 
-      hasSession: !!session, 
-      userEmail: user?.email,
-      userId: user?.id 
-    });
-  }, [session, user]);
+    }, [session, user]);
 
   // Vérifier les sélections actives de l'utilisateur
   useEffect(() => {
@@ -85,11 +73,9 @@ export default function Home() {
             subscriptions[`module_${sub.module_id}`] = true;
           });
           setUserSubscriptions(subscriptions);
-          console.log('✅ Sélections actives:', subscriptions);
-        }
+          }
       } catch (error) {
-        console.error('Erreur vérification sélections:', error);
-      }
+        }
     };
 
     if (user) {
@@ -101,40 +87,21 @@ export default function Home() {
     // Charger les modules depuis Supabase
     const fetchModules = async () => {
       try {
-        console.log('=== DIAGNOSTIC SUPABASE ===');
-        console.log('URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-        console.log('Anon Key présent:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-        console.log('Client Supabase configuré:', !!supabase);
-        
         // Test de connexion de base
         const { data: testData, error: testError } = await supabase
           .from('modules')
           .select('count')
           .limit(1);
         
-        console.log('Test de connexion:', { testData, testError });
-        
-        console.log('Tentative de chargement des modules depuis Supabase...');
-        
         // Récupérer les modules (structure simple sans jointure)
         const { data: modulesData, error: modulesError } = await supabase
           .from('modules')
           .select('*');
         
-        console.log('Réponse Supabase complète:', { modulesData, modulesError });
-        
         if (modulesError) {
-          console.error('=== ERREUR DÉTAILLÉE ===');
-          console.error('Erreur lors du chargement des modules:', modulesError);
-          console.error('Code d\'erreur:', modulesError.code);
-          console.error('Message d\'erreur:', modulesError.message);
-          console.error('Détails:', modulesError.details);
-          console.error('Hint:', modulesError.hint);
-        } else {
-          console.log('Modules chargés avec succès:', modulesData);
-          console.log('=== DEBUG PRIX DES MODULES ===');
+          } else {
           modulesData.forEach((module: any) => {
-            console.log(`${module.title}: prix = "${module.price}" (type: ${typeof module.price})`);
+            console.log('Module traité:', module.title);
           });
           
           // Traiter les modules avec la structure simple
@@ -158,8 +125,7 @@ export default function Home() {
           setModules(modulesWithRoles);
         }
       } catch (error) {
-        console.error('Erreur lors du chargement des modules:', error);
-      } finally {
+        } finally {
         setLoading(false);
       }
     };
@@ -171,25 +137,19 @@ export default function Home() {
     // Charger le rôle de l'utilisateur
     const fetchUserRole = async () => {
       if (session && user) {
-        console.log('Chargement du rôle pour:', user.email, 'ID:', user.id);
-        
         try {
           // Essayer d'abord de récupérer depuis auth.users (plus fiable)
           const { data: authData, error: authError } = await supabase.auth.getUser();
           if (authError) {
-            console.warn('Erreur lors du chargement depuis auth:', authError);
             setRole('user'); // Rôle par défaut
           } else {
             const userRole = authData.user?.user_metadata?.role || 'user';
-            console.log('Rôle récupéré depuis auth.users:', userRole);
             setRole(userRole);
           }
         } catch (err) {
-          console.error('Erreur inattendue lors du chargement du rôle:', err);
           setRole('user'); // Rôle par défaut
         }
       } else {
-        console.log('Pas de session ou utilisateur:', { session: !!session, user: !!user });
         setRole(null);
       }
     };
@@ -216,18 +176,14 @@ export default function Home() {
     if (isSelected) {
       // Désabonner
       newSelectedModules = selectedModules.filter(m => m.id !== module.id);
-      console.log('Désabonnement de:', module.title);
-    } else {
+      } else {
       // S'abonner
       newSelectedModules = [...selectedModules, module];
-      console.log('Abonnement à:', module.title);
-    }
+      }
     
-    console.log('Nouveaux modules sélectionnés:', newSelectedModules);
     setSelectedModules(newSelectedModules);
     localStorage.setItem('selectedModules', JSON.stringify(newSelectedModules));
-    console.log('localStorage mis à jour');
-  };
+    };
 
   const isModuleSelected = (moduleId: string) => {
     return selectedModules.some(module => module.id === moduleId);

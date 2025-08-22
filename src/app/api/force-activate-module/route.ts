@@ -5,8 +5,6 @@ export async function POST(request: NextRequest) {
   try {
     const { userEmail, moduleId, moduleTitle } = await request.json();
 
-    console.log('🔧 Force activation module:', { userEmail, moduleId, moduleTitle });
-
     if (!userEmail || !moduleId || !moduleTitle) {
       return NextResponse.json({ 
         success: false, 
@@ -22,14 +20,11 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (userError || !user) {
-      console.error('❌ Utilisateur non trouvé:', userEmail);
       return NextResponse.json({ 
         success: false, 
         error: 'Utilisateur non trouvé' 
       }, { status: 404 });
     }
-
-    console.log('✅ Utilisateur trouvé:', user.id);
 
     // 2. Vérifier si l'accès existe déjà
     const { data: existingAccess, error: checkError } = await supabase
@@ -41,7 +36,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingAccess) {
-      console.log('✅ Accès déjà existant pour:', userEmail, moduleId);
       return NextResponse.json({ 
         success: true, 
         message: 'Module déjà activé',
@@ -67,14 +61,11 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (accessError) {
-      console.error('❌ Erreur création accès module:', accessError);
       return NextResponse.json({ 
         success: false, 
         error: 'Erreur lors de la création de l\'accès module' 
       }, { status: 500 });
     }
-
-    console.log('✅ Accès module créé:', accessData.id);
 
     // 4. Créer un token d'accès
     const { data: tokenData, error: tokenError } = await supabase
@@ -97,11 +88,9 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (tokenError) {
-      console.error('❌ Erreur création token:', tokenError);
       // On continue même si le token n'est pas créé
     } else {
-      console.log('✅ Token d\'accès créé:', tokenData.id);
-    }
+      }
 
     // 5. Enregistrer un paiement factice pour la traçabilité
     const { error: paymentError } = await supabase
@@ -121,8 +110,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (paymentError) {
-      console.warn('⚠️ Erreur enregistrement paiement factice:', paymentError);
-    }
+      }
 
     return NextResponse.json({
       success: true,
@@ -133,7 +121,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur force activation:', error);
     return NextResponse.json({
       success: false,
       error: 'Erreur lors de l\'activation forcée'

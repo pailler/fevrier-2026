@@ -10,8 +10,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const queryString = searchParams.toString();
 
-    console.log(`🔌 [alias] Requête Socket.IO: ${queryString}`);
-
     const targetUrl = `${METUBE_CONFIG.url}/socket.io/?${queryString}`;
 
     const upstreamHeaders: Record<string, string> = {
@@ -42,7 +40,6 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('❌ [alias] Erreur Socket.IO:', error);
     return new NextResponse('Erreur interne du serveur', { status: 500 });
   }
 }
@@ -52,8 +49,6 @@ export async function POST(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const queryString = searchParams.toString();
     const body = await request.text();
-
-    console.log(`🔌 [alias] POST Socket.IO: ${queryString}`);
 
     const targetUrl = `${METUBE_CONFIG.url}/socket.io/?${queryString}`;
 
@@ -86,7 +81,6 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('❌ [alias] Erreur Socket.IO POST:', error);
     return new NextResponse('Erreur interne du serveur', { status: 500 });
   }
 }
@@ -101,9 +95,4 @@ export async function OPTIONS() {
     },
   });
 }
-
-
-
-
-
 

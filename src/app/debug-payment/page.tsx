@@ -34,7 +34,6 @@ export default function DebugPaymentPage() {
       const result = await response.json();
       setDebugResult(result);
     } catch (error) {
-      console.error('Erreur debug:', error);
       setDebugResult({ error: 'Erreur lors du debug' });
     } finally {
       setLoading(false);
@@ -70,7 +69,6 @@ export default function DebugPaymentPage() {
         alert(`Erreur: ${result.error}`);
       }
     } catch (error) {
-      console.error('Erreur force activation:', error);
       alert('Erreur lors de l\'activation forcée');
     } finally {
       setForceActivating(false);

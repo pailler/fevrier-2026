@@ -67,8 +67,7 @@ export default function RuinedFooocusPage() {
         return result.isActivated || false;
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification d\'activation:', error);
-    }
+      }
     return false;
   }, [session?.user?.id]);
 
@@ -80,13 +79,10 @@ export default function RuinedFooocusPage() {
     }
 
     if (!moduleTitle || !moduleId) {
-      console.error('❌ Paramètres manquants:', { moduleTitle, moduleId });
       return;
     }
 
     try {
-      console.log('🔍 Génération du token JWT pour:', moduleTitle);
-      
       const response = await fetch('/api/generate-access-token', {
         method: 'POST',
         headers: {
@@ -118,19 +114,14 @@ export default function RuinedFooocusPage() {
       }
       
       const { accessToken, moduleName } = responseData;
-      console.log('✅ Token JWT généré avec succès');
-      
       const baseUrl = 'https://ruinedfooocus.regispailler.fr';
       const accessUrl = `${baseUrl}?token=${accessToken}`;
-      console.log('🔗 URL d\'accès:', accessUrl);
-      
       setIframeModal({
         isOpen: true,
         url: accessUrl,
         title: moduleTitle
       });
     } catch (error) {
-      console.error('❌ Erreur lors de l\'accès:', error);
       alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
   }, [session, setIframeModal]);
@@ -172,7 +163,6 @@ export default function RuinedFooocusPage() {
           .eq('is_active', true);
 
         if (accessError) {
-          console.log('⚠️ Table user_applications non trouvée, pas d\'abonnements actifs');
           setUserSubscriptions({});
           return;
         }
@@ -193,7 +183,6 @@ export default function RuinedFooocusPage() {
               }
             };
           } catch (error) {
-            console.error(`❌ Exception traitement module ${access.module_id}:`, error);
             continue;
           }
         }
@@ -210,7 +199,6 @@ export default function RuinedFooocusPage() {
           setCheckingActivation(false);
         }
       } catch (error) {
-        console.error('❌ Erreur chargement données utilisateur:', error);
         setUserSubscriptions({});
         setCheckingActivation(false);
       }
@@ -244,17 +232,14 @@ export default function RuinedFooocusPage() {
           .single();
 
         if (error) {
-          console.error('Erreur lors du chargement de la carte:', error);
           router.push('/');
           return;
         }
 
         if (data) {
           setCard(data);
-          console.log('🔍 Debug card:', data.title, 'price:', data.price, 'price type:', typeof data.price, 'session:', !!session);
-        }
+          }
       } catch (error) {
-        console.error('Erreur:', error);
         router.push('/');
       } finally {
         setLoading(false);
@@ -266,7 +251,6 @@ export default function RuinedFooocusPage() {
 
   const handleSubscribe = (card: Card) => {
     if (!card?.id) {
-      console.error('❌ Carte invalide:', card);
       return;
     }
 
@@ -275,19 +259,15 @@ export default function RuinedFooocusPage() {
     
     if (isSelected) {
       newSelectedCards = selectedCards.filter(c => c.id !== card.id);
-      console.log('Désabonnement de:', card.title);
-    } else {
+      } else {
       newSelectedCards = [...selectedCards, card];
-      console.log('Abonnement à:', card.title);
-    }
+      }
     
-    console.log('Nouveaux modules sélectionnés:', newSelectedCards);
     setSelectedCards(newSelectedCards);
     
     if (typeof window !== 'undefined') {
       localStorage.setItem('selectedCards', JSON.stringify(newSelectedCards));
-      console.log('localStorage mis à jour');
-    }
+      }
   };
 
   const isCardSelected = (cardId: string) => {
@@ -320,7 +300,7 @@ export default function RuinedFooocusPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50 to-indigo-50">
       {/* Fil d'Ariane */}
       <div className="bg-white/60 backdrop-blur-sm border-b border-gray-200/50 pt-2">
         <div className="max-w-7xl mx-auto px-6 py-1">
@@ -334,7 +314,7 @@ export default function RuinedFooocusPage() {
       </div>
 
       {/* Bannière spéciale pour RuinedFooocus */}
-      <section className="bg-gradient-to-br from-amber-600 via-orange-600 to-red-700 py-8 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-700 py-8 relative overflow-hidden">
         {/* Effet de particules animées */}
         <div className="absolute inset-0">
           <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
@@ -352,13 +332,13 @@ export default function RuinedFooocusPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Générateur d'images IA avancé
+                Créez des images avec l'IA de pointe
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
-                {(card?.category || 'AI IMAGE GENERATOR').toUpperCase()}
+                {(card?.category || 'AI GENERATION').toUpperCase()}
               </span>
-              <p className="text-xl text-amber-100 mb-6">
-                RuinedFooocus vous offre une interface puissante et intuitive pour créer des images d'intelligence artificielle de haute qualité avec des modèles avancés.
+              <p className="text-xl text-purple-100 mb-6">
+                RuinedFooocus vous permet de générer des images de haute qualité à partir de descriptions textuelles avec une précision et une créativité exceptionnelles.
               </p>
               
               {/* Badges de fonctionnalités */}
@@ -367,10 +347,10 @@ export default function RuinedFooocusPage() {
                   🎨 Génération d'images
                 </span>
                 <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
-                  🚀 Modèles avancés
+                  🤖 IA avancée
                 </span>
                 <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
-                  ⚡ Interface rapide
+                  ⚡ Haute performance
                 </span>
               </div>
             </div>
@@ -379,40 +359,53 @@ export default function RuinedFooocusPage() {
             <div className="flex-1 flex justify-center">
               <div className="relative w-80 h-64">
                 {/* Formes géométriques abstraites */}
-                <div className="absolute top-0 left-0 w-24 h-24 bg-amber-400 rounded-full opacity-80 animate-pulse"></div>
-                <div className="absolute top-16 right-0 w-20 h-20 bg-orange-400 rounded-lg opacity-80 animate-bounce"></div>
-                <div className="absolute bottom-0 left-16 w-20 h-20 bg-red-400 transform rotate-45 opacity-80 animate-pulse"></div>
+                <div className="absolute top-0 left-0 w-24 h-24 bg-purple-400 rounded-full opacity-80 animate-pulse"></div>
+                <div className="absolute top-16 right-0 w-20 h-20 bg-indigo-400 rounded-lg opacity-80 animate-bounce"></div>
+                <div className="absolute bottom-0 left-16 w-20 h-20 bg-blue-400 transform rotate-45 opacity-80 animate-pulse"></div>
                 <div className="absolute bottom-16 right-16 w-16 h-16 bg-white rounded-full opacity-80 animate-bounce"></div>
                 
-                {/* Logo générateur d'images centré */}
+                {/* Logo IA centré */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="bg-white/95 backdrop-blur-sm rounded-full p-6 shadow-2xl border-2 border-amber-500/20">
+                  <div className="bg-white/95 backdrop-blur-sm rounded-full p-6 shadow-2xl border-2 border-purple-500/20">
                     <svg className="w-20 h-20" viewBox="0 0 24 24" fill="none">
-                      {/* Générateur d'images stylisé */}
-                      <rect x="2" y="2" width="20" height="20" rx="2" stroke="#D97706" strokeWidth="2" fill="none"/>
+                      {/* Cerveau stylisé */}
+                      <path 
+                        d="M12 2 C8 2 4 4 4 8 C4 12 8 14 12 14 C16 14 20 12 20 8 C20 4 16 2 12 2 Z" 
+                        stroke="#8B5CF6" 
+                        strokeWidth="2" 
+                        fill="none"
+                      />
+                      <path 
+                        d="M8 6 C8 8 10 10 12 10 C14 10 16 8 16 6" 
+                        stroke="#8B5CF6" 
+                        strokeWidth="2" 
+                        fill="none"
+                      />
+                      <path 
+                        d="M6 10 C6 12 8 14 10 14" 
+                        stroke="#8B5CF6" 
+                        strokeWidth="2" 
+                        fill="none"
+                      />
+                      <path 
+                        d="M18 10 C18 12 16 14 14 14" 
+                        stroke="#8B5CF6" 
+                        strokeWidth="2" 
+                        fill="none"
+                      />
                       
-                      {/* Éléments de génération */}
-                      <circle cx="8" cy="8" r="2" fill="#D97706" opacity="0.8"/>
-                      <circle cx="16" cy="8" r="2" fill="#D97706" opacity="0.8"/>
-                      <circle cx="8" cy="16" r="2" fill="#D97706" opacity="0.8"/>
-                      <circle cx="16" cy="16" r="2" fill="#D97706" opacity="0.8"/>
-                      <circle cx="12" cy="12" r="2" fill="#D97706" opacity="0.8"/>
-                      
-                      {/* Connexions de génération */}
-                      <path d="M10 8 L14 12" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round"/>
-                      <path d="M14 8 L10 12" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round"/>
-                      <path d="M10 12 L14 16" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round"/>
-                      <path d="M14 12 L10 16" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round"/>
-                      
-                      {/* Indicateurs de flux de génération */}
-                      <circle cx="10" cy="8" r="0.5" fill="#D97706" className="animate-pulse">
-                        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+                      {/* Particules d'IA */}
+                      <circle cx="6" cy="6" r="1" fill="#8B5CF6" className="animate-pulse">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
                       </circle>
-                      <circle cx="14" cy="12" r="0.5" fill="#D97706" className="animate-pulse">
-                        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
+                      <circle cx="18" cy="6" r="1" fill="#8B5CF6" className="animate-pulse">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" begin="0.5s"/>
                       </circle>
-                      <circle cx="10" cy="16" r="0.5" fill="#D97706" className="animate-pulse">
-                        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
+                      <circle cx="6" cy="18" r="1" fill="#8B5CF6" className="animate-pulse">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" begin="1s"/>
+                      </circle>
+                      <circle cx="18" cy="18" r="1" fill="#8B5CF6" className="animate-pulse">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" begin="1.5s"/>
                       </circle>
                     </svg>
                   </div>
@@ -441,7 +434,7 @@ export default function RuinedFooocusPage() {
           {/* Colonne 2 - Système de boutons */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
             <div className="text-left mb-8">
-              <div className="w-3/4 bg-gradient-to-r from-amber-600 to-orange-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
+              <div className="w-3/4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
                 <div className="text-4xl font-bold mb-1">
                   {card.price === 0 || card.price === '0' ? 'Free' : `€${card.price}`}
                 </div>
@@ -481,7 +474,7 @@ export default function RuinedFooocusPage() {
                     className={`w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
                       isCardSelected(card.id)
                         ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
-                        : 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white'
+                        : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white'
                     }`}
                     onClick={() => handleSubscribe(card)}
                   >
@@ -535,7 +528,6 @@ export default function RuinedFooocusPage() {
                           throw new Error('URL de session Stripe manquante.');
                         }
                       } catch (error) {
-                        console.error('Erreur lors de l\'activation:', error);
                         alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                       }
                     }}
@@ -564,32 +556,32 @@ export default function RuinedFooocusPage() {
       </div>
 
       {/* Section "À propos de" en pleine largeur maximale */}
-      <section className="bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 py-8 w-full relative overflow-hidden">
+      <section className="bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 py-8 w-full relative overflow-hidden">
         {/* Effet de particules en arrière-plan */}
         <div className="absolute inset-0">
-          <div className="absolute top-10 left-10 w-2 h-2 bg-amber-400/20 rounded-full animate-pulse"></div>
-          <div className="absolute top-20 right-20 w-1 h-1 bg-orange-400/30 rounded-full animate-bounce"></div>
-          <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-red-400/25 rounded-full animate-pulse"></div>
-          <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-amber-400/20 rounded-full animate-bounce"></div>
-          <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-orange-400/15 rounded-full animate-pulse"></div>
+          <div className="absolute top-10 left-10 w-2 h-2 bg-purple-400/20 rounded-full animate-pulse"></div>
+          <div className="absolute top-20 right-20 w-1 h-1 bg-indigo-400/30 rounded-full animate-bounce"></div>
+          <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-blue-400/25 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-purple-400/20 rounded-full animate-bounce"></div>
+          <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-indigo-400/15 rounded-full animate-pulse"></div>
         </div>
         
         <div className="w-full px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-white/50 p-8 sm:p-12 lg:p-16 hover:shadow-3xl transition-all duration-300">
             <div className="prose max-w-none">
               <div className="text-center mb-12">
-                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-amber-900 via-orange-900 to-red-900 bg-clip-text text-transparent mb-4">
+                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 bg-clip-text text-transparent mb-4">
                   À propos de RuinedFooocus
                 </h3>
-                <div className="w-24 h-1 bg-gradient-to-r from-amber-500 to-red-500 mx-auto rounded-full"></div>
+                <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto rounded-full"></div>
               </div>
               
               <div className="space-y-8 sm:space-y-12 text-gray-700">
                 {/* Description principale */}
                 <div className="text-center max-w-5xl mx-auto">
                   <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
-                    RuinedFooocus est une plateforme de génération d'images par intelligence artificielle qui combine 
-                    puissance et simplicité pour créer des visuels uniques et de haute qualité.
+                    RuinedFooocus est un modèle d'intelligence artificielle révolutionnaire qui transforme vos descriptions textuelles en images de haute qualité. 
+                    Cette technologie de pointe vous permet de créer des visuels uniques et créatifs en quelques secondes.
                   </p>
                   {card.subtitle && (
                     <p className="text-base sm:text-lg text-gray-600 italic mb-8">
@@ -601,119 +593,119 @@ export default function RuinedFooocusPage() {
                 {/* Description détaillée en plusieurs chapitres */}
                 <div className="max-w-6xl mx-auto space-y-8">
                   {/* Chapitre 1: Qu'est-ce que RuinedFooocus */}
-                  <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-8 rounded-2xl border border-amber-200 shadow-lg">
+                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-8 rounded-2xl border border-purple-200 shadow-lg">
                     <div className="flex items-center mb-6">
-                      <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                      <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                         <span className="text-white text-xl font-bold">1</span>
                       </div>
-                      <h4 className="text-2xl font-bold text-amber-900">Qu'est-ce que RuinedFooocus ?</h4>
+                      <h4 className="text-2xl font-bold text-purple-900">Qu'est-ce que RuinedFooocus ?</h4>
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        RuinedFooocus est un générateur d'images IA révolutionnaire qui utilise les technologies les plus 
-                        avancées de l'intelligence artificielle pour créer des visuels uniques et de haute qualité. 
-                        Basé sur des modèles de diffusion stables, il offre une expérience intuitive et puissante.
+                        RuinedFooocus est un modèle de génération d'images par diffusion stable, développé pour offrir 
+                        une expérience de création d'images par IA exceptionnelle. Cette technologie révolutionnaire 
+                        utilise l'apprentissage profond pour créer des images photoréalistes à partir de descriptions textuelles détaillées.
                       </p>
                       <p className="text-base leading-relaxed">
-                        Cette plateforme combine la simplicité d'utilisation avec la puissance des algorithmes d'IA 
-                        les plus récents, permettant à tous les utilisateurs, des débutants aux professionnels, 
-                        de créer des images exceptionnelles en quelques clics.
+                        Contrairement aux générateurs d'images traditionnels, RuinedFooocus excelle dans la création d'œuvres 
+                        artistiques, de portraits, de paysages et d'illustrations avec un niveau de détail et de réalisme exceptionnel. 
+                        Le modèle comprend les nuances subtiles du langage et les traduit en visuels cohérents.
                       </p>
                     </div>
                   </div>
 
                   {/* Chapitre 2: Pourquoi choisir RuinedFooocus */}
-                  <div className="bg-gradient-to-r from-orange-50 to-red-50 p-8 rounded-2xl border border-orange-200 shadow-lg">
+                  <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-8 rounded-2xl border border-indigo-200 shadow-lg">
                     <div className="flex items-center mb-6">
-                      <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                      <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                         <span className="text-white text-xl font-bold">2</span>
                       </div>
-                      <h4 className="text-2xl font-bold text-orange-900">Pourquoi choisir RuinedFooocus ?</h4>
+                      <h4 className="text-2xl font-bold text-indigo-900">Pourquoi choisir RuinedFooocus ?</h4>
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Interface intuitive :</strong> Une interface claire et moderne qui s'adapte à tous les niveaux 
-                        d'expérience, des débutants aux utilisateurs avancés.
+                        <strong>Qualité exceptionnelle :</strong> Les images générées rivalisent avec celles créées par des artistes professionnels, 
+                        avec une attention particulière aux détails, à la composition et à l'esthétique.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Modèles avancés :</strong> Accès aux modèles d'IA les plus récents et performants pour 
-                        des résultats de qualité professionnelle.
+                        <strong>Flexibilité créative :</strong> Du photoréalisme à l'art abstrait, en passant par les styles artistiques 
+                        classiques, RuinedFooocus s'adapte à tous vos besoins créatifs.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Génération rapide :</strong> Créez vos images en quelques secondes avec des algorithmes 
-                        optimisés pour la vitesse et la qualité.
+                        <strong>Performance optimisée :</strong> Grâce à notre infrastructure haute performance, vous obtenez des résultats 
+                        en quelques secondes, même pour les images les plus complexes.
                       </p>
                     </div>
                   </div>
 
                   {/* Chapitre 3: Fonctionnalités avancées */}
-                  <div className="bg-gradient-to-r from-red-50 to-pink-50 p-8 rounded-2xl border border-red-200 shadow-lg">
+                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-8 rounded-2xl border border-blue-200 shadow-lg">
                     <div className="flex items-center mb-6">
-                      <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                      <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                         <span className="text-white text-xl font-bold">3</span>
                       </div>
-                      <h4 className="text-2xl font-bold text-red-900">Fonctionnalités avancées</h4>
+                      <h4 className="text-2xl font-bold text-blue-900">Fonctionnalités avancées</h4>
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Génération par prompt :</strong> Créez des images en décrivant simplement ce que vous voulez 
-                        voir, avec des prompts en langage naturel.
+                        <strong>Génération text-to-image :</strong> Transformez vos idées en images en décrivant simplement ce que vous voulez voir. 
+                        Plus votre description est détaillée, plus le résultat sera précis.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Personnalisation avancée :</strong> Ajustez les paramètres de génération, les styles, 
-                        les ratios d'aspect et bien plus encore.
+                        <strong>Contrôle artistique :</strong> Ajustez les paramètres de génération pour influencer le style, la composition, 
+                        et l'ambiance de vos créations selon vos préférences.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Export haute qualité :</strong> Téléchargez vos créations dans différents formats 
-                        et résolutions adaptés à tous vos projets.
+                        <strong>Résolution haute définition :</strong> Générez des images jusqu'à 1024x1024 pixels avec une qualité 
+                        professionnelle adaptée à tous vos projets.
                       </p>
                     </div>
                   </div>
 
                   {/* Chapitre 4: Cas d'usage */}
-                  <div className="bg-gradient-to-r from-pink-50 to-purple-50 p-8 rounded-2xl border border-pink-200 shadow-lg">
+                  <div className="bg-gradient-to-r from-cyan-50 to-teal-50 p-8 rounded-2xl border border-cyan-200 shadow-lg">
                     <div className="flex items-center mb-6">
-                      <div className="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                      <div className="w-12 h-12 bg-cyan-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                         <span className="text-white text-xl font-bold">4</span>
                       </div>
-                      <h4 className="text-2xl font-bold text-pink-900">Cas d'usage et applications</h4>
+                      <h4 className="text-2xl font-bold text-cyan-900">Cas d'usage et applications</h4>
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Créateurs de contenu :</strong> Générez des visuels uniques pour vos réseaux sociaux, 
-                        blogs, ou projets créatifs personnels.
+                        <strong>Artistes et designers :</strong> Créez des concepts visuels, des illustrations personnalisées, 
+                        et explorez de nouveaux styles artistiques pour vos projets créatifs.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Professionnels :</strong> Créez des concepts, des maquettes ou des illustrations 
-                        pour vos projets professionnels.
+                        <strong>Marketing et publicité :</strong> Générez des visuels uniques pour vos campagnes, 
+                        des mockups de produits, et des contenus visuels engageants.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Artistes :</strong> Explorez de nouveaux styles et techniques artistiques 
-                        avec l'aide de l'intelligence artificielle.
+                        <strong>Éducation et recherche :</strong> Visualisez des concepts complexes, créez des supports pédagogiques, 
+                        et explorez les possibilités de l'IA générative.
                       </p>
                     </div>
                   </div>
 
-                  {/* Chapitre 5: Avantages techniques */}
-                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-8 rounded-2xl border border-purple-200 shadow-lg">
+                  {/* Chapitre 5: Sécurité et éthique */}
+                  <div className="bg-gradient-to-r from-teal-50 to-emerald-50 p-8 rounded-2xl border border-teal-200 shadow-lg">
                     <div className="flex items-center mb-6">
-                      <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                      <div className="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                         <span className="text-white text-xl font-bold">5</span>
                       </div>
-                      <h4 className="text-2xl font-bold text-purple-900">Avantages techniques</h4>
+                      <h4 className="text-2xl font-bold text-teal-900">Sécurité et éthique</h4>
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Haute qualité :</strong> Génération d'images haute résolution avec des détails 
-                        fins et des textures réalistes.
+                        <strong>Filtres de contenu :</strong> Notre système intègre des filtres avancés pour prévenir la génération 
+                        de contenu inapproprié ou nuisible, garantissant un environnement créatif sûr.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Performance optimisée :</strong> Algorithmes optimisés pour des temps de génération 
-                        rapides sans compromettre la qualité.
+                        <strong>Respect des droits :</strong> Nous encourageons l'utilisation éthique de l'IA et le respect 
+                        des droits de propriété intellectuelle dans toutes les créations.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Compatibilité universelle :</strong> Fonctionne sur tous les navigateurs modernes 
-                        et s'adapte à tous les appareils.
+                        <strong>Transparence :</strong> Nous nous engageons à être transparents sur les capacités et les limitations 
+                        de notre technologie pour une utilisation responsable.
                       </p>
                     </div>
                   </div>
@@ -721,53 +713,53 @@ export default function RuinedFooocusPage() {
                 
                 {/* Fonctionnalités principales */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 my-12">
-                  <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-6 sm:p-8 rounded-2xl border border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 sm:p-8 rounded-2xl border border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div className="text-center">
-                      <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                         <span className="text-2xl">🎨</span>
                       </div>
-                      <h4 className="font-bold text-amber-900 mb-3 text-lg">Génération d'images</h4>
-                      <p className="text-gray-700 text-sm">Créez des visuels uniques avec des prompts en langage naturel.</p>
+                      <h4 className="font-bold text-purple-900 mb-3 text-lg">Créativité</h4>
+                      <p className="text-gray-700 text-sm">Libérez votre imagination avec des outils de génération d'images avancés.</p>
                     </div>
                   </div>
                   
-                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 sm:p-8 rounded-2xl border border-orange-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 sm:p-8 rounded-2xl border border-indigo-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div className="text-center">
-                      <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl">🚀</span>
-                      </div>
-                      <h4 className="font-bold text-orange-900 mb-3 text-lg">Modèles avancés</h4>
-                      <p className="text-gray-700 text-sm">Accès aux modèles d'IA les plus récents et performants.</p>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-gradient-to-br from-red-50 to-red-100 p-6 sm:p-8 rounded-2xl border border-red-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                    <div className="text-center">
-                      <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <div className="w-16 h-16 bg-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                         <span className="text-2xl">⚡</span>
                       </div>
-                      <h4 className="font-bold text-red-900 mb-3 text-lg">Interface rapide</h4>
-                      <p className="text-gray-700 text-sm">Génération en quelques secondes avec une interface intuitive.</p>
+                      <h4 className="font-bold text-indigo-900 mb-3 text-lg">Performance</h4>
+                      <p className="text-gray-700 text-sm">Génération rapide d'images haute qualité avec notre infrastructure optimisée.</p>
                     </div>
                   </div>
                   
-                  <div className="bg-gradient-to-br from-pink-50 to-pink-100 p-6 sm:p-8 rounded-2xl border border-pink-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 sm:p-8 rounded-2xl border border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                     <div className="text-center">
-                      <div className="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span className="text-2xl">📥</span>
+                      <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <span className="text-2xl">🔒</span>
                       </div>
-                      <h4 className="font-bold text-pink-900 mb-3 text-lg">Export haute qualité</h4>
-                      <p className="text-gray-700 text-sm">Téléchargez vos créations dans différents formats et résolutions.</p>
+                      <h4 className="font-bold text-blue-900 mb-3 text-lg">Sécurité</h4>
+                      <p className="text-gray-700 text-sm">Filtres de contenu et utilisation éthique garantis.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 sm:p-8 rounded-2xl border border-cyan-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <span className="text-2xl">🌐</span>
+                      </div>
+                      <h4 className="font-bold text-cyan-900 mb-3 text-lg">Accessibilité</h4>
+                      <p className="text-gray-700 text-sm">Interface intuitive accessible à tous les niveaux d'expertise.</p>
                     </div>
                   </div>
                 </div>
                 
                 {/* Informations pratiques */}
-                <div className="bg-gradient-to-r from-gray-50 to-amber-50 p-8 sm:p-12 rounded-2xl border border-gray-200">
+                <div className="bg-gradient-to-r from-gray-50 to-purple-50 p-8 sm:p-12 rounded-2xl border border-gray-200">
                   <h4 className="text-2xl font-bold text-gray-900 mb-6 text-center">Informations pratiques</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                         <span className="text-white text-sm font-bold">€</span>
                       </div>
                       <div>
@@ -779,8 +771,8 @@ export default function RuinedFooocusPage() {
                     </div>
                     
                     <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                        <span className="text-white text-sm">🎨</span>
+                      <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <span className="text-white text-sm">📱</span>
                       </div>
                       <div>
                         <h5 className="font-semibold text-gray-900">Compatibilité</h5>
@@ -789,7 +781,7 @@ export default function RuinedFooocusPage() {
                     </div>
                     
                     <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                         <span className="text-white text-sm">⚙️</span>
                       </div>
                       <div>
@@ -803,10 +795,10 @@ export default function RuinedFooocusPage() {
                 {/* Call to action */}
                 <div className="text-center pt-8">
                   <p className="text-lg sm:text-xl text-gray-700 mb-6 max-w-4xl mx-auto">
-                    Prêt à créer des images extraordinaires ? Commencez dès maintenant et donnez vie à vos idées !
+                    Prêt à créer des images extraordinaires avec RuinedFooocus ? Commencez dès maintenant et explorez les possibilités infinies de l'IA générative !
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <Link href="/register" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <Link href="/register" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                       <span className="text-xl mr-2">🚀</span>
                       Commencer maintenant
                     </Link>

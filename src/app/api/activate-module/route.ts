@@ -11,8 +11,6 @@ export async function POST(request: NextRequest) {
   try {
     const { moduleId, userId, moduleTitle, moduleDescription, moduleCategory, moduleUrl } = await request.json();
     
-    console.log('🔍 Activation module:', { moduleId, userId, moduleTitle });
-
     if (!moduleId || !userId || !moduleTitle) {
       return NextResponse.json({ 
         success: false, 
@@ -28,7 +26,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (userError || !userData) {
-      console.error('❌ Utilisateur non trouvé:', userId);
       return NextResponse.json({ 
         success: false, 
         error: 'Utilisateur non trouvé' 
@@ -45,7 +42,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingAccess) {
-      console.log('✅ Accès déjà existant pour:', userId, moduleId);
       return NextResponse.json({ 
         success: true, 
         message: 'Module déjà activé',
@@ -72,14 +68,11 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (accessError) {
-      console.error('❌ Erreur création accès module:', accessError);
       return NextResponse.json({ 
         success: false, 
         error: 'Erreur lors de la création de l\'accès' 
       }, { status: 500 });
     }
-
-    console.log('✅ Accès module créé avec succès:', accessData.id);
 
     // Envoyer une notification d'activation de module
     try {
@@ -92,10 +85,8 @@ export async function POST(request: NextRequest) {
         userId: userId,
         accessId: accessData.id
       });
-      console.log('✅ Notification d\'activation de module envoyée');
-    } catch (notificationError) {
-      console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
-    }
+      } catch (notificationError) {
+      }
 
     // Note: La création automatique de token est désactivée car il y a une incohérence
     // entre les types de module_id (string dans modules vs integer dans access_tokens)
@@ -109,7 +100,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur activation module:', error);
     return NextResponse.json({ 
       success: false, 
       error: 'Erreur interne du serveur' 

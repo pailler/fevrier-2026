@@ -6,8 +6,6 @@ const JWT_SECRET = process.env.JWT_SECRET || 'iahome-super-secret-jwt-key-2025-c
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 Génération de token personnalisé...');
-    
     const { moduleId, moduleName, expiresIn, permissions } = await request.json();
     
     if (!moduleId || !moduleName) {
@@ -30,15 +28,11 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error } = await supabase.auth.getUser(token);
     
     if (error || !user) {
-      console.error('❌ Erreur authentification:', error);
       return NextResponse.json(
         { error: 'Utilisateur non authentifié' },
         { status: 401 }
       );
     }
-
-    console.log('✅ Utilisateur authentifié:', user.email);
-    console.log('🔍 Génération de token avec paramètres personnalisés');
 
     // Utiliser les paramètres personnalisés ou les valeurs par défaut
     const customExpiresIn = expiresIn || '72h';
@@ -59,10 +53,6 @@ export async function POST(request: NextRequest) {
 
     const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: customExpiresIn });
     
-    console.log('✅ Token JWT généré avec succès pour:', moduleName);
-    console.log('🔍 Paramètres du token:', { customExpiresIn, customPermissions });
-    console.log('🔍 Payload du token:', payload);
-
     return NextResponse.json({
       success: true,
       accessToken,
@@ -78,7 +68,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur génération token personnalisé:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

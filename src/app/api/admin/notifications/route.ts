@@ -16,7 +16,6 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Erreur lors de la récupération des notifications:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -51,7 +50,6 @@ export async function PUT(request: NextRequest) {
       );
     }
   } catch (error) {
-    console.error('Erreur lors de la mise à jour des notifications:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -79,7 +77,6 @@ export async function POST(request: NextRequest) {
       message: success ? 'Notification envoyée avec succès' : 'Erreur lors de l\'envoi'
     });
   } catch (error) {
-    console.error('Erreur lors de l\'envoi de notification:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

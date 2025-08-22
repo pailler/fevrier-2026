@@ -14,7 +14,6 @@ const METUBE_CONFIG = {
 
 // Fonction pour réécrire les URLs dans le HTML de Metube
 function rewriteMetubeUrls(html: string): string {
-  console.log('🔧 Début réécriture URLs Metube');
   let modifiedHtml = html;
   
   // Éviter la double réécriture en vérifiant si l'URL contient déjà /api/proxy-metube/static/
@@ -28,7 +27,6 @@ function rewriteMetubeUrls(html: string): string {
   
   modifiedHtml = modifiedHtml.replace(/src="([^"]*\.js[^"]*)"/g, (match, path) => {
     if (path.startsWith('http') || isAlreadyRewritten(path)) return match;
-    console.log(`🔧 Réécriture JS: ${path} -> /api/proxy-metube/static/${path}`);
     return `src="/api/proxy-metube/static/${path}"`;
   });
   
@@ -97,7 +95,6 @@ function rewriteMetubeUrls(html: string): string {
     return `url: '/api/proxy-metube/${normalized}'`;
   });
   
-  console.log('🔧 Fin réécriture URLs Metube');
   // Injection d'un pont fetch/XHR pour réécrire dynamiquement les appels '/api/...'
   const bridgeScript = `
     <script>
@@ -114,7 +111,7 @@ function rewriteMetubeUrls(html: string): string {
                 else if (url.startsWith('./api/')) input = '/api/proxy-metube/' + url.slice(2);
                 else if (url.startsWith('../api/')) input = '/api/proxy-metube/' + url.replace(/^\.\.\//, '');
               }
-            } catch (e) { console.debug('fetch bridge error', e); }
+            } catch (e) { }
             return originalFetch.apply(this, arguments);
           };
           const origOpen = XMLHttpRequest.prototype.open;
@@ -126,10 +123,10 @@ function rewriteMetubeUrls(html: string): string {
                 else if (url.startsWith('./api/')) url = '/api/proxy-metube/' + url.slice(2);
                 else if (url.startsWith('../api/')) url = '/api/proxy-metube/' + url.replace(/^\.\.\//, '');
               }
-            } catch (e) { console.debug('xhr bridge error', e); }
+            } catch (e) { }
             return origOpen.apply(this, [method, url]);
           };
-        } catch (e) { console.debug('bridge install error', e); }
+        } catch (e) { }
       })();
     </script>`;
   return modifiedHtml.replace('</head>', bridgeScript + '</head>');
@@ -138,8 +135,6 @@ function rewriteMetubeUrls(html: string): string {
 // Fonction pour tester l'accessibilité du module Metube
 async function testMetubeAccess(): Promise<{ accessible: boolean; status: number; content?: string; setCookie?: string | null }> {
   try {
-    console.log('🔍 Test d\'accessibilité Metube sur:', METUBE_CONFIG.url);
-    
     const response = await fetch(METUBE_CONFIG.url, {
       method: 'GET',
       headers: {
@@ -152,8 +147,6 @@ async function testMetubeAccess(): Promise<{ accessible: boolean; status: number
     const content = await response.text();
     const setCookie = response.headers.get('set-cookie');
     
-    console.log(`📡 Réponse Metube: ${response.status} - ${response.statusText}`);
-    
     // Réécrire les URLs dans le contenu
     const rewrittenContent = rewriteMetubeUrls(content);
     
@@ -164,7 +157,6 @@ async function testMetubeAccess(): Promise<{ accessible: boolean; status: number
       setCookie
     };
   } catch (error) {
-    console.error('❌ Erreur d\'accès à Metube:', error);
     return {
       accessible: false,
       status: 0,
@@ -176,28 +168,21 @@ async function testMetubeAccess(): Promise<{ accessible: boolean; status: number
 // Fonction pour authentifier automatiquement l'utilisateur sur Metube
 async function authenticateMetubeUser(token: string): Promise<{ success: boolean; method: string; html?: string; error?: string; setCookie?: string | null }> {
   try {
-    console.log('🔐 Tentative d\'authentification Metube pour le token:', token);
-    
     // Valider le token d'accès
     const accessData = await validateAccessToken(token);
     if (!accessData) {
-      console.error('❌ Token invalide ou expiré:', token);
       return { success: false, method: 'token-validation', error: 'Token invalide ou expiré' };
     }
 
     // Vérifier les permissions
     if (!hasPermission(accessData, 'access')) {
-      console.error('❌ Permissions insuffisantes pour le token:', token);
       return { success: false, method: 'permissions', error: 'Permissions insuffisantes' };
     }
 
     // Test d'accès initial
     const initialTest = await testMetubeAccess();
-    console.log(`📡 Test initial Metube: ${initialTest.status} - ${initialTest.accessible ? 'Accessible' : 'Non accessible'}`);
-
     // Si déjà accessible, retourner directement
     if (initialTest.accessible) {
-      console.log('✅ Metube déjà accessible sans authentification');
       return { 
         success: true, 
         method: 'no-auth-required', 
@@ -208,8 +193,6 @@ async function authenticateMetubeUser(token: string): Promise<{ success: boolean
 
     // Méthode 1: Authentification Basic HTTP
     try {
-      console.log('🔐 Tentative Basic Auth pour Metube...');
-      
       const credentials = Buffer.from(`${METUBE_CONFIG.credentials.username}:${METUBE_CONFIG.credentials.password}`).toString('base64');
       
       const headers = new Headers();
@@ -228,19 +211,14 @@ async function authenticateMetubeUser(token: string): Promise<{ success: boolean
          const html = await basicAuthResponse.text();
          const rewrittenHtml = rewriteMetubeUrls(html);
          const setCookie = basicAuthResponse.headers.get('set-cookie');
-         console.log('✅ Authentification Basic réussie pour Metube');
          return { success: true, method: 'basic-auth', html: rewrittenHtml, setCookie };
        } else {
-        console.log(`❌ Basic Auth échoué pour Metube: ${basicAuthResponse.status}`);
-      }
+        }
     } catch (error) {
-      console.log('❌ Erreur Basic Auth pour Metube:', error);
-    }
+      }
 
     // Méthode 2: Connexion directe via POST
     try {
-      console.log('🔐 Tentative connexion directe pour Metube...');
-      
       // Première requête pour obtenir les cookies et le formulaire
       const initialResponse = await fetch(METUBE_CONFIG.url, {
         method: 'GET',
@@ -276,20 +254,15 @@ async function authenticateMetubeUser(token: string): Promise<{ success: boolean
            const loginContent = await loginResponse.text();
            const rewrittenContent = rewriteMetubeUrls(loginContent);
            const setCookie = loginResponse.headers.get('set-cookie');
-           console.log('✅ Connexion directe réussie pour Metube');
            return { success: true, method: 'direct-login', html: rewrittenContent, setCookie };
          } else {
-          console.log(`❌ Connexion directe échouée pour Metube: ${loginResponse.status}`);
-        }
+          }
       }
     } catch (error) {
-      console.log('❌ Erreur connexion directe pour Metube:', error);
-    }
+      }
 
     // Méthode 3: Injection de formulaire avec JavaScript
     try {
-      console.log('🔐 Tentative injection de formulaire pour Metube...');
-      
       const response = await fetch(METUBE_CONFIG.url, {
         method: 'GET',
         headers: {
@@ -306,9 +279,6 @@ async function authenticateMetubeUser(token: string): Promise<{ success: boolean
         const injectionScript = `
         <script>
           (function() {
-            console.log('🔐 [IAHOME] Démarrage injection automatique pour Metube...');
-            console.log('🔐 [IAHOME] Credentials: ${METUBE_CONFIG.credentials.username} / ${METUBE_CONFIG.credentials.password}');
-            
             let attempts = 0;
             const maxAttempts = 10;
             let success = false;
@@ -316,8 +286,6 @@ async function authenticateMetubeUser(token: string): Promise<{ success: boolean
             function log(message, type = 'info') {
               const timestamp = new Date().toISOString();
               const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : '🔍';
-              console.log(\`\${prefix} [IAHOME] [\${timestamp}] \${message}\`);
-              
               // Ajouter au DOM pour debug
               const debugDiv = document.getElementById('iahome-debug') || createDebugDiv();
               debugDiv.innerHTML += \`<div class="\${type}">\${prefix} \${message}</div>\`;
@@ -467,12 +435,9 @@ async function authenticateMetubeUser(token: string): Promise<{ success: boolean
          };
       }
     } catch (error) {
-      console.log('❌ Erreur injection de formulaire pour Metube:', error);
-    }
+      }
 
     // Si aucune méthode n'a fonctionné
-    console.log('❌ Aucune méthode d\'authentification n\'a fonctionné pour Metube');
-    
     const diagnosticHtml = `
       <!DOCTYPE html>
       <html>
@@ -568,7 +533,6 @@ async function authenticateMetubeUser(token: string): Promise<{ success: boolean
       html: diagnosticHtml 
     };
   } catch (error) {
-    console.error('❌ Erreur authentification Metube:', error);
     return { 
       success: false, 
       method: 'error', 
@@ -588,12 +552,8 @@ export async function GET(request: NextRequest) {
     const token = searchParams.get('token');
     const action = searchParams.get('action') || 'proxy';
 
-    console.log('🔐 Accès Metube GET demandé:', { token: token ? 'présent' : 'manquant', action });
-
     // Pour Metube, permettre l'accès sans token (module gratuit)
     if (!token) {
-      console.log('⚠️ Accès Metube sans token - module gratuit');
-      
       // Test d'accès direct à Metube
       const testResult = await testMetubeAccess();
       if (testResult.accessible && testResult.content) {
@@ -679,7 +639,6 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('❌ Erreur proxy Metube GET:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
@@ -692,12 +651,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { token, action = 'proxy' } = body;
 
-    console.log('🔐 Accès Metube POST demandé:', { token: token ? 'présent' : 'manquant', action });
-
     // Pour Metube, permettre l'accès sans token (module gratuit)
     if (!token) {
-      console.log('⚠️ Accès Metube POST sans token - module gratuit');
-      
       // Test d'accès direct à Metube
       const testResult = await testMetubeAccess();
       if (testResult.accessible && testResult.content) {
@@ -757,12 +712,10 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('❌ Erreur proxy Metube POST:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
     );
   }
 }
-
 

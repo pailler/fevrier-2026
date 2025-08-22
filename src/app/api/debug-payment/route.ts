@@ -5,8 +5,6 @@ export async function POST(request: NextRequest) {
   try {
     const { userEmail, moduleId } = await request.json();
 
-    console.log('🔍 Debug paiement pour:', { userEmail, moduleId });
-
     if (!userEmail) {
       return NextResponse.json({ 
         error: 'userEmail requis' 
@@ -28,16 +26,12 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    console.log('✅ Utilisateur trouvé:', user.id);
-
     // 2. Vérifier les paiements
     const { data: payments, error: paymentsError } = await supabase
       .from('payments')
       .select('*')
       .eq('customer_email', userEmail)
       .eq('status', 'succeeded');
-
-    console.log('📊 Paiements trouvés:', payments?.length || 0);
 
     // 3. Vérifier les accès modules
     const { data: userApplications, error: applicationsError } = await supabase
@@ -46,16 +40,12 @@ export async function POST(request: NextRequest) {
       .eq('user_id', user.id)
       .eq('is_active', true);
 
-    console.log('📊 Applications utilisateur trouvées:', userApplications?.length || 0);
-
     // 4. Vérifier les tokens d'accès
     const { data: accessTokens, error: tokensError } = await supabase
       .from('access_tokens')
       .select('*')
       .eq('created_by', user.id)
       .eq('is_active', true);
-
-    console.log('📊 Tokens d\'accès trouvés:', accessTokens?.length || 0);
 
     // 5. Si un moduleId est spécifié, vérifier l'accès spécifique
     let specificAccess = null;
@@ -69,8 +59,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       specificAccess = specificAccessData;
-      console.log('📊 Accès spécifique au module:', specificAccess ? 'OUI' : 'NON');
-    }
+      }
 
     return NextResponse.json({
       success: true,
@@ -91,16 +80,10 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur debug paiement:', error);
     return NextResponse.json({
       success: false,
       error: 'Erreur lors du debug'
     }, { status: 500 });
   }
 }
-
-
-
-
-
 

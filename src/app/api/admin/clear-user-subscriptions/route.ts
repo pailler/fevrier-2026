@@ -35,8 +35,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email de l\'utilisateur requis' }, { status: 400 });
     }
 
-    console.log('🗑️ Début du vidage des abonnements pour:', targetEmail, 'par l\'admin:', user.email);
-
     // Identifier l'utilisateur cible
     const { data: targetUser, error: targetUserError } = await supabase
       .from('auth.users')
@@ -70,47 +68,39 @@ export async function POST(request: NextRequest) {
       .eq('user_id', targetUser.id);
 
     // Supprimer dans l'ordre pour éviter les conflits de clés étrangères
-    console.log('🗑️ Suppression des payment_tokens pour', targetEmail);
     const { error: paymentTokenError } = await supabase
       .from('payment_tokens')
       .delete()
       .eq('user_id', targetUser.id);
 
     if (paymentTokenError) {
-      console.error('❌ Erreur suppression payment_tokens:', paymentTokenError);
       return NextResponse.json({ error: 'Erreur lors de la suppression des payment_tokens' }, { status: 500 });
     }
 
-    console.log('🗑️ Suppression des access_tokens pour', targetEmail);
     const { error: tokenError } = await supabase
       .from('access_tokens')
       .delete()
       .eq('created_by', targetUser.id);
 
     if (tokenError) {
-      console.error('❌ Erreur suppression access_tokens:', tokenError);
       return NextResponse.json({ error: 'Erreur lors de la suppression des access_tokens' }, { status: 500 });
     }
 
-    console.log('🗑️ Suppression des module_access pour', targetEmail);
     const { error: accessError } = await supabase
       .from('module_access')
       .delete()
       .eq('user_id', targetUser.id);
 
     if (accessError) {
-      console.error('❌ Erreur suppression module_access:', accessError);
       return NextResponse.json({ error: 'Erreur lors de la suppression des module_access' }, { status: 500 });
     }
 
-    console.log('🗑️ Suppression des module_licenses pour', targetEmail);
     const { error: licenseError } = await supabase
       .from('module_licenses')
       .delete()
       .eq('user_id', targetUser.id);
 
     if (licenseError) {
-      console.error('❌ Erreur suppression module_licenses:', licenseError);
       return NextResponse.json({ error: 'Erreur lors de la suppression des module_licenses' }, { status: 500 });
     }
 
@@ -135,8 +125,6 @@ export async function POST(request: NextRequest) {
       .select('id', { count: 'exact' })
       .eq('user_id', targetUser.id);
 
-    console.log('✅ Vidage des abonnements terminé avec succès pour:', targetEmail);
-
     return NextResponse.json({
       success: true,
       message: `Tous les abonnements de ${targetEmail} ont été supprimés avec succès`,
@@ -159,23 +147,10 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur lors du vidage des abonnements:', error);
     return NextResponse.json({ 
       error: 'Erreur interne du serveur lors du vidage des abonnements',
       details: error instanceof Error ? error.message : 'Erreur inconnue'
     }, { status: 500 });
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
 

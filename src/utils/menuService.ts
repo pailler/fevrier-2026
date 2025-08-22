@@ -52,7 +52,6 @@ export class MenuService {
       .order('position', { ascending: true });
 
     if (error) {
-      console.error('Erreur lors de la récupération des menus:', error);
       throw error;
     }
 
@@ -68,7 +67,6 @@ export class MenuService {
       .single();
 
     if (error) {
-      console.error(`Erreur lors de la récupération du menu ${name}:`, error);
       return null;
     }
 
@@ -88,7 +86,6 @@ export class MenuService {
       .order('position', { ascending: true });
 
     if (error) {
-      console.error(`Erreur lors de la récupération des éléments du menu ${menuName}:`, error);
       return [];
     }
 
@@ -138,7 +135,6 @@ export class MenuService {
       .single();
 
     if (error) {
-      console.error('Erreur lors de la création du menu:', error);
       throw error;
     }
 
@@ -155,7 +151,6 @@ export class MenuService {
       .single();
 
     if (error) {
-      console.error('Erreur lors de la mise à jour du menu:', error);
       throw error;
     }
 
@@ -170,7 +165,6 @@ export class MenuService {
       .eq('id', id);
 
     if (error) {
-      console.error('Erreur lors de la suppression du menu:', error);
       throw error;
     }
   }
@@ -184,7 +178,6 @@ export class MenuService {
       .single();
 
     if (error) {
-      console.error('Erreur lors de la création de l\'élément de menu:', error);
       throw error;
     }
 
@@ -201,7 +194,6 @@ export class MenuService {
       .single();
 
     if (error) {
-      console.error('Erreur lors de la mise à jour de l\'élément de menu:', error);
       throw error;
     }
 
@@ -216,7 +208,6 @@ export class MenuService {
       .eq('id', id);
 
     if (error) {
-      console.error('Erreur lors de la suppression de l\'élément de menu:', error);
       throw error;
     }
   }
@@ -229,7 +220,6 @@ export class MenuService {
       .order('title', { ascending: true });
 
     if (error) {
-      console.error('Erreur lors de la récupération des pages:', error);
       throw error;
     }
 
@@ -246,7 +236,6 @@ export class MenuService {
       .single();
 
     if (error) {
-      console.error(`Erreur lors de la récupération de la page ${slug}:`, error);
       return null;
     }
 
@@ -262,7 +251,6 @@ export class MenuService {
       .single();
 
     if (error) {
-      console.error('Erreur lors de la création de la page:', error);
       throw error;
     }
 
@@ -279,7 +267,6 @@ export class MenuService {
       .single();
 
     if (error) {
-      console.error('Erreur lors de la mise à jour de la page:', error);
       throw error;
     }
 
@@ -294,7 +281,6 @@ export class MenuService {
       .eq('id', id);
 
     if (error) {
-      console.error('Erreur lors de la suppression de la page:', error);
       throw error;
     }
   }
@@ -311,7 +297,6 @@ export class MenuService {
       .upsert(updates, { onConflict: 'id' });
 
     if (error) {
-      console.error('Erreur lors de la réorganisation des éléments de menu:', error);
       throw error;
     }
   }

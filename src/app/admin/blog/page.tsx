@@ -43,15 +43,12 @@ export default function AdminBlogPage() {
     // Récupérer la session directement depuis Supabase
     const getSession = async () => {
       const { data: { session: currentSession } } = await supabase.auth.getSession();
-      console.log('AdminBlog - Session récupérée:', currentSession);
       setSession(currentSession);
       
       if (currentSession?.user) {
-        console.log('AdminBlog - Utilisateur trouvé:', currentSession.user);
         setCurrentUser(currentSession.user);
         checkAdminStatus(currentSession.user.id);
       } else {
-        console.log('AdminBlog - Pas de session utilisateur');
         setIsAdmin(false);
       }
     };
@@ -61,7 +58,6 @@ export default function AdminBlogPage() {
     // Écouter les changements d'état d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('AdminBlog - Changement d\'état d\'auth:', event, session);
         setSession(session);
         setCurrentUser(session?.user || null);
         
@@ -77,8 +73,6 @@ export default function AdminBlogPage() {
   }, []);
 
   const checkAdminStatus = async (userId: string) => {
-    console.log('AdminBlog - Vérification du rôle pour l\'utilisateur:', userId);
-    
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -86,24 +80,18 @@ export default function AdminBlogPage() {
         .eq('id', userId)
         .single();
 
-      console.log('AdminBlog - Résultat de la vérification du rôle:', { data, error });
-
       if (error) {
-        console.log('AdminBlog - Erreur lors de la vérification du rôle:', error);
         setIsAdmin(false);
         return;
       }
 
       const userIsAdmin = data?.role === 'admin';
-      console.log('AdminBlog - Rôle trouvé:', data?.role);
-      console.log('AdminBlog - Est admin:', userIsAdmin);
       setIsAdmin(userIsAdmin);
 
       if (userIsAdmin) {
         fetchArticles();
       }
     } catch (err) {
-      console.error('AdminBlog - Erreur inattendue lors de la vérification du rôle:', err);
       setIsAdmin(false);
     }
   };
@@ -122,14 +110,12 @@ export default function AdminBlogPage() {
         .order('published_at', { ascending: false });
 
       if (error) {
-        console.error('Erreur lors du chargement des articles:', error);
         return;
       }
 
       setArticles(data || []);
     } catch (error) {
-      console.error('Erreur:', error);
-    } finally {
+      } finally {
       setLoading(false);
     }
   };
@@ -155,7 +141,6 @@ export default function AdminBlogPage() {
           .eq('id', editingArticle.id);
 
         if (error) {
-          console.error('Erreur lors de la mise à jour:', error);
           setMessage('Erreur lors de la mise à jour de l\'article');
           return;
         }
@@ -178,7 +163,6 @@ export default function AdminBlogPage() {
           });
 
         if (error) {
-          console.error('Erreur lors de la création:', error);
           setMessage('Erreur lors de la création de l\'article');
           return;
         }
@@ -204,7 +188,6 @@ export default function AdminBlogPage() {
       // Effacer le message après 3 secondes
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
-      console.error('Erreur:', error);
       setMessage('Une erreur est survenue');
     }
   };
@@ -236,7 +219,6 @@ export default function AdminBlogPage() {
         .eq('id', id);
 
       if (error) {
-        console.error('Erreur lors de la suppression:', error);
         setMessage('Erreur lors de la suppression de l\'article');
         return;
       }
@@ -247,7 +229,6 @@ export default function AdminBlogPage() {
       // Effacer le message après 3 secondes
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
-      console.error('Erreur:', error);
       setMessage('Une erreur est survenue');
     }
   };

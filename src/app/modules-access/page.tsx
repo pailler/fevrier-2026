@@ -40,8 +40,6 @@ export default function ModulesAccess() {
       setError(null);
       setActiveModule(moduleKey);
 
-      console.log('🔐 Génération URL sécurisée pour:', moduleKey);
-
       // Générer une URL sécurisée
       const response = await fetch('/api/generate-access-url', {
         method: 'POST',
@@ -60,13 +58,10 @@ export default function ModulesAccess() {
       }
 
       const data = await response.json();
-      console.log('✅ URL sécurisée générée:', data.accessUrl);
-
       // Rediriger vers l'URL sécurisée
       window.open(data.accessUrl, '_blank');
 
     } catch (error) {
-      console.error('❌ Erreur accès module:', error);
       setError(error instanceof Error ? error.message : 'Erreur inconnue');
     } finally {
       setLoading(false);
@@ -76,7 +71,6 @@ export default function ModulesAccess() {
   const openModuleDirect = (moduleKey: string) => {
     const module = MODULES.find(m => m.key === moduleKey);
     if (module) {
-      console.log('🔗 Ouverture directe:', module.url);
       window.open(module.url, '_blank');
     }
   };

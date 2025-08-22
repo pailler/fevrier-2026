@@ -10,14 +10,10 @@ const STABLEDIFFUSION_CREDENTIALS = {
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔐 Proxy Stable Diffusion demandé');
-
     // Vérifier l'authentification
     const userId = request.headers.get('x-user-id');
     const moduleName = request.headers.get('x-module-name');
     const accessToken = request.headers.get('x-access-token');
-
-    console.log('🔍 Headers d\'authentification:', { userId, moduleName, accessToken: accessToken ? 'présent' : 'absent' });
 
     // Si pas d'authentification via headers, vérifier le token dans l'URL
     let authenticatedUser = null;
@@ -31,22 +27,18 @@ export async function GET(request: NextRequest) {
       const token = url.searchParams.get('token');
       
       if (token) {
-        console.log('🔍 Token trouvé dans l\'URL, validation...');
         const magicLinkData = validateMagicLink(token);
         
         if (magicLinkData && magicLinkData.moduleName === 'stablediffusion') {
           authenticatedUser = magicLinkData.userId;
           authenticatedModule = magicLinkData.moduleName;
-          console.log('✅ Token valide pour l\'utilisateur:', authenticatedUser);
-        } else {
-          console.log('❌ Token invalide ou module incorrect');
+          } else {
           return NextResponse.json(
             { error: 'Token d\'accès invalide ou expiré' },
             { status: 403 }
           );
         }
       } else {
-        console.log('❌ Aucune authentification trouvée');
         return NextResponse.json(
           { error: 'Authentification requise pour accéder à Stable Diffusion' },
           { status: 401 }
@@ -56,8 +48,6 @@ export async function GET(request: NextRequest) {
 
     // Vérifier l'abonnement actif
     if (authenticatedUser) {
-      console.log('🔍 Vérification de l\'abonnement pour l\'utilisateur:', authenticatedUser);
-      
       const { data: subscriptionData, error: subscriptionError } = await supabase
         .from('user_subscriptions')
         .select('*')
@@ -68,7 +58,6 @@ export async function GET(request: NextRequest) {
         .single();
 
       if (subscriptionError && subscriptionError.code !== 'PGRST116') {
-        console.error('❌ Erreur vérification abonnement:', subscriptionError);
         return NextResponse.json(
           { error: 'Erreur lors de la vérification de l\'abonnement' },
           { status: 500 }
@@ -76,11 +65,9 @@ export async function GET(request: NextRequest) {
       }
 
       if (!subscriptionData) {
-        console.log('⚠️ Aucun abonnement actif trouvé pour Stable Diffusion - Accès temporaire autorisé pour les tests');
         // Temporairement, permettre l'accès même sans abonnement pour les tests
       } else {
-        console.log('✅ Abonnement valide trouvé:', subscriptionData);
-      }
+        }
     }
 
     // Créer les headers avec authentification HTTP Basic
@@ -96,10 +83,7 @@ export async function GET(request: NextRequest) {
       headers: headers,
     });
 
-    console.log('📡 Réponse Stable Diffusion:', response.status, response.statusText);
-
     if (!response.ok) {
-      console.error('❌ Erreur Stable Diffusion:', response.status, response.statusText);
       return NextResponse.json(
         { error: `Erreur Stable Diffusion: ${response.status}` },
         { status: response.status }
@@ -145,7 +129,6 @@ export async function GET(request: NextRequest) {
               // Trouver et soumettre le formulaire
               const form = usernameInputs[0].closest('form') || passwordInputs[0].closest('form');
               if (form) {
-                console.log('🔐 Authentification automatique...');
                 setTimeout(function() {
                   form.submit();
                 }, 500);
@@ -169,8 +152,6 @@ export async function GET(request: NextRequest) {
       `
     );
 
-    console.log('✅ HTML modifié avec authentification automatique');
-
     // Retourner le HTML modifié
     return new NextResponse(modifiedHtml, {
       status: 200,
@@ -182,7 +163,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur proxy Stable Diffusion:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

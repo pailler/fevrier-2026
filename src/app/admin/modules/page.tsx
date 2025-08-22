@@ -73,7 +73,6 @@ export default function AdminModulesPage() {
         setLoading(false);
       }
     } catch (error) {
-      console.error('Erreur lors de la récupération de la session:', error);
       setLoading(false);
     }
   };
@@ -88,13 +87,11 @@ export default function AdminModulesPage() {
         .single();
 
       if (error) {
-        console.error('Erreur lors de la vérification du statut admin:', error);
         setIsAdmin(false);
       } else {
         setIsAdmin(data.role === 'admin');
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification du statut admin:', error);
       setIsAdmin(false);
     } finally {
       setLoading(false);
@@ -110,15 +107,13 @@ export default function AdminModulesPage() {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Erreur lors du chargement des modules:', error);
-      } else {
+        } else {
         setModules(data || []);
         // Charger les tokens pour chaque module
         await fetchModuleTokens(data || []);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des modules:', error);
-    }
+      }
   };
 
   // Charger les tokens associés à chaque module
@@ -134,7 +129,6 @@ export default function AdminModulesPage() {
           .order('created_at', { ascending: false });
 
         if (error) {
-          console.error(`Erreur lors du chargement des tokens pour le module ${module.title}:`, error);
           tokensMap[module.id] = [];
         } else {
           tokensMap[module.id] = tokens || [];
@@ -143,11 +137,8 @@ export default function AdminModulesPage() {
 
       setModuleTokens(tokensMap);
     } catch (error) {
-      console.error('Erreur lors du chargement des tokens:', error);
-    }
+      }
   };
-
-
 
   // Gérer la suppression d'un module
   const handleDeleteModule = async (moduleId: string) => {
@@ -162,14 +153,12 @@ export default function AdminModulesPage() {
            .eq('id', moduleId);
         
         if (error) {
-          console.error('Erreur lors de la suppression:', error);
           alert('Erreur lors de la suppression du module');
         } else {
         setModules(modules.filter(m => m.id !== moduleId));
           alert('Module supprimé avec succès');
         }
       } catch (error) {
-      console.error('Erreur lors de la suppression:', error);
       alert('Erreur lors de la suppression du module');
     }
   };
@@ -196,7 +185,6 @@ export default function AdminModulesPage() {
         .eq('id', tokenId);
 
       if (error) {
-        console.error('Erreur lors de la modification du token:', error);
         alert('Erreur lors de la modification du token');
       } else {
         // Recharger les tokens pour le module
@@ -204,7 +192,6 @@ export default function AdminModulesPage() {
         alert('Token modifié avec succès');
       }
     } catch (error) {
-      console.error('Erreur lors de la modification du token:', error);
       alert('Erreur lors de la modification du token');
     }
   };
@@ -222,7 +209,6 @@ export default function AdminModulesPage() {
         .eq('id', tokenId);
 
       if (error) {
-        console.error('Erreur lors de la suppression du token:', error);
         alert('Erreur lors de la suppression du token');
       } else {
         // Recharger les tokens pour le module
@@ -230,7 +216,6 @@ export default function AdminModulesPage() {
         alert('Token supprimé avec succès');
       }
     } catch (error) {
-      console.error('Erreur lors de la suppression du token:', error);
       alert('Erreur lors de la suppression du token');
     }
   }; 
@@ -275,7 +260,6 @@ export default function AdminModulesPage() {
         alert(`❌ Service ${moduleTitle} n'est pas accessible (${response.status})`);
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification du service:', error);
       alert(`❌ Erreur lors de la vérification du service ${moduleTitle}`);
     }
   };
@@ -283,17 +267,12 @@ export default function AdminModulesPage() {
   // Fonction de sauvegarde simplifiée (solution de secours)
   const handleSaveModuleSimple = async (moduleData: any) => {
     try {
-      console.log('🔄 Utilisation de la fonction de sauvegarde simplifiée...');
-      
       // Vérifier l'authentification d'abord
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        console.error('❌ Aucune session utilisateur trouvée');
         alert('Erreur: Vous devez être connecté pour modifier les modules');
         return;
       }
-      
-      console.log('✅ Session utilisateur trouvée:', session.user.email);
       
       // Données minimales
       const simpleData = {
@@ -302,8 +281,6 @@ export default function AdminModulesPage() {
         category: moduleData.category?.trim(),
         price: Number(moduleData.price) || 0
       };
-      
-      console.log('📝 Données simplifiées:', simpleData);
       
       if (isAdding) {
         // Ajouter un nouveau module
@@ -348,7 +325,6 @@ export default function AdminModulesPage() {
       }
       
         } catch (error) {
-      console.error('❌ Erreur dans la fonction simplifiée:', error);       
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       alert(`Erreur: ${errorMessage}`);
     }
@@ -357,47 +333,33 @@ export default function AdminModulesPage() {
   // Diagnostic détaillé de la base de données
   const diagnoseDatabase = async () => {
     try {
-      console.log('🔍 Début du diagnostic de la base de données...');
-      
       // 1. Test de connexion basique
-      console.log('1️⃣ Test de connexion basique...');
       const { data: testData, error: testError } = await supabase
         .from('modules')
         .select('count')
         .limit(1);
       
       if (testError) {
-        console.error('❌ Erreur de connexion:', testError);
         return { success: false, error: testError };
       }
       
-      console.log('✅ Connexion basique réussie');
-      
       // 2. Vérifier la structure de la table
-      console.log('2️⃣ Vérification de la structure...');
       const { data: structureData, error: structureError } = await supabase
         .from('modules')
         .select('*')
         .limit(1);
       
       if (structureError) {
-        console.error('❌ Erreur de structure:', structureError);
         return { success: false, error: structureError };
       }
       
       const columns = Object.keys(structureData[0] || {});
-      console.log('✅ Colonnes disponibles:', columns);
-      
       // Vérifier si updated_at existe
       const hasUpdatedAt = columns.includes('updated_at');
-      console.log('📋 Colonne updated_at présente:', hasUpdatedAt);
-      
       if (!hasUpdatedAt) {
-        console.warn('⚠️ La colonne updated_at n\'existe pas. Cela peut causer des problèmes.');
-      }
+        }
       
       // 3. Test d'insertion simple
-      console.log('3️⃣ Test d\'insertion simple...');
       const testModule = {
         title: 'Test Module',
         description: 'Module de test pour diagnostic',
@@ -412,14 +374,10 @@ export default function AdminModulesPage() {
         .single();
       
       if (insertError) {
-        console.error('❌ Erreur d\'insertion:', insertError);
         return { success: false, error: insertError };
       }
       
-      console.log('✅ Insertion réussie:', insertData);
-      
       // 4. Test de mise à jour
-      console.log('4️⃣ Test de mise à jour...');
       const { data: updateData, error: updateError } = await supabase
         .from('modules')
         .update({ title: 'Test Module Updated' })
@@ -428,44 +386,34 @@ export default function AdminModulesPage() {
         .single();
       
       if (updateError) {
-        console.error('❌ Erreur de mise à jour:', updateError);
         return { success: false, error: updateError };
       }
       
-      console.log('✅ Mise à jour réussie:', updateData);
-      
       // 5. Nettoyer le test
-      console.log('5️⃣ Nettoyage du test...');
       const { error: deleteError } = await supabase
         .from('modules')
         .delete()
         .eq('id', insertData.id);
       
       if (deleteError) {
-        console.error('⚠️ Erreur de suppression (non critique):', deleteError);
+        console.error('Erreur lors de la suppression:', deleteError);
       } else {
-        console.log('✅ Test nettoyé');
+        console.log('Module supprimé avec succès');
       }
       
-      console.log('🎉 Diagnostic terminé avec succès!');
       return { success: true, columns };
       
     } catch (error) {
-      console.error('❌ Erreur lors du diagnostic:', error);
       return { success: false, error };
     }
   };
 
   // Gérer les erreurs de colonnes manquantes
   const handleMissingColumnError = (error: any) => {
-    console.error('🔍 Analyse de l\'erreur:', error);
-    
     if (error.message && error.message.includes('Could not find the')) {
       const columnMatch = error.message.match(/Could not find the '([^']+)' column/);
       if (columnMatch) {
         const missingColumn = columnMatch[1];
-        console.error(`❌ Colonne manquante détectée: ${missingColumn}`);
-        
         const solution = `
 Erreur: Colonne '${missingColumn}' manquante dans la table modules.
 
@@ -493,8 +441,6 @@ Solutions:
   // Tester la connexion à Supabase et la structure de la table
   const testSupabaseConnection = async () => {
     try {
-      console.log('🔍 Test de connexion à Supabase...');
-      
       // Test de connexion basique
       const { data: testData, error: testError } = await supabase
         .from('modules')
@@ -502,12 +448,9 @@ Solutions:
         .limit(1);
       
       if (testError) {
-        console.error('❌ Erreur de connexion à Supabase:', testError);
         alert(`Erreur de connexion à Supabase: ${testError.message}`);
         return false;
       }
-      
-      console.log('✅ Connexion à Supabase réussie');
       
       // Vérifier la structure de la table
       const { data: structureData, error: structureError } = await supabase
@@ -516,21 +459,16 @@ Solutions:
         .limit(1);
       
       if (structureError) {
-        console.error('❌ Erreur lors de la vérification de la structure:', structureError);
         alert(`Erreur de structure de table: ${structureError.message}`);
         return false;
       }
       
-      console.log('✅ Structure de la table modules vérifiée');
       const availableColumns = Object.keys(structureData[0] || {});
-      console.log('📋 Colonnes disponibles:', availableColumns);
-      
       // Vérifier les colonnes requises
       const requiredColumns = ['id', 'title', 'description', 'category', 'price'];
       const missingColumns = requiredColumns.filter(col => !availableColumns.includes(col));
       
       if (missingColumns.length > 0) {
-        console.error('❌ Colonnes manquantes:', missingColumns);
         alert(`Colonnes manquantes dans la table modules: ${missingColumns.join(', ')}\nVeuillez exécuter le script fix-database.sql`);
         return false;
       }
@@ -540,13 +478,10 @@ Solutions:
       const missingOptionalColumns = optionalColumns.filter(col => !availableColumns.includes(col));
       
       if (missingOptionalColumns.length > 0) {
-        console.warn('⚠️ Colonnes optionnelles manquantes:', missingOptionalColumns);
-        console.warn('Ces colonnes peuvent être ajoutées avec le script fix-database.sql');
-      }
+        }
       
       return true;
     } catch (error) {
-      console.error('❌ Erreur lors du test de connexion:', error);
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       alert(`Erreur lors du test de connexion: ${errorMessage}`);
       return false;
@@ -611,26 +546,16 @@ Solutions:
   // Sauvegarder un module
   const handleSaveModule = async (moduleData: any) => {
     try {
-      console.log('🚀 Début de la sauvegarde du module...');
-      console.log('📝 Données reçues:', moduleData);
-      
       // Diagnostic complet de la base de données
-      console.log('🔍 Lancement du diagnostic...');
       const diagnosis = await diagnoseDatabase();
       
       if (!diagnosis.success) {
-        console.error('❌ Diagnostic échoué:', diagnosis.error);
-        console.log('🔄 Tentative avec la fonction simplifiée...');
         await handleSaveModuleSimple(moduleData);
         return;
       }
       
-      console.log('✅ Diagnostic réussi, colonnes disponibles:', diagnosis.columns);
-      
       // Vérifier si updated_at existe dans la base
       const hasUpdatedAt = diagnosis.columns?.includes('updated_at') || false;
-      console.log('📋 Colonne updated_at présente:', hasUpdatedAt);
-      
       // Validation des données
       const validation = validateModuleData(moduleData);
       if (!validation.isValid) {
@@ -660,8 +585,7 @@ Solutions:
       // Ne pas inclure updated_at si la colonne n'existe pas
       if (!hasUpdatedAt && cleanData.updated_at !== undefined) {
         delete cleanData.updated_at;
-        console.log('⚠️ Colonne updated_at supprimée des données car elle n\'existe pas dans la base');
-      }
+        }
       
       // Supprimer les propriétés undefined ou null qui peuvent causer des erreurs
       Object.keys(cleanData).forEach(key => {
@@ -669,10 +593,6 @@ Solutions:
           delete cleanData[key];
         }
       });
-      
-      console.log('📝 Données à sauvegarder:', cleanData);
-      console.log('🔍 État de selectedModule:', selectedModule);
-      console.log('🔍 Mode isAdding:', isAdding);
       
       if (isAdding) {
         // Ajouter un nouveau module
@@ -683,15 +603,7 @@ Solutions:
           .single();
         
         if (error) {
-          console.error('❌ Erreur lors de l\'ajout:', error);
-          console.error('📋 Détails de l\'erreur:', {
-            code: error.code,
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            type: typeof error,
-            keys: Object.keys(error)
-          });
+          console.error('Erreur lors de l\'ajout:', error);
           
           // Essayer de gérer les erreurs de colonnes manquantes
           if (!handleMissingColumnError(error)) {
@@ -708,20 +620,14 @@ Solutions:
       } else {
         // Vérifier que l'ID du module existe
         if (!selectedModule) {
-          console.error('Module en édition manquant');
           alert('Erreur: Module en édition manquant');
           return;
         }
         
         if (!selectedModule.id) {
-          console.error('ID du module manquant pour la modification');
-          console.error('Module complet:', selectedModule);
           alert('Erreur: ID du module manquant');
           return;
         }
-        
-        console.log('✅ ID du module trouvé:', selectedModule.id);
-        console.log('✅ Module en cours d\'édition:', selectedModule.title);
         
         // Modifier un module existant
         const { data, error } = await supabase
@@ -732,19 +638,7 @@ Solutions:
           .single();
 
         if (error) {
-          console.error('❌ Erreur lors de la modification:', error);
-          console.error('📋 Détails de l\'erreur:', {
-            code: error.code,
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            type: typeof error,
-            keys: Object.keys(error),
-            fullError: JSON.stringify(error, null, 2)
-          });
-          console.error('📝 Données envoyées:', cleanData);
-          console.error('🔍 ID du module:', selectedModule.id);
-          
+          console.error('Erreur lors de la modification:', error);
           // Essayer de gérer les erreurs de colonnes manquantes
           if (!handleMissingColumnError(error)) {
             const errorMessage = error.message || error.details || error.hint || 'Erreur inconnue';
@@ -760,13 +654,9 @@ Solutions:
         }
       }
     } catch (error) {
-      console.error('❌ Erreur lors de la sauvegarde:', error);
-      console.error('📋 Type d\'erreur:', typeof error);
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       const errorStack = error instanceof Error ? error.stack : 'Pas de stack trace';
-      console.error('📋 Message d\'erreur:', errorMessage);
-      console.error('📋 Stack trace:', errorStack);
-      console.error('📋 Erreur complète:', JSON.stringify(error, null, 2));
+      console.error('Erreur complète:', { errorMessage, errorStack });
       
       // Afficher l'erreur dans une alerte plus détaillée
       alert(`Erreur lors de la sauvegarde du module:\n\n${errorMessage}\n\nVérifiez la console pour plus de détails.`);
@@ -967,7 +857,6 @@ Solutions:
              isAdding={isAdding}
              onSave={handleSaveModule}
              onClose={() => {
-               console.log('🔍 Fermeture du modal - selectedModule:', selectedModule);
                setShowModal(false);
                setSelectedModule(null);
                setIsAdding(false);

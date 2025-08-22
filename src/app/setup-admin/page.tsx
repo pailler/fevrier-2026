@@ -21,19 +21,14 @@ export default function SetupAdminPage() {
 
   const checkAdminExists = async () => {
     try {
-      console.log('Vérification de l\'existence d\'un admin...');
-      
       // Utiliser la fonction RPC pour vérifier les admins
       const { data, error } = await supabase
         .rpc('check_admin_exists');
 
       if (error) {
-        console.error('Erreur lors de la vérification des admins:', error);
         setMessage('Erreur lors de la vérification: ' + error.message);
         return;
       }
-
-      console.log('Résultat de la vérification:', data);
 
       if (data && data.admin_exists) {
         setAdminExists(true);
@@ -42,10 +37,8 @@ export default function SetupAdminPage() {
           router.push('/login');
         }, 3000);
       } else {
-        console.log('Aucun admin trouvé, création possible');
-      }
+        }
     } catch (error) {
-      console.error('Erreur lors de la vérification des admins:', error);
       setMessage('Erreur générale: ' + (error instanceof Error ? error.message : 'Erreur inconnue'));
     }
   };
@@ -82,27 +75,20 @@ export default function SetupAdminPage() {
       }
 
       if (data.user) {
-        console.log('Utilisateur créé avec succès, ID:', data.user.id);
-        
         // Créer le profil admin avec la nouvelle fonction RPC
-        console.log('Tentative de création du profil admin...');
         const { data: insertData, error: profileError } = await supabase
           .rpc('create_admin_profile', {
             user_id: data.user.id,
             user_email: email
           });
 
-        console.log('Résultat de l\'insertion:', { insertData, profileError });
-
         if (profileError) {
-          console.error('Erreur détaillée:', profileError);
           setMessage('Erreur lors de la création du profil admin: ' + profileError.message);
           setIsLoading(false);
           return;
         }
 
         if (insertData && insertData.error) {
-          console.error('Erreur de la fonction RPC:', insertData.error);
           setMessage('Erreur lors de la création du profil admin: ' + insertData.error);
           setIsLoading(false);
           return;

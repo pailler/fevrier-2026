@@ -19,7 +19,6 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query;
     if (error) {
       // Si la table n'existe pas ou RLS bloque, retourner une liste vide au lieu d'un 500 pour l'UX admin
-      console.warn('licenses/list warning:', error);
       return NextResponse.json({ items: [] });
     }
 
@@ -28,5 +27,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
-
 

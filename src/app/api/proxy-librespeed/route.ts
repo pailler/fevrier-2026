@@ -49,7 +49,6 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('❌ Erreur proxy Librespeed GET:', error);
     return NextResponse.json({ error: 'Erreur proxy Librespeed' }, { status: 500 });
   }
 }
@@ -64,5 +63,4 @@ export async function OPTIONS() {
     },
   });
 }
-
 

@@ -19,8 +19,6 @@ const ALLOWED_IPS = [
   'localhost'     // Localhost
 ];
 
-
-
 export async function POST(request: NextRequest) {
   try {
     // Récupérer l'IP du client
@@ -28,14 +26,10 @@ export async function POST(request: NextRequest) {
                     request.headers.get('x-real-ip') ||
                     'unknown';
     
-    console.log(`🔑 Demande de token Gradio depuis IP: ${clientIP}`);
-    
     // Vérifier si l'IP est autorisée
     const isIPAllowed = ALLOWED_IPS.includes(clientIP);
     
     if (!isIPAllowed) {
-      console.log(`❌ Demande de token refusée - IP non autorisée: ${clientIP}`);
-      
       return NextResponse.json(
         { error: 'Accès non autorisé' },
         { status: 403 }
@@ -45,8 +39,6 @@ export async function POST(request: NextRequest) {
     // Vérifier l'authentification
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('❌ Demande de token refusée - Pas de token d\'authentification');
-      
       return NextResponse.json(
         { error: 'Authentification requise' },
         { status: 401 }
@@ -59,8 +51,6 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
-      console.log('❌ Demande de token refusée - Token invalide');
-      
       return NextResponse.json(
         { error: 'Token invalide' },
         { status: 401 }
@@ -86,8 +76,6 @@ export async function POST(request: NextRequest) {
       .single();
     
     if (accessError || !accessData) {
-      console.log(`❌ Demande de token refusée - Utilisateur ${user.id} n'a pas accès au module ${moduleTitle}`);
-      
       return NextResponse.json(
         { error: 'Accès non autorisé à ce module' },
         { status: 403 }
@@ -99,8 +87,6 @@ export async function POST(request: NextRequest) {
       const now = new Date();
       const expiresAt = new Date(accessData.expires_at);
       if (expiresAt <= now) {
-        console.log(`❌ Demande de token refusée - Accès expiré pour utilisateur ${user.id}`);
-        
         return NextResponse.json(
           { error: 'Accès expiré' },
           { status: 403 }
@@ -124,8 +110,6 @@ export async function POST(request: NextRequest) {
     // Signer le token
     const gradioToken = sign(gradioTokenData, JWT_SECRET, { expiresIn: '1h' });
     
-    console.log(`✅ Token Gradio généré pour utilisateur ${user.id} - Module: ${moduleTitle}`);
-    
     // Enregistrer l'utilisation dans la base de données
     await supabase
       .from('gradio_access_logs')
@@ -147,14 +131,10 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('❌ Erreur lors de la génération du token Gradio:', error);
-    
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
     );
   }
 }
-
-
 

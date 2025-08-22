@@ -25,8 +25,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🔐 Génération token JWT pour:', { userId, userEmail, module });
-
     // Créer un JWT simple côté serveur
     const header = {
       alg: 'HS256',
@@ -60,8 +58,6 @@ export async function POST(request: NextRequest) {
     // Assembler le JWT
     const jwt = `${encodedHeader}.${encodedPayload}.${signature}`;
 
-    console.log('✅ JWT généré avec succès');
-
     // 3. Retourner le token JWT
     return NextResponse.json({
       success: true,
@@ -73,7 +69,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur génération JWT:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

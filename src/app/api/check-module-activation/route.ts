@@ -10,8 +10,6 @@ export async function POST(request: NextRequest) {
   try {
     const { moduleId, userId } = await request.json();
     
-    console.log('🔍 Vérification activation module:', { moduleId, userId });
-
     if (!moduleId || !userId) {
       return NextResponse.json({ 
         success: false, 
@@ -27,7 +25,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (userError || !userData) {
-      console.error('❌ Utilisateur non trouvé:', userId);
       return NextResponse.json({ 
         success: false, 
         error: 'Utilisateur non trouvé' 
@@ -44,7 +41,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (checkError && checkError.code !== 'PGRST116') {
-      console.error('❌ Erreur lors de la vérification:', checkError);
       return NextResponse.json({ 
         success: false, 
         error: 'Erreur lors de la vérification' 
@@ -53,8 +49,6 @@ export async function POST(request: NextRequest) {
 
     const isActivated = !!existingAccess;
     
-    console.log('✅ Vérification terminée:', { moduleId, userId, isActivated });
-
     return NextResponse.json({
       success: true,
       isActivated: isActivated,
@@ -68,7 +62,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur vérification activation module:', error);
     return NextResponse.json({ 
       success: false,
       error: 'Erreur interne du serveur'

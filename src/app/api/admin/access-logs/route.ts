@@ -33,7 +33,6 @@ export async function GET(request: NextRequest) {
       .limit(1);
 
     if (tableError) {
-      console.error('Table access_logs non trouvée:', tableError);
       return NextResponse.json({ 
         logs: []
       });
@@ -54,13 +53,11 @@ export async function GET(request: NextRequest) {
       .limit(1000); // Limiter à 1000 logs les plus récents
 
     if (error) {
-      console.error('Erreur récupération logs:', error);
       return NextResponse.json({ error: 'Erreur lors de la récupération des logs' }, { status: 500 });
     }
 
     return NextResponse.json({ logs: logs || [] });
   } catch (error) {
-    console.error('Erreur API logs d\'accès:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
@@ -107,7 +104,6 @@ export async function POST(request: NextRequest) {
           .eq('id', logId);
 
         if (updateError) {
-          console.error('Erreur ajout note:', updateError);
           return NextResponse.json({ error: 'Erreur lors de l\'ajout de la note' }, { status: 500 });
         }
 
@@ -139,7 +135,6 @@ export async function POST(request: NextRequest) {
           .order('timestamp', { ascending: false });
 
         if (exportError) {
-          console.error('Erreur export logs:', exportError);
           return NextResponse.json({ error: 'Erreur lors de l\'export' }, { status: 500 });
         }
 
@@ -166,7 +161,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Erreur API logs d\'accès POST:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 } 

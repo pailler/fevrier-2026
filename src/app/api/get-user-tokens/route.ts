@@ -12,8 +12,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🔍 Récupération des tokens pour:', userEmail);
-
     // 1. Récupérer l'ID de l'utilisateur depuis la table profiles
     const { data: userProfile, error: profileError } = await supabase
       .from('profiles')
@@ -22,14 +20,11 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (profileError) {
-      console.error('❌ Erreur récupération profil:', profileError);
       return NextResponse.json(
         { error: 'Utilisateur non trouvé' },
         { status: 404 }
       );
     }
-
-    console.log('✅ Profil utilisateur trouvé:', userProfile.id);
 
     // 2. Récupérer tous les tokens d'accès actifs pour cet utilisateur
     const { data: tokensData, error: tokensError } = await supabase
@@ -53,14 +48,11 @@ export async function POST(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (tokensError) {
-      console.error('❌ Erreur récupération tokens:', tokensError);
       return NextResponse.json(
         { error: 'Erreur lors de la récupération des tokens' },
         { status: 500 }
       );
     }
-
-    console.log('✅ Tokens récupérés:', tokensData?.length || 0);
 
     // 3. Transformer les données pour correspondre au format attendu par la page encours
     const transformedTokens = (tokensData || []).map(token => ({
@@ -115,8 +107,6 @@ export async function POST(request: NextRequest) {
       }
     }));
 
-    console.log('✅ Tokens transformés:', transformedTokens.length);
-
     return NextResponse.json({
       success: true,
       tokens: transformedTokens,
@@ -127,7 +117,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur générale:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

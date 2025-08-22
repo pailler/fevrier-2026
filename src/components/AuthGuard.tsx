@@ -31,8 +31,7 @@ export default function AuthGuard({ children, moduleName, requireSubscription = 
           setHasSubscription(true);
         }
       } catch (error) {
-        console.error('Erreur lors de la récupération de la session:', error);
-      } finally {
+        } finally {
         setLoading(false);
       }
     };
@@ -70,7 +69,6 @@ export default function AuthGuard({ children, moduleName, requireSubscription = 
         setHasSubscription(false);
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification de l\'abonnement:', error);
       setHasSubscription(false);
     } finally {
       setCheckingSubscription(false);

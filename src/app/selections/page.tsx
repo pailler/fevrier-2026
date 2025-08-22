@@ -88,11 +88,9 @@ function SelectionsContent() {
             }
           });
           setUserSubscriptions(subscriptions);
-          console.log('✅ Sélections actives:', subscriptions);
-        }
+          }
       } catch (error) {
-        console.error('Erreur vérification sélections:', error);
-      }
+        }
     };
 
     if (user) {
@@ -118,19 +116,14 @@ function SelectionsContent() {
   useEffect(() => {
     // Récupérer les modules sélectionnés depuis le localStorage
     const saved = localStorage.getItem('selectedModules');
-    console.log('localStorage selectedModules:', saved);
-    
     if (saved) {
       try {
         const selectedModules = JSON.parse(saved);
-        console.log('Modules sélectionnés:', selectedModules);
         setModules(selectedModules);
       } catch (error) {
-        console.error('Erreur parsing localStorage:', error);
         setModules([]);
       }
     } else {
-      console.log('Aucun module dans localStorage');
       setModules([]);
     }
   }, []);
@@ -195,10 +188,8 @@ function SelectionsContent() {
                                   timestamp: new Date().toISOString(),
                                   userId: user?.id
                                 });
-                                console.log('✅ Notification d\'accès à l\'application envoyée');
-                              } catch (notificationError) {
-                                console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
-                              }
+                                } catch (notificationError) {
+                                }
                               
                               // Accès direct pour tous les modules
                               const moduleUrls: { [key: string]: string } = {
@@ -209,7 +200,6 @@ function SelectionsContent() {
                                 
                               const directUrl = moduleUrls[module.title];
                               if (directUrl) {
-                                console.log('🔍 Accès direct vers:', directUrl);
                                 window.open(directUrl, '_blank');
                               }
                             }}
@@ -320,7 +310,6 @@ function SelectionsContent() {
                               
                               const directUrl = moduleUrls[module.title];
                               if (directUrl) {
-                                console.log('🔍 Accès direct vers:', directUrl);
                                 window.open(directUrl, '_blank');
                               }
                             }
@@ -378,15 +367,12 @@ function SelectionsContent() {
                               const result = await response.json();
                               
                               if (!result.success) {
-                                console.error('Erreur activation module:', module.title, result.error);
                                 activationResults.push({
                                   module: module.title,
                                   status: 'error',
                                   message: result.error || 'Erreur lors de l\'activation'
                                 });
                               } else {
-                                console.log('✅ Module activé:', module.title);
-                                
                                 if (result.message === 'Module déjà activé') {
                                   hasAlreadyActivated = true;
                                   activationResults.push({
@@ -419,7 +405,6 @@ function SelectionsContent() {
                             setModules([]);
                             router.push('/validation?success=true');
                           } catch (error) {
-                            console.error('Erreur lors de l\'activation:', error);
                             alert('Erreur lors de l\'activation des modules');
                           }
                         }}
