@@ -484,8 +484,8 @@ export default function QRCodesPage() {
                   </button>
                 )}
                 
-                {/* Bouton "Activer" pour les modules gratuits */}
-                {isCardSelected(card.id) && !alreadyActivatedModules.includes(card.id) && (
+                {/* Bouton "Activer la sélection" pour les modules payants */}
+                {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (
                   <button 
                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                     onClick={async () => {
@@ -494,23 +494,23 @@ export default function QRCodesPage() {
                         return;
                       }
 
-                      // Vérifier si le module est déjà activé avant de procéder
+                      // Vérifier si le module est déjà activé avant de procéder au paiement
                       if (alreadyActivatedModules.includes(card.id)) {
                         alert(`ℹ️ Le module ${card.title} est déjà activé ! Vous pouvez l'utiliser depuis vos applications.`);
                         return;
                       }
 
                       try {
-                        const response = await fetch('/api/generate-premium-token', {
+                        const response = await fetch('/api/create-payment-intent', {
                           method: 'POST',
                           headers: {
                             'Content-Type': 'application/json',
                           },
                           body: JSON.stringify({
-                            moduleName: card.title,
-                            moduleId: card.id,
-                            userId: session.user.id,
-                            userEmail: session.user.email
+                            items: [card],
+                            customerEmail: user?.email || '',
+                            type: 'payment',
+                            testMode: true, // Mode test activé pour éviter les erreurs Stripe
                           }),
                         });
 
@@ -518,13 +518,16 @@ export default function QRCodesPage() {
                           throw new Error(`Erreur HTTP ${response.status}`);
                         }
 
-                        const result = await response.json();
-                        
-                        if (result.success) {
-                          // Redirection vers la page de transition comme sur StableDiffusion
-                          router.push(`/token-generated?module=${encodeURIComponent(card.title)}`);
+                        const { url, error } = await response.json();
+
+                        if (error) {
+                          throw new Error(`Erreur API: ${error}`);
+                        }
+
+                        if (url) {
+                          window.location.href = url;
                         } else {
-                          throw new Error(result.error || 'Erreur lors de l\'activation');
+                          throw new Error('URL de session Stripe manquante.');
                         }
                       } catch (error) {
                         alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
@@ -532,12 +535,12 @@ export default function QRCodesPage() {
                     }}
                   >
                     <span className="text-xl">⚡</span>
-                    <span>Activer l'application QR Codes</span>
+                    <span>Activer {card.title} (Mode Test)</span>
                   </button>
                 )}
 
-                {/* Bouton JWT - visible seulement si l'utilisateur a accès au module */}
-                {session && userSubscriptions[`module_${card.id}`] && (
+                {/* Bouton JWT - visible seulement si l'utilisateur a accès au module ET que le module n'est pas déjà activé */}
+                {session && userSubscriptions[`module_${card.id}`] && !alreadyActivatedModules.includes(card.id) && (
                   <button 
                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                     onClick={async () => {

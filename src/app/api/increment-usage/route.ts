@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     // Trouver l'application utilisateur pour ce module
     const { data: application, error: fetchError } = await supabase
       .from('user_applications')
-      .select('id, usage_count, max_usage')
+      .select('id, usage_count, max_usage, expires_at')
       .eq('user_id', userId)
       .eq('module_id', moduleId)
       .eq('is_active', true)
@@ -31,6 +31,18 @@ export async function POST(request: NextRequest) {
         { error: 'Application not found' },
         { status: 404 }
       );
+    }
+
+    // Vérifier si l'accès n'est pas expiré
+    if (application.expires_at) {
+      const expirationDate = new Date(application.expires_at);
+      const now = new Date();
+      if (expirationDate < now) {
+        return NextResponse.json(
+          { error: 'Access expired' },
+          { status: 403 }
+        );
+      }
     }
 
     // Vérifier si le quota n'est pas dépassé
