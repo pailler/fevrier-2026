@@ -237,7 +237,10 @@ export default function QRCodesPage() {
         }
 
         if (data) {
-          setCard(data);
+          // Forcer le prix à 0 pour QR Codes (module gratuit)
+          const cardData = { ...data, price: 0 };
+          setCard(cardData);
+          console.log('QR Codes card data:', cardData);
           }
       } catch (error) {
         router.push('/');
@@ -272,7 +275,9 @@ export default function QRCodesPage() {
 
   const isCardSelected = (cardId: string) => {
     if (!cardId) return false;
-    return selectedCards.some(card => card.id === cardId);
+    const selected = selectedCards.some(card => card.id === cardId);
+    console.log(`Card ${cardId} selected:`, selected, 'Selected cards:', selectedCards);
+    return selected;
   };
 
   if (loading) {
@@ -464,13 +469,34 @@ export default function QRCodesPage() {
                   </div>
                 )}
 
-                {/* Bouton d'activation pour les modules gratuits */}
-                {!alreadyActivatedModules.includes(card.id) && (card.price === 0 || card.price === '0') && (
+                {/* Bouton "Choisir" pour tous les modules */}
+                {!alreadyActivatedModules.includes(card.id) && (
                   <button 
-                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                    className={`w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
+                      isCardSelected(card.id)
+                        ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
+                        : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
+                    }`}
+                    onClick={() => handleSubscribe(card)}
+                  >
+                    <span className="text-xl">🔐</span>
+                    <span>{isCardSelected(card.id) ? 'Sélectionné' : 'Choisir'}</span>
+                  </button>
+                )}
+                
+                {/* Bouton "Activer" pour les modules gratuits */}
+                {isCardSelected(card.id) && !alreadyActivatedModules.includes(card.id) && (
+                  <button 
+                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                     onClick={async () => {
                       if (!session) {
                         window.location.href = '/login';
+                        return;
+                      }
+
+                      // Vérifier si le module est déjà activé avant de procéder
+                      if (alreadyActivatedModules.includes(card.id)) {
+                        alert(`ℹ️ Le module ${card.title} est déjà activé ! Vous pouvez l'utiliser depuis vos applications.`);
                         return;
                       }
 
@@ -495,6 +521,7 @@ export default function QRCodesPage() {
                         const result = await response.json();
                         
                         if (result.success) {
+                          // Redirection vers la page de transition comme sur StableDiffusion
                           router.push(`/token-generated?module=${encodeURIComponent(card.title)}`);
                         } else {
                           throw new Error(result.error || 'Erreur lors de l\'activation');
