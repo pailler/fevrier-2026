@@ -50,8 +50,8 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4">Ressources</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/blog?category=resources" className="text-gray-300 hover:text-white transition-colors">
-                  Guides
+                <Link href="/formation" className="text-gray-300 hover:text-white transition-colors">
+                  Formation
                 </Link>
               </li>
               <li>
@@ -67,6 +67,11 @@ export default function Footer() {
               <li>
                 <Link href="/blog?category=product" className="text-gray-300 hover:text-white transition-colors">
                   Actualités
+                </Link>
+              </li>
+              <li>
+                <Link href="/formation" className="text-gray-300 hover:text-white transition-colors">
+                  Formation
                 </Link>
               </li>
             </ul>
