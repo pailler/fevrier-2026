@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../utils/supabaseClient';
 import DynamicNavigation from './DynamicNavigation';
+import { NotificationServiceClient } from '../utils/notificationServiceClient';
 
 export default function Header() {
   const router = useRouter();
@@ -153,6 +154,19 @@ export default function Header() {
                   <button 
                     className="text-blue-100 hover:text-white transition-colors text-sm" 
                     onClick={async () => { 
+                      // Envoyer une notification de déconnexion avant de se déconnecter
+                      try {
+                        const notificationService = NotificationServiceClient.getInstance();
+                        await notificationService.sendNotification('user_logout', user?.email || '', {
+                          userName: user?.email?.split('@')[0] || 'Utilisateur',
+                          timestamp: new Date().toISOString(),
+                          userId: user?.id
+                        });
+                        console.log('✅ Notification de déconnexion envoyée');
+                      } catch (notificationError) {
+                        console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
+                      }
+                      
                       await supabase.auth.signOut(); 
                       router.push('/login'); 
                     }}

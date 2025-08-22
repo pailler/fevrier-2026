@@ -140,19 +140,9 @@ export class EmailService {
 
   private async sendWithSendGrid(emailData: EmailData): Promise<boolean> {
     try {
-      // Intégration avec SendGrid
-      const sgMail = require('@sendgrid/mail');
-      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-      
-      // Ajouter l'expéditeur par défaut
-      const emailWithFrom = {
-        ...emailData,
-        from: process.env.SENDGRID_FROM_EMAIL || 'noreply@home.regispailler.fr'
-      };
-      
-      await sgMail.send(emailWithFrom);
-      console.log('📧 Email envoyé via SendGrid:', emailData.to);
-      return true;
+      // SendGrid désactivé côté client pour éviter les erreurs fs
+      console.log('⚠️ SendGrid désactivé côté client - utilisation du mode console');
+      return await this.sendToConsole(emailData);
     } catch (error) {
       console.error('Erreur SendGrid:', error);
       return false;

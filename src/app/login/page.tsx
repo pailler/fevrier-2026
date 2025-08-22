@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../utils/supabaseClient';
 import { useRouter } from 'next/navigation';
+import { NotificationServiceClient } from '../../utils/notificationServiceClient';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -90,6 +91,20 @@ export default function LoginPage() {
         const userRole = data.user?.user_metadata?.role || 'user';
         console.log('Rôle utilisateur:', userRole);
         setMessage(`✅ Connexion réussie ! Rôle: ${userRole}`);
+        
+        // Envoyer une notification de connexion
+        try {
+          const notificationService = NotificationServiceClient.getInstance();
+          await notificationService.sendNotification('user_login', email, {
+            userName: email.split('@')[0],
+            timestamp: new Date().toISOString(),
+            userId: data.user?.id,
+            userRole: userRole
+          });
+          console.log('✅ Notification de connexion envoyée');
+        } catch (notificationError) {
+          console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
+        }
         
         // Rediriger vers l'URL spécifiée ou la page d'accueil
         setTimeout(() => {

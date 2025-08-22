@@ -5,6 +5,7 @@ import { supabase } from '../../../utils/supabaseClient';
 import Link from 'next/link';
 import Image from 'next/image';
 import Breadcrumb from '../../../components/Breadcrumb';
+import { NotificationServiceClient } from '../../../utils/notificationServiceClient';
 
 interface Card {
   id: string;
@@ -753,6 +754,21 @@ export default function CardDetailPage() {
                       <button 
                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                         onClick={async () => {
+                          // Envoyer une notification d'accès à l'application
+                          try {
+                            const notificationService = NotificationServiceClient.getInstance();
+                            await notificationService.sendNotification('app_accessed', user?.email || '', {
+                              userName: user?.email?.split('@')[0] || 'Utilisateur',
+                              appName: card.title,
+                              appId: card.id,
+                              timestamp: new Date().toISOString(),
+                              userId: user?.id
+                            });
+                            console.log('✅ Notification d\'accès à l\'application envoyée');
+                          } catch (notificationError) {
+                            console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
+                          }
+                          
                           await accessModuleWithJWT(card.title, card.id);
                         }}
                       >

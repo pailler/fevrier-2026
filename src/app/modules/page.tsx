@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
+import { NotificationServiceClient } from "../../utils/notificationServiceClient";
 
 export default function ModulesPage() {
   const router = useRouter();
@@ -172,7 +173,24 @@ export default function ModulesPage() {
               {module.status === 'active' ? (
                 <button
                   className={`w-full ${module.color} text-white font-medium py-3 px-4 rounded-lg transition-colors`}
-                  onClick={() => window.open(module.url, '_blank')}
+                  onClick={async () => {
+                    // Envoyer une notification d'accès à l'application
+                    try {
+                      const notificationService = NotificationServiceClient.getInstance();
+                      await notificationService.sendNotification('app_accessed', user?.email || '', {
+                        userName: user?.email?.split('@')[0] || 'Utilisateur',
+                        appName: module.name,
+                        appUrl: module.url,
+                        timestamp: new Date().toISOString(),
+                        userId: user?.id
+                      });
+                      console.log('✅ Notification d\'accès à l\'application envoyée');
+                    } catch (notificationError) {
+                      console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
+                    }
+                    
+                    window.open(module.url, '_blank');
+                  }}
                 >
                   Accéder à l'appli
                 </button>

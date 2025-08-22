@@ -4,6 +4,7 @@ import { supabase } from "../../utils/supabaseClient";
 import Link from "next/link";
 import Breadcrumb from "../../components/Breadcrumb";
 import Header from '../../components/Header';
+import { NotificationServiceClient, NotificationSetting, NotificationLog } from "../../utils/notificationServiceClient";
 
 interface BlogArticle {
   id: string;
@@ -65,7 +66,7 @@ export default function AdminPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [session, setSession] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'blog' | 'modules' | 'users' | 'linkedin' | 'menus' | 'tokens'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'blog' | 'modules' | 'users' | 'linkedin' | 'menus' | 'tokens' | 'notifications'>('overview');
   const [loading, setLoading] = useState(true);
   
   // États pour les données
@@ -76,6 +77,11 @@ export default function AdminPage() {
   const [userTokens, setUserTokens] = useState<{ [userId: string]: AccessToken[] }>({});
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showUserAppsModal, setShowUserAppsModal] = useState(false);
+  
+  // États pour les notifications
+  const [notificationSettings, setNotificationSettings] = useState<NotificationSetting[]>([]);
+  const [notificationLogs, setNotificationLogs] = useState<NotificationLog[]>([]);
+  const [notificationLoading, setNotificationLoading] = useState(false);
   const [stats, setStats] = useState({
     totalArticles: 0,
     publishedArticles: 0,
@@ -170,25 +176,27 @@ export default function AdminPage() {
       // Charger les applications des utilisateurs
       let userAppsData = null;
       try {
-        const { data: appsData, error: appsError } = await supabase
-          .from('user_applications')
-          .select(`
-            id,
-            user_id,
-            module_id,
-            access_level,
-            is_active,
-            created_at,
-            expires_at,
-            modules!inner(title)
-          `)
-          .order('created_at', { ascending: false });
+        // Temporairement commenté pour éviter les erreurs 400
+        // const { data: appsData, error: appsError } = await supabase
+        //   .from('user_applications')
+        //   .select(`
+        //     id,
+        //     user_id,
+        //     module_id,
+        //     access_level,
+        //     is_active,
+        //     created_at,
+        //     expires_at,
+        //     modules!inner(title)
+        //   `)
+        //   .order('created_at', { ascending: false });
         
-        if (appsError) {
-          console.log('Table user_applications non disponible:', appsError.message);
-        } else {
-          userAppsData = appsData;
-        }
+        // if (appsError) {
+        //   console.log('Table user_applications non disponible:', appsError.message);
+        // } else {
+        //   userAppsData = appsData;
+        // }
+        console.log('Chargement user_applications temporairement désactivé');
       } catch (error) {
         console.log('Erreur lors du chargement des applications utilisateur:', error);
       }
@@ -198,6 +206,17 @@ export default function AdminPage() {
         .from('access_tokens')
         .select('*')
         .order('created_at', { ascending: false });
+
+      // Charger les paramètres de notification
+      try {
+        const notificationService = NotificationServiceClient.getInstance();
+        const settings = await notificationService.getNotificationSettings();
+        const logs = await notificationService.getNotificationLogs(20);
+        setNotificationSettings(settings);
+        setNotificationLogs(logs);
+      } catch (error) {
+        console.log('Erreur lors du chargement des notifications:', error);
+      }
 
       // Organiser les applications par utilisateur
       const appsByUser: { [userId: string]: UserApplication[] } = {};
@@ -415,6 +434,90 @@ export default function AdminPage() {
     }
   };
 
+  // Fonctions pour les notifications
+  const handleToggleNotification = async (eventType: string, isEnabled: boolean) => {
+    setNotificationLoading(true);
+    try {
+      const notificationService = NotificationServiceClient.getInstance();
+      const success = await notificationService.updateNotificationSetting(eventType, { is_enabled: isEnabled });
+      
+      if (success) {
+        // Mettre à jour l'état local
+        setNotificationSettings(prev => 
+          prev.map(setting => 
+            setting.event_type === eventType 
+              ? { ...setting, is_enabled: isEnabled }
+              : setting
+          )
+        );
+        alert(isEnabled ? 'Notification activée' : 'Notification désactivée');
+      } else {
+        alert('Erreur lors de la mise à jour');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de la notification:', error);
+      alert('Erreur lors de la mise à jour');
+    } finally {
+      setNotificationLoading(false);
+    }
+  };
+
+  const handleUpdateNotificationTemplate = async (eventType: string, field: 'email_template_subject' | 'email_template_body', value: string) => {
+    setNotificationLoading(true);
+    try {
+      const notificationService = NotificationServiceClient.getInstance();
+      const success = await notificationService.updateNotificationSetting(eventType, { [field]: value });
+      
+      if (success) {
+        // Mettre à jour l'état local
+        setNotificationSettings(prev => 
+          prev.map(setting => 
+            setting.event_type === eventType 
+              ? { ...setting, [field]: value }
+              : setting
+          )
+        );
+        alert('Template mis à jour');
+      } else {
+        alert('Erreur lors de la mise à jour');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du template:', error);
+      alert('Erreur lors de la mise à jour');
+    } finally {
+      setNotificationLoading(false);
+    }
+  };
+
+  const handleTestNotification = async (eventType: string) => {
+    const testEmail = prompt('Entrez l\'email de test:');
+    if (!testEmail) return;
+    
+    setNotificationLoading(true);
+    try {
+      const notificationService = NotificationServiceClient.getInstance();
+      const success = await notificationService.sendNotification(eventType, testEmail, {
+        userName: 'Utilisateur de test',
+        moduleName: 'Module de test',
+        timestamp: new Date().toISOString()
+      });
+      
+      if (success) {
+        alert('Email de test envoyé avec succès');
+        // Recharger les logs
+        const logs = await notificationService.getNotificationLogs(20);
+        setNotificationLogs(logs);
+      } else {
+        alert('Erreur lors de l\'envoi de l\'email de test');
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi du test:', error);
+      alert('Erreur lors de l\'envoi du test');
+    } finally {
+      setNotificationLoading(false);
+    }
+  };
+
   // Contrôles d'accès
   if (!session) {
     return (
@@ -533,6 +636,16 @@ export default function AdminPage() {
             }`}
           >
             🔑 Tokens
+          </button>
+          <button
+            onClick={() => setActiveTab('notifications')}
+            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'notifications'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            🔔 Notifications
           </button>
         </div>
 
@@ -1279,6 +1392,144 @@ export default function AdminPage() {
                         <span className="font-medium">Suivi de l'utilisation</span>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Gestion des notifications */}
+            {activeTab === 'notifications' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-lg shadow-md p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">🔔 Gestion des Notifications</h2>
+                  <p className="text-gray-600 mb-6">Configurez les notifications par email pour les événements de la plateforme.</p>
+                  
+                  {notificationLoading && (
+                    <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                        <span className="ml-2 text-blue-800">Mise à jour en cours...</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Paramètres de notification */}
+                  <div className="space-y-6">
+                    {notificationSettings.map((setting) => (
+                      <div key={setting.id} className="border border-gray-200 rounded-lg p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h3 className="text-lg font-medium text-gray-900">{setting.event_name}</h3>
+                            <p className="text-sm text-gray-600">{setting.event_description}</p>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <button
+                              onClick={() => handleTestNotification(setting.event_type)}
+                              className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                              disabled={notificationLoading}
+                            >
+                              Test
+                            </button>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                className="sr-only peer"
+                                checked={setting.is_enabled}
+                                onChange={(e) => handleToggleNotification(setting.event_type, e.target.checked)}
+                                disabled={notificationLoading}
+                              />
+                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                              <span className="ml-3 text-sm font-medium text-gray-900">
+                                {setting.is_enabled ? 'Activé' : 'Désactivé'}
+                              </span>
+                            </label>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Sujet de l'email
+                            </label>
+                            <input
+                              type="text"
+                              value={setting.email_template_subject}
+                              onChange={(e) => handleUpdateNotificationTemplate(setting.event_type, 'email_template_subject', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Sujet de l'email"
+                              disabled={notificationLoading}
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Contenu de l'email
+                            </label>
+                            <textarea
+                              value={setting.email_template_body}
+                              onChange={(e) => handleUpdateNotificationTemplate(setting.event_type, 'email_template_body', e.target.value)}
+                              rows={4}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Contenu de l'email"
+                              disabled={notificationLoading}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                              Variables disponibles: {'{userName}'}, {'{moduleName}'}, {'{timestamp}'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Logs de notification */}
+                <div className="bg-white rounded-lg shadow-md p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">📋 Logs des Notifications</h3>
+                  <p className="text-gray-600 mb-6">Historique des notifications envoyées.</p>
+                  
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Événement</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {notificationLogs.map((log) => (
+                          <tr key={log.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">
+                                {notificationSettings.find(s => s.event_type === log.event_type)?.event_name || log.event_type}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">{log.user_email}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                log.email_sent 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-red-100 text-red-800'
+                              }`}>
+                                {log.email_sent ? 'Envoyé' : 'Erreur'}
+                              </span>
+                              {!log.email_sent && log.email_error && (
+                                <div className="text-xs text-red-600 mt-1">{log.email_error}</div>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900">
+                                {new Date(log.created_at).toLocaleString('fr-FR')}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>

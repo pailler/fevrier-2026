@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../utils/supabaseClient';
 import { useRouter } from 'next/navigation';
+import { NotificationServiceClient } from '../../utils/notificationServiceClient';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -54,6 +55,19 @@ export default function RegisterPage() {
     } else {
       setMessage("✅ Inscription réussie ! Vérifiez votre boîte mail pour confirmer votre compte.");
       // Le trigger handle_new_user va automatiquement créer le profil
+      
+      // Envoyer une notification de création de compte
+      try {
+        const notificationService = NotificationServiceClient.getInstance();
+        await notificationService.sendNotification('user_created', email, {
+          userName: email.split('@')[0],
+          timestamp: new Date().toISOString(),
+          userId: data.user?.id
+        });
+        console.log('✅ Notification de création de compte envoyée');
+      } catch (notificationError) {
+        console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
+      }
     }
   }
 

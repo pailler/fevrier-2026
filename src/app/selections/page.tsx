@@ -5,6 +5,7 @@ import { supabase } from '../../utils/supabaseClient';
 import StripeCheckout from '../../components/StripeCheckout';
 import Link from 'next/link';
 import Header from '../../components/Header';
+import { NotificationServiceClient } from '../../utils/notificationServiceClient';
 
 function SelectionsContent() {
   const router = useRouter();
@@ -184,21 +185,32 @@ function SelectionsContent() {
                         <div className="mt-2">
                           <button 
                             className="px-4 py-2 rounded-lg font-semibold text-sm bg-green-600 hover:bg-green-700 text-white transition-colors"
-                            onClick={() => {
-                                                                // Accès direct pour tous les modules
-                                  {
-                                                              // Accès direct pour les autres modules
+                            onClick={async () => {
+                              // Envoyer une notification d'accès à l'application
+                              try {
+                                const notificationService = NotificationServiceClient.getInstance();
+                                await notificationService.sendNotification('app_accessed', user?.email || '', {
+                                  userName: user?.email?.split('@')[0] || 'Utilisateur',
+                                  appName: module.title,
+                                  timestamp: new Date().toISOString(),
+                                  userId: user?.id
+                                });
+                                console.log('✅ Notification d\'accès à l\'application envoyée');
+                              } catch (notificationError) {
+                                console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
+                              }
+                              
+                              // Accès direct pour tous les modules
                               const moduleUrls: { [key: string]: string } = {
                                 'Metube': '/api/proxy-metube',
                                 'IAphoto': 'https://iaphoto.regispailler.fr',
                                 'IAvideo': 'https://iavideo.regispailler.fr',
                               };
                                 
-                                const directUrl = moduleUrls[module.title];
-                                if (directUrl) {
-                                  console.log('🔍 Accès direct vers:', directUrl);
-                                  window.open(directUrl, '_blank');
-                                }
+                              const directUrl = moduleUrls[module.title];
+                              if (directUrl) {
+                                console.log('🔍 Accès direct vers:', directUrl);
+                                window.open(directUrl, '_blank');
                               }
                             }}
                             title={`Accéder à ${module.title}`}

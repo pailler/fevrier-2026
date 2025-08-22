@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { NotificationService } from '../../../utils/notificationService';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -79,6 +80,22 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('✅ Accès module créé avec succès:', accessData.id);
+
+    // Envoyer une notification d'activation de module
+    try {
+      const notificationService = NotificationService.getInstance();
+      await notificationService.sendNotification('module_activated', userData.email, {
+        userName: userData.email.split('@')[0],
+        moduleName: moduleTitle,
+        moduleId: moduleId,
+        timestamp: new Date().toISOString(),
+        userId: userId,
+        accessId: accessData.id
+      });
+      console.log('✅ Notification d\'activation de module envoyée');
+    } catch (notificationError) {
+      console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
+    }
 
     // Note: La création automatique de token est désactivée car il y a une incohérence
     // entre les types de module_id (string dans modules vs integer dans access_tokens)
