@@ -121,8 +121,8 @@ async function getContextData(message: string) {
       
       const { data: articles, error: articlesError } = await supabase
         .from('blog_articles')
-        .select('title, content, category, is_published')
-        .eq('is_published', true)
+        .select('title, content, category, status')
+        .eq('status', 'published')
         .order('created_at', { ascending: false })
         .limit(10);
 
@@ -220,7 +220,7 @@ async function generateSimpleResponse(message: string) {
       const { data: articles, error } = await supabase
         .from('blog_articles')
         .select('title, category')
-        .eq('is_published', true)
+        .eq('status', 'published')
         .order('created_at', { ascending: false })
         .limit(3);
       

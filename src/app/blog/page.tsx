@@ -16,6 +16,7 @@ interface BlogArticle {
   read_time: number;
   published_at: string;
   image_url?: string;
+  status?: 'draft' | 'published';
 }
 
 export default function BlogPage() {
@@ -88,11 +89,11 @@ export default function BlogPage() {
 
   const fetchArticles = async () => {
     try {
-      // Requête avec filtre is_published remis
+      // Requête avec filtre status published
       const { data, error } = await supabase
         .from('blog_articles')
         .select('*')
-        .eq('is_published', true)  // Filtre remis
+        .eq('status', 'published')  // Filtre par statut publié
         .order('published_at', { ascending: false });
 
       if (error) {
@@ -199,7 +200,7 @@ export default function BlogPage() {
       </div>
 
       {/* Section héros */}
-      <section className="bg-gradient-to-br from-yellow-100 via-green-50 to-green-200 py-16 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-yellow-100 via-green-50 to-green-200 py-8 relative overflow-hidden">
         {/* Effet de particules en arrière-plan */}
         <div className="absolute inset-0">
           <div className="absolute top-10 left-10 w-2 h-2 bg-yellow-400/30 rounded-full animate-pulse"></div>

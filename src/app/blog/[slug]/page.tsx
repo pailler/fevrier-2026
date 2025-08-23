@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../../utils/supabaseClient";
 import Link from "next/link";
 import Breadcrumb from "../../../components/Breadcrumb";
+import Header from "../../../components/Header";
 import { useParams } from "next/navigation";
 
 interface BlogArticle {
@@ -16,6 +17,7 @@ interface BlogArticle {
   read_time: number;
   published_at: string;
   image_url?: string;
+  status?: 'draft' | 'published';
 }
 
 export default function BlogArticlePage() {
@@ -25,6 +27,37 @@ export default function BlogArticlePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Fonction pour nettoyer le contenu HTML
+  const cleanHtmlContent = (htmlContent: string): string => {
+    // Supprimer les balises DOCTYPE, html, head et body
+    let cleaned = htmlContent
+      .replace(/<!DOCTYPE[^>]*>/gi, '')
+      .replace(/<html[^>]*>/gi, '')
+      .replace(/<\/html>/gi, '')
+      .replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '')
+      .replace(/<body[^>]*>/gi, '')
+      .replace(/<\/body>/gi, '')
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+      .replace(/<meta[^>]*>/gi, '')
+      .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
+      .replace(/<link[^>]*>/gi, '')
+      .replace(/<header[^>]*>/gi, '<div class="article-header">')
+      .replace(/<\/header>/gi, '</div>')
+      .replace(/<main[^>]*>/gi, '<div class="article-main">')
+      .replace(/<\/main>/gi, '</div>')
+      .replace(/<footer[^>]*>/gi, '<div class="article-footer">')
+      .replace(/<\/footer>/gi, '</div>')
+      .replace(/class="wrap"/gi, 'class="article-section"')
+      .replace(/class="lede"/gi, 'class="article-lede"')
+      .replace(/class="note"/gi, 'class="article-note"')
+      .replace(/class="callout"/gi, 'class="article-callout"')
+      .replace(/class="glossary"/gi, 'class="article-glossary"')
+      .replace(/class="kbd"/gi, 'class="article-kbd"');
+
+    return cleaned.trim();
+  };
+
   useEffect(() => {
     const fetchArticle = async () => {
       try {
@@ -32,6 +65,7 @@ export default function BlogArticlePage() {
           .from('blog_articles')
           .select('*')
           .eq('slug', slug)
+          .eq('status', 'published')
           .single();
 
         if (error) {
@@ -64,11 +98,14 @@ export default function BlogArticlePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Chargement de l'article...</p>
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="pt-20">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Chargement de l'article...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -77,21 +114,24 @@ export default function BlogArticlePage() {
 
   if (error || !article) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Article non trouvé
-            </h1>
-            <p className="text-gray-600 mb-8">
-              L'article que vous recherchez n'existe pas ou a été supprimé.
-            </p>
-            <Link
-              href="/blog"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              ← Retour au blog
-            </Link>
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="pt-20">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                Article non trouvé
+              </h1>
+              <p className="text-gray-600 mb-8">
+                L'article que vous recherchez n'existe pas ou a été supprimé.
+              </p>
+              <Link
+                href="/blog"
+                className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                ← Retour au blog
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -99,11 +139,15 @@ export default function BlogArticlePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
-      <Breadcrumb />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      
+      {/* Fil d'ariane avec espacement correct */}
+      <div className="pt-20">
+        <Breadcrumb />
+      </div>
 
-
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Article */}
         <article className="bg-white rounded-lg shadow-md overflow-hidden">
           {/* Image de l'article */}
@@ -144,15 +188,15 @@ export default function BlogArticlePage() {
               </div>
             </header>
 
-            {/* Contenu de l'article */}
+            {/* Contenu de l'article nettoyé */}
             <div 
-              className="prose prose-lg max-w-none"
-              dangerouslySetInnerHTML={{ __html: article.content }}
+              className="prose prose-lg max-w-none article-content"
+              dangerouslySetInnerHTML={{ __html: cleanHtmlContent(article.content) }}
             />
           </div>
         </article>
 
-        {/* Navigation entre articles */}
+        {/* Navigation entre articles avec couleurs plus douces */}
         <div className="mt-12 flex justify-between">
           <Link
             href="/blog"
@@ -166,7 +210,7 @@ export default function BlogArticlePage() {
           
           <Link
             href="/blog"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
           >
             Articles récents
             <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

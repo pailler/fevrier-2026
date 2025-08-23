@@ -203,7 +203,7 @@ export default function FormationPage() {
       </div>
 
       {/* Section héros */}
-      <section className="bg-gradient-to-br from-purple-100 via-indigo-50 to-blue-200 py-16 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-purple-100 via-indigo-50 to-blue-200 py-8 relative overflow-hidden">
         {/* Effet de particules en arrière-plan */}
         <div className="absolute inset-0">
           <div className="absolute top-10 left-10 w-2 h-2 bg-purple-400/30 rounded-full animate-pulse"></div>

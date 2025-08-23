@@ -17,6 +17,7 @@ interface BlogArticle {
   read_time: number;
   published_at: string;
   image_url?: string;
+  status?: 'draft' | 'published';
 }
 
 export default function AdminBlogPage() {
@@ -35,9 +36,11 @@ export default function AdminBlogPage() {
     category: 'resources',
     author: '',
     read_time: 5,
-    image_url: ''
+    image_url: '',
+    status: 'draft' as 'draft' | 'published'
   });
   const [message, setMessage] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'published'>('all');
 
   useEffect(() => {
     // Récupérer la session directement depuis Supabase
@@ -100,14 +103,21 @@ export default function AdminBlogPage() {
     if (isAdmin) {
       fetchArticles();
     }
-  }, [isAdmin]);
+  }, [isAdmin, statusFilter]);
 
   const fetchArticles = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('blog_articles')
         .select('*')
         .order('published_at', { ascending: false });
+
+      // Appliquer le filtre de statut si nécessaire
+      if (statusFilter !== 'all') {
+        query = query.eq('status', statusFilter);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         return;
@@ -136,7 +146,8 @@ export default function AdminBlogPage() {
             category: formData.category,
             author: formData.author,
             read_time: formData.read_time,
-            image_url: formData.image_url || null
+            image_url: formData.image_url || null,
+            status: formData.status
           })
           .eq('id', editingArticle.id);
 
@@ -159,6 +170,7 @@ export default function AdminBlogPage() {
             author: formData.author,
             read_time: formData.read_time,
             image_url: formData.image_url || null,
+            status: formData.status,
             published_at: new Date().toISOString()
           });
 
@@ -179,7 +191,8 @@ export default function AdminBlogPage() {
         category: 'resources',
         author: '',
         read_time: 5,
-        image_url: ''
+        image_url: '',
+        status: 'draft'
       });
       setEditingArticle(null);
       setShowForm(false);
@@ -202,9 +215,32 @@ export default function AdminBlogPage() {
       category: article.category,
       author: article.author,
       read_time: article.read_time,
-      image_url: article.image_url || ''
+      image_url: article.image_url || '',
+      status: article.status || 'draft'
     });
     setShowForm(true);
+  };
+
+  const handleToggleStatus = async (id: string, newStatus: 'draft' | 'published') => {
+    try {
+      const { error } = await supabase
+        .from('blog_articles')
+        .update({ status: newStatus })
+        .eq('id', id);
+
+      if (error) {
+        setMessage('Erreur lors de la modification du statut');
+        return;
+      }
+
+      setMessage(`Article ${newStatus === 'published' ? 'publié' : 'mis en brouillon'} avec succès !`);
+      fetchArticles();
+      
+      // Effacer le message après 3 secondes
+      setTimeout(() => setMessage(''), 3000);
+    } catch (error) {
+      setMessage('Une erreur est survenue');
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -244,7 +280,8 @@ export default function AdminBlogPage() {
       category: 'resources',
       author: '',
       read_time: 5,
-      image_url: ''
+      image_url: '',
+      status: 'draft'
     });
   };
 
@@ -379,6 +416,45 @@ export default function AdminBlogPage() {
           </div>
         </div>
 
+        {/* Filtres de statut */}
+        <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+          <div className="flex items-center space-x-4">
+            <span className="text-sm font-medium text-gray-700">Filtrer par statut :</span>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setStatusFilter('all')}
+                className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                  statusFilter === 'all'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Tous
+              </button>
+              <button
+                onClick={() => setStatusFilter('published')}
+                className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                  statusFilter === 'published'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Publiés
+              </button>
+              <button
+                onClick={() => setStatusFilter('draft')}
+                className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                  statusFilter === 'draft'
+                    ? 'bg-yellow-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Brouillons
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Messages */}
         {message && (
           <div className={`mb-6 p-4 rounded-lg ${
@@ -459,7 +535,7 @@ export default function AdminBlogPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Catégorie *
@@ -502,6 +578,20 @@ export default function AdminBlogPage() {
                     onChange={(e) => setFormData({ ...formData, read_time: parseInt(e.target.value) })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Statut *
+                  </label>
+                  <select
+                    required
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as 'draft' | 'published' })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="draft">Brouillon</option>
+                    <option value="published">Publié</option>
+                  </select>
                 </div>
               </div>
 
@@ -569,6 +659,9 @@ export default function AdminBlogPage() {
                     Catégorie
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Statut
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Auteur
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -595,6 +688,15 @@ export default function AdminBlogPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         {article.category}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        article.status === 'published' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {article.status === 'published' ? 'Publié' : 'Brouillon'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -624,6 +726,19 @@ export default function AdminBlogPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                           </svg>
                           Modifier
+                        </button>
+                        <button
+                          onClick={() => handleToggleStatus(article.id, article.status === 'published' ? 'draft' : 'published')}
+                          className={`inline-flex items-center px-2 py-1 text-xs rounded transition-colors ${
+                            article.status === 'published' 
+                              ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' 
+                              : 'bg-green-100 text-green-700 hover:bg-green-200'
+                          }`}
+                        >
+                          <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                          </svg>
+                          {article.status === 'published' ? 'Brouillon' : 'Publier'}
                         </button>
                         <button
                           onClick={() => handleDelete(article.id)}

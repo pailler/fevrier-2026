@@ -99,42 +99,223 @@ body {
   margin: 1.5rem 0;
 }
 
-.article-content pre code {
-  background-color: transparent;
-  padding: 0;
-  color: inherit;
+/* Styles spécifiques pour le contenu des articles avec Tailwind Typography */
+.prose {
+  color: #374151;
 }
 
-.article-content a {
-  color: #3b82f6;
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  color: #111827;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.prose p {
+  color: #374151;
+  margin-bottom: 1.5rem;
+  line-height: 1.75;
+}
+
+.prose ul,
+.prose ol {
+  color: #374151;
+  margin-bottom: 1.5rem;
+}
+
+.prose li {
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.prose a {
+  color: #2563eb;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.prose a:hover {
+  color: #1d4ed8;
   text-decoration: underline;
 }
 
-.article-content a:hover {
-  color: #2563eb;
+.prose strong {
+  color: #111827;
+  font-weight: 600;
 }
 
-.article-content img {
+.prose blockquote {
+  border-left: 4px solid #3b82f6;
+  background-color: #f9fafb;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: #6b7280;
+}
+
+.prose code {
+  background-color: #f3f4f6;
+  color: #1f2937;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+}
+
+.prose pre {
+  background-color: #1f2937;
+  color: #f9fafb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.prose pre code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* Reset des styles pour éviter les conflits */
+.prose * {
+  box-sizing: border-box;
+}
+
+.prose img {
   max-width: 100%;
   height: auto;
   border-radius: 0.5rem;
   margin: 1.5rem 0;
 }
 
-.article-content table {
+/* Styles spécifiques pour les articles nettoyés */
+.article-header {
+  margin-bottom: 2rem;
+}
+
+.article-main {
+  margin-bottom: 2rem;
+}
+
+.article-footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.article-section {
+  max-width: 100%;
+  margin: 0;
+}
+
+.article-lede {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+  line-height: 1.75;
+}
+
+.article-note {
+  background: #f8fafc;
+  border-left: 4px solid #94a3b8;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: #6b7280;
+}
+
+.article-callout {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.article-callout h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #1e293b;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.article-callout p {
+  margin-bottom: 0;
+  color: #475569;
+}
+
+.article-glossary {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.article-glossary h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #1e293b;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.article-glossary dl {
+  margin: 0;
+}
+
+.article-glossary dt {
+  font-weight: 700;
+  color: #1e293b;
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.article-glossary dt:first-child {
+  margin-top: 0;
+}
+
+.article-glossary dd {
+  margin: 0 0 1rem 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.article-kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.875rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  color: #374151;
+}
+
+/* Styles pour les tableaux dans les articles */
+.prose table {
   width: 100%;
   border-collapse: collapse;
   margin: 1.5rem 0;
 }
 
-.article-content th,
-.article-content td {
-  border: 1px solid #d1d5db;
+.prose th,
+.prose td {
+  border: 1px solid #e5e7eb;
   padding: 0.75rem;
   text-align: left;
 }
 
-.article-content th {
+.prose th {
   background-color: #f9fafb;
   font-weight: 600;
+  color: #111827;
 }

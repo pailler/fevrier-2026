@@ -11,7 +11,7 @@ interface BlogArticle {
   title: string;
   content: string;
   category: string;
-  is_published: boolean;
+  status?: 'draft' | 'published';
   created_at: string;
 }
 
@@ -250,7 +250,7 @@ export default function AdminPage() {
       setUserTokens(tokensByUser);
 
       // Calculer les statistiques
-      const publishedArticles = articles?.filter(article => article.is_published).length || 0;
+      const publishedArticles = articles?.filter(article => article.status === 'published').length || 0;
       const modulesWithDetails = modulesData?.filter(module => module.youtube_url).length || 0;
       const adminUsers = usersData?.filter(user => user.role === 'admin').length || 0;
       const publishedLinkedInPosts = linkedinPosts?.filter(post => post.is_published).length || 0;
@@ -795,11 +795,11 @@ export default function AdminPage() {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                article.is_published 
+                                article.status === 'published' 
                                   ? 'bg-green-100 text-green-800' 
                                   : 'bg-yellow-100 text-yellow-800'
                               }`}>
-                                {article.is_published ? 'Publié' : 'Brouillon'}
+                                {article.status === 'published' ? 'Publié' : 'Brouillon'}
                               </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

@@ -108,7 +108,7 @@ export default function Breadcrumb({ items = [], showHome = true }: BreadcrumbPr
   }
   
   return (
-    <nav className="bg-white border-b border-gray-200 px-4 py-3" aria-label="Fil d'Ariane">
+    <nav className="bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3 sticky top-0 z-10" aria-label="Fil d'Ariane">
       <div className="max-w-7xl mx-auto">
         <ol className="flex items-center space-x-2 text-sm">
           {breadcrumbItems.map((item, index) => (
@@ -130,7 +130,7 @@ export default function Breadcrumb({ items = [], showHome = true }: BreadcrumbPr
               {item.href ? (
                 <Link 
                   href={item.href}
-                  className="text-blue-600 hover:text-blue-800 transition-colors duration-200 font-medium"
+                  className="text-gray-600 hover:text-gray-900 transition-colors duration-200 font-medium"
                 >
                   {item.label}
                 </Link>
