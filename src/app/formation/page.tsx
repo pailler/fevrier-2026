@@ -202,24 +202,24 @@ export default function FormationPage() {
         </div>
       </div>
 
-      {/* Section héros */}
-      <section className="bg-gradient-to-br from-purple-100 via-indigo-50 to-blue-200 py-8 relative overflow-hidden">
+            {/* Section héros */}
+      <section className="bg-gradient-to-br from-yellow-100 via-green-50 to-green-200 py-8 relative overflow-hidden">
         {/* Effet de particules en arrière-plan */}
         <div className="absolute inset-0">
-          <div className="absolute top-10 left-10 w-2 h-2 bg-purple-400/30 rounded-full animate-pulse"></div>
-          <div className="absolute top-20 right-20 w-1 h-1 bg-indigo-400/25 rounded-full animate-bounce"></div>
-          <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-blue-500/20 rounded-full animate-pulse"></div>
-          <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-purple-500/30 rounded-full animate-bounce"></div>
-          <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-indigo-600/15 rounded-full animate-pulse"></div>
+          <div className="absolute top-10 left-10 w-2 h-2 bg-yellow-400/30 rounded-full animate-pulse"></div>
+          <div className="absolute top-20 right-20 w-1 h-1 bg-green-400/25 rounded-full animate-bounce"></div>
+          <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-yellow-500/20 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-green-500/30 rounded-full animate-bounce"></div>
+          <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-yellow-600/15 rounded-full animate-pulse"></div>
         </div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
-                             <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-800 via-indigo-800 to-blue-900 bg-clip-text text-transparent leading-tight mb-4">
-                 Formations IAHome
-               </h1>
+              <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
+                Formations IAHome
+              </h1>
               <p className="text-xl text-gray-700 mb-6">
                 Maîtrisez l'intelligence artificielle avec nos formations expertes et nos ressources pédagogiques
               </p>
@@ -229,15 +229,15 @@ export default function FormationPage() {
             <div className="flex-1 flex justify-center">
               <div className="relative w-80 h-64">
                 {/* Formes géométriques abstraites */}
-                <div className="absolute top-0 left-0 w-24 h-24 bg-purple-400 rounded-full opacity-60 animate-pulse"></div>
-                <div className="absolute top-16 right-0 w-20 h-20 bg-indigo-400 rounded-lg opacity-60 animate-bounce"></div>
-                <div className="absolute bottom-0 left-16 w-20 h-20 bg-blue-400 transform rotate-45 opacity-60 animate-pulse"></div>
-                <div className="absolute bottom-16 right-16 w-16 h-16 bg-purple-400 rounded-full opacity-60 animate-bounce"></div>
+                <div className="absolute top-0 left-0 w-24 h-24 bg-red-400 rounded-full opacity-60 animate-pulse"></div>
+                <div className="absolute top-16 right-0 w-20 h-20 bg-yellow-400 rounded-lg opacity-60 animate-bounce"></div>
+                <div className="absolute bottom-0 left-16 w-20 h-20 bg-green-400 transform rotate-45 opacity-60 animate-pulse"></div>
+                <div className="absolute bottom-16 right-16 w-16 h-16 bg-blue-400 rounded-full opacity-60 animate-bounce"></div>
                 
                 {/* Éléments centraux */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-left">
-                    <div className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-700 bg-clip-text text-transparent mb-3">IAHome</div>
+                    <div className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-green-700 bg-clip-text text-transparent mb-3">IAHome</div>
                     <div className="text-xs text-gray-600">Formation IA</div>
                   </div>
                 </div>
@@ -258,7 +258,7 @@ export default function FormationPage() {
                 onClick={() => setCategoryFilter(category.value)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   categoryFilter === category.value
-                    ? 'bg-purple-600 text-white'
+                    ? 'bg-blue-600 text-white'
                     : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
                 }`}
               >
@@ -277,7 +277,7 @@ export default function FormationPage() {
             {isAdmin ? (
               <button
                 onClick={handleAdminRedirect}
-                className="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -287,7 +287,7 @@ export default function FormationPage() {
             ) : session ? (
               <button
                 onClick={handleAddArticle}
-                className="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -318,7 +318,7 @@ export default function FormationPage() {
                   {/* En-tête avec catégorie et icônes d'action */}
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         {article.category.charAt(0).toUpperCase() + article.category.slice(1)}
                       </span>
                       <span className="ml-2 text-sm text-gray-500">
@@ -354,7 +354,7 @@ export default function FormationPage() {
                   <h2 className="text-xl font-semibold text-gray-900 mb-3 line-clamp-2">
                     <Link 
                       href={`/formation/${article.slug}`}
-                      className="hover:text-purple-600 transition-colors"
+                      className="hover:text-blue-600 transition-colors"
                     >
                       {article.title}
                     </Link>
@@ -363,21 +363,6 @@ export default function FormationPage() {
                   <p className="text-gray-600 mb-4 line-clamp-3">
                     {article.excerpt}
                   </p>
-
-                  {/* Informations supplémentaires pour les formations */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-2">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        {article.difficulty}
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        {article.duration}
-                      </span>
-                    </div>
-                    <div className="text-lg font-bold text-purple-600">
-                      {article.price === 0 ? 'Gratuit' : `€${article.price}`}
-                    </div>
-                  </div>
 
                   <div className="flex items-center text-sm text-gray-500">
                     <span>Par {article.author}</span>
@@ -395,7 +380,7 @@ export default function FormationPage() {
           <div className="fixed bottom-6 right-6 z-50">
             <button
               onClick={handleAdminRedirect}
-              className="inline-flex items-center justify-center w-16 h-16 bg-purple-600 text-white rounded-full shadow-xl hover:bg-purple-700 transition-all duration-200 transform hover:scale-110"
+              className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-full shadow-xl hover:bg-blue-700 transition-all duration-200 transform hover:scale-110"
               title="Ajouter une formation"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8">

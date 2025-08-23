@@ -12,56 +12,76 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { sessionId, userId, userEmail, testMode = false } = body;
 
+    console.log('🔍 Début de l\'activation du module après paiement');
+    console.log('📋 Paramètres reçus:', { sessionId, userId, userEmail, testMode });
+
     if (!sessionId || !userId || !userEmail) {
+      console.log('❌ Paramètres manquants');
       return NextResponse.json(
         { success: false, error: 'Paramètres manquants' },
         { status: 400 }
       );
     }
 
-    let moduleId: string;
-    let moduleTitle: string;
+    let moduleId: string = '';
+    let moduleTitle: string = '';
     let paymentAmount = 0;
     let paymentCurrency = 'eur';
 
     // Mode test : simuler un paiement réussi
     if (testMode || sessionId.startsWith('cs_test_')) {
-      // Pour le mode test, détecter le module à partir du sessionId ou utiliser des valeurs par défaut
-      if (sessionId.includes('comfyui')) {
-        moduleId = 'comfyui';
-        moduleTitle = 'ComfyUI';
-        paymentAmount = 2999; // 29.99 EUR en centimes
-      } else if (sessionId.includes('cogstudio')) {
-        moduleId = 'cogstudio';
-        moduleTitle = 'CogStudio';
-        paymentAmount = 990; // 9.90 EUR en centimes
-      } else if (sessionId.includes('invoke')) {
-        moduleId = 'invoke';
-        moduleTitle = 'Invoke IA';
-        paymentAmount = 990; // 9.90 EUR en centimes
-      } else if (sessionId.includes('stablediffusion')) {
-        moduleId = 'stablediffusion';
-        moduleTitle = 'Stable diffusion IA';
-        paymentAmount = 990; // 9.90 EUR en centimes
-      } else if (sessionId.includes('sdnext')) {
-        moduleId = 'sdnext';
-        moduleTitle = 'SDnext IA';
-        paymentAmount = 1990; // 19.90 EUR en centimes
-      } else if (sessionId.includes('qrcodes')) {
-        moduleId = 'qrcodes';
-        moduleTitle = 'QR codes dynamiques';
-        paymentAmount = 499; // 4.99 EUR en centimes
-      } else if (sessionId.includes('ruinedfooocus')) {
-        moduleId = 'ruinedfooocus';
-        moduleTitle = 'RuinedFooocus';
-        paymentAmount = 999; // 9.99 EUR en centimes
-      } else {
-        // Module par défaut pour le test (fallback)
-        moduleId = 'ruinedfooocus';
-        moduleTitle = 'RuinedFooocus';
-        paymentAmount = 999; // 9.99 EUR en centimes
+      // Pour le mode test, utiliser les métadonnées ou détecter le module
+      // D'abord, essayer de récupérer la session Stripe pour obtenir les métadonnées
+      try {
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        if (session && session.metadata) {
+          moduleId = session.metadata.moduleId || '';
+          moduleTitle = session.metadata.moduleTitle || '';
+          paymentAmount = session.amount_total ? session.amount_total / 100 : 0;
+          paymentCurrency = session.currency || 'eur';
+        }
+      } catch (error) {
+        console.log('Impossible de récupérer la session Stripe, utilisation du fallback');
       }
-      paymentCurrency = 'eur';
+      
+      // Fallback si les métadonnées ne sont pas disponibles
+      if (!moduleId || !moduleTitle) {
+        if (sessionId.includes('comfyui')) {
+          moduleId = 'comfyui';
+          moduleTitle = 'ComfyUI';
+          paymentAmount = 2999; // 29.99 EUR en centimes
+        } else if (sessionId.includes('cogstudio')) {
+          moduleId = 'cogstudio';
+          moduleTitle = 'CogStudio';
+          paymentAmount = 990; // 9.90 EUR en centimes
+        } else if (sessionId.includes('invoke')) {
+          moduleId = 'invoke';
+          moduleTitle = 'Invoke IA';
+          paymentAmount = 990; // 9.90 EUR en centimes
+        } else if (sessionId.includes('stablediffusion')) {
+          moduleId = 'stablediffusion';
+          moduleTitle = 'Stable diffusion IA';
+          paymentAmount = 990; // 9.90 EUR en centimes
+        } else if (sessionId.includes('sdnext')) {
+          moduleId = 'sdnext';
+          moduleTitle = 'SDnext IA';
+          paymentAmount = 1990; // 19.90 EUR en centimes
+        } else if (sessionId.includes('qrcodes')) {
+          moduleId = 'qrcodes';
+          moduleTitle = 'QR codes dynamiques';
+          paymentAmount = 499; // 4.99 EUR en centimes
+        } else if (sessionId.includes('ruinedfooocus')) {
+          moduleId = 'ruinedfooocus';
+          moduleTitle = 'RuinedFooocus';
+          paymentAmount = 999; // 9.99 EUR en centimes
+        } else {
+          // Module par défaut pour le test (fallback)
+          moduleId = 'ruinedfooocus';
+          moduleTitle = 'RuinedFooocus';
+          paymentAmount = 999; // 9.99 EUR en centimes
+        }
+        paymentCurrency = 'eur';
+      }
       
       console.log('🧪 Mode test activé - Simulation d\'un paiement réussi pour', moduleTitle);
     } else {
@@ -90,11 +110,14 @@ export async function POST(request: NextRequest) {
     }
 
     if (!moduleId || !moduleTitle) {
+      console.log('❌ Informations du module manquantes:', { moduleId, moduleTitle });
       return NextResponse.json(
         { success: false, error: 'Informations du module manquantes' },
         { status: 400 }
       );
     }
+
+    console.log('✅ Module détecté:', { moduleId, moduleTitle, paymentAmount, paymentCurrency });
 
     // Récupérer les informations du module depuis la base de données
     const { data: moduleData, error: moduleError } = await supabase
@@ -104,11 +127,14 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (moduleError || !moduleData) {
+      console.log('❌ Module non trouvé dans la base de données:', { moduleId, moduleError });
       return NextResponse.json(
         { success: false, error: 'Module non trouvé' },
         { status: 404 }
       );
     }
+
+    console.log('✅ Module trouvé dans la base de données:', moduleData.title);
 
     // Vérifier si l'utilisateur a déjà accès à ce module
     const { data: existingAccess, error: accessError } = await supabase
@@ -120,12 +146,15 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingAccess) {
+      console.log('ℹ️ Module déjà activé pour l\'utilisateur');
       return NextResponse.json({
         success: true,
         message: 'Module déjà activé',
         moduleInfo: moduleData
       });
     }
+
+    console.log('🔄 Activation du module pour l\'utilisateur...');
 
     // Activer le module pour l'utilisateur avec quota de 50 utilisations par mois
     const now = new Date();
@@ -149,12 +178,14 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (activationError) {
-      console.error('Erreur lors de l\'activation du module:', activationError);
+      console.error('❌ Erreur lors de l\'activation du module:', activationError);
       return NextResponse.json(
         { success: false, error: 'Erreur lors de l\'activation du module' },
         { status: 500 }
       );
     }
+
+    console.log('✅ Module activé avec succès:', activationData);
 
     // Envoyer une notification d'activation du module
     try {

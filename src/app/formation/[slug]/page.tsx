@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../../utils/supabaseClient";
 import Link from "next/link";
 import Breadcrumb from "../../../components/Breadcrumb";
+import Header from "../../../components/Header";
 import { useParams } from "next/navigation";
 
 interface FormationArticle {
@@ -27,15 +28,48 @@ export default function FormationArticlePage() {
   const [article, setArticle] = useState<FormationArticle | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
+
+  // Fonction pour nettoyer le contenu HTML
+  const cleanHtmlContent = (htmlContent: string): string => {
+    // Supprimer les balises DOCTYPE, html, head et body
+    let cleaned = htmlContent
+      .replace(/<!DOCTYPE[^>]*>/gi, '')
+      .replace(/<html[^>]*>/gi, '')
+      .replace(/<\/html>/gi, '')
+      .replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '')
+      .replace(/<body[^>]*>/gi, '')
+      .replace(/<\/body>/gi, '')
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+      .replace(/<meta[^>]*>/gi, '')
+      .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
+      .replace(/<link[^>]*>/gi, '')
+      .replace(/<header[^>]*>/gi, '<div class="article-header">')
+      .replace(/<\/header>/gi, '</div>')
+      .replace(/<main[^>]*>/gi, '<div class="article-main">')
+      .replace(/<\/main>/gi, '</div>')
+      .replace(/<footer[^>]*>/gi, '<div class="article-footer">')
+      .replace(/<\/footer>/gi, '</div>')
+      .replace(/class="wrap"/gi, 'class="article-section"')
+      .replace(/class="lede"/gi, 'class="article-lede"')
+      .replace(/class="note"/gi, 'class="article-note"')
+      .replace(/class="callout"/gi, 'class="article-callout"')
+      .replace(/class="glossary"/gi, 'class="article-glossary"')
+      .replace(/class="kbd"/gi, 'class="article-kbd"');
+
+    return cleaned.trim();
+  };
 
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const { data, error } = await supabase
-          .from('formation_articles')
-          .select('*')
-          .eq('slug', slug)
-          .single();
+                 const { data, error } = await supabase
+           .from('formation_articles')
+           .select('*')
+           .eq('slug', slug)
+           .eq('is_published', true)
+           .single();
 
         if (error) {
           console.error('Erreur lors du chargement de la formation:', error);
@@ -43,6 +77,8 @@ export default function FormationArticlePage() {
           return;
         }
 
+        console.log('Article chargé:', data);
+        console.log('Image URL:', data.image_url);
         setArticle(data);
       } catch (error) {
         console.error('Erreur:', error);
@@ -67,11 +103,14 @@ export default function FormationArticlePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Chargement de la formation...</p>
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="pt-20">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Chargement de la formation...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -80,21 +119,24 @@ export default function FormationArticlePage() {
 
   if (error || !article) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Formation non trouvée
-            </h1>
-            <p className="text-gray-600 mb-8">
-              La formation que vous recherchez n'existe pas ou a été supprimée.
-            </p>
-            <Link
-              href="/formation"
-              className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-            >
-              ← Retour aux formations
-            </Link>
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="pt-20">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                Formation non trouvée
+              </h1>
+              <p className="text-gray-600 mb-8">
+                La formation que vous recherchez n'existe pas ou a été supprimée.
+              </p>
+              <Link
+                href="/formation"
+                className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                ← Retour aux formations
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -102,28 +144,50 @@ export default function FormationArticlePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
-      <Breadcrumb />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      
+      {/* Fil d'ariane avec espacement correct */}
+      <div className="pt-20">
+        <Breadcrumb />
+      </div>
 
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Article */}
         <article className="bg-white rounded-lg shadow-md overflow-hidden">
           {/* Image de l'article */}
-          {article.image_url && (
-            <div className="w-full h-64 md:h-96 relative overflow-hidden">
+          <div className="w-full h-64 md:h-96 relative overflow-hidden">
+            {article.image_url ? (
               <img
                 src={article.image_url}
                 alt={article.title}
                 className="w-full h-full object-cover"
+                                 onError={(e) => {
+                   // Fallback vers une image par défaut si l'image ne se charge pas
+                   console.log('Erreur de chargement image:', article.image_url);
+                   setImageError(true);
+                   const target = e.target as HTMLImageElement;
+                   target.src = '/images/iaphoto.jpg';
+                 }}
+                onLoad={() => {
+                  console.log('Image chargée avec succès:', article.image_url);
+                }}
               />
-            </div>
-          )}
+            ) : (
+                             // Image par défaut si aucune image n'est définie
+               <img
+                 src="/images/iaphoto.jpg"
+                 alt={article.title}
+                 className="w-full h-full object-cover"
+               />
+            )}
+          </div>
           
           <div className="p-8">
             {/* En-tête de l'article */}
             <header className="mb-8">
               <div className="flex items-center mb-4">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                   {article.category.charAt(0).toUpperCase() + article.category.slice(1)}
                 </span>
                 <span className="ml-3 text-sm text-gray-500">
@@ -138,21 +202,6 @@ export default function FormationArticlePage() {
               <p className="text-xl text-gray-600 mb-6">
                 {article.excerpt}
               </p>
-
-              {/* Informations supplémentaires pour les formations */}
-              <div className="flex flex-wrap items-center gap-4 mb-6">
-                <div className="flex items-center space-x-2">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                    {article.difficulty}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    {article.duration}
-                  </span>
-                </div>
-                <div className="text-2xl font-bold text-purple-600">
-                  {article.price === 0 ? 'Gratuit' : `€${article.price}`}
-                </div>
-              </div>
               
               <div className="flex items-center text-sm text-gray-500">
                 <span>Par {article.author}</span>
@@ -161,84 +210,17 @@ export default function FormationArticlePage() {
               </div>
             </header>
 
-            {/* Contenu de l'article */}
+            {/* Contenu de l'article nettoyé */}
             <div 
-              className="prose prose-lg max-w-none formation-content"
-              dangerouslySetInnerHTML={{ __html: article.content }}
+              className="prose prose-lg max-w-none article-content"
+              dangerouslySetInnerHTML={{ __html: cleanHtmlContent(article.content) }}
             />
             
-            <style jsx>{`
-              .formation-content h2 {
-                font-size: 1.75rem;
-                font-weight: 700;
-                color: #1f2937;
-                margin-top: 2.5rem;
-                margin-bottom: 1rem;
-                padding-bottom: 0.5rem;
-                border-bottom: 3px solid #8b5cf6;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-              }
-              
-              .formation-content h2::after {
-                content: attr(data-duration);
-                font-size: 0.875rem;
-                font-weight: 600;
-                color: #8b5cf6;
-                background: #f3f4f6;
-                padding: 0.25rem 0.75rem;
-                border-radius: 9999px;
-                border: 2px solid #e5e7eb;
-              }
-              
-              .formation-content h3 {
-                font-size: 1.25rem;
-                font-weight: 600;
-                color: #374151;
-                margin-top: 1.5rem;
-                margin-bottom: 0.75rem;
-                padding-left: 0.5rem;
-                border-left: 4px solid #8b5cf6;
-              }
-              
-              .formation-content p {
-                margin-bottom: 1rem;
-                line-height: 1.7;
-                color: #4b5563;
-              }
-              
-              .formation-content ul {
-                margin: 1rem 0;
-                padding-left: 1.5rem;
-              }
-              
-              .formation-content li {
-                margin-bottom: 0.5rem;
-                color: #4b5563;
-              }
-              
-              .formation-content strong {
-                color: #1f2937;
-                font-weight: 600;
-              }
-              
-              .formation-content .section-duration {
-                display: inline-block;
-                font-size: 0.875rem;
-                font-weight: 600;
-                color: #8b5cf6;
-                background: #f3f4f6;
-                padding: 0.25rem 0.75rem;
-                border-radius: 9999px;
-                border: 2px solid #e5e7eb;
-                margin-left: 1rem;
-              }
-            `}</style>
+
           </div>
         </article>
 
-        {/* Navigation entre articles */}
+        {/* Navigation entre articles avec couleurs plus douces */}
         <div className="mt-12 flex justify-between">
           <Link
             href="/formation"
@@ -252,7 +234,7 @@ export default function FormationArticlePage() {
           
           <Link
             href="/formation"
-            className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
           >
             Formations récentes
             <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

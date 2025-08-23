@@ -50,15 +50,11 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4">Ressources</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/formation" className="text-gray-300 hover:text-white transition-colors">
-                  Formation
+                <Link href="/" className="text-gray-300 hover:text-white transition-colors">
+                  Applications
                 </Link>
               </li>
-              <li>
-                <Link href="/blog?category=examples" className="text-gray-300 hover:text-white transition-colors">
-                  Exemples
-                </Link>
-              </li>
+
               <li>
                 <Link href="/blog?category=community" className="text-gray-300 hover:text-white transition-colors">
                   Communauté
@@ -84,9 +80,12 @@ export default function Footer() {
             <div className="text-gray-400 text-sm">
               © 2025 IAHome. Tous droits réservés.
             </div>
-            <div className="flex space-x-6 mt-4 md:mt-0">
+            <div className="flex flex-wrap gap-x-6 gap-y-2 mt-4 md:mt-0">
               <Link href="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Confidentialité
+              </Link>
+              <Link href="/cookies" className="text-gray-400 hover:text-white text-sm transition-colors">
+                Cookies
               </Link>
               <Link href="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Conditions d'utilisation

@@ -85,6 +85,15 @@ export default function Breadcrumb({ items = [], showHome = true }: BreadcrumbPr
         case 'debug':
           label = 'Debug';
           break;
+        case 'formation':
+          // Pour les pages de formation, remplacer le premier "formation" par "Applications"
+          if (index === 0) {
+            label = 'Applications';
+            currentPath = '/'; // Lien vers la page d'accueil
+          } else {
+            label = 'Formation';
+          }
+          break;
         default:
           // Capitaliser la première lettre et remplacer les tirets par des espaces
           label = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
