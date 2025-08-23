@@ -468,7 +468,7 @@ export default function SDNextPage() {
                   </button>
                 )}
                 
-                {/* Bouton "Activer la sélection" pour les modules payants */}
+                {/* Bouton "Payer et activer" pour les modules payants */}
                 {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (
                   <button 
                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-orange-600 to-pink-600 hover:from-orange-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
@@ -494,7 +494,7 @@ export default function SDNextPage() {
                             items: [card],
                             customerEmail: user?.email || '',
                             type: 'payment',
-                            testMode: true, // Mode test activé pour éviter les erreurs Stripe
+                            testMode: false, // Mode production activé
                           }),
                         });
 
@@ -518,21 +518,8 @@ export default function SDNextPage() {
                       }
                     }}
                   >
-                    <span className="text-xl">⚡</span>
-                    <span>Activer {card.title} (Mode Test)</span>
-                  </button>
-                )}
-
-                {/* Bouton JWT - visible seulement si l'utilisateur a accès au module ET que le module n'est pas déjà activé */}
-                {session && userSubscriptions[`module_${card.id}`] && !alreadyActivatedModules.includes(card.id) && (
-                  <button 
-                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                    onClick={async () => {
-                      await accessModuleWithJWT(card.title, card.id);
-                    }}
-                  >
-                    <span className="text-xl">🔑</span>
-                    <span>Accéder à {card.title}</span>
+                    <span className="text-xl">💳</span>
+                    <span>Payer et activer {card.title}</span>
                   </button>
                 )}
               </div>

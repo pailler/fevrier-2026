@@ -432,114 +432,101 @@ export default function CogStudioPage() {
               </div>
             </div>
 
-            <div className="space-y-6">
-              {/* Boutons d'action */}
-              <div className="space-y-4">
-                {/* Message si le module est déjà activé */}
-                {alreadyActivatedModules.includes(card.id) && (
-                  <div className="w-3/4 mx-auto bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
-                    <div className="flex items-center justify-center space-x-3 text-green-800">
-                      <span className="text-2xl">✅</span>
-                      <div className="text-center">
-                        <p className="font-semibold">Module déjà activé !</p>
-                        <p className="text-sm opacity-80">Vous pouvez accéder à ce module depuis vos applications</p>
-                      </div>
-                    </div>
-                    <div className="mt-3 text-center">
-                      <button
-                        onClick={() => router.push('/encours')}
-                        className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
-                      >
-                        <span className="mr-2">📱</span>
-                        Voir mes applications
-                      </button>
-                    </div>
-                  </div>
-                )}
+                         <div className="space-y-6">
+               {/* Boutons d'action */}
+               <div className="space-y-4">
+                 {/* Message si le module est déjà activé */}
+                 {alreadyActivatedModules.includes(card.id) && (
+                   <div className="w-3/4 mx-auto bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
+                     <div className="flex items-center justify-center space-x-3 text-green-800">
+                       <span className="text-2xl">✅</span>
+                       <div className="text-center">
+                         <p className="font-semibold">Module déjà activé !</p>
+                         <p className="text-sm opacity-80">Vous pouvez accéder à ce module depuis vos applications</p>
+                       </div>
+                     </div>
+                     <div className="mt-3 text-center">
+                       <button
+                         onClick={() => router.push('/encours')}
+                         className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                       >
+                         <span className="mr-2">📱</span>
+                         Voir mes applications
+                       </button>
+                     </div>
+                   </div>
+                 )}
 
-                {!alreadyActivatedModules.includes(card.id) && (
-                  <button 
-                    className={`w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
-                      isCardSelected(card.id)
-                        ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
-                        : 'bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 text-white'
-                    }`}
-                    onClick={() => handleSubscribe(card)}
-                  >
-                    <span className="text-xl">🔐</span>
-                    <span>{isCardSelected(card.id) ? 'Sélectionné' : 'Choisir'}</span>
-                  </button>
-                )}
-                
-                {/* Bouton "Activer la sélection" pour les modules payants */}
-                {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (
-                  <button 
-                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                    onClick={async () => {
-                      if (!session) {
-                        window.location.href = '/login';
-                        return;
-                      }
+                 {!alreadyActivatedModules.includes(card.id) && (
+                   <button 
+                     className={`w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
+                       isCardSelected(card.id)
+                         ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
+                         : 'bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 text-white'
+                     }`}
+                     onClick={() => handleSubscribe(card)}
+                   >
+                     <span className="text-xl">🔐</span>
+                     <span>{isCardSelected(card.id) ? 'Sélectionné' : 'Choisir'}</span>
+                   </button>
+                 )}
+                 
+                 {/* Bouton "Payer et activer" pour les modules payants */}
+                 {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (
+                   <button 
+                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                     onClick={async () => {
+                       if (!session) {
+                         window.location.href = '/login';
+                         return;
+                       }
 
-                      // Vérifier si le module est déjà activé avant de procéder au paiement
-                      if (alreadyActivatedModules.includes(card.id)) {
-                        alert(`ℹ️ Le module ${card.title} est déjà activé ! Vous pouvez l'utiliser depuis vos applications.`);
-                        return;
-                      }
+                       // Vérifier si le module est déjà activé avant de procéder au paiement
+                       if (alreadyActivatedModules.includes(card.id)) {
+                         alert(`ℹ️ Le module ${card.title} est déjà activé ! Vous pouvez l'utiliser depuis vos applications.`);
+                         return;
+                       }
 
-                      try {
-                        const response = await fetch('/api/create-payment-intent', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({
-                            items: [card],
-                            customerEmail: user?.email || '',
-                            type: 'payment',
-                            testMode: true, // Mode test activé pour éviter les erreurs Stripe
-                          }),
-                        });
+                       try {
+                         const response = await fetch('/api/create-payment-intent', {
+                           method: 'POST',
+                           headers: {
+                             'Content-Type': 'application/json',
+                           },
+                           body: JSON.stringify({
+                             items: [card],
+                             customerEmail: user?.email || '',
+                             type: 'payment',
+                             testMode: false, // Mode production activé
+                           }),
+                         });
 
-                        if (!response.ok) {
-                          throw new Error(`Erreur HTTP ${response.status}`);
-                        }
+                         if (!response.ok) {
+                           throw new Error(`Erreur HTTP ${response.status}`);
+                         }
 
-                        const { url, error } = await response.json();
+                         const { url, error } = await response.json();
 
-                        if (error) {
-                          throw new Error(`Erreur API: ${error}`);
-                        }
+                         if (error) {
+                           throw new Error(`Erreur API: ${error}`);
+                         }
 
-                        if (url) {
-                          window.location.href = url;
-                        } else {
-                          throw new Error('URL de session Stripe manquante.');
-                        }
-                      } catch (error) {
-                        alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
-                      }
-                    }}
-                  >
-                    <span className="text-xl">⚡</span>
-                    <span>Activer {card.title} (Mode Test)</span>
-                  </button>
-                )}
-
-                {/* Bouton JWT - visible seulement si l'utilisateur a accès au module ET que le module n'est pas déjà activé */}
-                {session && userSubscriptions[`module_${card.id}`] && !alreadyActivatedModules.includes(card.id) && (
-                  <button 
-                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                    onClick={async () => {
-                      await accessModuleWithJWT(card.title, card.id);
-                    }}
-                  >
-                    <span className="text-xl">🔑</span>
-                    <span>Accéder à {card.title}</span>
-                  </button>
-                )}
-              </div>
-            </div>
+                         if (url) {
+                           window.location.href = url;
+                         } else {
+                           throw new Error('URL de session Stripe manquante.');
+                         }
+                       } catch (error) {
+                         alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                       }
+                     }}
+                   >
+                     <span className="text-xl">💳</span>
+                     <span>Payer et activer {card.title}</span>
+                   </button>
+                 )}
+               </div>
+             </div>
           </div>
         </div>
       </div>
