@@ -12,6 +12,7 @@ interface FormationArticle {
   slug: string;
   excerpt: string;
   category: string;
+  categories?: string; // Champ JSON pour les catégories multiples
   author: string;
   read_time: number;
   published_at: string;
@@ -110,21 +111,39 @@ export default function FormationPage() {
     }
   };
 
-  const filteredArticles = categoryFilter === 'all' 
-    ? articles 
-    : articles.filter(article => article.category === categoryFilter);
+  // Fonction pour vérifier si une formation correspond au filtre
+  const matchesFilter = (article: FormationArticle) => {
+    if (categoryFilter === 'all') return true;
+    
+    // Vérifier si la formation a la catégorie dans ses catégories multiples
+    const articleCategories = article.categories ? JSON.parse(article.categories) : [article.category];
+    return articleCategories.includes(categoryFilter);
+  };
 
-  const categories = [
-    { value: 'all', label: 'Toutes les formations' },
-    { value: 'Débutant', label: 'Débutant' },
-    { value: 'Intermédiaire', label: 'Intermédiaire' },
-    { value: 'Avancé', label: 'Avancé' },
-    { value: 'Intelligence artificielle', label: 'Intelligence artificielle' },
-    { value: 'Impression 3D', label: 'Impression 3D' },
-    { value: 'Photographie', label: 'Photographie' },
-    { value: 'Développement Web', label: 'Développement Web' },
-    { value: 'Logiciels', label: 'Logiciels' },
-    { value: 'Assistance', label: 'Assistance' }
+  const filteredArticles = articles.filter(matchesFilter);
+
+  // Catégories de niveau
+  const levelCategories = [
+    { value: 'Débutant', label: 'Débutant', color: 'bg-green-100 text-green-800' },
+    { value: 'Intermédiaire', label: 'Intermédiaire', color: 'bg-yellow-100 text-yellow-800' },
+    { value: 'Avancé', label: 'Avancé', color: 'bg-red-100 text-red-800' }
+  ];
+
+  // Catégories thématiques
+  const themeCategories = [
+    { value: 'Intelligence artificielle', label: 'Intelligence artificielle', color: 'bg-blue-100 text-blue-800' },
+    { value: 'Impression 3D', label: 'Impression 3D', color: 'bg-purple-100 text-purple-800' },
+    { value: 'Photographie', label: 'Photographie', color: 'bg-pink-100 text-pink-800' },
+    { value: 'Développement Web', label: 'Développement Web', color: 'bg-indigo-100 text-indigo-800' },
+    { value: 'Logiciels', label: 'Logiciels', color: 'bg-gray-100 text-gray-800' },
+    { value: 'Assistance', label: 'Assistance', color: 'bg-orange-100 text-orange-800' }
+  ];
+
+  // Toutes les catégories combinées
+  const allCategories = [
+    { value: 'all', label: 'Toutes les formations', color: 'bg-gray-100 text-gray-800' },
+    ...levelCategories,
+    ...themeCategories
   ];
 
   const formatDate = (dateString: string) => {
@@ -251,24 +270,24 @@ export default function FormationPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 
-        {/* Filtres */}
-        <div className="mb-8">
-          <div className="flex flex-wrap gap-2 justify-center">
-            {categories.map((category) => (
-              <button
-                key={category.value}
-                onClick={() => setCategoryFilter(category.value)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  categoryFilter === category.value
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-                }`}
-              >
-                {category.label}
-              </button>
-            ))}
-          </div>
-        </div>
+                 {/* Filtres */}
+         <div className="mb-8">
+           <div className="flex flex-wrap gap-2 justify-center">
+             {allCategories.map((category) => (
+               <button
+                 key={category.value}
+                 onClick={() => setCategoryFilter(category.value)}
+                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                   categoryFilter === category.value
+                     ? 'bg-blue-600 text-white'
+                     : `${category.color} hover:opacity-80 border border-gray-300`
+                 }`}
+               >
+                 {category.label}
+               </button>
+             ))}
+           </div>
+         </div>
 
         {/* Articles */}
         {filteredArticles.length === 0 ? (
@@ -319,14 +338,26 @@ export default function FormationPage() {
                 <div className="p-6">
                   {/* En-tête avec catégorie et icônes d'action */}
                   <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {article.category.charAt(0).toUpperCase() + article.category.slice(1)}
-                      </span>
-                      <span className="ml-2 text-sm text-gray-500">
-                        {article.read_time} min de lecture
-                      </span>
-                    </div>
+                                         <div className="flex items-center flex-wrap gap-2">
+                       {/* Afficher les catégories multiples */}
+                       {(() => {
+                         const articleCategories = article.categories ? JSON.parse(article.categories) : [article.category];
+                         return articleCategories.map((cat: string, index: number) => {
+                           const categoryConfig = allCategories.find(c => c.value === cat);
+                           return (
+                             <span 
+                               key={index}
+                               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${categoryConfig?.color || 'bg-blue-100 text-blue-800'}`}
+                             >
+                               {cat}
+                             </span>
+                           );
+                         });
+                       })()}
+                       <span className="text-sm text-gray-500">
+                         {article.read_time} min de lecture
+                       </span>
+                     </div>
                     
                     {/* Boutons d'action seulement pour les admins */}
                     {isAdmin && (
