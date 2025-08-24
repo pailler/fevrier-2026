@@ -116,13 +116,15 @@ export default function FormationPage() {
 
   const categories = [
     { value: 'all', label: 'Toutes les formations' },
-    { value: 'debutant', label: 'Débutant' },
-    { value: 'intermediaire', label: 'Intermédiaire' },
-    { value: 'avance', label: 'Avancé' },
-    { value: 'ia', label: 'Intelligence Artificielle' },
-    { value: 'web', label: 'Développement Web' },
-    { value: 'mobile', label: 'Développement Mobile' },
-    { value: 'data', label: 'Data Science' }
+    { value: 'Débutant', label: 'Débutant' },
+    { value: 'Intermédiaire', label: 'Intermédiaire' },
+    { value: 'Avancé', label: 'Avancé' },
+    { value: 'Intelligence artificielle', label: 'Intelligence artificielle' },
+    { value: 'Impression 3D', label: 'Impression 3D' },
+    { value: 'Photographie', label: 'Photographie' },
+    { value: 'Développement Web', label: 'Développement Web' },
+    { value: 'Logiciels', label: 'Logiciels' },
+    { value: 'Assistance', label: 'Assistance' }
   ];
 
   const formatDate = (dateString: string) => {
