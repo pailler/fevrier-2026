@@ -475,6 +475,8 @@ export default function Home() {
         </div>
       </section>
 
+
+
       {/* Section principale avec filtres et contenu */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-6">

@@ -78,9 +78,18 @@ export default function ModulesPage() {
       id: 'metube',
       name: 'IAmetube',
       description: 'Téléchargement et gestion de vidéos YouTube',
-              url: '/api/proxy-metube',
+      url: '/api/proxy-metube',
       icon: '📺',
       color: 'bg-blue-500 hover:bg-blue-600',
+      status: 'active'
+    },
+    {
+      id: 'blender-3d',
+      name: 'Générateur 3D Blender',
+      description: 'Créez des objets 3D avec l\'IA via Blender',
+      url: '/blender-3d',
+      icon: '🎨',
+      color: 'bg-purple-500 hover:bg-purple-600',
       status: 'active'
     },
     {
@@ -182,7 +191,12 @@ export default function ModulesPage() {
                       console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
                     }
                     
-                    window.open(module.url, '_blank');
+                    // Navigation différente selon le module
+                    if (module.id === 'blender-3d') {
+                      router.push(module.url);
+                    } else {
+                      window.open(module.url, '_blank');
+                    }
                   }}
                 >
                   Accéder à l'appli

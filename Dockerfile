@@ -46,6 +46,9 @@ COPY --from=base /app/.next/standalone ./
 COPY --from=base /app/.next/static ./.next/static
 COPY --from=base /app/package.json ./package.json
 
+# S'assurer que tous les fichiers statiques sont copiés
+RUN ls -la ./.next/static || echo "Static files not found"
+
 # Créer le dossier logs
 RUN mkdir -p /app/logs
 

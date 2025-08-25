@@ -364,7 +364,8 @@ export default function EncoursPage() {
       'invoke': 'https://invoke.regispailler.fr',
       'comfyui': 'https://comfyui.regispailler.fr',
       'cogstudio': 'https://cogstudio.regispailler.fr',
-      'sdnext': 'https://sdnext.regispailler.fr'
+      'sdnext': 'https://sdnext.regispailler.fr',
+      'blender-3d': '/blender-3d' // URL interne pour le module Blender 3D
     };
     
     return moduleUrls[moduleId] || '';
@@ -372,9 +373,7 @@ export default function EncoursPage() {
 
   // Fonction pour accéder à un module
   const accessModule = async (module: UserModule) => {
-    // TEST SIMPLE - Vérifier que le code s'exécute côté client
-    alert('🔍 TEST: Fonction accessModule exécutée !');
-    console.log('🔍 TEST: Fonction accessModule exécutée !');
+    console.log('🚀 Accès au module:', module.module_title);
     
     try {
       console.log('🚀 Accès au module:', module.module_title);
@@ -495,8 +494,11 @@ export default function EncoursPage() {
             url: moduleUrl,
             title: module.module_title
           });
+        } else if (moduleUrl.startsWith('/')) {
+          // URL interne - utiliser router.push
+          router.push(moduleUrl);
         } else {
-          // Ouvrir l'application dans un nouvel onglet pour les autres modules
+          // URL externe - ouvrir dans un nouvel onglet
           window.open(moduleUrl, '_blank');
         }
       } else {
@@ -821,7 +823,7 @@ export default function EncoursPage() {
               Vous n'avez pas encore souscrit à des modules. Découvrez notre collection d'applications IA et commencez à explorer !
             </p>
             <Link 
-              href="/" 
+              href="/modules" 
               className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             >
               🚀 Découvrir nos modules

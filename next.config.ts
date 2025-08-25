@@ -12,6 +12,14 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   
+  // Configuration pour les assets statiques
+  assetPrefix: process.env.NODE_ENV === 'production' ? 'https://iahome.fr' : '',
+  
+  // Configuration pour le cache des assets
+  generateBuildId: async () => {
+    return 'build-' + Date.now();
+  },
+  
   serverExternalPackages: ['@supabase/supabase-js'],
   
   // Configuration pour résoudre l'avertissement cross-origin
@@ -41,6 +49,21 @@ const nextConfig: NextConfig = {
           {
             key: 'Access-Control-Allow-Origin',
             value: '*'
+          },
+          // Headers pour les assets statiques
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ]
+      },
+      // Headers spécifiques pour les assets statiques
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
           }
         ]
       }

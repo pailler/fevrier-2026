@@ -16,7 +16,9 @@ export default function ChatAI() {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     // Récupérer l'utilisateur connecté
@@ -31,7 +33,7 @@ export default function ChatAI() {
       setMessages([
         {
           id: '1',
-          content: "Bonjour ! Je suis votre assistant IA. Comment puis-je vous aider aujourd'hui ?",
+          content: "Bonjour ! Je suis IAHome Assistant, votre assistant IA personnel. 🚀\n\nJe peux vous aider avec :\n• Les modules IA (Stable Diffusion, ComfyUI, etc.)\n• Le support technique\n• Les abonnements et paiements\n• Les articles de blog\n• L'utilisation de la plateforme\n\nComment puis-je vous aider aujourd'hui ?",
           role: 'assistant',
           timestamp: new Date()
         }
@@ -42,6 +44,14 @@ export default function ChatAI() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    // Auto-resize du textarea
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 120) + 'px';
+    }
+  }, [inputValue]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -60,6 +70,7 @@ export default function ChatAI() {
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
+    setIsTyping(true);
 
     try {
       // Appel à l'API de chat IA
@@ -71,7 +82,7 @@ export default function ChatAI() {
         body: JSON.stringify({
           message: inputValue,
           userId: user?.id,
-          conversationHistory: messages.slice(-5) // Garder les 5 derniers messages pour le contexte
+          conversationHistory: messages.slice(-10) // Garder les 10 derniers messages pour le contexte
         }),
       });
 
@@ -88,15 +99,17 @@ export default function ChatAI() {
         throw new Error('Erreur lors de la communication avec l\'IA');
       }
     } catch (error) {
+      console.error('Erreur chat:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "Désolé, je rencontre des difficultés techniques. Pouvez-vous réessayer ?",
+        content: "Désolé, je rencontre des difficultés techniques. Pouvez-vous réessayer ? Si le problème persiste, contactez notre support.",
         role: 'assistant',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      setIsTyping(false);
     }
   };
 
@@ -107,20 +120,31 @@ export default function ChatAI() {
     }
   };
 
+  const clearChat = () => {
+    setMessages([
+      {
+        id: '1',
+        content: "Conversation effacée. Comment puis-je vous aider ?",
+        role: 'assistant',
+        timestamp: new Date()
+      }
+    ]);
+  };
+
   return (
     <>
       {/* Bouton flottant du chat */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50 flex items-center justify-center"
+        className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50 flex items-center justify-center group"
         aria-label="Ouvrir le chat IA"
       >
         {isOpen ? (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         ) : (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
         )}
@@ -128,51 +152,68 @@ export default function ChatAI() {
 
       {/* Interface du chat */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-96 h-[500px] bg-white rounded-lg shadow-2xl border border-gray-200 z-50 flex flex-col">
+        <div className="fixed bottom-24 right-6 w-96 h-[600px] bg-white rounded-lg shadow-2xl border border-gray-200 z-50 flex flex-col">
           {/* En-tête du chat */}
-          <div className="bg-blue-600 text-white p-4 rounded-t-lg">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-t-lg">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold">Assistant IA</h3>
-                  <p className="text-xs text-blue-100">En ligne</p>
+                  <h3 className="font-semibold text-lg">IAHome Assistant</h3>
+                  <p className="text-xs text-blue-100 flex items-center">
+                    <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                    En ligne
+                  </p>
                 </div>
               </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-blue-100 hover:text-white transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={clearChat}
+                  className="text-blue-100 hover:text-white transition-colors p-1"
+                  title="Effacer la conversation"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="text-blue-100 hover:text-white transition-colors p-1"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Zone des messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                  className={`max-w-xs lg:max-w-md px-4 py-3 rounded-lg shadow-sm ${
                     message.role === 'user'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-800'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white'
+                      : 'bg-white text-gray-800 border border-gray-200'
                   }`}
                 >
-                  <p className="text-sm">{message.content}</p>
-                  <p className={`text-xs mt-1 ${
+                  <div className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</div>
+                  <p className={`text-xs mt-2 ${
                     message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
                   }`}>
-                    {message.timestamp.toLocaleTimeString()}
+                    {message.timestamp.toLocaleTimeString('fr-FR', { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
                   </p>
                 </div>
               </div>
@@ -180,11 +221,14 @@ export default function ChatAI() {
             
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="bg-white text-gray-800 px-4 py-3 rounded-lg border border-gray-200 shadow-sm">
+                  <div className="flex items-center space-x-2">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
+                    <span className="text-sm text-gray-600">IAHome Assistant réfléchit...</span>
                   </div>
                 </div>
               </div>
@@ -194,26 +238,38 @@ export default function ChatAI() {
           </div>
 
           {/* Zone de saisie */}
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 border-t border-gray-200 bg-white">
             <div className="flex space-x-2">
               <textarea
+                ref={textareaRef}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Tapez votre message..."
-                className="flex-1 resize-none border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Tapez votre message... (Entrée pour envoyer, Shift+Entrée pour nouvelle ligne)"
+                className="flex-1 resize-none border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 rows={1}
                 disabled={isLoading}
+                maxLength={1000}
               />
               <button
                 onClick={handleSendMessage}
                 disabled={!inputValue.trim() || isLoading}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center min-w-[44px]"
+                title="Envoyer le message"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
+                {isLoading ? (
+                  <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                )}
               </button>
+            </div>
+            <div className="text-xs text-gray-500 mt-2 text-center">
+              {inputValue.length}/1000 caractères
             </div>
           </div>
         </div>

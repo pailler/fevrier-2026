@@ -55,6 +55,89 @@ export default function CommunityPage() {
         </div>
       </section>
 
+      {/* Section YouTube - Chaîne de Régis Pailler */}
+      <section className="py-16 bg-gradient-to-r from-red-50 to-red-100">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Découvrez notre chaîne YouTube
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Suivez Régis Pailler, fondateur d'IAhome, pour des tutoriels, des démonstrations et des insights sur l'intelligence artificielle et les technologies numériques.
+            </p>
+          </div>
+          
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-4xl mx-auto">
+            <div className="flex flex-col lg:flex-row">
+              {/* Thumbnail YouTube */}
+              <div className="lg:w-1/2 relative">
+                <div className="aspect-video bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <div className="text-6xl mb-4">📺</div>
+                    <div className="text-2xl font-bold mb-2">@pailleradamhome</div>
+                    <div className="text-lg opacity-90">Chaîne YouTube officielle</div>
+                  </div>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform cursor-pointer">
+                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Contenu descriptif */}
+              <div className="lg:w-1/2 p-8 lg:p-12">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                      Régis Pailler
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      Fondateur d'IAhome et expert en intelligence artificielle. Découvrez des contenus exclusifs sur l'IA, les outils numériques et les technologies émergentes.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center text-gray-700">
+                      <span className="w-2 h-2 bg-red-500 rounded-full mr-3"></span>
+                      <span>Tutoriels pratiques sur l'IA</span>
+                    </div>
+                    <div className="flex items-center text-gray-700">
+                      <span className="w-2 h-2 bg-red-500 rounded-full mr-3"></span>
+                      <span>Démonstrations d'outils numériques</span>
+                    </div>
+                    <div className="flex items-center text-gray-700">
+                      <span className="w-2 h-2 bg-red-500 rounded-full mr-3"></span>
+                      <span>Actualités technologiques</span>
+                    </div>
+                    <div className="flex items-center text-gray-700">
+                      <span className="w-2 h-2 bg-red-500 rounded-full mr-3"></span>
+                      <span>Conseils d'expert</span>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4">
+                    <a 
+                      href="https://www.youtube.com/@pailleradamhome" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                    >
+                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                      </svg>
+                      S'abonner à la chaîne
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Article Content */}
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="article-content">
