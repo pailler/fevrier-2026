@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  qr-code-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: qr-code-service
+    restart: unless-stopped
+    ports:
+      - "7005:8080"
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=postgresql://qrcode_user:qrcode_password@postgres:5432/qrcode_db
+    volumes:
+      - ./qr-codes:/app/qr_codes
+      - ./logs:/app/logs
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: qr-code-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=qrcode_db
+      - POSTGRES_USER=qrcode_user
+      - POSTGRES_PASSWORD=qrcode_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qrcode_user -d qrcode_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  postgres_data:
+  qr-codes:
+  logs:
