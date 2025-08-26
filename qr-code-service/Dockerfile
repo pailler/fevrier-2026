@@ -4,7 +4,7 @@ FROM python:3.9-alpine
 RUN apk add --no-cache gcc musl-dev libffi-dev curl postgresql-dev
 
 # Installer les packages Python
-RUN pip install --no-cache-dir flask flask-cors qrcode[pil] pillow psycopg2-binary
+RUN pip install --no-cache-dir flask flask-cors qrcode[pil] pillow psycopg2-binary PyJWT requests
 
 # Créer le répertoire de travail
 WORKDIR /app

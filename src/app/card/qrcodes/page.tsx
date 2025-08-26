@@ -551,6 +551,59 @@ export default function QRCodesPage() {
                     <span>Accéder à {card.title}</span>
                   </button>
                 )}
+
+                {/* Nouveau bouton pour accéder au service QR Code local */}
+                {session && (
+                  <button 
+                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                    onClick={async () => {
+                      try {
+                        // Utiliser la session Supabase directement
+                        const { data: { session: currentSession } } = await supabase.auth.getSession();
+                        
+                        if (!currentSession) {
+                          throw new Error('Aucune session active');
+                        }
+
+                                                // Générer un token JWT pour le service QR Code local
+                        const response = await fetch('/api/qr-auth/validate-session', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          credentials: 'include',
+                          body: JSON.stringify({
+                            userId: currentSession.user.id,
+                            userEmail: currentSession.user.email,
+                            userName: currentSession.user.user_metadata?.full_name || currentSession.user.email?.split('@')[0] || 'Utilisateur'
+                          }),
+                        });
+
+                        if (!response.ok) {
+                          const errorData = await response.json().catch(() => ({}));
+                          throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
+                        }
+
+                        const data = await response.json();
+                        
+                        // Rediriger vers le service QR Code local avec le token
+                        const qrServiceUrl = new URL('http://localhost:7005');
+                        qrServiceUrl.searchParams.set('auth_token', data.qrToken);
+                        qrServiceUrl.searchParams.set('user_id', data.user.id);
+                        qrServiceUrl.searchParams.set('user_email', data.user.email);
+                        qrServiceUrl.searchParams.set('user_name', data.user.name);
+                        
+                        window.open(qrServiceUrl.toString(), '_blank');
+                      } catch (error) {
+                        console.error('Erreur accès service QR Code:', error);
+                        alert(`Erreur lors de l'accès au service QR Code: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                      }
+                    }}
+                  >
+                    <span className="text-xl">📱</span>
+                    <span>Service QR Code Local (Port 7005)</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>

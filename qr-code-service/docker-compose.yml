@@ -12,6 +12,8 @@ services:
     environment:
       - FLASK_ENV=production
       - DATABASE_URL=postgresql://qrcode_user:qrcode_password@postgres:5432/qrcode_db
+      - IAHOME_JWT_SECRET=qr-code-secret-key-change-in-production
+      - IAHOME_API_URL=http://localhost:3000
     volumes:
       - ./qr-codes:/app/qr_codes
       - ./logs:/app/logs
