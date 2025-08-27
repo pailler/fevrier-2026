@@ -9,8 +9,9 @@ RUN pip install --no-cache-dir flask flask-cors qrcode[pil] pillow psycopg2-bina
 # Créer le répertoire de travail
 WORKDIR /app
 
-# Copier le code source
+# Copier le code source et le template
 COPY qr_service.py .
+COPY template.html .
 
 # Créer le dossier pour les QR codes
 RUN mkdir -p /app/qr_codes

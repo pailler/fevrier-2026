@@ -81,19 +81,28 @@ def get_user_from_token():
     # Méthode 1: Vérifier le token dans les paramètres de l'URL
     auth_token = request.args.get('auth_token')
     if auth_token:
+        logger.info(f"Token trouvé dans les paramètres: {auth_token[:50]}...")
         payload = validate_iahome_token(auth_token)
         if payload:
+            logger.info(f"Token validé avec succès pour l'utilisateur: {payload.get('userId')}")
             return payload.get('userId')
+        else:
+            logger.warning("Token invalide dans les paramètres")
     
     # Méthode 2: Vérifier le token dans les headers
     auth_header = request.headers.get('Authorization')
     if auth_header and auth_header.startswith('Bearer '):
         token = auth_header[7:]
+        logger.info(f"Token trouvé dans les headers: {token[:50]}...")
         payload = validate_iahome_token(token)
         if payload:
+            logger.info(f"Token validé avec succès pour l'utilisateur: {payload.get('userId')}")
             return payload.get('userId')
+        else:
+            logger.warning("Token invalide dans les headers")
     
     # Aucun token valide trouvé
+    logger.warning("Aucun token valide trouvé")
     return None
 
 def require_iahome_auth(f):
@@ -106,475 +115,7 @@ def require_iahome_auth(f):
     decorated_function.__name__ = f.__name__
     return decorated_function
 
-# Template HTML simplifié pour l'interface web
-HTML_TEMPLATE = """
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Generator - IAHome</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        h1, h2 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .user-info {
-            background-color: #e3f2fd;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #ddd;
-            gap: 5px;
-        }
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            border: 2px solid #6c757d;
-            background: #ffffff;
-            color: #495057;
-            font-size: 16px;
-            font-weight: 500;
-            border-radius: 5px 5px 0 0;
-            margin-right: 2px;
-            transition: all 0.3s ease;
-        }
-        .tab:hover {
-            background-color: #e9ecef;
-        }
-        .tab.active {
-            background-color: #007bff;
-            color: white;
-            border-color: #0056b3;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        input, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .result {
-            margin-top: 30px;
-            text-align: center;
-        }
-        .qr-code {
-            max-width: 300px;
-            margin: 20px auto;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
-        }
-        .qr-list {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
-        }
-        .qr-item {
-            border: 1px solid #eee;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 10px;
-            background-color: #f9f9f9;
-        }
-        .error {
-            color: #dc3545;
-            background-color: #f8d7da;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-        .success {
-            color: #155724;
-            background-color: #d4edda;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="user-info">
-            <h3>👤 Connecté via IAHome.fr</h3>
-            <p>Service QR Code Generator</p>
-        </div>
-        
-        <h1>🎯 QR Code Generator</h1>
-        
-        <div class="tabs">
-            <button class="tab active" onclick="showTab('static')">QR Code Statique</button>
-            <button class="tab" onclick="showTab('dynamic')">QR Code Dynamique</button>
-            <button class="tab" onclick="showTab('manage')">Gérer les QR Codes</button>
-        </div>
-        
-        <!-- QR Code Statique -->
-        <div id="static" class="tab-content active">
-            <h2>Générer un QR Code Statique</h2>
-            <form id="staticForm">
-                <div class="form-group">
-                    <label for="staticText">Texte ou URL :</label>
-                    <input type="text" id="staticText" name="text" placeholder="https://example.com" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="staticSize">Taille (px) :</label>
-                    <input type="number" id="staticSize" name="size" value="300" min="100" max="1000">
-                </div>
-                
-                <button type="submit">Générer QR Code Statique</button>
-            </form>
-            
-            <div id="staticResult" class="result" style="display: none;">
-                <h3>QR Code généré :</h3>
-                <div id="staticQrCode" class="qr-code"></div>
-                <button onclick="downloadQR('static')">Télécharger PNG</button>
-            </div>
-        </div>
-        
-        <!-- QR Code Dynamique -->
-        <div id="dynamic" class="tab-content">
-            <h2>Créer un QR Code Dynamique</h2>
-            <form id="dynamicForm">
-                <div class="form-group">
-                    <label for="dynamicUrl">URL de destination :</label>
-                    <input type="url" id="dynamicUrl" name="url" placeholder="https://example.com" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="dynamicName">Nom du QR Code (optionnel) :</label>
-                    <input type="text" id="dynamicName" name="name" placeholder="Mon QR Code">
-                </div>
-                
-                <button type="submit">Créer QR Code Dynamique</button>
-            </form>
-            
-            <div id="dynamicResult" class="result" style="display: none;">
-                <h3>QR Code Dynamique créé :</h3>
-                <div id="dynamicQrCode" class="qr-code"></div>
-                <p><strong>URL du QR Code :</strong> <span id="dynamicQrUrl"></span></p>
-                <p><strong>ID unique :</strong> <span id="dynamicQrId"></span></p>
-                <button onclick="downloadQR('dynamic')">Télécharger PNG</button>
-            </div>
-        </div>
-        
-        <!-- Gérer les QR Codes -->
-        <div id="manage" class="tab-content">
-            <h2>Gérer les QR Codes Dynamiques</h2>
-            <button onclick="loadDynamicQRCodes()">Actualiser la liste</button>
-            <div id="qrList" class="qr-list"></div>
-        </div>
-    </div>
-
-    <script>
-        let currentStaticQR = null;
-        let currentDynamicQR = null;
-        
-        // Charger les QR codes au démarrage
-        document.addEventListener('DOMContentLoaded', function() {
-            loadDynamicQRCodes();
-        });
-        
-        function showTab(tabName) {
-            // Masquer tous les contenus
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Afficher le contenu sélectionné
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-        }
-        
-        // QR Code Statique
-        document.getElementById('staticForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const params = new URLSearchParams();
-            
-            for (let [key, value] of formData.entries()) {
-                params.append(key, value);
-            }
-            
-            const url = '/api/qr?' + params.toString();
-            
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        currentStaticQR = data.qr_code;
-                        document.getElementById('staticQrCode').innerHTML = 
-                            `<img src="data:image/png;base64,${data.qr_code}" alt="QR Code" style="max-width: 100%;">`;
-                        document.getElementById('staticResult').style.display = 'block';
-                    } else {
-                        alert('Erreur: ' + data.error);
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur:', error);
-                    alert('Erreur lors de la génération du QR code');
-                });
-        });
-        
-        // QR Code Dynamique
-        document.getElementById('dynamicForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const data = {};
-            
-            for (let [key, value] of formData.entries()) {
-                data[key] = value;
-            }
-            
-            // Récupérer le token d'authentification depuis l'URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const authToken = urlParams.get('auth_token');
-            
-            const headers = {
-                'Content-Type': 'application/json'
-            };
-            
-            // Ajouter le token d'authentification si disponible
-            if (authToken) {
-                headers['Authorization'] = `Bearer ${authToken}`;
-            }
-            
-            fetch('/api/dynamic/qr', {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    currentDynamicQR = data.qr_code;
-                    document.getElementById('dynamicQrCode').innerHTML = 
-                        `<img src="data:image/png;base64,${data.qr_code}" alt="QR Code" style="max-width: 100%;">`;
-                    document.getElementById('dynamicQrUrl').textContent = data.qr_url;
-                    document.getElementById('dynamicQrId').textContent = data.qr_id;
-                    document.getElementById('dynamicResult').style.display = 'block';
-                } else {
-                    alert('Erreur: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                alert('Erreur lors de la création du QR code dynamique');
-            });
-        });
-        
-        function downloadQR(type) {
-            const qrData = type === 'static' ? currentStaticQR : currentDynamicQR;
-            if (!qrData) return;
-            
-            const link = document.createElement('a');
-            link.href = 'data:image/png;base64,' + qrData;
-            link.download = 'qrcode-' + type + '-' + Date.now() + '.png';
-            link.click();
-        }
-        
-        function loadDynamicQRCodes() {
-            console.log('🔍 Chargement des QR codes dynamiques...');
-            
-            // Récupérer le token d'authentification depuis l'URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const authToken = urlParams.get('auth_token');
-            console.log('🔑 Token trouvé:', authToken ? 'Oui' : 'Non');
-            
-            const headers = {
-                'Content-Type': 'application/json'
-            };
-            
-            // Ajouter le token d'authentification si disponible
-            if (authToken) {
-                headers['Authorization'] = `Bearer ${authToken}`;
-                console.log('🔐 Headers d\'authentification ajoutés');
-            }
-            
-            console.log('📡 Envoi de la requête à /api/dynamic/qr...');
-            fetch('/api/dynamic/qr', {
-                headers: headers
-            })
-                .then(response => {
-                    console.log('📥 Réponse reçue:', response.status, response.statusText);
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('📊 Données reçues:', data);
-                    if (data.success) {
-                        console.log('✅ Affichage des QR codes...');
-                        displayQRCodes(data.qr_codes);
-                    } else {
-                        console.error('❌ Erreur dans la réponse:', data.error);
-                        document.getElementById('qrList').innerHTML = '<div class="error">Erreur: ' + data.error + '</div>';
-                    }
-                })
-                .catch(error => {
-                    console.error('❌ Erreur lors du chargement:', error);
-                    document.getElementById('qrList').innerHTML = '<div class="error">Erreur lors du chargement des QR codes</div>';
-                });
-        }
-        
-        function displayQRCodes(qrCodes) {
-            const container = document.getElementById('qrList');
-            
-            if (Object.keys(qrCodes).length === 0) {
-                container.innerHTML = '<p>Aucun QR code dynamique créé.</p>';
-                return;
-            }
-            
-            let html = '';
-            for (const [id, qr] of Object.entries(qrCodes)) {
-                html += `
-                    <div class="qr-item">
-                        <h4>${qr.name || 'QR Code sans nom'}</h4>
-                        <p><strong>ID :</strong> ${id}</p>
-                        <p><strong>URL de destination :</strong> ${qr.url}</p>
-                        <p><strong>URL du QR Code :</strong> ${qr.qr_url}</p>
-                        <p><strong>Créé le :</strong> ${new Date(qr.created_at).toLocaleString()}</p>
-                        <p><strong>Scans :</strong> ${qr.scans || 0}</p>
-                        <button onclick="editQRCode('${id}')">Modifier l'URL</button>
-                        <button onclick="deleteQRCode('${id}')">Supprimer</button>
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
-        }
-        
-        function editQRCode(id) {
-            const newUrl = prompt('Nouvelle URL de destination :');
-            if (!newUrl) return;
-            
-            // Récupérer le token d'authentification depuis l'URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const authToken = urlParams.get('auth_token');
-            
-            const headers = {
-                'Content-Type': 'application/json'
-            };
-            
-            // Ajouter le token d'authentification si disponible
-            if (authToken) {
-                headers['Authorization'] = `Bearer ${authToken}`;
-            }
-            
-            fetch(`/api/dynamic/qr/${id}`, {
-                method: 'PUT',
-                headers: headers,
-                body: JSON.stringify({url: newUrl})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('QR Code modifié avec succès !');
-                    loadDynamicQRCodes();
-                } else {
-                    alert('Erreur: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                alert('Erreur lors de la modification du QR code');
-            });
-        }
-        
-        function deleteQRCode(id) {
-            if (!confirm('Êtes-vous sûr de vouloir supprimer ce QR code ?')) {
-                return;
-            }
-            
-            // Récupérer le token d'authentification depuis l'URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const authToken = urlParams.get('auth_token');
-            
-            const headers = {
-                'Content-Type': 'application/json'
-            };
-            
-            // Ajouter le token d'authentification si disponible
-            if (authToken) {
-                headers['Authorization'] = `Bearer ${authToken}`;
-            }
-            
-            fetch(`/api/dynamic/qr/${id}`, {
-                method: 'DELETE',
-                headers: headers
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('QR Code supprimé avec succès !');
-                    loadDynamicQRCodes();
-                } else {
-                    alert('Erreur: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                alert('Erreur lors de la suppression du QR code');
-            });
-        }
-    </script>
-</body>
-</html>
-"""
+# Le template HTML est maintenant dans le fichier template.html
 
 @app.route('/')
 def index():
@@ -584,7 +125,33 @@ def index():
     
     if user_id:
         # Utilisateur authentifié, afficher l'interface
-        return render_template_string(HTML_TEMPLATE)
+        try:
+            with open('template.html', 'r', encoding='utf-8') as f:
+                template_content = f.read()
+            return template_content
+        except FileNotFoundError:
+            # Fallback si le fichier template n'existe pas
+            logger.error("Fichier template.html non trouvé")
+            return """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Erreur - QR Code Generator</title>
+                <style>
+                    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                    .error { color: #d32f2f; background: #ffebee; padding: 20px; border-radius: 8px; margin: 20px; }
+                </style>
+            </head>
+            <body>
+                <h1>QR Code Generator</h1>
+                <div class="error">
+                    <h2>Erreur</h2>
+                    <p>Le fichier template.html est manquant.</p>
+                    <p>Veuillez redémarrer le service.</p>
+                </div>
+            </body>
+            </html>
+            """
     else:
         # Utilisateur non authentifié, afficher un message d'erreur
         error_html = """
@@ -623,21 +190,32 @@ def health():
         'timestamp': datetime.now().isoformat()
     })
 
-@app.route('/api/qr')
+@app.route('/api/qr', methods=['GET', 'POST'])
 def generate_qr():
-    """Générer un QR code statique via GET"""
+    """Générer un QR code statique via GET ou POST"""
     try:
-        # Récupérer les paramètres
-        text = request.args.get('text', '')
-        size = int(request.args.get('size', 300))
-        margin = int(request.args.get('margin', 4))
-        error_correction = request.args.get('errorCorrection', 'M')
+        # Récupérer les paramètres selon la méthode
+        if request.method == 'GET':
+            text = request.args.get('text', '')
+            size = int(request.args.get('size', 300))
+            margin = int(request.args.get('margin', 4))
+            error_correction = request.args.get('errorCorrection', 'M')
+            foreground_color = request.args.get('foreground_color', '#000000')
+            background_color = request.args.get('background_color', '#FFFFFF')
+        else:  # POST
+            data = request.get_json() or {}
+            text = data.get('url') or data.get('text', '')  # Support pour 'url' ou 'text'
+            size = int(data.get('size', 300))
+            margin = int(data.get('margin', 4))
+            error_correction = data.get('errorCorrection', 'M')
+            foreground_color = data.get('foreground_color', '#000000')
+            background_color = data.get('background_color', '#FFFFFF')
         
         if not text:
-            return jsonify({'success': False, 'error': 'Le paramètre "text" est requis'}), 400
+            return jsonify({'success': False, 'error': 'Le paramètre "text" ou "url" est requis'}), 400
         
-        # Générer le QR code
-        qr_code = generate_qr_code(text, size, margin, error_correction)
+        # Générer le QR code avec les couleurs personnalisées
+        qr_code = generate_qr_code(text, size, margin, error_correction, foreground_color, background_color)
         
         return jsonify({
             'success': True,
@@ -663,14 +241,79 @@ def create_dynamic_qr():
         if not data:
             return jsonify({'success': False, 'error': 'Données JSON requises'}), 400
         
-        url = data.get('url', '').strip()
+        # Log des données reçues pour debug
+        logger.info(f"Données reçues pour création QR dynamique: {data}")
+        
+        # Extraire l'URL de destination selon le type de contenu
+        url = ''
         name = data.get('name', '').strip()
         size = int(data.get('size', 300))
         margin = int(data.get('margin', 4))
         error_correction = data.get('errorCorrection', 'M')
         
+        # Chercher l'URL dans différents champs possibles
+        if data.get('url'):
+            url = data.get('url', '').strip()
+        elif data.get('webUrl'):
+            url = data.get('webUrl', '').strip()
+        elif data.get('mediaUrl'):
+            url = data.get('mediaUrl', '').strip()
+        elif data.get('platform') and data.get('username'):
+            # Pour les réseaux sociaux, construire l'URL
+            platform = data.get('platform', '').strip()
+            username = data.get('username', '').strip()
+            url = build_social_url(platform, username)
+        elif data.get('type') in ['contact', 'email', 'phone', 'sms', 'vcard']:
+            # Pour les contacts, construire l'URL selon le type
+            # Normaliser les données pour build_contact_url
+            contact_data = data.copy()
+            if data.get('type') == 'email':
+                contact_data['contactType'] = 'email'
+                contact_data['contactEmail'] = data.get('email', '')
+                contact_data['contactSubject'] = data.get('subject', '')
+            elif data.get('type') == 'phone':
+                contact_data['contactType'] = 'phone'
+                contact_data['contactPhone'] = data.get('phone', '')
+            elif data.get('type') == 'sms':
+                contact_data['contactType'] = 'sms'
+                contact_data['contactSmsPhone'] = data.get('phone', '')
+                contact_data['contactSmsMessage'] = data.get('message', '')
+            elif data.get('type') == 'vcard':
+                contact_data['contactType'] = 'vcard'
+                contact_data['vcardName'] = data.get('name', '')
+                contact_data['vcardPhone'] = data.get('phone', '')
+                contact_data['vcardEmail'] = data.get('email', '')
+                contact_data['vcardCompany'] = data.get('company', '')
+            url = build_contact_url(contact_data)
+        elif data.get('type') in ['interactive', 'wifi', 'geo', 'calendar', 'payment']:
+            # Pour les actions interactives, construire l'URL selon le type
+            # Normaliser les données pour build_interactive_url
+            interactive_data = data.copy()
+            if data.get('type') == 'wifi':
+                interactive_data['interactiveType'] = 'wifi'
+                interactive_data['wifiSSID'] = data.get('ssid', '')
+                interactive_data['wifiPassword'] = data.get('password', '')
+                interactive_data['wifiEncryption'] = data.get('encryption', 'WPA')
+            elif data.get('type') == 'geo':
+                interactive_data['interactiveType'] = 'geo'
+                interactive_data['geoLatitude'] = data.get('latitude', '')
+                interactive_data['geoLongitude'] = data.get('longitude', '')
+                interactive_data['geoLabel'] = data.get('label', '')
+            elif data.get('type') == 'calendar':
+                interactive_data['interactiveType'] = 'calendar'
+                interactive_data['calendarTitle'] = data.get('title', '')
+                interactive_data['calendarDate'] = data.get('date', '')
+                interactive_data['calendarTime'] = data.get('time', '')
+                interactive_data['calendarDescription'] = data.get('description', '')
+            elif data.get('type') == 'payment':
+                interactive_data['interactiveType'] = 'payment'
+                interactive_data['paymentType'] = data.get('paymentType', '')
+                interactive_data['paymentAmount'] = data.get('amount', '')
+                interactive_data['paymentCurrency'] = data.get('currency', 'EUR')
+            url = build_interactive_url(interactive_data)
+        
         if not url:
-            return jsonify({'success': False, 'error': 'L\'URL de destination est requise'}), 400
+            return jsonify({'success': False, 'error': 'Impossible de déterminer l\'URL de destination à partir des données fournies'}), 400
         
         # Créer le QR code en base de données
         user_id = get_user_from_token()
@@ -683,10 +326,12 @@ def create_dynamic_qr():
             try:
                 with conn.cursor(cursor_factory=RealDictCursor) as cur:
                     cur.execute("""
-                        INSERT INTO dynamic_qr_codes (qr_id, name, url, qr_url, size, margin, error_correction, user_id)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                        INSERT INTO dynamic_qr_codes (qr_id, name, url, qr_url, size, margin, error_correction, user_id, 
+                                                    foreground_color, background_color, logo_size, logo_position)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                         RETURNING *
-                    """, (qr_id, name, url, qr_url, size, margin, error_correction, user_id))
+                    """, (qr_id, name, url, qr_url, size, margin, error_correction, user_id, 
+                         foreground_color, background_color, logo_size, logo_position))
                     
                     result = cur.fetchone()
                     conn.commit()
@@ -696,8 +341,39 @@ def create_dynamic_qr():
             finally:
                 conn.close()
         
-        # Générer le QR code
-        qr_code = generate_qr_code(qr_url, size, margin, error_correction)
+        # Récupérer les couleurs depuis les paramètres
+        foreground_color = data.get('foreground_color', '#000000')
+        background_color = data.get('background_color', '#FFFFFF')
+         
+        # Récupérer les paramètres de logo
+        logo = data.get('logo')
+        logo_size = int(data.get('logo_size', 15))
+        logo_position = data.get('logo_position', 'center')
+        
+        # Traiter le logo si fourni (extraire la partie base64 de la data URL)
+        if logo and logo.startswith('data:image'):
+            try:
+                # Extraire la partie base64 de la data URL
+                # Format: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...
+                logo = logo.split(',')[1]
+                logger.info(f"Logo base64 extrait, longueur: {len(logo)}")
+            except Exception as e:
+                logger.error(f"Erreur lors de l'extraction du logo base64: {e}")
+                logo = None
+        
+        # Générer le QR code avec les couleurs et logo personnalisés
+        if logo:
+            qr_code = generate_custom_qr_code(
+                text=qr_url,
+                size=size,
+                foreground_color=foreground_color,
+                background_color=background_color,
+                logo=logo,
+                logo_size=logo_size,
+                logo_position=logo_position
+            )
+        else:
+            qr_code = generate_qr_code(qr_url, size, margin, error_correction, foreground_color, background_color)
         
         return jsonify({
             'success': True,
@@ -758,13 +434,96 @@ def update_dynamic_qr(qr_id):
     try:
         data = request.get_json()
         
+        # Log des données reçues pour debug
+        logger.info(f"Données reçues pour mise à jour QR {qr_id}: {data}")
+        
         if not data:
             return jsonify({'success': False, 'error': 'Données JSON requises'}), 400
         
         new_url = data.get('url', '').strip()
         
+        logger.info(f"Nouvelle URL extraite: '{new_url}'")
+        
         if not new_url:
             return jsonify({'success': False, 'error': 'La nouvelle URL est requise'}), 400
+        
+        # Récupérer les paramètres de personnalisation depuis la base de données
+        conn = get_db_connection()
+        if conn:
+            try:
+                with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                    cur.execute("SELECT * FROM dynamic_qr_codes WHERE qr_id = %s", (qr_id,))
+                    qr_data = cur.fetchone()
+                    
+                    if qr_data:
+                        # Utiliser les paramètres de la base de données si pas fournis dans la requête
+                        foreground_color = data.get('foreground_color', qr_data.get('foreground_color', '#000000'))
+                        background_color = data.get('background_color', qr_data.get('background_color', '#FFFFFF'))
+                        logo = data.get('logo')  # Le logo doit être fourni dans la requête car il ne peut pas être stocké en base
+                        logo_size = int(data.get('logo_size', qr_data.get('logo_size', 15)))
+                        logo_position = data.get('logo_position', qr_data.get('logo_position', 'center'))
+                        size = int(data.get('size', qr_data.get('size', 300)))
+                        margin = int(data.get('margin', qr_data.get('margin', 4)))
+                        error_correction = data.get('errorCorrection', qr_data.get('error_correction', 'M'))
+                    else:
+                        # Valeurs par défaut si QR code non trouvé
+                        foreground_color = data.get('foreground_color', '#000000')
+                        background_color = data.get('background_color', '#FFFFFF')
+                        logo = data.get('logo')
+                        logo_size = int(data.get('logo_size', 15))
+                        logo_position = data.get('logo_position', 'center')
+                        size = int(data.get('size', 300))
+                        margin = int(data.get('margin', 4))
+                        error_correction = data.get('errorCorrection', 'M')
+            except Exception as e:
+                logger.error(f"Erreur lors de la récupération des paramètres: {e}")
+                # Valeurs par défaut en cas d'erreur
+                foreground_color = data.get('foreground_color', '#000000')
+                background_color = data.get('background_color', '#FFFFFF')
+                logo = data.get('logo')
+                logo_size = int(data.get('logo_size', 15))
+                logo_position = data.get('logo_position', 'center')
+                size = int(data.get('size', 300))
+                margin = int(data.get('margin', 4))
+                error_correction = data.get('errorCorrection', 'M')
+            finally:
+                conn.close()
+        else:
+            # Valeurs par défaut si pas de connexion
+            foreground_color = data.get('foreground_color', '#000000')
+            background_color = data.get('background_color', '#FFFFFF')
+            logo = data.get('logo')
+            logo_size = int(data.get('logo_size', 15))
+            logo_position = data.get('logo_position', 'center')
+            size = int(data.get('size', 300))
+            margin = int(data.get('margin', 4))
+            error_correction = data.get('errorCorrection', 'M')
+        
+        # Traiter le logo si fourni (extraire la partie base64 de la data URL)
+        if logo and logo.startswith('data:image'):
+            try:
+                # Extraire la partie base64 de la data URL
+                # Format: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...
+                logo = logo.split(',')[1]
+                logger.info(f"Logo base64 extrait lors de la mise à jour, longueur: {len(logo)}")
+            except Exception as e:
+                logger.error(f"Erreur lors de l'extraction du logo base64: {e}")
+                logo = None
+        
+        # Régénérer le QR code avec les nouveaux paramètres
+        qr_url = f"http://localhost:7005/r/{qr_id}"
+        if logo:
+            qr_code = generate_custom_qr_code(
+                text=qr_url,
+                size=size,
+                foreground_color=foreground_color,
+                background_color=background_color,
+                logo=logo,
+                logo_size=logo_size,
+                logo_position=logo_position
+            )
+        else:
+            qr_code = generate_qr_code(qr_url, size, margin, error_correction, foreground_color, background_color)
         
         # Mettre à jour en base de données
         conn = get_db_connection()
@@ -773,9 +532,11 @@ def update_dynamic_qr(qr_id):
                 with conn.cursor() as cur:
                     cur.execute("""
                         UPDATE dynamic_qr_codes 
-                        SET url = %s, updated_at = CURRENT_TIMESTAMP
+                        SET url = %s, updated_at = CURRENT_TIMESTAMP,
+                            foreground_color = %s, background_color = %s,
+                            logo_size = %s, logo_position = %s, size = %s, margin = %s, error_correction = %s
                         WHERE qr_id = %s
-                    """, (new_url, qr_id))
+                    """, (new_url, foreground_color, background_color, logo_size, logo_position, size, margin, error_correction, qr_id))
                     
                     conn.commit()
             except Exception as e:
@@ -788,11 +549,51 @@ def update_dynamic_qr(qr_id):
             'success': True,
             'qr_id': qr_id,
             'new_url': new_url,
+            'qr_code': qr_code,  # Retourner le nouveau QR code généré
             'timestamp': datetime.now().isoformat()
         })
         
     except Exception as e:
         logger.error(f"Erreur lors de la mise à jour du QR code: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/dynamic/qr/<qr_id>/download', methods=['GET'])
+@require_iahome_auth
+def download_qr(qr_id):
+    """Télécharger un QR code dynamique"""
+    try:
+        # Récupérer les informations du QR code depuis la base de données
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'success': False, 'error': 'Erreur de connexion à la base de données'}), 500
+        
+        try:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("SELECT * FROM dynamic_qr_codes WHERE qr_id = %s", (qr_id,))
+                qr_data = cur.fetchone()
+                
+                if not qr_data:
+                    return jsonify({'success': False, 'error': 'QR Code non trouvé'}), 404
+                
+                # Générer le QR code
+                qr_code_data = generate_qr_code(qr_data['url'], size=300)
+                
+                # Retourner l'image
+                return send_file(
+                    io.BytesIO(base64.b64decode(qr_code_data)),
+                    mimetype='image/png',
+                    as_attachment=True,
+                    download_name=f'qr-code-{qr_id}.png'
+                )
+                
+        except Exception as e:
+            logger.error(f"Erreur base de données: {e}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+        finally:
+            conn.close()
+            
+    except Exception as e:
+        logger.error(f"Erreur lors du téléchargement: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/dynamic/qr/<qr_id>', methods=['DELETE'])
@@ -864,7 +665,109 @@ def redirect_qr(qr_id):
         logger.error(f"Erreur lors de la redirection: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-def generate_qr_code(text, size=300, margin=4, error_correction='M'):
+def build_social_url(platform, username):
+    """Construire l'URL pour un réseau social"""
+    social_urls = {
+        'instagram': f'https://instagram.com/{username}',
+        'linkedin': f'https://linkedin.com/in/{username}',
+        'tiktok': f'https://tiktok.com/@{username}',
+        'facebook': f'https://facebook.com/{username}',
+        'twitter': f'https://twitter.com/{username}',
+        'youtube': f'https://youtube.com/@{username}',
+        'snapchat': f'https://snapchat.com/add/{username}',
+        'whatsapp': f'https://wa.me/{username}',
+        'telegram': f'https://t.me/{username}',
+        'discord': f'https://discord.gg/{username}'
+    }
+    return social_urls.get(platform, f'https://{platform}.com/{username}')
+
+def build_contact_url(data):
+    """Construire l'URL pour un contact"""
+    contact_type = data.get('contactType', '')
+    
+    if contact_type == 'email':
+        email = data.get('contactEmail', '')
+        subject = data.get('contactSubject', '')
+        if subject:
+            return f'mailto:{email}?subject={subject}'
+        return f'mailto:{email}'
+    
+    elif contact_type == 'phone':
+        phone = data.get('contactPhone', '')
+        return f'tel:{phone}'
+    
+    elif contact_type == 'sms':
+        phone = data.get('contactSmsPhone', '')
+        message = data.get('contactSmsMessage', '')
+        if message:
+            return f'sms:{phone}?body={message}'
+        return f'sms:{phone}'
+    
+    elif contact_type == 'vcard':
+        # Créer un vCard simple
+        name = data.get('vcardName', '')
+        phone = data.get('vcardPhone', '')
+        email = data.get('vcardEmail', '')
+        company = data.get('vcardCompany', '')
+        
+        vcard = f"""BEGIN:VCARD
+VERSION:3.0
+FN:{name}
+TEL:{phone}
+EMAIL:{email}"""
+        if company:
+            vcard += f"\nORG:{company}"
+        vcard += "\nEND:VCARD"
+        
+        return f'data:text/vcard;charset=utf-8,{vcard}'
+    
+    return ''
+
+def build_interactive_url(data):
+    """Construire l'URL pour une action interactive"""
+    interactive_type = data.get('interactiveType', '')
+    
+    if interactive_type == 'wifi':
+        ssid = data.get('wifiSSID', '')
+        password = data.get('wifiPassword', '')
+        encryption = data.get('wifiEncryption', 'WPA')
+        return f'WIFI:T:{encryption};S:{ssid};P:{password};;'
+    
+    elif interactive_type == 'geo':
+        lat = data.get('geoLatitude', '')
+        lon = data.get('geoLongitude', '')
+        label = data.get('geoLabel', '')
+        return f'geo:{lat},{lon}?q={label}'
+    
+    elif interactive_type == 'calendar':
+        title = data.get('calendarTitle', '')
+        date = data.get('calendarDate', '')
+        time = data.get('calendarTime', '')
+        description = data.get('calendarDescription', '')
+        
+        # Créer un événement iCal simple
+        event = f"""BEGIN:VEVENT
+SUMMARY:{title}
+DTSTART:{date}T{time}00
+DESCRIPTION:{description}
+END:VEVENT"""
+        return f'data:text/calendar;charset=utf-8,{event}'
+    
+    elif interactive_type == 'payment':
+        payment_type = data.get('paymentType', '')
+        amount = data.get('paymentAmount', '')
+        currency = data.get('paymentCurrency', 'EUR')
+        
+        if payment_type == 'paypal':
+            return f'https://paypal.me/{amount}'
+        elif payment_type == 'stripe':
+            return f'https://stripe.com/pay/{amount}'
+        elif payment_type == 'crypto':
+            return f'crypto:{currency}:{amount}'
+    
+    return ''
+
+def generate_qr_code(text, size=300, margin=4, error_correction='M', foreground_color='#000000', background_color='#FFFFFF'):
     """Générer un QR code et retourner en base64"""
     
     # Configuration du QR code
@@ -878,8 +781,8 @@ def generate_qr_code(text, size=300, margin=4, error_correction='M'):
     qr.add_data(text)
     qr.make(fit=True)
     
-    # Créer l'image
-    img = qr.make_image(fill_color="black", back_color="white")
+    # Créer l'image avec les couleurs personnalisées
+    img = qr.make_image(fill_color=foreground_color, back_color=background_color)
     
     # Redimensionner si nécessaire
     if size != 300:
@@ -891,6 +794,143 @@ def generate_qr_code(text, size=300, margin=4, error_correction='M'):
     buffer.seek(0)
     
     return base64.b64encode(buffer.getvalue()).decode('utf-8')
+
+def generate_custom_qr_code(text, size=1000, foreground_color='#000000', background_color='#FFFFFF', 
+                           gradient_type='none', gradient_color1='#000000', gradient_color2='#0000FF',
+                           qr_style='square', corner_style='square', eye_style='square', margin=4,
+                           logo=None, logo_size=15, logo_position='center'):
+    """Générer un QR code personnalisé avec couleurs, styles et logo"""
+    
+    try:
+        # Configuration du QR code
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,  # Niveau H pour permettre le logo
+            box_size=10,
+            border=margin
+        )
+        
+        qr.add_data(text)
+        qr.make(fit=True)
+        
+        # Créer l'image avec les couleurs personnalisées
+        img = qr.make_image(fill_color=foreground_color, back_color=background_color)
+        
+        # Appliquer les styles personnalisés (simplifié pour l'instant)
+        # Note: Les styles avancés nécessiteraient une bibliothèque plus sophistiquée
+        
+        # Ajouter le logo si fourni
+        if logo:
+            try:
+                logger.info(f"Traitement du logo, taille base64: {len(logo)}")
+                # Décoder le logo base64
+                logo_data = base64.b64decode(logo)
+                logo_img = Image.open(io.BytesIO(logo_data))
+                logger.info(f"Logo décodé avec succès, dimensions: {logo_img.size}")
+                
+                # Redimensionner le logo
+                logo_width = int(size * logo_size / 100)
+                logo_height = int(size * logo_size / 100)
+                logo_img = logo_img.resize((logo_width, logo_height), Image.Resampling.LANCZOS)
+                
+                # Calculer la position du logo
+                qr_width, qr_height = img.size
+                if logo_position == 'center':
+                    x = (qr_width - logo_width) // 2
+                    y = (qr_height - logo_height) // 2
+                elif logo_position == 'top-left':
+                    x = margin * 10
+                    y = margin * 10
+                elif logo_position == 'top-right':
+                    x = qr_width - logo_width - margin * 10
+                    y = margin * 10
+                elif logo_position == 'bottom-left':
+                    x = margin * 10
+                    y = qr_height - logo_height - margin * 10
+                elif logo_position == 'bottom-right':
+                    x = qr_width - logo_width - margin * 10
+                    y = qr_height - logo_height - margin * 10
+                else:
+                    x = (qr_width - logo_width) // 2
+                    y = (qr_height - logo_height) // 2
+                
+                # Coller le logo sur le QR code
+                img.paste(logo_img, (x, y), logo_img if logo_img.mode == 'RGBA' else None)
+                logger.info(f"Logo collé sur le QR code à la position ({x}, {y})")
+                
+            except Exception as e:
+                logger.error(f"Erreur lors de l'ajout du logo: {e}")
+        
+        # Redimensionner à la taille demandée
+        if size != 1000:
+            img = img.resize((size, size), Image.Resampling.LANCZOS)
+        
+        # Convertir en base64
+        buffer = io.BytesIO()
+        img.save(buffer, format='PNG')
+        buffer.seek(0)
+        
+        return base64.b64encode(buffer.getvalue()).decode('utf-8')
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de la génération du QR code personnalisé: {e}")
+        raise e
+
+@app.route('/api/qr/custom', methods=['POST'])
+def custom_qr():
+    """Générer un QR code personnalisé"""
+    try:
+        # Récupérer les paramètres depuis le corps de la requête
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'success': False, 'error': 'Données JSON requises'}), 400
+            
+        text = data.get('text')
+        size = int(data.get('size', 1000))
+        foreground_color = data.get('foreground_color', '#000000')
+        background_color = data.get('background_color', '#FFFFFF')
+        gradient_type = data.get('gradient_type', 'none')
+        gradient_color1 = data.get('gradient_color1', '#000000')
+        gradient_color2 = data.get('gradient_color2', '#0000FF')
+        qr_style = data.get('qr_style', 'square')
+        corner_style = data.get('corner_style', 'square')
+        eye_style = data.get('eye_style', 'square')
+        margin = int(data.get('margin', 4))
+        logo = data.get('logo')
+        logo_size = int(data.get('logo_size', 15))
+        logo_position = data.get('logo_position', 'center')
+
+        if not text:
+            return jsonify({'success': False, 'error': 'Texte requis'}), 400
+
+        # Générer le QR code personnalisé
+        qr_code = generate_custom_qr_code(
+            text=text,
+            size=size,
+            foreground_color=foreground_color,
+            background_color=background_color,
+            gradient_type=gradient_type,
+            gradient_color1=gradient_color1,
+            gradient_color2=gradient_color2,
+            qr_style=qr_style,
+            corner_style=corner_style,
+            eye_style=eye_style,
+            margin=margin,
+            logo=logo,
+            logo_size=logo_size,
+            logo_position=logo_position
+        )
+
+        return jsonify({
+            'success': True,
+            'qr_code': qr_code,
+            'timestamp': datetime.now().isoformat()
+        })
+
+    except Exception as e:
+        logger.error(f"Erreur lors de la génération du QR code personnalisé: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
     print("🚀 Démarrage du service QR Code Generator - IAHome...")

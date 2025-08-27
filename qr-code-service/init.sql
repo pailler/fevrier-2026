@@ -20,6 +20,10 @@ CREATE TABLE IF NOT EXISTS dynamic_qr_codes (
     error_correction VARCHAR(1) DEFAULT 'M',
     scans INTEGER DEFAULT 0,
     user_id INTEGER,
+    foreground_color VARCHAR(7) DEFAULT '#000000',
+    background_color VARCHAR(7) DEFAULT '#FFFFFF',
+    logo_size INTEGER DEFAULT 15,
+    logo_position VARCHAR(20) DEFAULT 'center',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_scan TIMESTAMP,
@@ -76,3 +80,27 @@ INSERT INTO dynamic_qr_codes (qr_id, name, url, qr_url, size, margin, error_corr
 VALUES 
     ('test1234', 'QR Code de test', 'https://www.google.com', 'http://localhost:7005/r/test1234', 300, 4, 'M')
 ON CONFLICT (qr_id) DO NOTHING;
+
+-- Migration pour ajouter les colonnes de personnalisation aux tables existantes
+DO $$ 
+BEGIN
+    -- Ajouter foreground_color si elle n'existe pas
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'dynamic_qr_codes' AND column_name = 'foreground_color') THEN
+        ALTER TABLE dynamic_qr_codes ADD COLUMN foreground_color VARCHAR(7) DEFAULT '#000000';
+    END IF;
+    
+    -- Ajouter background_color si elle n'existe pas
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'dynamic_qr_codes' AND column_name = 'background_color') THEN
+        ALTER TABLE dynamic_qr_codes ADD COLUMN background_color VARCHAR(7) DEFAULT '#FFFFFF';
+    END IF;
+    
+    -- Ajouter logo_size si elle n'existe pas
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'dynamic_qr_codes' AND column_name = 'logo_size') THEN
+        ALTER TABLE dynamic_qr_codes ADD COLUMN logo_size INTEGER DEFAULT 15;
+    END IF;
+    
+    -- Ajouter logo_position si elle n'existe pas
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'dynamic_qr_codes' AND column_name = 'logo_position') THEN
+        ALTER TABLE dynamic_qr_codes ADD COLUMN logo_position VARCHAR(20) DEFAULT 'center';
+    END IF;
+END $$;
