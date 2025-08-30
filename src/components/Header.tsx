@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '../utils/supabaseClient';
 import DynamicNavigation from './DynamicNavigation';
 import { NotificationServiceClient } from '../utils/notificationServiceClient';
+import { useIframeDetection } from '../utils/useIframeDetection';
 
 export default function Header() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function Header() {
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const isInIframe = useIframeDetection();
 
   // Vérification de la configuration Supabase
   useEffect(() => {
@@ -90,8 +92,9 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 w-full z-50">
-      {/* Bannière bleue - Fonctions de connexion */}
-      <div className="bg-blue-600 text-white shadow-sm">
+      {/* Bannière bleue - Fonctions de connexion - Masquée en iframe */}
+      {!isInIframe && (
+        <div className="bg-blue-600 text-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-10">
             {/* Mode non connecté */}
@@ -179,9 +182,11 @@ export default function Header() {
           </div>
         </div>
       </div>
+      )}
 
-      {/* Bannière blanche - Navigation du site */}
-      <div className="bg-white shadow-sm border-b border-gray-100">
+      {/* Bannière blanche - Navigation du site - Masquée en iframe */}
+      {!isInIframe && (
+        <div className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo et navigation */}
@@ -244,6 +249,7 @@ export default function Header() {
           )}
         </div>
       </div>
+      )}
     </header>
   );
 } 

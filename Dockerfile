@@ -2,7 +2,7 @@
 FROM node:20-alpine AS base
 
 # Installer les dépendances nécessaires
-RUN apk add --no-cache libc6-compat wget
+RUN apk add --no-cache libc6-compat curl
 
 # Définir le répertoire de travail
 WORKDIR /app
@@ -29,8 +29,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Installer wget pour healthcheck
-RUN apk add --no-cache wget
+    # Installer curl pour healthcheck (wget non disponible)
+    RUN apk add --no-cache curl
 
 # Copier les variables d'environnement
 COPY --from=base /app/.env.production ./

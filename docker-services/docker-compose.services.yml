@@ -123,7 +123,7 @@ services:
       - DB_USERNAME=polr
       - DB_PASSWORD=polr_password
       - APP_NAME=QRCode Regispailler
-      - APP_ADDRESS=http://qrcode.regispailler.fr
+      - APP_ADDRESS=https://qrcode.regispailler.fr
       - ADMIN_USERNAME=admin
       - ADMIN_PASSWORD=admin123
       - SETTING_PUBLIC_INTERFACE=true

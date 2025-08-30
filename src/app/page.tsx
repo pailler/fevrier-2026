@@ -218,7 +218,7 @@ export default function Home() {
 
     // Architectes & Designers d'intérieur
     if (title.includes('autocad') || title.includes('sketchup') || title.includes('revit') ||
-        title.includes('3d') || title.includes('blender') || title.includes('design') ||
+        title.includes('3d') || title.includes('design') ||
         title.includes('architecture') || title.includes('maquette') || category.includes('design')) {
       return 'Architecte';
     }
