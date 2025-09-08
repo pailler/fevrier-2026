@@ -1,0 +1,71 @@
+# Configuration des middlewares Traefik pour iahome.fr
+http:
+  middlewares:
+    # Middleware de whitelist IP stricte
+    iahome-whitelist:
+      ipWhiteList:
+        sourceRange:
+          - "90.90.226.59/32"
+        ipStrategy:
+          depth: 1
+          excludedIPs:
+            - "127.0.0.1"
+            - "::1"
+    
+    # Middleware de redirection HTTPS
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+        permanent: true
+    
+    # Middleware de sécurité headers
+    security-headers:
+      headers:
+        customResponseHeaders:
+          Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+          X-Content-Type-Options: "nosniff"
+          X-Frame-Options: "DENY"
+          X-XSS-Protection: "1; mode=block"
+          Referrer-Policy: "strict-origin-when-cross-origin"
+    
+    # Middleware de compression
+    compress:
+      compress: true
+
+    # Middleware BasicAuth pour Guacamole
+    guac-basicauth:
+      basicAuth:
+        users:
+          - "guacadmin:$2y$05$l3MHxX.qAps0WH6W.xrFH.ZyKRTVhpfsYHDjdjloTyb2p9TE47pAa"
+
+    # Redirection HTTP -> HTTPS:8443 pour Guacamole
+    redirect-to-guacsecure:
+      redirectScheme:
+        scheme: https
+        port: "8443"
+        permanent: true
+
+    # Middleware Authelia ForwardAuth (protège les apps via Authelia)
+    authelia-forwardauth:
+      forwardAuth:
+        address: "http://iahome-authelia:9091/api/verify"
+        trustForwardHeader: true
+        authResponseHeaders:
+          - "Remote-User"
+          - "Remote-Groups"
+
+    oauth2-proxy-forwardauth:
+      forwardAuth:
+        address: "http://iahome-oauth2-proxy:4180/oauth2/auth"
+        trustForwardHeader: true
+        authResponseHeaders:
+          - "X-Auth-Request-Email"
+          - "X-Auth-Request-User"
+
+    oauth2-errors:
+      errors:
+        status:
+          - "401"
+          - "403"
+        service: oauth2-proxy
+        query: /oauth2/sign_in

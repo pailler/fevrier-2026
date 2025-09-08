@@ -12,8 +12,8 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   
-  // Configuration pour les assets statiques
-  assetPrefix: process.env.NODE_ENV === 'production' ? 'https://iahome.fr' : '',
+  // Configuration pour les assets statiques - Désactivé pour le développement local
+  // assetPrefix: process.env.NODE_ENV === 'production' ? 'https://iahome.fr' : '',
   
   // Configuration pour le cache des assets
   generateBuildId: async () => {

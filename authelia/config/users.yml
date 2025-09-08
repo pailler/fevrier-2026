@@ -1,0 +1,9 @@
+users:
+  admin@iahome.fr:
+    displayname: "Admin"
+    password: "$argon2id$v=19$m=65536,t=3,p=4$ZHVtbXk$5k8Hn8wYlQp9j+J0DDuTtQ" # placeholder; replace
+    email: admin@iahome.fr
+    groups:
+      - admins
+
+

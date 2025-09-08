@@ -4,7 +4,7 @@ import { validateAccessToken, hasPermission } from '../../../utils/accessToken';
 // Configuration du module Metube
 const METUBE_CONFIG = {
   url: 'http://iahome-metube:8081', // URL interne du module Metube (nom du service Docker)
-  externalUrl: 'http://localhost:6400', // URL externe accessible depuis le navigateur
+  externalUrl: 'http://192.168.1.150:8082', // URL externe accessible depuis le navigateur
   credentials: {
     username: process.env.METUBE_USERNAME || 'admin',
     password: process.env.METUBE_PASSWORD || 'password'
@@ -476,7 +476,7 @@ async function authenticateMetubeUser(token: string): Promise<{ success: boolean
           <div class="success">
             <h3>🛠️ Solutions possibles :</h3>
             <ol>
-              <li>Vérifiez que Metube est accessible sur le port 6400</li>
+              <li>Vérifiez que Metube est accessible sur le port 8082</li>
               <li>Vérifiez les credentials (username/password)</li>
               <li>Essayez d'accéder manuellement à l'application</li>
               <li>Vérifiez la configuration du module</li>

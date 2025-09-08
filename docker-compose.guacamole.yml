@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  guacamole:
+    image: flcontainers/guacamole
+    container_name: iahome-guacamole
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Paris
+      - EXTENSIONS=auth-totp
+    volumes:
+      - ./guacamole-data:/config
+    ports:
+      - "18080:8080"  # Exposed for NAS reverse proxy
+
+    networks:
+      - iahome-network
+
+networks:
+  iahome-network:
+    external: true
+
+

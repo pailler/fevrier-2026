@@ -1,0 +1,36 @@
+# Configuration LibreSpeed pour Cloudflare SSL
+http:
+  routers:
+    # Route pour les challenges Let's Encrypt (si nécessaire)
+    librespeed-acme:
+      rule: "Host(`librespeed.iahome.fr`) && PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["web"]
+      service: librespeed-direct
+      priority: 1000
+
+    # Route principale (Cloudflare SSL - HTTP vers Traefik)
+    librespeed-main:
+      rule: "Host(`librespeed.iahome.fr`)"
+      entryPoints: ["web"]
+      service: librespeed-service
+      middlewares: ["security-headers@file", "compress@file"]
+      priority: 10
+
+  services:
+    # Service pour les challenges Let's Encrypt
+    librespeed-direct:
+      loadBalancer:
+        servers:
+          - url: "http://librespeed:80"
+
+    # Service principal pour LibreSpeed
+    librespeed-service:
+      loadBalancer:
+        servers:
+          - url: "http://librespeed:80"
+
+    # Service proxy d'authentification pour LibreSpeed
+    librespeed-proxy-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"

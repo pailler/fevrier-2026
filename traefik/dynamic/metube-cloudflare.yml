@@ -1,0 +1,30 @@
+# Configuration MeTube pour Cloudflare SSL (même modèle que LibreSpeed)
+http:
+  routers:
+    # Route pour les challenges Let's Encrypt (si nécessaire)
+    metube-acme:
+      rule: "Host(`metube.iahome.fr`) && PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["web"]
+      service: metube-direct
+      priority: 1000
+
+    # Route principale (Cloudflare SSL - HTTP vers Traefik)
+    metube-main:
+      rule: "Host(`metube.iahome.fr`)"
+      entryPoints: ["web"]
+      service: metube-service
+      middlewares: ["security-headers@file", "compress@file", "metube-proxy-headers@file"]
+      priority: 10
+
+  services:
+    # Service pour les challenges Let's Encrypt
+    metube-direct:
+      loadBalancer:
+        servers:
+          - url: "http://metube:8081"
+
+    # Service principal pour MeTube
+    metube-service:
+      loadBalancer:
+        servers:
+          - url: "http://metube:8081"

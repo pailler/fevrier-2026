@@ -1,0 +1,51 @@
+# Middlewares pour l'authentification
+http:
+  middlewares:
+    # Middleware d'authentification pour LibreSpeed
+    librespeed-auth:
+      forwardAuth:
+        address: "http://iahome-app:3000/api/check-auth"
+        authResponseHeaders:
+          - "X-User-Id"
+          - "X-User-Email"
+          - "X-User-Name"
+        trustForwardHeader: true
+
+    # Middleware pour rediriger vers l'API proxy
+    librespeed-strip-prefix:
+      replacePathRegex:
+        regex: "^/(.*)"
+        replacement: "/api/check-auth"
+
+    # Middleware pour les headers de proxy MeTube
+    metube-proxy-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-Host: "metube.iahome.fr"
+          X-Forwarded-For: "127.0.0.1"
+          X-Real-IP: "127.0.0.1"
+        customResponseHeaders:
+          X-Forwarded-Proto: "https"
+
+    # Middleware pour les headers de proxy PDF
+    pdf-proxy-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-Host: "pdf.iahome.fr"
+          X-Forwarded-For: "127.0.0.1"
+          X-Real-IP: "127.0.0.1"
+        customResponseHeaders:
+          X-Forwarded-Proto: "https"
+
+    # Middleware pour les headers de proxy QR Codes
+    qrcodes-proxy-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-Host: "qrcodes.iahome.fr"
+          X-Forwarded-For: "127.0.0.1"
+          X-Real-IP: "127.0.0.1"
+        customResponseHeaders:
+          X-Forwarded-Proto: "https"

@@ -1,0 +1,30 @@
+tunnel: iahome
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  # Application principale IAHome
+  - hostname: iahome.fr
+    service: http://iahome-app:3000
+  - hostname: www.iahome.fr
+    service: http://iahome-app:3000
+  
+  # LibreSpeed avec oauth2-proxy
+  - hostname: librespeed.iahome.fr
+    service: http://iahome-oauth2-proxy:4180
+  
+  # Services externes
+  - hostname: pdf.iahome.fr
+    service: http://stirling-pdf:8080
+  - hostname: metube.iahome.fr
+    service: http://metube:8081
+  - hostname: psitransfer.iahome.fr
+    service: http://psitransfer:3000
+  - hostname: qrcode.iahome.fr
+    service: http://polr:80
+  
+  # Dashboard Traefik (optionnel)
+  - hostname: traefik.iahome.fr
+    service: http://iahome-traefik:8080
+  
+  # Catch-all rule
+  - service: http_status:404

@@ -1,0 +1,30 @@
+# Configuration QR codes pour Cloudflare SSL (même approche que LibreSpeed, MeTube, PDF et PsiTransfer)
+http:
+  routers:
+    # Route pour les challenges Let's Encrypt (si nécessaire)
+    qrcodes-acme:
+      rule: "Host(`qrcodes.iahome.fr`) && PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["web"]
+      service: qrcodes-direct
+      priority: 1000
+
+    # Route principale (Cloudflare SSL - HTTP vers Traefik)
+    qrcodes-main:
+      rule: "Host(`qrcodes.iahome.fr`)"
+      entryPoints: ["web"]
+      service: qrcodes-service
+      middlewares: ["security-headers@file", "compress@file", "qrcodes-proxy-headers@file"]
+      priority: 10
+
+  services:
+    # Service pour les challenges Let's Encrypt
+    qrcodes-direct:
+      loadBalancer:
+        servers:
+          - url: "http://qr-code-service:8080"
+
+    # Service principal pour QR codes
+    qrcodes-service:
+      loadBalancer:
+        servers:
+          - url: "http://qr-code-service:8080"

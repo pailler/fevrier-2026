@@ -1,165 +1,158 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { supabase } from '../../utils/supabaseClient';
-import { useRouter } from 'next/navigation';
-import { NotificationServiceClient } from '../../utils/notificationServiceClient';
 
-export default function RegisterPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
-  const [session, setSession] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import GoogleSignInButton from '../../components/GoogleSignInButton';
+import ClassicSignUpForm from '../../components/ClassicSignUpForm';
+import { supabase } from '../../utils/supabaseClient';
+
+function RegisterContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Récupérer la session actuelle
-    const getSession = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      setSession(currentSession);
-      setUser(currentSession?.user || null);
+    // Vérifier si l'utilisateur est déjà connecté
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser(session.user);
+        router.push('/');
+      }
+      setLoading(false);
     };
 
-    getSession();
+    checkSession();
 
-    // Écouter les changements de session
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user || null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setMessage('');
-    
-    // Créer le compte
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/login`
-      }
-    });
-    
-    if (error) {
-      setMessage(`Erreur lors de l'inscription: ${error.message}`);
-    } else {
-      setMessage("✅ Inscription réussie ! Vérifiez votre boîte mail pour confirmer votre compte.");
-      // Le trigger handle_new_user va automatiquement créer le profil
-      
-      // Envoyer une notification de création de compte
-      try {
-        const notificationService = NotificationServiceClient.getInstance();
-        await notificationService.sendNotification('user_created', email, {
-          userName: email.split('@')[0],
-          timestamp: new Date().toISOString(),
-          userId: data.user?.id
-        });
-        } catch (notificationError) {
-        }
+    // Vérifier les erreurs dans l'URL
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      setError('Une erreur est survenue lors de l\'inscription. Veuillez réessayer.');
     }
+  }, [router, searchParams]);
+
+  const handleAuthSuccess = (user: any) => {
+    if (user) {
+      setUser(user);
+      router.push('/');
+    }
+  };
+
+  const handleAuthError = (error: any) => {
+    console.error('Erreur d\'inscription:', error);
+    setError('Erreur lors de l\'inscription. Veuillez réessayer.');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
-  if (session) {
+  if (user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-blue-50 pt-16">
-        <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col gap-6 w-full max-w-md">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-blue-900 mb-2">Déjà connecté</h1>
-            <p className="text-gray-600">Vous êtes connecté en tant que <b>{user?.email}</b></p>
-          </div>
-          <div className="flex gap-3">
-            <button 
-              className="flex-1 bg-blue-600 text-white py-3 rounded-md font-semibold hover:bg-blue-700 transition-colors" 
-              onClick={() => router.push('/')}
-            >
-              Aller à l'accueil
-            </button>
-            <button 
-              className="flex-1 bg-gray-600 text-white py-3 rounded-md font-semibold hover:bg-gray-700 transition-colors" 
-              onClick={async () => { 
-                await supabase.auth.signOut(); 
-                router.push('/login'); 
-              }}
-            >
-              Se déconnecter
-            </button>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Vous êtes déjà connecté !
+          </h2>
+          <p className="text-gray-600 mb-4">
+            Redirection vers la page d'accueil...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-blue-50 pt-16">
-      <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col gap-6 w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-blue-900 mb-2">Créer un compte</h1>
-          <p className="text-gray-600">Rejoignez IAHome pour accéder aux outils IA</p>
+          <div className="mx-auto h-12 w-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+            <span className="text-white font-bold text-xl">I</span>
+          </div>
+          <h2 className="text-3xl font-extrabold text-gray-900">
+            Rejoindre IAhome
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Créez votre compte avec Google pour accéder à tous les services IAHome : applications IA, formations IA, nos conseils
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              type="email"
-              placeholder="votre@email.com"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
+        <div className="mt-8 space-y-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+            <GoogleSignInButton
+              onSuccess={handleAuthSuccess}
+              onError={handleAuthError}
+              className="mb-6"
             />
-          </div>
+            
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">ou</span>
+              </div>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
-            <input
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              type="password"
-              placeholder="Votre mot de passe"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
+            <ClassicSignUpForm
+              onSuccess={handleAuthSuccess}
+              onError={handleAuthError}
             />
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600">
+                En créant un compte, vous acceptez nos{' '}
+                <a href="/terms" className="text-blue-600 hover:text-blue-500 font-medium">
+                  conditions d'utilisation
+                </a>
+                {' '}et notre{' '}
+                <a href="/privacy" className="text-blue-600 hover:text-blue-500 font-medium">
+                  politique de confidentialité
+                </a>
+              </p>
+            </div>
           </div>
 
-          <button
-            className="w-full bg-blue-600 text-white py-3 rounded-md font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-            type="submit"
-          >
-            Créer un compte
-          </button>
-        </form>
-
-        <div className="text-center">
-          <button
-            type="button"
-            className="text-blue-600 hover:text-blue-800 underline text-sm"
-            onClick={() => router.push('/login')}
-          >
-            Déjà inscrit ? Se connecter
-          </button>
-        </div>
-
-        {message && (
-          <div className={`p-3 rounded-md text-sm ${
-            message.includes('✅')
-              ? 'bg-green-100 text-green-700 border border-green-200'
-              : 'bg-red-100 text-red-700 border border-red-200'
-          }`}>
-            {message}
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              Déjà un compte ?{' '}
+              <a href="/login" className="text-blue-600 hover:text-blue-500 font-medium">
+                Se connecter
+              </a>
+            </p>
           </div>
-        )}
 
-        <div className="text-center text-xs text-gray-500">
-          <p>IAHome - Plateforme d'outils IA</p>
+          <div className="text-center">
+            <p className="text-xs text-gray-500">
+              IAhome - Plateforme d'outils IA sécurisée
+            </p>
+          </div>
         </div>
       </div>
     </div>
   );
-} 
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <RegisterContent />
+    </Suspense>
+  );
+}

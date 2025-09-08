@@ -1,0 +1,30 @@
+# Configuration PDF pour Cloudflare SSL (même modèle que LibreSpeed)
+http:
+  routers:
+    # Route pour les challenges Let's Encrypt (si nécessaire)
+    pdf-acme:
+      rule: "Host(`pdf.iahome.fr`) && PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["web"]
+      service: pdf-direct
+      priority: 1000
+
+    # Route principale (Cloudflare SSL - HTTP vers Traefik)
+    pdf-main:
+      rule: "Host(`pdf.iahome.fr`)"
+      entryPoints: ["web"]
+      service: pdf-service
+      middlewares: ["security-headers@file", "compress@file", "pdf-proxy-headers@file"]
+      priority: 10
+
+  services:
+    # Service pour les challenges Let's Encrypt
+    pdf-direct:
+      loadBalancer:
+        servers:
+          - url: "http://stirling-pdf:8080"
+
+    # Service principal pour PDF
+    pdf-service:
+      loadBalancer:
+        servers:
+          - url: "http://stirling-pdf:8080"

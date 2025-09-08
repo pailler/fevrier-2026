@@ -1,0 +1,51 @@
+http:
+  middlewares:
+    # Redirection HTTP vers HTTPS
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+        permanent: true
+    
+    # En-têtes de sécurité (HSTS désactivé temporairement)
+    security-headers:
+      headers:
+        customResponseHeaders:
+          X-Content-Type-Options: "nosniff"
+          X-Frame-Options: "DENY"
+          X-XSS-Protection: "1; mode=block"
+          Referrer-Policy: "strict-origin-when-cross-origin"
+          Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://api.stripe.com https://*.supabase.co; frame-src https://js.stripe.com; object-src 'none';"
+    
+    # Compression
+    compress:
+      compress: {}
+
+  routers:
+    # Configuration HTTP (temporaire)
+    iahome-http:
+      rule: "Host(`iahome.fr`) || Host(`www.iahome.fr`) || Host(`app.iahome.fr`)"
+      entryPoints:
+        - web
+      service: iahome-app
+      middlewares:
+        - security-headers
+        - compress
+    
+           # Configuration HTTPS avec Let's Encrypt
+           iahome-https:
+             rule: "Host(`iahome.fr`) || Host(`www.iahome.fr`)"
+             entryPoints:
+               - websecure
+             service: iahome-app
+             tls:
+               certResolver: letsencrypt
+             middlewares:
+               - security-headers
+               - compress
+
+  services:
+    iahome-app:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        passHostHeader: true

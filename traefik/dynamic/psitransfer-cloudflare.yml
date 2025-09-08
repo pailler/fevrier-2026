@@ -1,0 +1,31 @@
+# Configuration PsiTransfer pour Cloudflare SSL (même approche que LibreSpeed, MeTube et PDF)
+http:
+  routers:
+    # Route pour les challenges Let's Encrypt (si nécessaire)
+    psitransfer-acme:
+      rule: "Host(`psitransfer.iahome.fr`) && PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["web"]
+      service: psitransfer-direct
+      priority: 1000
+
+    # Route principale (Cloudflare SSL - HTTP vers Traefik)
+    psitransfer-main:
+      rule: "Host(`psitransfer.iahome.fr`)"
+      entryPoints: ["web"]
+      service: psitransfer-service
+      middlewares: ["security-headers@file", "compress@file"]
+      priority: 10
+
+  services:
+    # Service pour les challenges Let's Encrypt
+    psitransfer-direct:
+      loadBalancer:
+        servers:
+          - url: "http://psitransfer:3000"
+
+    # Service principal pour PsiTransfer
+    psitransfer-service:
+      loadBalancer:
+        servers:
+          - url: "http://psitransfer:3000"
+

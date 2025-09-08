@@ -1,0 +1,57 @@
+server:
+  address: '0.0.0.0'
+  port: 9091
+
+log:
+  level: info
+
+theme: light
+
+identity_providers:
+  oidc:
+    enabled: true
+    issuer_private_key: |
+      -----BEGIN EC PRIVATE KEY-----
+      MHcCAQEEIO4Z9zQFQvD0K2Kcob9uW9gEtKTI6qaWvtYZY1bZkYw+oAoGCCqGSM49
+      AwEHoUQDQgAEJtVva6K4knYq0bF4mQy2b79r1hoD3FZStAQVv4xG0Vf3QvF9a8J
+      3w4mJtUTq9C5Yh8y2+z1k9Yh1oYQf3K8xQwG3L7XGQ==
+      -----END EC PRIVATE KEY-----
+    clients:
+      - id: iahome
+        description: IAHOME App
+        secret: change-this-secret
+        redirect_uris:
+          - https://auth.iahome.fr/callback
+        scopes:
+          - openid
+          - profile
+          - email
+
+authentication_backend:
+  file:
+    path: /config/users.yml
+    password:
+      algorithm: argon2id
+
+session:
+  name: authelia_session
+  secret: change-this-session-secret
+  expiration: 1h
+  inactivity: 15m
+  remember_me_duration: 1M
+
+storage:
+  local:
+    path: /config/db.sqlite3
+
+notifier:
+  filesystem:
+    filename: /config/notification.txt
+
+access_control:
+  default_policy: deny
+  rules:
+    - domain: librespeed.regispailler.fr
+      policy: one_factor
+
+
