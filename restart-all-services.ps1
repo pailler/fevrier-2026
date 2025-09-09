@@ -57,7 +57,6 @@ $services = @(
     @{Name="LibreSpeed"; URL="http://localhost:8083"; Port=8083},
     @{Name="PSITransfer"; URL="http://localhost:8084"; Port=8084},
     @{Name="Polr"; URL="http://localhost:8086"; Port=8086},
-    @{Name="DragGAN"; URL="http://localhost:8087"; Port=8087}
 )
 
 foreach ($service in $services) {
@@ -84,13 +83,7 @@ Write-Host "   • MeTube:           http://localhost:8082 | https://metube.regi
 Write-Host "   • LibreSpeed:       http://localhost:8083 | https://librespeed.regispailler.fr" -ForegroundColor White
 Write-Host "   • PSITransfer:      http://localhost:8084 | https://psitransfer.regispailler.fr" -ForegroundColor White
 Write-Host "   • Polr (QR):        http://localhost:8086 | https://qrcode.regispailler.fr" -ForegroundColor White
-Write-Host "   • DragGAN:          http://localhost:8087 | https://draggan.regispailler.fr" -ForegroundColor White
 
-Write-Host "`n📚 Module DragGAN:" -ForegroundColor Yellow
-Write-Host "   • Édition d'images par IA" -ForegroundColor White
-Write-Host "   • Interface Gradio moderne" -ForegroundColor White
-Write-Host "   • Modèles pré-entraînés inclus" -ForegroundColor White
-Write-Host "   • Support GPU/CPU automatique" -ForegroundColor White
 
 Write-Host "`n🔧 Commandes utiles:" -ForegroundColor Yellow
 Write-Host "   • Voir les logs:     docker-compose -f docker-services/docker-compose.services.yml logs -f" -ForegroundColor White

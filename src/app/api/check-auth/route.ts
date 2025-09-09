@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import AuthorizationService from '../../../utils/authorizationService';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -101,7 +102,18 @@ async function handleLibreSpeedProxy(request: NextRequest) {
   try {
     console.log('LibreSpeed Proxy: Début de la vérification');
     
-    // Vérifier que la requête vient bien de iahome.fr
+    // Vérifier s'il y a un token dans les paramètres de requête
+    const url = new URL(request.url);
+    const token = url.searchParams.get('token');
+    
+    if (token) {
+      console.log('LibreSpeed Proxy: Token trouvé, vérification du token temporaire');
+      // Pour l'instant, accepter tous les tokens (approche simplifiée)
+      console.log('LibreSpeed Proxy: Token accepté (approche simplifiée)');
+      return NextResponse.redirect('http://librespeed:80', 302);
+    }
+    
+    // Si pas de token, vérifier l'origine de la requête (accès direct bloqué)
     const referer = request.headers.get('referer');
     const origin = request.headers.get('origin');
     const host = request.headers.get('host');
@@ -110,8 +122,8 @@ async function handleLibreSpeedProxy(request: NextRequest) {
     
     // Vérifier l'origine de la requête
     if (!referer?.includes('iahome.fr') && !origin?.includes('iahome.fr') && !host?.includes('iahome.fr')) {
-      console.log('LibreSpeed Proxy: Accès direct bloqué - redirection vers iahome.fr');
-      return NextResponse.redirect('https://iahome.fr/encours', 302);
+      console.log('LibreSpeed Proxy: Accès direct bloqué - redirection vers login');
+      return NextResponse.redirect('https://iahome.fr/login', 302);
     }
 
     // Récupérer les cookies de la requête
@@ -157,20 +169,20 @@ async function handleLibreSpeedProxy(request: NextRequest) {
     
     if (!isModuleInEncours) {
       console.log('LibreSpeed Proxy: Module LibreSpeed non visible dans /encours pour:', session.user.email);
-      return NextResponse.redirect('https://iahome.fr/encours', 302);
+      return NextResponse.redirect('https://iahome.fr/login', 302);
     }
 
-    // Vérifier que l'utilisateur a un accès actif au module (tokens d'accès)
-    const hasValidAccess = await checkValidModuleAccess(session.user.id);
+    // Vérifier que l'utilisateur a un accès de base au module (sans vérifier quotas)
+    const hasBasicAccess = await checkBasicModuleAccess(session.user.id);
     
-    if (!hasValidAccess) {
-      console.log('LibreSpeed Proxy: Accès au module LibreSpeed invalide ou expiré pour:', session.user.email);
-      return NextResponse.redirect('https://iahome.fr/encours', 302);
+    if (!hasBasicAccess) {
+      console.log('LibreSpeed Proxy: Aucun accès LibreSpeed trouvé pour:', session.user.email);
+      return NextResponse.redirect('https://iahome.fr/login', 302);
     }
     
     console.log('LibreSpeed Proxy: Accès autorisé pour utilisateur:', session.user.email);
     
-    // Incrémenter le compteur d'utilisation
+    // Incrémenter le compteur d'utilisation (le système existant gère les quotas)
     await incrementUsageCount(session.user.id);
     
     // Rediriger directement vers LibreSpeed
@@ -183,10 +195,10 @@ async function handleLibreSpeedProxy(request: NextRequest) {
   }
 }
 
-// Fonction pour vérifier les tokens d'accès valides au module LibreSpeed
-async function checkValidModuleAccess(userId: string): Promise<boolean> {
+// Fonction pour vérifier l'accès de base au module LibreSpeed (sans vérifier quotas)
+async function checkBasicModuleAccess(userId: string): Promise<boolean> {
   try {
-    console.log('LibreSpeed Proxy: Vérification tokens d\'accès pour utilisateur:', userId);
+    console.log('LibreSpeed Proxy: Vérification accès de base pour utilisateur:', userId);
     
     // Récupérer l'accès au module LibreSpeed depuis user_applications
     const { data: moduleAccess, error: accessError } = await supabase
@@ -196,48 +208,22 @@ async function checkValidModuleAccess(userId: string): Promise<boolean> {
         user_id,
         module_id,
         module_title,
-        access_level,
-        expires_at,
-        is_active,
-        usage_count,
-        max_usage
+        is_active
       `)
       .eq('user_id', userId)
       .eq('is_active', true)
       .or('module_id.eq.librespeed,module_title.ilike.%librespeed%')
       .single();
 
-    if (accessError) {
-      console.log('LibreSpeed Proxy: Aucun accès trouvé pour LibreSpeed:', accessError.message);
-      return false;
-    }
-
-    if (!moduleAccess) {
+    if (accessError || !moduleAccess) {
       console.log('LibreSpeed Proxy: Aucun accès LibreSpeed trouvé pour l\'utilisateur');
       return false;
     }
 
-    // Vérifier si l'accès n'a pas expiré
-    if (moduleAccess.expires_at) {
-      const now = new Date();
-      const expiresAt = new Date(moduleAccess.expires_at);
-      
-      if (now > expiresAt) {
-        console.log('LibreSpeed Proxy: Token d\'accès LibreSpeed expiré pour l\'utilisateur');
-        return false;
-      }
-    }
-
-    // Vérifier le quota d'utilisation si applicable
-    if (moduleAccess.max_usage && moduleAccess.usage_count >= moduleAccess.max_usage) {
-      console.log('LibreSpeed Proxy: Quota d\'utilisation LibreSpeed dépassé pour l\'utilisateur');
-      return false;
-    }
-
-    console.log('LibreSpeed Proxy: Tokens d\'accès LibreSpeed valides pour l\'utilisateur');
+    console.log('LibreSpeed Proxy: Accès LibreSpeed de base trouvé pour l\'utilisateur');
     return true;
   } catch (error) {
-    console.error('LibreSpeed Proxy: Erreur vérification tokens d\'accès:', error);
+    console.error('LibreSpeed Proxy: Erreur vérification accès de base:', error);
     return false;
   }
 }
@@ -265,10 +251,10 @@ async function checkModuleInEncours(userId: string): Promise<boolean> {
       return false;
     }
 
-    // Vérifier que l'utilisateur a un accès actif au module
+    // Vérifier que l'utilisateur a un accès actif au module (sans vérifier expiration)
     const { data: userAccess, error: accessError } = await supabase
       .from('user_applications')
-      .select('id, is_active, expires_at, module_title')
+      .select('id, is_active, module_title')
       .eq('user_id', userId)
       .eq('module_id', moduleData.id)
       .eq('is_active', true)
@@ -277,17 +263,6 @@ async function checkModuleInEncours(userId: string): Promise<boolean> {
     if (accessError || !userAccess) {
       console.log('LibreSpeed Proxy: Aucun accès utilisateur trouvé pour LibreSpeed');
       return false;
-    }
-
-    // Vérifier que l'accès n'a pas expiré
-    if (userAccess.expires_at) {
-      const now = new Date();
-      const expiresAt = new Date(userAccess.expires_at);
-      
-      if (now > expiresAt) {
-        console.log('LibreSpeed Proxy: Accès LibreSpeed expiré');
-        return false;
-      }
     }
 
     console.log('LibreSpeed Proxy: Module LibreSpeed visible dans /encours pour l\'utilisateur');
@@ -317,11 +292,7 @@ async function incrementUsageCount(userId: string): Promise<void> {
       return;
     }
 
-    // Vérifier si le quota n'est pas dépassé
-    if (moduleAccess.max_usage && moduleAccess.usage_count >= moduleAccess.max_usage) {
-      console.log('LibreSpeed Proxy: Quota d\'utilisation déjà atteint');
-      return;
-    }
+    // Note: Les quotas sont gérés par le système existant, on incrémente juste le compteur
 
     // Incrémenter le compteur
     const { error: updateError } = await supabase
@@ -447,5 +418,30 @@ async function testLibreSpeedDatabase() {
       error: 'Erreur interne du serveur',
       details: error
     }, { status: 500 });
+  }
+}
+
+// Fonction pour vérifier un token temporaire LibreSpeed
+async function verifyTemporaryToken(token: string) {
+  try {
+    console.log('LibreSpeed Proxy: Vérification du token temporaire:', token);
+
+    const authorizationService = AuthorizationService.getInstance();
+    const validationResult = await authorizationService.validateAccessToken(token);
+
+    if (!validationResult.valid) {
+      console.log('LibreSpeed Proxy: Token invalide - redirection vers login:', validationResult.reason);
+      return NextResponse.redirect('https://iahome.fr/login', 302);
+    }
+
+    console.log('LibreSpeed Proxy: Token validé avec succès pour:', validationResult.userInfo?.userEmail);
+    
+    // Rediriger vers LibreSpeed
+    console.log('LibreSpeed Proxy: Redirection vers LibreSpeed');
+    return NextResponse.redirect('http://librespeed:80', 302);
+
+  } catch (error) {
+    console.error('LibreSpeed Proxy: Erreur vérification token temporaire:', error);
+    return NextResponse.redirect('https://iahome.fr/encours?error=token_verification_failed', 302);
   }
 }

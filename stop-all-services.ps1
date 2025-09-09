@@ -15,7 +15,7 @@ docker-compose -f docker-compose.prod.yml down
 Write-Host "🔍 Vérification des conteneurs..." -ForegroundColor Yellow
 $containers = docker ps --format "table {{.Names}}\t{{.Status}}"
 
-if ($containers -match "iahome|stirling-pdf|metube|librespeed|psitransfer|polr|draggan") {
+if ($containers -match "iahome|stirling-pdf|metube|librespeed|psitransfer|polr") {
     Write-Host "⚠️  Certains conteneurs sont encore en cours d'exécution:" -ForegroundColor Yellow
     docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
     
@@ -51,7 +51,6 @@ Write-Host "   • MeTube" -ForegroundColor White
 Write-Host "   • LibreSpeed" -ForegroundColor White
 Write-Host "   • PSITransfer" -ForegroundColor White
 Write-Host "   • Polr (QR)" -ForegroundColor White
-Write-Host "   • DragGAN" -ForegroundColor White
 
 Write-Host "`n🔧 Pour redémarrer:" -ForegroundColor Yellow
 Write-Host "   • Tous les services: .\\start-all-services.ps1" -ForegroundColor White

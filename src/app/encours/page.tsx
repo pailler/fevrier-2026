@@ -4,6 +4,7 @@ import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import Header from '../../components/Header';
+import AuthorizedAccessButton from '../../components/AuthorizedAccessButton';
 
 interface UserModule {
   id: string;
@@ -34,14 +35,16 @@ export default function EncoursPage() {
   const [loading, setLoading] = useState(true);
   const [sessionChecked, setSessionChecked] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [processingModule, setProcessingModule] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [iframeModal, setIframeModal] = useState<{isOpen: boolean, url: string, title: string}>({
     isOpen: false,
     url: '',
     title: ''
   });
+  const [tokenError, setTokenError] = useState<string | null>(null);
 
-  // Vérification de la session
+  // Vérification de la session et des erreurs de token
   useEffect(() => {
     const getSession = async () => {
       try {
@@ -53,6 +56,29 @@ export default function EncoursPage() {
         setSessionChecked(true);
       }
     };
+
+    // Vérifier s'il y a des erreurs de token dans l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorParam = urlParams.get('error');
+    
+    if (errorParam) {
+      switch (errorParam) {
+        case 'invalid_token':
+          setTokenError('Token d\'accès invalide. Veuillez cliquer à nouveau sur "Accéder à l\'application".');
+          break;
+        case 'token_expired':
+          setTokenError('Token d\'accès expiré. Veuillez cliquer à nouveau sur "Accéder à l\'application".');
+          break;
+        case 'token_verification_failed':
+          setTokenError('Erreur de vérification du token. Veuillez réessayer.');
+          break;
+        default:
+          setTokenError('Erreur d\'accès à LibreSpeed. Veuillez réessayer.');
+      }
+      
+      // Nettoyer l'URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
 
     getSession();
 
@@ -375,12 +401,37 @@ export default function EncoursPage() {
   const accessModule = async (module: UserModule) => {
     console.log('🚀 Accès au module:', module.module_title);
     
+    // Démarrer l'indicateur de traitement
+    setProcessingModule(module.module_id);
+    
     try {
       console.log('🚀 Accès au module:', module.module_title);
       console.log('👤 Utilisateur:', user?.email);
       console.log('🔍 DEBUG: Début de accessModule');
       console.log('🔍 DEBUG: Module:', module);
       console.log('🔍 DEBUG: User:', user);
+
+      // Si c'est LibreSpeed, générer un token temporaire avant l'accès
+      if (module.module_id === 'librespeed' || module.module_title.toLowerCase().includes('librespeed')) {
+        console.log('🔐 Génération d\'un token temporaire pour LibreSpeed...');
+        
+        try {
+          // Générer un token temporaire côté client (approche simplifiée)
+          const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+          const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+          
+          console.log('✅ Token généré côté client:', token);
+          
+          // Rediriger vers LibreSpeed avec le token
+          const librespeedUrl = `https://librespeed.iahome.fr?token=${token}`;
+          window.open(librespeedUrl, '_blank');
+          return;
+        } catch (tokenError) {
+          console.error('❌ Erreur lors de la génération du token:', tokenError);
+          alert('Erreur lors de l\'accès à LibreSpeed. Veuillez réessayer.');
+          return;
+        }
+      }
       
       // TEST DIAGNOSTIC - Appel API simple pour vérifier que le code s'exécute
       try {
@@ -507,6 +558,9 @@ export default function EncoursPage() {
       }
     } catch (error) {
       alert('Erreur lors de l\'accès au module');
+    } finally {
+      // Arrêter l'indicateur de traitement
+      setProcessingModule(null);
     }
   };
 
@@ -797,6 +851,35 @@ export default function EncoursPage() {
           </div>
         </div>
 
+        {/* Affichage des erreurs de token */}
+        {tokenError && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">
+                  Erreur d'accès à LibreSpeed
+                </h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{tokenError}</p>
+                </div>
+                <div className="mt-4">
+                  <button
+                    onClick={() => setTokenError(null)}
+                    className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200 transition-colors"
+                  >
+                    Fermer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Contenu principal */}
         {loading ? (
           <div className="text-center py-12">
@@ -1054,27 +1137,47 @@ export default function EncoursPage() {
                       </div>
 
                       {/* Bouton d'accès */}
-                      <button 
-                        onClick={() => accessModule(module)}
+                      <AuthorizedAccessButton
+                        moduleId={module.module_id}
+                        moduleTitle={module.module_title}
+                        moduleUrl={getModuleUrl(module.module_id)}
+                        className={`w-full px-4 py-3 rounded-lg transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1`}
                         disabled={isExpired || isQuotaExceeded}
-                        className={`w-full px-4 py-3 rounded-lg transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
-                          isExpired || isQuotaExceeded
-                            ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                            : 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white'
-                        }`}
-                        title={
-                          isExpired ? 'Module expiré' :
-                          isQuotaExceeded ? 'Quota épuisé' :
-                          `Accéder à ${module.module_title}`
-                        }
+                        onAccessGranted={(url) => {
+                          // Envoyer une notification d'accès à l'application
+                          try {
+                            const { NotificationService } = require('../../utils/notificationService');
+                            const notificationService = NotificationService.getInstance();
+                            notificationService.notifyAppAccessed(
+                              user?.email || '',
+                              module.module_title,
+                              user?.name || user?.email || 'Utilisateur'
+                            );
+                            console.log('✅ Notification d\'accès à l\'application envoyée');
+                          } catch (notificationError) {
+                            console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
+                          }
+                          
+                          // Navigation différente selon le module
+                          if (module.module_id === 'blender-3d') {
+                            router.push(url);
+                          } else {
+                            window.open(url, '_blank');
+                          }
+                        }}
+                        onAccessDenied={(reason) => {
+                          console.log('❌ Accès refusé:', reason);
+                          alert(`Accès refusé: ${reason}`);
+                        }}
                       >
                         <span className="text-xl mr-2">
-                          {isExpired ? '⏰' : isQuotaExceeded ? '⚠️' : '🚀'}
+                          {isExpired ? '⏰' : 
+                           isQuotaExceeded ? '⚠️' : '🚀'}
                         </span>
                         {isExpired ? 'Module expiré' :
                          isQuotaExceeded ? 'Quota épuisé' :
                          'Accéder à l\'application'}
-                      </button>
+                      </AuthorizedAccessButton>
                     </div>
                   </div>
                 );

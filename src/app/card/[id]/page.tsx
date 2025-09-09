@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Breadcrumb from '../../../components/Breadcrumb';
 import { NotificationServiceClient } from '../../../utils/notificationServiceClient';
+import AuthorizedAccessButton from '../../../components/AuthorizedAccessButton';
 
 interface Card {
   id: string;
@@ -751,9 +752,11 @@ export default function CardDetailPage() {
 
                     {/* Bouton JWT - visible seulement si l'utilisateur a accès au module */}
                     {session && userSubscriptions[`module_${card.id}`] && (
-                      <button 
+                      <AuthorizedAccessButton
+                        moduleId={card.id}
+                        moduleTitle={card.title}
                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                        onClick={async () => {
+                        onAccessGranted={async (url) => {
                           // Envoyer une notification d'accès à l'application
                           try {
                             const notificationService = NotificationServiceClient.getInstance();
@@ -763,12 +766,21 @@ export default function CardDetailPage() {
                             console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
                           }
                           
-                          await accessModuleWithJWT(card.title, card.id);
+                          // Navigation différente selon le module
+                          if (card.id === 'blender-3d') {
+                            router.push(url);
+                          } else {
+                            window.open(url, '_blank');
+                          }
+                        }}
+                        onAccessDenied={(reason) => {
+                          console.log('❌ Accès refusé:', reason);
+                          alert(`Accès refusé: ${reason}`);
                         }}
                       >
                         <span className="text-xl">🔑</span>
                         <span>Accéder à {card.title}</span>
-                      </button>
+                      </AuthorizedAccessButton>
                     )}
 
                     {/* Boutons d'activation pour les modules gratuits */}

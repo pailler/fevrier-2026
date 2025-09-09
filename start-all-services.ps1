@@ -13,23 +13,6 @@ try {
     exit 1
 }
 
-# Créer les répertoires nécessaires pour DragGAN
-Write-Host "📁 Création des répertoires DragGAN..." -ForegroundColor Yellow
-$draggan_directories = @(
-    "docker-services/draggan/models",
-    "docker-services/draggan/outputs", 
-    "docker-services/draggan/uploads",
-    "docker-services/draggan/cache"
-)
-
-foreach ($dir in $draggan_directories) {
-    if (-not (Test-Path $dir)) {
-        New-Item -ItemType Directory -Path $dir -Force | Out-Null
-        Write-Host "✅ Créé: $dir" -ForegroundColor Green
-    } else {
-        Write-Host "✅ Existe déjà: $dir" -ForegroundColor Green
-    }
-}
 
 # Arrêter tous les services existants
 Write-Host "🛑 Arrêt des services existants..." -ForegroundColor Yellow
@@ -40,9 +23,6 @@ docker-compose -f docker-compose.prod.yml down 2>$null
 Write-Host "🧹 Nettoyage des images obsolètes..." -ForegroundColor Yellow
 docker system prune -f
 
-# Construire l'image DragGAN
-Write-Host "🔨 Construction de l'image DragGAN..." -ForegroundColor Yellow
-docker-compose -f docker-services/docker-compose.services.yml build draggan --no-cache
 
 # Démarrer tous les services
 Write-Host "🚀 Démarrage de tous les services..." -ForegroundColor Yellow
@@ -65,7 +45,6 @@ $services = @(
     @{Name="LibreSpeed"; URL="http://localhost:8083"; Port=8083},
     @{Name="PSITransfer"; URL="http://localhost:8084"; Port=8084},
     @{Name="Polr"; URL="http://localhost:8086"; Port=8086},
-    @{Name="DragGAN"; URL="http://localhost:8087"; Port=8087}
 )
 
 foreach ($service in $services) {
@@ -88,14 +67,7 @@ Write-Host "   • MeTube:           http://localhost:8082 | https://metube.regi
 Write-Host "   • LibreSpeed:       http://localhost:8083 | https://librespeed.regispailler.fr" -ForegroundColor White
 Write-Host "   • PSITransfer:      http://localhost:8084 | https://psitransfer.regispailler.fr" -ForegroundColor White
 Write-Host "   • Polr (QR):        http://localhost:8086 | https://qrcode.regispailler.fr" -ForegroundColor White
-Write-Host "   • DragGAN:          http://localhost:8087 | https://draggan.regispailler.fr" -ForegroundColor White
 
-Write-Host "`n📚 Nouveau module DragGAN:" -ForegroundColor Yellow
-Write-Host "   • Édition d'images par IA" -ForegroundColor White
-Write-Host "   • Interface Gradio moderne" -ForegroundColor White
-Write-Host "   • Modèles pré-entraînés inclus" -ForegroundColor White
-Write-Host "   • Support GPU/CPU automatique" -ForegroundColor White
-Write-Host "   • Sauvegarde automatique des résultats" -ForegroundColor White
 
 Write-Host "`n🔧 Commandes utiles:" -ForegroundColor Yellow
 Write-Host "   • Voir les logs:     docker-compose -f docker-services/docker-compose.services.yml logs -f" -ForegroundColor White

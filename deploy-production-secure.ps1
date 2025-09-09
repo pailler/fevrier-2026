@@ -140,7 +140,6 @@ Write-Host "   - LibreSpeed (avec Google SSO): https://librespeed.regispailler.f
 Write-Host "   - PDF Service: https://pdf.regispailler.fr" -ForegroundColor White
 Write-Host "   - MeTube: https://metube.regispailler.fr" -ForegroundColor White
 Write-Host "   - PsiTransfer: https://psitransfer.regispailler.fr" -ForegroundColor White
-Write-Host "   - DragGAN: https://draggan.regispailler.fr" -ForegroundColor White
 Write-Host "   - QR Code: https://qrcode.regispailler.fr" -ForegroundColor White
 Write-Host ""
 Write-Host "📊 Dashboard Traefik: http://localhost:8080" -ForegroundColor Cyan

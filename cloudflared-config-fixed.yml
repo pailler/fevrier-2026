@@ -8,21 +8,21 @@ ingress:
   - hostname: www.iahome.fr
     service: http://localhost:3000
   
-  # LibreSpeed avec oauth2-proxy
+  # LibreSpeed via Traefik
   - hostname: librespeed.iahome.fr
     service: http://localhost:80
   
-  # Services externes
+  # Services externes via Traefik
   - hostname: pdf.iahome.fr
-    service: http://localhost:8080
+    service: http://localhost:80
   - hostname: metube.iahome.fr
-    service: http://localhost:8081
+    service: http://localhost:80
   - hostname: psitransfer.iahome.fr
-    service: http://localhost:3000
+    service: http://localhost:80
   - hostname: qrcodes.iahome.fr
     service: http://localhost:80
   
-  # Dashboard Traefik (optionnel)
+  # Dashboard Traefik
   - hostname: traefik.iahome.fr
     service: http://localhost:8080
   

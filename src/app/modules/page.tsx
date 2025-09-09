@@ -4,6 +4,7 @@ import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import { NotificationServiceClient } from "../../utils/notificationServiceClient";
+import AuthorizedAccessButton from "../../components/AuthorizedAccessButton";
 
 export default function ModulesPage() {
   const router = useRouter();
@@ -179,13 +180,16 @@ export default function ModulesPage() {
               </div>
               
               {module.status === 'active' ? (
-                <button
+                <AuthorizedAccessButton
+                  moduleId={module.id}
+                  moduleTitle={module.name}
+                  moduleUrl={module.url}
                   className={`w-full ${module.color} text-white font-medium py-3 px-4 rounded-lg transition-colors`}
-                  onClick={async () => {
+                  onAccessGranted={(url) => {
                     // Envoyer une notification d'accès à l'application
                     try {
                       const notificationService = NotificationServiceClient.getInstance();
-                      await notificationService.notifyAppAccessed(user?.email || '', module.name, user?.email?.split('@')[0] || 'Utilisateur');
+                      notificationService.notifyAppAccessed(user?.email || '', module.name, user?.email?.split('@')[0] || 'Utilisateur');
                       console.log('✅ Notification d\'accès à l\'application envoyée');
                     } catch (notificationError) {
                       console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
@@ -193,14 +197,18 @@ export default function ModulesPage() {
                     
                     // Navigation différente selon le module
                     if (module.id === 'blender-3d') {
-                      router.push(module.url);
+                      router.push(url);
                     } else {
-                      window.open(module.url, '_blank');
+                      window.open(url, '_blank');
                     }
+                  }}
+                  onAccessDenied={(reason) => {
+                    console.log('❌ Accès refusé:', reason);
+                    alert(`Accès refusé: ${reason}`);
                   }}
                 >
                   Accéder à l'appli
-                </button>
+                </AuthorizedAccessButton>
               ) : (
                 <button
                   className="w-full bg-gray-300 text-gray-500 font-medium py-3 px-4 rounded-lg cursor-not-allowed"

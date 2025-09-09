@@ -37,14 +37,6 @@ sections:
         icon: fas fa-link
         url: http://localhost:8086
 
-  - title: IA & ML
-    icon: fas fa-brain
-    items:
-      - title: DragGAN
-        description: Génération d'images IA
-        icon: fas fa-magic
-        url: http://localhost:8087
-        status: http://localhost:8087
 
 appConfig:
   theme: dark

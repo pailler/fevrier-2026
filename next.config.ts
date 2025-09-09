@@ -48,12 +48,46 @@ const nextConfig: NextConfig = {
           // Autoriser CORS pour l'IP locale et le domaine custom
           {
             key: 'Access-Control-Allow-Origin',
-            value: '*'
+            value: 'http://localhost:3000'
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, PUT, DELETE, OPTIONS'
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, Authorization, Cookie, X-Requested-With'
+          },
+          {
+            key: 'Access-Control-Allow-Credentials',
+            value: 'true'
           },
           // Headers pour les assets statiques
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable'
+          }
+        ]
+      },
+      // Headers spécifiques pour l'API librespeed-token
+      {
+        source: '/api/librespeed-token',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: 'http://localhost:3000'
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'POST, OPTIONS'
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, Authorization, Cookie, X-Requested-With'
+          },
+          {
+            key: 'Access-Control-Allow-Credentials',
+            value: 'true'
           }
         ]
       },
