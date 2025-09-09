@@ -15,9 +15,9 @@ const nextConfig: NextConfig = {
   // Configuration pour les assets statiques - Désactivé pour le développement local
   // assetPrefix: process.env.NODE_ENV === 'production' ? 'https://iahome.fr' : '',
   
-  // Configuration pour le cache des assets
+  // Configuration pour le cache des assets - ID stable pour éviter les problèmes de préchargement
   generateBuildId: async () => {
-    return 'build-' + Date.now();
+    return 'production-build';
   },
   
   serverExternalPackages: ['@supabase/supabase-js'],
@@ -62,10 +62,10 @@ const nextConfig: NextConfig = {
             key: 'Access-Control-Allow-Credentials',
             value: 'true'
           },
-          // Headers pour les assets statiques
+          // Headers pour les assets statiques - Cache optimisé
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable'
+            value: 'public, max-age=31536000, immutable, stale-while-revalidate=86400'
           }
         ]
       },
@@ -91,13 +91,31 @@ const nextConfig: NextConfig = {
           }
         ]
       },
-      // Headers spécifiques pour les assets statiques
+      // Headers spécifiques pour les assets statiques - Optimisé pour éviter les warnings de préchargement
       {
         source: '/_next/static/(.*)',
         headers: [
           {
             key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable, stale-while-revalidate=86400'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          }
+        ]
+      },
+      // Headers pour les CSS spécifiquement
+      {
+        source: '/_next/static/css/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable'
+          },
+          {
+            key: 'Content-Type',
+            value: 'text/css; charset=utf-8'
           }
         ]
       }

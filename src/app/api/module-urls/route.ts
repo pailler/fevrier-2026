@@ -7,17 +7,17 @@ export async function GET(request: NextRequest) {
 
     // Configuration des URLs des modules (URLs externes directes)
     const moduleUrls: { [key: string]: string } = {
-      'metube': 'https://metube.regispailler.fr',
-      'librespeed': 'https://librespeed.regispailler.fr',
-      'pdf': 'https://pdf.regispailler.fr',
-      'psitransfer': 'https://psitransfer.regispailler.fr',
-      'qrcodes': 'https://qrcodes.regispailler.fr',
-      'stablediffusion': 'https://stablediffusion.regispailler.fr',
-      'ruinedfooocus': 'https://ruinedfooocus.regispailler.fr',
-      'invoke': 'https://invoke.regispailler.fr',
-      'comfyui': 'https://comfyui.regispailler.fr',
-      'cogstudio': 'https://cogstudio.regispailler.fr',
-      'sdnext': 'https://sdnext.regispailler.fr'
+      'metube': 'https://metube.iahome.fr',
+      'librespeed': 'https://librespeed.iahome.fr',
+      'pdf': 'https://pdf.iahome.fr',
+      'psitransfer': 'https://psitransfer.iahome.fr',
+      'qrcodes': 'https://qrcodes.iahome.fr',
+      'stablediffusion': 'https://stablediffusion.iahome.fr',
+      'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
+      'invoke': 'https://invoke.iahome.fr',
+      'comfyui': 'https://comfyui.iahome.fr',
+      'cogstudio': 'https://cogstudio.iahome.fr',
+      'sdnext': 'https://sdnext.iahome.fr'
     };
 
     if (moduleName) {

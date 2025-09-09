@@ -108,9 +108,21 @@ async function handleLibreSpeedProxy(request: NextRequest) {
     
     if (token) {
       console.log('LibreSpeed Proxy: Token trouvé, vérification du token temporaire');
-      // Pour l'instant, accepter tous les tokens (approche simplifiée)
-      console.log('LibreSpeed Proxy: Token accepté (approche simplifiée)');
-      return NextResponse.redirect('http://librespeed:80', 302);
+      
+      // Vérifier le token avec le système d'autorisation
+      const authorizationService = AuthorizationService.getInstance();
+      const validationResult = await authorizationService.validateAccessToken(token);
+      
+      if (!validationResult.valid) {
+        console.log('LibreSpeed Proxy: Token invalide - redirection vers login:', validationResult.reason);
+        return NextResponse.redirect('https://iahome.fr/login', 302);
+      }
+      
+      console.log('LibreSpeed Proxy: Token validé avec succès pour:', validationResult.userInfo?.userEmail);
+      
+      // Rediriger vers LibreSpeed (URL de production)
+      console.log('LibreSpeed Proxy: Redirection vers LibreSpeed');
+      return NextResponse.redirect('https://librespeed.iahome.fr', 302);
     }
     
     // Si pas de token, vérifier l'origine de la requête (accès direct bloqué)
@@ -187,7 +199,7 @@ async function handleLibreSpeedProxy(request: NextRequest) {
     
     // Rediriger directement vers LibreSpeed
     console.log('LibreSpeed Proxy: Redirection vers LibreSpeed');
-    return NextResponse.redirect('http://librespeed:80', 302);
+    return NextResponse.redirect('https://librespeed.iahome.fr', 302);
 
   } catch (error) {
     console.error('LibreSpeed Proxy Error:', error);
@@ -438,7 +450,7 @@ async function verifyTemporaryToken(token: string) {
     
     // Rediriger vers LibreSpeed
     console.log('LibreSpeed Proxy: Redirection vers LibreSpeed');
-    return NextResponse.redirect('http://librespeed:80', 302);
+    return NextResponse.redirect('https://librespeed.iahome.fr', 302);
 
   } catch (error) {
     console.error('LibreSpeed Proxy: Erreur vérification token temporaire:', error);

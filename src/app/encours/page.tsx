@@ -380,17 +380,17 @@ export default function EncoursPage() {
   // Mapping des modules vers leurs URLs directes
   const getModuleUrl = (moduleId: string): string => {
     const moduleUrls: { [key: string]: string } = {
-      'metube': 'https://metube.regispailler.fr',
-      'librespeed': 'https://librespeed.regispailler.fr',
-      'pdf': 'https://pdf.regispailler.fr',
-      'psitransfer': 'https://psitransfer.regispailler.fr',
-      'qrcodes': 'https://qrcodes.regispailler.fr',
-      'stablediffusion': 'https://stablediffusion.regispailler.fr',
-      'ruinedfooocus': 'https://ruinedfooocus.regispailler.fr',
-      'invoke': 'https://invoke.regispailler.fr',
-      'comfyui': 'https://comfyui.regispailler.fr',
-      'cogstudio': 'https://cogstudio.regispailler.fr',
-      'sdnext': 'https://sdnext.regispailler.fr',
+      'metube': 'https://metube.iahome.fr',
+      'librespeed': 'https://librespeed.iahome.fr',
+      'pdf': 'https://pdf.iahome.fr',
+      'psitransfer': 'https://psitransfer.iahome.fr',
+      'qrcodes': 'https://qrcodes.iahome.fr',
+      'stablediffusion': 'https://stablediffusion.iahome.fr',
+      'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
+      'invoke': 'https://invoke.iahome.fr',
+      'comfyui': 'https://comfyui.iahome.fr',
+      'cogstudio': 'https://cogstudio.iahome.fr',
+      'sdnext': 'https://sdnext.iahome.fr',
       'blender-3d': '/blender-3d' // URL interne pour le module Blender 3D
     };
     
@@ -1158,12 +1158,8 @@ export default function EncoursPage() {
                             console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
                           }
                           
-                          // Navigation différente selon le module
-                          if (module.module_id === 'blender-3d') {
-                            router.push(url);
-                          } else {
-                            window.open(url, '_blank');
-                          }
+                          // La navigation est maintenant gérée par AuthorizedAccessButton
+                          // Pas besoin de faire window.open() ou router.push() ici
                         }}
                         onAccessDenied={(reason) => {
                           console.log('❌ Accès refusé:', reason);

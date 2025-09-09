@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
-import { useUser } from '@supabase/auth-helpers-react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { supabase } from '../utils/supabaseClient';
 import AuthorizationService, { ModuleAccessInfo } from '../utils/authorizationService';
 
 interface AuthorizedAccessButtonProps {
@@ -27,16 +27,61 @@ export default function AuthorizedAccessButton({
   showLoadingState = true,
   disabled = false
 }: AuthorizedAccessButtonProps) {
-  const user = useUser();
+  const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('Vérification des quotas...');
   const [error, setError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [clickCount, setClickCount] = useState(0);
 
   const authorizationService = AuthorizationService.getInstance();
 
+  // Récupérer l'utilisateur connecté
+  useEffect(() => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+    };
+
+    getSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const handleAccess = useCallback(async () => {
+    // Protection renforcée contre les clics multiples
+    const newClickCount = clickCount + 1;
+    setClickCount(newClickCount);
+    
+    console.log(`🔍 AuthorizedAccessButton - Clic #${newClickCount} - handleAccess appelé`);
+    console.log('🔍 AuthorizedAccessButton - isProcessing:', isProcessing);
+    console.log('🔍 AuthorizedAccessButton - isLoading:', isLoading);
+    
+    if (isProcessing || isLoading) {
+      console.log('⚠️ Clic ignoré - traitement en cours');
+      return;
+    }
+
+    if (newClickCount > 1) {
+      console.log('⚠️ Clic multiple détecté - ignoré');
+      return;
+    }
+
+    console.log('🔍 AuthorizedAccessButton - User data:', user);
+    console.log('🔍 AuthorizedAccessButton - User ID:', user?.id);
+    console.log('🔍 AuthorizedAccessButton - User Email:', user?.email);
+    console.log('🔍 AuthorizedAccessButton - Module ID:', moduleId);
+    console.log('🔍 AuthorizedAccessButton - Module Title:', moduleTitle);
+    
     if (!user?.id || !user?.email) {
       const reason = 'Vous devez être connecté pour accéder aux modules';
+      console.log('❌ AuthorizedAccessButton - Accès refusé:', reason);
       setError(reason);
       onAccessDenied?.(reason);
       return;
@@ -45,6 +90,8 @@ export default function AuthorizedAccessButton({
     if (disabled) {
       return;
     }
+
+    setIsProcessing(true);
 
     setIsLoading(true);
     setError(null);
@@ -173,30 +220,37 @@ export default function AuthorizedAccessButton({
           });
 
           const librespeedUrl = `https://librespeed.iahome.fr?token=${tokenResult.token}`;
-          console.log('🔗 Redirection vers LibreSpeed avec token valide');
+          console.log('🔗 Ouverture de LibreSpeed dans un nouvel onglet avec token valide');
+          console.log('🔗 URL LibreSpeed:', librespeedUrl);
+          console.log('🔗 Appel onAccessGranted...');
           onAccessGranted?.(librespeedUrl);
+          console.log('🔗 Appel window.open...');
           window.open(librespeedUrl, '_blank');
+          console.log('🔗 LibreSpeed - Fin de la fonction');
+          return;
         } else {
           const reason = 'Impossible de générer un token d\'accès temporaire';
           setError(reason);
           onAccessDenied?.(reason);
+          return;
         }
-        return;
       }
 
-      // Gestion spéciale pour Metube avec iframe
+      // Gestion spéciale pour Metube avec ouverture dans un nouvel onglet
       if (moduleTitle.toLowerCase().includes('metube') || moduleTitle.toLowerCase().includes('me tube')) {
-        console.log('🔑 Accès direct à Metube via iframe');
-        const metubeUrl = 'https://metube.regispailler.fr';
+        console.log('🔑 Ouverture de Metube dans un nouvel onglet');
+        const metubeUrl = 'https://metube.iahome.fr';
         onAccessGranted?.(metubeUrl);
+        window.open(metubeUrl, '_blank');
         return;
       }
 
-      // Gestion spéciale pour PDF avec iframe
+      // Gestion spéciale pour PDF avec ouverture dans un nouvel onglet
       if (moduleTitle.toLowerCase().includes('pdf') || moduleTitle.toLowerCase().includes('pdf+')) {
-        console.log('🔑 Accès direct à PDF via iframe');
-        const pdfUrl = 'https://pdf.regispailler.fr';
+        console.log('🔑 Ouverture de PDF dans un nouvel onglet');
+        const pdfUrl = 'https://pdf.iahome.fr';
         onAccessGranted?.(pdfUrl);
+        window.open(pdfUrl, '_blank');
         return;
       }
 
@@ -204,16 +258,58 @@ export default function AuthorizedAccessButton({
       if (moduleId === 'blender-3d' || moduleTitle.toLowerCase().includes('blender')) {
         console.log('🔑 Accès à Blender 3D via navigation interne');
         const blenderUrl = moduleUrl || '/card/blender-3d';
+        // Pour Blender, on garde la navigation interne (pas de nouvel onglet)
         onAccessGranted?.(blenderUrl);
         return;
       }
 
-      // Gestion par défaut - ouverture dans un nouvel onglet
+      // Gestion spéciale pour PsiTransfer avec ouverture dans un nouvel onglet
+      if (moduleTitle.toLowerCase().includes('psitransfer') || moduleTitle.toLowerCase().includes('psi transfer')) {
+        console.log('🔑 Ouverture de PsiTransfer dans un nouvel onglet');
+        const psitransferUrl = 'https://psitransfer.iahome.fr';
+        onAccessGranted?.(psitransferUrl);
+        window.open(psitransferUrl, '_blank');
+        return;
+      }
+
+      // Gestion spéciale pour QR Code avec ouverture dans un nouvel onglet
+      if (moduleTitle.toLowerCase().includes('qrcode') || moduleTitle.toLowerCase().includes('qr code') || moduleId === 'qrcodes') {
+        console.log('🔑 Ouverture de QR Code dans un nouvel onglet');
+        const qrcodeUrl = 'https://qrcodes.iahome.fr';
+        onAccessGranted?.(qrcodeUrl);
+        window.open(qrcodeUrl, '_blank');
+        return;
+      }
+
+      // Gestion par défaut - ouverture dans un nouvel onglet avec URL de production
       const finalUrl = moduleUrl || authResult.moduleData?.url;
-      if (finalUrl) {
-        console.log('🔗 Ouverture du module dans un nouvel onglet:', finalUrl);
-        onAccessGranted?.(finalUrl);
-        window.open(finalUrl, '_blank');
+      
+      // Mapping des modules vers leurs URLs de production (domaines iahome.fr)
+      const getProductionUrl = (moduleId: string, fallbackUrl?: string): string => {
+        const productionUrls: { [key: string]: string } = {
+          'metube': 'https://metube.iahome.fr',
+          'librespeed': 'https://librespeed.iahome.fr',
+          'pdf': 'https://pdf.iahome.fr',
+          'psitransfer': 'https://psitransfer.iahome.fr',
+          'qrcodes': 'https://qrcodes.iahome.fr',
+          'qrcode': 'https://qrcodes.iahome.fr',
+          'stablediffusion': 'https://stablediffusion.iahome.fr',
+          'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
+          'invoke': 'https://invoke.iahome.fr',
+          'comfyui': 'https://comfyui.iahome.fr',
+          'cogstudio': 'https://cogstudio.iahome.fr',
+          'sdnext': 'https://sdnext.iahome.fr'
+        };
+        
+        return productionUrls[moduleId] || fallbackUrl || '';
+      };
+
+      const productionUrl = getProductionUrl(moduleId, finalUrl);
+      
+      if (productionUrl) {
+        console.log('🔗 Ouverture du module dans un nouvel onglet avec URL de production:', productionUrl);
+        onAccessGranted?.(productionUrl);
+        window.open(productionUrl, '_blank');
       } else {
         const reason = 'URL du module non trouvée';
         setError(reason);
@@ -227,6 +323,11 @@ export default function AuthorizedAccessButton({
       onAccessDenied?.(reason);
     } finally {
       setIsLoading(false);
+      setIsProcessing(false);
+      // Reset du compteur de clics après un délai
+      setTimeout(() => {
+        setClickCount(0);
+      }, 2000);
     }
   }, [
     user,
@@ -235,7 +336,10 @@ export default function AuthorizedAccessButton({
     moduleUrl,
     disabled,
     onAccessGranted,
-    onAccessDenied
+    onAccessDenied,
+    isProcessing,
+    isLoading,
+    clickCount
   ]);
 
   const getButtonContent = () => {
@@ -279,11 +383,11 @@ export default function AuthorizedAccessButton({
   return (
     <button
       onClick={handleAccess}
-      disabled={disabled || (isLoading && showLoadingState)}
+      disabled={disabled || (isLoading && showLoadingState) || isProcessing}
       className={getButtonClassName()}
       title={
         disabled ? 'Accès désactivé' :
-        isLoading ? 'Traitement en cours...' :
+        isLoading || isProcessing ? 'Traitement en cours...' :
         error ? error :
         `Accéder à ${moduleTitle}`
       }

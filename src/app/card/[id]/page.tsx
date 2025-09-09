@@ -766,12 +766,8 @@ export default function CardDetailPage() {
                             console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
                           }
                           
-                          // Navigation différente selon le module
-                          if (card.id === 'blender-3d') {
-                            router.push(url);
-                          } else {
-                            window.open(url, '_blank');
-                          }
+                          // La navigation est maintenant gérée par AuthorizedAccessButton
+                          // Pas besoin de faire window.open() ou router.push() ici
                         }}
                         onAccessDenied={(reason) => {
                           console.log('❌ Accès refusé:', reason);

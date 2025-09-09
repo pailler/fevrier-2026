@@ -1,0 +1,16 @@
+# Middleware Traefik pour la sécurité LibreSpeed
+http:
+  middlewares:
+    librespeed-auth:
+      forwardAuth:
+        address: "http://iahome-app:3000/api/check-auth"
+        trustForwardHeader: true
+        authResponseHeaders:
+          - "X-User-Id"
+          - "X-User-Email"
+        authRequestHeaders:
+          - "Authorization"
+          - "Cookie"
+          - "X-Forwarded-For"
+          - "X-Forwarded-Proto"
+          - "X-Forwarded-Host"

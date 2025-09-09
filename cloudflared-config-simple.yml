@@ -2,17 +2,17 @@ tunnel: b19084f4-e2d6-47f5-81c3-0972662e953c
 credentials-file: C:\Users\AAA\.cloudflared\cert.pem
 
 ingress:
-  # Application principale IAHome - accès direct port 3000
+  # Application principale IAHome
   - hostname: iahome.fr
     service: http://localhost:3000
   - hostname: www.iahome.fr
     service: http://localhost:3000
   
-  # LibreSpeed - accès via proxy nginx sur port 8080
+  # LibreSpeed - accès direct port 8083
   - hostname: librespeed.iahome.fr
-    service: http://localhost:8080
+    service: http://localhost:8083
   
-  # Services externes - accès via Traefik sur port 8080
+  # Services via Traefik
   - hostname: pdf.iahome.fr
     service: http://localhost:8080
   - hostname: metube.iahome.fr
@@ -20,10 +20,6 @@ ingress:
   - hostname: psitransfer.iahome.fr
     service: http://localhost:8080
   - hostname: qrcodes.iahome.fr
-    service: http://localhost:8080
-  
-  # Dashboard Traefik - port 8080
-  - hostname: traefik.iahome.fr
     service: http://localhost:8080
   
   # Catch-all rule
