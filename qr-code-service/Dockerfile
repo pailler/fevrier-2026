@@ -1,23 +1,36 @@
-FROM python:3.9-alpine
+FROM python:3.9-slim
 
 # Installer les dépendances système
-RUN apk add --no-cache gcc musl-dev libffi-dev curl postgresql-dev
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Installer les packages Python
-RUN pip install --no-cache-dir flask flask-cors qrcode[pil] pillow psycopg2-binary PyJWT requests
-
-# Créer le répertoire de travail
+# Définir le répertoire de travail
 WORKDIR /app
 
-# Copier le code source et le template
-COPY qr_service.py .
-COPY template.html .
+# Copier le fichier requirements.txt s'il existe
+COPY requirements.txt* ./
 
-# Créer le dossier pour les QR codes
+# Installer les dépendances Python
+RUN pip install --no-cache-dir \
+    flask \
+    flask-cors \
+    qrcode[pil] \
+    pillow \
+    psycopg2-binary \
+    pyjwt \
+    && rm -rf /root/.cache/pip
+
+# Copier le code de l'application
+COPY . .
+
+# Créer le répertoire pour les QR codes
 RUN mkdir -p /app/qr_codes
 
 # Exposer le port
-EXPOSE 8080
+EXPOSE 7005
 
-# Commande de démarrage
+# Commande par défaut
 CMD ["python", "qr_service.py"]

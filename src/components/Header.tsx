@@ -205,6 +205,14 @@ export default function Header() {
                 userRole={role || undefined}
                 className="hidden md:flex items-center space-x-6"
               />
+              
+              {/* Lien Applications - Ajouté après Formation */}
+              <Link 
+                href="https://iahome.fr" 
+                className="hidden md:block text-gray-700 hover:text-blue-600 font-medium transition-colors"
+              >
+                Applications
+              </Link>
             </div>
             
             {/* Boutons à droite - Desktop */}
@@ -237,6 +245,14 @@ export default function Header() {
                   userRole={role || undefined}
                   className="flex flex-col space-y-3"
                 />
+                
+                {/* Lien Applications - Mobile */}
+                <Link 
+                  href="https://iahome.fr" 
+                  className="text-gray-700 font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-left"
+                >
+                  Applications
+                </Link>
                 
                 {/* Boutons mobile */}
                 <div className="flex flex-col space-y-2 pt-3 border-t border-gray-200">

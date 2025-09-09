@@ -236,22 +236,850 @@ export default function AuthorizedAccessButton({
         }
       }
 
-      // Gestion spéciale pour Metube avec ouverture dans un nouvel onglet
-      if (moduleTitle.toLowerCase().includes('metube') || moduleTitle.toLowerCase().includes('me tube')) {
-        console.log('🔑 Ouverture de Metube dans un nouvel onglet');
-        const metubeUrl = 'https://metube.iahome.fr';
-        onAccessGranted?.(metubeUrl);
-        window.open(metubeUrl, '_blank');
-        return;
+      // Gestion spéciale pour MeTube avec vérification des quotas et génération de token
+      if (moduleId === 'metube' || moduleTitle.toLowerCase().includes('metube') || moduleTitle.toLowerCase().includes('me tube')) {
+        console.log('🔑 Vérification des quotas et génération d\'un token temporaire pour MeTube...');
+        setLoadingMessage('Vérification des quotas MeTube...');
+        
+        // 1. Vérifier d'abord les quotas et l'autorisation
+        const quotaResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'check_access'
+          })
+        });
+
+        const quotaResult = await quotaResponse.json();
+        
+        if (!quotaResult.success || !quotaResult.authorized) {
+          const reason = quotaResult.reason || 'Accès non autorisé';
+          console.log('❌ Accès refusé pour MeTube:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        // 2. Vérifier les quotas spécifiquement
+        if (quotaResult.quotaInfo && quotaResult.quotaInfo.isQuotaExceeded) {
+          const reason = `Quota d'utilisation épuisé (${quotaResult.quotaInfo.usageCount}/${quotaResult.quotaInfo.maxUsage})`;
+          console.log('❌ Quota dépassé pour MeTube:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        console.log('✅ Quotas respectés, génération du token...');
+        setLoadingMessage('Génération du token d\'accès...');
+        
+        // 3. Générer le token temporaire
+        const tokenResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'generate_token'
+          })
+        });
+
+        const tokenResult = await tokenResponse.json();
+        
+        if (tokenResult.success && tokenResult.token) {
+          setLoadingMessage('Finalisation de l\'accès...');
+          
+          // 4. Incrémenter le compteur d'utilisation
+          await fetch('/api/authorize-module-access', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              moduleId,
+              moduleTitle,
+              userId: user.id,
+              userEmail: user.email,
+              action: 'increment_usage'
+            })
+          });
+
+          const metubeUrl = `https://metube.iahome.fr?token=${tokenResult.token}`;
+          console.log('🔗 Ouverture de MeTube dans un nouvel onglet avec token valide');
+          console.log('🔗 URL MeTube:', metubeUrl);
+          console.log('🔗 Appel onAccessGranted...');
+          onAccessGranted?.(metubeUrl);
+          console.log('🔗 Appel window.open...');
+          window.open(metubeUrl, '_blank');
+          console.log('🔗 MeTube - Fin de la fonction');
+          return;
+        } else {
+          const reason = 'Impossible de générer un token d\'accès temporaire';
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
       }
 
-      // Gestion spéciale pour PDF avec ouverture dans un nouvel onglet
-      if (moduleTitle.toLowerCase().includes('pdf') || moduleTitle.toLowerCase().includes('pdf+')) {
-        console.log('🔑 Ouverture de PDF dans un nouvel onglet');
-        const pdfUrl = 'https://pdf.iahome.fr';
-        onAccessGranted?.(pdfUrl);
-        window.open(pdfUrl, '_blank');
-        return;
+      // Gestion spéciale pour PsiTransfer avec vérification des quotas et génération de token
+      if (moduleId === 'psitransfer' || moduleTitle.toLowerCase().includes('psitransfer') || moduleTitle.toLowerCase().includes('psi transfer')) {
+        console.log('🔑 Vérification des quotas et génération d\'un token temporaire pour PsiTransfer...');
+        setLoadingMessage('Vérification des quotas PsiTransfer...');
+        
+        // 1. Vérifier d'abord les quotas et l'autorisation
+        const quotaResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'check_access'
+          })
+        });
+
+        const quotaResult = await quotaResponse.json();
+        
+        if (!quotaResult.success || !quotaResult.authorized) {
+          const reason = quotaResult.reason || 'Accès non autorisé';
+          console.log('❌ Accès refusé pour PsiTransfer:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        // 2. Vérifier les quotas spécifiquement
+        if (quotaResult.quotaInfo && quotaResult.quotaInfo.isQuotaExceeded) {
+          const reason = `Quota d'utilisation épuisé (${quotaResult.quotaInfo.usageCount}/${quotaResult.quotaInfo.maxUsage})`;
+          console.log('❌ Quota dépassé pour PsiTransfer:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        console.log('✅ Quotas respectés, génération du token...');
+        setLoadingMessage('Génération du token d\'accès...');
+        
+        // 3. Générer le token temporaire
+        const tokenResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'generate_token'
+          })
+        });
+
+        const tokenResult = await tokenResponse.json();
+        
+        if (tokenResult.success && tokenResult.token) {
+          setLoadingMessage('Finalisation de l\'accès...');
+          
+          // 4. Incrémenter le compteur d'utilisation
+          await fetch('/api/authorize-module-access', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              moduleId,
+              moduleTitle,
+              userId: user.id,
+              userEmail: user.email,
+              action: 'increment_usage'
+            })
+          });
+
+          const psitransferUrl = `https://psitransfer.iahome.fr?token=${tokenResult.token}`;
+          console.log('🔗 Ouverture de PsiTransfer dans un nouvel onglet avec token valide');
+          console.log('🔗 URL PsiTransfer:', psitransferUrl);
+          console.log('🔗 Appel onAccessGranted...');
+          onAccessGranted?.(psitransferUrl);
+          console.log('🔗 Appel window.open...');
+          window.open(psitransferUrl, '_blank');
+          console.log('🔗 PsiTransfer - Fin de la fonction');
+          return;
+        } else {
+          const reason = 'Impossible de générer un token d\'accès temporaire';
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+      }
+
+      // Gestion spéciale pour PDF avec vérification des quotas et génération de token
+      if (moduleId === 'pdf' || moduleTitle.toLowerCase().includes('pdf') || moduleTitle.toLowerCase().includes('pdf+')) {
+        console.log('🔑 Vérification des quotas et génération d\'un token temporaire pour PDF...');
+        setLoadingMessage('Vérification des quotas PDF...');
+        
+        // 1. Vérifier d'abord les quotas et l'autorisation
+        const quotaResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'check_access'
+          })
+        });
+
+        const quotaResult = await quotaResponse.json();
+        
+        if (!quotaResult.success || !quotaResult.authorized) {
+          const reason = quotaResult.reason || 'Accès non autorisé';
+          console.log('❌ Accès refusé pour PDF:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        // 2. Vérifier les quotas spécifiquement
+        if (quotaResult.quotaInfo && quotaResult.quotaInfo.isQuotaExceeded) {
+          const reason = `Quota d'utilisation épuisé (${quotaResult.quotaInfo.usageCount}/${quotaResult.quotaInfo.maxUsage})`;
+          console.log('❌ Quota dépassé pour PDF:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        console.log('✅ Quotas respectés, génération du token...');
+        setLoadingMessage('Génération du token d\'accès...');
+        
+        // 3. Générer le token temporaire
+        const tokenResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'generate_token'
+          })
+        });
+
+        const tokenResult = await tokenResponse.json();
+        
+        if (tokenResult.success && tokenResult.token) {
+          setLoadingMessage('Finalisation de l\'accès...');
+          
+          // 4. Incrémenter le compteur d'utilisation
+          await fetch('/api/authorize-module-access', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              moduleId,
+              moduleTitle,
+              userId: user.id,
+              userEmail: user.email,
+              action: 'increment_usage'
+            })
+          });
+
+          const pdfUrl = `https://pdf.iahome.fr?token=${tokenResult.token}`;
+          console.log('🔗 Ouverture de PDF dans un nouvel onglet avec token valide');
+          console.log('🔗 URL PDF:', pdfUrl);
+          console.log('🔗 Appel onAccessGranted...');
+          onAccessGranted?.(pdfUrl);
+          console.log('🔗 Appel window.open...');
+          window.open(pdfUrl, '_blank');
+          console.log('🔗 PDF - Fin de la fonction');
+          return;
+        } else {
+          const reason = 'Impossible de générer un token d\'accès temporaire';
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+      }
+
+      // Gestion spéciale pour StableDiffusion avec vérification des quotas et génération de token
+      if (moduleId === 'stablediffusion' || moduleTitle.toLowerCase().includes('stablediffusion') || moduleTitle.toLowerCase().includes('stable diffusion')) {
+        console.log('🔑 Vérification des quotas et génération d\'un token temporaire pour StableDiffusion...');
+        setLoadingMessage('Vérification des quotas StableDiffusion...');
+        
+        // 1. Vérifier d'abord les quotas et l'autorisation
+        const quotaResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'check_access'
+          })
+        });
+
+        const quotaResult = await quotaResponse.json();
+        
+        if (!quotaResult.success || !quotaResult.authorized) {
+          const reason = quotaResult.reason || 'Accès non autorisé';
+          console.log('❌ Accès refusé pour StableDiffusion:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        // 2. Vérifier les quotas spécifiquement
+        if (quotaResult.quotaInfo && quotaResult.quotaInfo.isQuotaExceeded) {
+          const reason = `Quota d'utilisation épuisé (${quotaResult.quotaInfo.usageCount}/${quotaResult.quotaInfo.maxUsage})`;
+          console.log('❌ Quota dépassé pour StableDiffusion:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        console.log('✅ Quotas respectés, génération du token...');
+        setLoadingMessage('Génération du token d\'accès...');
+        
+        // 3. Générer le token temporaire
+        const tokenResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'generate_token'
+          })
+        });
+
+        const tokenResult = await tokenResponse.json();
+        
+        if (tokenResult.success && tokenResult.token) {
+          setLoadingMessage('Finalisation de l\'accès...');
+          
+          // 4. Incrémenter le compteur d'utilisation
+          await fetch('/api/authorize-module-access', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              moduleId,
+              moduleTitle,
+              userId: user.id,
+              userEmail: user.email,
+              action: 'increment_usage'
+            })
+          });
+
+          const stablediffusionUrl = `https://stablediffusion.iahome.fr?token=${tokenResult.token}`;
+          console.log('🔗 Ouverture de StableDiffusion dans un nouvel onglet avec token valide');
+          console.log('🔗 URL StableDiffusion:', stablediffusionUrl);
+          console.log('🔗 Appel onAccessGranted...');
+          onAccessGranted?.(stablediffusionUrl);
+          console.log('🔗 Appel window.open...');
+          window.open(stablediffusionUrl, '_blank');
+          console.log('🔗 StableDiffusion - Fin de la fonction');
+          return;
+        } else {
+          const reason = 'Impossible de générer un token d\'accès temporaire';
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+      }
+
+      // Gestion spéciale pour RuinedFooocus avec vérification des quotas et génération de token
+      if (moduleId === 'ruinedfooocus' || moduleTitle.toLowerCase().includes('ruinedfooocus') || moduleTitle.toLowerCase().includes('ruined fooocus')) {
+        console.log('🔑 Vérification des quotas et génération d\'un token temporaire pour RuinedFooocus...');
+        setLoadingMessage('Vérification des quotas RuinedFooocus...');
+        
+        // 1. Vérifier d'abord les quotas et l'autorisation
+        const quotaResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'check_access'
+          })
+        });
+
+        const quotaResult = await quotaResponse.json();
+        
+        if (!quotaResult.success || !quotaResult.authorized) {
+          const reason = quotaResult.reason || 'Accès non autorisé';
+          console.log('❌ Accès refusé pour RuinedFooocus:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        // 2. Vérifier les quotas spécifiquement
+        if (quotaResult.quotaInfo && quotaResult.quotaInfo.isQuotaExceeded) {
+          const reason = `Quota d'utilisation épuisé (${quotaResult.quotaInfo.usageCount}/${quotaResult.quotaInfo.maxUsage})`;
+          console.log('❌ Quota dépassé pour RuinedFooocus:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        console.log('✅ Quotas respectés, génération du token...');
+        setLoadingMessage('Génération du token d\'accès...');
+        
+        // 3. Générer le token temporaire
+        const tokenResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'generate_token'
+          })
+        });
+
+        const tokenResult = await tokenResponse.json();
+        
+        if (tokenResult.success && tokenResult.token) {
+          setLoadingMessage('Finalisation de l\'accès...');
+          
+          // 4. Incrémenter le compteur d'utilisation
+          await fetch('/api/authorize-module-access', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              moduleId,
+              moduleTitle,
+              userId: user.id,
+              userEmail: user.email,
+              action: 'increment_usage'
+            })
+          });
+
+          const ruinedfooocusUrl = `https://ruinedfooocus.iahome.fr?token=${tokenResult.token}`;
+          console.log('🔗 Ouverture de RuinedFooocus dans un nouvel onglet avec token valide');
+          console.log('🔗 URL RuinedFooocus:', ruinedfooocusUrl);
+          console.log('🔗 Appel onAccessGranted...');
+          onAccessGranted?.(ruinedfooocusUrl);
+          console.log('🔗 Appel window.open...');
+          window.open(ruinedfooocusUrl, '_blank');
+          console.log('🔗 RuinedFooocus - Fin de la fonction');
+          return;
+        } else {
+          const reason = 'Impossible de générer un token d\'accès temporaire';
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+      }
+
+      // Gestion spéciale pour ComfyUI avec vérification des quotas et génération de token
+      if (moduleId === 'comfyui' || moduleTitle.toLowerCase().includes('comfyui') || moduleTitle.toLowerCase().includes('comfy ui')) {
+        console.log('🔑 Vérification des quotas et génération d\'un token temporaire pour ComfyUI...');
+        setLoadingMessage('Vérification des quotas ComfyUI...');
+        
+        // 1. Vérifier d'abord les quotas et l'autorisation
+        const quotaResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'check_access'
+          })
+        });
+
+        const quotaResult = await quotaResponse.json();
+        
+        if (!quotaResult.success || !quotaResult.authorized) {
+          const reason = quotaResult.reason || 'Accès non autorisé';
+          console.log('❌ Accès refusé pour ComfyUI:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        // 2. Vérifier les quotas spécifiquement
+        if (quotaResult.quotaInfo && quotaResult.quotaInfo.isQuotaExceeded) {
+          const reason = `Quota d'utilisation épuisé (${quotaResult.quotaInfo.usageCount}/${quotaResult.quotaInfo.maxUsage})`;
+          console.log('❌ Quota dépassé pour ComfyUI:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        console.log('✅ Quotas respectés, génération du token...');
+        setLoadingMessage('Génération du token d\'accès...');
+        
+        // 3. Générer le token temporaire
+        const tokenResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'generate_token'
+          })
+        });
+
+        const tokenResult = await tokenResponse.json();
+        
+        if (tokenResult.success && tokenResult.token) {
+          setLoadingMessage('Finalisation de l\'accès...');
+          
+          // 4. Incrémenter le compteur d'utilisation
+          await fetch('/api/authorize-module-access', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              moduleId,
+              moduleTitle,
+              userId: user.id,
+              userEmail: user.email,
+              action: 'increment_usage'
+            })
+          });
+
+          const comfyuiUrl = `https://comfyui.iahome.fr?token=${tokenResult.token}`;
+          console.log('🔗 Ouverture de ComfyUI dans un nouvel onglet avec token valide');
+          console.log('🔗 URL ComfyUI:', comfyuiUrl);
+          console.log('🔗 Appel onAccessGranted...');
+          onAccessGranted?.(comfyuiUrl);
+          console.log('🔗 Appel window.open...');
+          window.open(comfyuiUrl, '_blank');
+          console.log('🔗 ComfyUI - Fin de la fonction');
+          return;
+        } else {
+          const reason = 'Impossible de générer un token d\'accès temporaire';
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+      }
+
+      // Gestion spéciale pour SDNext avec vérification des quotas et génération de token
+      if (moduleId === 'sdnext' || moduleTitle.toLowerCase().includes('sdnext') || moduleTitle.toLowerCase().includes('sd next')) {
+        console.log('🔑 Vérification des quotas et génération d\'un token temporaire pour SDNext...');
+        setLoadingMessage('Vérification des quotas SDNext...');
+        
+        // 1. Vérifier d'abord les quotas et l'autorisation
+        const quotaResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'check_access'
+          })
+        });
+
+        const quotaResult = await quotaResponse.json();
+        
+        if (!quotaResult.success || !quotaResult.authorized) {
+          const reason = quotaResult.reason || 'Accès non autorisé';
+          console.log('❌ Accès refusé pour SDNext:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        // 2. Vérifier les quotas spécifiquement
+        if (quotaResult.quotaInfo && quotaResult.quotaInfo.isQuotaExceeded) {
+          const reason = `Quota d'utilisation épuisé (${quotaResult.quotaInfo.usageCount}/${quotaResult.quotaInfo.maxUsage})`;
+          console.log('❌ Quota dépassé pour SDNext:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        console.log('✅ Quotas respectés, génération du token...');
+        setLoadingMessage('Génération du token d\'accès...');
+        
+        // 3. Générer le token temporaire
+        const tokenResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'generate_token'
+          })
+        });
+
+        const tokenResult = await tokenResponse.json();
+        
+        if (tokenResult.success && tokenResult.token) {
+          setLoadingMessage('Finalisation de l\'accès...');
+          
+          // 4. Incrémenter le compteur d'utilisation
+          await fetch('/api/authorize-module-access', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              moduleId,
+              moduleTitle,
+              userId: user.id,
+              userEmail: user.email,
+              action: 'increment_usage'
+            })
+          });
+
+          const sdnextUrl = `https://sdnext.iahome.fr?token=${tokenResult.token}`;
+          console.log('🔗 Ouverture de SDNext dans un nouvel onglet avec token valide');
+          console.log('🔗 URL SDNext:', sdnextUrl);
+          console.log('🔗 Appel onAccessGranted...');
+          onAccessGranted?.(sdnextUrl);
+          console.log('🔗 Appel window.open...');
+          window.open(sdnextUrl, '_blank');
+          console.log('🔗 SDNext - Fin de la fonction');
+          return;
+        } else {
+          const reason = 'Impossible de générer un token d\'accès temporaire';
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+      }
+
+      // Gestion spéciale pour Invoke avec vérification des quotas et génération de token
+      if (moduleId === 'invoke' || moduleTitle.toLowerCase().includes('invoke')) {
+        console.log('🔑 Vérification des quotas et génération d\'un token temporaire pour Invoke...');
+        setLoadingMessage('Vérification des quotas Invoke...');
+        
+        // 1. Vérifier d'abord les quotas et l'autorisation
+        const quotaResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'check_access'
+          })
+        });
+
+        const quotaResult = await quotaResponse.json();
+        
+        if (!quotaResult.success || !quotaResult.authorized) {
+          const reason = quotaResult.reason || 'Accès non autorisé';
+          console.log('❌ Accès refusé pour Invoke:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        // 2. Vérifier les quotas spécifiquement
+        if (quotaResult.quotaInfo && quotaResult.quotaInfo.isQuotaExceeded) {
+          const reason = `Quota d'utilisation épuisé (${quotaResult.quotaInfo.usageCount}/${quotaResult.quotaInfo.maxUsage})`;
+          console.log('❌ Quota dépassé pour Invoke:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        console.log('✅ Quotas respectés, génération du token...');
+        setLoadingMessage('Génération du token d\'accès...');
+        
+        // 3. Générer le token temporaire
+        const tokenResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'generate_token'
+          })
+        });
+
+        const tokenResult = await tokenResponse.json();
+        
+        if (tokenResult.success && tokenResult.token) {
+          setLoadingMessage('Finalisation de l\'accès...');
+          
+          // 4. Incrémenter le compteur d'utilisation
+          await fetch('/api/authorize-module-access', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              moduleId,
+              moduleTitle,
+              userId: user.id,
+              userEmail: user.email,
+              action: 'increment_usage'
+            })
+          });
+
+          const invokeUrl = `https://invoke.iahome.fr?token=${tokenResult.token}`;
+          console.log('🔗 Ouverture d\'Invoke dans un nouvel onglet avec token valide');
+          console.log('🔗 URL Invoke:', invokeUrl);
+          console.log('🔗 Appel onAccessGranted...');
+          onAccessGranted?.(invokeUrl);
+          console.log('🔗 Appel window.open...');
+          window.open(invokeUrl, '_blank');
+          console.log('🔗 Invoke - Fin de la fonction');
+          return;
+        } else {
+          const reason = 'Impossible de générer un token d\'accès temporaire';
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+      }
+
+      // Gestion spéciale pour QR Codes avec vérification des quotas et génération de token
+      if (moduleId === 'qrcodes' || moduleTitle.toLowerCase().includes('qrcodes') || moduleTitle.toLowerCase().includes('qr codes') || moduleTitle.toLowerCase().includes('qr-codes')) {
+        console.log('🔑 Vérification des quotas et génération d\'un token temporaire pour QR Codes...');
+        setLoadingMessage('Vérification des quotas QR Codes...');
+        
+        // 1. Vérifier d'abord les quotas et l'autorisation
+        const quotaResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'check_access'
+          })
+        });
+
+        const quotaResult = await quotaResponse.json();
+        
+        if (!quotaResult.success || !quotaResult.authorized) {
+          const reason = quotaResult.reason || 'Accès non autorisé';
+          console.log('❌ Accès refusé pour QR Codes:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        // 2. Vérifier les quotas spécifiquement
+        if (quotaResult.quotaInfo && quotaResult.quotaInfo.isQuotaExceeded) {
+          const reason = `Quota d'utilisation épuisé (${quotaResult.quotaInfo.usageCount}/${quotaResult.quotaInfo.maxUsage})`;
+          console.log('❌ Quota dépassé pour QR Codes:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        console.log('✅ Quotas respectés, génération du token...');
+        setLoadingMessage('Génération du token d\'accès...');
+        
+        // 3. Générer le token temporaire
+        const tokenResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'generate_token'
+          })
+        });
+
+        const tokenResult = await tokenResponse.json();
+        
+        if (tokenResult.success && tokenResult.token) {
+          setLoadingMessage('Finalisation de l\'accès...');
+          
+          // 4. Incrémenter le compteur d'utilisation
+          await fetch('/api/authorize-module-access', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              moduleId,
+              moduleTitle,
+              userId: user.id,
+              userEmail: user.email,
+              action: 'increment_usage'
+            })
+          });
+
+          const qrcodesUrl = `https://qrcodes.iahome.fr?token=${tokenResult.token}`;
+          console.log('🔗 Ouverture de QR Codes dans un nouvel onglet avec token valide');
+          console.log('🔗 URL QR Codes:', qrcodesUrl);
+          console.log('🔗 Appel onAccessGranted...');
+          onAccessGranted?.(qrcodesUrl);
+          console.log('🔗 Appel window.open...');
+          window.open(qrcodesUrl, '_blank');
+          console.log('🔗 QR Codes - Fin de la fonction');
+          return;
+        } else {
+          const reason = 'Impossible de générer un token d\'accès temporaire';
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
       }
 
       // Gestion spéciale pour Blender 3D avec navigation interne

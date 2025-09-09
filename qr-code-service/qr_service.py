@@ -36,7 +36,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Configuration de l'authentification centralisée
-IAHOME_JWT_SECRET = os.getenv('IAHOME_JWT_SECRET', 'qr-code-secret-key-change-in-production')
+IAHOME_JWT_SECRET = os.getenv('IAHOME_JWT_SECRET', 'your-super-secret-jwt-key-change-in-production')
 
 def get_db_connection():
     """Créer une connexion à la base de données"""
@@ -65,6 +65,7 @@ def validate_iahome_token(token):
             logger.warning("Token expiré")
             return None
             
+        logger.info(f"Token validé avec succès pour l'utilisateur: {payload.get('userId')}")
         return payload
     except jwt.ExpiredSignatureError:
         logger.warning("Token expiré")
@@ -876,6 +877,49 @@ def generate_custom_qr_code(text, size=1000, foreground_color='#000000', backgro
         logger.error(f"Erreur lors de la génération du QR code personnalisé: {e}")
         raise e
 
+@app.route('/api/validate-token', methods=['POST'])
+def validate_token():
+    """Valider un token JWT et retourner les informations utilisateur"""
+    try:
+        # Récupérer le token depuis les headers ou le body
+        token = None
+        
+        # Essayer d'abord depuis les headers
+        auth_header = request.headers.get('Authorization')
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header[7:]
+        else:
+            # Essayer depuis le body JSON
+            data = request.get_json()
+            if data and 'token' in data:
+                token = data['token']
+        
+        if not token:
+            return jsonify({'success': False, 'error': 'Token manquant'}), 401
+        
+        # Valider le token
+        payload = validate_iahome_token(token)
+        if not payload:
+            return jsonify({'success': False, 'error': 'Token invalide'}), 401
+        
+        # Retourner les informations utilisateur
+        user_info = {
+            'success': True,
+            'userId': payload.get('userId'),
+            'userEmail': payload.get('userEmail'),
+            'email': payload.get('userEmail'),  # Alias pour compatibilité
+            'moduleId': payload.get('moduleId'),
+            'moduleTitle': payload.get('moduleTitle'),
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        logger.info(f"Token validé avec succès pour l'utilisateur: {user_info['userEmail']}")
+        return jsonify(user_info)
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de la validation du token: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/qr/custom', methods=['POST'])
 def custom_qr():
     """Générer un QR code personnalisé"""
@@ -934,8 +978,8 @@ def custom_qr():
 
 if __name__ == '__main__':
     print("🚀 Démarrage du service QR Code Generator - IAHome...")
-    print("🌐 Interface web: http://localhost:8080")
-    print("📡 API: http://localhost:8080/api/qr")
-    print("❤️  Health check: http://localhost:8080/health")
+    print("🌐 Interface web: http://localhost:7005")
+    print("📡 API: http://localhost:7005/api/qr")
+    print("❤️  Health check: http://localhost:7005/health")
     
-    app.run(host='0.0.0.0', port=8080, debug=False)
+    app.run(host='0.0.0.0', port=7005, debug=False)

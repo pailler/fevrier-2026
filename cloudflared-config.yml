@@ -19,6 +19,18 @@ ingress:
     service: http://metube:8081
   - hostname: psitransfer.iahome.fr
     service: http://psitransfer:3000
+  - hostname: stablediffusion.iahome.fr
+    service: http://stablediffusion:8080
+  - hostname: ruinedfooocus.iahome.fr
+    service: http://ruinedfooocus:8080
+  - hostname: comfyui.iahome.fr
+    service: http://comfyui:8188
+  - hostname: sdnext.iahome.fr
+    service: http://sdnext:7860
+  - hostname: invoke.iahome.fr
+    service: http://invoke:9090
+  - hostname: qrcodes.iahome.fr
+    service: http://qrcodes:7005
   - hostname: qrcode.iahome.fr
     service: http://polr:80
   

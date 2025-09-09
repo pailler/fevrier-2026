@@ -44,7 +44,7 @@ export default function QRCodesPage() {
   const [checkingActivation, setCheckingActivation] = useState(false);
 
   // Vérifier si c'est un module gratuit
-  const isFreeModule = true; // QR Codes est gratuit
+  const isFreeModule = false; // QR Codes est payant
 
   // Fonction pour vérifier si un module est déjà activé
   const checkModuleActivation = useCallback(async (moduleId: string) => {
@@ -237,8 +237,8 @@ export default function QRCodesPage() {
         }
 
         if (data) {
-          // Forcer le prix à 0 pour QR Codes (module gratuit)
-          const cardData = { ...data, price: 0 };
+          // Configurer QR Codes comme module payant (0.10€)
+          const cardData = { ...data, price: 0.10 };
           setCard(cardData);
           console.log('QR Codes card data:', cardData);
           }
@@ -436,10 +436,10 @@ export default function QRCodesPage() {
             <div className="text-left mb-8">
               <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
                 <div className="text-4xl font-bold mb-1">
-                  {card.price === 0 || card.price === '0' ? 'Free' : `€${card.price}`}
+                  €{card.price}
                 </div>
                 <div className="text-sm opacity-90">
-                  {card.price === 0 || card.price === '0' ? 'Gratuit' : 'par mois'}
+                  50 utilisations pour 1 an
                 </div>
               </div>
             </div>
@@ -535,7 +535,7 @@ export default function QRCodesPage() {
                     }}
                   >
                     <span className="text-xl">⚡</span>
-                    <span>Activer {card.title} (Mode Test)</span>
+                    <span>Activer QR Codes</span>
                   </button>
                 )}
 
@@ -552,58 +552,6 @@ export default function QRCodesPage() {
                   </button>
                 )}
 
-                {/* Nouveau bouton pour accéder au service QR Code local */}
-                {session && (
-                  <button 
-                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                    onClick={async () => {
-                      try {
-                        // Utiliser la session Supabase directement
-                        const { data: { session: currentSession } } = await supabase.auth.getSession();
-                        
-                        if (!currentSession) {
-                          throw new Error('Aucune session active');
-                        }
-
-                                                // Générer un token JWT pour le service QR Code local
-                        const response = await fetch('/api/qr-auth/validate-session', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          credentials: 'include',
-                          body: JSON.stringify({
-                            userId: currentSession.user.id,
-                            userEmail: currentSession.user.email,
-                            userName: currentSession.user.user_metadata?.full_name || currentSession.user.email?.split('@')[0] || 'Utilisateur'
-                          }),
-                        });
-
-                        if (!response.ok) {
-                          const errorData = await response.json().catch(() => ({}));
-                          throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
-                        }
-
-                        const data = await response.json();
-                        
-                        // Rediriger vers le service QR Code local avec le token
-                        const qrServiceUrl = new URL('http://localhost:7005');
-                        qrServiceUrl.searchParams.set('auth_token', data.qrToken);
-                        qrServiceUrl.searchParams.set('user_id', data.user.id);
-                        qrServiceUrl.searchParams.set('user_email', data.user.email);
-                        qrServiceUrl.searchParams.set('user_name', data.user.name);
-                        
-                        window.open(qrServiceUrl.toString(), '_blank');
-                      } catch (error) {
-                        console.error('Erreur accès service QR Code:', error);
-                        alert(`Erreur lors de l'accès au service QR Code: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
-                      }
-                    }}
-                  >
-                    <span className="text-xl">📱</span>
-                    <span>Service QR Code Local (Port 7005)</span>
-                  </button>
-                )}
               </div>
             </div>
           </div>
@@ -820,7 +768,7 @@ export default function QRCodesPage() {
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          {card.price === 0 || card.price === '0' ? 'Gratuit' : `€${card.price} par mois`}
+                          €{card.price} pour 50 utilisations (1 an)
                         </p>
                       </div>
                     </div>

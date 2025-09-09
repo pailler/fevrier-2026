@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import jwt from 'jsonwebtoken';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -159,7 +160,14 @@ export class AuthorizationService {
         return null;
       }
 
-      // Générer un token unique
+      // Pour les modules qui nécessitent un JWT (comme QR Codes), générer un JWT
+      if (accessInfo.moduleId === 'qrcodes') {
+        const jwtToken = this.generateJWTToken(accessInfo, durationMinutes);
+        console.log('✅ Token JWT généré avec succès pour QR Codes');
+        return jwtToken;
+      }
+
+      // Pour les autres modules, utiliser le système de tokens uniques
       const token = this.generateUniqueToken();
       const expiresAt = new Date(Date.now() + durationMinutes * 60 * 1000);
 
@@ -295,6 +303,25 @@ export class AuthorizationService {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return result;
+  }
+
+  /**
+   * Génère un token JWT pour l'authentification
+   */
+  generateJWTToken(accessInfo: ModuleAccessInfo, durationMinutes: number = 5): string {
+    const secret = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
+    const payload = {
+      userId: accessInfo.userId,
+      userEmail: accessInfo.userEmail,
+      moduleId: accessInfo.moduleId,
+      moduleTitle: accessInfo.moduleTitle,
+      email: accessInfo.userEmail, // Alias pour compatibilité
+      sub: accessInfo.userId, // Alias pour compatibilité
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + (durationMinutes * 60)
+    };
+    
+    return jwt.sign(payload, secret, { algorithm: 'HS256' });
   }
 
   /**

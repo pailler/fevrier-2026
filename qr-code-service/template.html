@@ -925,10 +925,16 @@
         
         <!-- User connection info in top banner -->
         <div class="banner-top-info">
-            <div class="connection-status">
+            <div class="connection-status" id="connection-status">
                 <span class="status-dot"></span>
                 <span class="status-text">Connecté via IAHome</span>
                 <span class="user-email" id="user-email">Chargement...</span>
+            </div>
+            <div class="connection-actions" id="connection-actions" style="display: none;">
+                <button class="banner-button" onclick="connectToIAHome()">
+                    <span>🔐</span>
+                    <span>Se connecter à IAHome</span>
+                </button>
             </div>
         </div>
     </div>
@@ -1380,6 +1386,154 @@
         function getAuthToken() {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('auth_token');
+        }
+        
+        // User authentication and session management
+        let currentUser = null;
+        let authToken = null;
+        
+        // Initialize authentication
+        function initializeAuth() {
+            authToken = getAuthToken();
+            
+            if (authToken) {
+                // User is authenticated, validate token and get user info
+                validateTokenAndGetUserInfo();
+            } else {
+                // User is not authenticated, show login button
+                showLoginButton();
+            }
+        }
+        
+        // Validate token and get user information
+        async function validateTokenAndGetUserInfo() {
+            try {
+                const response = await fetch('/api/validate-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token: authToken })
+                });
+                
+                if (response.ok) {
+                    const userInfo = await response.json();
+                    currentUser = userInfo;
+                    showUserInfo(userInfo);
+                } else {
+                    console.error('Token validation failed');
+                    showLoginButton();
+                }
+            } catch (error) {
+                console.error('Error validating token:', error);
+                showLoginButton();
+            }
+        }
+        
+        // Show user information
+        function showUserInfo(userInfo) {
+            const connectionStatus = document.getElementById('connection-status');
+            const connectionActions = document.getElementById('connection-actions');
+            const userEmail = document.getElementById('user-email');
+            
+            if (connectionStatus && userEmail) {
+                userEmail.textContent = userInfo.email || userInfo.userEmail || 'Utilisateur IAHome';
+                connectionStatus.style.display = 'flex';
+                if (connectionActions) {
+                    connectionActions.style.display = 'none';
+                }
+            }
+            
+            // Load user's QR codes
+            loadUserQRCodes();
+        }
+        
+        // Show login button
+        function showLoginButton() {
+            const connectionStatus = document.getElementById('connection-status');
+            const connectionActions = document.getElementById('connection-actions');
+            
+            if (connectionStatus) {
+                connectionStatus.style.display = 'none';
+            }
+            if (connectionActions) {
+                connectionActions.style.display = 'flex';
+            }
+        }
+        
+        // Connect to IAHome
+        function connectToIAHome() {
+            window.location.href = 'https://iahome.fr/login?redirect=' + encodeURIComponent(window.location.href);
+        }
+        
+        // Load user's QR codes
+        async function loadUserQRCodes() {
+            if (!authToken) return;
+            
+            try {
+                const response = await fetch('/api/dynamic/qr', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        updateUserStats(data.qr_codes);
+                        displayUserQRCodes(data.qr_codes);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user QR codes:', error);
+            }
+        }
+        
+        // Update user statistics
+        function updateUserStats(qrCodes) {
+            const totalQRCodes = Object.keys(qrCodes).length;
+            const totalScans = Object.values(qrCodes).reduce((sum, qr) => sum + (qr.scans || 0), 0);
+            const avgScans = totalQRCodes > 0 ? Math.round(totalScans / totalQRCodes) : 0;
+            
+            const totalQRCodesEl = document.getElementById('total-qr-codes');
+            const totalScansEl = document.getElementById('total-scans');
+            const avgScansEl = document.getElementById('avg-scans');
+            
+            if (totalQRCodesEl) totalQRCodesEl.textContent = totalQRCodes;
+            if (totalScansEl) totalScansEl.textContent = totalScans;
+            if (avgScansEl) avgScansEl.textContent = avgScans;
+        }
+        
+        // Display user's QR codes in management section
+        function displayUserQRCodes(qrCodes) {
+            const qrCodesList = document.getElementById('qr-codes-list');
+            if (!qrCodesList) return;
+            
+            if (Object.keys(qrCodes).length === 0) {
+                qrCodesList.innerHTML = '<p class="no-qr-codes">Aucun QR code créé pour le moment.</p>';
+                return;
+            }
+            
+            let html = '';
+            Object.values(qrCodes).forEach(qr => {
+                html += `
+                    <div class="qr-code-item">
+                        <div class="qr-code-info">
+                            <h4>${qr.name || 'QR Code sans nom'}</h4>
+                            <p>URL: ${qr.url}</p>
+                            <p>Créé le: ${new Date(qr.created_at).toLocaleDateString()}</p>
+                            <p>Scans: ${qr.scans || 0}</p>
+                        </div>
+                        <div class="qr-code-actions">
+                            <button onclick="editQRCode('${qr.qr_id}')" class="btn btn-secondary">Modifier</button>
+                            <button onclick="downloadQRCode('${qr.qr_id}')" class="btn btn-primary">Télécharger</button>
+                            <button onclick="deleteQRCode('${qr.qr_id}')" class="btn btn-danger">Supprimer</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            qrCodesList.innerHTML = html;
         }
         
                  // Step navigation with state persistence
@@ -2786,19 +2940,30 @@
               statsDiv.innerHTML = html;
           }
           
-                  // Load user email from JWT token
+        // Load user email from JWT token via API
         function loadUserEmail() {
-            const authToken = getAuthToken();
+            const authToken = getAuthToken(); 
             if (authToken) {
-                try {
-                    // Decode JWT token (payload is the second part)
-                    const payload = JSON.parse(atob(authToken.split('.')[1]));
-                    const userEmail = payload.email || payload.sub || 'Utilisateur IAHome';
-                    document.getElementById('user-email').textContent = userEmail;
-                } catch (error) {
-                    console.error('Erreur lors du décodage du token:', error);
+                // Validate token via API and get user info
+                fetch('/api/validate-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token: authToken })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.userEmail) {
+                        document.getElementById('user-email').textContent = data.userEmail;
+                    } else {
+                        document.getElementById('user-email').textContent = 'Utilisateur IAHome';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la validation du token:', error);
                     document.getElementById('user-email').textContent = 'Utilisateur IAHome';
-                }
+                });
             } else {
                 document.getElementById('user-email').textContent = 'Non connecté';
             }
@@ -2835,6 +3000,7 @@
         // Initialize workflow and stats
         document.addEventListener('DOMContentLoaded', function() {
             showStep(1);
+            initializeAuth(); // Initialize authentication first
             loadUserEmail();
             loadUserStats();
         });

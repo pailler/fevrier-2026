@@ -28,11 +28,11 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.stirling-pdf.rule=Host(`pdf.regispailler.fr`)"
+      - "traefik.http.routers.stirling-pdf.rule=Host(`pdf.iahome.fr`)"
       - "traefik.http.routers.stirling-pdf.entrypoints=websecure"
       - "traefik.http.routers.stirling-pdf.tls=true"
       - "traefik.http.services.stirling-pdf.loadbalancer.server.port=8080"
-      - "traefik.http.routers.stirling-pdf-http.rule=Host(`pdf.regispailler.fr`)"
+      - "traefik.http.routers.stirling-pdf-http.rule=Host(`pdf.iahome.fr`)"
       - "traefik.http.routers.stirling-pdf-http.entrypoints=web"
       - "traefik.http.routers.stirling-pdf-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -51,10 +51,15 @@ services:
       - services-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.metube.rule=Host(`metube.regispailler.fr`)"
+      - "traefik.http.routers.metube.rule=Host(`metube.iahome.fr`)"
       - "traefik.http.routers.metube.entrypoints=websecure"
       - "traefik.http.routers.metube.tls=true"
       - "traefik.http.services.metube.loadbalancer.server.port=8081"
+      - "traefik.http.routers.metube-http.rule=Host(`metube.iahome.fr`)"
+      - "traefik.http.routers.metube-http.entrypoints=web"
+      - "traefik.http.routers.metube-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
 
   # Service LibreSpeed (test de vitesse)
   librespeed:
@@ -98,17 +103,177 @@ services:
       - services-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.psitransfer.rule=Host(`psitransfer.regispailler.fr`)"
+      - "traefik.http.routers.psitransfer.rule=Host(`psitransfer.iahome.fr`)"
       - "traefik.http.routers.psitransfer.entrypoints=websecure"
       - "traefik.http.routers.psitransfer.tls=true"
       - "traefik.http.services.psitransfer.loadbalancer.server.port=3000"
-      - "traefik.http.routers.psitransfer-http.rule=Host(`psitransfer.regispailler.fr`)"
+      - "traefik.http.routers.psitransfer-http.rule=Host(`psitransfer.iahome.fr`)"
       - "traefik.http.routers.psitransfer-http.entrypoints=web"
       - "traefik.http.routers.psitransfer-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
 
 
+
+  # Service StableDiffusion
+  stablediffusion:
+    image: pytorch/pytorch:latest
+    container_name: stablediffusion
+    restart: unless-stopped
+    ports:
+      - "8085:8080"  # Port pour StableDiffusion
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./stablediffusion-data:/app
+    networks:
+      - services-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.stablediffusion.rule=Host(`stablediffusion.iahome.fr`)"
+      - "traefik.http.routers.stablediffusion.entrypoints=websecure"
+      - "traefik.http.routers.stablediffusion.tls=true"
+      - "traefik.http.services.stablediffusion.loadbalancer.server.port=8080"
+      - "traefik.http.routers.stablediffusion-http.rule=Host(`stablediffusion.iahome.fr`)"
+      - "traefik.http.routers.stablediffusion-http.entrypoints=web"
+      - "traefik.http.routers.stablediffusion-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+  # Service RuinedFooocus
+  ruinedfooocus:
+    image: python:3.9-slim
+    container_name: ruinedfooocus
+    restart: unless-stopped
+    ports:
+      - "8087:8080"  # Port pour RuinedFooocus
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./ruinedfooocus-data:/app
+    networks:
+      - services-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ruinedfooocus.rule=Host(`ruinedfooocus.iahome.fr`)"
+      - "traefik.http.routers.ruinedfooocus.entrypoints=websecure"
+      - "traefik.http.routers.ruinedfooocus.tls=true"
+      - "traefik.http.services.ruinedfooocus.loadbalancer.server.port=8080"
+      - "traefik.http.routers.ruinedfooocus-http.rule=Host(`ruinedfooocus.iahome.fr`)"
+      - "traefik.http.routers.ruinedfooocus-http.entrypoints=web"
+      - "traefik.http.routers.ruinedfooocus-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+  # Service ComfyUI
+  comfyui:
+    image: yanwk/comfyui:latest
+    container_name: comfyui
+    restart: unless-stopped
+    ports:
+      - "8088:8188"  # Port pour ComfyUI
+    environment:
+      - CLI_ARGS=--listen --port 8188 --enable-cors-header
+    volumes:
+      - ./comfyui-models:/app/models
+      - ./comfyui-outputs:/app/output
+    networks:
+      - services-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.comfyui.rule=Host(`comfyui.iahome.fr`)"
+      - "traefik.http.routers.comfyui.entrypoints=websecure"
+      - "traefik.http.routers.comfyui.tls=true"
+      - "traefik.http.services.comfyui.loadbalancer.server.port=8188"
+      - "traefik.http.routers.comfyui-http.rule=Host(`comfyui.iahome.fr`)"
+      - "traefik.http.routers.comfyui-http.entrypoints=web"
+      - "traefik.http.routers.comfyui-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+  # Service SDNext
+  sdnext:
+    image: ghcr.io/automatic1111/stable-diffusion-webui:latest
+    container_name: sdnext
+    restart: unless-stopped
+    ports:
+      - "8089:7860"  # Port pour SDNext
+    environment:
+      - CLI_ARGS=--listen --port 7860 --enable-cors-header
+    volumes:
+      - ./sdnext-models:/app/models
+      - ./sdnext-outputs:/app/output
+    networks:
+      - services-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sdnext.rule=Host(`sdnext.iahome.fr`)"
+      - "traefik.http.routers.sdnext.entrypoints=websecure"
+      - "traefik.http.routers.sdnext.tls=true"
+      - "traefik.http.services.sdnext.loadbalancer.server.port=7860"
+      - "traefik.http.routers.sdnext-http.rule=Host(`sdnext.iahome.fr`)"
+      - "traefik.http.routers.sdnext-http.entrypoints=web"
+      - "traefik.http.routers.sdnext-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+  # Service Invoke
+  invoke:
+    image: invokeai/invokeai:latest
+    container_name: invoke
+    restart: unless-stopped
+    ports:
+      - "8090:9090"  # Port pour Invoke
+    environment:
+      - INVOKEAI_ROOT=/app/invokeai
+    volumes:
+      - ./invoke-models:/app/invokeai/models
+      - ./invoke-outputs:/app/invokeai/outputs
+    networks:
+      - services-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.invoke.rule=Host(`invoke.iahome.fr`)"
+      - "traefik.http.routers.invoke.entrypoints=websecure"
+      - "traefik.http.routers.invoke.tls=true"
+      - "traefik.http.services.invoke.loadbalancer.server.port=9090"
+      - "traefik.http.routers.invoke-http.rule=Host(`invoke.iahome.fr`)"
+      - "traefik.http.routers.invoke-http.entrypoints=web"
+      - "traefik.http.routers.invoke-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+  # Service QR Codes
+  qrcodes:
+    build: ../qr-code-service
+    container_name: qrcodes
+    restart: unless-stopped
+    ports:
+      - "8091:7005"  # Port pour QR Codes
+    environment:
+      - PYTHONUNBUFFERED=1
+      - FLASK_APP=qr_service.py
+      - FLASK_ENV=production
+      - IAHOME_JWT_SECRET=iahome-jwt-secret-2024-production-secure-key
+      - DATABASE_URL=postgresql://qrcode_user:qrcode_password@postgres:5432/qrcode_db
+    volumes:
+      - C:\Users\AAA\Documents\iahome\qr-code-service:/app
+      - C:\Users\AAA\Documents\iahome\qrcodes-data:/app/qr_codes
+    working_dir: /app
+    command: ["python", "qr_service.py"]
+    networks:
+      - services-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.qrcodes.rule=Host(`qrcodes.iahome.fr`)"
+      - "traefik.http.routers.qrcodes.entrypoints=websecure"
+      - "traefik.http.routers.qrcodes.tls=true"
+      - "traefik.http.services.qrcodes.loadbalancer.server.port=7005"
+      - "traefik.http.routers.qrcodes-http.rule=Host(`qrcodes.iahome.fr`)"
+      - "traefik.http.routers.qrcodes-http.entrypoints=web"
+      - "traefik.http.routers.qrcodes-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
 
   # Service Polr (raccourcissement d'URL)
   polr:
