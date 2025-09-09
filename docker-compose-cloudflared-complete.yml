@@ -1,9 +1,0 @@
-services:
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflared-tunnel
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run --token eyJhIjoiOWJhNDI5NGFhNzg3ZTY3YzMzNWM3MTg3NmMxMGFmMjEiLCJ0IjoiYjE5MDg0ZjQtZTJkNi00N2Y1LTgxYzMtMDk3MjY2MmU5NTNjIiwicyI6IlkyVm1OalJpT0RZdFpERmlNUzAwTURSaUxXSmhPVFV0WXpWaFlqRTBNakppWVdSbSJ9
-    network_mode: host
-    environment:
-      - TUNNEL_ORIGIN_CERT=C:\Users\AAA\.cloudflared\cert.pem
