@@ -208,7 +208,7 @@ export default function Header() {
               
               {/* Lien Applis IA - Ajouté après Formation */}
               <Link 
-                href="https://iahome.fr" 
+                href="/applications" 
                 className="hidden md:block text-gray-700 hover:text-blue-600 font-medium transition-colors"
               >
                 Applis IA
@@ -256,7 +256,7 @@ export default function Header() {
                 
                 {/* Lien Applis IA - Mobile */}
                 <Link 
-                  href="https://iahome.fr" 
+                  href="/applications" 
                   className="text-gray-700 font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-left"
                 >
                   Applis IA
