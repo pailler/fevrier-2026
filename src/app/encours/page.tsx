@@ -391,7 +391,6 @@ export default function EncoursPage() {
       'comfyui': 'https://comfyui.iahome.fr',
       'cogstudio': 'https://cogstudio.iahome.fr',
       'sdnext': 'https://sdnext.iahome.fr',
-      'blender-3d': '/blender-3d' // URL interne pour le module Blender 3D
     };
     
     return moduleUrls[moduleId] || '';

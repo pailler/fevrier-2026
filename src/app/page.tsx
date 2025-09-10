@@ -104,23 +104,39 @@ export default function Home() {
             console.log('Module traité:', module.title);
           });
           
-          // Traiter les modules avec la structure simple
-          const modulesWithRoles = (modulesData || []).map(module => {
-            // Utiliser la catégorie directement depuis la table modules
-            const primaryCategory = module.category || 'Non classé';
-            
-            return {
-              ...module,
-              // Catégorie principale
-              category: cleanCategory(primaryCategory),
-              // Catégories multiples (utiliser la même catégorie pour compatibilité)
-              categories: [cleanCategory(primaryCategory)],
-              // Ajouter des données aléatoires seulement pour l'affichage (pas stockées en DB)
-              role: getRandomRole(),
-              usage_count: Math.floor(Math.random() * 1000) + 1,
-              profession: getModuleProfession(module.title, primaryCategory)
-            };
-          });
+          // Modules essentiels à exclure de la page d'accueil
+          const essentialModules = [
+            'librespeed',
+            'metube', 
+            'pdf',
+            'psitransfer',
+            'qrcodes'
+          ];
+
+          // Traiter les modules avec la structure simple (exclure les modules essentiels)
+          const modulesWithRoles = (modulesData || [])
+            .filter(module => 
+              !essentialModules.includes(module.id) && 
+              !essentialModules.some(essentialId => 
+                module.title.toLowerCase().includes(essentialId.toLowerCase())
+              )
+            )
+            .map(module => {
+              // Utiliser la catégorie directement depuis la table modules
+              const primaryCategory = module.category || 'Non classé';
+              
+              return {
+                ...module,
+                // Catégorie principale
+                category: cleanCategory(primaryCategory),
+                // Catégories multiples (utiliser la même catégorie pour compatibilité)
+                categories: [cleanCategory(primaryCategory)],
+                // Ajouter des données aléatoires seulement pour l'affichage (pas stockées en DB)
+                role: getRandomRole(),
+                usage_count: Math.floor(Math.random() * 1000) + 1,
+                profession: getModuleProfession(module.title, primaryCategory)
+              };
+            });
           
           setModules(modulesWithRoles);
         }
@@ -413,10 +429,10 @@ export default function Home() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
-                Accès directs à la puissance GPU, IA et outils essentiels
+                Gagnez une longueur d'avance avec l'Intelligence Artificielle
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Le numérique à portée de main, pour une utilisation simple et directe.
+                Apprenez, pratiquez et grandissez : l'IA simplifie votre quotidien, boost vos projets et décuple vos idées
               </p>
               
               {/* Barre de recherche et bouton Mes applis */}

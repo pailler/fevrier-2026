@@ -213,6 +213,14 @@ export default function Header() {
               >
                 Applications
               </Link>
+              
+              {/* Lien Essentiels */}
+              <Link 
+                href="/essentiels" 
+                className="hidden md:block text-gray-700 hover:text-blue-600 font-medium transition-colors"
+              >
+                Essentiels
+              </Link>
             </div>
             
             {/* Boutons à droite - Desktop */}
@@ -252,6 +260,14 @@ export default function Header() {
                   className="text-gray-700 font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-left"
                 >
                   Applications
+                </Link>
+                
+                {/* Lien Essentiels - Mobile */}
+                <Link 
+                  href="/essentiels" 
+                  className="text-gray-700 font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-left"
+                >
+                  Essentiels
                 </Link>
                 
                 {/* Boutons mobile */}

@@ -1082,14 +1082,6 @@ export default function AuthorizedAccessButton({
         }
       }
 
-      // Gestion spéciale pour Blender 3D avec navigation interne
-      if (moduleId === 'blender-3d' || moduleTitle.toLowerCase().includes('blender')) {
-        console.log('🔑 Accès à Blender 3D via navigation interne');
-        const blenderUrl = moduleUrl || '/card/blender-3d';
-        // Pour Blender, on garde la navigation interne (pas de nouvel onglet)
-        onAccessGranted?.(blenderUrl);
-        return;
-      }
 
       // Gestion spéciale pour PsiTransfer avec ouverture dans un nouvel onglet
       if (moduleTitle.toLowerCase().includes('psitransfer') || moduleTitle.toLowerCase().includes('psi transfer')) {
