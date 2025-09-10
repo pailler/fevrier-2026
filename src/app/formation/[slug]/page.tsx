@@ -4,6 +4,7 @@ import { supabase } from "../../../utils/supabaseClient";
 import Link from "next/link";
 import Breadcrumb from "../../../components/Breadcrumb";
 import Header from "../../../components/Header";
+import FormationContent from "../../../components/FormationContent";
 import { useParams } from "next/navigation";
 
 interface FormationArticle {
@@ -30,36 +31,6 @@ export default function FormationArticlePage() {
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
 
-  // Fonction pour nettoyer le contenu HTML
-  const cleanHtmlContent = (htmlContent: string): string => {
-    // Supprimer les balises DOCTYPE, html, head et body
-    let cleaned = htmlContent
-      .replace(/<!DOCTYPE[^>]*>/gi, '')
-      .replace(/<html[^>]*>/gi, '')
-      .replace(/<\/html>/gi, '')
-      .replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '')
-      .replace(/<body[^>]*>/gi, '')
-      .replace(/<\/body>/gi, '')
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-      .replace(/<meta[^>]*>/gi, '')
-      .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
-      .replace(/<link[^>]*>/gi, '')
-      .replace(/<header[^>]*>/gi, '<div class="article-header">')
-      .replace(/<\/header>/gi, '</div>')
-      .replace(/<main[^>]*>/gi, '<div class="article-main">')
-      .replace(/<\/main>/gi, '</div>')
-      .replace(/<footer[^>]*>/gi, '<div class="article-footer">')
-      .replace(/<\/footer>/gi, '</div>')
-      .replace(/class="wrap"/gi, 'class="article-section"')
-      .replace(/class="lede"/gi, 'class="article-lede"')
-      .replace(/class="note"/gi, 'class="article-note"')
-      .replace(/class="callout"/gi, 'class="article-callout"')
-      .replace(/class="glossary"/gi, 'class="article-glossary"')
-      .replace(/class="kbd"/gi, 'class="article-kbd"');
-
-    return cleaned.trim();
-  };
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -186,13 +157,28 @@ export default function FormationArticlePage() {
           <div className="p-8">
             {/* En-tête de l'article */}
             <header className="mb-8">
-              <div className="flex items-center mb-4">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                  {article.category.charAt(0).toUpperCase() + article.category.slice(1)}
-                </span>
-                <span className="ml-3 text-sm text-gray-500">
-                  {article.read_time} min de lecture
-                </span>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center flex-wrap gap-2">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    {article.category.charAt(0).toUpperCase() + article.category.slice(1)}
+                  </span>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    {article.difficulty}
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    {article.read_time} min de lecture
+                  </span>
+                </div>
+                
+                {/* Prix de la formation */}
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-gray-900">
+                    {article.price === 0 ? 'Gratuit' : `${article.price}€`}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Durée: {article.duration}
+                  </div>
+                </div>
               </div>
               
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -210,10 +196,12 @@ export default function FormationArticlePage() {
               </div>
             </header>
 
-            {/* Contenu de l'article nettoyé */}
-            <div 
-              className="prose prose-lg max-w-none article-content"
-              dangerouslySetInnerHTML={{ __html: cleanHtmlContent(article.content) }}
+            {/* Contenu de la formation structuré */}
+            <FormationContent 
+              content={article.content || ''}
+              difficulty={article.difficulty || 'Débutant'}
+              duration={article.duration || '60 min'}
+              price={article.price || 0}
             />
             
 

@@ -206,12 +206,12 @@ export default function Header() {
                 className="hidden md:flex items-center space-x-6"
               />
               
-              {/* Lien Applications - Ajouté après Formation */}
+              {/* Lien Applis IA - Ajouté après Formation */}
               <Link 
                 href="https://iahome.fr" 
                 className="hidden md:block text-gray-700 hover:text-blue-600 font-medium transition-colors"
               >
-                Applications
+                Applis IA
               </Link>
               
               {/* Lien Essentiels */}
@@ -254,12 +254,12 @@ export default function Header() {
                   className="flex flex-col space-y-3"
                 />
                 
-                {/* Lien Applications - Mobile */}
+                {/* Lien Applis IA - Mobile */}
                 <Link 
                   href="https://iahome.fr" 
                   className="text-gray-700 font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-left"
                 >
-                  Applications
+                  Applis IA
                 </Link>
                 
                 {/* Lien Essentiels - Mobile */}
