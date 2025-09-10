@@ -42,47 +42,68 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Section héros - Style avec animations comme la page applications */}
-      <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-20 relative overflow-hidden">
-        {/* Effet de particules en arrière-plan */}
+      {/* Section héros - Bannière avec couleurs de la page applications */}
+      <section className="bg-gradient-to-br from-yellow-100 via-green-50 to-green-200 py-16 relative overflow-hidden">
+        {/* Effet de particules en arrière-plan - identique à la page applications */}
         <div className="absolute inset-0">
-          <div className="absolute top-10 left-10 w-3 h-3 bg-blue-400/30 rounded-full animate-pulse"></div>
-          <div className="absolute top-20 right-20 w-2 h-2 bg-indigo-400/25 rounded-full animate-bounce"></div>
-          <div className="absolute bottom-10 left-1/4 w-2.5 h-2.5 bg-purple-500/20 rounded-full animate-pulse"></div>
-          <div className="absolute bottom-20 right-1/3 w-2 h-2 bg-blue-500/30 rounded-full animate-bounce"></div>
-          <div className="absolute top-1/2 left-1/3 w-1.5 h-1.5 bg-indigo-600/15 rounded-full animate-pulse"></div>
-          <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-purple-400/25 rounded-full animate-bounce"></div>
+          <div className="absolute top-10 left-10 w-2 h-2 bg-yellow-400/30 rounded-full animate-pulse"></div>
+          <div className="absolute top-20 right-20 w-1 h-1 bg-green-400/25 rounded-full animate-bounce"></div>
+          <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-yellow-500/20 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-green-500/30 rounded-full animate-bounce"></div>
+          <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-yellow-600/15 rounded-full animate-pulse"></div>
         </div>
         
-        <div className="w-full px-6 relative z-10">
-          <div className="text-center">
-            <h1 className="text-4xl lg:text-6xl xl:text-7xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent leading-tight mb-8">
-              Gagnez une longueur d'avance avec l'Intelligence Artificielle
-            </h1>
-            <p className="text-xl lg:text-2xl xl:text-3xl text-gray-700 mb-12 max-w-5xl mx-auto">
-              Apprenez, pratiquez et grandissez : l'IA simplifie votre quotidien, boost vos projets et décuple vos idées.
-            </p>
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+            {/* Contenu texte */}
+            <div className="flex-1 max-w-2xl">
+              <h1 className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
+                Gagnez une longueur d'avance avec l'Intelligence Artificielle
+              </h1>
+              <p className="text-lg text-gray-700 mb-6">
+                Apprenez, pratiquez et grandissez : l'IA simplifie votre quotidien, boost vos projets et décuple vos idées
+              </p>
+              
+              {/* Boutons d'action */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link
+                  href="/applications"
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                >
+                  <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                  Applications IA
+                </Link>
+                <Link
+                  href="/essentiels"
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                >
+                  <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Essentiels
+                </Link>
+              </div>
+            </div>
             
-            {/* Boutons d'action avec style moderne */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
-              <Link
-                href="/applications"
-                className="inline-flex items-center px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xl font-semibold rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-2xl"
-              >
-                <svg className="w-7 h-7 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                Applications IA
-              </Link>
-              <Link
-                href="/essentiels"
-                className="inline-flex items-center px-10 py-5 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xl font-semibold rounded-2xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 shadow-2xl"
-              >
-                <svg className="w-7 h-7 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Essentiels
-              </Link>
+            {/* Illustration - identique à la page applications */}
+            <div className="flex-1 flex justify-center">
+              <div className="relative w-80 h-64">
+                {/* Formes géométriques abstraites */}
+                <div className="absolute top-0 left-0 w-24 h-24 bg-red-400 rounded-full opacity-60 animate-pulse"></div>
+                <div className="absolute top-16 right-0 w-20 h-20 bg-yellow-400 rounded-lg opacity-60 animate-bounce"></div>
+                <div className="absolute bottom-0 left-16 w-20 h-20 bg-green-400 transform rotate-45 opacity-60 animate-pulse"></div>
+                <div className="absolute bottom-16 right-16 w-16 h-16 bg-blue-400 rounded-full opacity-60 animate-bounce"></div>
+                
+                {/* Éléments centraux */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-left">
+                    <div className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-green-700 bg-clip-text text-transparent mb-3">IAHome</div>
+                    <div className="text-xs text-gray-600">Intelligence Artificielle</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -235,6 +256,40 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
+            </div>
+
+            {/* Moteur de recherche */}
+            <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-200">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
+                  <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">Recherche</h3>
+                </div>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Trouvez rapidement ce que vous cherchez dans toutes nos sections : applications, formations, articles et plus.
+              </p>
+              <form action="/search" method="GET" className="flex gap-2">
+                <input
+                  type="text"
+                  name="q"
+                  placeholder="Rechercher..."
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  required
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </button>
+              </form>
             </div>
 
             {/* Contact */}

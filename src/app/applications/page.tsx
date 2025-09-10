@@ -427,10 +427,10 @@ export default function Home() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
-                Gagnez une longueur d'avance avec l'Intelligence Artificielle
+                Accès direct à la puissance et aux outils IA
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Apprenez, pratiquez et grandissez : l'IA simplifie votre quotidien, boost vos projets et décuple vos idées
+                Découvrez, apprenez et maîtrisez l'intelligence artificielle avec nos applications, formations et ressources expertes
               </p>
               
               {/* Barre de recherche et bouton Mes applis */}
