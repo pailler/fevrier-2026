@@ -226,17 +226,17 @@ export default function AdminModulesPage() {
     
     // Mapping des URLs des modules
     const moduleUrls: { [key: string]: string } = {
-      'stablediffusion': 'https://stablediffusion.regispailler.fr',
-      'iaphoto': 'https://iaphoto.regispailler.fr', 
+      'stablediffusion': 'https://stablediffusion.iahome.fr',
+      'iaphoto': 'https://iaphoto.iahome.fr', 
       'iametube': '/api/proxy-metube',
-      'chatgpt': 'https://chatgpt.regispailler.fr',
+      'chatgpt': 'https://chatgpt.iahome.fr',
       'librespeed': '/api/proxy-librespeed',
-      'psitransfer': 'https://psitransfer.regispailler.fr',
-      'pdf+': 'https://pdfplus.regispailler.fr',
-      'aiassistant': 'https://aiassistant.regispailler.fr',
-      'cogstudio': 'https://cogstudio.regispailler.fr',
+      'psitransfer': 'https://psitransfer.iahome.fr',
+      'pdf+': 'https://pdfplus.iahome.fr',
+      'aiassistant': 'https://aiassistant.iahome.fr',
+      'cogstudio': 'https://cogstudio.iahome.fr',
               'ruinedfooocus': '/api/gradio-secure',
-      'invoke': 'https://invoke.regispailler.fr'
+      'invoke': 'https://invoke.iahome.fr'
     };
     
     const baseUrl = moduleUrls[moduleName];
@@ -668,7 +668,7 @@ Solutions:
     const moduleName = module.title.toLowerCase().replace(/\s+/g, '');
     
     // Utiliser l'URL du module depuis la base de données, sinon URL par défaut
-    const baseUrl = module.url || 'https://stablediffusion.regispailler.fr';
+    const baseUrl = module.url || 'https://stablediffusion.iahome.fr';
     const accessUrl = `${baseUrl}?token={JWT_TOKEN}`;
     
     return {

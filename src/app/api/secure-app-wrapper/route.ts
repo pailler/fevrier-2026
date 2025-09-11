@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
         description: 'Téléchargeur de vidéos'
       },
       'stablediffusion': {
-        url: 'https://stablediffusion.regispailler.fr',
+        url: 'https://stablediffusion.iahome.fr',
         name: 'Stable Diffusion',
         description: 'Générateur d\'images Stable Diffusion'
       }

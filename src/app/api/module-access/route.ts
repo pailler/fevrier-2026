@@ -19,7 +19,7 @@ const MODULES_CONFIG: Record<string, {
   };
 }> = {
   stablediffusion: {
-    url: 'https://stablediffusion.regispailler.fr',
+    url: 'https://stablediffusion.iahome.fr',
     credentials: { username: 'admin', password: 'Rasulova75' },
     type: 'gradio',
     authMethods: ['gradio-auth', 'launch-args', 'gradio-injection', 'basic-auth', 'form-injection', 'cookie-session', 'direct-login'],

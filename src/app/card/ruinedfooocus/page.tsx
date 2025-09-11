@@ -114,7 +114,7 @@ export default function RuinedFooocusPage() {
       }
       
       const { accessToken, moduleName } = responseData;
-      const baseUrl = 'https://ruinedfooocus.regispailler.fr';
+      const baseUrl = 'https://ruinedfooocus.iahome.fr';
       const accessUrl = `${baseUrl}?token=${accessToken}`;
       setIframeModal({
         isOpen: true,

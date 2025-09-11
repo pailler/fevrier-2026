@@ -77,11 +77,11 @@ services:
       - services-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.librespeed.rule=Host(`librespeed.regispailler.fr`)"
+      - "traefik.http.routers.librespeed.rule=Host(`librespeed.iahome.fr`)"
       - "traefik.http.routers.librespeed.entrypoints=websecure"
       - "traefik.http.routers.librespeed.tls=true"
       - "traefik.http.services.librespeed.loadbalancer.server.port=80"
-      - "traefik.http.routers.librespeed-http.rule=Host(`librespeed.regispailler.fr`)"
+      - "traefik.http.routers.librespeed-http.rule=Host(`librespeed.iahome.fr`)"
       - "traefik.http.routers.librespeed-http.entrypoints=web"
       - "traefik.http.routers.librespeed-http.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
@@ -288,12 +288,12 @@ services:
       - DB_USERNAME=polr
       - DB_PASSWORD=polr_password
       - APP_NAME=QRCode Regispailler
-      - APP_ADDRESS=https://qrcode.regispailler.fr
+      - APP_ADDRESS=https://qrcode.iahome.fr
       - ADMIN_USERNAME=admin
       - ADMIN_PASSWORD=admin123
       - SETTING_PUBLIC_INTERFACE=true
       - SETTING_SHORTEN_PERMISSION=true
-      - SETTING_INDEX_REDIRECT=https://qrcode.regispailler.fr
+      - SETTING_INDEX_REDIRECT=https://qrcode.iahome.fr
     volumes:
       - ./polr-data:/app/.env
     networks:

@@ -111,7 +111,7 @@ export default function QRCodeIframePage() {
               
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={() => window.open(process.env.NEXT_PUBLIC_QR_CODE_SERVICE_URL || 'https://qrcode.regispailler.fr', '_blank')}
+                  onClick={() => window.open(process.env.NEXT_PUBLIC_QR_CODE_SERVICE_URL || 'https://qrcode.iahome.fr', '_blank')}
                   className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
                 >
                   Ouvrir dans un nouvel onglet
@@ -132,7 +132,7 @@ export default function QRCodeIframePage() {
             )}
             
             <iframe
-              src={process.env.NEXT_PUBLIC_QR_CODE_SERVICE_URL || 'https://qrcode.regispailler.fr'}
+              src={process.env.NEXT_PUBLIC_QR_CODE_SERVICE_URL || 'https://qrcode.iahome.fr'}
               className="w-full h-full border-0"
               onLoad={() => setIframeLoaded(true)}
               title="QR Codes Intelligents"

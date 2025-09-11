@@ -114,7 +114,7 @@ export default function CogStudioPage() {
       }
       
       const { accessToken, moduleName } = responseData;
-      const baseUrl = 'https://cogstudio.regispailler.fr';
+      const baseUrl = 'https://cogstudio.iahome.fr';
       const accessUrl = `${baseUrl}?token=${accessToken}`;
       setIframeModal({
         isOpen: true,

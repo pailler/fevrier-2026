@@ -36,7 +36,7 @@ function SearchContent() {
       // Recherche dans les articles de blog
       const { data: blogArticles } = await supabase
         .from('blog_articles')
-        .select('id, title, content, published_at')
+        .select('id, title, content, published_at, slug')
         .or(`title.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`)
         .eq('is_published', true);
 
@@ -47,7 +47,7 @@ function SearchContent() {
             title: article.title,
             description: article.content?.substring(0, 200) + '...' || '',
             type: 'blog',
-            url: `/blog/${article.id}`,
+            url: `/blog/${article.slug}`,
             published_at: article.published_at
           });
         });
@@ -56,7 +56,7 @@ function SearchContent() {
       // Recherche dans les formations
       const { data: formationArticles } = await supabase
         .from('formation_articles')
-        .select('id, title, content, published_at')
+        .select('id, title, content, published_at, slug')
         .or(`title.ilike.%${searchQuery}%,content.ilike.%${searchQuery}%`)
         .eq('is_published', true);
 
@@ -67,7 +67,7 @@ function SearchContent() {
             title: formation.title,
             description: formation.content?.substring(0, 200) + '...' || '',
             type: 'formation',
-            url: `/formation/${formation.id}`,
+            url: `/formation/${formation.slug}`,
             published_at: formation.published_at
           });
         });
@@ -86,7 +86,7 @@ function SearchContent() {
             title: module.title,
             description: module.description || '',
             type: 'application',
-            url: `/applications`,
+            url: `/card/${module.id}`,
             category: module.category,
             price: module.price
           });

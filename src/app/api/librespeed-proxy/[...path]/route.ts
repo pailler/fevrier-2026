@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const LIBRESPEED_SERVICE_URL = process.env.LIBRESPEED_SERVICE_URL || 'https://librespeed.regispailler.fr';
+const LIBRESPEED_SERVICE_URL = process.env.LIBRESPEED_SERVICE_URL || 'https://librespeed.iahome.fr';
 
 export async function GET(
   request: NextRequest,
@@ -199,7 +199,7 @@ function rewriteLibrespeedUrls(html: string): string {
     return `<${tag}${attrs} ${attr}="/api/librespeed-proxy/${path}"`;
   });
   
-  // Réécrire les URLs complètes vers librespeed.regispailler.fr
+  // Réécrire les URLs complètes vers librespeed.iahome.fr
   modified = modified.replace(/https?:\/\/librespeed\.regispailler\.fr\//g, '/api/librespeed-proxy/');
   
   return modified;

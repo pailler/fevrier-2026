@@ -1,0 +1,7 @@
+tunnel: iahome-tunnel
+credentials-file: C:\Users\AAA\.cloudflared\cert.pem
+
+ingress:
+  - hostname: iahome.fr
+    service: http://localhost:3000
+  - service: http_status:404

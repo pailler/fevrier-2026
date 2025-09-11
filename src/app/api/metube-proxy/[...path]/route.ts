@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const METUBE_SERVICE_URL = process.env.METUBE_SERVICE_URL || 'https://metube.regispailler.fr';
+const METUBE_SERVICE_URL = process.env.METUBE_SERVICE_URL || 'https://metube.iahome.fr';
 
 function rewriteMetubeUrls(html: string): string {
   let modified = html;
@@ -18,7 +18,7 @@ function rewriteMetubeUrls(html: string): string {
     return `<${tag}${attrs} ${attr}="/api/metube-proxy/${path}"`;
   });
   
-  // Réécrire les URLs absolues vers metube.regispailler.fr
+  // Réécrire les URLs absolues vers metube.iahome.fr
   modified = modified.replace(/https?:\/\/metube\.regispailler\.fr\//g, '/api/metube-proxy/');
   
   // Réécrire les appels API

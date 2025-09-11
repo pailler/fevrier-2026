@@ -175,19 +175,19 @@ export async function POST(request: NextRequest) {
 // Fonction pour obtenir l'URL du module
 function getModuleUrl(moduleTitle: string): string {
   const moduleUrls: { [key: string]: string } = {
-    'Stable Diffusion': 'https://stablediffusion.regispailler.fr',
-    'IA Photo': 'https://iaphoto.regispailler.fr',
+    'Stable Diffusion': 'https://stablediffusion.iahome.fr',
+    'IA Photo': 'https://iaphoto.iahome.fr',
     'MeTube': '/api/proxy-metube',
-    'ChatGPT': 'https://chatgpt.regispailler.fr',
+    'ChatGPT': 'https://chatgpt.iahome.fr',
     'LibreSpeed': '/api/proxy-librespeed',
-    'PsiTransfer': 'https://psitransfer.regispailler.fr',
-    'PDF+': 'https://pdfplus.regispailler.fr',
-    'AI Assistant': 'https://aiassistant.regispailler.fr',
-    'CogStudio': 'https://cogstudio.regispailler.fr',
+    'PsiTransfer': 'https://psitransfer.iahome.fr',
+    'PDF+': 'https://pdfplus.iahome.fr',
+    'AI Assistant': 'https://aiassistant.iahome.fr',
+    'CogStudio': 'https://cogstudio.iahome.fr',
     'ruinedfooocus': '/api/gradio-secure',
     'RuinedFooocus': '/api/gradio-secure',
-    'Invoke': 'https://invoke.regispailler.fr'
+    'Invoke': 'https://invoke.iahome.fr'
   };
 
-  return moduleUrls[moduleTitle] || 'https://stablediffusion.regispailler.fr';
+  return moduleUrls[moduleTitle] || 'https://stablediffusion.iahome.fr';
 } 

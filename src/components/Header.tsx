@@ -146,6 +146,17 @@ export default function Header() {
                     <span className="hidden sm:inline">Mes applis</span>
                   </Link>
                   
+                  {/* Lien Admin pour les administrateurs */}
+                  {role === 'admin' && (
+                    <Link 
+                      href="/admin/dashboard" 
+                      className="bg-red-500 text-white font-semibold px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors flex items-center space-x-1"
+                    >
+                      <span>⚙️</span>
+                      <span className="hidden sm:inline">Admin</span>
+                    </Link>
+                  )}
+                  
                   <button 
                     className="text-blue-100 hover:text-white transition-colors text-sm" 
                     onClick={async () => { 
@@ -318,6 +329,17 @@ export default function Header() {
                   <Link href="/contact" className="text-gray-700 font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-left">
                     Contact
                   </Link>
+                  
+                  {/* Lien Admin pour les administrateurs - Mobile */}
+                  {role === 'admin' && (
+                    <Link 
+                      href="/admin/dashboard" 
+                      className="bg-red-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-600 transition-colors text-left flex items-center space-x-2"
+                    >
+                      <span>⚙️</span>
+                      <span>Administration</span>
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

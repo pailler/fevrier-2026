@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 
 // Configuration du service QR Code Generator
 const QR_CODE_CONFIG = {
-  url: process.env.QR_CODE_SERVICE_URL || 'https://qrcode.regispailler.fr',
+  url: process.env.QR_CODE_SERVICE_URL || 'https://qrcode.iahome.fr',
   jwtSecret: process.env.QR_CODE_JWT_SECRET || 'qr-code-secret-key-change-in-production'
 };
 

@@ -114,7 +114,7 @@ export default function SDNextPage() {
       }
       
       const { accessToken, moduleName } = responseData;
-      const baseUrl = 'https://sdnext.regispailler.fr';
+      const baseUrl = 'https://sdnext.iahome.fr';
       const accessUrl = `${baseUrl}?token=${accessToken}`;
       setIframeModal({
         isOpen: true,

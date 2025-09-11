@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Tester la connexion au service QR Code
-    const qrServiceUrl = process.env.QR_CODE_SERVICE_URL || 'https://qrcode.regispailler.fr';
+    const qrServiceUrl = process.env.QR_CODE_SERVICE_URL || 'https://qrcode.iahome.fr';
     
     try {
       const response = await fetch(qrServiceUrl, {

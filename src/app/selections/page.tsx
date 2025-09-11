@@ -22,8 +22,8 @@ function SelectionsContent() {
     const moduleUrls: { [key: string]: string } = {
       'Metube': '/api/proxy-metube',
       // Ajouter d'autres modules ici quand ils seront disponibles
-      // 'IAphoto': 'https://iaphoto.regispailler.fr',
-      // 'IAvideo': 'https://iavideo.regispailler.fr',
+      // 'IAphoto': 'https://iaphoto.iahome.fr',
+      // 'IAvideo': 'https://iavideo.iahome.fr',
     };
     
     return moduleUrls[moduleName] || null;
@@ -194,8 +194,8 @@ function SelectionsContent() {
                               // Accès direct pour tous les modules
                               const moduleUrls: { [key: string]: string } = {
                                 'Metube': '/api/proxy-metube',
-                                'IAphoto': 'https://iaphoto.regispailler.fr',
-                                'IAvideo': 'https://iavideo.regispailler.fr',
+                                'IAphoto': 'https://iaphoto.iahome.fr',
+                                'IAvideo': 'https://iavideo.iahome.fr',
                               };
                                 
                               const directUrl = moduleUrls[module.title];
@@ -313,8 +313,8 @@ function SelectionsContent() {
                               // Accès direct pour les autres modules
                               const moduleUrls: { [key: string]: string } = {
                                 'IAmetube': '/api/proxy-metube',
-                                'IAphoto': 'https://iaphoto.regispailler.fr',
-                                'IAvideo': 'https://iavideo.regispailler.fr',
+                                'IAphoto': 'https://iaphoto.iahome.fr',
+                                'IAvideo': 'https://iavideo.iahome.fr',
                               };
                               
                               const directUrl = moduleUrls[module.title];

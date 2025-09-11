@@ -114,7 +114,7 @@ export default function QRCodesPage() {
       }
       
       const { accessToken, moduleName } = responseData;
-      const baseUrl = 'https://qrcodes.regispailler.fr';
+      const baseUrl = 'https://qrcodes.iahome.fr';
       const accessUrl = `${baseUrl}?token=${accessToken}`;
       setIframeModal({
         isOpen: true,

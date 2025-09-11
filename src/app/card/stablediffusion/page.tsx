@@ -114,7 +114,7 @@ export default function StableDiffusionPage() {
       }
       
       const { accessToken, moduleName } = responseData;
-      const baseUrl = 'https://stablediffusion.regispailler.fr';
+      const baseUrl = 'https://stablediffusion.iahome.fr';
       const accessUrl = `${baseUrl}?token=${accessToken}`;
       setIframeModal({
         isOpen: true,

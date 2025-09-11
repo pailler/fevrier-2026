@@ -18,7 +18,8 @@ const protectedRoutes = [
   '/simple-stablediffusion',
   '/module',
   '/modules-access',
-  '/secure-access'
+  '/secure-access',
+  '/admin/dashboard'
 ];
 
 // Routes API protégées
@@ -27,7 +28,8 @@ const protectedApiRoutes = [
   '/api/direct-stablediffusion',
   '/api/proxy-stablediffusion',
   '/api/module-access',
-  '/api/secure-proxy'
+  '/api/secure-proxy',
+  '/api/admin/statistics'
 ];
 
 // IPs autorisées pour l'accès direct
