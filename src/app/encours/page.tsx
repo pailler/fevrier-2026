@@ -385,6 +385,7 @@ export default function EncoursPage() {
       'pdf': 'https://pdf.iahome.fr',
       'psitransfer': 'https://psitransfer.iahome.fr',
       'qrcodes': 'https://qrcodes.iahome.fr',
+      'converter': 'https://converter.iahome.fr',
       'stablediffusion': 'https://stablediffusion.iahome.fr',
       'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
       'invoke': 'https://invoke.iahome.fr',

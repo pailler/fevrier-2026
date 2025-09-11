@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@iahome/utils/supabaseClient';
+import { supabase } from '@/utils/supabaseClient';
 
 export default function QRCodeIframePage() {
   const router = useRouter();

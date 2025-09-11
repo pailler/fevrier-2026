@@ -99,6 +99,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       return '/images/librespeed.jpg'; // Utiliser l'image spécifique librespeed.jpg
     }
     
+    if (titleLower.includes('converter') || titleLower.includes('convert')) {
+      return '/images/converter.jpg'; // Utiliser l'image spécifique converter.jpg
+    }
+    
     if (titleLower.includes('canvas') || titleLower.includes('framework')) {
       return '/images/canvas-framework.jpg'; // Utiliser l'image spécifique canvas-framework.jpg
     }
@@ -154,9 +158,12 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   
   // Vérifier si c'est le module QRcodes dynamiques pour appliquer un style spécial
   const isQRCodes = module.title.toLowerCase().includes('qrcodes') || module.title.toLowerCase().includes('qr codes') || module.title.toLowerCase().includes('qr-codes') || module.title.toLowerCase().includes('qrcode') || module.id === 'qrcodes';
+  
+  // Vérifier si c'est le module Universal Converter pour appliquer un style spécial
+  const isConverter = module.title.toLowerCase().includes('converter') || module.title.toLowerCase().includes('universal converter') || module.id === 'converter';
 
   return (
-    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isInvokeIA ? 'ring-2 ring-orange-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isSDnext ? 'ring-2 ring-rose-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''}`}>
+    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isInvokeIA ? 'ring-2 ring-orange-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isSDnext ? 'ring-2 ring-rose-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isConverter ? 'ring-2 ring-cyan-500 ring-opacity-50' : ''}`}>
       
       {/* Image du module - Cliquable */}
       <Link href={`/card/${module.id}`} className="block">
@@ -181,7 +188,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
           />
           
           {/* Overlay au survol - seulement pour les modules non-spéciaux */}
-          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isInvokeIA && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isSDnext && !isQRCodes && (
+          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isInvokeIA && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isSDnext && !isQRCodes && !isConverter && (
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
               <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white bg-opacity-90 rounded-full p-3">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -921,6 +928,66 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                 </div>
               </div>
             </>
+          ) : isConverter ? (
+            <>
+              {/* Style spécial pour Universal Converter - informations visibles en permanence */}
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Logo Universal Converter au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-cyan-500/20">
+                  {/* Logo Universal Converter avec icône de conversion */}
+                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
+                    {/* Cercle de fond */}
+                    <circle cx="12" cy="12" r="10" fill="#06B6D4" stroke="#0891B2" strokeWidth="1"/>
+                    
+                    {/* Icône de conversion - flèches circulaires */}
+                    <path d="M8 8 L16 8 L16 16 L8 16 Z" fill="white" opacity="0.9"/>
+                    <path d="M10 10 L14 10 L14 14 L10 14 Z" fill="#06B6D4"/>
+                    
+                    {/* Flèches de conversion */}
+                    <path d="M12 6 L12 18" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M6 12 L18 12" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                    
+                    {/* Indicateurs de formats */}
+                    <circle cx="8" cy="8" r="1" fill="white" opacity="0.8"/>
+                    <circle cx="16" cy="8" r="1" fill="white" opacity="0.8"/>
+                    <circle cx="8" cy="16" r="1" fill="white" opacity="0.8"/>
+                    <circle cx="16" cy="16" r="1" fill="white" opacity="0.8"/>
+                    
+                    {/* Point central */}
+                    <circle cx="12" cy="12" r="1.5" fill="white"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Badge prix en haut à droite */}
+              <div className="absolute top-3 right-3 z-20">
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "UNIVERSAL" pour Universal Converter */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    🔄 UNIVERSAL
+                  </span>
+                </div>
+              </div>
+            </>
           ) : (
             <>
               {/* Style normal pour les autres modules */}
@@ -947,7 +1014,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             {module.title}
           </h3>
           {/* Pour les modules spéciaux, afficher seulement la description si pas de sous-titre */}
-          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isInvokeIA || isComfyUI || isStableDiffusion || isRuinedFooocus || isSDnext || isQRCodes ? (
+          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isInvokeIA || isComfyUI || isStableDiffusion || isRuinedFooocus || isSDnext || isQRCodes || isConverter ? (
             !module.subtitle && (
               <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
                 {module.description}

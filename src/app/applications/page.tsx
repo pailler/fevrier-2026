@@ -109,7 +109,8 @@ export default function Home() {
             'metube', 
             'pdf',
             'psitransfer',
-            'qrcodes'
+            'qrcodes',
+            'converter'
           ];
 
           // Traiter les modules avec la structure simple (exclure les modules essentiels)

@@ -23,7 +23,7 @@ export default function GoogleSignInButton({
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'http://192.168.1.150:3000/auth/callback'
+          redirectTo: 'https://iahome.fr/auth/callback'
         }
       });
 

@@ -1,0 +1,42 @@
+tunnel: b19084f4-e2d6-47f5-81c3-0972662e953c
+credentials-file: C:\Users\AAA\.cloudflared\cert.pem
+
+ingress:
+  # Application principale IAHome
+  - hostname: iahome.fr
+    service: http://localhost:3000
+  - hostname: www.iahome.fr
+    service: http://localhost:3000
+  
+  # Services essentiels
+  - hostname: librespeed.iahome.fr
+    service: http://localhost:8083
+  - hostname: pdf.iahome.fr
+    service: http://localhost:8081
+  - hostname: metube.iahome.fr
+    service: http://localhost:8082
+  - hostname: psitransfer.iahome.fr
+    service: http://localhost:8084
+  - hostname: converter.iahome.fr
+    service: http://localhost:8096
+  - hostname: qrcodes.iahome.fr
+    service: http://localhost:7005
+  
+  # Services de portfolio photo
+  - hostname: portfolio.iahome.fr
+    service: http://localhost:9000
+  - hostname: portfolio-api.iahome.fr
+    service: http://localhost:9308
+  - hostname: portfolio-admin.iahome.fr
+    service: http://localhost:9307
+  
+  # Services de développement
+  - hostname: dashy.iahome.fr
+    service: http://localhost:8085
+  - hostname: guacamole.iahome.fr
+    service: http://localhost:18080
+  - hostname: traefik.iahome.fr
+    service: http://localhost:8080
+  
+  # Catch-all rule
+  - service: http_status:404

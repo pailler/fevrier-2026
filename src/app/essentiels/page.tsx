@@ -19,7 +19,8 @@ export default function Essentiels() {
     'metube', 
     'pdf',
     'psitransfer',
-    'qrcodes'
+    'qrcodes',
+    'converter'
   ];
 
   useEffect(() => {
