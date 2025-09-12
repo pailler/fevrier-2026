@@ -109,213 +109,374 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section des menus principaux - Style cohérent */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Explorez nos univers
-            </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Plongez dans nos différents domaines d'expertise et découvrez tout ce que l'IA peut vous apporter
-            </p>
+      {/* Section d'actions principales - Visuel à gauche, texte à droite avec animations variées */}
+      <section className="py-16 bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 relative overflow-hidden">
+        {/* Effet de particules en arrière-plan */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 right-10 w-2 h-2 bg-orange-400/30 rounded-full animate-pulse"></div>
+          <div className="absolute top-20 left-20 w-1 h-1 bg-amber-400/25 rounded-full animate-bounce"></div>
+          <div className="absolute bottom-10 right-1/4 w-1.5 h-1.5 bg-orange-500/20 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-20 left-1/3 w-1 h-1 bg-amber-500/30 rounded-full animate-bounce"></div>
+          <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-orange-600/15 rounded-full animate-pulse"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Applications - Mise en avant */}
-            <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-200">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Applications IA</h3>
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    Populaire
-                  </span>
-                </div>
-              </div>
-              <p className="text-gray-600 mb-4">
-                Découvrez notre collection d'applications IA prêtes à l'emploi : génération d'images, traitement de documents, assistants conversationnels et bien plus.
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="flex flex-col lg:flex-row-reverse items-center justify-between gap-8">
+            {/* Contenu texte et boutons */}
+            <div className="flex-1 max-w-2xl">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                Découvrez et utilisez nos applications IA
+              </h2>
+              <p className="text-lg text-gray-600 mb-8">
+                Explorez notre collection complète d'outils d'intelligence artificielle conçus pour simplifier votre travail et booster votre productivité.
               </p>
+              
+              {/* Boutons d'action - Modèle exact de l'image */}
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <Link
                 href="/applications"
-                className="inline-flex items-center text-blue-600 font-medium hover:text-blue-700 transition-colors"
+                  className="inline-flex items-center px-6 py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
               >
                 Explorer les applications
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+                <Link
+                  href="/essentiels"
+                  className="inline-flex items-center text-orange-500 font-semibold hover:text-orange-600 transition-colors"
+                >
+                  Voir les essentiels
                 <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
             </div>
 
-            {/* Essentiels - Mise en avant */}
-            <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-200">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Essentiels</h3>
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                    Recommandé
-                  </span>
-                </div>
+              {/* Section "Voir aussi" - Modèle exact de l'image */}
+              <div className="text-sm text-gray-500">
+                <h3 className="font-medium text-gray-700 mb-2">Voir aussi</h3>
+                <p className="text-gray-500">
+                  IAHome a été désigné comme Leader dans le rapport Forrester Wave 2025 pour les plateformes IA
+                </p>
               </div>
-              <p className="text-gray-600 mb-4">
-                Les outils et ressources indispensables pour bien commencer avec l'IA : guides, tutoriels et conseils d'experts.
-              </p>
-              <Link
-                href="/essentiels"
-                className="inline-flex items-center text-purple-600 font-medium hover:text-purple-700 transition-colors"
-              >
-                Découvrir les essentiels
-                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
             </div>
 
-            {/* Formation */}
-            <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-200">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
+            {/* Illustration - Graphique circulaire animé avec variantes */}
+            <div className="flex-1 flex justify-center">
+              <div className="relative w-80 h-80">
+                {/* Graphique circulaire - Modèle de l'image avec animations */}
+                <div className="relative w-full h-full">
+                  {/* Cercle central blanc avec animation de rotation */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white rounded-full shadow-lg z-10 flex items-center justify-center animate-pulse">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-gray-900 mb-1">IA</div>
+                      <div className="text-xs text-gray-500">Performance</div>
+                    </div>
+                  </div>
+                  
+                  {/* Anneaux concentriques orange clair avec animations */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-4 border-orange-200 rounded-full animate-spin" style={{animationDuration: '20s'}}></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-56 h-56 border-2 border-orange-100 rounded-full animate-spin" style={{animationDuration: '15s', animationDirection: 'reverse'}}></div>
+                  
+                  {/* Segments colorés avec animations variées */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40">
+                    {/* Segment jaune avec animation de pulsation */}
+                    <div className="absolute top-0 left-1/2 w-20 h-20 bg-yellow-400 rounded-tl-full transform origin-bottom-left animate-pulse"></div>
+                    {/* Segment rouge avec animation de rebond */}
+                    <div className="absolute top-0 right-1/2 w-20 h-20 bg-red-400 rounded-tr-full transform origin-bottom-right animate-bounce"></div>
+                    {/* Segment vert avec animation de pulsation */}
+                    <div className="absolute bottom-0 left-1/2 w-20 h-20 bg-green-400 rounded-bl-full transform origin-top-left animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                    {/* Segment blanc avec animation de rebond */}
+                    <div className="absolute bottom-0 right-1/2 w-20 h-20 bg-white rounded-br-full transform origin-top-right animate-bounce" style={{animationDelay: '0.3s'}}></div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Formation</h3>
+                  
+                  {/* Ligne diagonale avec animation de rotation */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-0.5 bg-gray-600 rotate-45 animate-spin" style={{animationDuration: '10s'}}></div>
+                  
+                  {/* Points colorés autour du graphique avec animations variées */}
+                  <div className="absolute top-8 left-8 w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
+                  <div className="absolute top-12 right-12 w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                  <div className="absolute bottom-12 left-12 w-3 h-3 bg-green-500 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                  <div className="absolute bottom-8 right-8 w-3 h-3 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.6s'}}></div>
+                  
+                  {/* Formes géométriques supplémentaires pour plus de dynamisme */}
+                  <div className="absolute top-4 left-1/2 w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style={{animationDelay: '0.8s'}}></div>
+                  <div className="absolute bottom-4 right-1/2 w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{animationDelay: '1s'}}></div>
+                  <div className="absolute left-4 top-1/2 w-2 h-2 bg-indigo-400 rounded-full animate-pulse" style={{animationDelay: '1.2s'}}></div>
+                  <div className="absolute right-4 top-1/2 w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{animationDelay: '1.4s'}}></div>
+                  
+                  {/* Lignes de connexion animées */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-0.5 bg-gradient-to-r from-transparent via-orange-300 to-transparent animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-0.5 bg-gradient-to-r from-transparent via-amber-300 to-transparent rotate-90 animate-pulse" style={{animationDelay: '1s'}}></div>
                 </div>
               </div>
-              <p className="text-gray-600 mb-4">
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      {/* Section Formation - Texte à gauche, visuel à droite */}
+      <section className="py-16 bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 relative overflow-hidden">
+        {/* Effet de particules en arrière-plan */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-2 h-2 bg-green-400/30 rounded-full animate-pulse"></div>
+          <div className="absolute top-20 right-20 w-1 h-1 bg-emerald-400/25 rounded-full animate-bounce"></div>
+          <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-green-500/20 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-emerald-500/30 rounded-full animate-bounce"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+            {/* Contenu texte */}
+            <div className="flex-1 max-w-2xl">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                Formation
+              </h2>
+              <p className="text-lg text-gray-600 mb-8">
                 Apprenez l'IA à votre rythme avec nos formations structurées et nos cours adaptés à tous les niveaux.
               </p>
+              
+              {/* Boutons d'action */}
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <Link
                 href="/formation"
-                className="inline-flex items-center text-green-600 font-medium hover:text-green-700 transition-colors"
+                  className="inline-flex items-center px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
               >
                 Voir les formations
-                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
             </div>
-
-            {/* Blog */}
-            <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-200">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
-                  <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                  </svg>
+            </div>
+            
+            {/* Illustration - Hexagones animés avec variantes */}
+            <div className="flex-1 flex justify-center">
+              <div className="relative w-80 h-80">
+                {/* Hexagones - Variante verte avec animations différentes */}
+                <div className="relative w-full h-full">
+                  {/* Hexagone central blanc avec animation de pulsation */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white shadow-lg z-10 flex items-center justify-center animate-pulse" style={{clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)'}}>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-gray-900 mb-1">Learn</div>
+                      <div className="text-xs text-gray-500">Formation</div>
+                    </div>
+                  </div>
+                  
+                  {/* Hexagones concentriques verts avec animations */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-4 border-green-200 animate-bounce" style={{clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)', animationDuration: '2s'}}></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-56 h-56 border-2 border-green-100 animate-bounce" style={{clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)', animationDuration: '2.5s', animationDelay: '0.3s'}}></div>
+                  
+                  {/* Triangles colorés avec animations variées */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40">
+                    {/* Triangle vert avec animation de rotation */}
+                    <div className="absolute top-0 left-1/2 w-0 h-0 border-l-10 border-r-10 border-b-20 border-l-transparent border-r-transparent border-b-green-400 transform -translate-x-1/2 animate-spin" style={{animationDuration: '8s'}}></div>
+                    {/* Triangle emerald avec animation de pulsation */}
+                    <div className="absolute bottom-0 left-1/2 w-0 h-0 border-l-10 border-r-10 border-t-20 border-l-transparent border-r-transparent border-t-emerald-400 transform -translate-x-1/2 animate-pulse" style={{animationDelay: '0.3s'}}></div>
+                    {/* Triangle teal avec animation de rebond */}
+                    <div className="absolute left-0 top-1/2 w-0 h-0 border-t-10 border-b-10 border-r-20 border-t-transparent border-b-transparent border-r-teal-400 transform -translate-y-1/2 animate-bounce" style={{animationDelay: '0.6s'}}></div>
+                    {/* Triangle blanc avec animation de rotation */}
+                    <div className="absolute right-0 top-1/2 w-0 h-0 border-t-10 border-b-10 border-l-20 border-t-transparent border-b-transparent border-l-white transform -translate-y-1/2 animate-spin" style={{animationDuration: '6s', animationDelay: '0.9s'}}></div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Blog</h3>
+                  
+                  {/* Lignes hexagonales avec animation de pulsation */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-0.5 bg-green-600 rotate-30 animate-pulse" style={{animationDelay: '1s'}}></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-0.5 bg-green-600 rotate-90 animate-pulse" style={{animationDelay: '1.2s'}}></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-0.5 bg-green-600 rotate-150 animate-pulse" style={{animationDelay: '1.4s'}}></div>
+                  
+                  {/* Points colorés autour des hexagones avec animations variées */}
+                  <div className="absolute top-8 left-8 w-3 h-3 bg-green-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                  <div className="absolute top-12 right-12 w-3 h-3 bg-emerald-500 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                  <div className="absolute bottom-12 left-12 w-3 h-3 bg-teal-500 rounded-full animate-bounce" style={{animationDelay: '0.6s'}}></div>
+                  <div className="absolute bottom-8 right-8 w-3 h-3 bg-lime-500 rounded-full animate-pulse" style={{animationDelay: '0.8s'}}></div>
+                  
+                  {/* Formes géométriques supplémentaires */}
+                  <div className="absolute top-4 left-1/2 w-2 h-2 bg-green-300 rounded-full animate-bounce" style={{animationDelay: '1s'}}></div>
+                  <div className="absolute bottom-4 right-1/2 w-2 h-2 bg-emerald-300 rounded-full animate-pulse" style={{animationDelay: '1.2s'}}></div>
+                  <div className="absolute left-4 top-1/2 w-2 h-2 bg-teal-300 rounded-full animate-bounce" style={{animationDelay: '1.4s'}}></div>
+                  <div className="absolute right-4 top-1/2 w-2 h-2 bg-lime-300 rounded-full animate-pulse" style={{animationDelay: '1.6s'}}></div>
                 </div>
               </div>
-              <p className="text-gray-600 mb-4">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section Blog - Visuel à gauche, texte à droite */}
+      <section className="py-16 bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 relative overflow-hidden">
+        {/* Effet de particules en arrière-plan */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 right-10 w-2 h-2 bg-orange-400/30 rounded-full animate-pulse"></div>
+          <div className="absolute top-20 left-20 w-1 h-1 bg-amber-400/25 rounded-full animate-bounce"></div>
+          <div className="absolute bottom-10 right-1/4 w-1.5 h-1.5 bg-orange-500/20 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-20 left-1/3 w-1 h-1 bg-amber-500/30 rounded-full animate-bounce"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="flex flex-col lg:flex-row-reverse items-center justify-between gap-8">
+            {/* Contenu texte */}
+            <div className="flex-1 max-w-2xl">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                Blog
+              </h2>
+              <p className="text-lg text-gray-600 mb-8">
                 Restez informé des dernières tendances IA avec nos articles, tutoriels et analyses d'experts.
               </p>
+              
+              {/* Boutons d'action */}
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <Link
                 href="/blog"
-                className="inline-flex items-center text-orange-600 font-medium hover:text-orange-700 transition-colors"
+                  className="inline-flex items-center px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
               >
                 Lire le blog
-                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
             </div>
-
-            {/* Communauté */}
-            <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-200">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center mr-4">
-                  <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
+            </div>
+            
+            {/* Illustration - Carrés et losanges animés avec variantes */}
+            <div className="flex-1 flex justify-center">
+              <div className="relative w-80 h-80">
+                {/* Carrés et losanges - Variante orange avec animations différentes */}
+                <div className="relative w-full h-full">
+                  {/* Carré central blanc avec animation de rotation */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white shadow-lg z-10 flex items-center justify-center animate-spin" style={{animationDuration: '15s'}}>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-gray-900 mb-1">Blog</div>
+                      <div className="text-xs text-gray-500">Articles</div>
+                    </div>
+                  </div>
+                  
+                  {/* Carrés concentriques orange avec animations */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-4 border-orange-200 animate-pulse" style={{animationDuration: '3s'}}></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-56 h-56 border-2 border-orange-100 animate-pulse" style={{animationDuration: '4s', animationDelay: '0.5s'}}></div>
+                  
+                  {/* Losanges colorés avec animations variées */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40">
+                    {/* Losange orange avec animation de rebond */}
+                    <div className="absolute top-0 left-1/2 w-20 h-20 bg-orange-400 transform -translate-x-1/2 rotate-45 animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    {/* Losange amber avec animation de pulsation */}
+                    <div className="absolute bottom-0 left-1/2 w-20 h-20 bg-amber-400 transform -translate-x-1/2 rotate-45 animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                    {/* Losange yellow avec animation de rotation */}
+                    <div className="absolute left-0 top-1/2 w-20 h-20 bg-yellow-400 transform -translate-y-1/2 rotate-45 animate-spin" style={{animationDuration: '8s', animationDelay: '0.6s'}}></div>
+                    {/* Losange blanc avec animation de rebond */}
+                    <div className="absolute right-0 top-1/2 w-20 h-20 bg-white transform -translate-y-1/2 rotate-45 animate-bounce" style={{animationDelay: '0.8s'}}></div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Communauté</h3>
+                  
+                  {/* Lignes carrées avec animation de pulsation */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-0.5 bg-orange-600 animate-pulse" style={{animationDelay: '1s'}}></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-0.5 h-40 bg-orange-600 animate-pulse" style={{animationDelay: '1.2s'}}></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-0.5 bg-orange-600 rotate-45 animate-pulse" style={{animationDelay: '1.4s'}}></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-0.5 bg-orange-600 -rotate-45 animate-pulse" style={{animationDelay: '1.6s'}}></div>
+                  
+                  {/* Points colorés autour des carrés avec animations variées */}
+                  <div className="absolute top-8 left-8 w-3 h-3 bg-orange-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                  <div className="absolute top-12 right-12 w-3 h-3 bg-amber-500 rounded-full animate-pulse" style={{animationDelay: '0.3s'}}></div>
+                  <div className="absolute bottom-12 left-12 w-3 h-3 bg-yellow-500 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
+                  <div className="absolute bottom-8 right-8 w-3 h-3 bg-amber-600 rounded-full animate-pulse" style={{animationDelay: '0.7s'}}></div>
+                  
+                  {/* Formes géométriques supplémentaires */}
+                  <div className="absolute top-4 left-1/2 w-2 h-2 bg-orange-300 rounded-full animate-bounce" style={{animationDelay: '0.9s'}}></div>
+                  <div className="absolute bottom-4 right-1/2 w-2 h-2 bg-amber-300 rounded-full animate-pulse" style={{animationDelay: '1.1s'}}></div>
+                  <div className="absolute left-4 top-1/2 w-2 h-2 bg-yellow-300 rounded-full animate-bounce" style={{animationDelay: '1.3s'}}></div>
+                  <div className="absolute right-4 top-1/2 w-2 h-2 bg-orange-300 rounded-full animate-pulse" style={{animationDelay: '1.5s'}}></div>
                 </div>
               </div>
-              <p className="text-gray-600 mb-4">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section Communauté - Texte à gauche, visuel à droite */}
+      <section className="py-16 bg-gradient-to-br from-teal-50 via-cyan-50 to-teal-100 relative overflow-hidden">
+        {/* Effet de particules en arrière-plan */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-2 h-2 bg-teal-400/30 rounded-full animate-pulse"></div>
+          <div className="absolute top-20 right-20 w-1 h-1 bg-cyan-400/25 rounded-full animate-bounce"></div>
+          <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-teal-500/20 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-cyan-500/30 rounded-full animate-bounce"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+            {/* Contenu texte */}
+            <div className="flex-1 max-w-2xl">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                Communauté
+              </h2>
+              <p className="text-lg text-gray-600 mb-8">
                 Rejoignez notre communauté d'experts et d'enthousiastes de l'IA pour échanger et apprendre ensemble.
               </p>
+              
+              {/* Boutons d'action */}
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <Link
                 href="/community"
-                className="inline-flex items-center text-teal-600 font-medium hover:text-teal-700 transition-colors"
+                  className="inline-flex items-center px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
               >
                 Rejoindre la communauté
-                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
             </div>
-
-            {/* Moteur de recherche */}
-            <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-200">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
-                  <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Recherche</h3>
+
+            {/* Illustration - Étoiles et polygones animés avec variantes */}
+            <div className="flex-1 flex justify-center">
+              <div className="relative w-80 h-80">
+                {/* Étoiles et polygones - Variante teal avec animations différentes */}
+                <div className="relative w-full h-full">
+                  {/* Étoile centrale blanche avec animation de pulsation */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white shadow-lg z-10 flex items-center justify-center animate-pulse" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDuration: '2s'}}>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-gray-900 mb-1">Comm</div>
+                      <div className="text-xs text-gray-500">Community</div>
                 </div>
               </div>
-              <p className="text-gray-600 mb-4">
-                Trouvez rapidement ce que vous cherchez dans toutes nos sections : applications, formations, articles et plus.
-              </p>
-              <form action="/search" method="GET" className="flex gap-2">
-                <input
-                  type="text"
-                  name="q"
-                  placeholder="Rechercher..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </button>
-              </form>
+                  
+                  {/* Étoiles concentriques teal avec animations */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-4 border-teal-200 animate-bounce" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDuration: '3s'}}></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-56 h-56 border-2 border-teal-100 animate-bounce" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDuration: '4s', animationDelay: '0.5s'}}></div>
+                  
+                  {/* Polygones colorés avec animations variées */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40">
+                    {/* Polygone teal avec animation de rotation */}
+                    <div className="absolute top-0 left-1/2 w-20 h-20 bg-teal-400 transform -translate-x-1/2 animate-spin" style={{clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)', animationDuration: '10s'}}></div>
+                    {/* Polygone cyan avec animation de pulsation */}
+                    <div className="absolute bottom-0 left-1/2 w-20 h-20 bg-cyan-400 transform -translate-x-1/2 animate-pulse" style={{clipPath: 'polygon(50% 100%, 0% 0%, 100% 0%)', animationDelay: '0.2s'}}></div>
+                    {/* Polygone sky avec animation de rebond */}
+                    <div className="absolute left-0 top-1/2 w-20 h-20 bg-sky-400 transform -translate-y-1/2 animate-bounce" style={{clipPath: 'polygon(0% 50%, 100% 0%, 100% 100%)', animationDelay: '0.4s'}}></div>
+                    {/* Polygone blanc avec animation de rotation */}
+                    <div className="absolute right-0 top-1/2 w-20 h-20 bg-white transform -translate-y-1/2 animate-spin" style={{clipPath: 'polygon(100% 50%, 0% 0%, 0% 100%)', animationDuration: '12s', animationDelay: '0.6s'}}></div>
             </div>
 
-            {/* Contact */}
-            <div className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-gray-200">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mr-4">
-                  <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Contact</h3>
+                  {/* Lignes étoilées avec animation de pulsation */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-0.5 bg-teal-600 animate-pulse" style={{animationDelay: '0.8s'}}></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-0.5 h-40 bg-teal-600 animate-pulse" style={{animationDelay: '1s'}}></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-0.5 bg-teal-600 rotate-30 animate-pulse" style={{animationDelay: '1.2s'}}></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-0.5 bg-teal-600 -rotate-30 animate-pulse" style={{animationDelay: '1.4s'}}></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-0.5 bg-teal-600 rotate-60 animate-pulse" style={{animationDelay: '1.6s'}}></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-0.5 bg-teal-600 -rotate-60 animate-pulse" style={{animationDelay: '1.8s'}}></div>
+                  
+                  {/* Points colorés autour des étoiles avec animations variées */}
+                  <div className="absolute top-8 left-8 w-3 h-3 bg-teal-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                  <div className="absolute top-12 right-12 w-3 h-3 bg-cyan-500 rounded-full animate-pulse" style={{animationDelay: '0.3s'}}></div>
+                  <div className="absolute bottom-12 left-12 w-3 h-3 bg-sky-500 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
+                  <div className="absolute bottom-8 right-8 w-3 h-3 bg-cyan-600 rounded-full animate-pulse" style={{animationDelay: '0.7s'}}></div>
+                  
+                  {/* Formes géométriques supplémentaires */}
+                  <div className="absolute top-4 left-1/2 w-2 h-2 bg-teal-300 rounded-full animate-bounce" style={{animationDelay: '0.9s'}}></div>
+                  <div className="absolute bottom-4 right-1/2 w-2 h-2 bg-cyan-300 rounded-full animate-pulse" style={{animationDelay: '1.1s'}}></div>
+                  <div className="absolute left-4 top-1/2 w-2 h-2 bg-sky-300 rounded-full animate-bounce" style={{animationDelay: '1.3s'}}></div>
+                  <div className="absolute right-4 top-1/2 w-2 h-2 bg-teal-300 rounded-full animate-pulse" style={{animationDelay: '1.5s'}}></div>
                 </div>
               </div>
-              <p className="text-gray-600 mb-4">
-                Une question ? Un projet ? Contactez-nous pour obtenir de l'aide et des conseils personnalisés.
-              </p>
-              <Link
-                href="/contact"
-                className="inline-flex items-center text-gray-600 font-medium hover:text-gray-700 transition-colors"
-              >
-                Nous contacter
-                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
             </div>
           </div>
         </div>
