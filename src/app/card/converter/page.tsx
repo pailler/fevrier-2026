@@ -75,7 +75,7 @@ export default function ConverterPage() {
       // Gestion spéciale pour Converter avec lien direct
       if (moduleTitle.toLowerCase().includes('converter') || moduleTitle.toLowerCase().includes('convert')) {
         console.log('🔑 Accès direct à Converter via iframe');
-        const converterUrl = 'https://converter.iahome.fr';
+        const converterUrl = 'https://convert.iahome.fr';
         console.log('🔗 URL d\'accès Converter directe:', converterUrl);
         setIframeModal({
           isOpen: true,
@@ -132,7 +132,7 @@ export default function ConverterPage() {
         const converterData: Card = {
           id: 'converter',
           title: 'Universal Converter',
-          description: 'Convertisseur universel de fichiers - Transformez vos documents, images, audio et vidéo en toute simplicité. Support de plus de 50 formats de fichiers différents.',
+          description: 'Convertisseur universel de fichiers HRConvert2 - Transformez vos documents, images, audio et vidéo en toute simplicité. Support de plus de 200 formats de fichiers différents.',
           subtitle: 'Convertissez vos fichiers en un clic - Documents, images, audio, vidéo',
           category: 'Web Tools',
           price: 0,
@@ -146,7 +146,7 @@ export default function ConverterPage() {
             'Conversion par lots',
             'Aucune inscription requise',
             'Résultats instantanés',
-            'Support de plus de 50 formats'
+            'Support de plus de 200 formats'
           ],
           requirements: [
             'Navigateur web moderne',
@@ -167,8 +167,8 @@ export default function ConverterPage() {
             'Extraire le texte d\'un PDF',
             'Convertir un fichier audio MP3 en WAV'
           ],
-          documentation_url: 'https://converter.iahome.fr',
-          demo_url: 'https://converter.iahome.fr',
+          documentation_url: 'https://convert.iahome.fr',
+          demo_url: 'https://convert.iahome.fr',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         };
@@ -327,7 +327,7 @@ export default function ConverterPage() {
                   ⚡ Instantané
                 </span>
                 <span className="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-full text-sm font-semibold border border-white/30 shadow-lg">
-                  🎯 50+ formats
+                  🎯 200+ formats
                 </span>
                 <span className="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-full text-sm font-semibold border border-white/30 shadow-lg">
                   🆓 Gratuit
@@ -424,8 +424,8 @@ export default function ConverterPage() {
                     <div className="space-y-4">
                       <h5 className="text-lg font-semibold text-green-800">🎯 Support universel</h5>
                       <p className="text-gray-700">
-                        Plus de 50 formats de fichiers supportés : documents, images, audio, vidéo. 
-                        Une solution pour tous vos besoins de conversion.
+                        Plus de 200 formats de fichiers supportés : documents, images, audio, vidéo, eBooks, archives, formats techniques. 
+                        Une solution complète pour tous vos besoins de conversion.
                       </p>
                     </div>
                     <div className="space-y-4">
@@ -536,7 +536,7 @@ export default function ConverterPage() {
 
                   {/* Bouton principal d'accès */}
                   <button
-                    onClick={() => window.location.href = '/transition-converter'}
+                    onClick={() => window.open('https://convert.iahome.fr', '_blank')}
                     disabled={checkingActivation}
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:cursor-not-allowed flex items-center justify-center space-x-3"
                   >
@@ -571,7 +571,7 @@ export default function ConverterPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Formats supportés:</span>
-                      <span className="font-medium text-gray-900">50+</span>
+                      <span className="font-medium text-gray-900">200+</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Installation:</span>
