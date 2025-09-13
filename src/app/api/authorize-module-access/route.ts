@@ -1,15 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import AuthorizationService from '../../../utils/authorizationService';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export async function POST(request: NextRequest) {
   try {
-    const { moduleId, moduleTitle, userId, userEmail, action } = await request.json();
+    console.log('🔍 API authorize-module-access appelée');
+    
+    const body = await request.text();
+    console.log('📝 Body reçu:', body);
+    
+    let parsedBody;
+    try {
+      parsedBody = JSON.parse(body);
+    } catch (parseError) {
+      console.error('❌ Erreur de parsing JSON:', parseError);
+      return NextResponse.json(
+        { error: 'JSON invalide' },
+        { status: 400 }
+      );
+    }
+    
+    const { moduleId, moduleTitle, userId, userEmail, action } = parsedBody;
     
     if (!moduleId || !moduleTitle || !userId || !userEmail || !action) {
       return NextResponse.json(

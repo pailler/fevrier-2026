@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       category: 'Web Tools',
       price: 0,
       youtube_url: '',
-      url: 'https://converter.iahome.fr',
+      url: 'https://convert.iahome.fr',
       image_url: '/images/converter.jpg',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()

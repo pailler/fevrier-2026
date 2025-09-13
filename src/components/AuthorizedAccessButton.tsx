@@ -236,6 +236,100 @@ export default function AuthorizedAccessButton({
         }
       }
 
+      // Gestion spéciale pour Universal Converter avec vérification des quotas et génération de token
+      if (moduleId === 'converter' || moduleTitle.toLowerCase().includes('converter') || moduleTitle.toLowerCase().includes('universal converter')) {
+        console.log('🔑 Vérification des quotas et génération d\'un token temporaire pour Universal Converter...');
+        setLoadingMessage('Vérification des quotas Universal Converter...');
+        
+        // 1. Vérifier d'abord les quotas et l'autorisation
+        const quotaResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'check_access'
+          })
+        });
+
+        const quotaResult = await quotaResponse.json();
+        
+        if (!quotaResult.success || !quotaResult.authorized) {
+          const reason = quotaResult.reason || 'Accès non autorisé';
+          console.log('❌ Accès refusé pour Universal Converter:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        // 2. Vérifier les quotas spécifiquement
+        if (quotaResult.quotaInfo && quotaResult.quotaInfo.isQuotaExceeded) {
+          const reason = `Quota d'utilisation épuisé (${quotaResult.quotaInfo.usageCount}/${quotaResult.quotaInfo.maxUsage})`;
+          console.log('❌ Quota dépassé pour Universal Converter:', reason);
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+
+        console.log('✅ Quotas respectés, génération du token...');
+        setLoadingMessage('Génération du token d\'accès...');
+        
+        // 3. Générer le token temporaire
+        const tokenResponse = await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'generate_token'
+          })
+        });
+
+        const tokenResult = await tokenResponse.json();
+        
+        if (tokenResult.success && tokenResult.token) {
+          setLoadingMessage('Finalisation de l\'accès...');
+          
+          // 4. Incrémenter le compteur d'utilisation
+          await fetch('/api/authorize-module-access', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              moduleId,
+              moduleTitle,
+              userId: user.id,
+              userEmail: user.email,
+              action: 'increment_usage'
+            })
+          });
+
+          const converterUrl = `https://convert.iahome.fr?token=${tokenResult.token}`;
+          console.log('🔗 Ouverture d\'Universal Converter dans un nouvel onglet avec token valide');
+          console.log('🔗 URL Universal Converter:', converterUrl);
+          console.log('🔗 Appel onAccessGranted...');
+          onAccessGranted?.(converterUrl);
+          console.log('🔗 Appel window.open...');
+          window.open(converterUrl, '_blank');
+          console.log('🔗 Universal Converter - Fin de la fonction');
+          return;
+        } else {
+          const reason = 'Impossible de générer un token d\'accès temporaire';
+          setError(reason);
+          onAccessDenied?.(reason);
+          return;
+        }
+      }
+
       // Gestion spéciale pour MeTube avec vérification des quotas et génération de token
       if (moduleId === 'metube' || moduleTitle.toLowerCase().includes('metube') || moduleTitle.toLowerCase().includes('me tube')) {
         console.log('🔑 Vérification des quotas et génération d\'un token temporaire pour MeTube...');

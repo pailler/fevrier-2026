@@ -396,3 +396,35 @@ Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Copying file f8
 Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Copied file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.zip.
 Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified file.
 Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Download Complete.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Verified inbound connection.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Verified globals.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Created a directory at /home/converter/5cf8d421483a/61d212875052/.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Created a directory at /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Created a directory at /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/61d212875052/.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Verified required directories.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Cleaned temporary location.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Cleaned convert location.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Could not verify tokens!
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Verified color scheme.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Verified language.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Displaying the GUI.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Verified inbound connection.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Verified globals.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Created a directory at /home/converter/5cf8d421483a/8c915e700698/.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Created a directory at /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/8c915e700698/.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Verified required directories.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Cleaned temporary location.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Cleaned convert location.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Could not verify tokens!
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Verified color scheme.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Verified language.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Displaying the GUI.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Verified inbound connection.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Verified globals.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Verified required directories.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Cleaned temporary location.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Cleaned convert location.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Could not verify tokens!
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Verified color scheme.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Verified language.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Displaying the GUI.

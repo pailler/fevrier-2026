@@ -28,31 +28,9 @@ export default function TransitionConverterPage() {
         clearInterval(interval);
         // Ajouter le module à la page /encours
         addModuleToEncours();
-        // Rediriger immédiatement vers /encours
+        // Rediriger vers /encours après activation
         setTimeout(() => {
           router.push('/encours');
-        }, 500);
-        
-        // Ouvrir l'application en arrière-plan après la redirection
-        setTimeout(() => {
-          supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session?.user?.id) {
-              // Utilisateur connecté - générer le token et ouvrir l'application
-              generateConverterToken().then(converterUrl => {
-                if (converterUrl) {
-                  // Ouvrir l'application dans un nouvel onglet avec le token
-                  window.open(converterUrl, '_blank');
-                } else {
-                  // Fallback vers l'URL directe si le token échoue
-                  window.open('https://converter.iahome.fr', '_blank');
-                }
-              });
-            } else {
-              // Utilisateur non connecté - rediriger vers la page de connexion
-              console.log('Utilisateur non connecté - redirection vers la page de connexion');
-              router.push('/login');
-            }
-          });
         }, 1000);
       }
     }, 800);

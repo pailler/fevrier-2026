@@ -1,129 +1,183 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../../utils/supabaseClient';
 
 const PDF_SERVICE_URL = process.env.PDF_SERVICE_URL || 'https://pdf.iahome.fr';
 
-// Fonction pour réécrire les URLs dans le contenu HTML
-function rewritePdfUrls(html: string): string {
-  let modified = html;
-  
-  // Gérer la balise base href
-  if (/\<base\s+href=/i.test(modified)) {
-    modified = modified.replace(/<base\s+href="[^"]*"\s*\/>|<base\s+href="[^"]*"\s*>/i, '<base href="/api/pdf-proxy/">');
-  } else if (modified.includes('<head>')) {
-    modified = modified.replace('<head>', '<head><base href="/api/pdf-proxy/">');
-  }
-  
-  // Réécrire les URLs relatives commençant par /
-  modified = modified.replace(/<(script|link|img|a)([^>]*?)\s(src|href)="\/([^"']+)"/gi, (m, tag, attrs, attr, path) => {
-    if (path.startsWith('api/pdf-proxy/')) return m;
-    return `<${tag}${attrs} ${attr}="/api/pdf-proxy/${path}"`;
-  });
-  
-  // Réécrire les URLs absolues de pdf.iahome.fr
-  modified = modified.replace(/https?:\/\/pdf\.regispailler\.fr\//g, '/api/pdf-proxy/');
-  
-  return modified;
-}
-
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 Proxy PDF+ racine - redirection vers le service');
+    console.log('PDF Proxy: Début de la vérification');
     
-    const response = await fetch(PDF_SERVICE_URL, {
-      method: 'GET',
-      headers: {
-        'User-Agent': request.headers.get('user-agent') || '',
-        'Accept': request.headers.get('accept') || '*/*',
-        'Accept-Language': request.headers.get('accept-language') || '',
-        'Cache-Control': request.headers.get('cache-control') || '',
-      },
-    });
-
-    if (!response.ok) {
-      console.error(`❌ Erreur proxy PDF+ racine: ${response.status} ${response.statusText}`);
-      return new NextResponse(`Erreur PDF+ Service: ${response.status}`, { status: response.status });
-    }
-
-    const contentType = response.headers.get('content-type') || 'text/html';
-    const content = await response.text();
+    // Vérifier s'il y a un token dans les paramètres de requête
+    const url = new URL(request.url);
+    const token = url.searchParams.get('token');
     
-    let modifiedContent = content;
-    
-    // Réécrire les URLs seulement pour le contenu HTML
-    if (contentType.includes('text/html')) {
-      modifiedContent = rewritePdfUrls(content);
-    }
-    
-    return new NextResponse(modifiedContent, {
-      status: response.status,
-      headers: {
-        'Content-Type': contentType,
-        'Cache-Control': response.headers.get('cache-control') || 'no-cache',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
-    });
-    
-  } catch (error) {
-    console.error('❌ Erreur proxy PDF+ racine:', error);
-    return new NextResponse('Erreur interne du proxy PDF+', { status: 500 });
-  }
-}
-
-export async function POST(request: NextRequest) {
-  try {
-    console.log('🔍 Proxy PDF+ racine POST - redirection vers le service');
-    
-    const body = await request.text();
-    const headers = new Headers();
-    
-    // Copier les headers pertinents
-    request.headers.forEach((value, key) => {
-      if (key.toLowerCase() !== 'host' && key.toLowerCase() !== 'origin') {
-        headers.set(key, value);
+    if (token) {
+      console.log('PDF Proxy: Token trouvé, vérification du token temporaire');
+      
+      // Vérifier le token avec l'API pdf-validate-token
+      const tokenResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/pdf-validate-token?token=${token}`);
+      
+      if (tokenResponse.ok) {
+        const tokenData = await tokenResponse.json();
+        console.log('PDF Proxy: Token validé avec succès pour:', tokenData.user_email);
+        
+        // Rediriger vers PDF (URL de production)
+        console.log('PDF Proxy: Redirection vers PDF');
+        return NextResponse.redirect('https://pdf.iahome.fr', 302);
+      } else {
+        console.log('PDF Proxy: Token invalide - redirection vers essentiels');
+        return NextResponse.redirect('https://iahome.fr/essentiels', 302);
       }
-    });
+    }
     
-    const response = await fetch(PDF_SERVICE_URL, {
-      method: 'POST',
-      headers,
-      body,
-    });
-
-    if (!response.ok) {
-      console.error(`❌ Erreur proxy PDF+ racine POST: ${response.status} ${response.statusText}`);
-      return new NextResponse(`Erreur PDF+ Service: ${response.status}`, { status: response.status });
+    // Si pas de token, vérifier l'origine de la requête (accès direct bloqué)
+    const referer = request.headers.get('referer');
+    const origin = request.headers.get('origin');
+    const host = request.headers.get('host');
+    
+    console.log('PDF Proxy: Headers - referer:', referer, 'origin:', origin, 'host:', host);
+    
+    // Vérifier l'origine de la requête
+    if (!referer?.includes('iahome.fr') && !origin?.includes('iahome.fr') && !host?.includes('iahome.fr')) {
+      console.log('PDF Proxy: Accès direct bloqué - redirection vers essentiels');
+      return NextResponse.redirect('https://iahome.fr/essentiels', 302);
     }
 
-    const contentType = response.headers.get('content-type') || 'application/json';
-    const content = await response.text();
+    // Récupérer les cookies de la requête
+    const cookieHeader = request.headers.get('cookie');
     
-    return new NextResponse(content, {
-      status: response.status,
-      headers: {
-        'Content-Type': contentType,
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
-    });
+    if (!cookieHeader) {
+      console.log('PDF Proxy: Aucun cookie trouvé - redirection vers login');
+      return NextResponse.redirect('https://iahome.fr/login', 302);
+    }
+
+    // Créer un client Supabase avec les cookies
+    const supabaseWithCookies = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+        global: {
+          headers: {
+            cookie: cookieHeader,
+          },
+        },
+      }
+    );
+
+    // Vérifier la session
+    const { data: { session }, error } = await supabaseWithCookies.auth.getSession();
     
+    if (error) {
+      console.error('PDF Proxy: Erreur lors de la vérification de la session:', error);
+      return NextResponse.redirect('https://iahome.fr/login', 302);
+    }
+
+    if (!session) {
+      console.log('PDF Proxy: Aucune session trouvée - redirection vers login');
+      return NextResponse.redirect('https://iahome.fr/login', 302);
+    }
+
+    // Vérifier si le module apparaît dans /encours (vérification principale)
+    const isModuleInEncours = await checkPdfModuleInEncours(session.user.id);
+    
+    if (!isModuleInEncours) {
+      console.log('PDF Proxy: Module PDF non visible dans /encours pour:', session.user.email);
+      return NextResponse.redirect('https://iahome.fr/essentiels', 302);
+    }
+
+    // Vérifier que l'utilisateur a un accès de base au module (sans vérifier quotas)
+    const hasBasicAccess = await checkBasicPdfAccess(session.user.id);
+    
+    if (!hasBasicAccess) {
+      console.log('PDF Proxy: Aucun accès PDF trouvé pour:', session.user.email);
+      return NextResponse.redirect('https://iahome.fr/essentiels', 302);
+    }
+    
+    console.log('PDF Proxy: Accès autorisé pour utilisateur:', session.user.email);
+    
+    // Incrémenter le compteur d'utilisation (le système existant gère les quotas)
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/increment-usage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: session.user.id,
+          moduleId: 'pdf',
+          moduleTitle: 'PDF'
+        })
+      });
+    } catch (usageError) {
+      console.error('PDF Proxy: Erreur lors de l\'incrémentation de l\'usage:', usageError);
+      // Ne pas bloquer l'accès pour cette erreur
+    }
+    
+    // Rediriger vers PDF
+    console.log('PDF Proxy: Redirection vers PDF');
+    return NextResponse.redirect('https://pdf.iahome.fr', 302);
+
   } catch (error) {
-    console.error('❌ Erreur proxy PDF+ racine POST:', error);
-    return new NextResponse('Erreur interne du proxy PDF+', { status: 500 });
+    console.error('PDF Proxy Error:', error);
+    return NextResponse.redirect('https://iahome.fr/essentiels', 302);
   }
 }
 
-export async function OPTIONS(request: NextRequest) {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+// Fonction pour vérifier si le module PDF est dans /encours
+async function checkPdfModuleInEncours(userId: string): Promise<boolean> {
+  try {
+    const { data: userApps, error } = await supabase
+      .from('user_applications')
+      .select('module_id, module_title')
+      .eq('user_id', userId)
+      .eq('is_active', true);
+
+    if (error) {
+      console.error('PDF Proxy: Erreur lors de la vérification des applications:', error);
+      return false;
+    }
+
+    // Vérifier si le module pdf est présent
+    const hasPdf = userApps?.some(app => 
+      app.module_id === 'pdf' || 
+      app.module_title?.toLowerCase().includes('pdf')
+    );
+
+    console.log('PDF Proxy: Module PDF dans /encours:', hasPdf);
+    return hasPdf || false;
+  } catch (error) {
+    console.error('PDF Proxy: Erreur lors de la vérification du module dans /encours:', error);
+    return false;
+  }
 }
 
+// Fonction pour vérifier l'accès de base au module PDF
+async function checkBasicPdfAccess(userId: string): Promise<boolean> {
+  try {
+    // Vérifier si l'utilisateur a le module pdf dans ses applications
+    const { data: userApps, error } = await supabase
+      .from('user_applications')
+      .select('module_id')
+      .eq('user_id', userId)
+      .eq('module_id', 'pdf')
+      .eq('is_active', true);
 
+    if (error) {
+      console.error('PDF Proxy: Erreur lors de la vérification des applications:', error);
+      return false;
+    }
+
+    // Si l'utilisateur a le module pdf ou si c'est un module gratuit
+    const hasAccess = userApps && userApps.length > 0;
+    console.log('PDF Proxy: Accès de base PDF:', hasAccess);
+    return hasAccess;
+  } catch (error) {
+    console.error('PDF Proxy: Erreur lors de la vérification de l\'accès:', error);
+    return false;
+  }
+}

@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     console.log('Converter Token: Token généré avec succès:', token);
 
     // Retourner l'URL avec le token
-    const converterUrl = `https://converter.iahome.fr?token=${token}`;
+    const converterUrl = `https://convert.iahome.fr?token=${token}`;
     
     return NextResponse.json({
       success: true,

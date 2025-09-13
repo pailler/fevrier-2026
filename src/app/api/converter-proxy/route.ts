@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
         
         // Rediriger vers Universal Converter (URL de production)
         console.log('Converter Proxy: Redirection vers Universal Converter');
-        return NextResponse.redirect('https://converter.iahome.fr', 302);
+        return NextResponse.redirect('https://convert.iahome.fr', 302);
       } else {
         console.log('Converter Proxy: Token invalide - redirection vers login');
         return NextResponse.redirect('https://iahome.fr/essentiels', 302);
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
     
     // Rediriger vers Universal Converter
     console.log('Converter Proxy: Redirection vers Universal Converter');
-    return NextResponse.redirect('https://converter.iahome.fr', 302);
+    return NextResponse.redirect('https://convert.iahome.fr', 302);
 
   } catch (error) {
     console.error('Converter Proxy Error:', error);

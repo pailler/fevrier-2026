@@ -1,10 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from './supabaseClient';
 import jwt from 'jsonwebtoken';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export interface AuthorizationResult {
   authorized: boolean;
@@ -172,20 +167,38 @@ export class AuthorizationService {
       const expiresAt = new Date(Date.now() + durationMinutes * 60 * 1000);
 
       // Stocker le token en base de données
-      const { error: insertError } = await supabase
-        .from('librespeed_tokens')
+      console.log('💾 Insertion du token en base de données:', {
+        jwt_token: token,
+        created_by: accessInfo.userId,
+        expires_at: expiresAt.toISOString(),
+        is_active: true
+      });
+
+      const { data: insertData, error: insertError } = await supabase
+        .from('access_tokens')
         .insert({
-          token,
-          user_id: accessInfo.userId,
-          user_email: accessInfo.userEmail,
+          name: `Token ${accessInfo.moduleTitle}`,
+          description: `Token temporaire pour ${accessInfo.userEmail}`,
+          module_id: accessInfo.moduleId === 'pdf' ? 1 : (accessInfo.moduleId === 'converter' ? 2 : 3),
+          module_name: accessInfo.moduleTitle,
+          access_level: 'temporary',
+          permissions: ['read', 'access'],
+          max_usage: 1,
+          current_usage: 0,
+          is_active: true,
           expires_at: expiresAt.toISOString(),
-          is_used: false
-        });
+          jwt_token: token,
+          expiration_hours: 1, // 1 heure (minimum)
+          created_by: accessInfo.userId
+        })
+        .select();
 
       if (insertError) {
         console.error('❌ Erreur lors de l\'insertion du token:', insertError);
         return null;
       }
+
+      console.log('✅ Token inséré avec succès:', insertData);
 
       console.log('✅ Token généré avec succès:', token);
       return token;
@@ -204,10 +217,10 @@ export class AuthorizationService {
       console.log('🔍 Validation du token:', token);
 
       const { data: tokenData, error } = await supabase
-        .from('librespeed_tokens')
+        .from('access_tokens')
         .select('*')
-        .eq('token', token)
-        .eq('is_used', false)
+        .eq('jwt_token', token)
+        .eq('is_active', true)
         .single();
 
       if (error || !tokenData) {
@@ -230,15 +243,21 @@ export class AuthorizationService {
 
       // Marquer le token comme utilisé
       await supabase
-        .from('librespeed_tokens')
-        .update({ is_used: true, used_at: new Date().toISOString() })
+        .from('access_tokens')
+        .update({ 
+          is_active: false, 
+          last_used_at: new Date().toISOString(),
+          current_usage: 1
+        })
         .eq('id', tokenData.id);
 
       return {
         valid: true,
         userInfo: {
-          userId: tokenData.user_id,
-          userEmail: tokenData.user_email
+          userId: tokenData.created_by,
+          userEmail: tokenData.description.split('pour ')[1] || 'unknown',
+          moduleId: tokenData.module_name.toLowerCase(),
+          moduleTitle: tokenData.module_name
         }
       };
 
@@ -332,7 +351,7 @@ export class AuthorizationService {
       console.log('🧹 Nettoyage des tokens expirés...');
 
       const { data, error } = await supabase
-        .from('librespeed_tokens')
+        .from('access_tokens')
         .delete()
         .lt('expires_at', new Date().toISOString());
 

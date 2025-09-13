@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../../utils/supabaseClient';
 
 const PSITRANSFER_SERVICE_URL = process.env.PSITRANSFER_SERVICE_URL || 'http://localhost:8084';
 
@@ -130,6 +132,63 @@ export async function POST(request: NextRequest) {
     const url = new URL(request.url);
     const searchParams = url.searchParams.toString();
     
+    // Vérifier le quota si c'est un upload de fichier
+    const contentType = request.headers.get('content-type') || '';
+    const contentLength = request.headers.get('content-length');
+    
+    if (contentType.includes('multipart/form-data') && contentLength) {
+      const fileSize = parseInt(contentLength);
+      
+      // Récupérer l'utilisateur depuis les cookies
+      const cookieHeader = request.headers.get('cookie');
+      if (cookieHeader) {
+        const supabaseWithCookies = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          {
+            auth: {
+              persistSession: false,
+              autoRefreshToken: false,
+            },
+            global: {
+              headers: {
+                cookie: cookieHeader,
+              },
+            },
+          }
+        );
+
+        const { data: { session } } = await supabaseWithCookies.auth.getSession();
+        
+        if (session?.user?.id) {
+          // Vérifier le quota
+          const quotaResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/psitransfer-quota`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: session.user.id,
+              fileSize: fileSize,
+              action: 'check'
+            })
+          });
+
+          if (quotaResponse.ok) {
+            const quotaResult = await quotaResponse.json();
+            if (!quotaResult.allowed) {
+              return NextResponse.json({
+                error: 'Quota dépassé',
+                message: quotaResult.reason,
+                currentUsage: quotaResult.currentUsage,
+                maxUsage: quotaResult.maxUsage
+              }, { status: 413 });
+            }
+          }
+        }
+      }
+    }
+    
     const targetUrl = `${PSITRANSFER_SERVICE_URL}/${searchParams ? `?${searchParams}` : ''}`;
     
     const body = await request.arrayBuffer();
@@ -144,6 +203,52 @@ export async function POST(request: NextRequest) {
     });
 
     const data = await response.arrayBuffer();
+    
+    // Si l'upload a réussi, incrémenter le quota
+    if (response.ok && contentType.includes('multipart/form-data') && contentLength) {
+      const fileSize = parseInt(contentLength);
+      const cookieHeader = request.headers.get('cookie');
+      
+      if (cookieHeader) {
+        const supabaseWithCookies = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          {
+            auth: {
+              persistSession: false,
+              autoRefreshToken: false,
+            },
+            global: {
+              headers: {
+                cookie: cookieHeader,
+              },
+            },
+          }
+        );
+
+        const { data: { session } } = await supabaseWithCookies.auth.getSession();
+        
+        if (session?.user?.id) {
+          // Incrémenter le quota
+          try {
+            await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/psitransfer-quota`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userId: session.user.id,
+                fileSize: fileSize,
+                action: 'add'
+              })
+            });
+          } catch (quotaError) {
+            console.error('❌ Erreur lors de l\'incrémentation du quota:', quotaError);
+            // Ne pas bloquer la réponse pour cette erreur
+          }
+        }
+      }
+    }
     
     // Gérer le code de statut 304 qui n'est pas valide pour NextResponse
     const status = response.status === 304 ? 200 : response.status;

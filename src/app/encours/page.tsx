@@ -382,10 +382,10 @@ export default function EncoursPage() {
     const moduleUrls: { [key: string]: string } = {
       'metube': 'https://metube.iahome.fr',
       'librespeed': 'https://librespeed.iahome.fr',
-      'pdf': 'https://pdf.iahome.fr',
+      'pdf': '/api/pdf-proxy',
       'psitransfer': 'https://psitransfer.iahome.fr',
       'qrcodes': 'https://qrcodes.iahome.fr',
-      'converter': 'https://converter.iahome.fr',
+      'converter': 'https://convert.iahome.fr',
       'stablediffusion': 'https://stablediffusion.iahome.fr',
       'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
       'invoke': 'https://invoke.iahome.fr',
