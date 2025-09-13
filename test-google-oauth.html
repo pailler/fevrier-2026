@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Google OAuth - IAHOME</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        .debug-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Test Google OAuth - IAHOME</h1>
+        
+        <div class="test-section info">
+            <h3>📋 Instructions</h3>
+            <p>Ce test vérifie la configuration Google OAuth pour IAHOME.</p>
+            <p><strong>URL de redirection attendue :</strong> <code>https://iahome.fr/auth/callback</code></p>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 Test de connexion Google</h3>
+            <button onclick="testGoogleOAuth()">Tester Google OAuth</button>
+            <div id="result" class="debug-info" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Informations de debug</h3>
+            <div class="debug-info">
+                <div><strong>URL actuelle :</strong> <span id="currentUrl"></span></div>
+                <div><strong>Origin :</strong> <span id="origin"></span></div>
+                <div><strong>User Agent :</strong> <span id="userAgent"></span></div>
+                <div><strong>Timestamp :</strong> <span id="timestamp"></span></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>✅ Vérifications à faire</h3>
+            <ul>
+                <li>✅ URL de redirection mise à jour dans Google Cloud Console</li>
+                <li>✅ URL de redirection mise à jour dans Supabase</li>
+                <li>✅ Code source mis à jour (GoogleSignInButton.tsx)</li>
+                <li>⏳ Test de connexion réussi</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Afficher les informations de debug
+        document.getElementById('currentUrl').textContent = window.location.href;
+        document.getElementById('origin').textContent = window.location.origin;
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+        document.getElementById('timestamp').textContent = new Date().toISOString();
+
+        function testGoogleOAuth() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            
+            try {
+                // Simuler la redirection Google OAuth
+                const redirectUrl = 'https://iahome.fr/auth/callback';
+                const googleOAuthUrl = `https://accounts.google.com/oauth/authorize?` +
+                    `client_id=507950012705-vhalhjt8jnk5k2r6oijhpgfta0hv5rkt.apps.googleusercontent.com&` +
+                    `redirect_uri=${encodeURIComponent(redirectUrl)}&` +
+                    `response_type=code&` +
+                    `scope=openid%20email%20profile&` +
+                    `access_type=offline`;
+                
+                resultDiv.innerHTML = `
+                    <div style="color: #28a745;">
+                        <strong>✅ Test de redirection Google OAuth</strong><br>
+                        <strong>URL de redirection :</strong> ${redirectUrl}<br>
+                        <strong>URL Google OAuth :</strong> <a href="${googleOAuthUrl}" target="_blank">Tester la connexion</a><br>
+                        <br>
+                        <em>Cliquez sur le lien pour tester la redirection vers Google OAuth.</em>
+                    </div>
+                `;
+                
+                // Ouvrir dans une nouvelle fenêtre pour le test
+                window.open(googleOAuthUrl, '_blank');
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div style="color: #dc3545;">
+                        <strong>❌ Erreur lors du test :</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Vérifier si on est sur la page de callback
+        if (window.location.href.includes('/auth/callback')) {
+            document.body.innerHTML = `
+                <div class="container">
+                    <div class="test-section success">
+                        <h3>🎉 Callback reçu !</h3>
+                        <p>La redirection Google OAuth fonctionne correctement.</p>
+                        <p><strong>URL complète :</strong> ${window.location.href}</p>
+                        <p><strong>Paramètres :</strong></p>
+                        <div class="debug-info">${window.location.search}</div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

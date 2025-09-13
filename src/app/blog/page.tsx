@@ -187,17 +187,6 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Fil d'Ariane amélioré - placé juste en dessous du Header */}
-      <div className="bg-white/60 backdrop-blur-sm border-b border-gray-200/50 pt-4">
-        <div className="max-w-7xl mx-auto px-6 py-1">
-          <Breadcrumb 
-            items={[
-              { label: 'Accueil', href: '/' },
-              { label: 'Blog' }
-            ]}
-          />
-        </div>
-      </div>
 
       {/* Section héros */}
       <section className="bg-gradient-to-br from-yellow-100 via-green-50 to-green-200 py-8 relative overflow-hidden">

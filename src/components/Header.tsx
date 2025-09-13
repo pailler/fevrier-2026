@@ -208,10 +208,18 @@ export default function Header() {
               
               {/* Lien Applications - Ajouté après Formation */}
               <Link 
-                href="https://iahome.fr" 
+                href="/applications" 
                 className="hidden md:block text-gray-700 hover:text-blue-600 font-medium transition-colors"
               >
                 Applications
+              </Link>
+              
+              {/* Lien Essentiels */}
+              <Link 
+                href="/essentiels" 
+                className="hidden md:block text-gray-700 hover:text-blue-600 font-medium transition-colors"
+              >
+                Essentiels
               </Link>
             </div>
             
@@ -248,10 +256,18 @@ export default function Header() {
                 
                 {/* Lien Applications - Mobile */}
                 <Link 
-                  href="https://iahome.fr" 
+                  href="/applications" 
                   className="text-gray-700 font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-left"
                 >
                   Applications
+                </Link>
+                
+                {/* Lien Essentiels - Mobile */}
+                <Link 
+                  href="/essentiels" 
+                  className="text-gray-700 font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-left"
+                >
+                  Essentiels
                 </Link>
                 
                 {/* Boutons mobile */}

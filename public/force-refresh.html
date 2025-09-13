@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Force Refresh - IAHome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .warning {
+            background: #ff9800;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Force Refresh - IAHome</h1>
+        <div class="warning">
+            <strong>⚠️ Attention :</strong> Cette page va forcer le rechargement complet de l'application pour résoudre les problèmes de cache.
+        </div>
+        <p>Cliquez sur le bouton ci-dessous pour forcer le rechargement complet de l'application :</p>
+        <button onclick="forceRefresh()">🔄 Forcer le Rechargement</button>
+        <button onclick="clearCacheAndRefresh()">🗑️ Vider le Cache et Recharger</button>
+        <p><small>Cette action va rediriger vers l'application principale après le rechargement.</small></p>
+    </div>
+
+    <script>
+        function forceRefresh() {
+            // Forcer le rechargement avec cache vidé
+            window.location.href = '/?v=' + Date.now() + '&force=true';
+        }
+
+        function clearCacheAndRefresh() {
+            // Vider le cache du navigateur et recharger
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
+                });
+            }
+            
+            // Forcer le rechargement
+            window.location.href = '/?v=' + Date.now() + '&force=true&cache=cleared';
+        }
+
+        // Auto-redirect après 5 secondes si pas d'action
+        setTimeout(() => {
+            if (confirm('Voulez-vous forcer le rechargement automatiquement ?')) {
+                forceRefresh();
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
