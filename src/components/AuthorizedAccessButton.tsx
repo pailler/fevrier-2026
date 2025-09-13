@@ -127,20 +127,7 @@ export default function AuthorizedAccessButton({
 
       console.log('✅ Accès autorisé pour le module:', moduleTitle);
 
-      // Incrémenter le compteur d'utilisation
-      await fetch('/api/authorize-module-access', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          moduleId,
-          moduleTitle,
-          userId: user.id,
-          userEmail: user.email,
-          action: 'increment_usage'
-        })
-      });
+      // L'incrémentation du compteur d'utilisation se fait dans chaque bloc de module spécifique
 
       // Gestion spéciale pour LibreSpeed avec vérification des quotas et génération de token
       if (moduleId === 'librespeed' || moduleTitle.toLowerCase().includes('librespeed')) {
@@ -1180,6 +1167,22 @@ export default function AuthorizedAccessButton({
       // Gestion spéciale pour PsiTransfer avec ouverture dans un nouvel onglet
       if (moduleTitle.toLowerCase().includes('psitransfer') || moduleTitle.toLowerCase().includes('psi transfer')) {
         console.log('🔑 Ouverture de PsiTransfer dans un nouvel onglet');
+        
+        // Incrémenter le compteur d'utilisation
+        await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'increment_usage'
+          })
+        });
+        
         const psitransferUrl = 'https://psitransfer.iahome.fr';
         onAccessGranted?.(psitransferUrl);
         window.open(psitransferUrl, '_blank');
@@ -1189,6 +1192,22 @@ export default function AuthorizedAccessButton({
       // Gestion spéciale pour QR Code avec ouverture dans un nouvel onglet
       if (moduleTitle.toLowerCase().includes('qrcode') || moduleTitle.toLowerCase().includes('qr code') || moduleId === 'qrcodes') {
         console.log('🔑 Ouverture de QR Code dans un nouvel onglet');
+        
+        // Incrémenter le compteur d'utilisation
+        await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'increment_usage'
+          })
+        });
+        
         const qrcodeUrl = 'https://qrcodes.iahome.fr';
         onAccessGranted?.(qrcodeUrl);
         window.open(qrcodeUrl, '_blank');
@@ -1222,6 +1241,22 @@ export default function AuthorizedAccessButton({
       
       if (productionUrl) {
         console.log('🔗 Ouverture du module dans un nouvel onglet avec URL de production:', productionUrl);
+        
+        // Incrémenter le compteur d'utilisation pour les modules par défaut
+        await fetch('/api/authorize-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleTitle,
+            userId: user.id,
+            userEmail: user.email,
+            action: 'increment_usage'
+          })
+        });
+        
         onAccessGranted?.(productionUrl);
         window.open(productionUrl, '_blank');
       } else {
