@@ -190,43 +190,73 @@ export default function BlogPage() {
 
       {/* Section héros */}
       <section className="bg-gradient-to-br from-yellow-100 via-green-50 to-green-200 py-8 relative overflow-hidden">
-        {/* Effet de particules en arrière-plan */}
+        {/* Effet de particules en arrière-plan - Thème blog/écriture */}
         <div className="absolute inset-0">
-          <div className="absolute top-10 left-10 w-2 h-2 bg-yellow-400/30 rounded-full animate-pulse"></div>
-          <div className="absolute top-20 right-20 w-1 h-1 bg-green-400/25 rounded-full animate-bounce"></div>
-          <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-yellow-500/20 rounded-full animate-pulse"></div>
-          <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-green-500/30 rounded-full animate-bounce"></div>
-          <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-yellow-600/15 rounded-full animate-pulse"></div>
+          {/* Particules flottantes avec animations variées */}
+          <div className="absolute top-10 left-10 w-3 h-3 bg-yellow-400/40 rounded-full animate-float-slow"></div>
+          <div className="absolute top-20 right-20 w-2 h-2 bg-green-400/35 rounded-full animate-float-fast"></div>
+          <div className="absolute bottom-10 left-1/4 w-2.5 h-2.5 bg-yellow-500/30 rounded-full animate-float-medium"></div>
+          <div className="absolute bottom-20 right-1/3 w-1.5 h-1.5 bg-green-500/40 rounded-full animate-float-slow"></div>
+          <div className="absolute top-1/2 left-1/3 w-2 h-2 bg-yellow-600/25 rounded-full animate-float-fast"></div>
+          <div className="absolute top-1/3 right-1/4 w-1 h-1 bg-green-600/30 rounded-full animate-float-medium"></div>
+          <div className="absolute bottom-1/3 left-1/5 w-1.5 h-1.5 bg-yellow-700/20 rounded-full animate-float-slow"></div>
+          <div className="absolute top-3/4 right-1/5 w-2 h-2 bg-green-700/25 rounded-full animate-float-fast"></div>
+          
+          {/* Formes géométriques flottantes - Thème écriture */}
+          <div className="absolute top-16 left-1/2 w-4 h-4 bg-yellow-300/20 transform rotate-45 animate-rotate-slow"></div>
+          <div className="absolute bottom-16 right-1/2 w-3 h-3 bg-green-300/25 transform rotate-12 animate-rotate-fast"></div>
+          <div className="absolute top-1/2 left-1/6 w-2 h-2 bg-yellow-400/30 transform rotate-45 animate-rotate-medium"></div>
+          
+          {/* Ondes de fond */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-radial from-yellow-200/30 via-transparent to-transparent animate-pulse-slow"></div>
+            <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-radial from-green-200/30 via-transparent to-transparent animate-pulse-slow" style={{animationDelay: '1s'}}></div>
+          </div>
         </div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             {/* Contenu texte */}
-            <div className="flex-1 max-w-2xl">
-              <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
+            <div className="flex-1 max-w-2xl animate-fade-in-up">
+              <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4 animate-typewriter">
                 Blog IAHome
               </h1>
-              <p className="text-xl text-gray-700 mb-6">
+              <p className="text-xl text-gray-700 mb-6 animate-fade-in-up-delayed">
                 L'intelligence artificielle : les outils, les ressources et les meilleures pratiques
               </p>
             </div>
             
             {/* Illustration */}
-            <div className="flex-1 flex justify-center">
-              <div className="relative w-80 h-64">
-                {/* Formes géométriques abstraites */}
-                <div className="absolute top-0 left-0 w-24 h-24 bg-red-400 rounded-full opacity-60 animate-pulse"></div>
-                <div className="absolute top-16 right-0 w-20 h-20 bg-yellow-400 rounded-lg opacity-60 animate-bounce"></div>
-                <div className="absolute bottom-0 left-16 w-20 h-20 bg-green-400 transform rotate-45 opacity-60 animate-pulse"></div>
-                <div className="absolute bottom-16 right-16 w-16 h-16 bg-blue-400 rounded-full opacity-60 animate-bounce"></div>
+            <div className="flex-1 flex justify-center animate-fade-in-right">
+              <div className="relative w-80 h-64 animate-float-gentle">
+                {/* Formes géométriques abstraites avec animations améliorées - Thème blog */}
+                <div className="absolute top-0 left-0 w-24 h-24 bg-red-400 rounded-full opacity-60 animate-float-slow hover:scale-110 transition-transform duration-300"></div>
+                <div className="absolute top-16 right-0 w-20 h-20 bg-yellow-400 rounded-lg opacity-60 animate-float-medium hover:scale-110 transition-transform duration-300"></div>
+                <div className="absolute bottom-0 left-16 w-20 h-20 bg-green-400 transform rotate-45 opacity-60 animate-float-fast hover:scale-110 transition-transform duration-300"></div>
+                <div className="absolute bottom-16 right-16 w-16 h-16 bg-blue-400 rounded-full opacity-60 animate-float-slow hover:scale-110 transition-transform duration-300"></div>
                 
-                {/* Éléments centraux */}
-                <div className="absolute inset-0 flex items-center justify-center">
+                {/* Nouvelles formes flottantes - Thème écriture */}
+                <div className="absolute top-8 right-8 w-12 h-12 bg-purple-400 rounded-full opacity-50 animate-float-medium"></div>
+                <div className="absolute bottom-8 left-8 w-14 h-14 bg-orange-400 transform rotate-12 opacity-50 animate-float-fast"></div>
+                
+                {/* Éléments centraux avec animation - Thème blog */}
+                <div className="absolute inset-0 flex items-center justify-center animate-pulse-gentle">
                   <div className="text-left">
-                    <div className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-green-700 bg-clip-text text-transparent mb-3">IAHome</div>
-                    <div className="text-xs text-gray-600">Intelligence Artificielle</div>
+                    <div className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-green-700 bg-clip-text text-transparent mb-3 animate-text-glow">IAHome</div>
+                    <div className="text-xs text-gray-600 animate-fade-in-delayed">Intelligence Artificielle</div>
                   </div>
                 </div>
+                
+                {/* Effet de particules autour de l'illustration - Thème écriture */}
+                <div className="absolute -top-4 -left-4 w-2 h-2 bg-yellow-300/40 rounded-full animate-float-slow"></div>
+                <div className="absolute -top-2 -right-4 w-1.5 h-1.5 bg-green-300/40 rounded-full animate-float-medium"></div>
+                <div className="absolute -bottom-4 -left-2 w-1 h-1 bg-blue-300/40 rounded-full animate-float-fast"></div>
+                <div className="absolute -bottom-2 -right-2 w-1.5 h-1.5 bg-purple-300/40 rounded-full animate-float-slow"></div>
+                
+                {/* Lignes d'écriture animées */}
+                <div className="absolute top-4 left-4 w-16 h-0.5 bg-yellow-300/30 animate-line-draw"></div>
+                <div className="absolute top-6 left-4 w-12 h-0.5 bg-green-300/30 animate-line-draw-delayed"></div>
+                <div className="absolute top-8 left-4 w-14 h-0.5 bg-blue-300/30 animate-line-draw-delayed-2"></div>
               </div>
             </div>
           </div>
@@ -376,6 +406,181 @@ export default function BlogPage() {
           </div>
         )}
       </div>
+
+      <style jsx>{`
+        /* Animations personnalisées pour la bannière blog */
+        @keyframes float-slow {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        @keyframes float-medium {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-15px) rotate(-3deg); }
+        }
+        
+        @keyframes float-fast {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        
+        @keyframes float-gentle {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-5px); }
+        }
+        
+        @keyframes rotate-slow {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes rotate-medium {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(180deg); }
+        }
+        
+        @keyframes rotate-fast {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(90deg); }
+        }
+        
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 0.1; transform: scale(1); }
+          50% { opacity: 0.3; transform: scale(1.05); }
+        }
+        
+        @keyframes pulse-gentle {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.8; transform: scale(1.02); }
+        }
+        
+        @keyframes fade-in-up {
+          0% { opacity: 0; transform: translateY(30px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fade-in-up-delayed {
+          0% { opacity: 0; transform: translateY(30px); }
+          50% { opacity: 0; transform: translateY(30px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fade-in-right {
+          0% { opacity: 0; transform: translateX(30px); }
+          100% { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes fade-in-delayed {
+          0% { opacity: 0; }
+          70% { opacity: 0; }
+          100% { opacity: 1; }
+        }
+        
+        @keyframes typewriter {
+          0% { width: 0; }
+          100% { width: 100%; }
+        }
+        
+        @keyframes text-glow {
+          0%, 100% { text-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
+          50% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 30px rgba(34, 197, 94, 0.4); }
+        }
+        
+        @keyframes line-draw {
+          0% { width: 0; }
+          100% { width: 100%; }
+        }
+        
+        @keyframes line-draw-delayed {
+          0% { width: 0; }
+          50% { width: 0; }
+          100% { width: 100%; }
+        }
+        
+        @keyframes line-draw-delayed-2 {
+          0% { width: 0; }
+          70% { width: 0; }
+          100% { width: 100%; }
+        }
+        
+        .animate-float-slow {
+          animation: float-slow 6s ease-in-out infinite;
+        }
+        
+        .animate-float-medium {
+          animation: float-medium 4s ease-in-out infinite;
+        }
+        
+        .animate-float-fast {
+          animation: float-fast 3s ease-in-out infinite;
+        }
+        
+        .animate-float-gentle {
+          animation: float-gentle 5s ease-in-out infinite;
+        }
+        
+        .animate-rotate-slow {
+          animation: rotate-slow 20s linear infinite;
+        }
+        
+        .animate-rotate-medium {
+          animation: rotate-medium 15s linear infinite;
+        }
+        
+        .animate-rotate-fast {
+          animation: rotate-fast 10s linear infinite;
+        }
+        
+        .animate-pulse-slow {
+          animation: pulse-slow 4s ease-in-out infinite;
+        }
+        
+        .animate-pulse-gentle {
+          animation: pulse-gentle 3s ease-in-out infinite;
+        }
+        
+        .animate-fade-in-up {
+          animation: fade-in-up 1s ease-out;
+        }
+        
+        .animate-fade-in-up-delayed {
+          animation: fade-in-up-delayed 1.5s ease-out;
+        }
+        
+        .animate-fade-in-right {
+          animation: fade-in-right 1s ease-out;
+        }
+        
+        .animate-fade-in-delayed {
+          animation: fade-in-delayed 2s ease-out;
+        }
+        
+        .animate-typewriter {
+          animation: typewriter 2s ease-in-out;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+        
+        .animate-text-glow {
+          animation: text-glow 2s ease-in-out infinite;
+        }
+        
+        .animate-line-draw {
+          animation: line-draw 1s ease-in-out;
+        }
+        
+        .animate-line-draw-delayed {
+          animation: line-draw-delayed 1.5s ease-in-out;
+        }
+        
+        .animate-line-draw-delayed-2 {
+          animation: line-draw-delayed-2 2s ease-in-out;
+        }
+        
+        .bg-gradient-radial {
+          background: radial-gradient(circle, var(--tw-gradient-stops));
+        }
+      `}</style>
     </div>
   );
 } 
