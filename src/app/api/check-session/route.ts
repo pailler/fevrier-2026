@@ -4,7 +4,7 @@ import Stripe from 'stripe';
 // Vérifier si la clé Stripe est disponible
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, {
-  apiVersion: '2025-07-30.basil',
+  apiVersion: '2025-08-27.basil',
 }) : null;
 
 export async function POST(request: NextRequest) {

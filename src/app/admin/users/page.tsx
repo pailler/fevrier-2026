@@ -171,7 +171,7 @@ export default function AdminUsersPage() {
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Accès refusé</h1>
             <p className="text-gray-600 mb-8">Vous devez avoir les droits d'administrateur pour accéder à cette page.</p>
-                               <Link href="https://home.regispailler.fr/admin/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Retour à l'administration</Link>
+                               <Link href="/admin/dashboard" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Retour à l'administration</Link>
           </div>
         </div>
       </div>

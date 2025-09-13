@@ -114,7 +114,7 @@ export default function ComfyUIPage() {
       }
       
       const { accessToken, moduleName } = responseData;
-      const baseUrl = 'https://comfyui.regispailler.fr';
+      const baseUrl = 'https://comfyui.iahome.fr';
       const accessUrl = `${baseUrl}?token=${accessToken}`;
       setIframeModal({
         isOpen: true,

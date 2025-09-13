@@ -1,88 +1,70 @@
-# Dependencies
+# Fichiers à ignorer lors de la construction Docker
+
+# Dépendances
 node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Next.js
-.next/
-out/
-
-# Production
+# Fichiers de build
+.next
+out
+dist
 build
 
-# Misc
-.DS_Store
-*.tgz
-*.tar.gz
+# Fichiers de cache
+.cache
+.parcel-cache
 
-# Debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Fichiers d'environnement
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Local env files
-.env*.local
-.env.development
-.env.test
-
-# Vercel
-.vercel
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
-
-# Docker
-docker-services/
-docker-compose*.yml
-Dockerfile*
-
-# Logs
-logs/
+# Fichiers de logs
+logs
 *.log
 
-# Git
-.git/
-.gitignore
+# Fichiers de test
+coverage
+.nyc_output
 
-# IDE
-.vscode/
-.idea/
+# Fichiers de développement
+.vscode
+.idea
 *.swp
 *.swo
+*~
 
-# OS
+# Fichiers système
 .DS_Store
 Thumbs.db
 
-# Documentation
+# Fichiers Git
+.git
+.gitignore
+
+# Fichiers Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Fichiers de documentation
+README.md
 *.md
-!README.md
+docs/
 
-# Scripts
-scripts/
-*.ps1
-*.sh
+# Fichiers de déploiement
+deploy-*.sh
+deploy-*.ps1
 
-# Traefik
-traefik/
+# Fichiers de test
+test-*
+*test*
 
-# Nginx
-nginx/
-
-# Error pages
-error-pages/
-
-# Tools
-tools/
-
-# Portainer
-portainer-stack.yml
-
-# Backup files
-*.backup
-*.example
-
-# Migration files
-.migration-status
+# Fichiers temporaires
+tmp/
+temp/
+uploads/

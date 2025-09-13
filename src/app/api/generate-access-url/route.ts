@@ -8,7 +8,7 @@ const MODULES_CONFIG: Record<string, {
   type: string;
 }> = {
   stablediffusion: {
-    url: 'https://stablediffusion.regispailler.fr',
+    url: 'https://stablediffusion.iahome.fr',
     credentials: { username: 'admin', password: 'Rasulova75' },
     type: 'http-basic'
   },

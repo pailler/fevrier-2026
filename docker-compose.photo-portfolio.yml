@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # Service principal Next.js
+  photo-portfolio:
+    build:
+      context: .
+      dockerfile: Dockerfile.photo-portfolio
+    container_name: iahome-photo-portfolio
+    ports:
+      - "3001:3000"
+    environment:
+      # Configuration Next.js
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      
+      # Configuration Supabase
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      
+      # Configuration OpenAI
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-text-embedding-3-small}
+      - EMBEDDING_DIMENSIONS=${EMBEDDING_DIMENSIONS:-1536}
+      
+      # Configuration Storage
+      - SUPABASE_STORAGE_BUCKET=${SUPABASE_STORAGE_BUCKET:-photo-portfolio}
+      - MAX_FILE_SIZE=${MAX_FILE_SIZE:-10485760}
+      - ALLOWED_IMAGE_TYPES=${ALLOWED_IMAGE_TYPES:-image/jpeg,image/png,image/webp}
+      
+      # Configuration base de données
+      - DATABASE_URL=${DATABASE_URL}
+      
+    volumes:
+      # Volume pour les uploads temporaires
+      - photo-uploads:/app/uploads
+      # Volume pour les logs
+      - photo-logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - iahome-network
+
+  # Service Nginx pour reverse proxy (optionnel)
+  nginx:
+    image: nginx:alpine
+    container_name: iahome-photo-portfolio-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/photo-portfolio.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - photo-portfolio
+    restart: unless-stopped
+    networks:
+      - iahome-network
+
+  # Service Redis pour cache (optionnel)
+  redis:
+    image: redis:7-alpine
+    container_name: iahome-photo-portfolio-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - iahome-network
+    command: redis-server --appendonly yes
+
+volumes:
+  photo-uploads:
+    driver: local
+  photo-logs:
+    driver: local
+  redis-data:
+    driver: local
+
+networks:
+  iahome-network:
+    external: true

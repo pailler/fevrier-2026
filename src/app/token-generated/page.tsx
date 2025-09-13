@@ -89,11 +89,11 @@ function TokenGeneratedContent() {
               </div>
               
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                Token Premium Généré !
+                Application activée !
               </h1>
               
               <p className="text-lg text-gray-600 mb-2">
-                Votre token premium pour <span className="font-semibold text-blue-600">{moduleName}</span> a été créé avec succès.
+                Utilisez-là dès maintenant !
               </p>
               
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-8">

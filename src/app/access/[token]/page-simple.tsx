@@ -81,8 +81,8 @@ export default function AccessPageSimple() {
         setTimeout(() => {
           const moduleUrls: { [key: string]: string } = {
             'IAmetube': '/api/proxy-metube',
-            'IAphoto': 'https://iaphoto.regispailler.fr',
-            'IAvideo': 'https://iavideo.regispailler.fr',
+            'IAphoto': 'https://iaphoto.iahome.fr',
+            'IAvideo': 'https://iavideo.iahome.fr',
             'test-module': 'https://test.example.com',
           };
 

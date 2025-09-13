@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const PDF_SERVICE_URL = process.env.PDF_SERVICE_URL || 'https://pdf.regispailler.fr';
+const PDF_SERVICE_URL = process.env.PDF_SERVICE_URL || 'https://pdf.iahome.fr';
 
 // Fonction pour réécrire les URLs dans le contenu HTML
 function rewritePdfUrls(html: string): string {
@@ -19,7 +19,7 @@ function rewritePdfUrls(html: string): string {
     return `<${tag}${attrs} ${attr}="/api/pdf-proxy/${path}"`;
   });
   
-  // Réécrire les URLs absolues de pdf.regispailler.fr
+  // Réécrire les URLs absolues de pdf.iahome.fr
   modified = modified.replace(/https?:\/\/pdf\.regispailler\.fr\//g, '/api/pdf-proxy/');
   
   return modified;

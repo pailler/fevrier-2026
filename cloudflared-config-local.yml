@@ -1,9 +1,0 @@
-tunnel: iahome
-credentials-file: /etc/cloudflared/iahome.json
-
-ingress:
-  - hostname: iahome.fr
-    service: http://iahome-app:3000
-  - hostname: librespeed.iahome.fr
-    service: http://iahome-traefik:80
-  - service: http_status:404

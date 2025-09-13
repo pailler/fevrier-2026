@@ -26,7 +26,6 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: [
     'iahome.fr',
     'www.iahome.fr',
-    'home.regispailler.fr',
     '192.168.1.150',
     'localhost'
   ],
@@ -134,12 +133,6 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'www.iahome.fr',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'home.regispailler.fr',
         port: '',
         pathname: '/**',
       },

@@ -88,7 +88,6 @@ ${contextData.statsData}
 - Transfert de fichiers avec PsiTransfer
 - Tests de vitesse avec LibreSpeed
 - Génération de QR codes
-- Modèles 3D avec Blender
 - Et bien plus encore !
 
 💡 CAPACITÉS :
@@ -225,7 +224,6 @@ Services IA disponibles :
 - PsiTransfer (transfert fichiers)
 - LibreSpeed (tests de vitesse)
 - QR Codes (génération QR)
-- Blender 3D (modélisation 3D)
 - ChatGPT (assistance IA)
 - IA Photo (traitement photos)
 - IA Tube (plateforme vidéo)

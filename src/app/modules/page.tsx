@@ -85,15 +85,6 @@ export default function ModulesPage() {
       status: 'active'
     },
     {
-      id: 'blender-3d',
-      name: 'Générateur 3D Blender',
-      description: 'Créez des objets 3D avec l\'IA via Blender',
-      url: '/blender-3d',
-      icon: '🎨',
-      color: 'bg-purple-500 hover:bg-purple-600',
-      status: 'active'
-    },
-    {
       id: 'future-module',
       name: 'Appli Futur',
       description: 'Appli en développement',

@@ -3,7 +3,7 @@ import { createHmac } from 'crypto';
 
 // Configuration FusionAuth
 const FUSIONAUTH_CONFIG = {
-  baseUrl: process.env.FUSIONAUTH_BASE_URL || 'https://fusionauth.regispailler.fr',
+  baseUrl: process.env.FUSIONAUTH_BASE_URL || 'https://fusionauth.iahome.fr',
   apiKey: process.env.FUSIONAUTH_API_KEY || 'H6DZYq4RFdFh87J9DkhNdvo0U7Lqb1yUmK6YmwOU',
   applicationId: process.env.FUSIONAUTH_APPLICATION_ID || 'a3bd1666-71cd-4037-8037-322126502010',
   clientSecret: process.env.FUSIONAUTH_CLIENT_SECRET || '7KT8f8LCBXHwOYCOr1zDKrpodB5EgSaTunpRkN5rgro',
@@ -32,8 +32,8 @@ export async function POST(request: NextRequest) {
     };
 
     const payload = {
-      iss: 'iahome.regispailler.fr',
-      aud: 'stablediffusion.regispailler.fr',
+      iss: 'iahome.fr',
+      aud: 'stablediffusion.iahome.fr',
       sub: userId,
       email: userEmail,
       module: module,

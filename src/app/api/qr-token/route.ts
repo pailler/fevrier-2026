@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 // Configuration du service QR Code Generator
 const QR_CODE_CONFIG = {
   // URL locale pour accès direct
-  url: process.env.QR_CODE_SERVICE_URL || 'https://qrcode.regispailler.fr',
+  url: process.env.QR_CODE_SERVICE_URL || 'https://qrcode.iahome.fr',
   // Clé secrète JWT pour signer les tokens
   jwtSecret: process.env.JWT_SECRET_QR_CODE || 'your-secret-jwt-key-for-qr-code'
 };

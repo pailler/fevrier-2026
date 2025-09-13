@@ -336,7 +336,7 @@ export function UnifiedModuleModal({
                     value={formData.url || ''}
                     onChange={(e) => setFormData({...formData, url: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                    placeholder="https://nouveau-module.regispailler.fr"
+                    placeholder="https://nouveau-module.iahome.fr"
                   />
                   <p className="mt-1 text-sm text-gray-500">
                     URL de l'application sur votre réseau local

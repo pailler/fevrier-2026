@@ -9,7 +9,7 @@ const MODULES_CONFIG: Record<string, {
 }> = {
   'SD': {
     code: 'SD',
-    url: 'https://stablediffusion.regispailler.fr',
+    url: 'https://stablediffusion.iahome.fr',
     credentials: { username: 'admin', password: 'Rasulova75' },
     name: 'Stable Diffusion'
   },

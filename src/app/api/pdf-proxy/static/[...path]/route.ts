@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const PDF_SERVICE_URL = process.env.PDF_SERVICE_URL || 'https://pdf.regispailler.fr';
+const PDF_SERVICE_URL = process.env.PDF_SERVICE_URL || 'https://pdf.iahome.fr';
 
 export async function GET(
   request: NextRequest,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const QR_CODE_SERVICE_URL = process.env.QR_CODE_SERVICE_URL || 'https://qrcode.regispailler.fr';
+const QR_CODE_SERVICE_URL = process.env.QR_CODE_SERVICE_URL || 'https://qrcode.iahome.fr';
 
 export async function GET(request: NextRequest) {
   try {

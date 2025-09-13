@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const METUBE_SERVICE_URL = process.env.METUBE_SERVICE_URL || 'https://metube.regispailler.fr';
+const METUBE_SERVICE_URL = process.env.METUBE_SERVICE_URL || 'https://metube.iahome.fr';
 
 export async function GET(request: NextRequest) {
   try {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createHmac } from 'crypto';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-jwt-secret-key-change-this-in-production';
-const STABLEDIFFUSION_URL = 'https://stablediffusion.regispailler.fr';
+const STABLEDIFFUSION_URL = 'https://stablediffusion.iahome.fr';
 const STABLEDIFFUSION_CREDENTIALS = {
   username: 'admin',
   password: 'Rasulova75'
@@ -36,7 +36,7 @@ function verifyJWT(token: string) {
     }
 
     // Vérifier l'émetteur et l'audience
-    if (payload.iss !== 'iahome.regispailler.fr' || payload.aud !== 'stablediffusion.regispailler.fr') {
+    if (payload.iss !== 'iahome.fr' || payload.aud !== 'stablediffusion.iahome.fr') {
       throw new Error('Token invalide (iss/aud)');
     }
 

@@ -11,7 +11,7 @@ const MODULE_CREDENTIALS: { [key: string]: { username: string; password: string 
 
 // Configuration des URLs de base pour chaque module
 const MODULE_URLS: { [key: string]: string } = {
-  'stablediffusion': 'https://stablediffusion.regispailler.fr',
+  'stablediffusion': 'https://stablediffusion.iahome.fr',
 };
 
 export async function GET(
@@ -113,7 +113,7 @@ export async function GET(
             return `${attr}="${proxyUrl}"`;
           }
           // Si c'est une URL absolue du même domaine, la transformer aussi
-          if (url.includes('stablediffusion.regispailler.fr')) {
+          if (url.includes('stablediffusion.iahome.fr')) {
             const path = new URL(url).pathname;
             const proxyUrl = `/api/proxy-module${path}?token=${token}&module=${module}`;
             return `${attr}="${proxyUrl}"`;

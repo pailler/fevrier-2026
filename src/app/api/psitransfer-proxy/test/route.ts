@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const PSITRANSFER_SERVICE_URL = process.env.PSITRANSFER_SERVICE_URL || 'https://psitransfer.regispailler.fr';
+const PSITRANSFER_SERVICE_URL = process.env.PSITRANSFER_SERVICE_URL || 'https://psitransfer.iahome.fr';
 
 export async function GET(request: NextRequest) {
   try {

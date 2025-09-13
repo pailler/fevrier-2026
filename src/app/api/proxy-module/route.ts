@@ -11,7 +11,7 @@ const MODULE_CREDENTIALS: { [key: string]: { username: string; password: string 
 
 // Configuration des URLs de base pour chaque module
 const MODULE_URLS: { [key: string]: string } = {
-  'stablediffusion': 'https://stablediffusion.regispailler.fr',
+  'stablediffusion': 'https://stablediffusion.iahome.fr',
 };
 
 export async function GET(request: NextRequest) {

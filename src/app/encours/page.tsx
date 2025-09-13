@@ -385,13 +385,13 @@ export default function EncoursPage() {
       'pdf': 'https://pdf.iahome.fr',
       'psitransfer': 'https://psitransfer.iahome.fr',
       'qrcodes': 'https://qrcodes.iahome.fr',
+      'converter': 'https://converter.iahome.fr',
       'stablediffusion': 'https://stablediffusion.iahome.fr',
       'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
       'invoke': 'https://invoke.iahome.fr',
       'comfyui': 'https://comfyui.iahome.fr',
       'cogstudio': 'https://cogstudio.iahome.fr',
       'sdnext': 'https://sdnext.iahome.fr',
-      'blender-3d': '/blender-3d' // URL interne pour le module Blender 3D
     };
     
     return moduleUrls[moduleId] || '';

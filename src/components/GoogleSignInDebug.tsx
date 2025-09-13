@@ -21,7 +21,7 @@ export default function GoogleSignInDebug() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://iahome.fr/auth/callback'
+          redirectTo: `${window.location.origin}/auth/callback`
         }
       });
 

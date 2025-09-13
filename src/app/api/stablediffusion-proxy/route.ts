@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '../../../utils/supabaseClient';
 import { validateMagicLink } from '../../../utils/magicLink';
 
-const STABLEDIFFUSION_URL = 'https://stablediffusion.regispailler.fr';
+const STABLEDIFFUSION_URL = 'https://stablediffusion.iahome.fr';
 const STABLEDIFFUSION_CREDENTIALS = {
   username: 'admin',
   password: 'Rasulova75'

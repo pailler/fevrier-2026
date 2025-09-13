@@ -102,7 +102,7 @@ export default function CardDetailPage() {
       // Gestion spéciale pour Metube avec lien direct
       if (moduleTitle.toLowerCase().includes('metube') || moduleTitle.toLowerCase().includes('me tube')) {
         console.log('🔑 Accès direct à Metube via iframe');
-        const metubeUrl = 'https://metube.regispailler.fr';
+        const metubeUrl = 'https://metube.iahome.fr';
         console.log('🔗 URL d\'accès Metube directe:', metubeUrl);
         setIframeModal({
           isOpen: true,
@@ -115,7 +115,7 @@ export default function CardDetailPage() {
       // Gestion spéciale pour PDF avec lien direct
       if (moduleTitle.toLowerCase().includes('pdf') || moduleTitle.toLowerCase().includes('pdf+')) {
         console.log('🔑 Accès direct à PDF via iframe');
-        const pdfUrl = 'https://pdf.regispailler.fr';
+        const pdfUrl = 'https://pdf.iahome.fr';
         console.log('🔗 URL d\'accès PDF directe:', pdfUrl);
         setIframeModal({
           isOpen: true,
@@ -128,7 +128,7 @@ export default function CardDetailPage() {
       // Gestion spéciale pour LibreSpeed avec lien direct
       if (moduleTitle.toLowerCase().includes('librespeed') || moduleTitle.toLowerCase().includes('speed')) {
         console.log('🔑 Accès direct à LibreSpeed via iframe');
-        const librespeedUrl = 'https://librespeed.regispailler.fr';
+        const librespeedUrl = 'https://librespeed.iahome.fr';
         console.log('🔗 URL d\'accès LibreSpeed directe:', librespeedUrl);
         setIframeModal({
           isOpen: true,
@@ -177,19 +177,19 @@ export default function CardDetailPage() {
       console.log('✅ Token JWT généré avec succès');
       
       const moduleUrls: { [key: string]: string } = {
-        'stablediffusion': 'https://stablediffusion.regispailler.fr',
-        'iaphoto': 'https://iaphoto.regispailler.fr', 
-        'metube': 'https://metube.regispailler.fr',
-        'ia metube': 'https://metube.regispailler.fr',
-        'chatgpt': 'https://chatgpt.regispailler.fr',
-        'librespeed': 'https://librespeed.regispailler.fr',
-        'psitransfer': 'https://psitransfer.regispailler.fr',
-        'pdf+': 'https://pdf.regispailler.fr',
-        'pdf': 'https://pdf.regispailler.fr',
-        'aiassistant': 'https://aiassistant.regispailler.fr',
-        'cogstudio': 'https://cogstudio.regispailler.fr',
+        'stablediffusion': 'https://stablediffusion.iahome.fr',
+        'iaphoto': 'https://iaphoto.iahome.fr', 
+        'metube': 'https://metube.iahome.fr',
+        'ia metube': 'https://metube.iahome.fr',
+        'chatgpt': 'https://chatgpt.iahome.fr',
+        'librespeed': 'https://librespeed.iahome.fr',
+        'psitransfer': 'https://psitransfer.iahome.fr',
+        'pdf+': 'https://pdf.iahome.fr',
+        'pdf': 'https://pdf.iahome.fr',
+        'aiassistant': 'https://aiassistant.iahome.fr',
+        'cogstudio': 'https://cogstudio.iahome.fr',
         'ruinedfooocus': '/api/gradio-secure',
-        'invoke': 'https://invoke.regispailler.fr'
+        'invoke': 'https://invoke.iahome.fr'
       };
 
       const normalizedName = (moduleName || '').toLowerCase().replace(/\s+/g, '');
@@ -201,11 +201,11 @@ export default function CardDetailPage() {
       }
       
       if (!baseUrl && ((moduleName || '').toLowerCase().includes('librespeed') || (moduleTitle || '').toLowerCase().includes('librespeed'))) {
-        baseUrl = 'https://librespeed.regispailler.fr';
+        baseUrl = 'https://librespeed.iahome.fr';
       }
       
       if (!baseUrl) {
-        baseUrl = 'https://metube.regispailler.fr';
+        baseUrl = 'https://metube.iahome.fr';
       }
       
       const isProxyModule = baseUrl.startsWith('/api/');

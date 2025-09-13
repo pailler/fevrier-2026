@@ -114,7 +114,7 @@ export default function InvokePage() {
       }
       
       const { accessToken, moduleName } = responseData;
-      const baseUrl = 'https://invoke.regispailler.fr';
+      const baseUrl = 'https://invoke.iahome.fr';
       const accessUrl = `${baseUrl}?token=${accessToken}`;
       setIframeModal({
         isOpen: true,
