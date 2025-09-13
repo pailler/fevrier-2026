@@ -284,7 +284,7 @@ export default function Home() {
   const categories = ['Toutes les catégories', ...allCategories];
 
   // Modules essentiels définis
-  const essentialModules = ['metube', 'psitransfer', 'universal-converter', 'pdf', 'librespeed'];
+  const essentialModules = ['metube', 'psitransfer', 'universal-converter', 'pdf', 'librespeed', 'qrcodes'];
   
   // Filtrer et trier les modules essentiels
   const filteredAndSortedModules = modules

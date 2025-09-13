@@ -283,9 +283,21 @@ export default function Home() {
   // Ajouter "Toutes les catégories" au début
   const categories = ['Toutes les catégories', ...allCategories];
 
+  // Modules essentiels à exclure de la page applications
+  const essentialModules = ['metube', 'psitransfer', 'universal-converter', 'pdf', 'librespeed', 'qrcodes'];
+  
   // Filtrer et trier les modules
   const filteredAndSortedModules = modules
     .filter(module => {
+      // Exclure les modules essentiels (affichés dans la page essentiels)
+      const isEssential = essentialModules.some(essentialId => 
+        module.id === essentialId || 
+        module.title.toLowerCase().includes(essentialId.toLowerCase()) ||
+        module.title.toLowerCase().includes(essentialId.replace('-', ' '))
+      );
+      
+      if (isEssential) return false;
+      
       // Filtre de recherche
       const matchesSearch = !search || 
         module.title.toLowerCase().includes(search.toLowerCase()) ||
