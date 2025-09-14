@@ -23,3 +23,4 @@ export const getSupabaseClient = (): SupabaseClient => {
 
 // Export pour compatibilité
 export const supabase = getSupabaseClient();
+
