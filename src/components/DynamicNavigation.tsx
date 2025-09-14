@@ -44,13 +44,7 @@ export default function DynamicNavigation({
 
   // Ne pas rendre côté serveur pour éviter l'erreur d'hydratation
   if (!isClient) {
-    return (
-      <div className={`flex items-center space-x-4 ${className}`}>
-        <div className="animate-pulse bg-gray-200 h-4 w-16 rounded"></div>
-        <div className="animate-pulse bg-gray-200 h-4 w-20 rounded"></div>
-        <div className="animate-pulse bg-gray-200 h-4 w-14 rounded"></div>
-      </div>
-    );
+    return null;
   }
 
   if (loading) {
