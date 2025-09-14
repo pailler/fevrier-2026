@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const moduleData = {
       id: 'whisper',
       title: 'Whisper IA',
-      description: 'Intelligence artificielle multimédia - Transformez vos fichiers audio, vidéo et images en texte avec une précision exceptionnelle grâce aux technologies OpenAI Whisper et Tesseract OCR.',
+      description: 'Transformez vos fichiers audio, vidéo et images en texte avec une précision exceptionnelle grâce aux technologies OpenAI Whisper et Tesseract OCR.',
       subtitle: 'Transcription audio, vidéo et reconnaissance de texte (OCR)',
       category: 'Productivité',
       price: 0,

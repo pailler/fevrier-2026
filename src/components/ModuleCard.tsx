@@ -195,7 +195,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
           />
           
           {/* Overlay au survol - seulement pour les modules non-spéciaux */}
-          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isInvokeIA && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isSDnext && !isQRCodes && !isConverter && (
+          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isInvokeIA && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isSDnext && !isQRCodes && !isConverter && !isWhisper && (
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
               <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white bg-opacity-90 rounded-full p-3">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -991,6 +991,62 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                 <div className="mt-2">
                   <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
                     🔄 UNIVERSAL
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : isWhisper ? (
+            <>
+              {/* Style spécial pour Whisper IA - informations visibles en permanence */}
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Logo Whisper au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-blue-500/20">
+                  {/* Logo Whisper avec icône de microphone et ondes sonores */}
+                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
+                    {/* Cercle de fond */}
+                    <circle cx="12" cy="12" r="10" fill="#3B82F6" stroke="#2563EB" strokeWidth="1"/>
+                    
+                    {/* Microphone central */}
+                    <rect x="10" y="6" width="4" height="8" rx="2" fill="white"/>
+                    <rect x="11" y="14" width="2" height="3" fill="white"/>
+                    <rect x="9" y="17" width="6" height="1" fill="white"/>
+                    
+                    {/* Ondes sonores */}
+                    <path d="M6 8 Q8 6 12 6 Q16 6 18 8" stroke="white" strokeWidth="2" fill="none" opacity="0.8"/>
+                    <path d="M5 12 Q8 9 12 9 Q16 9 19 12" stroke="white" strokeWidth="2" fill="none" opacity="0.6"/>
+                    <path d="M4 16 Q8 12 12 12 Q16 12 20 16" stroke="white" strokeWidth="2" fill="none" opacity="0.4"/>
+                    
+                    {/* Point central */}
+                    <circle cx="12" cy="12" r="1" fill="white"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Badge prix en haut à droite */}
+              <div className="absolute top-3 right-3 z-20">
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "AI POWERED" pour Whisper */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    🎤 AI POWERED
                   </span>
                 </div>
               </div>
