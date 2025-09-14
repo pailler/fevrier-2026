@@ -248,8 +248,8 @@ export default function WhisperPage() {
     try {
       setIsActivating(true);
       
-      // Appeler l'API pour activer le module
-      const response = await fetch('/api/activate-module', {
+      // Appeler l'API pour activer le module Whisper
+      const response = await fetch('/api/activate-whisper', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
