@@ -327,7 +327,7 @@ export default function CardDetailPage() {
       if (!params.id) return;
 
       // Liste des modules qui ont des pages spécifiques
-      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'sdnext', 'invoke', 'cogstudio', 'ruinedfooocus'];
+      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'sdnext', 'invoke', 'cogstudio', 'ruinedfooocus', 'whisper'];
       
       // Si c'est un module avec une page spécifique, rediriger
       if (specificPages.includes(params.id as string)) {

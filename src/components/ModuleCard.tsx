@@ -107,6 +107,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       return '/images/canvas-framework.jpg'; // Utiliser l'image spécifique canvas-framework.jpg
     }
     
+    if (titleLower.includes('whisper') || titleLower.includes('transcription') || titleLower.includes('audio')) {
+      return '/images/module-visuals/whisper-module.svg'; // Utiliser l'image SVG Whisper
+    }
+    
     // Image par défaut pour tous les autres modules
     return '/images/chatgpt.jpg';
   };
@@ -161,9 +165,12 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   
   // Vérifier si c'est le module Universal Converter pour appliquer un style spécial
   const isConverter = module.title.toLowerCase().includes('converter') || module.title.toLowerCase().includes('universal converter') || module.id === 'converter';
+  
+  // Vérifier si c'est le module Whisper IA pour appliquer un style spécial
+  const isWhisper = module.title.toLowerCase().includes('whisper') || module.title.toLowerCase().includes('transcription') || module.id === 'whisper';
 
   return (
-    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isInvokeIA ? 'ring-2 ring-orange-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isSDnext ? 'ring-2 ring-rose-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isConverter ? 'ring-2 ring-cyan-500 ring-opacity-50' : ''}`}>
+    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isInvokeIA ? 'ring-2 ring-orange-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isSDnext ? 'ring-2 ring-rose-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isConverter ? 'ring-2 ring-cyan-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''}`}>
       
       {/* Image du module - Cliquable */}
       <Link href={`/card/${module.id}`} className="block">
@@ -1014,7 +1021,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             {module.title}
           </h3>
           {/* Pour les modules spéciaux, afficher seulement la description si pas de sous-titre */}
-          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isInvokeIA || isComfyUI || isStableDiffusion || isRuinedFooocus || isSDnext || isQRCodes || isConverter ? (
+          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isInvokeIA || isComfyUI || isStableDiffusion || isRuinedFooocus || isSDnext || isQRCodes || isConverter || isWhisper ? (
             !module.subtitle && (
               <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
                 {module.description}
