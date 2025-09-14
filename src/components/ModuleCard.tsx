@@ -168,9 +168,21 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   
   // Vérifier si c'est le module Whisper IA pour appliquer un style spécial
   const isWhisper = module.title.toLowerCase().includes('whisper') || module.title.toLowerCase().includes('transcription') || module.id === 'whisper';
+  
+  // Vérifier si c'est le module ChatGPT pour appliquer un style spécial
+  const isChatGPT = module.title.toLowerCase().includes('chatgpt') || module.title.toLowerCase().includes('chat') || module.id === 'chatgpt';
+  
+  // Vérifier si c'est le module IA Photo pour appliquer un style spécial
+  const isIAPhoto = module.title.toLowerCase().includes('ia photo') || module.title.toLowerCase().includes('iaphoto') || module.title.toLowerCase().includes('photo') || module.id === 'iaphoto';
+  
+  // Vérifier si c'est le module IA Tube pour appliquer un style spécial
+  const isIATube = module.title.toLowerCase().includes('ia tube') || module.title.toLowerCase().includes('iatube') || module.title.toLowerCase().includes('tube') || module.id === 'iatube';
+  
+  // Vérifier si c'est le module Stirling PDF pour appliquer un style spécial
+  const isStirlingPDF = module.title.toLowerCase().includes('stirling') || module.title.toLowerCase().includes('stirling pdf') || module.id === 'stirling';
 
   return (
-    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isInvokeIA ? 'ring-2 ring-orange-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isSDnext ? 'ring-2 ring-rose-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isConverter ? 'ring-2 ring-cyan-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''}`}>
+    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isInvokeIA ? 'ring-2 ring-orange-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isSDnext ? 'ring-2 ring-rose-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isConverter ? 'ring-2 ring-cyan-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isChatGPT ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isIAPhoto ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isIATube ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isStirlingPDF ? 'ring-2 ring-gray-500 ring-opacity-50' : ''}`}>
       
       {/* Image du module - Cliquable */}
       <Link href={`/card/${module.id}`} className="block">
@@ -195,7 +207,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
           />
           
           {/* Overlay au survol - seulement pour les modules non-spéciaux */}
-          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isInvokeIA && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isSDnext && !isQRCodes && !isConverter && !isWhisper && (
+          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isInvokeIA && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isSDnext && !isQRCodes && !isConverter && !isWhisper && !isChatGPT && !isIAPhoto && !isIATube && !isStirlingPDF && (
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
               <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white bg-opacity-90 rounded-full p-3">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1051,6 +1063,212 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                 </div>
               </div>
             </>
+          ) : isChatGPT ? (
+            <>
+              {/* Style spécial pour ChatGPT - informations visibles en permanence */}
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Logo ChatGPT au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-green-500/20">
+                  {/* Logo ChatGPT avec icône de chat */}
+                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
+                    {/* Cercle de fond */}
+                    <circle cx="12" cy="12" r="10" fill="#10B981" stroke="#059669" strokeWidth="1"/>
+                    
+                    {/* Bulle de chat */}
+                    <path d="M8 8 L16 8 L16 16 L12 16 L8 20 L8 16 Z" fill="white" opacity="0.9"/>
+                    <path d="M10 10 L14 10 L14 14 L10 14 Z" fill="#10B981"/>
+                    
+                    {/* Points de conversation */}
+                    <circle cx="11" cy="11" r="1" fill="white"/>
+                    <circle cx="13" cy="11" r="1" fill="white"/>
+                    <circle cx="11" cy="13" r="1" fill="white"/>
+                    <circle cx="13" cy="13" r="1" fill="white"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Badge prix en haut à droite */}
+              <div className="absolute top-3 right-3 z-20">
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "AI CHAT" pour ChatGPT */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-green-400 to-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    💬 AI CHAT
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : isIAPhoto ? (
+            <>
+              {/* Style spécial pour IA Photo - informations visibles en permanence */}
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-pink-500 to-rose-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Logo IA Photo au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-pink-500/20">
+                  {/* Logo IA Photo avec icône d'appareil photo */}
+                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
+                    {/* Cercle de fond */}
+                    <circle cx="12" cy="12" r="10" fill="#EC4899" stroke="#DB2777" strokeWidth="1"/>
+                    
+                    {/* Appareil photo */}
+                    <rect x="8" y="6" width="8" height="6" rx="1" fill="white" opacity="0.9"/>
+                    <circle cx="12" cy="9" r="2" fill="#EC4899"/>
+                    <rect x="9" y="12" width="6" height="1" fill="white" opacity="0.7"/>
+                    
+                    {/* Flash */}
+                    <rect x="14" y="7" width="1" height="2" fill="white" opacity="0.8"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Badge prix en haut à droite */}
+              <div className="absolute top-3 right-3 z-20">
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "AI PHOTO" pour IA Photo */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-pink-400 to-rose-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    📸 AI PHOTO
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : isIATube ? (
+            <>
+              {/* Style spécial pour IA Tube - informations visibles en permanence */}
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-red-500 to-pink-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Logo IA Tube au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-red-500/20">
+                  {/* Logo IA Tube avec icône de vidéo */}
+                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
+                    {/* Cercle de fond */}
+                    <circle cx="12" cy="12" r="10" fill="#EF4444" stroke="#DC2626" strokeWidth="1"/>
+                    
+                    {/* Bouton play */}
+                    <path d="M9 7 L9 17 L17 12 Z" fill="white" opacity="0.9"/>
+                    
+                    {/* Ondes vidéo */}
+                    <path d="M6 9 Q8 7 12 7 Q16 7 18 9" stroke="white" strokeWidth="2" fill="none" opacity="0.6"/>
+                    <path d="M5 12 Q8 10 12 10 Q16 10 19 12" stroke="white" strokeWidth="2" fill="none" opacity="0.4"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Badge prix en haut à droite */}
+              <div className="absolute top-3 right-3 z-20">
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "AI VIDEO" pour IA Tube */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-red-400 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    🎥 AI VIDEO
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : isStirlingPDF ? (
+            <>
+              {/* Style spécial pour Stirling PDF - informations visibles en permanence */}
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-gray-500 to-slate-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Logo Stirling PDF au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-gray-500/20">
+                  {/* Logo Stirling PDF avec icône de document */}
+                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
+                    {/* Cercle de fond */}
+                    <circle cx="12" cy="12" r="10" fill="#6B7280" stroke="#4B5563" strokeWidth="1"/>
+                    
+                    {/* Document PDF */}
+                    <rect x="8" y="6" width="8" height="10" rx="1" fill="white" opacity="0.9"/>
+                    <rect x="9" y="8" width="6" height="1" fill="#6B7280"/>
+                    <rect x="9" y="10" width="6" height="1" fill="#6B7280"/>
+                    <rect x="9" y="12" width="4" height="1" fill="#6B7280"/>
+                    
+                    {/* Badge PDF */}
+                    <rect x="11" y="14" width="2" height="1" fill="#EF4444"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Badge prix en haut à droite */}
+              <div className="absolute top-3 right-3 z-20">
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "PDF TOOLS" pour Stirling PDF */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-gray-400 to-slate-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    📄 PDF TOOLS
+                  </span>
+                </div>
+              </div>
+            </>
           ) : (
             <>
               {/* Style normal pour les autres modules */}
@@ -1077,7 +1295,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             {module.title}
           </h3>
           {/* Pour les modules spéciaux, afficher seulement la description si pas de sous-titre */}
-          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isInvokeIA || isComfyUI || isStableDiffusion || isRuinedFooocus || isSDnext || isQRCodes || isConverter || isWhisper ? (
+          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isInvokeIA || isComfyUI || isStableDiffusion || isRuinedFooocus || isSDnext || isQRCodes || isConverter || isWhisper || isChatGPT || isIAPhoto || isIATube || isStirlingPDF ? (
             !module.subtitle && (
               <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
                 {module.description}
