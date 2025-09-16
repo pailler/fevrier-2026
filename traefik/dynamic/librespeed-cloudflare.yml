@@ -8,12 +8,13 @@ http:
       service: librespeed-direct
       priority: 1000
 
-    # Route principale (Cloudflare SSL - HTTP vers Traefik)
+    # Route principale (Cloudflare SSL - HTTPS vers Traefik)
     librespeed-main:
       rule: "Host(`librespeed.iahome.fr`)"
-      entryPoints: ["web"]
-      service: librespeed-service
-      middlewares: ["security-headers@file", "compress@file"]
+      entryPoints: ["websecure"]
+      service: librespeed-proxy-service
+      middlewares: ["librespeed-auth@file", "security-headers@file", "compress@file"]
+      tls: {}
       priority: 10
 
   services:

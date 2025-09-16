@@ -39,3 +39,6 @@ Write-Host "   ✓ Cohérence avec le contenu" -ForegroundColor White
 
 Write-Host "`n✅ Titre Whisper IA mis à jour !" -ForegroundColor Green
 Write-Host "   Plus direct, plus clair, plus percutant" -ForegroundColor White
+
+
+

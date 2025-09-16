@@ -79,12 +79,13 @@ export async function GET(request: NextRequest) {
     const isVisible = moduleData?.is_visible !== false;
     console.log('🔍 Module LibreSpeed visible:', isVisible);
 
-    // 5. Simuler la vérification pour un utilisateur de test
-    const testUserId = 'test-user-id';
+    // 5. Vérifier l'accès pour l'utilisateur fourni
+    const url = new URL(request.url);
+    const userId = url.searchParams.get('userId') || 'test-user-id';
     const { data: userAccess, error: accessError } = await supabase
       .from('user_applications')
       .select('id, user_id, module_id, module_title, is_active, expires_at')
-      .eq('user_id', testUserId)
+      .eq('user_id', userId)
       .eq('module_id', moduleData.id)
       .eq('is_active', true)
       .single();

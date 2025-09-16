@@ -31,17 +31,17 @@ http:
         - security-headers
         - compress
     
-           # Configuration HTTPS avec Let's Encrypt
-           iahome-https:
-             rule: "Host(`iahome.fr`) || Host(`www.iahome.fr`)"
-             entryPoints:
-               - websecure
-             service: iahome-app
-             tls:
-               certResolver: letsencrypt
-             middlewares:
-               - security-headers
-               - compress
+    # Configuration HTTPS avec Let's Encrypt
+    iahome-https:
+      rule: "Host(`iahome.fr`) || Host(`www.iahome.fr`)"
+      entryPoints:
+        - websecure
+      service: iahome-app
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - security-headers
+        - compress
 
   services:
     iahome-app:

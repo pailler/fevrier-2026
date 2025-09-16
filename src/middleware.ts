@@ -48,8 +48,9 @@ const PROTECTED_ROUTES = [
 ];
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const url = new URL(request.url);
+  try {
+    const { pathname } = request.nextUrl;
+    const url = new URL(request.url);
 
   // Ne jamais interférer avec la racine
   if (pathname === '/') {
@@ -210,6 +211,12 @@ export async function middleware(request: NextRequest) {
     }
 
   return NextResponse.next();
+  } catch (error) {
+    console.error('Middleware error:', error);
+    
+    // En cas d'erreur, rediriger vers une page d'erreur ou continuer
+    return NextResponse.next();
+  }
 }
 
 function getModuleNameFromPath(pathname: string): string | null {

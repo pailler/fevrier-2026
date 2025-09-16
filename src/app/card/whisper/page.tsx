@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../../utils/supabaseClient';
 import Breadcrumb from '../../../components/Breadcrumb';
+import WhisperLimits from '../../../components/WhisperLimits';
 import Link from 'next/link';
 
 interface Card {
@@ -459,6 +460,11 @@ export default function WhisperPage() {
           </div>
         </div>
       </section>
+
+      {/* Affichage des limites de taille */}
+      <div className="max-w-7xl mx-auto px-6 py-4">
+        <WhisperLimits />
+      </div>
 
       {/* Vidéo Whisper IA - Zone séparée après la bannière */}
       <div className="max-w-7xl mx-auto px-6 py-8">

@@ -2,9 +2,21 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Configuration pour la production avec Docker
-  output: 'standalone', // Activé pour Docker
+  output: 'standalone',
   experimental: {
-    // outputFileTracingRoot: undefined, // Supprimé car obsolète
+    // outputFileTracingRoot: undefined,
+  },
+  
+  // Configuration pour améliorer la stabilité
+  reactStrictMode: true,
+  swcMinify: true,
+  
+  // Configuration pour gérer les erreurs
+  onDemandEntries: {
+    // période d'inactivité avant de fermer les pages (en ms)
+    maxInactiveAge: 25 * 1000,
+    // nombre de pages à garder simultanément
+    pagesBufferLength: 2,
   },
   
   // Désactiver ESLint temporairement pour le déploiement
@@ -12,10 +24,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   
-  // Configuration pour les assets statiques - Désactivé pour le développement local
-  // assetPrefix: process.env.NODE_ENV === 'production' ? 'https://iahome.fr' : '',
-  
-  // Configuration pour le cache des assets - ID stable pour éviter les problèmes de préchargement
+  // Configuration pour les assets statiques
   generateBuildId: async () => {
     return 'production-build';
   },
@@ -44,7 +53,6 @@ const nextConfig: NextConfig = {
             key: 'X-Content-Type-Options',
             value: 'nosniff'
           },
-          // Autoriser CORS pour l'IP locale et le domaine custom
           {
             key: 'Access-Control-Allow-Origin',
             value: 'http://localhost:3000'
@@ -61,14 +69,12 @@ const nextConfig: NextConfig = {
             key: 'Access-Control-Allow-Credentials',
             value: 'true'
           },
-          // Headers pour les assets statiques - Cache optimisé
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable, stale-while-revalidate=86400'
           }
         ]
       },
-      // Headers spécifiques pour l'API librespeed-token
       {
         source: '/api/librespeed-token',
         headers: [
@@ -90,7 +96,6 @@ const nextConfig: NextConfig = {
           }
         ]
       },
-      // Headers spécifiques pour les assets statiques - Optimisé pour éviter les warnings de préchargement
       {
         source: '/_next/static/(.*)',
         headers: [
@@ -104,7 +109,6 @@ const nextConfig: NextConfig = {
           }
         ]
       },
-      // Headers pour les CSS spécifiquement
       {
         source: '/_next/static/css/(.*)',
         headers: [
@@ -121,7 +125,7 @@ const nextConfig: NextConfig = {
     ];
   },
   
-  // Configuration des domaines autorisés avec remotePatterns
+  // Configuration des domaines autorisés
   images: {
     remotePatterns: [
       {
@@ -159,3 +163,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+

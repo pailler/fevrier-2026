@@ -16,6 +16,7 @@ export default function Home() {
   const [search, setSearch] = useState('');
   const [modules, setModules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [priceFilter, setPriceFilter] = useState('all');
   const [professionFilter, setProfessionFilter] = useState('all'); // CHANGÉ : experienceFilter -> professionFilter
@@ -87,11 +88,18 @@ export default function Home() {
     // Charger les modules depuis Supabase
     const fetchModules = async () => {
       try {
+        setError(null);
+        setLoading(true);
+        
         // Test de connexion de base
         const { data: testData, error: testError } = await supabase
           .from('modules')
           .select('count')
           .limit(1);
+        
+        if (testError) {
+          throw new Error(`Erreur de connexion à la base de données: ${testError.message}`);
+        }
         
         // Récupérer les modules (structure simple sans jointure)
         const { data: modulesData, error: modulesError } = await supabase
@@ -99,7 +107,8 @@ export default function Home() {
           .select('*');
         
         if (modulesError) {
-          } else {
+          throw new Error(`Erreur lors du chargement des modules: ${modulesError.message}`);
+        } else {
           modulesData.forEach((module: any) => {
             console.log('Module traité:', module.title);
           });
@@ -125,7 +134,9 @@ export default function Home() {
           setModules(modulesWithRoles);
         }
       } catch (error) {
-        } finally {
+        console.error('Erreur lors du chargement des modules:', error);
+        setError(error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite');
+      } finally {
         setLoading(false);
       }
     };
@@ -566,8 +577,29 @@ export default function Home() {
               {/* Grille de templates */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {loading ? (
-                  <div className="col-span-full text-left py-12">
-                    <div className="text-gray-500">Chargement des templates...</div>
+                  <div className="col-span-full text-center py-12">
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-blue-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                    </div>
+                    <div className="text-gray-500">Chargement des applications...</div>
+                  </div>
+                ) : error ? (
+                  <div className="col-span-full text-center py-12">
+                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                    </div>
+                    <div className="text-red-600 font-medium mb-2">Erreur de chargement</div>
+                    <div className="text-gray-500 mb-4">{error}</div>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                    >
+                      Réessayer
+                    </button>
                   </div>
                 ) : filteredAndSortedModules.length === 0 ? (
                   <div className="col-span-full text-left py-12">

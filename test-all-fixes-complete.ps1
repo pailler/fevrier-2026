@@ -67,3 +67,6 @@ Write-Host "`n🎉 Module Whisper IA complètement fonctionnel !" -ForegroundCol
 Write-Host "   Toutes les erreurs ont été corrigées" -ForegroundColor White
 Write-Host "   Le workflow est prêt pour la production" -ForegroundColor White
 Write-Host "   URL de test: http://localhost:3000/card/whisper" -ForegroundColor White
+
+
+

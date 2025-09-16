@@ -8,9 +8,9 @@ ingress:
   - hostname: www.iahome.fr
     service: http://iahome-app:3000
   
-  # LibreSpeed avec oauth2-proxy
+  # LibreSpeed avec authentification via API iahome
   - hostname: librespeed.iahome.fr
-    service: http://iahome-oauth2-proxy:4180
+    service: http://iahome-app:3000/api/check-auth
   
   # Services externes
   - hostname: pdf.iahome.fr

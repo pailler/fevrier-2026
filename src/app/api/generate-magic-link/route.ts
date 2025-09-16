@@ -28,9 +28,10 @@ export async function POST(request: NextRequest) {
 
     // Déterminer la durée d'accès selon le module
     const isTimeLimitedModule = moduleName === 'Metube';
+    const isLibreSpeed = moduleName === 'LibreSpeed';
     
-    // Pour les modules sans limitation de temps, vérifier l'abonnement
-    if (!isTimeLimitedModule) {
+    // Pour les modules sans limitation de temps, vérifier l'abonnement (sauf LibreSpeed)
+    if (!isTimeLimitedModule && !isLibreSpeed) {
       const { data: subscriptions, error: subError } = await supabase
         .from('user_subscriptions')
         .select('*')
@@ -56,10 +57,11 @@ export async function POST(request: NextRequest) {
     const magicLinkToken = generateMagicLink(currentUserId, moduleName, permissions || ['access'], accessDurationMinutes);
 
     // Configuration des URLs de base pour chaque module
-          const moduleUrls: { [key: string]: string } = {
-        'Metube': '/api/proxy-metube', // Utiliser le proxy sécurisé
+    const moduleUrls: { [key: string]: string } = {
+      'Metube': '/api/proxy-metube', // Utiliser le proxy sécurisé
       'IAphoto': 'https://iaphoto.iahome.fr',
       'IAvideo': 'https://iavideo.iahome.fr',
+      'LibreSpeed': 'https://librespeed.iahome.fr',
     };
 
     const baseUrl = moduleUrls[moduleName];

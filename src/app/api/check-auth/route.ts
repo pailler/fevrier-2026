@@ -147,27 +147,27 @@ async function handleLibreSpeedProxy(request: NextRequest) {
   try {
     console.log('LibreSpeed Proxy: Début de la vérification');
     
-    // Vérifier s'il y a un token dans les paramètres de requête
+    // Vérifier s'il y a un token ou magic_link dans les paramètres de requête
     const url = new URL(request.url);
-    const token = url.searchParams.get('token');
+    const token = url.searchParams.get('token') || url.searchParams.get('magic_link');
     
     if (token) {
-      console.log('LibreSpeed Proxy: Token trouvé, vérification du token temporaire');
+      console.log('LibreSpeed Proxy: Token/Magic link trouvé, vérification...');
       
       // Vérifier le token avec le système d'autorisation
       const authorizationService = AuthorizationService.getInstance();
       const validationResult = await authorizationService.validateAccessToken(token);
       
       if (!validationResult.valid) {
-        console.log('LibreSpeed Proxy: Token invalide - redirection vers login:', validationResult.reason);
-        return NextResponse.redirect('https://iahome.fr/login', 302);
+        console.log('LibreSpeed Proxy: Token invalide - redirection vers accueil:', validationResult.reason);
+        return NextResponse.redirect('https://iahome.fr/encours?error=token_invalid', 302);
       }
       
       console.log('LibreSpeed Proxy: Token validé avec succès pour:', validationResult.userInfo?.userEmail);
       
-      // Rediriger vers LibreSpeed (URL de production)
-      console.log('LibreSpeed Proxy: Redirection vers LibreSpeed');
-      return NextResponse.redirect('https://librespeed.iahome.fr', 302);
+      // Proxifier vers le service LibreSpeed interne avec le token
+      console.log('LibreSpeed Proxy: Proxification vers LibreSpeed avec token');
+      return proxyToLibreSpeed(request, token);
     }
     
     // Si pas de token, vérifier l'origine de la requête (accès direct bloqué)
@@ -179,16 +179,16 @@ async function handleLibreSpeedProxy(request: NextRequest) {
     
     // Vérifier l'origine de la requête
     if (!referer?.includes('iahome.fr') && !origin?.includes('iahome.fr') && !host?.includes('iahome.fr')) {
-      console.log('LibreSpeed Proxy: Accès direct bloqué - redirection vers login');
-      return NextResponse.redirect('https://iahome.fr/login', 302);
+      console.log('LibreSpeed Proxy: Accès direct bloqué - redirection vers accueil');
+      return NextResponse.redirect('https://iahome.fr/encours?error=access_denied', 302);
     }
 
     // Récupérer les cookies de la requête
     const cookieHeader = request.headers.get('cookie');
     
     if (!cookieHeader) {
-      console.log('LibreSpeed Proxy: Aucun cookie trouvé - redirection vers login');
-      return NextResponse.redirect('https://iahome.fr/login', 302);
+      console.log('LibreSpeed Proxy: Aucun cookie trouvé - redirection vers accueil');
+      return NextResponse.redirect('https://iahome.fr/encours?error=no_session', 302);
     }
 
     // Créer un client Supabase avec les cookies
@@ -213,12 +213,12 @@ async function handleLibreSpeedProxy(request: NextRequest) {
     
     if (error) {
       console.error('LibreSpeed Proxy: Erreur lors de la vérification de la session:', error);
-      return NextResponse.redirect('https://iahome.fr/login', 302);
+      return NextResponse.redirect('https://iahome.fr/encours?error=session_error', 302);
     }
 
     if (!session) {
-      console.log('LibreSpeed Proxy: Aucune session trouvée - redirection vers login');
-      return NextResponse.redirect('https://iahome.fr/login', 302);
+      console.log('LibreSpeed Proxy: Aucune session trouvée - redirection vers accueil');
+      return NextResponse.redirect('https://iahome.fr/encours?error=no_session', 302);
     }
 
     // Vérifier si le module apparaît dans /encours (vérification principale)
@@ -226,7 +226,7 @@ async function handleLibreSpeedProxy(request: NextRequest) {
     
     if (!isModuleInEncours) {
       console.log('LibreSpeed Proxy: Module LibreSpeed non visible dans /encours pour:', session.user.email);
-      return NextResponse.redirect('https://iahome.fr/login', 302);
+      return NextResponse.redirect('https://iahome.fr/encours?error=module_not_available', 302);
     }
 
     // Vérifier que l'utilisateur a un accès de base au module (sans vérifier quotas)
@@ -234,7 +234,7 @@ async function handleLibreSpeedProxy(request: NextRequest) {
     
     if (!hasBasicAccess) {
       console.log('LibreSpeed Proxy: Aucun accès LibreSpeed trouvé pour:', session.user.email);
-      return NextResponse.redirect('https://iahome.fr/login', 302);
+      return NextResponse.redirect('https://iahome.fr/encours?error=no_access', 302);
     }
     
     console.log('LibreSpeed Proxy: Accès autorisé pour utilisateur:', session.user.email);
@@ -242,9 +242,9 @@ async function handleLibreSpeedProxy(request: NextRequest) {
     // Incrémenter le compteur d'utilisation (le système existant gère les quotas)
     await incrementUsageCount(session.user.id);
     
-    // Rediriger directement vers LibreSpeed
-    console.log('LibreSpeed Proxy: Redirection vers LibreSpeed');
-    return NextResponse.redirect('https://librespeed.iahome.fr', 302);
+    // Proxifier vers le service LibreSpeed interne
+    console.log('LibreSpeed Proxy: Proxification vers LibreSpeed');
+    return proxyToLibreSpeed(request);
 
   } catch (error) {
     console.error('LibreSpeed Proxy Error:', error);
@@ -2567,5 +2567,44 @@ async function verifyTemporaryToken(token: string) {
   } catch (error) {
     console.error('LibreSpeed Proxy: Erreur vérification token temporaire:', error);
     return NextResponse.redirect('https://iahome.fr/encours?error=token_verification_failed', 302);
+  }
+}
+
+// Fonction pour proxifier vers LibreSpeed
+async function proxyToLibreSpeed(request: NextRequest, token?: string) {
+  try {
+    const url = new URL(request.url);
+    const targetUrl = `http://librespeed:80${url.pathname}${url.search}`;
+    
+    console.log('LibreSpeed Proxy: Proxification vers:', targetUrl);
+    
+    // Créer la requête vers LibreSpeed
+    const proxyRequest = new Request(targetUrl, {
+      method: request.method,
+      headers: request.headers,
+      body: request.body,
+    });
+    
+    // Ajouter le token si fourni
+    if (token) {
+      proxyRequest.headers.set('X-LibreSpeed-Token', token);
+    }
+    
+    // Faire la requête vers LibreSpeed
+    const response = await fetch(proxyRequest);
+    
+    // Créer la réponse avec les headers appropriés
+    const responseHeaders = new Headers(response.headers);
+    responseHeaders.set('X-Proxy-Source', 'iahome-librespeed-proxy');
+    
+    return new NextResponse(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: responseHeaders,
+    });
+    
+  } catch (error) {
+    console.error('LibreSpeed Proxy Error:', error);
+    return new NextResponse('Proxy Error', { status: 500 });
   }
 }

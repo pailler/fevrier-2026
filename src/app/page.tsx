@@ -4,6 +4,7 @@ import { supabase } from "../utils/supabaseClient";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import Breadcrumb from '../components/Breadcrumb';
+import StructuredData from '../components/StructuredData';
 
 export default function Home() {
   const router = useRouter();
@@ -33,8 +34,13 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-blue-50 font-sans">
-      <Breadcrumb />
+    <>
+      {/* Données structurées pour la page d'accueil */}
+      <StructuredData type="website" />
+      <StructuredData type="organization" />
+      
+      <div className="min-h-screen bg-blue-50 font-sans">
+        <Breadcrumb />
 
       {/* Section héros principale */}
       <section className="bg-gradient-to-br from-yellow-100 via-green-50 to-green-200 py-16 relative overflow-hidden">
@@ -119,7 +125,7 @@ export default function Home() {
 
 
       {/* Section Formation */}
-      <section className="py-16 bg-gradient-to-r from-blue-50 to-green-50 relative overflow-hidden">
+      <section className="py-8 bg-gradient-to-r from-blue-50 to-green-50 relative overflow-hidden">
         {/* Particules flottantes */}
         <div className="absolute inset-0">
           <div className="absolute top-16 left-16 w-2 h-2 bg-blue-300/40 rounded-full animate-pulse"></div>
@@ -187,7 +193,7 @@ export default function Home() {
       </section>
 
       {/* Section Blog */}
-      <section className="py-16 bg-gradient-to-r from-orange-50 to-yellow-50 relative overflow-hidden">
+      <section className="py-8 bg-gradient-to-r from-orange-50 to-yellow-50 relative overflow-hidden">
         {/* Particules flottantes */}
         <div className="absolute inset-0">
           <div className="absolute top-20 left-20 w-3 h-3 bg-orange-300/40 rounded-full animate-bounce"></div>
@@ -251,7 +257,7 @@ export default function Home() {
       </section>
 
       {/* Section Communauté */}
-      <section className="py-16 bg-gradient-to-r from-blue-50 to-green-50 relative overflow-hidden">
+      <section className="py-8 bg-gradient-to-r from-blue-50 to-green-50 relative overflow-hidden">
         {/* Particules flottantes */}
         <div className="absolute inset-0">
           <div className="absolute top-16 left-16 w-2 h-2 bg-blue-300/40 rounded-full animate-pulse"></div>
@@ -345,6 +351,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

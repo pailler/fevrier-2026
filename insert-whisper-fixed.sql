@@ -23,3 +23,6 @@ ON CONFLICT (id) DO UPDATE SET
     url = EXCLUDED.url,
     image_url = EXCLUDED.image_url,
     updated_at = NOW();
+
+
+

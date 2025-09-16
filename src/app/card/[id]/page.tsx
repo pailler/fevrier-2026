@@ -33,6 +33,7 @@ export default function CardDetailPage() {
   const router = useRouter();
   const [card, setCard] = useState<Card | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [session, setSession] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
   const [selectedCards, setSelectedCards] = useState<any[]>([]);
@@ -337,6 +338,36 @@ export default function CardDetailPage() {
       }
 
       try {
+        // Gestion spéciale pour LibreSpeed
+        if (params.id === 'librespeed') {
+          console.log('🔧 Chargement spécial pour LibreSpeed');
+          const librespeedCard = {
+            id: 'librespeed',
+            title: 'LibreSpeed',
+            description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision.',
+            subtitle: 'Test de vitesse internet',
+            category: 'WEB TOOLS',
+            price: 0,
+            image_url: '/images/librespeed.jpg',
+            features: [
+              'Test de vitesse précis',
+              'Interface moderne et intuitive',
+              'Résultats détaillés',
+              'Compatible tous navigateurs'
+            ],
+            requirements: [
+              'Connexion internet stable',
+              'Navigateur web moderne'
+            ],
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          setCard(librespeedCard);
+          console.log('✅ LibreSpeed chargé avec succès');
+          setLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase
           .from('modules')
           .select('*')
@@ -345,7 +376,18 @@ export default function CardDetailPage() {
 
         if (error) {
           console.error('Erreur lors du chargement de la carte:', error);
-          router.push('/');
+          // Au lieu de rediriger, afficher une carte par défaut
+          const defaultCard = {
+            id: params.id as string,
+            title: params.id as string,
+            description: 'Module en cours de configuration',
+            category: 'AUTRE',
+            price: 0,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          setCard(defaultCard);
+          setLoading(false);
           return;
         }
 
@@ -355,7 +397,18 @@ export default function CardDetailPage() {
         }
       } catch (error) {
         console.error('Erreur:', error);
-        router.push('/');
+        setError('Erreur lors du chargement du module');
+        // Au lieu de rediriger, afficher une carte par défaut
+        const defaultCard = {
+          id: params.id as string,
+          title: params.id as string,
+          description: 'Module en cours de configuration',
+          category: 'AUTRE',
+          price: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        setCard(defaultCard);
       } finally {
         setLoading(false);
       }
@@ -430,6 +483,36 @@ export default function CardDetailPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">chargement</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Erreur de chargement</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <div className="space-y-3">
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              Réessayer
+            </button>
+            <button
+              onClick={() => router.push('/')}
+              className="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              Retour à l'accueil
+            </button>
+          </div>
         </div>
       </div>
     );

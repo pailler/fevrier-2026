@@ -55,3 +55,6 @@ Write-Host "   4. Configurer le tunnel Cloudflared en production" -ForegroundCol
 
 Write-Host "`n🎊 Module Whisper IA complètement déployé !" -ForegroundColor Green
 Write-Host "   Prêt pour la production sur iahome.fr" -ForegroundColor White
+
+
+

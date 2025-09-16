@@ -47,3 +47,6 @@ Write-Host "   - Le service sera accessible sur https://whisper.iahome.fr" -Fore
 
 Write-Host "`n✅ Module Whisper prêt à être ajouté !" -ForegroundColor Green
 Write-Host "   Interface d'administration: http://localhost:3000/admin/modules" -ForegroundColor White
+
+
+

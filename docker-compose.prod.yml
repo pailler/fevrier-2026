@@ -64,8 +64,8 @@ services:
   #     retries: 3
 
   # Les services externes (PDF, MeTube, etc.) sont maintenant gérés séparément
-  # dans le dossier ../docker-services/
-  # Voir: ../docker-services/docker-compose.services.yml
+  # dans le dossier ../essentiels/
+  # Voir: ../essentiels/docker-compose.services.yml
 
   traefik:
     image: traefik:v2.10
@@ -90,6 +90,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/dynamic:/etc/traefik/dynamic:ro
+      - ./traefik/librespeed-middleware.yml:/etc/traefik/librespeed-middleware.yml:ro
       - ./letsencrypt:/letsencrypt
     networks:
       - iahome-network

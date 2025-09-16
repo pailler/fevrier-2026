@@ -60,3 +60,6 @@ Write-Host "   ✓ Cards: 1/2/4 colonnes selon écran" -ForegroundColor White
 
 Write-Host "`n🎉 Page Whisper IA complète !" -ForegroundColor Green
 Write-Host "   Structure parfaite: bannière + vidéo/boutons + contenu détaillé" -ForegroundColor White
+
+
+

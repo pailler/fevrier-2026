@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../utils/supabaseClient';
 
-export default function TransitionPage() {
+function TransitionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [moduleName, setModuleName] = useState('');
@@ -141,5 +141,20 @@ export default function TransitionPage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function TransitionPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    }>
+      <TransitionContent />
+    </Suspense>
   );
 }

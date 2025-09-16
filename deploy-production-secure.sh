@@ -52,7 +52,7 @@ fi
 # Arrêter les conteneurs existants
 echo "📦 Arrêt des conteneurs existants..."
 docker-compose -f docker-compose.prod.yml down 2>/dev/null || true
-docker-compose -f docker-services/docker-compose.services.yml down 2>/dev/null || true
+docker-compose -f essentiels/docker-compose.services.yml down 2>/dev/null || true
 
 # Nettoyer les images obsolètes
 echo "🧹 Nettoyage des images obsolètes..."
@@ -64,7 +64,7 @@ docker-compose -f docker-compose.prod.yml build --no-cache
 
 # Démarrer les services externes d'abord
 echo "🚀 Démarrage des services externes..."
-docker-compose -f docker-services/docker-compose.services.yml up -d
+docker-compose -f essentiels/docker-compose.services.yml up -d
 
 # Attendre que les services soient prêts
 echo "⏳ Attente du démarrage des services externes..."
@@ -86,7 +86,7 @@ docker-compose -f docker-compose.prod.yml ps
 
 echo ""
 echo "📊 Services externes:"
-docker-compose -f docker-services/docker-compose.services.yml ps
+docker-compose -f essentiels/docker-compose.services.yml ps
 
 # Test de l'API de santé
 echo ""
@@ -100,7 +100,7 @@ docker-compose -f docker-compose.prod.yml logs --tail=10
 
 echo ""
 echo "📋 Logs récents (services externes):"
-docker-compose -f docker-services/docker-compose.services.yml logs --tail=10
+docker-compose -f essentiels/docker-compose.services.yml logs --tail=10
 
 echo ""
 echo "✅ Déploiement terminé !"
@@ -120,4 +120,4 @@ echo "🌐 Le tunnel Cloudflare est configuré pour l'accès externe"
 echo ""
 echo "📝 Pour arrêter tous les services:"
 echo "   docker-compose -f docker-compose.prod.yml down"
-echo "   docker-compose -f docker-services/docker-compose.services.yml down"
+echo "   docker-compose -f essentiels/docker-compose.services.yml down"

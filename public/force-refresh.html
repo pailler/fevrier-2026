@@ -3,85 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Force Refresh - IAHome</title>
+    <title>Force Refresh - IA Home</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
         }
-        .container {
-            text-align: center;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.1);
+        .card {
+            background: white;
             border-radius: 10px;
-            backdrop-filter: blur(10px);
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        button {
-            background: #4CAF50;
+        .btn {
+            background: #3b82f6;
             color: white;
+            padding: 12px 24px;
             border: none;
-            padding: 15px 30px;
-            font-size: 16px;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 16px;
             margin: 10px;
+            text-decoration: none;
+            display: inline-block;
         }
-        button:hover {
-            background: #45a049;
+        .btn:hover {
+            background: #2563eb;
+        }
+        .success {
+            background: #10b981;
         }
         .warning {
-            background: #ff9800;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 20px 0;
+            background: #f59e0b;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔄 Force Refresh - IAHome</h1>
-        <div class="warning">
-            <strong>⚠️ Attention :</strong> Cette page va forcer le rechargement complet de l'application pour résoudre les problèmes de cache.
+    <div class="card">
+        <h1>🔄 Force Refresh - IA Home</h1>
+        <p>Cette page vous aide à forcer le rechargement de l'application et vider le cache Cloudflare.</p>
+        
+        <h2>📋 Modifications attendues :</h2>
+        <ul>
+            <li>✅ <strong>Modules essentiels</strong> : "Module gratuit" (au lieu de "premium")</li>
+            <li>✅ <strong>Modules IA</strong> : "Module IA" (au lieu de "Module premium")</li>
+            <li>✅ <strong>Icônes</strong> : 🤖 pour les modules IA, 🔑 pour les modules essentiels</li>
+            <li>✅ <strong>Nettoyage</strong> : "premium0" → "premium"</li>
+        </ul>
+
+        <h2>🔧 Actions à effectuer :</h2>
+        
+        <div class="card">
+            <h3>1. Vider le cache Cloudflare</h3>
+            <p>Allez sur le dashboard Cloudflare et purgez le cache :</p>
+            <a href="https://dash.cloudflare.com" target="_blank" class="btn">Dashboard Cloudflare</a>
+            <p><small>→ Caching → Configuration → Purge Everything</small></p>
         </div>
-        <p>Cliquez sur le bouton ci-dessous pour forcer le rechargement complet de l'application :</p>
-        <button onclick="forceRefresh()">🔄 Forcer le Rechargement</button>
-        <button onclick="clearCacheAndRefresh()">🗑️ Vider le Cache et Recharger</button>
-        <p><small>Cette action va rediriger vers l'application principale après le rechargement.</small></p>
+
+        <div class="card">
+            <h3>2. Recharger avec cache-busting</h3>
+            <button onclick="forceReload()" class="btn success">🔄 Recharger avec cache-busting</button>
+            <p><small>Ajoute un timestamp à l'URL pour contourner le cache</small></p>
+        </div>
+
+        <div class="card">
+            <h3>3. Mode navigation privée</h3>
+            <button onclick="openIncognito()" class="btn warning">🔒 Ouvrir en navigation privée</button>
+            <p><small>Ouvre une nouvelle fenêtre privée pour tester</small></p>
+        </div>
+
+        <div class="card">
+            <h3>4. Vider le cache du navigateur</h3>
+            <p><strong>Chrome/Edge :</strong> Ctrl + Shift + Delete → "Tout effacer"</p>
+            <p><strong>Firefox :</strong> Ctrl + Shift + Delete → "Tout effacer"</p>
+        </div>
     </div>
 
     <script>
-        function forceRefresh() {
-            // Forcer le rechargement avec cache vidé
-            window.location.href = '/?v=' + Date.now() + '&force=true';
+        function forceReload() {
+            const timestamp = Date.now();
+            window.location.href = `https://iahome.fr/encours?v=${timestamp}&cb=${Math.random()}`;
         }
 
-        function clearCacheAndRefresh() {
-            // Vider le cache du navigateur et recharger
-            if ('caches' in window) {
-                caches.keys().then(function(names) {
-                    for (let name of names) {
-                        caches.delete(name);
-                    }
-                });
-            }
-            
-            // Forcer le rechargement
-            window.location.href = '/?v=' + Date.now() + '&force=true&cache=cleared';
+        function openIncognito() {
+            window.open('https://iahome.fr/encours', '_blank');
         }
 
-        // Auto-redirect après 5 secondes si pas d'action
+        // Auto-refresh toutes les 30 secondes pour forcer la mise à jour
         setTimeout(() => {
-            if (confirm('Voulez-vous forcer le rechargement automatiquement ?')) {
-                forceRefresh();
-            }
-        }, 5000);
+            console.log('Auto-refresh dans 30 secondes...');
+            forceReload();
+        }, 30000);
     </script>
 </body>
 </html>

@@ -43,6 +43,7 @@ export default function EncoursPage() {
     title: ''
   });
   const [tokenError, setTokenError] = useState<string | null>(null);
+  const [cacheBuster] = useState(() => Date.now());
 
   // Vérification de la session et des erreurs de token
   useEffect(() => {
@@ -279,7 +280,7 @@ export default function EncoursPage() {
                 module_description: moduleInfo.description || 'Module activé via souscription',
                 module_category: 'Module activé',
                 module_url: moduleInfo.url || '',
-                access_type: access.access_level || 'basic',
+                access_type: (access.access_level || 'basic').replace(/premium\d+/, 'premium'),
                 expires_at: access.expires_at || null,
                 is_active: access.is_active !== undefined ? access.is_active : true,
                 created_at: access.created_at || new Date().toISOString(),
@@ -341,7 +342,7 @@ export default function EncoursPage() {
                 module_description: token.description || 'Accès via token créé par l\'admin',
                 module_category: 'Token d\'accès',
                 module_url: moduleInfo.url || '', // Utiliser l'URL du module si trouvé
-                access_type: `Token (${token.access_level || 'standard'})`,
+                access_type: `Token (${(token.access_level || 'standard').replace(/premium\d+/, 'premium')})`,
                 expires_at: token.expires_at || null,
                 is_active: token.is_active !== undefined ? token.is_active : true,
                 created_at: token.created_at || new Date().toISOString(),
@@ -382,7 +383,7 @@ export default function EncoursPage() {
     const moduleUrls: { [key: string]: string } = {
       'metube': 'https://metube.iahome.fr',
       'librespeed': 'https://librespeed.iahome.fr',
-      'pdf': '/api/pdf-proxy',
+      'pdf': 'https://pdf.iahome.fr',
       'psitransfer': 'https://psitransfer.iahome.fr',
       'qrcodes': 'https://qrcodes.iahome.fr',
       'converter': 'https://convert.iahome.fr',
@@ -411,20 +412,39 @@ export default function EncoursPage() {
       console.log('🔍 DEBUG: Module:', module);
       console.log('🔍 DEBUG: User:', user);
 
-      // Si c'est LibreSpeed, générer un token temporaire avant l'accès
+      // Si c'est LibreSpeed, générer un token temporaire via l'API
       if (module.module_id === 'librespeed' || module.module_title.toLowerCase().includes('librespeed')) {
         console.log('🔐 Génération d\'un token temporaire pour LibreSpeed...');
         
         try {
-          // Générer un token temporaire côté client (approche simplifiée)
-          const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-          const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+          // Appeler l'API pour générer un token temporaire valide
+          const tokenResponse = await fetch('/api/generate-magic-link', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: user?.id,
+              moduleName: 'LibreSpeed',
+              permissions: ['read', 'write'],
+              durationMinutes: 60
+            })
+          });
+
+          if (!tokenResponse.ok) {
+            throw new Error(`Erreur API: ${tokenResponse.status}`);
+          }
+
+          const tokenData = await tokenResponse.json();
           
-          console.log('✅ Token généré côté client:', token);
+          if (tokenData.error) {
+            throw new Error(tokenData.error);
+          }
+
+          console.log('✅ Magic link généré via API:', tokenData.magicLink);
           
-          // Rediriger vers LibreSpeed avec le token
-          const librespeedUrl = `https://librespeed.iahome.fr?token=${token}`;
-          window.open(librespeedUrl, '_blank');
+          // Utiliser l'URL générée par l'API (qui contient déjà le token)
+          window.open(tokenData.magicLink, '_blank');
           return;
         } catch (tokenError) {
           console.error('❌ Erreur lors de la génération du token:', tokenError);
@@ -648,7 +668,7 @@ export default function EncoursPage() {
             module_description: moduleInfo.description || 'Module activé via souscription',
             module_category: 'Module activé',
             module_url: moduleInfo.url || '',
-            access_type: access.access_level,
+            access_type: (access.access_level || 'basic').replace(/premium\d+/, 'premium'),
             expires_at: access.expires_at,
             is_active: access.is_active,
             created_at: access.created_at,
@@ -692,7 +712,7 @@ export default function EncoursPage() {
             module_description: token.description || 'Accès via token créé par l\'admin',
             module_category: 'Token d\'accès',
             module_url: moduleInfo.url || '',
-            access_type: `Token (${token.access_level})`,
+            access_type: `Token (${(token.access_level || 'standard').replace(/premium\d+/, 'premium')})`,
             expires_at: token.expires_at,
             is_active: token.is_active,
             created_at: token.created_at,
@@ -774,17 +794,28 @@ export default function EncoursPage() {
     if (module.is_free) {
       return '🆓';
     }
-    return '💎';
+    return '🤖';
   };
 
   const getModuleTypeLabel = (module: UserModule) => {
     if (module.module_category === 'Token d\'accès') {
       return 'Token d\'accès';
     }
-    if (module.is_free) {
-      return 'Module gratuit';
+    
+    // Pour les modules essentiels, afficher "Module essentiel"
+    const essentialModules = ['metube', 'psitransfer', 'universal-converter', 'pdf', 'librespeed', 'qrcodes'];
+    const isEssential = essentialModules.some(essentialId => 
+      module.module_id === essentialId || 
+      module.module_title.toLowerCase().includes(essentialId.toLowerCase()) ||
+      module.module_title.toLowerCase().includes(essentialId.replace('-', ' '))
+    );
+    
+    if (isEssential) {
+      return 'Module essentiel ✅';
     }
-    return 'Module premium';
+    
+    // Pour les autres modules, afficher "Module IA"
+    return 'Module IA 🤖';
   };
 
   // Contrôles d'accès
@@ -819,6 +850,10 @@ export default function EncoursPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Cache buster: {cacheBuster} */}
+      <div className="bg-red-500 text-white p-4 text-center font-bold">
+        🔄 VERSION MISE À JOUR - {new Date().toLocaleString()} - Cache buster: {cacheBuster}
+      </div>
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
@@ -932,7 +967,7 @@ export default function EncoursPage() {
                   <div className="text-2xl font-bold text-purple-600">
                     {userModules.filter(m => !m.is_free).length}
                   </div>
-                  <div className="text-sm text-gray-600">Modules premium</div>
+                  <div className="text-sm text-gray-600">Modules IA</div>
                 </div>
                 <div className="bg-orange-50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-orange-600">
@@ -1073,8 +1108,7 @@ export default function EncoursPage() {
                       </div>
                       
                       <div className="flex items-center space-x-4 text-sm opacity-90">
-                        <span>📱 {module.module_category}</span>
-                        <span>🔑 {module.access_type}</span>
+                        <span>🔑 Module gratuit</span>
                         {module.price && Number(module.price) > 0 && (
                           <span>💎 €{module.price}</span>
                         )}
