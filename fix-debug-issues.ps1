@@ -238,3 +238,4 @@ Write-Host "   - Le service email devrait fonctionner correctement" -ForegroundC
 
 Write-Host "`n✅ Corrections appliquées!" -ForegroundColor Green
 Write-Host "🔧 Redémarrez l'application avec: docker restart iahome-app" -ForegroundColor Cyan
+

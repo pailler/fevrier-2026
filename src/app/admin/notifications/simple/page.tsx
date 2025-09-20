@@ -4,3 +4,4 @@ export default function SimplePage() {
   return <SimpleNotificationsPage />;
 }
 
+

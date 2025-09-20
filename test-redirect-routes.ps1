@@ -52,3 +52,4 @@ Write-Host "   ❌ https://librespeed.iahome.fr?token=... (ancien format)" -Fore
 
 Write-Host "`n✅ Test terminé!" -ForegroundColor Green
 Write-Host "🔧 Le problème est le cache du navigateur, pas le code!" -ForegroundColor Yellow
+

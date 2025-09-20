@@ -1,0 +1,15 @@
+# LibreSpeed avec authentification sécurisée via API iahome
+- hostname: librespeed.iahome.fr
+  service: http://172.19.0.2:3000/api/redirect-librespeed
+  originRequest:
+    httpHostHeader: librespeed.iahome.fr
+    timeout: 30s
+  # Règles de sécurité Cloudflare
+  rules:
+    - type: "http_status"
+      status: 403
+      path: "/"
+      origin:
+        hostname: "librespeed.iahome.fr"
+        port: 80
+        httpHostHeader: "librespeed.iahome.fr"

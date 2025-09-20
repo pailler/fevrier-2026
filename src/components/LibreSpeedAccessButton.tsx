@@ -16,6 +16,8 @@ export default function LibreSpeedAccessButton({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  console.log('🔍 LibreSpeedAccessButton: Rendu avec user:', user ? 'présent' : 'absent');
+
   const handleAccess = async () => {
     if (!user) {
       setError('Vous devez être connecté');

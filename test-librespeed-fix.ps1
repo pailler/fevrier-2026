@@ -41,3 +41,4 @@ Write-Host "   ✅ Redirection directe vers https://librespeed.iahome.fr?token=.
 
 Write-Host "`n✅ Test terminé!" -ForegroundColor Green
 Write-Host "🔧 LibreSpeed devrait maintenant fonctionner correctement!" -ForegroundColor Yellow
+

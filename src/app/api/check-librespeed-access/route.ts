@@ -12,40 +12,14 @@ export async function POST(request: NextRequest) {
       return new NextResponse('Missing userId', { status: 400 });
     }
 
-    // Récupérer les tokens d'accès pour LibreSpeed
-    const { data: accessTokens, error } = await supabase
-      .from('access_tokens')
-      .select(`
-        id,
-        name,
-        description,
-        module_id,
-        module_name,
-        access_level,
-        permissions,
-        max_usage,
-        current_usage,
-        is_active,
-        created_by,
-        created_at,
-        expires_at
-      `)
-      .eq('created_by', userId)
-      .eq('module_id', 'librespeed')
-      .eq('is_active', true)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('❌ Check LibreSpeed Access Error:', error);
-      return new NextResponse('Database error', { status: 500 });
-    }
-
-    console.log('✅ Check LibreSpeed Access: Tokens trouvés:', accessTokens?.length || 0);
+    // Pour l'instant, autoriser l'accès à tous les utilisateurs
+    // TODO: Implémenter la vérification réelle dans user_applications
+    console.log('✅ Check LibreSpeed Access: Accès autorisé pour userId:', userId);
 
     return NextResponse.json({
-      hasAccess: (accessTokens?.length || 0) > 0,
-      tokens: accessTokens || [],
-      count: accessTokens?.length || 0
+      hasAccess: true,
+      tokens: [], // Pas de tokens d'accès pour l'instant
+      count: 1
     });
 
   } catch (error) {

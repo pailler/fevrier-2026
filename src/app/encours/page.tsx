@@ -430,6 +430,7 @@ export default function EncoursPage() {
       'psitransfer': 'https://psitransfer.iahome.fr',  // PsiTransfer direct avec token
       'qrcodes': 'https://qrcodes.iahome.fr',  // QR Codes direct avec token
       'converter': 'https://convert.iahome.fr',  // Converter direct avec token
+      'whisper': 'https://whisper.iahome.fr',  // Whisper direct avec token
       'stablediffusion': 'https://stablediffusion.iahome.fr',  // StableDiffusion direct avec token
       'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',  // RuinedFooocus direct avec token
       'invoke': 'https://invoke.iahome.fr',  // Invoke direct avec token
@@ -1038,31 +1039,105 @@ export default function EncoursPage() {
                       </div>
 
                       {/* Bouton d'accès */}
-                      {module.module_id === 'librespeed' ? (
-                        <LibreSpeedAccessButton
-                          user={user}
-                          onAccessGranted={(url) => {
-                            console.log('✅ LibreSpeed: Accès autorisé à:', url);
-                            // Envoyer une notification d'accès à l'application
-                            try {
-                              const { NotificationServiceClient } = require('../../utils/notificationServiceClient');
-                              const notificationService = NotificationServiceClient.getInstance();
-                              notificationService.notifyAppAccessed(
-                                user?.email || '',
-                                module.module_title,
-                                user?.name || user?.email || 'Utilisateur'
-                              );
-                              console.log('✅ Notification d\'accès à l\'application envoyée');
-                            } catch (notificationError) {
-                              console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
-                            }
-                          }}
-                          onAccessDenied={(reason) => {
-                            console.log('❌ LibreSpeed: Accès refusé:', reason);
-                            alert(`Accès refusé: ${reason}`);
-                          }}
-                        />
-                      ) : module.module_id === 'metube' ? (
+                      {module.module_title === 'LibreSpeed' ? (
+                        <div className="flex flex-col items-center space-y-2">
+                          <button
+                            onClick={async () => {
+                              console.log('🚀 LibreSpeed: Clic sur le bouton d\'accès');
+                              
+                              if (!user) {
+                                console.log('❌ LibreSpeed: Utilisateur non connecté - redirection vers login');
+                                window.location.href = 'https://iahome.fr/login';
+                                return;
+                              }
+                              
+                              try {
+                                // ÉTAPE 1: Vérifier l'autorisation d'accès
+                                console.log('🔐 LibreSpeed: ÉTAPE 1 - Vérification de l\'autorisation...');
+                                const accessResponse = await fetch('/api/check-librespeed-access', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({
+                                    userId: user.id
+                                  })
+                                });
+                                
+                                if (!accessResponse.ok) {
+                                  console.log('❌ LibreSpeed: ÉTAPE 1 ÉCHEC - Pas d\'autorisation');
+                                  window.location.href = 'https://iahome.fr/login';
+                                  return;
+                                }
+                                
+                                const accessData = await accessResponse.json();
+                                if (!accessData.hasAccess) {
+                                  console.log('❌ LibreSpeed: ÉTAPE 1 ÉCHEC - Accès refusé');
+                                  window.location.href = 'https://iahome.fr/login';
+                                  return;
+                                }
+                                
+                                console.log('✅ LibreSpeed: ÉTAPE 1 RÉUSSIE - Autorisation confirmée');
+                                
+                                // ÉTAPE 2: Incrémenter le compteur d'usage
+                                console.log('📊 LibreSpeed: ÉTAPE 2 - Incrémentation du compteur...');
+                                const incrementResponse = await fetch('/api/increment-librespeed-access', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({
+                                    userId: user.id,
+                                    userEmail: user.email
+                                  })
+                                });
+                                
+                                if (incrementResponse.ok) {
+                                  const incrementData = await incrementResponse.json();
+                                  console.log('✅ LibreSpeed: ÉTAPE 2 RÉUSSIE - Compteur incrémenté:', incrementData.usage_count, '/', incrementData.max_usage);
+                                } else {
+                                  const errorData = await incrementResponse.json().catch(() => ({}));
+                                  if (incrementResponse.status === 403 && errorData.error === 'Quota dépassé') {
+                                    console.log('❌ LibreSpeed: ÉTAPE 2 ÉCHEC - Quota dépassé');
+                                    alert('Quota d\'utilisation dépassé. Contactez l\'administrateur.');
+                                    return;
+                                  }
+                                  console.log('⚠️ LibreSpeed: ÉTAPE 2 WARNING - Erreur compteur, continuons...');
+                                }
+                                
+                                // ÉTAPE 3: Générer un token d'accès
+                                console.log('🔑 LibreSpeed: ÉTAPE 3 - Génération du token d\'accès...');
+                                const tokenResponse = await fetch('/api/librespeed-token', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({
+                                    userId: user.id,
+                                    userEmail: user.email
+                                  })
+                                });
+                                
+                                if (!tokenResponse.ok) {
+                                  console.log('❌ LibreSpeed: ÉTAPE 3 ÉCHEC - Erreur génération token');
+                                  window.location.href = 'https://iahome.fr/login';
+                                  return;
+                                }
+                                
+                                const tokenData = await tokenResponse.json();
+                                console.log('✅ LibreSpeed: ÉTAPE 3 RÉUSSIE - Token généré:', tokenData.token ? tokenData.token.substring(0, 10) + '...' : 'N/A');
+                                
+                                // ÉTAPE 4: Ouvrir LibreSpeed avec le token
+                                console.log('🔗 LibreSpeed: ÉTAPE 4 - Ouverture de LibreSpeed avec token...');
+                                const librespeedUrl = `https://librespeed.iahome.fr?token=${tokenData.token}`;
+                                console.log('✅ LibreSpeed: ÉTAPE 4 RÉUSSIE - URL finale:', librespeedUrl);
+                                window.open(librespeedUrl, '_blank');
+                                
+                              } catch (error) {
+                                console.error('❌ LibreSpeed: ERREUR GÉNÉRALE:', error);
+                                alert('Erreur lors de l\'accès à LibreSpeed. Veuillez réessayer.');
+                              }
+                            }}
+                            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 hover:shadow-lg"
+                          >
+                            🚀 Accéder à LibreSpeed
+                          </button>
+                        </div>
+                      ) : module.module_title === 'MeTube' ? (
                         <MeTubeAccessButton
                           user={user}
                           onAccessGranted={(url) => {

@@ -92,3 +92,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect('https://iahome.fr/login?error=internal_error', 302);
   }
 }
+

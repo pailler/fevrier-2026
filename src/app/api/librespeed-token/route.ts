@@ -33,9 +33,16 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('✅ LibreSpeed Token: Token généré avec succès');
-    return new NextResponse(result.token!, { 
+    return new NextResponse(JSON.stringify({
+      success: true,
+      token: result.token,
+      expiresIn: 300 // 5 minutes
+    }), { 
       status: 200,
-      headers: corsHeaders
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json'
+      }
     });
 
   } catch (error) {

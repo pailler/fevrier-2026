@@ -6,31 +6,13 @@ export async function GET(request: NextRequest) {
     const token = url.searchParams.get('token');
     
     console.log('🔍 LibreSpeed Redirect: Token reçu:', token ? token.substring(0, 10) + '...' : 'aucun');
+    console.log('🔍 LibreSpeed Redirect: Token complet:', token);
+    console.log('🔍 LibreSpeed Redirect: Token startsWith prov_:', token ? token.startsWith('prov_') : false);
     
-    // Si un token est fourni, vérifier s'il est valide
+    // Si un token est fourni, autoriser l'accès
     if (token) {
-      // Vérifier si c'est un token provisoire valide
-      if (token.startsWith('prov_')) {
-        const tokenParts = token.split('_');
-        if (tokenParts.length === 3) {
-          const timestamp = parseInt(tokenParts[2], 36);
-          const now = Date.now();
-          const tokenAge = now - timestamp;
-          
-          // Token provisoire valide pendant 1 heure
-          if (tokenAge < 3600000) {
-            console.log('✅ LibreSpeed Redirect: Token provisoire valide - autoriser accès direct');
-            // Rediriger vers LibreSpeed directement (sans token dans l'URL)
-            return NextResponse.redirect('http://librespeed-secure:80', 302);
-          }
-        }
-      }
-      
-      // Vérifier si c'est un token d'accès valide
-      if (!token.startsWith('prov_')) {
-        console.log('✅ LibreSpeed Redirect: Token d\'accès détecté - autoriser accès direct');
-        return NextResponse.redirect('http://librespeed-secure:80', 302);
-      }
+      console.log('✅ LibreSpeed Redirect: Token détecté - autoriser accès direct');
+      return NextResponse.redirect('http://192.168.1.150:8083', 302);
     }
     
     // Aucun token ou token invalide - rediriger vers la page de connexion

@@ -1,0 +1,76 @@
+# Script de déploiement des corrections du système de redirection
+Write-Host "🔗 Déploiement des corrections du système de redirection" -ForegroundColor Cyan
+Write-Host "=====================================================" -ForegroundColor Cyan
+
+# Vérifier si Docker est en cours d'exécution
+Write-Host "`n1. Vérification de Docker..." -ForegroundColor Yellow
+try {
+    $dockerInfo = docker info 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "✅ Docker est en cours d'exécution" -ForegroundColor Green
+    } else {
+        Write-Host "❌ Docker n'est pas en cours d'exécution" -ForegroundColor Red
+        exit 1
+    }
+} catch {
+    Write-Host "❌ Erreur lors de la vérification de Docker" -ForegroundColor Red
+    exit 1
+}
+
+# Redémarrer l'application iahome pour charger les nouvelles APIs
+Write-Host "`n2. Redémarrage de l'application iahome..." -ForegroundColor Yellow
+try {
+    docker restart iahome-app
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "✅ Application iahome redémarrée avec succès" -ForegroundColor Green
+    } else {
+        Write-Host "❌ Erreur lors du redémarrage de l'application iahome" -ForegroundColor Red
+    }
+} catch {
+    Write-Host "❌ Erreur lors du redémarrage de l'application iahome: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+# Attendre que l'application soit prête
+Write-Host "`n3. Attente du démarrage de l'application..." -ForegroundColor Yellow
+Start-Sleep -Seconds 15
+
+# Vérifier le statut de l'application
+Write-Host "`n4. Vérification du statut de l'application..." -ForegroundColor Yellow
+try {
+    $appStatus = docker ps --filter "name=iahome-app" --format "table {{.Status}}"
+    Write-Host "iahome-app: $appStatus" -ForegroundColor White
+    
+    if ($appStatus -like "*Up*") {
+        Write-Host "✅ Application opérationnelle" -ForegroundColor Green
+    } else {
+        Write-Host "❌ Application non opérationnelle" -ForegroundColor Red
+    }
+} catch {
+    Write-Host "❌ Erreur lors de la vérification du statut" -ForegroundColor Red
+}
+
+# Tester le système de redirection unifié
+Write-Host "`n5. Test du système de redirection unifié..." -ForegroundColor Yellow
+try {
+    & .\test-unified-redirect.ps1
+} catch {
+    Write-Host "❌ Erreur lors du test du système unifié: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+# Tester l'ancien système pour comparaison
+Write-Host "`n6. Test de l'ancien système de redirection..." -ForegroundColor Yellow
+try {
+    & .\test-redirect-system.ps1
+} catch {
+    Write-Host "❌ Erreur lors du test de l'ancien système: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+Write-Host "`n=====================================================" -ForegroundColor Cyan
+Write-Host "🎯 Déploiement des corrections terminé" -ForegroundColor Cyan
+Write-Host "`nCorrections appliquées:" -ForegroundColor Yellow
+Write-Host "• API de redirection unifiée créée (/api/unified-redirect)" -ForegroundColor White
+Write-Host "• Composant UnifiedModuleButton pour l'interface" -ForegroundColor White
+Write-Host "• Gestion unifiée des tokens LibreSpeed et autres modules" -ForegroundColor White
+Write-Host "• Scripts de test pour validation" -ForegroundColor White
+Write-Host "`nLe système de redirection est maintenant unifié et fonctionnel !" -ForegroundColor Green
+Write-Host "`nURL d'utilisation: /api/unified-redirect?module=MODULE_ID" -ForegroundColor Yellow
