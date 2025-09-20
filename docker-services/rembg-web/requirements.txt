@@ -1,0 +1,9 @@
+# Requirements pour le service REMBG
+flask==2.3.3
+rembg==2.0.50
+pillow==10.0.1
+requests==2.31.0
+werkzeug==2.3.7
+gunicorn==21.2.0
+
+

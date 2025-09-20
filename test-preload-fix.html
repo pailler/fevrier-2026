@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Preload Fix</title>
+    <script>
+        // Script de test pour vérifier la suppression des preloads
+        function checkPreloads() {
+            console.log('🔍 Vérification des preloads...');
+            
+            // Vérifier les preloads de polices Geist
+            const geistFonts = document.querySelectorAll('link[rel="preload"][as="font"][href*="geist"]');
+            console.log('📝 Preloads Geist trouvés:', geistFonts.length);
+            geistFonts.forEach(link => {
+                console.log('  -', link.getAttribute('href'));
+            });
+            
+            // Vérifier les preloads d'images og-image
+            const ogImages = document.querySelectorAll('link[rel="preload"][as="image"][href*="og-image"]');
+            console.log('📝 Preloads og-image trouvés:', ogImages.length);
+            ogImages.forEach(link => {
+                console.log('  -', link.getAttribute('href'));
+            });
+            
+            // Vérifier tous les preloads
+            const allPreloads = document.querySelectorAll('link[rel="preload"]');
+            console.log('📝 Total preloads:', allPreloads.length);
+            allPreloads.forEach(link => {
+                console.log('  -', link.getAttribute('href'), '(' + link.getAttribute('as') + ')');
+            });
+        }
+        
+        // Exécuter la vérification après le chargement
+        window.addEventListener('load', () => {
+            setTimeout(checkPreloads, 1000);
+        });
+    </script>
+</head>
+<body>
+    <h1>Test de suppression des preloads</h1>
+    <p>Ouvrez la console pour voir les résultats.</p>
+    <p>Rechargez la page pour tester la suppression automatique.</p>
+</body>
+</html>

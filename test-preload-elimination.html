@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Élimination Preloads</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test d'Élimination des Preloads</h1>
+    
+    <div class="test-section info">
+        <h3>📋 Instructions</h3>
+        <p>1. Ouvrez la console du navigateur (F12)</p>
+        <p>2. Rechargez cette page</p>
+        <p>3. Vérifiez les messages de suppression des preloads</p>
+        <p>4. Vérifiez qu'il n'y a plus d'avertissements de preload</p>
+    </div>
+
+    <div class="test-section">
+        <h3>🔍 Vérification des Preloads</h3>
+        <button onclick="checkPreloads()">Vérifier les Preloads</button>
+        <div id="preload-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Logs de Suppression</h3>
+        <div id="suppression-logs"></div>
+    </div>
+
+    <script>
+        // Capturer les logs de suppression
+        const originalLog = console.log;
+        const suppressionLogs = [];
+        
+        console.log = function(...args) {
+            if (args[0] && args[0].includes('🗑️')) {
+                suppressionLogs.push(args.join(' '));
+                updateSuppressionLogs();
+            }
+            originalLog.apply(console, args);
+        };
+
+        function updateSuppressionLogs() {
+            const logsDiv = document.getElementById('suppression-logs');
+            logsDiv.innerHTML = suppressionLogs.map(log => `<div style="margin: 5px 0; padding: 5px; background: #f8f9fa; border-radius: 3px;">${log}</div>`).join('');
+        }
+
+        function checkPreloads() {
+            const resultsDiv = document.getElementById('preload-results');
+            
+            // Vérifier les preloads de polices
+            const fontPreloads = document.querySelectorAll('link[rel="preload"][as="font"]');
+            const geistFonts = Array.from(fontPreloads).filter(link => 
+                link.getAttribute('href') && link.getAttribute('href').includes('geist')
+            );
+            
+            // Vérifier les preloads d'images
+            const imagePreloads = document.querySelectorAll('link[rel="preload"][as="image"]');
+            const ogImages = Array.from(imagePreloads).filter(link => 
+                link.getAttribute('href') && link.getAttribute('href').includes('og-image')
+            );
+            
+            let html = '<h4>Résultats de la Vérification:</h4>';
+            
+            if (fontPreloads.length === 0) {
+                html += '<div class="success">✅ Aucun preload de police trouvé</div>';
+            } else {
+                html += `<div class="error">❌ ${fontPreloads.length} preload(s) de police trouvé(s)</div>`;
+                fontPreloads.forEach(link => {
+                    html += `<div style="margin-left: 20px;">- ${link.getAttribute('href')}</div>`;
+                });
+            }
+            
+            if (geistFonts.length === 0) {
+                html += '<div class="success">✅ Aucun preload de police Geist trouvé</div>';
+            } else {
+                html += `<div class="error">❌ ${geistFonts.length} preload(s) de police Geist trouvé(s)</div>`;
+                geistFonts.forEach(link => {
+                    html += `<div style="margin-left: 20px;">- ${link.getAttribute('href')}</div>`;
+                });
+            }
+            
+            if (imagePreloads.length === 0) {
+                html += '<div class="success">✅ Aucun preload d\'image trouvé</div>';
+            } else {
+                html += `<div class="error">❌ ${imagePreloads.length} preload(s) d\'image trouvé(s)</div>`;
+                imagePreloads.forEach(link => {
+                    html += `<div style="margin-left: 20px;">- ${link.getAttribute('href')}</div>`;
+                });
+            }
+            
+            if (ogImages.length === 0) {
+                html += '<div class="success">✅ Aucun preload d\'image og-image trouvé</div>';
+            } else {
+                html += `<div class="error">❌ ${ogImages.length} preload(s) d\'image og-image trouvé(s)</div>`;
+                ogImages.forEach(link => {
+                    html += `<div style="margin-left: 20px;">- ${link.getAttribute('href')}</div>`;
+                });
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // Vérifier automatiquement au chargement
+        window.addEventListener('load', () => {
+            setTimeout(checkPreloads, 1000);
+        });
+    </script>
+</body>
+</html>

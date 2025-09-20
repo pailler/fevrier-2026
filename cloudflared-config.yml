@@ -4,13 +4,64 @@ credentials-file: /etc/cloudflared/credentials.json
 ingress:
   # Application principale IAHome
   - hostname: iahome.fr
-    service: http://iahome-app:3000
+    service: http://172.19.0.2:3000
+    originRequest:
+      timeout: 900s  # 15 minutes timeout pour les uploads
+      httpHostHeader: iahome.fr
   - hostname: www.iahome.fr
-    service: http://iahome-app:3000
+    service: http://172.19.0.2:3000
+    originRequest:
+      timeout: 900s  # 15 minutes timeout pour les uploads
+      httpHostHeader: www.iahome.fr
   
   # LibreSpeed avec authentification via API iahome
   - hostname: librespeed.iahome.fr
-    service: http://iahome-app:3000/api/check-auth
+    service: http://172.19.0.2:3000/api/check-auth
+  
+  # Services Whisper
+  - hostname: whisper.iahome.fr
+    service: http://172.19.0.2:3000/whisper
+    originRequest:
+      httpHostHeader: whisper.iahome.fr
+      noTLSVerify: true
+      disableChunkedEncoding: false
+      maxChunkSize: 10485760  # 10MB chunks
+      timeout: 900s  # 15 minutes timeout
+      httpHostHeader: whisper.iahome.fr
+      originServerName: whisper.iahome.fr
+      # Headers pour augmenter la limite
+      headers:
+        X-Cloudflare-Max-Upload-Size: "1073741824"  # 1GB
+        X-Cloudflare-Timeout: "900"
+  - hostname: whisper-audio.iahome.fr
+    service: http://whisper-api-prod:9000
+    originRequest:
+      httpHostHeader: whisper-audio.iahome.fr
+      noTLSVerify: true
+      disableChunkedEncoding: false
+      maxChunkSize: 10485760  # 10MB chunks
+      timeout: 900s  # 15 minutes timeout
+  - hostname: whisper-video.iahome.fr
+    service: http://whisper-video-prod:9000
+    originRequest:
+      httpHostHeader: whisper-video.iahome.fr
+      noTLSVerify: true
+      disableChunkedEncoding: false
+      maxChunkSize: 52428800  # 50MB chunks pour vidéo
+      timeout: 900s  # 15 minutes timeout
+      originServerName: whisper-video.iahome.fr
+      # Headers pour augmenter la limite
+      headers:
+        X-Cloudflare-Max-Upload-Size: "1073741824"  # 1GB
+        X-Cloudflare-Timeout: "900"
+  - hostname: whisper-ocr.iahome.fr
+    service: http://whisper-ocr-prod:8080
+    originRequest:
+      httpHostHeader: whisper-ocr.iahome.fr
+      noTLSVerify: true
+      disableChunkedEncoding: false
+      maxChunkSize: 10485760  # 10MB chunks
+      timeout: 900s  # 15 minutes timeout
   
   # Services externes
   - hostname: pdf.iahome.fr
