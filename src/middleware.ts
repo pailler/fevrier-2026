@@ -52,6 +52,37 @@ export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const url = new URL(request.url);
 
+    // Intercepter les réponses HTML pour nettoyer les preloads
+    if (request.headers.get('accept')?.includes('text/html')) {
+      try {
+        const originalResponse = await fetch(request);
+        if (originalResponse.ok) {
+          const html = await originalResponse.text();
+          
+          // Supprimer les preloads de polices Geist
+          const cleanedHtml = html
+            .replace(/<link[^>]*rel="preload"[^>]*as="font"[^>]*href="[^"]*geist[^"]*"[^>]*>/gi, '')
+            .replace(/<link[^>]*rel="preload"[^>]*as="image"[^>]*href="[^"]*og-image[^"]*"[^>]*>/gi, '')
+            .replace(/<link[^>]*rel="preload"[^>]*as="font"[^>]*href="[^"]*\.woff2[^"]*"[^>]*>/gi, '');
+          
+          const response = new NextResponse(cleanedHtml, {
+            status: originalResponse.status,
+            statusText: originalResponse.statusText,
+            headers: originalResponse.headers,
+          });
+          
+          // Ajouter des headers pour corriger les types MIME
+          response.headers.set('X-Preload-Cleaner', 'enabled');
+          response.headers.set('X-Content-Type-Options', 'nosniff');
+          response.headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';");
+          
+          return response;
+        }
+      } catch (error) {
+        console.error('Erreur lors du nettoyage des preloads:', error);
+      }
+    }
+
   // Ne jamais interférer avec la racine
   if (pathname === '/') {
     return NextResponse.next();

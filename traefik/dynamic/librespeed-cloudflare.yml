@@ -1,4 +1,4 @@
-# Configuration LibreSpeed pour Cloudflare SSL
+# Configuration LibreSpeed pour Cloudflare SSL - Updated
 http:
   routers:
     # Route pour les challenges Let's Encrypt (si nécessaire)
@@ -8,14 +8,14 @@ http:
       service: librespeed-direct
       priority: 1000
 
-    # Route principale (Cloudflare SSL - HTTPS vers Traefik)
+    # Route principale pour LibreSpeed (avec redirection)
     librespeed-main:
       rule: "Host(`librespeed.iahome.fr`)"
       entryPoints: ["websecure"]
-      service: librespeed-proxy-service
-      middlewares: ["librespeed-auth@file", "security-headers@file", "compress@file"]
+      service: librespeed-redirect-service
+      middlewares: ["security-headers@file", "compress@file"]
       tls: {}
-      priority: 10
+      priority: 200
 
   services:
     # Service pour les challenges Let's Encrypt
@@ -28,10 +28,19 @@ http:
     librespeed-service:
       loadBalancer:
         servers:
-          - url: "http://librespeed:80"
+          - url: "http://librespeed-secure:80"
 
     # Service proxy d'authentification pour LibreSpeed
     librespeed-proxy-service:
       loadBalancer:
         servers:
-          - url: "http://iahome-app:3000"
+          - url: "http://librespeed-secure:80"
+
+    # Service de redirection pour LibreSpeed
+    librespeed-redirect-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000/api/librespeed-redirect"
+
+# Force reload 09/20/2025 10:40:29
+# Force reload 09/20/2025 10:59:54

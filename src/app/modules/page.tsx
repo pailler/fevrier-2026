@@ -4,7 +4,7 @@ import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import { NotificationServiceClient } from "../../utils/notificationServiceClient";
-import AuthorizedAccessButton from "../../components/AuthorizedAccessButton";
+// import AuthorizedAccessButton from "../../components/AuthorizedAccessButton";
 
 export default function ModulesPage() {
   const router = useRouter();
@@ -23,7 +23,7 @@ export default function ModulesPage() {
     getSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: any, session: any) => {
         setSession(session);
         setUser(session?.user || null);
       }
@@ -171,12 +171,8 @@ export default function ModulesPage() {
               </div>
               
               {module.status === 'active' ? (
-                <AuthorizedAccessButton
-                  moduleId={module.id}
-                  moduleTitle={module.name}
-                  moduleUrl={module.url}
-                  className={`w-full ${module.color} text-white font-medium py-3 px-4 rounded-lg transition-colors`}
-                  onAccessGranted={(url) => {
+                <button
+                  onClick={() => {
                     // Envoyer une notification d'accès à l'application
                     try {
                       const notificationService = NotificationServiceClient.getInstance();
@@ -186,16 +182,13 @@ export default function ModulesPage() {
                       console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
                     }
                     
-                    // La navigation est maintenant gérée par AuthorizedAccessButton
-                    // Pas besoin de faire window.open() ou router.push() ici
+                    // Redirection simple vers l'application
+                    window.open(module.url, '_blank');
                   }}
-                  onAccessDenied={(reason) => {
-                    console.log('❌ Accès refusé:', reason);
-                    alert(`Accès refusé: ${reason}`);
-                  }}
+                  className={`w-full ${module.color} text-white font-medium py-3 px-4 rounded-lg transition-colors`}
                 >
                   Accéder à l'appli
-                </AuthorizedAccessButton>
+                </button>
               ) : (
                 <button
                   className="w-full bg-gray-300 text-gray-500 font-medium py-3 px-4 rounded-lg cursor-not-allowed"

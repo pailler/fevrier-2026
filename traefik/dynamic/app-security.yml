@@ -1,0 +1,271 @@
+# Configuration Traefik pour la sécurisation des applications iahome
+# Redirection sécurisée vers les applications avec vérification des modules dans /encours
+
+http:
+  middlewares:
+    # Middleware de redirection sécurisée pour LibreSpeed
+    librespeed-secure-redirect:
+      redirectRegex:
+        regex: "^https://librespeed\\.iahome\\.fr(.*)$"
+        replacement: "https://iahome.fr/api/redirect-librespeed$1"
+        permanent: false
+    
+    # Middleware de redirection sécurisée pour MeTube
+    metube-secure-redirect:
+      redirectRegex:
+        regex: "^https://metube\\.iahome\\.fr(.*)$"
+        replacement: "https://iahome.fr/redirect-metube$1"
+        permanent: false
+    
+    # Middleware de redirection sécurisée pour PDF
+    pdf-secure-redirect:
+      redirectRegex:
+        regex: "^https://pdf\\.iahome\\.fr(.*)$"
+        replacement: "https://iahome.fr/api/redirect-pdf$1"
+        permanent: false
+    
+    # Middleware de redirection sécurisée pour PsiTransfer
+    psitransfer-secure-redirect:
+      redirectRegex:
+        regex: "^https://psitransfer\\.iahome\\.fr(.*)$"
+        replacement: "https://iahome.fr/api/redirect-psitransfer$1"
+        permanent: false
+    
+    # Middleware de redirection sécurisée pour QR Codes
+    qrcodes-secure-redirect:
+      redirectRegex:
+        regex: "^https://qrcodes\\.iahome\\.fr(.*)$"
+        replacement: "https://iahome.fr/api/redirect-qrcodes$1"
+        permanent: false
+    
+    # Middleware de redirection sécurisée pour Universal Converter
+    converter-secure-redirect:
+      redirectRegex:
+        regex: "^https://convert\\.iahome\\.fr(.*)$"
+        replacement: "https://iahome.fr/api/redirect-converter$1"
+        permanent: false
+    
+    # Middleware de redirection sécurisée pour Stable Diffusion
+    stablediffusion-secure-redirect:
+      redirectRegex:
+        regex: "^https://stablediffusion\\.iahome\\.fr(.*)$"
+        replacement: "https://iahome.fr/api/redirect-stablediffusion$1"
+        permanent: false
+    
+    # Middleware de redirection sécurisée pour Ruined Fooocus
+    ruinedfooocus-secure-redirect:
+      redirectRegex:
+        regex: "^https://ruinedfooocus\\.iahome\\.fr(.*)$"
+        replacement: "https://iahome.fr/api/redirect-ruinedfooocus$1"
+        permanent: false
+    
+    # Middleware de redirection sécurisée pour Invoke AI
+    invoke-secure-redirect:
+      redirectRegex:
+        regex: "^https://invoke\\.iahome\\.fr(.*)$"
+        replacement: "https://iahome.fr/api/redirect-invoke$1"
+        permanent: false
+    
+    # Middleware de redirection sécurisée pour ComfyUI
+    comfyui-secure-redirect:
+      redirectRegex:
+        regex: "^https://comfyui\\.iahome\\.fr(.*)$"
+        replacement: "https://iahome.fr/api/redirect-comfyui$1"
+        permanent: false
+    
+    # Middleware de redirection sécurisée pour Cog Studio
+    cogstudio-secure-redirect:
+      redirectRegex:
+        regex: "^https://cogstudio\\.iahome\\.fr(.*)$"
+        replacement: "https://iahome.fr/api/redirect-cogstudio$1"
+        permanent: false
+    
+    # Middleware de redirection sécurisée pour SD.Next
+    sdnext-secure-redirect:
+      redirectRegex:
+        regex: "^https://sdnext\\.iahome\\.fr(.*)$"
+        replacement: "https://iahome.fr/api/redirect-sdnext$1"
+        permanent: false
+
+  routers:
+    # LibreSpeed - Redirection sécurisée
+    librespeed-secure:
+      rule: "Host(`librespeed.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: librespeed-redirect-service
+      middlewares: ["librespeed-secure-redirect", "security-headers@file", "compress@file"]
+      tls: {}
+      priority: 100
+
+    # MeTube - Redirection sécurisée
+    metube-secure:
+      rule: "Host(`metube.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: metube-redirect-service
+      middlewares: ["metube-secure-redirect", "security-headers@file", "compress@file"]
+      tls: {}
+      priority: 100
+
+    # PDF - Redirection sécurisée
+    pdf-secure:
+      rule: "Host(`pdf.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: pdf-redirect-service
+      middlewares: ["pdf-secure-redirect", "security-headers@file", "compress@file"]
+      tls: {}
+      priority: 100
+
+    # PsiTransfer - Redirection sécurisée
+    psitransfer-secure:
+      rule: "Host(`psitransfer.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: psitransfer-redirect-service
+      middlewares: ["psitransfer-secure-redirect", "security-headers@file", "compress@file"]
+      tls: {}
+      priority: 100
+
+    # QR Codes - Redirection sécurisée
+    qrcodes-secure:
+      rule: "Host(`qrcodes.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: qrcodes-redirect-service
+      middlewares: ["qrcodes-secure-redirect", "security-headers@file", "compress@file"]
+      tls: {}
+      priority: 100
+
+    # Universal Converter - Redirection sécurisée
+    converter-secure:
+      rule: "Host(`convert.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: converter-redirect-service
+      middlewares: ["converter-secure-redirect", "security-headers@file", "compress@file"]
+      tls: {}
+      priority: 100
+
+    # Stable Diffusion - Redirection sécurisée
+    stablediffusion-secure:
+      rule: "Host(`stablediffusion.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: stablediffusion-redirect-service
+      middlewares: ["stablediffusion-secure-redirect", "security-headers@file", "compress@file"]
+      tls: {}
+      priority: 100
+
+    # Ruined Fooocus - Redirection sécurisée
+    ruinedfooocus-secure:
+      rule: "Host(`ruinedfooocus.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: ruinedfooocus-redirect-service
+      middlewares: ["ruinedfooocus-secure-redirect", "security-headers@file", "compress@file"]
+      tls: {}
+      priority: 100
+
+    # Invoke AI - Redirection sécurisée
+    invoke-secure:
+      rule: "Host(`invoke.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: invoke-redirect-service
+      middlewares: ["invoke-secure-redirect", "security-headers@file", "compress@file"]
+      tls: {}
+      priority: 100
+
+    # ComfyUI - Redirection sécurisée
+    comfyui-secure:
+      rule: "Host(`comfyui.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: comfyui-redirect-service
+      middlewares: ["comfyui-secure-redirect", "security-headers@file", "compress@file"]
+      tls: {}
+      priority: 100
+
+    # Cog Studio - Redirection sécurisée
+    cogstudio-secure:
+      rule: "Host(`cogstudio.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: cogstudio-redirect-service
+      middlewares: ["cogstudio-secure-redirect", "security-headers@file", "compress@file"]
+      tls: {}
+      priority: 100
+
+    # SD.Next - Redirection sécurisée
+    sdnext-secure:
+      rule: "Host(`sdnext.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: sdnext-redirect-service
+      middlewares: ["sdnext-secure-redirect", "security-headers@file", "compress@file"]
+      tls: {}
+      priority: 100
+
+  services:
+    # Services de redirection vers l'application iahome
+    librespeed-redirect-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        passHostHeader: true
+
+    metube-redirect-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        passHostHeader: true
+
+    pdf-redirect-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        passHostHeader: true
+
+    psitransfer-redirect-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        passHostHeader: true
+
+    qrcodes-redirect-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        passHostHeader: true
+
+    converter-redirect-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        passHostHeader: true
+
+    stablediffusion-redirect-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        passHostHeader: true
+
+    ruinedfooocus-redirect-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        passHostHeader: true
+
+    invoke-redirect-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        passHostHeader: true
+
+    comfyui-redirect-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        passHostHeader: true
+
+    cogstudio-redirect-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        passHostHeader: true
+
+    sdnext-redirect-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        passHostHeader: true

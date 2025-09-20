@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Breadcrumb from '../../../components/Breadcrumb';
 // import { NotificationServiceClient } from '../../../utils/notificationServiceClient';
-import AuthorizedAccessButton from '../../../components/AuthorizedAccessButton';
+// import AuthorizedAccessButton from '../../../components/AuthorizedAccessButton';
 
 interface Card {
   id: string;
@@ -833,27 +833,19 @@ export default function CardDetailPage() {
                       </button>
                     )}
 
-                    {/* Bouton JWT - visible seulement si l'utilisateur a accès au module */}
+                    {/* Bouton d'accès - visible seulement si l'utilisateur a accès au module */}
                     {session && userSubscriptions[`module_${card.id}`] && (
-                      <AuthorizedAccessButton
-                        moduleId={card.id}
-                        moduleTitle={card.title}
-                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                        onAccessGranted={async (url) => {
-                          // Notification désactivée temporairement
+                      <button
+                        onClick={() => {
                           console.log('✅ Accès à l\'application accordé');
-                          
-                          // La navigation est maintenant gérée par AuthorizedAccessButton
-                          // Pas besoin de faire window.open() ou router.push() ici
+                          // Redirection simple vers l'application
+                          window.open(`https://${card.id}.iahome.fr`, '_blank');
                         }}
-                        onAccessDenied={(reason) => {
-                          console.log('❌ Accès refusé:', reason);
-                          alert(`Accès refusé: ${reason}`);
-                        }}
+                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                       >
                         <span className="text-xl">🔑</span>
                         <span>Accéder à {card.title}</span>
-                      </AuthorizedAccessButton>
+                      </button>
                     )}
 
                     {/* Boutons d'activation pour les modules gratuits */}

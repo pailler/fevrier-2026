@@ -9,15 +9,28 @@ export interface EmailData {
 
 export class EmailService {
   private static instance: EmailService;
-  private resend: Resend;
+  private resend: Resend | null = null;
+  private isConfigured: boolean = false;
 
   constructor() {
+    this.initializeResend();
+  }
+
+  private initializeResend() {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
       console.warn('RESEND_API_KEY not configured - email service disabled');
-      this.resend = null as any;
-    } else {
+      this.isConfigured = false;
+      return;
+    }
+
+    try {
       this.resend = new Resend(apiKey);
+      this.isConfigured = true;
+      console.log('Email service initialized successfully');
+    } catch (error) {
+      console.error('Failed to initialize email service:', error);
+      this.isConfigured = false;
     }
   }
 
@@ -30,13 +43,15 @@ export class EmailService {
 
   async sendEmail(emailData: EmailData): Promise<boolean> {
     try {
-      if (!this.resend) {
+      if (!this.isConfigured || !this.resend) {
         console.warn('Email service not configured - skipping email send');
         return false;
       }
 
       const { to, subject, html, from = process.env.RESEND_FROM_EMAIL || 'IAHome <noreply@iahome.fr>' } = emailData;
 
+      console.log('🔍 DEBUG: Appel de emailService.sendEmail...');
+      
       const result = await this.resend.emails.send({
         from,
         to,
@@ -46,13 +61,16 @@ export class EmailService {
 
       if (result.error) {
         console.error('Email send error:', result.error);
+        console.log('📧 Résultat envoi email: false');
         return false;
       }
 
+      console.log('📧 Résultat envoi email: true');
       console.log('Email sent successfully:', result.data?.id);
       return true;
     } catch (error) {
       console.error('Email service error:', error);
+      console.log('📧 Résultat envoi email: false');
       return false;
     }
   }
@@ -73,5 +91,9 @@ export class EmailService {
         </div>
       `
     });
+  }
+
+  isServiceConfigured(): boolean {
+    return this.isConfigured;
   }
 }

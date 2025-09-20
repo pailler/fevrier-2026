@@ -4,7 +4,9 @@ import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import Header from '../../components/Header';
-import AuthorizedAccessButton from '../../components/AuthorizedAccessButton';
+import LibreSpeedAccessButton from '../../components/LibreSpeedAccessButton';
+import MeTubeAccessButton from '../../components/MeTubeAccessButton';
+import ModuleAccessButton from '../../components/ModuleAccessButton';
 
 interface UserModule {
   id: string;
@@ -43,7 +45,7 @@ export default function EncoursPage() {
     title: ''
   });
   const [tokenError, setTokenError] = useState<string | null>(null);
-  const [cacheBuster] = useState(() => Date.now());
+  const [cacheBuster] = useState(() => Date.now() + Math.random() * 1000);
 
   // Vérification de la session et des erreurs de token
   useEffect(() => {
@@ -84,7 +86,7 @@ export default function EncoursPage() {
     getSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: any, session: any) => {
         setSession(session);
         setUser(session?.user || null);
         setSessionChecked(true);
@@ -131,6 +133,8 @@ export default function EncoursPage() {
       
       try {
         setLoading(true);
+        console.log('🔍 Chargement des modules pour utilisateur:', user.id);
+        
         // Récupérer les modules souscrits via user_applications avec jointure vers modules
         let moduleAccessData: any[] | null = null;
         let moduleAccessError: any = null;
@@ -156,6 +160,7 @@ export default function EncoursPage() {
 
           moduleAccessData = result.data;
           moduleAccessError = result.error;
+          console.log('📊 Modules user_applications récupérés:', moduleAccessData?.length || 0);
         } catch (error) {
           moduleAccessError = error;
         }
@@ -248,54 +253,75 @@ export default function EncoursPage() {
           accessTokensData = [];
         }
         
-        // Transformer les modules user_applications
-        const transformedModules: UserModule[] = (moduleAccessData || [])
-          .filter(access => {
-            // Vérifier que l'accès est valide
-            if (!access || typeof access !== 'object') {
-              console.error('Accès invalide:', access);
-              return false;
-            }
-            if (!access.id) {
-              return false;
-            }
-            // Filtrer les accès non expirés
-            if (!access.expires_at) return true;
+        // Transformer les modules user_applications avec vérification de sécurité
+        const transformedModules: UserModule[] = [];
+        
+        for (const access of (moduleAccessData || [])) {
+          // Vérifier que l'accès est valide
+          if (!access || typeof access !== 'object' || !access.id) {
+            console.error('Accès invalide:', access);
+            continue;
+          }
+          
+          // Filtrer les accès non expirés
+          if (access.expires_at) {
             try {
-              return new Date(access.expires_at) > new Date();
+              if (new Date(access.expires_at) <= new Date()) {
+                console.log('⏰ Module expiré ignoré:', access.module_title);
+                continue;
+              }
             } catch (error) {
-              return true; // Garder par défaut si erreur de date
+              console.error('Erreur vérification date expiration:', error);
+              continue;
             }
-          })
-          .map(access => {
-            try {
-              // Trouver les informations du module correspondant
-              const moduleInfo = modulesData.find(module => module.id.toString() === access.module_id?.toString()) || {};
-              const isFree = moduleInfo.price === 0 || moduleInfo.price === '0' || moduleInfo.price === null;
-              
-              return {
-                id: access.id || 'unknown',
-                module_id: access.module_id || 'unknown',
-                module_title: access.module_title || moduleInfo.title || `Module ${access.module_id || 'unknown'}`,
-                module_description: moduleInfo.description || 'Module activé via souscription',
-                module_category: 'Module activé',
-                module_url: moduleInfo.url || '',
-                access_type: (access.access_level || 'basic').replace(/premium\d+/, 'premium'),
-                expires_at: access.expires_at || null,
-                is_active: access.is_active !== undefined ? access.is_active : true,
-                created_at: access.created_at || new Date().toISOString(),
-                current_usage: access.usage_count || 0,
-                max_usage: access.max_usage || undefined,
-                user_id: access.user_id,
-                created_by: access.user_id,
-                price: moduleInfo.price || 0,
-                is_free: isFree
-              };
-            } catch (error) {
-              return null;
+          }
+          
+          // Vérifier que le module est visible dans /encours via l'API de sécurité
+          try {
+            const securityResponse = await fetch(`/api/check-module-security?module=${access.module_id}&userId=${user.id}`);
+            const securityResult = await securityResponse.json();
+            
+            if (!securityResult.success || !securityResult.isVisible || !securityResult.hasAccess) {
+              console.log('🔒 Module non visible dans /encours:', access.module_title, securityResult.reason);
+              continue;
             }
-          })
-          .filter(Boolean) as UserModule[];
+            
+            console.log('✅ Module visible dans /encours:', access.module_title);
+          } catch (securityError) {
+            console.error('Erreur vérification sécurité module:', securityError);
+            // En cas d'erreur, on garde le module par sécurité
+          }
+          
+          // Créer l'objet module
+          try {
+            // Trouver les informations du module correspondant
+            const moduleInfo = modulesData.find(module => module.id.toString() === access.module_id?.toString()) || {};
+            const isFree = moduleInfo.price === 0 || moduleInfo.price === '0' || moduleInfo.price === null;
+            
+            const module: UserModule = {
+              id: access.id || 'unknown',
+              module_id: access.module_id || 'unknown',
+              module_title: access.module_title || moduleInfo.title || `Module ${access.module_id || 'unknown'}`,
+              module_description: moduleInfo.description || 'Module activé via souscription',
+              module_category: 'Module activé',
+              module_url: moduleInfo.url || '',
+              access_type: (access.access_level || 'basic').replace(/premium\d+/, 'premium'),
+              expires_at: access.expires_at || null,
+              is_active: access.is_active !== undefined ? access.is_active : true,
+              created_at: access.created_at || new Date().toISOString(),
+              current_usage: access.usage_count || 0,
+              max_usage: access.max_usage || undefined,
+              user_id: access.user_id,
+              created_by: access.user_id,
+              price: moduleInfo.price || 0,
+              is_free: isFree
+            };
+            
+            transformedModules.push(module);
+          } catch (error) {
+            console.error('Erreur création module:', error);
+          }
+        }
 
         // Transformer les tokens d'accès en modules
         const transformedTokens: UserModule[] = (accessTokensData || [])
@@ -378,211 +404,48 @@ export default function EncoursPage() {
     }
   }, [user, sessionChecked]);
 
-  // Mapping des modules vers leurs URLs directes
+  // Mapping des modules vers leurs URLs directes (sécurisées via tokens)
   const getModuleUrl = (moduleId: string): string => {
-    const moduleUrls: { [key: string]: string } = {
-      'metube': 'https://metube.iahome.fr',
-      'librespeed': 'https://librespeed.iahome.fr',
-      'pdf': 'https://pdf.iahome.fr',
-      'psitransfer': 'https://psitransfer.iahome.fr',
-      'qrcodes': 'https://qrcodes.iahome.fr',
-      'converter': 'https://convert.iahome.fr',
-      'stablediffusion': 'https://stablediffusion.iahome.fr',
-      'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
-      'invoke': 'https://invoke.iahome.fr',
-      'comfyui': 'https://comfyui.iahome.fr',
-      'cogstudio': 'https://cogstudio.iahome.fr',
-      'sdnext': 'https://sdnext.iahome.fr',
+    // Mapping des module_id (numériques) vers les slugs
+    const moduleIdMapping: { [key: string]: string } = {
+      '1': 'pdf',      // PDF+ -> pdf
+      '2': 'metube',   // MeTube -> metube
+      '3': 'librespeed', // LibreSpeed -> librespeed
+      '4': 'psitransfer', // PsiTransfer -> psitransfer
+      '5': 'qrcodes',  // QR Codes -> qrcodes
+      '6': 'converter', // Universal Converter -> converter
+      '7': 'stablediffusion', // Stable Diffusion -> stablediffusion
+      '8': 'ruinedfooocus', // Ruined Fooocus -> ruinedfooocus
+      '9': 'invoke',   // Invoke AI -> invoke
+      '10': 'comfyui', // ComfyUI -> comfyui
+      '11': 'cogstudio', // Cog Studio -> cogstudio
+      '12': 'sdnext',  // SD.Next -> sdnext
+    };
+
+    // Mapping des slugs vers les URLs directes (sécurisées via tokens)
+    const directUrls: { [key: string]: string } = {
+      'metube': 'https://metube.iahome.fr',  // MeTube direct avec token
+      'librespeed': 'https://librespeed.iahome.fr',  // LibreSpeed direct avec token
+      'pdf': 'https://pdf.iahome.fr',  // PDF direct avec token
+      'psitransfer': 'https://psitransfer.iahome.fr',  // PsiTransfer direct avec token
+      'qrcodes': 'https://qrcodes.iahome.fr',  // QR Codes direct avec token
+      'converter': 'https://convert.iahome.fr',  // Converter direct avec token
+      'stablediffusion': 'https://stablediffusion.iahome.fr',  // StableDiffusion direct avec token
+      'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',  // RuinedFooocus direct avec token
+      'invoke': 'https://invoke.iahome.fr',  // Invoke direct avec token
+      'comfyui': 'https://comfyui.iahome.fr',  // ComfyUI direct avec token
+      'cogstudio': 'https://cogstudio.iahome.fr',  // CogStudio direct avec token
+      'sdnext': 'https://sdnext.iahome.fr',  // SDNext direct avec token
     };
     
-    return moduleUrls[moduleId] || '';
+    // Convertir module_id numérique en slug si nécessaire
+    const slug = moduleIdMapping[moduleId] || moduleId;
+    const url = directUrls[slug] || '';
+    
+    console.log(`🔗 getModuleUrl: ${moduleId} -> ${slug} -> ${url}`);
+    return url;
   };
 
-  // Fonction pour accéder à un module
-  const accessModule = async (module: UserModule) => {
-    console.log('🚀 Accès au module:', module.module_title);
-    
-    // Démarrer l'indicateur de traitement
-    setProcessingModule(module.module_id);
-    
-    try {
-      console.log('🚀 Accès au module:', module.module_title);
-      console.log('👤 Utilisateur:', user?.email);
-      console.log('🔍 DEBUG: Début de accessModule');
-      console.log('🔍 DEBUG: Module:', module);
-      console.log('🔍 DEBUG: User:', user);
-
-      // Si c'est LibreSpeed, générer un token temporaire via l'API
-      if (module.module_id === 'librespeed' || module.module_title.toLowerCase().includes('librespeed')) {
-        console.log('🔐 Génération d\'un token temporaire pour LibreSpeed...');
-        
-        try {
-          // Appeler l'API pour générer un token temporaire valide
-          const tokenResponse = await fetch('/api/generate-magic-link', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              userId: user?.id,
-              moduleName: 'LibreSpeed',
-              permissions: ['read', 'write'],
-              durationMinutes: 60
-            })
-          });
-
-          if (!tokenResponse.ok) {
-            throw new Error(`Erreur API: ${tokenResponse.status}`);
-          }
-
-          const tokenData = await tokenResponse.json();
-          
-          if (tokenData.error) {
-            throw new Error(tokenData.error);
-          }
-
-          console.log('✅ Magic link généré via API:', tokenData.magicLink);
-          
-          // Utiliser l'URL générée par l'API (qui contient déjà le token)
-          window.open(tokenData.magicLink, '_blank');
-          return;
-        } catch (tokenError) {
-          console.error('❌ Erreur lors de la génération du token:', tokenError);
-          alert('Erreur lors de l\'accès à LibreSpeed. Veuillez réessayer.');
-          return;
-        }
-      }
-      
-      // TEST DIAGNOSTIC - Appel API simple pour vérifier que le code s'exécute
-      try {
-        console.log('🔍 DEBUG: Test diagnostic - appel API...');
-        const testResponse = await fetch('/api/test-real-notification', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: user?.email || 'test@test.com',
-            appName: 'Test Diagnostic Client',
-            userName: user?.name || user?.email || 'Testeur'
-          })
-        });
-        
-        if (testResponse.ok) {
-          const testResult = await testResponse.json();
-          console.log('🔍 DEBUG: Test diagnostic réussi:', testResult);
-        } else {
-          console.log('🔍 DEBUG: Test diagnostic échoué:', testResponse.status);
-        }
-      } catch (testError) {
-        console.log('🔍 DEBUG: Erreur test diagnostic:', testError);
-      }
-      
-      // Envoyer une notification d'accès à l'application
-      if (user?.email) {
-        try {
-          console.log('📧 Tentative d\'envoi de notification...');
-          console.log('🔍 DEBUG: Email utilisateur trouvé:', user.email);
-          
-          // Import statique pour éviter les problèmes d'import dynamique
-          const { NotificationService } = await import('../../utils/notificationService');
-          const notificationService = NotificationService.getInstance();
-          
-          console.log('✅ Service de notification chargé');
-          console.log('🔍 DEBUG: Service de notification initialisé');
-          
-          const result = await notificationService.notifyAppAccessed(
-            user.email,
-            module.module_title,
-            user.name || user.email
-          );
-          
-          console.log('📧 Résultat de la notification:', result);
-          console.log('🔍 DEBUG: Résultat détaillé:', result);
-          
-          if (result) {
-            console.log('✅ Notification envoyée avec succès');
-            console.log('🔍 DEBUG: Notification réussie');
-          } else {
-            console.log('❌ Échec de l\'envoi de la notification');
-            console.log('🔍 DEBUG: Notification échouée');
-          }
-        } catch (error) {
-          console.error('❌ Erreur lors de l\'envoi de la notification:', error);
-          console.log('🔍 DEBUG: Erreur détaillée:', error);
-        }
-      } else {
-        console.log('⚠️ Pas d\'email utilisateur disponible pour la notification');
-        console.log('🔍 DEBUG: Email utilisateur manquant');
-      }
-
-      // Vérifier si c'est un token d'accès
-      if (module.module_category === 'Token d\'accès') {
-        // Pour les tokens, rediriger vers la page du module associé
-        if (module.module_id && module.module_id !== 'unknown') {
-          router.push(`/card/${module.module_id}`);
-        } else {
-          alert('Ce token d\'accès n\'est pas associé à un module spécifique');
-        }
-        return;
-      }
-      
-      // Incrémenter le compteur d'utilisation pour les modules activés
-      if (module.module_category === 'Module activé' && user?.id) {
-        try {
-          const response = await fetch('/api/increment-usage', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              userId: user.id,
-              moduleId: module.module_id
-            })
-          });
-
-          if (response.ok) {
-            const result = await response.json();
-            // Rafraîchir les données pour afficher le nouveau compteur
-            await refreshData();
-          } else {
-            }
-        } catch (error) {
-          }
-      }
-      
-      // Obtenir l'URL directe du module
-      const moduleUrl = getModuleUrl(module.module_id);
-      
-      if (moduleUrl) {
-        // Liste des modules qui doivent s'ouvrir en iframe
-        const iframeModules = ['metube', 'psitransfer', 'librespeed', 'pdf'];
-        
-        if (iframeModules.includes(module.module_id)) {
-          // Ouvrir en iframe
-          setIframeModal({
-            isOpen: true,
-            url: moduleUrl,
-            title: module.module_title
-          });
-        } else if (moduleUrl.startsWith('/')) {
-          // URL interne - utiliser router.push
-          router.push(moduleUrl);
-        } else {
-          // URL externe - ouvrir dans un nouvel onglet
-          window.open(moduleUrl, '_blank');
-        }
-      } else {
-        // Si pas d'URL directe, rediriger vers la page du module
-        router.push(`/card/${module.module_id}`);
-      }
-    } catch (error) {
-      alert('Erreur lors de l\'accès au module');
-    } finally {
-      // Arrêter l'indicateur de traitement
-      setProcessingModule(null);
-    }
-  };
 
   // Fonction pour rafraîchir les données
   const refreshData = async () => {
@@ -851,9 +714,13 @@ export default function EncoursPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Cache buster: {cacheBuster} */}
-      <div className="bg-red-500 text-white p-4 text-center font-bold">
-        🔄 VERSION MISE À JOUR - {new Date().toLocaleString()} - Cache buster: {cacheBuster}
-      </div>
+            <div className="bg-red-500 text-white p-4 text-center font-bold">
+              🔄 VERSION MISE À JOUR - {new Date().toLocaleString()} - Cache buster: {cacheBuster} - URLs CORRIGÉES
+              <br />
+              <a href="/force-refresh" className="underline text-yellow-200 hover:text-white">
+                🚨 PROBLÈME DE CACHE ? Cliquez ici pour forcer le refresh
+              </a>
+            </div>
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
@@ -1171,43 +1038,58 @@ export default function EncoursPage() {
                       </div>
 
                       {/* Bouton d'accès */}
-                      <AuthorizedAccessButton
-                        moduleId={module.module_id}
-                        moduleTitle={module.module_title}
-                        moduleUrl={getModuleUrl(module.module_id)}
-                        className={`w-full px-4 py-3 rounded-lg transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1`}
-                        disabled={isExpired || isQuotaExceeded}
-                        onAccessGranted={(url) => {
-                          // Envoyer une notification d'accès à l'application
-                          try {
-                            const { NotificationService } = require('../../utils/notificationService');
-                            const notificationService = NotificationService.getInstance();
-                            notificationService.notifyAppAccessed(
-                              user?.email || '',
-                              module.module_title,
-                              user?.name || user?.email || 'Utilisateur'
-                            );
-                            console.log('✅ Notification d\'accès à l\'application envoyée');
-                          } catch (notificationError) {
-                            console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
-                          }
-                          
-                          // La navigation est maintenant gérée par AuthorizedAccessButton
-                          // Pas besoin de faire window.open() ou router.push() ici
-                        }}
-                        onAccessDenied={(reason) => {
-                          console.log('❌ Accès refusé:', reason);
-                          alert(`Accès refusé: ${reason}`);
-                        }}
-                      >
-                        <span className="text-xl mr-2">
-                          {isExpired ? '⏰' : 
-                           isQuotaExceeded ? '⚠️' : '🚀'}
-                        </span>
-                        {isExpired ? 'Module expiré' :
-                         isQuotaExceeded ? 'Quota épuisé' :
-                         'Accéder à l\'application'}
-                      </AuthorizedAccessButton>
+                      {module.module_id === 'librespeed' ? (
+                        <LibreSpeedAccessButton
+                          user={user}
+                          onAccessGranted={(url) => {
+                            console.log('✅ LibreSpeed: Accès autorisé à:', url);
+                            // Envoyer une notification d'accès à l'application
+                            try {
+                              const { NotificationServiceClient } = require('../../utils/notificationServiceClient');
+                              const notificationService = NotificationServiceClient.getInstance();
+                              notificationService.notifyAppAccessed(
+                                user?.email || '',
+                                module.module_title,
+                                user?.name || user?.email || 'Utilisateur'
+                              );
+                              console.log('✅ Notification d\'accès à l\'application envoyée');
+                            } catch (notificationError) {
+                              console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
+                            }
+                          }}
+                          onAccessDenied={(reason) => {
+                            console.log('❌ LibreSpeed: Accès refusé:', reason);
+                            alert(`Accès refusé: ${reason}`);
+                          }}
+                        />
+                      ) : module.module_id === 'metube' ? (
+                        <MeTubeAccessButton
+                          user={user}
+                          onAccessGranted={(url) => {
+                            console.log('🔗 MeTube: Accès autorisé:', url);
+                            window.open(url, '_blank');
+                          }}
+                          onAccessDenied={(reason) => {
+                            console.log('❌ MeTube: Accès refusé:', reason);
+                            alert(`Accès refusé: ${reason}`);
+                          }}
+                        />
+                      ) : (
+                        <ModuleAccessButton
+                          user={user}
+                          moduleId={module.module_id}
+                          moduleTitle={module.module_title}
+                          moduleUrl={getModuleUrl(module.module_id) || ''}
+                          onAccessGranted={(url) => {
+                            console.log(`🔗 ${module.module_title}: Accès autorisé (NOUVEAU CODE):`, url);
+                            window.open(url, '_blank');
+                          }}
+                          onAccessDenied={(reason) => {
+                            console.log(`❌ ${module.module_title}: Accès refusé:`, reason);
+                            alert(`Accès refusé: ${reason}`);
+                          }}
+                        />
+                      )}
                     </div>
                   </div>
                 );

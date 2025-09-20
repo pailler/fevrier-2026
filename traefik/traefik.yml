@@ -20,6 +20,9 @@ providers:
     endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
     network: traefik-network
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
 
 certificatesResolvers:
   letsencrypt:
@@ -33,6 +36,8 @@ log:
   level: INFO
 
 accessLog: {}
+
+# Configuration LibreSpeed gérée par librespeed-cloudflare.yml
 
 
 

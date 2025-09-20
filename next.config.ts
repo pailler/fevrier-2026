@@ -5,11 +5,19 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   experimental: {
     // outputFileTracingRoot: undefined,
+    optimizePackageImports: ['@supabase/supabase-js'],
+  },
+  
+  // Désactiver complètement les preloads automatiques
+  optimizeFonts: false,
+  
+  // Désactiver les preloads de ressources
+  compiler: {
+    removeConsole: false,
   },
   
   // Configuration pour améliorer la stabilité
   reactStrictMode: true,
-  swcMinify: true,
   
   // Configuration pour gérer les erreurs
   onDemandEntries: {
@@ -29,7 +37,7 @@ const nextConfig: NextConfig = {
     return 'production-build';
   },
   
-  serverExternalPackages: ['@supabase/supabase-js'],
+  transpilePackages: ['@supabase/supabase-js'],
   
   // Configuration pour résoudre l'avertissement cross-origin
   allowedDevOrigins: [
@@ -55,7 +63,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Access-Control-Allow-Origin',
-            value: 'http://localhost:3000'
+            value: '*'
           },
           {
             key: 'Access-Control-Allow-Methods',
@@ -80,7 +88,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Access-Control-Allow-Origin',
-            value: 'http://localhost:3000'
+            value: '*'
           },
           {
             key: 'Access-Control-Allow-Methods',
@@ -159,6 +167,16 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+  },
+  
+  // Configuration pour optimiser le préchargement
+  async rewrites() {
+    return [
+      {
+        source: '/fonts/:path*',
+        destination: '/fonts/:path*',
+      },
+    ];
   },
 };
 

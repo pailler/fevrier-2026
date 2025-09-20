@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Boutons - IAhome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+        .button:hover { background: #45a049; }
+        .button:disabled { background: #666; cursor: not-allowed; }
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: rgba(76, 175, 80, 0.3); }
+        .error { background: rgba(244, 67, 54, 0.3); }
+        .info { background: rgba(33, 150, 243, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test des Boutons d'Accès</h1>
+        
+        <div class="test-section">
+            <h3>📋 Instructions :</h3>
+            <ol>
+                <li>Ouvrez la console du navigateur (F12)</li>
+                <li>Cliquez sur les boutons de test ci-dessous</li>
+                <li>Vérifiez dans la console si vous voyez les messages "(NOUVEAU CODE)"</li>
+                <li>Comptez le nombre d'onglets qui s'ouvrent</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Actions de test :</h3>
+            <button class="button" onclick="clearCache()">🗑️ Vider le cache</button>
+            <button class="button" onclick="testLibreSpeed()">🚀 Test LibreSpeed</button>
+            <button class="button" onclick="testPDF()">📄 Test PDF</button>
+            <button class="button" onclick="testMeTube()">🎥 Test MeTube</button>
+            <button class="button" onclick="clearLogs()">🧹 Effacer les logs</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Logs de test :</h3>
+            <div id="logs" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📈 Statistiques :</h3>
+            <div id="stats">
+                <div>Onglets ouverts: <span id="tabCount">0</span></div>
+                <div>Tests effectués: <span id="testCount">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tabCount = 0;
+        let testCount = 0;
+
+        function log(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `status ${type}`;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logs.appendChild(logEntry);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function updateStats() {
+            document.getElementById('tabCount').textContent = tabCount;
+            document.getElementById('testCount').textContent = testCount;
+        }
+
+        function clearCache() {
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        caches.delete(name);
+                    });
+                });
+            }
+            localStorage.clear();
+            sessionStorage.clear();
+            log('✅ Cache vidé', 'success');
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+            tabCount = 0;
+            testCount = 0;
+            updateStats();
+        }
+
+        function testModule(moduleName, moduleId) {
+            log(`🧪 Test ${moduleName}...`, 'info');
+            testCount++;
+            
+            // Simuler un clic sur le bouton d'accès
+            const testUrl = `https://${moduleId}.iahome.fr?token=test_${Date.now()}`;
+            
+            // Ouvrir l'onglet
+            const newTab = window.open(testUrl, '_blank');
+            if (newTab) {
+                tabCount++;
+                log(`✅ ${moduleName}: Onglet ouvert (${tabCount} total)`, 'success');
+            } else {
+                log(`❌ ${moduleName}: Échec ouverture onglet`, 'error');
+            }
+            
+            updateStats();
+        }
+
+        function testLibreSpeed() {
+            testModule('LibreSpeed', 'librespeed');
+        }
+
+        function testPDF() {
+            testModule('PDF', 'pdf');
+        }
+
+        function testMeTube() {
+            testModule('MeTube', 'metube');
+        }
+
+        // Intercepter les window.open pour compter les onglets
+        const originalOpen = window.open;
+        window.open = function(...args) {
+            const result = originalOpen.apply(this, args);
+            if (result) {
+                tabCount++;
+                log(`🔗 window.open() appelé - Onglet ${tabCount}`, 'info');
+                updateStats();
+            }
+            return result;
+        };
+
+        // Log initial
+        log('🚀 Page de test chargée', 'success');
+        log('💡 Ouvrez la console (F12) pour voir les logs détaillés', 'info');
+    </script>
+</body>
+</html>

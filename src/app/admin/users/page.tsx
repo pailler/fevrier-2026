@@ -35,7 +35,7 @@ export default function AdminUsersPage() {
     getSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: any, session: any) => {
         setSession(session);
         setCurrentUser(session?.user || null);
         if (session?.user) {
@@ -92,8 +92,8 @@ export default function AdminUsersPage() {
       }
 
       // Combiner les données
-      const usersWithProfiles = authUsers.users.map(user => {
-        const profile = profiles?.find(p => p.id === user.id);
+      const usersWithProfiles = authUsers.users.map((user: any) => {
+        const profile = profiles?.find((p: any) => p.id === user.id);
         return {
           id: user.id,
           email: user.email || '',

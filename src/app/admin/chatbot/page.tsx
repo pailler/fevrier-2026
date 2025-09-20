@@ -56,7 +56,7 @@ export default function ChatbotAdminPage() {
     getSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: any, session: any) => {
         setSession(session);
         setCurrentUser(session?.user || null);
         if (session?.user) {
@@ -106,7 +106,7 @@ export default function ChatbotAdminPage() {
         .limit(100);
 
       if (!conversationsError && conversationsData) {
-        const conversationsWithEmail = conversationsData.map(conv => ({
+        const conversationsWithEmail = conversationsData.map((conv: any) => ({
           ...conv,
           user_email: conv.profiles?.email || 'Utilisateur inconnu'
         }));

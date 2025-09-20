@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test LibreSpeed Tokens</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .test-button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .success { background: rgba(76, 175, 80, 0.3); }
+        .error { background: rgba(244, 67, 54, 0.3); }
+        .info { background: rgba(33, 150, 243, 0.3); }
+        .warning { background: rgba(255, 152, 0, 0.3); }
+        .token-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔑 Test LibreSpeed Tokens</h1>
+        <p><strong>Version:</strong> 2025-09-20 10:30:00 - Système de tokens implémenté</p>
+        
+        <div class="status info">
+            <h3>📋 Système de tokens implémenté :</h3>
+            <ul>
+                <li>✅ Token provisoire (1 heure de validité)</li>
+                <li>✅ Tokens d'accès existants (durée, quota, utilisation)</li>
+                <li>✅ Priorité aux tokens d'accès sur les tokens provisoires</li>
+                <li>✅ Validation et comptage d'utilisation</li>
+            </ul>
+        </div>
+
+        <div class="status warning">
+            <h3>⚠️ Note importante :</h3>
+            <p>Ce test nécessite d'être connecté à iahome.fr pour fonctionner correctement.</p>
+        </div>
+
+        <div class="status info">
+            <h3>🔧 Tests disponibles :</h3>
+            <button class="test-button" onclick="testProvisionalToken()">
+                Test Token Provisoire
+            </button>
+            <button class="test-button" onclick="testAccessTokens()">
+                Test Tokens d'Accès
+            </button>
+            <button class="test-button" onclick="testTokenValidation()">
+                Test Validation Token
+            </button>
+            <button class="test-button" onclick="testLibreSpeedAccess()">
+                Test Accès LibreSpeed
+            </button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> - ${message}`;
+            results.appendChild(div);
+        }
+
+        function generateProvisionalToken() {
+            const userId = 'test-user-' + Math.random().toString(36).substring(2, 15);
+            const userEmail = 'test@example.com';
+            const timestamp = Date.now();
+            const random = Math.random().toString(36).substring(2, 15);
+            const data = `${userId}-${userEmail}-${timestamp}-${random}`;
+            
+            let hash = 0;
+            for (let i = 0; i < data.length; i++) {
+                const char = data.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            
+            return `prov_${Math.abs(hash).toString(36)}_${timestamp.toString(36)}`;
+        }
+
+        async function testProvisionalToken() {
+            addResult('🔑 Test génération token provisoire...', 'info');
+            try {
+                const token = generateProvisionalToken();
+                addResult('✅ Token provisoire généré:', 'success');
+                addResult(`<div class="token-display">${token}</div>`, 'info');
+                
+                // Tester la validation
+                const response = await fetch('/api/validate-librespeed-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ Token validé: ${data.valid ? 'OUI' : 'NON'}`, data.valid ? 'success' : 'error');
+                    if (data.valid) {
+                        addResult(`📅 Type: ${data.type}, Expire: ${data.expiresAt}`, 'info');
+                    }
+                } else {
+                    addResult('❌ Erreur validation token', 'error');
+                }
+            } catch (error) {
+                addResult('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+
+        async function testAccessTokens() {
+            addResult('🔍 Test vérification tokens d\'accès...', 'info');
+            try {
+                const response = await fetch('/api/check-librespeed-access', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: 'test-user' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ Tokens d'accès trouvés: ${data.count}`, 'success');
+                    if (data.tokens && data.tokens.length > 0) {
+                        data.tokens.forEach((token, index) => {
+                            addResult(`📋 Token ${index + 1}: ${token.name} (Usage: ${token.current_usage}/${token.max_usage || '∞'})`, 'info');
+                        });
+                    }
+                } else {
+                    addResult('❌ Erreur vérification tokens d\'accès', 'error');
+                }
+            } catch (error) {
+                addResult('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+
+        async function testTokenValidation() {
+            addResult('🔍 Test validation token...', 'info');
+            try {
+                // Tester avec un token provisoire
+                const provisionalToken = generateProvisionalToken();
+                const response = await fetch('/api/validate-librespeed-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: provisionalToken })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ Validation token provisoire: ${data.valid ? 'OUI' : 'NON'}`, data.valid ? 'success' : 'error');
+                } else {
+                    addResult('❌ Erreur validation token', 'error');
+                }
+            } catch (error) {
+                addResult('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+
+        function testLibreSpeedAccess() {
+            addResult('🚀 Test accès LibreSpeed...', 'info');
+            try {
+                const token = generateProvisionalToken();
+                const librespeedUrl = `https://librespeed.iahome.fr?token=${token}`;
+                addResult(`🔗 URL générée: ${librespeedUrl}`, 'info');
+                
+                // Ouvrir dans un nouvel onglet
+                window.open(librespeedUrl, '_blank');
+                addResult('✅ LibreSpeed ouvert dans un nouvel onglet', 'success');
+            } catch (error) {
+                addResult('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+
+        // Auto-test au chargement
+        window.onload = function() {
+            addResult('🚀 Test LibreSpeed Tokens chargé - Système de tokens implémenté', 'success');
+            addResult('📝 Bouton LibreSpeed rétabli avec tokens provisoires et d\'accès', 'info');
+        };
+    </script>
+</body>
+</html>

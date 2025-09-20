@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Single Tab - IAhome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #2563eb;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Single Tab - IAhome</h1>
+    <p>Ce test vérifie qu'un seul onglet s'ouvre par clic de bouton.</p>
+
+    <div class="test-section">
+        <h2>📊 Compteur d'onglets ouverts</h2>
+        <p>Onglets ouverts: <span id="tabCount">0</span></p>
+        <button class="test-button" onclick="resetCounter()">🔄 Reset</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🔗 Test des boutons de modules</h2>
+        <p>Cliquez sur les boutons pour tester l'ouverture d'un seul onglet :</p>
+        
+        <button class="test-button" onclick="testModuleAccess('pdf', 'https://pdf.iahome.fr')">
+            📄 Test PDF
+        </button>
+        
+        <button class="test-button" onclick="testModuleAccess('metube', 'https://metube.iahome.fr')">
+            🎥 Test MeTube
+        </button>
+        
+        <button class="test-button" onclick="testModuleAccess('converter', 'https://convert.iahome.fr')">
+            🔄 Test Converter
+        </button>
+        
+        <button class="test-button" onclick="testModuleAccess('librespeed', 'https://librespeed.iahome.fr')">
+            🚀 Test LibreSpeed
+        </button>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 Log des tests</h2>
+        <div id="log" class="log"></div>
+        <button class="test-button" onclick="clearLog()">🗑️ Clear Log</button>
+    </div>
+
+    <script>
+        let tabCount = 0;
+        let openedTabs = new Set();
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function updateTabCount() {
+            document.getElementById('tabCount').textContent = tabCount;
+        }
+
+        function resetCounter() {
+            tabCount = 0;
+            openedTabs.clear();
+            updateTabCount();
+            log('Compteur réinitialisé', 'info');
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        function testModuleAccess(moduleId, moduleUrl) {
+            log(`🔍 Test du module: ${moduleId}`, 'info');
+            
+            // Simuler l'ouverture d'un onglet
+            try {
+                const newTab = window.open(moduleUrl, '_blank');
+                if (newTab) {
+                    tabCount++;
+                    openedTabs.add(moduleId);
+                    updateTabCount();
+                    log(`✅ ${moduleId}: Onglet ouvert (Total: ${tabCount})`, 'success');
+                } else {
+                    log(`❌ ${moduleId}: Échec ouverture onglet (popup bloqué?)`, 'error');
+                }
+            } catch (error) {
+                log(`❌ ${moduleId}: Erreur: ${error.message}`, 'error');
+            }
+        }
+
+        // Détecter la fermeture d'onglets (approximation)
+        window.addEventListener('beforeunload', function() {
+            if (tabCount > 0) {
+                tabCount--;
+                updateTabCount();
+            }
+        });
+
+        // Log initial
+        log('🧪 Test Single Tab démarré', 'info');
+        log('Cliquez sur les boutons pour tester l\'ouverture d\'onglets', 'info');
+    </script>
+</body>
+</html>

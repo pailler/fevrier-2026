@@ -1,7 +1,7 @@
 // Exemples d'intégration des notifications dans les événements existants
-import { NotificationService } from './notificationService';
+import { NotificationServiceClient } from './notificationServiceClient';
 
-const notificationService = NotificationService.getInstance();
+const notificationService = NotificationServiceClient.getInstance();
 
 // Exemple 1: Intégration dans la création de compte
 export async function handleUserRegistration(userEmail: string, userName?: string) {

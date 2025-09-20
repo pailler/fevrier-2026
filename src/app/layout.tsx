@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import FontAwesomeLocal from '@/components/FontAwesomeLocal';
-import { Geist, Geist_Mono } from "next/font/google";
+// import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -9,16 +9,21 @@ import ConditionalComponents from "../components/ConditionalComponents";
 import CSSOptimizer from "../components/CSSOptimizer";
 import PerformanceOptimizer from "../components/PerformanceOptimizer";
 import WebVitals from "../components/WebVitals";
+import ResourceOptimizer from "../components/ResourceOptimizer";
+import HTMLPreloadCleaner from "../components/HTMLPreloadCleaner";
+import CSSPreloadManager from "../components/CSSPreloadManager";
+import AggressivePreloadCleaner from "../components/AggressivePreloadCleaner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// Utilisation de polices système pour éviter les preloads
+const geistSans = {
+  variable: "--font-sans",
+  className: "font-sans"
+};
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const geistMono = {
+  variable: "--font-mono", 
+  className: "font-mono"
+};
 
 export const metadata: Metadata = {
   title: {
@@ -69,17 +74,10 @@ export const metadata: Metadata = {
     siteName: 'IA Home',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/images/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'IA Home - Plateforme d\'Intelligence Artificielle - Formation et Outils IA',
-        type: 'image/jpeg',
-      },
-      {
-        url: '/og-image-square.jpg',
-        width: 1200,
-        height: 1200,
-        alt: 'IA Home - Plateforme d\'Intelligence Artificielle',
         type: 'image/jpeg',
       },
     ],
@@ -93,7 +91,7 @@ export const metadata: Metadata = {
     creator: '@iahome_fr',
     title: "IA Home - Plateforme d'Intelligence Artificielle | Formation IA & Outils IA",
     description: "Découvrez l'IA avec IA Home : formations interactives, outils Whisper, Stable Diffusion, ComfyUI. Apprenez l'intelligence artificielle à votre rythme.",
-    images: ['/og-image.jpg'],
+    images: ['/images/og-image.jpg'],
   },
   robots: {
     index: true,
@@ -138,6 +136,10 @@ export default function RootLayout({
         <CSSOptimizer />
         <PerformanceOptimizer />
         <WebVitals />
+        <ResourceOptimizer />
+        <HTMLPreloadCleaner />
+        <CSSPreloadManager />
+        <AggressivePreloadCleaner />
         <AdaptiveLayout>
           <Header />
           <main className="flex-1">

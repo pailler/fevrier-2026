@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
-import { NotificationService } from './notificationService';
+import { NotificationServiceClient } from './notificationServiceClient';
 
 export const useNotifications = () => {
-  const notificationService = NotificationService.getInstance();
+  const notificationService = NotificationServiceClient.getInstance();
 
   const notifyUserCreated = useCallback(async (userEmail: string, userName?: string) => {
     try {

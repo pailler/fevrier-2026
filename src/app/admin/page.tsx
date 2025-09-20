@@ -108,7 +108,7 @@ export default function AdminPage() {
     getSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: any, session: any) => {
         setSession(session);
         setCurrentUser(session?.user || null);
         if (session?.user) {
@@ -250,10 +250,10 @@ export default function AdminPage() {
       setUserTokens(tokensByUser);
 
       // Calculer les statistiques
-      const publishedArticles = articles?.filter(article => article.status === 'published').length || 0;
-      const modulesWithDetails = modulesData?.filter(module => module.youtube_url).length || 0;
-      const adminUsers = usersData?.filter(user => user.role === 'admin').length || 0;
-      const publishedLinkedInPosts = linkedinPosts?.filter(post => post.is_published).length || 0;
+      const publishedArticles = articles?.filter((article: any) => article.status === 'published').length || 0;
+      const modulesWithDetails = modulesData?.filter((module: any) => module.youtube_url).length || 0;
+      const adminUsers = usersData?.filter((user: any) => user.role === 'admin').length || 0;
+      const publishedLinkedInPosts = linkedinPosts?.filter((post: any) => post.is_published).length || 0;
 
       setStats({
         totalArticles: articles?.length || 0,

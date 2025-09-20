@@ -21,8 +21,9 @@ export const getSupabaseClient = (): SupabaseClient => {
   return clientInstance;
 };
 
-// Export pour compatibilité
-export const supabase = getSupabaseClient();
+// Export pour compatibilité - utiliser getSupabaseClient() pour éviter les instances multiples
+// export const supabase = getSupabaseClient();
+
 
 
 

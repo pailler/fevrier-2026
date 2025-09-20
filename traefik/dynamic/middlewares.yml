@@ -10,12 +10,24 @@ http:
           - "X-User-Email"
           - "X-User-Name"
         trustForwardHeader: true
+        authRequestHeaders:
+          - "X-Forwarded-Proto"
+          - "X-Forwarded-Host"
+          - "X-Forwarded-For"
+          - "X-Real-IP"
 
     # Middleware pour rediriger vers l'API proxy
     librespeed-strip-prefix:
       replacePathRegex:
         regex: "^/(.*)"
         replacement: "/api/check-auth"
+
+    # Middleware pour rediriger vers la page d'accueil en cas d'erreur d'authentification
+    librespeed-redirect:
+      redirectRegex:
+        regex: ".*"
+        replacement: "https://iahome.fr/encours?error=access_denied"
+        permanent: false
 
     # Middleware pour les headers de proxy MeTube
     metube-proxy-headers:

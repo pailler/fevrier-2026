@@ -27,10 +27,9 @@ export interface NotificationLog {
 
 export class NotificationService {
   private static instance: NotificationService;
-  private emailService: EmailService;
 
   constructor() {
-    this.emailService = EmailService.getInstance();
+    // EmailService sera appelé via API routes côté serveur
   }
 
   static getInstance(): NotificationService {
@@ -132,10 +131,13 @@ export class NotificationService {
       
       console.log('📧 Données email:', emailData);
       
-      console.log('🔍 DEBUG: Appel de emailService.sendEmail...');
-      const emailSent = await this.emailService.sendEmail(emailData);
+      console.log('🔍 DEBUG: Appel direct du service email...');
       
-      console.log('📧 Résultat envoi email:', emailSent);
+      // Appeler directement EmailService
+      const emailService = EmailService.getInstance();
+      const emailSent = await emailService.sendEmail(emailData);
+      
+      console.log('📧 Résultat envoi email direct:', emailSent);
 
       // Enregistrer le log
       console.log('🔍 DEBUG: Enregistrement du log...');

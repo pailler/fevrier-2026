@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeTube Security</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .spinner {
+            width: 64px;
+            height: 64px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+        }
+        p {
+            margin: 0;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <h1>Vérification de l'accès...</h1>
+        <p>Vérification de votre autorisation d'accès à MeTube.</p>
+    </div>
+
+    <script>
+        // Script de redirection pour MeTube
+        (function() {
+            'use strict';
+            
+            // Vérifier si on est sur metube.iahome.fr
+            if (window.location.hostname === 'metube.iahome.fr') {
+                // Vérifier s'il y a un token valide dans l'URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const token = urlParams.get('token');
+                
+                if (!token) {
+                    // Aucun token - rediriger vers la page de connexion
+                    console.log('❌ MeTube: Aucun token - redirection vers login');
+                    window.location.href = 'https://iahome.fr/login';
+                    return;
+                }
+                
+                // Vérifier si c'est un token provisoire valide
+                if (token.startsWith('prov_')) {
+                    const tokenParts = token.split('_');
+                    if (tokenParts.length === 3) {
+                        const timestamp = parseInt(tokenParts[2], 36);
+                        const now = Date.now();
+                        const tokenAge = now - timestamp;
+                        
+                        // Token provisoire valide pendant 1 heure
+                        if (tokenAge < 3600000) {
+                            console.log('✅ MeTube: Token provisoire valide - accès autorisé');
+                            // Supprimer le token de l'URL pour un accès propre
+                            const newUrl = new URL(window.location);
+                            newUrl.searchParams.delete('token');
+                            window.history.replaceState({}, '', newUrl.toString());
+                            return;
+                        }
+                    }
+                }
+                
+                // Vérifier si c'est un token d'accès valide
+                if (!token.startsWith('prov_')) {
+                    console.log('✅ MeTube: Token d\'accès détecté - accès autorisé');
+                    // Supprimer le token de l'URL pour un accès propre
+                    const newUrl = new URL(window.location);
+                    newUrl.searchParams.delete('token');
+                    window.history.replaceState({}, '', newUrl.toString());
+                    return;
+                }
+                
+                // Token invalide - rediriger vers la page de connexion
+                console.log('❌ MeTube: Token invalide - redirection vers login');
+                window.location.href = 'https://iahome.fr/login';
+            }
+        })();
+    </script>
+</body>
+</html>

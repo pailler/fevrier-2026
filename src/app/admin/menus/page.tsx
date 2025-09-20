@@ -78,7 +78,7 @@ export default function MenusAdminPage() {
     getSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: any, session: any) => {
         setSession(session);
         setCurrentUser(session?.user || null);
         if (session?.user) {

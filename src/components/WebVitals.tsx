@@ -22,7 +22,7 @@ export default function WebVitals() {
               });
             }
             
-            console.log('LCP:', lastEntry.startTime);
+            // console.log('LCP:', lastEntry.startTime);
           });
           
           observer.observe({ entryTypes: ['largest-contentful-paint'] });
@@ -46,7 +46,7 @@ export default function WebVitals() {
                 });
               }
               
-              console.log('FID:', fid);
+              // console.log('FID:', fid);
             });
           });
           
@@ -78,7 +78,7 @@ export default function WebVitals() {
               });
             }
             
-            console.log('CLS:', clsValue);
+            // console.log('CLS:', clsValue);
           });
           
           observer.observe({ entryTypes: ['layout-shift'] });
@@ -100,7 +100,7 @@ export default function WebVitals() {
                 });
               }
               
-              console.log('FCP:', entry.startTime);
+              // console.log('FCP:', entry.startTime);
             });
           });
           
@@ -124,7 +124,7 @@ export default function WebVitals() {
                   });
                 }
                 
-                console.log('TTI:', entry.startTime);
+                // console.log('TTI:', entry.startTime);
               }
             });
           });

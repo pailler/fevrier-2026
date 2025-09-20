@@ -1,5 +1,4 @@
 import { supabase } from './supabaseClient';
-import { NotificationService } from './notificationService';
 
 export interface NotificationSetting {
   id: string;
@@ -27,10 +26,9 @@ export interface NotificationLog {
 
 export class NotificationServiceClient {
   private static instance: NotificationServiceClient;
-  private notificationService: NotificationService;
 
   constructor() {
-    this.notificationService = NotificationService.getInstance();
+    // Utilise uniquement les API routes côté serveur
   }
 
   static getInstance(): NotificationServiceClient {
@@ -43,7 +41,10 @@ export class NotificationServiceClient {
   // Récupérer tous les paramètres de notification
   async getNotificationSettings(): Promise<NotificationSetting[]> {
     try {
-      return await this.notificationService.getNotificationSettings();
+      const response = await fetch('/api/admin/notifications');
+      if (!response.ok) return [];
+      const data = await response.json();
+      return data.settings || [];
     } catch (error) {
       return [];
     }
@@ -55,7 +56,12 @@ export class NotificationServiceClient {
     updates: Partial<NotificationSetting>
   ): Promise<boolean> {
     try {
-      return await this.notificationService.updateNotificationSetting(eventType, updates);
+      const response = await fetch('/api/admin/notifications', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventType, updates })
+      });
+      return response.ok;
     } catch (error) {
       return false;
     }
@@ -64,20 +70,32 @@ export class NotificationServiceClient {
   // Récupérer les logs de notification
   async getNotificationLogs(limit: number = 20): Promise<NotificationLog[]> {
     try {
-      return await this.notificationService.getNotificationLogs(limit);
+      const response = await fetch(`/api/admin/notifications?logs=true&limit=${limit}`);
+      if (!response.ok) return [];
+      const data = await response.json();
+      return data.logs || [];
     } catch (error) {
       return [];
     }
   }
 
-  // Envoyer une notification directement via le service
+  // Envoyer une notification directement via l'API
   async sendNotification(
     eventType: string,
     userEmail: string,
     eventData: any = {}
   ): Promise<boolean> {
     try {
-      return await this.notificationService.sendNotification(eventType, userEmail, eventData);
+      const response = await fetch('/api/test-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          email: userEmail, 
+          appName: eventData.appName || eventType,
+          userName: eventData.userName || 'Utilisateur'
+        })
+      });
+      return response.ok;
     } catch (error) {
       console.error('Erreur lors de l\'envoi de notification:', error);
       return false;
@@ -85,15 +103,23 @@ export class NotificationServiceClient {
   }
 
   // Méthodes spécifiques pour chaque type de notification
+  async notifyUserCreated(userEmail: string, userName?: string): Promise<boolean> {
+    return await this.sendNotification('user_created', userEmail, { userName });
+  }
+
   async notifyUserLogin(userEmail: string, userName?: string): Promise<boolean> {
-    return await this.notificationService.notifyUserLogin(userEmail, userName);
+    return await this.sendNotification('user_login', userEmail, { userName });
   }
 
   async notifyUserLogout(userEmail: string, userName?: string): Promise<boolean> {
-    return await this.notificationService.notifyUserLogout(userEmail, userName);
+    return await this.sendNotification('user_logout', userEmail, { userName });
   }
 
   async notifyAppAccessed(userEmail: string, appName: string, userName?: string): Promise<boolean> {
-    return await this.notificationService.notifyAppAccessed(userEmail, appName, userName);
+    return await this.sendNotification('app_accessed', userEmail, { appName, userName });
+  }
+
+  async notifyModuleActivated(userEmail: string, moduleName: string, userName?: string): Promise<boolean> {
+    return await this.sendNotification('module_activated', userEmail, { moduleName, userName });
   }
 }

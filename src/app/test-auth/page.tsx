@@ -27,7 +27,7 @@ export default function TestAuthPage() {
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: any, session: any) => {
         console.log('🔄 Auth state change:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user || null);

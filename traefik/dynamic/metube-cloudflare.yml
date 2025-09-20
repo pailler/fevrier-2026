@@ -1,5 +1,13 @@
-# Configuration MeTube pour Cloudflare SSL (même modèle que LibreSpeed)
+# Configuration MeTube pour Cloudflare SSL - Updated
 http:
+  middlewares:
+    # Middleware de redirection vers login pour MeTube
+    metube-redirect-to-login:
+      redirectRegex:
+        regex: "^https://metube\\.iahome\\.fr(.*)$"
+        replacement: "https://iahome.fr/login"
+        permanent: false
+
   routers:
     # Route pour les challenges Let's Encrypt (si nécessaire)
     metube-acme:
@@ -8,23 +16,36 @@ http:
       service: metube-direct
       priority: 1000
 
-    # Route principale (Cloudflare SSL - HTTP vers Traefik)
+    # Route principale pour MeTube (avec redirection)
     metube-main:
       rule: "Host(`metube.iahome.fr`)"
-      entryPoints: ["web"]
-      service: metube-service
-      middlewares: ["security-headers@file", "compress@file", "metube-proxy-headers@file"]
-      priority: 10
+      entryPoints: ["websecure"]
+      service: metube-redirect-service
+      middlewares: ["metube-redirect-to-login"]
+      tls: {}
+      priority: 1
 
   services:
     # Service pour les challenges Let's Encrypt
     metube-direct:
       loadBalancer:
         servers:
-          - url: "http://metube:8081"
+          - url: "http://metube:80"
 
     # Service principal pour MeTube
     metube-service:
       loadBalancer:
         servers:
-          - url: "http://metube:8081"
+          - url: "http://metube-secure:80"
+
+    # Service proxy d'authentification pour MeTube
+    metube-proxy-service:
+      loadBalancer:
+        servers:
+          - url: "http://metube-secure:80"
+
+    # Service de redirection pour MeTube
+    metube-redirect-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000/login"
