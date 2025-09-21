@@ -1,0 +1,113 @@
+tunnel: c7a6cb1b-46d8-4fb8-9433-73362e805dfd
+credentials-file: C:\Users\AAA\.cloudflared\c7a6cb1b-46d8-4fb8-9433-73362e805dfd.json
+
+ingress:
+  # Application principale IAHome
+  - hostname: iahome.fr
+    service: http://192.168.1.150:3000
+    originRequest:
+      httpHostHeader: iahome.fr
+      timeout: 30s
+  
+  - hostname: www.iahome.fr
+    service: http://192.168.1.150:3000
+    originRequest:
+      httpHostHeader: www.iahome.fr
+      timeout: 30s
+
+  # LibreSpeed
+  - hostname: librespeed.iahome.fr
+    service: http://192.168.1.150:8083
+    originRequest:
+      httpHostHeader: librespeed.iahome.fr
+      timeout: 30s
+
+  # Services Whisper
+  - hostname: whisper.iahome.fr
+    service: http://192.168.1.150:8093
+    originRequest:
+      httpHostHeader: whisper.iahome.fr
+      noTLSVerify: true
+      originServerName: whisper.iahome.fr
+      timeout: 30s
+
+  - hostname: whisper-audio.iahome.fr
+    service: http://192.168.1.150:9000
+    originRequest:
+      httpHostHeader: whisper-audio.iahome.fr
+      noTLSVerify: true
+      timeout: 30s
+
+  - hostname: whisper-video.iahome.fr
+    service: http://192.168.1.150:9000
+    originRequest:
+      httpHostHeader: whisper-video.iahome.fr
+      noTLSVerify: true
+      originServerName: whisper-video.iahome.fr
+      timeout: 30s
+
+  - hostname: whisper-ocr.iahome.fr
+    service: http://192.168.1.150:8080
+    originRequest:
+      httpHostHeader: whisper-ocr.iahome.fr
+      noTLSVerify: true
+      timeout: 30s
+
+  # Services externes
+  - hostname: pdf.iahome.fr
+    service: http://192.168.1.150:8081
+    originRequest:
+      timeout: 30s
+
+  - hostname: metube.iahome.fr
+    service: http://192.168.1.150:8082
+    originRequest:
+      timeout: 30s
+
+  - hostname: psitransfer.iahome.fr
+    service: http://192.168.1.150:8084
+    originRequest:
+      timeout: 30s
+
+  - hostname: stablediffusion.iahome.fr
+    service: http://192.168.1.150:8080
+    originRequest:
+      timeout: 30s
+
+  - hostname: ruinedfooocus.iahome.fr
+    service: http://192.168.1.150:8080
+    originRequest:
+      timeout: 30s
+
+  - hostname: comfyui.iahome.fr
+    service: http://192.168.1.150:8188
+    originRequest:
+      timeout: 30s
+
+  - hostname: sdnext.iahome.fr
+    service: http://192.168.1.150:7860
+    originRequest:
+      timeout: 30s
+
+  - hostname: invoke.iahome.fr
+    service: http://192.168.1.150:9090
+    originRequest:
+      timeout: 30s
+
+  - hostname: qrcodes.iahome.fr
+    service: http://192.168.1.150:7005
+    originRequest:
+      timeout: 30s
+
+  - hostname: converter.iahome.fr
+    service: http://192.168.1.150:8096
+    originRequest:
+      timeout: 30s
+
+  - hostname: traefik.iahome.fr
+    service: http://192.168.1.150:8080
+    originRequest:
+      timeout: 30s
+
+  # Catch-all rule
+  - service: http_status:404
