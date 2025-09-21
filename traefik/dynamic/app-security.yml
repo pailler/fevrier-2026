@@ -3,12 +3,6 @@
 
 http:
   middlewares:
-    # Middleware de redirection sécurisée pour LibreSpeed
-    librespeed-secure-redirect:
-      redirectRegex:
-        regex: "^https://librespeed\\.iahome\\.fr(.*)$"
-        replacement: "https://iahome.fr/api/redirect-librespeed$1"
-        permanent: false
     
     # Middleware de redirection sécurisée pour MeTube
     metube-secure-redirect:
@@ -88,14 +82,6 @@ http:
         permanent: false
 
   routers:
-    # LibreSpeed - Redirection sécurisée
-    librespeed-secure:
-      rule: "Host(`librespeed.iahome.fr`)"
-      entryPoints: ["websecure"]
-      service: librespeed-redirect-service
-      middlewares: ["librespeed-secure-redirect", "security-headers@file", "compress@file"]
-      tls: {}
-      priority: 100
 
     # MeTube - Redirection sécurisée
     metube-secure:
@@ -198,11 +184,6 @@ http:
 
   services:
     # Services de redirection vers l'application iahome
-    librespeed-redirect-service:
-      loadBalancer:
-        servers:
-          - url: "http://iahome-app:3000"
-        passHostHeader: true
 
     metube-redirect-service:
       loadBalancer:

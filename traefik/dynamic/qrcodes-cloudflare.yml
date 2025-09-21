@@ -1,4 +1,4 @@
-# Configuration QR codes pour Cloudflare SSL (même approche que LibreSpeed, MeTube, PDF et PsiTransfer)
+# Configuration QR codes pour Cloudflare SSL (même approche que MeTube, PDF et PsiTransfer)
 http:
   routers:
     # Route pour les challenges Let's Encrypt (si nécessaire)

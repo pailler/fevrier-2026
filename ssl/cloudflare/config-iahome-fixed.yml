@@ -1,0 +1,39 @@
+tunnel: 9f502e05-14b3-4b40-ab89-b8673b2012ab
+credentials-file: ssl/cloudflare/credentials-iahome.json
+
+ingress:
+  # Application principale IAHome (Docker)
+  - hostname: iahome.fr
+    service: http://192.168.1.150:3000
+    originRequest:
+      timeout: 900s
+      httpHostHeader: iahome.fr
+  - hostname: www.iahome.fr
+    service: http://192.168.1.150:3000
+    originRequest:
+      timeout: 900s
+      httpHostHeader: www.iahome.fr
+
+  # Services de conversion
+  - hostname: convert.iahome.fr
+    service: http://192.168.1.150:3000
+    originRequest:
+      timeout: 900s
+      httpHostHeader: convert.iahome.fr
+
+  # LibreSpeed avec authentification centralisée
+  - hostname: librespeed.iahome.fr
+    service: http://192.168.1.150:7006
+    originRequest:
+      httpHostHeader: librespeed.iahome.fr
+      timeout: 30s
+
+  # Service QR Codes
+  - hostname: qrcodes.iahome.fr
+    service: http://192.168.1.150:7005
+    originRequest:
+      httpHostHeader: qrcodes.iahome.fr
+      timeout: 30s
+
+  # Catch-all rule
+  - service: http_status:404

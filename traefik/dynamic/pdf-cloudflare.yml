@@ -1,4 +1,4 @@
-# Configuration PDF pour Cloudflare SSL (même modèle que LibreSpeed)
+# Configuration PDF pour Cloudflare SSL
 http:
   routers:
     # Route pour les challenges Let's Encrypt (si nécessaire)

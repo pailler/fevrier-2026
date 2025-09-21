@@ -6,7 +6,7 @@ services:
     container_name: librespeed-secure
     restart: unless-stopped
     networks:
-      - traefik-network
+      - iahome-network
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.librespeed-secure.rule=Host(`librespeed.iahome.fr`)"
@@ -20,5 +20,5 @@ services:
       - TZ=Europe/Paris
 
 networks:
-  traefik-network:
+  iahome-network:
     external: true

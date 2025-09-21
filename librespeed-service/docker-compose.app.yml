@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  librespeed-app:
+    image: adolfintel/speedtest:latest
+    container_name: librespeed-app
+    restart: unless-stopped
+    networks:
+      - iahome-network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  iahome-network:
+    external: true

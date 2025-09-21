@@ -91,3 +91,6 @@ export default function SEOFAQ({ faqs, title = "Questions fréquentes", classNam
 
 
 
+
+
+

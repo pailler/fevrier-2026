@@ -1,0 +1,52 @@
+# Configuration complète pour le tunnel iahome avec token
+# Utilise le token existant mais avec tous les domaines
+
+tunnel: 9f502e05-14b3-4b40-ab89-b8673b2012ab
+credentials-file: C:\Users\AAA\.cloudflared\9f502e05-14b3-4b40-ab89-b8673b2012ab.json
+
+# Configuration complète du tunnel iahome
+no-autoupdate: true
+logfile: logs/cloudflared-token-complete.log
+loglevel: info
+
+ingress:
+  # Application principale IAHome
+  - hostname: iahome.fr
+    service: http://172.18.0.2:3000
+    originRequest:
+      timeout: 900s
+      httpHostHeader: iahome.fr
+      noTLSVerify: false
+  - hostname: www.iahome.fr
+    service: http://172.18.0.2:3000
+    originRequest:
+      timeout: 900s
+      httpHostHeader: www.iahome.fr
+      noTLSVerify: false
+
+  # Services de conversion
+  - hostname: convert.iahome.fr
+    service: http://172.18.0.2:3000
+    originRequest:
+      timeout: 900s
+      httpHostHeader: convert.iahome.fr
+      noTLSVerify: false
+
+  # LibreSpeed avec authentification centralisée
+  - hostname: librespeed.iahome.fr
+    service: http://192.168.1.150:7006
+    originRequest:
+      httpHostHeader: librespeed.iahome.fr
+      timeout: 30s
+      noTLSVerify: false
+
+  # Service QR Codes
+  - hostname: qrcodes.iahome.fr
+    service: http://192.168.1.150:5000
+    originRequest:
+      httpHostHeader: qrcodes.iahome.fr
+      timeout: 30s
+      noTLSVerify: false
+
+  # Catch-all rule
+  - service: http_status:404

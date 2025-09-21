@@ -1,0 +1,8 @@
+{
+  "userEmail": "test456@example.com",
+  "expires_in_hours": 2,
+  "token": "87c8bd12e11e4487985f",
+  "userId": "test_user_456",
+  "librespeed_url": "https://librespeed.iahome.fr/?token=87c8bd12e11e4487985f",
+  "created_at": "2025-09-21T22:29:32.209533"
+}

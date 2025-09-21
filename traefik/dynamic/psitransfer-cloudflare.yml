@@ -1,4 +1,4 @@
-# Configuration PsiTransfer pour Cloudflare SSL (même approche que LibreSpeed, MeTube et PDF)
+# Configuration PsiTransfer pour Cloudflare SSL (même approche que MeTube et PDF)
 http:
   routers:
     # Route pour les challenges Let's Encrypt (si nécessaire)

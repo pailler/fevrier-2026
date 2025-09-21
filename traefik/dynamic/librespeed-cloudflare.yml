@@ -1,38 +1,5 @@
-# Configuration LibreSpeed sécurisée avec authentification par tokens
+# Configuration LibreSpeed pour Cloudflare SSL (même approche que QR codes)
 http:
-  middlewares:
-    # Middleware de vérification d'authentification pour LibreSpeed
-    librespeed-auth-check:
-      forwardAuth:
-        address: "http://iahome-app:3000/api/librespeed-auth-check"
-        trustForwardHeader: true
-        authResponseHeaders:
-          - "X-User-Id"
-          - "X-User-Email"
-          - "X-Access-Granted"
-        authRequestHeaders:
-          - "Authorization"
-          - "Cookie"
-          - "X-Forwarded-For"
-          - "X-Forwarded-Proto"
-          - "X-Forwarded-Host"
-          - "X-Real-IP"
-
-    # Middleware de redirection vers l'API de génération de token
-    librespeed-token-redirect:
-      redirectRegex:
-        regex: "^https://librespeed\\.iahome\\.fr(.*)$"
-        replacement: "https://iahome.fr/api/redirect-librespeed$1"
-        permanent: false
-
-    # Middleware de blocage direct (sécurité renforcée)
-    librespeed-block-direct:
-      errors:
-        status:
-          - "403"
-        service: librespeed-blocked-service
-        query: "/api/librespeed-blocked"
-
   routers:
     # Route pour les challenges Let's Encrypt (si nécessaire)
     librespeed-acme:
@@ -41,43 +8,23 @@ http:
       service: librespeed-direct
       priority: 1000
 
-    # Route principale sécurisée pour LibreSpeed
-    librespeed-secure-main:
+    # Route principale (Cloudflare SSL - HTTP vers Traefik)
+    librespeed-main:
       rule: "Host(`librespeed.iahome.fr`)"
-      entryPoints: ["websecure"]
-      service: librespeed-redirect-service
-      middlewares: ["librespeed-token-redirect", "security-headers@file", "compress@file"]
-      tls: {}
-      priority: 200
-
-    # Route de blocage pour les accès directs non autorisés
-    librespeed-blocked:
-      rule: "Host(`librespeed.iahome.fr`) && Headers(`X-Access-Granted`, `false`)"
-      entryPoints: ["websecure"]
-      service: librespeed-blocked-service
-      middlewares: ["librespeed-block-direct", "security-headers@file"]
-      tls: {}
-      priority: 150
+      entryPoints: ["web"]
+      service: librespeed-service
+      middlewares: ["security-headers@file", "compress@file", "librespeed-proxy-headers@file"]
+      priority: 10
 
   services:
     # Service pour les challenges Let's Encrypt
     librespeed-direct:
       loadBalancer:
         servers:
-          - url: "http://librespeed:80"
+          - url: "http://librespeed-auth:7006"
 
-    # Service de redirection vers l'API de génération de token
-    librespeed-redirect-service:
+    # Service principal pour LibreSpeed (service d'authentification)
+    librespeed-service:
       loadBalancer:
         servers:
-          - url: "http://iahome-app:3000"
-        passHostHeader: true
-
-    # Service de blocage pour les accès non autorisés
-    librespeed-blocked-service:
-      loadBalancer:
-        servers:
-          - url: "http://iahome-app:3000"
-        passHostHeader: true
-
-# Configuration mise à jour le 20/01/2025 - Sécurisation renforcée
+          - url: "http://librespeed-auth:7006"

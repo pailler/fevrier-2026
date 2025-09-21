@@ -1,33 +1,6 @@
 # Middlewares pour l'authentification
 http:
   middlewares:
-    # Middleware d'authentification pour LibreSpeed
-    librespeed-auth:
-      forwardAuth:
-        address: "http://iahome-app:3000/api/check-auth"
-        authResponseHeaders:
-          - "X-User-Id"
-          - "X-User-Email"
-          - "X-User-Name"
-        trustForwardHeader: true
-        authRequestHeaders:
-          - "X-Forwarded-Proto"
-          - "X-Forwarded-Host"
-          - "X-Forwarded-For"
-          - "X-Real-IP"
-
-    # Middleware pour rediriger vers l'API proxy
-    librespeed-strip-prefix:
-      replacePathRegex:
-        regex: "^/(.*)"
-        replacement: "/api/check-auth"
-
-    # Middleware pour rediriger vers la page d'accueil en cas d'erreur d'authentification
-    librespeed-redirect:
-      redirectRegex:
-        regex: ".*"
-        replacement: "https://iahome.fr/encours?error=access_denied"
-        permanent: false
 
     # Middleware pour les headers de proxy MeTube
     metube-proxy-headers:
@@ -61,3 +34,15 @@ http:
           X-Real-IP: "127.0.0.1"
         customResponseHeaders:
           X-Forwarded-Proto: "https"
+
+    # Middleware pour les headers de proxy LibreSpeed
+    librespeed-proxy-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-Host: "librespeed.iahome.fr"
+          X-Forwarded-For: "127.0.0.1"
+          X-Real-IP: "127.0.0.1"
+        customResponseHeaders:
+          X-Forwarded-Proto: "https"
+

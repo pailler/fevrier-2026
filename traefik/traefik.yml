@@ -37,7 +37,6 @@ log:
 
 accessLog: {}
 
-# Configuration LibreSpeed gérée par librespeed-cloudflare.yml
 
 
 
