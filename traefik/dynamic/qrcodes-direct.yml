@@ -1,0 +1,50 @@
+# Configuration QR Codes directe (sans authentification via l'app principale)
+http:
+  routers:
+    # Route directe vers QR Codes
+    qrcodes-direct:
+      rule: "Host(`qrcodes.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: qrcodes-service
+      middlewares: ["security-headers", "compress"]
+      tls:
+        certResolver: letsencrypt
+      priority: 100
+
+    # Route HTTP vers HTTPS
+    qrcodes-http-redirect:
+      rule: "Host(`qrcodes.iahome.fr`)"
+      entryPoints: ["web"]
+      middlewares: ["redirect-to-https"]
+      service: qrcodes-service
+      priority: 50
+
+  services:
+    # Service QR Codes direct
+    qrcodes-service:
+      loadBalancer:
+        servers:
+          - url: "http://qrcodes:7005"
+        passHostHeader: true
+
+  middlewares:
+    # Headers de sécurité
+    security-headers:
+      headers:
+        customResponseHeaders:
+          Strict-Transport-Security: "max-age=31536000; includeSubDomains; preload"
+          X-Content-Type-Options: "nosniff"
+          X-Frame-Options: "SAMEORIGIN"
+          X-XSS-Protection: "1; mode=block"
+          Referrer-Policy: "strict-origin-when-cross-origin"
+          Permissions-Policy: "camera=(), microphone=(), geolocation=()"
+    
+    # Compression
+    compress:
+      compress: {}
+    
+    # Redirection HTTP vers HTTPS
+    redirect-to-https:
+      redirectScheme:
+        scheme: "https"
+        permanent: true

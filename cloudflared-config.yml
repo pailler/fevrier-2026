@@ -1,33 +1,36 @@
-tunnel: iahome
+tunnel: b19084f4-e2d6-47f5-81c3-0972662e953c
 credentials-file: /etc/cloudflared/credentials.json
 
 ingress:
   # Application principale IAHome
   - hostname: iahome.fr
-    service: http://172.19.0.2:3000
+    service: http://192.168.1.150:3000
     originRequest:
       timeout: 900s  # 15 minutes timeout pour les uploads
       httpHostHeader: iahome.fr
   - hostname: www.iahome.fr
-    service: http://172.19.0.2:3000
+    service: http://192.168.1.150:3000
     originRequest:
       timeout: 900s  # 15 minutes timeout pour les uploads
       httpHostHeader: www.iahome.fr
   
-  # LibreSpeed avec authentification via API iahome
-  - hostname: librespeed.iahome.fr
-    service: http://172.19.0.2:3000/api/check-auth
+  # LibreSpeed standalone (accès direct)
+  - hostname: speed.iahome.fr
+    service: http://192.168.1.150:8085
+    originRequest:
+      httpHostHeader: speed.iahome.fr
+      timeout: 30s
+      noTLSVerify: true
   
   # Services Whisper
   - hostname: whisper.iahome.fr
-    service: http://172.19.0.2:3000/whisper
+    service: http://192.168.1.150:3000
     originRequest:
       httpHostHeader: whisper.iahome.fr
       noTLSVerify: true
       disableChunkedEncoding: false
       maxChunkSize: 10485760  # 10MB chunks
       timeout: 900s  # 15 minutes timeout
-      httpHostHeader: whisper.iahome.fr
       originServerName: whisper.iahome.fr
       # Headers pour augmenter la limite
       headers:
@@ -65,25 +68,28 @@ ingress:
   
   # Services externes
   - hostname: pdf.iahome.fr
-    service: http://stirling-pdf:8080
+    service: http://192.168.1.150:8081
   - hostname: metube.iahome.fr
-    service: http://metube:8081
+    service: http://192.168.1.150:8082
   - hostname: psitransfer.iahome.fr
-    service: http://psitransfer:3000
+    service: http://192.168.1.150:8084
   - hostname: stablediffusion.iahome.fr
-    service: http://stablediffusion:8080
+    service: http://192.168.1.150:8085
   - hostname: ruinedfooocus.iahome.fr
-    service: http://ruinedfooocus:8080
+    service: http://192.168.1.150:8087
   - hostname: comfyui.iahome.fr
-    service: http://comfyui:8188
+    service: http://192.168.1.150:8088
   - hostname: sdnext.iahome.fr
-    service: http://sdnext:7860
+    service: http://192.168.1.150:8089
   - hostname: invoke.iahome.fr
-    service: http://invoke:9090
+    service: http://192.168.1.150:8090
   - hostname: qrcodes.iahome.fr
-    service: http://qrcodes:7005
+    service: http://192.168.1.150:443
+    originRequest:
+      httpHostHeader: qrcodes.iahome.fr
+      noTLSVerify: true
   - hostname: qrcode.iahome.fr
-    service: http://polr:80
+    service: http://192.168.1.150:8086
   
   # Dashboard Traefik (optionnel)
   - hostname: traefik.iahome.fr

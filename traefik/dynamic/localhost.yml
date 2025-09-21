@@ -1,0 +1,68 @@
+# Configuration Traefik pour localhost
+# Routage des requêtes localhost vers l'application iahome
+
+http:
+  routers:
+    # Route principale pour localhost
+    iahome-localhost:
+      rule: "Host(`localhost`)"
+      entryPoints: ["web"]
+      service: iahome-service
+      middlewares: ["security-headers", "compress"]
+      priority: 100
+
+    # Route HTTPS pour localhost (si certificat auto-signé)
+    iahome-localhost-https:
+      rule: "Host(`localhost`)"
+      entryPoints: ["websecure"]
+      service: iahome-service
+      middlewares: ["security-headers", "compress"]
+      tls: {}
+      priority: 90
+
+    # Route pour les assets statiques (favicon, etc.)
+    iahome-assets:
+      rule: "Host(`localhost`) && (PathPrefix(`/favicon.ico`) || PathPrefix(`/static/`) || PathPrefix(`/images/`) || PathPrefix(`/_next/`))"
+      entryPoints: ["web"]
+      service: iahome-service
+      middlewares: ["cache-assets", "compress"]
+      priority: 200
+
+    # Route pour l'API
+    iahome-api:
+      rule: "Host(`localhost`) && PathPrefix(`/api/`)"
+      entryPoints: ["web"]
+      service: iahome-service
+      middlewares: ["compress"]
+      priority: 150
+
+  middlewares:
+    # En-têtes de sécurité
+    security-headers:
+      headers:
+        customResponseHeaders:
+          X-Content-Type-Options: "nosniff"
+          X-Frame-Options: "DENY"
+          X-XSS-Protection: "1; mode=block"
+          Referrer-Policy: "strict-origin-when-cross-origin"
+
+    # Compression
+    compress:
+      compress: {}
+
+    # Cache pour les assets
+    cache-assets:
+      headers:
+        customResponseHeaders:
+          Cache-Control: "public, max-age=31536000, immutable"
+
+  services:
+    # Service principal iahome
+    iahome-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        healthCheck:
+          path: "/"
+          interval: "30s"
+          timeout: "5s"

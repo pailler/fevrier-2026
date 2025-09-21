@@ -1,0 +1,154 @@
+# Configuration Traefik pour la production
+# Optimisations de sécurité, performance et monitoring
+
+http:
+  middlewares:
+    # Middleware de sécurité renforcé
+    security-headers-prod:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+        customResponseHeaders:
+          Strict-Transport-Security: "max-age=31536000; includeSubDomains; preload"
+          X-Content-Type-Options: "nosniff"
+          X-Frame-Options: "DENY"
+          X-XSS-Protection: "1; mode=block"
+          Referrer-Policy: "strict-origin-when-cross-origin"
+          Permissions-Policy: "camera=(), microphone=(), geolocation=()"
+          Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none';"
+          X-Permitted-Cross-Domain-Policies: "none"
+
+    # Rate limiting pour la production
+    rate-limit-prod:
+      rateLimit:
+        burst: 200
+        average: 100
+        period: "1m"
+
+    # Compression optimisée
+    compress-prod:
+      compress:
+        excludedContentTypes:
+          - "text/event-stream"
+          - "application/grpc"
+
+    # Cache pour les assets statiques
+    cache-assets:
+      headers:
+        customResponseHeaders:
+          Cache-Control: "public, max-age=31536000, immutable"
+
+    # Cache pour les pages dynamiques
+    cache-dynamic:
+      headers:
+        customResponseHeaders:
+          Cache-Control: "public, max-age=300, s-maxage=60"
+
+    # Protection contre les attaques DDoS
+    ddos-protection:
+      rateLimit:
+        burst: 50
+        average: 25
+        period: "10s"
+
+    # Authentification basique pour les services admin
+    basic-auth-admin:
+      basicAuth:
+        users:
+          - "admin:$2y$10$8K1p/a0dL3L0ZQK0L0ZQK0L0ZQK0L0ZQK0L0ZQK0L0ZQK0L0ZQK0L0ZQK0"
+
+    # Redirection HTTPS forcée
+    redirect-https:
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+  # Routers de production
+  routers:
+    # Route principale sécurisée
+    iahome-prod:
+      rule: "Host(`iahome.fr`) || Host(`www.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: iahome-service
+      middlewares: ["security-headers-prod", "compress-prod", "rate-limit-prod"]
+      tls:
+        certResolver: "letsencrypt"
+        options: "modern"
+
+    # Route HTTP avec redirection
+    iahome-http-redirect:
+      rule: "Host(`iahome.fr`) || Host(`www.iahome.fr`)"
+      entryPoints: ["web"]
+      service: iahome-service
+      middlewares: ["redirect-https"]
+
+    # Route pour les assets statiques
+    iahome-assets:
+      rule: "Host(`iahome.fr`) && PathPrefix(`/static/`, `/images/`, `/fonts/`)"
+      entryPoints: ["websecure"]
+      service: iahome-service
+      middlewares: ["cache-assets", "compress-prod"]
+      tls:
+        certResolver: "letsencrypt"
+
+    # Route pour l'API
+    iahome-api:
+      rule: "Host(`iahome.fr`) && PathPrefix(`/api/`)"
+      entryPoints: ["websecure"]
+      service: iahome-service
+      middlewares: ["ddos-protection", "compress-prod"]
+      tls:
+        certResolver: "letsencrypt"
+
+    # Dashboard Traefik sécurisé
+    traefik-dashboard:
+      rule: "Host(`traefik.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: traefik-service
+      middlewares: ["basic-auth-admin"]
+      tls:
+        certResolver: "letsencrypt"
+
+  # Services
+  services:
+    iahome-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        healthCheck:
+          path: "/"
+          interval: "30s"
+          timeout: "5s"
+
+    traefik-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-traefik:8080"
+
+# Configuration TLS optimisée
+tls:
+  options:
+    modern:
+      minVersion: "VersionTLS12"
+      maxVersion: "VersionTLS13"
+      cipherSuites:
+        - "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+        - "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305"
+        - "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+        - "TLS_AES_256_GCM_SHA384"
+        - "TLS_AES_128_GCM_SHA256"
+        - "TLS_CHACHA20_POLY1305_SHA256"
+      curvePreferences:
+        - "CurveP521"
+        - "CurveP384"
+      sniStrict: true
+
+# Configuration des certificats
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "admin@iahome.fr"
+      storage: "/letsencrypt/acme.json"
+      httpChallenge:
+        entryPoint: "web"
+      caServer: "https://acme-v02.api.letsencrypt.org/directory"

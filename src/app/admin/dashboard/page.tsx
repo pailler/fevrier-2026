@@ -308,6 +308,47 @@ function AdminDashboardContent() {
           />
         </div>
 
+        {/* Contrôles du cache */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <svg className="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Gestion du cache
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-blue-900 mb-2">Cache buster actuel</h3>
+              <p className="text-sm text-blue-700 font-mono">{Date.now()}</p>
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-green-900 mb-2">Dernière mise à jour</h3>
+              <p className="text-sm text-green-700">{new Date().toLocaleString('fr-FR')}</p>
+            </div>
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-purple-900 mb-2">Actions rapides</h3>
+              <div className="space-y-2">
+                <button
+                  onClick={() => {
+                    window.location.href = '/force-refresh';
+                  }}
+                  className="w-full px-3 py-2 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 transition-colors"
+                >
+                  🔄 Forcer le refresh
+                </button>
+                <button
+                  onClick={() => {
+                    window.location.reload();
+                  }}
+                  className="w-full px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                >
+                  🔄 Recharger la page
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Paramètres système */}
         <SystemControls
           settings={settings}

@@ -714,14 +714,6 @@ export default function EncoursPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Cache buster: {cacheBuster} */}
-            <div className="bg-red-500 text-white p-4 text-center font-bold">
-              🔄 VERSION MISE À JOUR - {new Date().toLocaleString()} - Cache buster: {cacheBuster} - URLs CORRIGÉES
-              <br />
-              <a href="/force-refresh" className="underline text-yellow-200 hover:text-white">
-                🚨 PROBLÈME DE CACHE ? Cliquez ici pour forcer le refresh
-              </a>
-            </div>
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
