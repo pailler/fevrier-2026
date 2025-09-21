@@ -1,15 +1,78 @@
-# LibreSpeed avec authentification sécurisée via API iahome
-- hostname: librespeed.iahome.fr
-  service: http://172.19.0.2:3000/api/redirect-librespeed
-  originRequest:
-    httpHostHeader: librespeed.iahome.fr
-    timeout: 30s
-  # Règles de sécurité Cloudflare
-  rules:
-    - type: "http_status"
-      status: 403
-      path: "/"
-      origin:
-        hostname: "librespeed.iahome.fr"
-        port: 80
-        httpHostHeader: "librespeed.iahome.fr"
+tunnel: bb2cbda3-f6b6-4a05-b352-e084cec6c7ab
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  # Application principale IAHome
+  - hostname: iahome.fr
+    service: http://172.18.0.2:3000
+    originRequest:
+      timeout: 900s  # 15 minutes timeout pour les uploads
+      httpHostHeader: iahome.fr
+  - hostname: www.iahome.fr
+    service: http://172.18.0.2:3000
+    originRequest:
+      timeout: 900s  # 15 minutes timeout pour les uploads
+      httpHostHeader: www.iahome.fr
+
+  # LibreSpeed direct
+  - hostname: librespeed.iahome.fr
+    service: http://192.168.1.150:8083
+    originRequest:
+      httpHostHeader: librespeed.iahome.fr
+      timeout: 30s
+
+  # Services Whisper
+  - hostname: whisper.iahome.fr
+    service: http://192.168.1.150:8093
+    originRequest:
+      httpHostHeader: whisper.iahome.fr
+      noTLSVerify: true
+      originServerName: whisper.iahome.fr
+  - hostname: whisper-audio.iahome.fr
+    service: http://192.168.1.150:9000
+    originRequest:
+      httpHostHeader: whisper-audio.iahome.fr
+      noTLSVerify: true
+  - hostname: whisper-video.iahome.fr
+    service: http://192.168.1.150:9000
+    originRequest:
+      httpHostHeader: whisper-video.iahome.fr
+      noTLSVerify: true
+      originServerName: whisper-video.iahome.fr
+  - hostname: whisper-ocr.iahome.fr
+    service: http://192.168.1.150:8080
+    originRequest:
+      httpHostHeader: whisper-ocr.iahome.fr
+      noTLSVerify: true
+
+  # Services externes
+  - hostname: pdf.iahome.fr
+    service: http://192.168.1.150:8081
+  - hostname: metube.iahome.fr
+    service: http://192.168.1.150:8082
+  - hostname: psitransfer.iahome.fr
+    service: http://192.168.1.150:8084
+  - hostname: stablediffusion.iahome.fr
+    service: http://192.168.1.150:8080
+  - hostname: ruinedfooocus.iahome.fr
+    service: http://192.168.1.150:8080
+  - hostname: comfyui.iahome.fr
+    service: http://192.168.1.150:8188
+  - hostname: sdnext.iahome.fr
+    service: http://192.168.1.150:7860
+  - hostname: invoke.iahome.fr
+    service: http://192.168.1.150:9090
+  - hostname: qrcodes.iahome.fr
+    service: http://192.168.1.150:7005
+    originRequest:
+      httpHostHeader: qrcodes.iahome.fr
+      noTLSVerify: true
+  - hostname: qrcode.iahome.fr
+    service: http://192.168.1.150:8086
+
+  # Dashboard Traefik (optionnel)
+  - hostname: traefik.iahome.fr
+    service: http://192.168.1.150:8080
+
+  # Catch-all rule
+  - service: http_status:404

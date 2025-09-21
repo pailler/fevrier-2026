@@ -126,19 +126,6 @@ services:
       - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
       - "traefik.http.services.traefik.loadbalancer.server.port=8080"
 
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: iahome-cloudflared
-    restart: unless-stopped
-    command: tunnel --no-autoupdate --config /etc/cloudflared/config.yml run b19084f4-e2d6-47f5-81c3-0972662e953c
-    volumes:
-      - ./cloudflared-config.yml:/etc/cloudflared/config.yml:ro
-      - ./ssl/cloudflare:/etc/cloudflared:ro
-    networks:
-      - iahome-network
-    depends_on:
-      - iahome-app
-      - traefik
 
   # Service de monitoring (optionnel)
   # prometheus:
