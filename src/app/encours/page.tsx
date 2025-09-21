@@ -968,7 +968,10 @@ export default function EncoursPage() {
                       </div>
                       
                       <div className="flex items-center space-x-4 text-sm opacity-90">
-                        <span>🔑 Module gratuit</span>
+                        {/* Ne pas afficher "Module gratuit" pour le module QR codes */}
+                        {module.module_id !== '5' && module.module_id !== 'qrcodes' && (
+                          <span>🔑 Module gratuit</span>
+                        )}
                         {module.price && Number(module.price) > 0 && (
                           <span>💎 €{module.price}</span>
                         )}
