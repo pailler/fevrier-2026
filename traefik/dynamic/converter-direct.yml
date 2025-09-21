@@ -3,7 +3,7 @@ http:
   routers:
     # Route directe vers Converter avec vérification de token
     converter-direct:
-      rule: "Host(`converter.iahome.fr`)"
+      rule: "Host(`convert.iahome.fr`)"
       entryPoints: ["websecure"]
       service: converter-service
       middlewares: ["converter-token-check", "security-headers", "compress"]
@@ -13,7 +13,7 @@ http:
 
     # Route HTTP vers HTTPS
     converter-http-redirect:
-      rule: "Host(`converter.iahome.fr`)"
+      rule: "Host(`convert.iahome.fr`)"
       entryPoints: ["web"]
       middlewares: ["redirect-to-https"]
       service: converter-service

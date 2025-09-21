@@ -99,11 +99,9 @@ ingress:
     originRequest:
       timeout: 30s
 
-  - hostname: converter.iahome.fr
-    service: http://192.168.1.150:443
+  - hostname: convert.iahome.fr
+    service: http://192.168.1.150:8096
     originRequest:
-      httpHostHeader: converter.iahome.fr
-      noTLSVerify: true
       timeout: 30s
 
   - hostname: traefik.iahome.fr

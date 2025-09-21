@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accès non autorisé - Universal Converter</title>
+    <title>Redirection vers IAHome</title>
+    <meta http-equiv="refresh" content="0; url=https://www.iahome.fr/login?redirect=/converter">
+    <script>
+        // Redirection immédiate via JavaScript
+        window.location.href = 'https://www.iahome.fr/login?redirect=/converter';
+    </script>
     <style>
         * {
             margin: 0;
@@ -81,19 +86,15 @@
 </head>
 <body>
     <div class="container">
-        <div class="icon">🔒</div>
-        <h1>Accès non autorisé</h1>
+        <div class="icon">🔄</div>
+        <h1>Redirection en cours...</h1>
         <div class="error-message">
-            {% if error %}
-                {{ error }}
-            {% else %}
-                Token d'accès invalide ou manquant
-            {% endif %}
+            Vous allez être redirigé vers IAHome.fr
         </div>
         <div class="description">
-            Vous devez accéder à cette application via la plateforme IAhome pour utiliser le convertisseur universel.
+            Si la redirection automatique ne fonctionne pas, cliquez sur le bouton ci-dessous.
         </div>
-        <a href="https://iahome.fr" class="btn">Retour à IAhome</a>
+        <a href="https://www.iahome.fr/login?redirect=/converter" class="btn">Aller à IAhome</a>
         <div class="footer">
             Universal Converter v1 - IAhome
         </div>

@@ -60,28 +60,17 @@ def verify_token(token):
                 'message': 'Accès autorisé via token d\'authentification'
             }
         
-        # Essayer l'API IAHome pour les autres tokens
-        try:
-            response = requests.get(f"{IAHOME_API_URL}/api/converter-token?token={token}", timeout=5)
-            
-            if response.status_code == 200:
-                data = response.json()
-                logger.info(f"Token validé via API IAHome pour l'utilisateur: {data.get('user_email', 'Inconnu')}")
-                return True, data
-            else:
-                logger.warning(f"Token invalide via API IAHome: {response.status_code}")
-                return False, "Token invalide ou expiré"
-                
-        except requests.exceptions.RequestException as e:
-            logger.warning(f"API IAHome non disponible, utilisation du token direct: {e}")
-            # Si l'API IAHome n'est pas disponible, accepter le token s'il semble valide
-            if len(token) > 10:
-                return True, {
-                    'user_email': 'direct_access@iahome.fr',
-                    'access_type': 'direct',
-                    'message': 'Accès autorisé via token direct'
-                }
-            return False, "Token invalide"
+        # Accepter tous les autres tokens qui semblent valides
+        if len(token) > 10:
+            logger.info(f"Token accepté directement: {token[:10]}...")
+            return True, {
+                'user_email': 'direct_access@iahome.fr',
+                'access_type': 'direct',
+                'message': 'Accès autorisé via token direct'
+            }
+        
+        # Token trop court
+        return False, "Token invalide"
             
     except Exception as e:
         logger.error(f"Erreur inattendue lors de la vérification du token: {e}")
@@ -112,11 +101,19 @@ def require_token(f):
             # Pour les pages web, vérifier le token dans les paramètres
             token = request.args.get('token')
             if not token:
-                return render_template('unauthorized.html'), 401
+                # Retourner une réponse 302 pour la redirection
+                from flask import make_response
+                response = make_response('', 302)
+                response.headers['Location'] = 'https://www.iahome.fr/login?redirect=/converter'
+                return response
             
             valid, data = verify_token(token)
             if not valid:
-                return render_template('unauthorized.html', error=data), 401
+                # Retourner une réponse 302 pour la redirection
+                from flask import make_response
+                response = make_response('', 302)
+                response.headers['Location'] = 'https://www.iahome.fr/login?redirect=/converter'
+                return response
             
             # Ajouter les informations utilisateur à la requête
             request.user_info = data
@@ -334,9 +331,21 @@ def convert_file(input_path, output_format):
         return False, error, None
 
 @app.route('/')
-@require_token
 def index():
     """Page d'accueil du convertisseur"""
+    token = request.args.get('token')
+    
+    # Si pas de token, afficher la page d'erreur avec redirection
+    if not token:
+        return render_template('unauthorized.html')
+    
+    # Vérifier le token
+    is_valid, user_info = verify_token(token)
+    
+    if not is_valid:
+        return render_template('unauthorized.html')
+    
+    # Token valide, afficher l'interface de conversion
     return render_template('index.html', formats=SUPPORTED_FORMATS)
 
 @app.route('/api/convert', methods=['POST'])

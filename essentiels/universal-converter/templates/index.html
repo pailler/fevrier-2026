@@ -148,10 +148,23 @@
             gap: 20px;
         }
 
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
         .form-group {
             display: flex;
             flex-direction: column;
             gap: 10px;
+        }
+
+        .convert-btn {
+            width: 100%;
+            font-size: 1.2em;
+            padding: 18px 30px;
+            margin-top: 10px;
         }
 
         .form-group label {
@@ -273,6 +286,16 @@
             .header h1 {
                 font-size: 2em;
             }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .convert-btn {
+                font-size: 1.1em;
+                padding: 15px 25px;
+            }
         }
     </style>
 </head>
@@ -301,15 +324,33 @@
             </div>
 
             <div class="conversion-form" id="conversionForm" style="display: none;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="inputFormat">Format d'entrée :</label>
+                        <select id="inputFormat" disabled>
+                            <option value="">Détecté automatiquement</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="outputFormat">Format de sortie :</label>
+                        <select id="outputFormat">
+                            <option value="">Sélectionnez un format...</option>
+                        </select>
+                    </div>
+                </div>
+                
                 <div class="form-group">
-                    <label for="outputFormat">Format de sortie :</label>
-                    <select id="outputFormat">
-                        <option value="">Sélectionnez un format...</option>
+                    <label for="quality">Qualité de conversion :</label>
+                    <select id="quality">
+                        <option value="high">Haute qualité</option>
+                        <option value="medium" selected>Qualité moyenne</option>
+                        <option value="low">Qualité réduite (plus rapide)</option>
                     </select>
                 </div>
                 
-                <button class="btn" id="convertBtn" onclick="convertFile()">
-                    🔄 Convertir
+                <button class="btn convert-btn" id="convertBtn" onclick="convertFile()">
+                    🔄 Convertir le fichier
                 </button>
             </div>
 
@@ -405,6 +446,11 @@
             // Déterminer la catégorie du fichier
             const category = getFileCategory(file.name);
             if (category && supportedFormats[category]) {
+                // Mettre à jour le format d'entrée
+                const inputFormat = document.getElementById('inputFormat');
+                const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+                inputFormat.innerHTML = `<option value="${fileExt}">${fileExt.toUpperCase()}</option>`;
+                
                 // Remplir les options de format de sortie
                 outputFormat.innerHTML = '<option value="">Sélectionnez un format...</option>';
                 supportedFormats[category].output.forEach(format => {
@@ -448,6 +494,7 @@
             const formData = new FormData();
             formData.append('file', selectedFile);
             formData.append('output_format', outputFormat.value);
+            formData.append('quality', document.getElementById('quality').value);
 
             // Afficher le loading
             convertBtn.disabled = true;
