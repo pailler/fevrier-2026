@@ -33,3 +33,4 @@ const testLibreSpeedAPI = async () => {
 
 // Exécuter le test
 testLibreSpeedAPI();
+

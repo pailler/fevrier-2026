@@ -3,130 +3,148 @@ import { supabase } from '../../../utils/supabaseClient';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 Validate LibreSpeed Token: API appelée');
-    
+    console.log('🔑 LibreSpeed Token Validation: API appelée');
+
+    const corsHeaders = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Cookie',
+      'Access-Control-Allow-Credentials': 'true',
+    };
+
     const body = await request.json();
     const { token } = body;
-    
+
     if (!token) {
-      return new NextResponse('Missing token', { status: 400 });
+      return new NextResponse('Token manquant', {
+        status: 400,
+        headers: corsHeaders
+      });
     }
 
-    // Vérifier si c'est un token provisoire
-    if (token.startsWith('prov_')) {
-      console.log('🔄 LibreSpeed: Token provisoire détecté');
-      
-      // Valider le format du token provisoire
-      const tokenParts = token.split('_');
-      if (tokenParts.length === 3) {
-        const timestamp = parseInt(tokenParts[2], 36);
-        const now = Date.now();
-        const tokenAge = now - timestamp;
-        
-        // Token provisoire valide pendant 1 heure
-        if (tokenAge < 3600000) { // 1 heure en millisecondes
-          console.log('✅ LibreSpeed: Token provisoire valide');
-          return NextResponse.json({
-            valid: true,
-            type: 'provisional',
-            expiresAt: new Date(timestamp + 3600000).toISOString()
-          });
-        } else {
-          console.log('❌ LibreSpeed: Token provisoire expiré');
-          return NextResponse.json({
-            valid: false,
-            reason: 'Token provisoire expiré'
-          });
-        }
-      } else {
-        console.log('❌ LibreSpeed: Format token provisoire invalide');
-        return NextResponse.json({
-          valid: false,
-          reason: 'Format token invalide'
-        });
-      }
-    }
-
-    // Vérifier si c'est un token d'accès existant
-    const { data: accessToken, error } = await supabase
-      .from('access_tokens')
-      .select(`
-        id,
-        name,
-        description,
-        module_id,
-        module_name,
-        access_level,
-        permissions,
-        max_usage,
-        current_usage,
-        is_active,
-        created_by,
-        created_at,
-        expires_at
-      `)
-      .eq('id', token)
-      .eq('module_id', 'librespeed')
+    // Vérifier le token dans la base de données
+    const { data: tokenData, error: tokenError } = await supabase
+      .from('librespeed_tokens')
+      .select('*')
+      .eq('token', token)
       .eq('is_active', true)
       .single();
 
-    if (error || !accessToken) {
-      console.log('❌ LibreSpeed: Token d\'accès non trouvé');
-      return NextResponse.json({
-        valid: false,
-        reason: 'Token d\'accès non trouvé'
+    if (tokenError || !tokenData) {
+      console.log('❌ LibreSpeed Token: Token invalide ou expiré');
+      return new NextResponse(JSON.stringify({
+        success: false,
+        error: 'Token invalide ou expiré'
+      }), {
+        status: 403,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
       });
     }
 
     // Vérifier l'expiration
-    if (accessToken.expires_at && new Date(accessToken.expires_at) < new Date()) {
-      console.log('❌ LibreSpeed: Token d\'accès expiré');
-      return NextResponse.json({
-        valid: false,
-        reason: 'Token d\'accès expiré'
+    if (tokenData.expires_at && new Date(tokenData.expires_at) < new Date()) {
+      console.log('❌ LibreSpeed Token: Token expiré');
+      return new NextResponse(JSON.stringify({
+        success: false,
+        error: 'Token expiré'
+      }), {
+        status: 403,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
       });
     }
 
-    // Vérifier le quota d'utilisation
-    if (accessToken.max_usage && accessToken.current_usage >= accessToken.max_usage) {
-      console.log('❌ LibreSpeed: Quota d\'utilisation dépassé');
-      return NextResponse.json({
-        valid: false,
-        reason: 'Quota d\'utilisation dépassé'
+    // Vérifier l'accès utilisateur
+    const { data: userApp, error: appError } = await supabase
+      .from('user_applications')
+      .select('id, usage_count, max_usage, expires_at, module_id')
+      .eq('user_id', tokenData.user_id)
+      .eq('is_active', true)
+      .like('module_id', '%librespeed%')
+      .single();
+
+    if (appError || !userApp) {
+      console.log('❌ LibreSpeed Token: Module non activé pour l\'utilisateur');
+      return new NextResponse(JSON.stringify({
+        success: false,
+        error: 'Module LibreSpeed non activé'
+      }), {
+        status: 403,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
       });
     }
 
-    // Incrémenter le compteur d'utilisation
-    const { error: updateError } = await supabase
-      .from('access_tokens')
-      .update({ 
-        current_usage: (accessToken.current_usage || 0) + 1,
-        last_used_at: new Date().toISOString()
-      })
-      .eq('id', token);
-
-    if (updateError) {
-      console.error('❌ LibreSpeed: Erreur mise à jour utilisation:', updateError);
+    // Vérifier l'expiration de l'accès
+    if (userApp.expires_at && new Date(userApp.expires_at) < new Date()) {
+      console.log('❌ LibreSpeed Token: Accès expiré');
+      return new NextResponse(JSON.stringify({
+        success: false,
+        error: 'Accès expiré'
+      }), {
+        status: 403,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      });
     }
 
-    console.log('✅ LibreSpeed: Token d\'accès valide');
-    return NextResponse.json({
-      valid: true,
-      type: 'access_token',
-      token: accessToken,
-      usage: {
-        current: (accessToken.current_usage || 0) + 1,
-        max: accessToken.max_usage
+    // Vérifier le quota
+    const currentUsage = userApp.usage_count || 0;
+    const maxUsage = userApp.max_usage || 50;
+
+    if (currentUsage >= maxUsage) {
+      console.log('❌ LibreSpeed Token: Quota dépassé');
+      return new NextResponse(JSON.stringify({
+        success: false,
+        error: 'Quota dépassé',
+        current_usage: currentUsage,
+        max_usage: maxUsage
+      }), {
+        status: 403,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+
+    console.log('✅ LibreSpeed Token: Token validé avec succès');
+
+    return new NextResponse(JSON.stringify({
+      success: true,
+      magicLinkData: {
+        userId: tokenData.user_id,
+        userEmail: tokenData.user_email,
+        moduleName: 'librespeed',
+        token: token,
+        expiresAt: tokenData.expires_at,
+        usageCount: currentUsage,
+        maxUsage: maxUsage
+      }
+    }), {
+      status: 200,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json'
       }
     });
 
   } catch (error) {
-    console.error('❌ Validate LibreSpeed Token Error:', error);
+    console.error('❌ LibreSpeed Token Validation Error:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
 
-export async function OPTIONS() {
+export async function OPTIONS(request: NextRequest) {
   return new NextResponse(null, {
     status: 200,
     headers: {

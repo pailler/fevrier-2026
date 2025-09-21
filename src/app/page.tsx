@@ -6,6 +6,9 @@ import Link from "next/link";
 import Breadcrumb from '../components/Breadcrumb';
 import StructuredData from '../components/StructuredData';
 
+// Désactiver le cache pour cette page
+export const dynamic = 'force-dynamic';
+
 export default function Home() {
   const router = useRouter();
   const [session, setSession] = useState<any>(null);
@@ -13,6 +16,22 @@ export default function Home() {
 
   // Vérification de la configuration Supabase
   useEffect(() => {
+    // Redirection pour librespeed.iahome.fr
+    if (typeof window !== 'undefined' && window.location.hostname === 'librespeed.iahome.fr') {
+      // Vérifier s'il y a un token dans l'URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      
+      if (token) {
+        // Si un token est présent, rediriger vers la page de gestion LibreSpeed
+        router.replace(`/librespeed-host?token=${token}`);
+        return;
+      } else {
+        // Sinon, rediriger vers la page de login
+        router.replace('/login?redirect=/librespeed');
+        return;
+      }
+    }
     // Récupérer la session actuelle
     const getSession = async () => {
       const { data: { session: currentSession } } = await supabase.auth.getSession();

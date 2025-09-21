@@ -51,6 +51,46 @@ export async function middleware(request: NextRequest) {
   try {
     const { pathname } = request.nextUrl;
     const url = new URL(request.url);
+    const hostname = request.headers.get('host') || '';
+
+    // Gestion spéciale pour librespeed.iahome.fr
+    console.log('🔍 Middleware: hostname=', hostname, 'pathname=', pathname);
+    if (hostname === 'librespeed.iahome.fr' && pathname === '/') {
+      console.log('🎯 Middleware: Interception librespeed.iahome.fr');
+      const url = new URL(request.url);
+      const token = url.searchParams.get('token');
+      console.log('🔑 Middleware: Token trouvé =', token ? 'OUI' : 'NON');
+      
+      // Si un token est présent, valider le token et autoriser l'accès
+      if (token) {
+        try {
+          // Valider le token d'accès LibreSpeed
+          const response = await fetch(`${request.nextUrl.origin}/api/validate-librespeed-token`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: token }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            
+            // Rediriger vers la page de redirection directe LibreSpeed
+            const libreSpeedDirectUrl = new URL('/librespeed-direct', request.url);
+            libreSpeedDirectUrl.searchParams.set('token', token);
+            return NextResponse.redirect(libreSpeedDirectUrl);
+          }
+        } catch (error) {
+          console.error('Erreur validation token LibreSpeed:', error);
+        }
+      }
+      
+      // Si pas de token ou token invalide, rediriger vers la page de login
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', '/librespeed');
+      return NextResponse.redirect(loginUrl);
+    }
 
     // Intercepter les réponses HTML pour nettoyer les preloads
     if (request.headers.get('accept')?.includes('text/html')) {
@@ -257,15 +297,6 @@ function getModuleNameFromPath(pathname: string): string | null {
 
 export const config = {
   matcher: [
-    '/api/proxy-metubesocket.io/:path*',
-    '/socket.io/:path*',
-    '/api/proxy-metube/:path*',
-    '/api/proxy-librespeed/:path*',
-    '/modules-access',
-    '/secure-access',
-    '/module/:path*',
-    '/api/proxy-ruinedfooocus/:path*',
-    '/ruinedfooocus/:path*',
-    '/gradio-access/:path*'
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.).*)'
   ],
 }; 

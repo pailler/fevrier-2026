@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertisseur Universel v1 - IAHome</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background-color: #f0f4ff;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .format-selector {
+            margin: 30px 0;
+        }
+
+        .format-selector h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .format-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .format-category {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+        }
+
+        .format-category h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .format-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .format-tag {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+
+        .conversion-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group select {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .file-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .download-btn {
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 Convertisseur Universel v1</h1>
+            <p>Convertissez vos fichiers facilement et rapidement</p>
+        </div>
+
+        <div class="content">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <h3>Glissez-déposez votre fichier ici</h3>
+                <p>ou cliquez pour sélectionner un fichier</p>
+                <input type="file" id="fileInput" class="file-input" accept="*/*">
+                <button class="btn" onclick="document.getElementById('fileInput').click()">
+                    Choisir un fichier
+                </button>
+            </div>
+
+            <div class="file-info" id="fileInfo">
+                <h4>Fichier sélectionné :</h4>
+                <p id="fileName"></p>
+                <p id="fileSize"></p>
+            </div>
+
+            <div class="conversion-form" id="conversionForm" style="display: none;">
+                <div class="form-group">
+                    <label for="outputFormat">Format de sortie :</label>
+                    <select id="outputFormat">
+                        <option value="">Sélectionnez un format...</option>
+                    </select>
+                </div>
+                
+                <button class="btn" id="convertBtn" onclick="convertFile()">
+                    🔄 Convertir
+                </button>
+            </div>
+
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Conversion en cours...</p>
+            </div>
+
+            <div class="result" id="result"></div>
+
+            <div class="format-selector">
+                <h3>Formats supportés :</h3>
+                <div class="format-categories">
+                    {% for category, formats in formats.items() %}
+                    <div class="format-category">
+                        <h4>{{ category.title() }}</h4>
+                        <div class="format-list">
+                            {% for ext in formats.input %}
+                            <span class="format-tag">{{ ext }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Convertisseur Universel v1 - IAHome</p>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInfo = document.getElementById('fileInfo');
+        const conversionForm = document.getElementById('conversionForm');
+        const outputFormat = document.getElementById('outputFormat');
+        const convertBtn = document.getElementById('convertBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+
+        let selectedFile = null;
+        let supportedFormats = {};
+
+        // Charger les formats supportés
+        fetch('/api/formats')
+            .then(response => response.json())
+            .then(data => {
+                supportedFormats = data;
+            });
+
+        // Gestion du drag & drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        // Gestion de la sélection de fichier
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            selectedFile = file;
+            
+            // Afficher les informations du fichier
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = `Taille: ${formatFileSize(file.size)}`;
+            fileInfo.style.display = 'block';
+
+            // Déterminer la catégorie du fichier
+            const category = getFileCategory(file.name);
+            if (category && supportedFormats[category]) {
+                // Remplir les options de format de sortie
+                outputFormat.innerHTML = '<option value="">Sélectionnez un format...</option>';
+                supportedFormats[category].output.forEach(format => {
+                    const option = document.createElement('option');
+                    option.value = format.substring(1); // Enlever le point
+                    option.textContent = format.toUpperCase();
+                    outputFormat.appendChild(option);
+                });
+                
+                conversionForm.style.display = 'block';
+            } else {
+                alert('Format de fichier non supporté');
+                conversionForm.style.display = 'none';
+            }
+        }
+
+        function getFileCategory(filename) {
+            const ext = '.' + filename.split('.').pop().toLowerCase();
+            for (const [category, formats] of Object.entries(supportedFormats)) {
+                if (formats.input.includes(ext)) {
+                    return category;
+                }
+            }
+            return null;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function convertFile() {
+            if (!selectedFile || !outputFormat.value) {
+                alert('Veuillez sélectionner un fichier et un format de sortie');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('output_format', outputFormat.value);
+
+            // Afficher le loading
+            convertBtn.disabled = true;
+            loading.style.display = 'block';
+            progressBar.style.display = 'block';
+            result.style.display = 'none';
+
+            // Simuler la progression
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 30;
+                if (progress > 90) progress = 90;
+                progressFill.style.width = progress + '%';
+            }, 200);
+
+            fetch('/api/convert', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                
+                setTimeout(() => {
+                    loading.style.display = 'none';
+                    progressBar.style.display = 'none';
+                    convertBtn.disabled = false;
+                    
+                    if (data.success) {
+                        showResult('success', 'Conversion réussie !', data.download_url);
+                    } else {
+                        showResult('error', 'Erreur: ' + data.error);
+                    }
+                }, 500);
+            })
+            .catch(error => {
+                clearInterval(progressInterval);
+                loading.style.display = 'none';
+                progressBar.style.display = 'none';
+                convertBtn.disabled = false;
+                showResult('error', 'Erreur: ' + error.message);
+            });
+        }
+
+        function showResult(type, message, downloadUrl = null) {
+            result.className = `result ${type}`;
+            result.innerHTML = `
+                <h4>${message}</h4>
+                ${downloadUrl ? `<a href="${downloadUrl}" class="download-btn" download>Télécharger le fichier</a>` : ''}
+            `;
+            result.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

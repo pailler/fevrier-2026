@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  blender-headless:
+    image: nytimes/blender:latest
+    container_name: blender-3d-generator
+    environment:
+      - DISPLAY=:99
+      - PYTHONPATH=/blender/scripts
+    volumes:
+      - ./blender-scripts:/blender/scripts
+      - ./blender-output:/blender/output
+      - ./blender-temp:/blender/temp
+    ports:
+      - "9090:8080"
+    command: >
+      blender --background --python /blender/scripts/blender_api.py
+    restart: unless-stopped
+
+  blender-api:
+    image: python:3.11-slim
+    container_name: blender-api-server
+    working_dir: /app
+    environment:
+      - BLENDER_HOST=blender-headless
+      - BLENDER_PORT=8080
+    volumes:
+      - ./blender-api:/app
+      - ./blender-output:/app/output
+      - ./blender-temp:/app/temp
+    ports:
+      - "3001:3001"
+    command: >
+      sh -c "apt-get update && apt-get install -y blender && pip install -r requirements.txt && python api_server.py"
+    depends_on:
+      - blender-headless
+    restart: unless-stopped
+
+  blender-webui:
+    image: nginx:alpine
+    container_name: blender-webui
+    ports:
+      - "9091:80"
+    volumes:
+      - ./blender-webui:/usr/share/nginx/html
+      - ./blender-output:/usr/share/nginx/html/output
+    restart: unless-stopped

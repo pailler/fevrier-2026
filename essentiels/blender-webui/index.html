@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blender 3D Generator - IAHome</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .status {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .files-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .file-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .file-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s;
+        }
+        
+        .file-item:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .file-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #ffd700;
+        }
+        
+        .file-info {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .download-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+        
+        .download-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        
+        .refresh-btn {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Blender 3D Generator</h1>
+        
+        <div class="status">
+            ✅ Blender virtualisé opérationnel - Mode headless actif
+        </div>
+        
+        <button class="refresh-btn" onclick="loadFiles()">🔄 Actualiser les fichiers</button>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalFiles">0</div>
+                <div class="stat-label">Fichiers générés</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalSize">0 KB</div>
+                <div class="stat-label">Taille totale</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="lastUpdate">-</div>
+                <div class="stat-label">Dernière mise à jour</div>
+            </div>
+        </div>
+        
+        <div class="files-section">
+            <h2>📁 Fichiers 3D générés</h2>
+            <div class="file-list" id="fileList">
+                <div style="text-align: center; opacity: 0.7;">
+                    Chargement des fichiers...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('fr-FR');
+        }
+        
+        async function loadFiles() {
+            try {
+                const response = await fetch('/output/');
+                const text = await response.text();
+                
+                // Parser la liste des fichiers (simulation)
+                const files = [
+                    { name: 'test_objects.obj', size: 16872, date: new Date(), type: 'obj' },
+                    { name: 'test_objects.mtl', size: 306, date: new Date(), type: 'mtl' },
+                    { name: 'test_cube.obj', size: 958, date: new Date(), type: 'obj' },
+                    { name: 'test_cube.mtl', size: 124, date: new Date(), type: 'mtl' }
+                ];
+                
+                displayFiles(files);
+                updateStats(files);
+                
+            } catch (error) {
+                console.error('Erreur lors du chargement des fichiers:', error);
+                document.getElementById('fileList').innerHTML = 
+                    '<div style="text-align: center; color: #ff6b6b;">Erreur lors du chargement des fichiers</div>';
+            }
+        }
+        
+        function displayFiles(files) {
+            const fileList = document.getElementById('fileList');
+            
+            if (files.length === 0) {
+                fileList.innerHTML = '<div style="text-align: center; opacity: 0.7;">Aucun fichier trouvé</div>';
+                return;
+            }
+            
+            fileList.innerHTML = files.map(file => `
+                <div class="file-item">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-info">
+                        Taille: ${formatFileSize(file.size)}<br>
+                        Type: ${file.type.toUpperCase()}<br>
+                        Date: ${formatDate(file.date)}
+                    </div>
+                    <button class="download-btn" onclick="downloadFile('${file.name}')">
+                        📥 Télécharger
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        function updateStats(files) {
+            const totalFiles = files.length;
+            const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+            
+            document.getElementById('totalFiles').textContent = totalFiles;
+            document.getElementById('totalSize').textContent = formatFileSize(totalSize);
+            document.getElementById('lastUpdate').textContent = formatDate(new Date());
+        }
+        
+        function downloadFile(filename) {
+            const link = document.createElement('a');
+            link.href = `/output/${filename}`;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Charger les fichiers au démarrage
+        loadFiles();
+        
+        // Actualiser toutes les 30 secondes
+        setInterval(loadFiles, 30000);
+    </script>
+</body>
+</html>

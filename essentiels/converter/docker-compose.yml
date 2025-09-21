@@ -1,0 +1,40 @@
+services:
+  # Service Convertisseur Universel
+  converter:
+    build: ../universal-converter
+    container_name: converter
+    restart: unless-stopped
+    ports:
+      - "8096:8080"  # Port pour le convertisseur universel
+    environment:
+      - PYTHONUNBUFFERED=1
+      - FLASK_APP=converter_app.py
+      - FLASK_ENV=production
+      - CONVERTER_PORT=8080
+      - CONVERTER_HOST=0.0.0.0
+    volumes:
+      - ../universal-converter/uploads:/app/uploads
+      - ../universal-converter/downloads:/app/downloads
+      - ../universal-converter/logs:/app/logs
+    networks:
+      - converter-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.converter.rule=Host(`converter.iahome.fr`)"
+      - "traefik.http.routers.converter.entrypoints=websecure"
+      - "traefik.http.routers.converter.tls=true"
+      - "traefik.http.services.converter.loadbalancer.server.port=8080"
+      - "traefik.http.routers.converter-http.rule=Host(`converter.iahome.fr`)"
+      - "traefik.http.routers.converter-http.entrypoints=web"
+      - "traefik.http.routers.converter-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+
+networks:
+  converter-network:
+    driver: bridge
+
+volumes:
+  converter-uploads:
+  converter-downloads:
+  converter-logs:

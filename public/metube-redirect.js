@@ -50,3 +50,4 @@
     window.location.href = 'https://iahome.fr/login';
   }
 })();
+

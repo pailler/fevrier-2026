@@ -1,0 +1,430 @@
+OP-Act, September 13, 2025, 12:43 am: Logfile created using method 1.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/50179e3b066f: Verified inbound connection.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/50179e3b066f: Verified globals.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/50179e3b066f: Created a directory at /home/converter/5cf8d421483a.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/50179e3b066f: Created a directory at /home/converter/5cf8d421483a/50179e3b066f/.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/50179e3b066f: Created a directory at /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/50179e3b066f: Created a directory at /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/50179e3b066f/.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/50179e3b066f: Verified required directories.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/50179e3b066f: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/50179e3b066f: Cleaned convert location.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/50179e3b066f: Could not verify tokens!
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/50179e3b066f: Verified color scheme.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/50179e3b066f: Verified language.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/50179e3b066f: Displaying the GUI.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified inbound connection.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified globals.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Created a directory at /home/converter/5cf8d421483a/e1af1fdf27e7/.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Created a directory at /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/e1af1fdf27e7/.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified required directories.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Cleaned convert location.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified tokens.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified color scheme.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified language.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Displaying the GUI.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Initiating Uploader.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: User selected to Upload file 20250821_213433.mp4.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Uploaded file 20250821_213433.mp4 to /home/converter/5cf8d421483a/e1af1fdf27e7/20250821_213433.mp4.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Upload Complete.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified inbound connection.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified globals.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified required directories.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Cleaned convert location.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified tokens.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified color scheme.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified language.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Displaying the GUI.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified inbound connection.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified globals.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified required directories.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Cleaned convert location.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified tokens.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified color scheme.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified language.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Initiating Downloader.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: User selected to Download file 20250821_213433.mp4.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Copying file 20250821_213433.mp4 to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/e1af1fdf27e7/20250821_213433.mp4.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Copied file 20250821_213433.mp4.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Verified file.
+Op-Act, September 13, 2025, 12:43 am, 5cf8d421483a/e1af1fdf27e7: Download Complete.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Verified inbound connection.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Verified globals.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Verified required directories.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Cleaned convert location.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Verified tokens.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Verified color scheme.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Verified language.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Initiating Converter.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: User selected to Convert file 20250821_213433.mp4.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Deleting stale file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/e1af1fdf27e7/20250821_213433.mp4.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Copying file 20250821_213433.mp4 to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/e1af1fdf27e7/20250821_213433.mp4.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Copied file 20250821_213433.mp4.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Verified file /home/converter/5cf8d421483a/e1af1fdf27e7/20250821_213433.mkv.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Starting virus scan.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Virus scan complete.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Converting video.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Video Conversion Complete
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Created a file at /home/converter/5cf8d421483a/e1af1fdf27e7/20250821_213433.mkv.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Conversion Complete.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Verified inbound connection.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Verified globals.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Verified required directories.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Cleaned convert location.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Verified tokens.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Verified color scheme.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Verified language.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Initiating Downloader.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: User selected to Download file 20250821_213433.mkv.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Copying file 20250821_213433.mkv to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/e1af1fdf27e7/20250821_213433.mkv.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Copied file 20250821_213433.mkv.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Verified file.
+Op-Act, September 13, 2025, 12:44 am, 5cf8d421483a/e1af1fdf27e7: Download Complete.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/50179e3b066f: Verified inbound connection.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/50179e3b066f: Verified globals.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/50179e3b066f: Created a directory at /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/50179e3b066f: Created a directory at /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/50179e3b066f/.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/50179e3b066f: Verified required directories.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/50179e3b066f: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/50179e3b066f: Cleaned convert location.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/50179e3b066f: Could not verify tokens!
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/50179e3b066f: Verified color scheme.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/50179e3b066f: Verified language.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/50179e3b066f: Displaying the GUI.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified inbound connection.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified globals.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Created a directory at /home/converter/5cf8d421483a.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Created a directory at /home/converter/5cf8d421483a/7d5752c471d2/.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Created a directory at /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/7d5752c471d2/.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified required directories.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Cleaned convert location.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified tokens.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified color scheme.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified language.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Displaying the GUI.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Initiating Uploader.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: User selected to Upload file Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Uploaded file Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf to /home/converter/5cf8d421483a/7d5752c471d2/Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Upload Complete.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified inbound connection.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified globals.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified required directories.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Cleaned convert location.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified tokens.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified color scheme.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified language.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Displaying the GUI.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified inbound connection.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified globals.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified required directories.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Cleaned convert location.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified tokens.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified color scheme.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified language.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Initiating Downloader.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: User selected to Download file Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Copying file Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/7d5752c471d2/Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Copied file Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified file.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Download Complete.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified inbound connection.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified globals.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified required directories.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Cleaned convert location.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified tokens.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified color scheme.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified language.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Initiating Converter.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: User selected to perform OCR on file Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Deleting stale file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/7d5752c471d2/Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Copying file Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/7d5752c471d2/Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Copied file Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Deleting stale file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/7d5752c471d2/Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Verified file /home/converter/5cf8d421483a/7d5752c471d2/Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Starting virus scan.
+Op-Act, September 13, 2025, 12:55 am, 5cf8d421483a/7d5752c471d2: Virus scan complete.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Verified inbound connection.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Verified globals.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Verified required directories.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Cleaned convert location.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Verified tokens.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Verified color scheme.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Verified language.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Initiating Converter.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: User selected to perform OCR on file Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Deleting stale file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/7d5752c471d2/Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf.
+ERROR!!! September 13, 2025, 12:56 am, IAHome Converter-14002, 5cf8d421483a/7d5752c471d2: The file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/7d5752c471d2/Pailler_Adam_prescription-medicale-de-transport_2025-09-10.pdf failed second stage validation!
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Verified inbound connection.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Verified globals.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Verified required directories.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Cleaned convert location.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Verified tokens.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Verified color scheme.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Verified language.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: Initiating Downloader.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/7d5752c471d2: User selected to Download file Pailler_Adam_prescription-medicale-de-transport_2025-09-10.docx.
+ERROR!!! September 13, 2025, 12:56 am, IAHome Converter-14002, 5cf8d421483a/7d5752c471d2: The file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/7d5752c471d2/Pailler_Adam_prescription-medicale-de-transport_2025-09-10.docx failed second stage validation!
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/b5fb3627a705: Verified inbound connection.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/b5fb3627a705: Verified globals.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/b5fb3627a705: Created a directory at /home/converter/5cf8d421483a/b5fb3627a705/.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/b5fb3627a705: Created a directory at /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/b5fb3627a705/.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/b5fb3627a705: Verified required directories.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/b5fb3627a705: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/b5fb3627a705: Cleaned convert location.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/b5fb3627a705: Could not verify tokens!
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/b5fb3627a705: Verified color scheme.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/b5fb3627a705: Verified language.
+Op-Act, September 13, 2025, 12:56 am, 5cf8d421483a/b5fb3627a705: Displaying the GUI.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/d79fbc8e0140: Verified inbound connection.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/d79fbc8e0140: Verified globals.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/d79fbc8e0140: Created a directory at /home/converter/5cf8d421483a/d79fbc8e0140/.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/d79fbc8e0140: Created a directory at /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/d79fbc8e0140/.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/d79fbc8e0140: Verified required directories.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/d79fbc8e0140: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/d79fbc8e0140: Cleaned convert location.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/d79fbc8e0140: Could not verify tokens!
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/d79fbc8e0140: Verified color scheme.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/d79fbc8e0140: Verified language.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/d79fbc8e0140: Displaying the GUI.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified inbound connection.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified globals.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Created a directory at /home/converter/5cf8d421483a/946a5ced2304/.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Created a directory at /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified required directories.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Cleaned convert location.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified tokens.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified color scheme.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified language.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Displaying the GUI.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Initiating Uploader.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: User selected to Upload file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Uploaded file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf to /home/converter/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Upload Complete.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified inbound connection.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified globals.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified required directories.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Cleaned convert location.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified tokens.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified color scheme.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified language.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Displaying the GUI.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified inbound connection.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified globals.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified required directories.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Cleaned convert location.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified tokens.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified color scheme.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified language.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Initiating Converter.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: User selected to perform OCR on file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Copying file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Copied file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified file /home/converter/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.doc.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Starting virus scan.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Virus scan complete.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified inbound connection.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified globals.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified required directories.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Cleaned convert location.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified tokens.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified color scheme.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified language.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Initiating Converter.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: User selected to perform OCR on file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Deleting stale file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Copying file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Copied file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified file /home/converter/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.doc.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Starting virus scan.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Virus scan complete.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified inbound connection.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified globals.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified required directories.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Cleaned convert location.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified tokens.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified color scheme.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified language.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Initiating Converter.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: User selected to perform OCR on file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Deleting stale file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Copying file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Copied file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Verified file /home/converter/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.doc.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Starting virus scan.
+Op-Act, September 13, 2025, 12:57 am, 5cf8d421483a/946a5ced2304: Virus scan complete.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified inbound connection.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified globals.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified required directories.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Cleaned convert location.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified tokens.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified color scheme.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified language.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Initiating Converter.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: User selected to perform OCR on file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Deleting stale file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Copying file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Copied file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified file /home/converter/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.doc.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Starting virus scan.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Virus scan complete.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified inbound connection.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified globals.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified required directories.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Cleaned convert location.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified tokens.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified color scheme.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified language.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Initiating Converter.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: User selected to perform OCR on file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Deleting stale file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Copying file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Copied file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified file /home/converter/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.doc.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Starting virus scan.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Virus scan complete.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified inbound connection.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified globals.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified required directories.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Cleaned convert location.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified tokens.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified color scheme.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified language.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Initiating Converter.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: User selected to perform OCR on file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Deleting stale file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Copying file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Copied file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified file /home/converter/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.doc.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Starting virus scan.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Virus scan complete.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Performing OCR intermediate operation using method 0.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Converted file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.jpg to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.txt.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Performing OCR final using method 0.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified inbound connection.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified globals.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified required directories.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Cleaned convert location.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified tokens.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified color scheme.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified language.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Initiating Converter.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: User selected to perform OCR on file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Deleting stale file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Copying file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Copied file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified file /home/converter/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.doc.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Starting virus scan.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Virus scan complete.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Performing OCR intermediate operation using method 0.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Converted file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.jpg to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.txt.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Performing OCR final using method 0.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified inbound connection.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified globals.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified required directories.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Cleaned convert location.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified tokens.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified color scheme.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified language.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Displaying the GUI.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified inbound connection.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified globals.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified required directories.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Cleaned convert location.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified tokens.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified color scheme.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified language.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Initiating Archiver.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: User selected to Archive file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Deleting stale file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Copying file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Copied file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified file/home/converter/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.zip.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Starting virus scan.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Virus scan complete.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: The archiver returned the following: 
+  
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Archived file /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.pdf.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Archive Complete.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified inbound connection.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified globals.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified required directories.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Cleaned temporary location.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Cleaned convert location.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified tokens.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified color scheme.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified language.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Skipping display GUI procedure.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Initiating Downloader.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: User selected to Download file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.zip.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Copying file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.zip to /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/946a5ced2304/f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.zip.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Copied file f85ca39a-5155-419b-8ae1-005c693dc7a4_Tu_es_un_developpeur_full-stack_exp.zip.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Verified file.
+Op-Act, September 13, 2025, 12:58 am, 5cf8d421483a/946a5ced2304: Download Complete.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Verified inbound connection.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Verified globals.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Created a directory at /home/converter/5cf8d421483a/61d212875052/.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Created a directory at /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Created a directory at /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/61d212875052/.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Verified required directories.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Cleaned temporary location.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Cleaned convert location.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Could not verify tokens!
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Verified color scheme.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Verified language.
+Op-Act, September 13, 2025, 10:26 pm, 5cf8d421483a/61d212875052: Displaying the GUI.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Verified inbound connection.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Verified globals.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Created a directory at /home/converter/5cf8d421483a/8c915e700698/.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Created a directory at /var/www/html/HRProprietary/HRConvert2/DATA/5cf8d421483a/8c915e700698/.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Verified required directories.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Cleaned temporary location.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Cleaned convert location.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Could not verify tokens!
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Verified color scheme.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Verified language.
+Op-Act, September 13, 2025, 10:27 pm, 5cf8d421483a/8c915e700698: Displaying the GUI.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Verified inbound connection.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Verified globals.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Verified required directories.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Cleaned temporary location.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Cleaned convert location.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Could not verify tokens!
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Verified color scheme.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Verified language.
+Op-Act, September 13, 2025, 11:07 pm, 5cf8d421483a/61d212875052: Displaying the GUI.
