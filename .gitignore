@@ -1,83 +1,66 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-env.production.local
-env.production
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# logs
-/logs/
-*.log
-
-# backups
-/backups/
-
-# downloads and uploads
-/downloads/
-/uploads/
-/metube-downloads/
-/metube-config/
-
-# temporary files
+# Fichiers temporaires et de test
 *.tmp
 *.temp
+*.log
 *.bak
-*.backup
+*.old
+test-*.ps1
+test-*.html
+temp_*
+debug-*
 
-# IDE
-.vscode/
-.idea/
+# Fichiers binaires
+*.exe
+cloudflared.exe
+
+# Fichiers de configuration temporaires
+cloudflared-*.yml
+*-config.yml
+!cloudflared-config.yml
+!ssl/cloudflare/config.yml
+
+# Dossiers temporaires
+essentiels/pdf-temp/
+essentiels/blender-temp/
+essentiels/*-temp/
+essentiels/*-output/
+essentiels/*-logs/
+
+# Fichiers de déploiement temporaires
+deploy-*.ps1
+fix-*.ps1
+diagnose-*.ps1
+
+# Fichiers de test dans public/
+public/test-*.html
+public/force-*.html
+
+# Fichiers de credentials temporaires
+temp_credentials.json
+*_credentials.json
+
+# Dossiers de cache
+.next/
+node_modules/
+dist/
+build/
+
+# Fichiers d'environnement
+.env.local
+.env.production.local
+.env.development.local
+
+# Logs
+logs/
+*.log
+
+# Fichiers système
+.DS_Store
+Thumbs.db
 *.swp
 *.swo
+*~
 
-# OS
-Thumbs.db
-.DS_Store
-
-# Docker services data
-docker-services/*/mysql.sock
-docker-services/*/ib_buffer_pool
-docker-services/*/ib_logfile*
-docker-services/*/auto.cnf
-docker-services/pdf-temp/
-docker-services/polr-db-data/
-docker-services/portainer-data/
-docker-services/psitransfer-data/
-docker-services/metube-downloads/
+# Fichiers de backup
+*.backup
+*.bak
