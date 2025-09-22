@@ -263,25 +263,42 @@ def require_iahome_auth(f):
 
 @app.route('/')
 def index():
-    """Page d'accueil avec redirection vers LibreSpeed (même logique que QR codes)"""
+    """Page d'accueil avec interface LibreSpeed (même logique que QR codes)"""
     # Vérifier l'authentification IAHome
     user_id = get_user_from_token()
     
     if user_id:
-        # Utilisateur authentifié, servir l'application LibreSpeed directement
+        # Utilisateur authentifié, afficher l'application LibreSpeed
         logger.info(f"🚀 Utilisateur authentifié ({user_id}) - Affichage de LibreSpeed")
         try:
-            # Récupérer le contenu de l'application LibreSpeed
-            import requests
-            librespeed_response = requests.get('http://librespeed-app:80', timeout=10)
-            if librespeed_response.status_code == 200:
-                # Servir le contenu LibreSpeed directement
-                return librespeed_response.content
+            # Faire une requête interne vers l'application LibreSpeed sur le port 8081
+            response = requests.get('http://192.168.1.150:8081', timeout=10)
+            if response.status_code == 200:
+                return response.text
             else:
-                logger.error(f"Erreur récupération LibreSpeed: {librespeed_response.status_code}")
-                return f"<h1>Erreur LibreSpeed</h1><p>Code: {librespeed_response.status_code}</p>"
+                logger.error(f"Erreur lors de la récupération de LibreSpeed: {response.status_code}")
+                return """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Erreur - LibreSpeed</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                        .error { color: #d32f2f; background: #ffebee; padding: 20px; border-radius: 8px; margin: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>LibreSpeed Speedtest</h1>
+                    <div class="error">
+                        <h2>Erreur</h2>
+                        <p>Impossible de charger LibreSpeed.</p>
+                        <p>Veuillez réessayer plus tard.</p>
+                    </div>
+                </body>
+                </html>
+                """
         except Exception as e:
-            logger.error(f"Erreur récupération LibreSpeed: {e}")
+            logger.error(f"Erreur lors de la redirection vers LibreSpeed: {e}")
             return """
             <!DOCTYPE html>
             <html>
@@ -296,89 +313,40 @@ def index():
                 <h1>LibreSpeed Speedtest</h1>
                 <div class="error">
                     <h2>Erreur</h2>
-                    <p>Impossible de charger LibreSpeed.</p>
+                    <p>Impossible de rediriger vers LibreSpeed.</p>
                     <p>Veuillez réessayer plus tard.</p>
                 </div>
             </body>
             </html>
             """
     else:
-        # Utilisateur non authentifié, afficher la page d'erreur
+        # Utilisateur non authentifié, afficher un message d'erreur (comme QR codes)
         logger.warning("🔒 Accès refusé - Authentification requise")
-        return """
+        error_html = """
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Accès Refusé - LibreSpeed</title>
+            <title>LibreSpeed - Authentification requise</title>
             <style>
-                body { 
-                    font-family: Arial, sans-serif; 
-                    text-align: center; 
-                    padding: 50px; 
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    margin: 0;
-                    min-height: 100vh;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-                .container {
-                    background: rgba(255, 255, 255, 0.1);
-                    padding: 40px;
-                    border-radius: 15px;
-                    backdrop-filter: blur(10px);
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-                    max-width: 500px;
-                }
-                .error { 
-                    color: #ff6b6b; 
-                    background: rgba(255, 107, 107, 0.1); 
-                    padding: 20px; 
-                    border-radius: 8px; 
-                    margin: 20px 0;
-                    border: 1px solid rgba(255, 107, 107, 0.3);
-                }
-                .warning { 
-                    color: #feca57; 
-                    background: rgba(254, 202, 87, 0.1); 
-                    padding: 20px; 
-                    border-radius: 8px; 
-                    margin: 20px 0;
-                    border: 1px solid rgba(254, 202, 87, 0.3);
-                }
-                .btn {
-                    display: inline-block;
-                    padding: 12px 24px;
-                    background: #4ecdc4;
-                    color: white;
-                    text-decoration: none;
-                    border-radius: 6px;
-                    margin: 10px;
-                    transition: background 0.3s;
-                }
-                .btn:hover {
-                    background: #45b7b8;
-                }
+                body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                .error { color: #d32f2f; background: #ffebee; padding: 20px; border-radius: 8px; margin: 20px; }
+                .info { color: #1976d2; background: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px; }
             </style>
         </head>
         <body>
-            <div class="container">
-                <h1>🚫 Accès Refusé</h1>
-                <div class="warning">
-                    <h2>⚠️ Authentification Requise</h2>
-                    <p>Vous devez être connecté à IAHome.fr pour accéder à LibreSpeed.</p>
-                </div>
-                <div class="error">
-                    <h2>🔒 Accès Non Autorisé</h2>
-                    <p>Cette application nécessite une authentification valide.</p>
-                    <p>Veuillez vous connecter via le module LibreSpeed sur IAHome.fr</p>
-                </div>
-                <a href="https://iahome.fr" class="btn">Retour à IAHome.fr</a>
+            <h1>LibreSpeed Speedtest</h1>
+            <div class="error">
+                <h2>Authentification requise</h2>
+                <p>Vous devez être connecté à IAHome.fr pour accéder à ce service.</p>
+            </div>
+            <div class="info">
+                <p>Ce service est intégré à IAHome.fr et nécessite une authentification centralisée.</p>
+                <p>Veuillez accéder au service via <a href="https://iahome.fr">IAHome.fr</a></p>
             </div>
         </body>
         </html>
         """
+        return error_html
 
 @app.route('/health')
 def health():

@@ -5,6 +5,8 @@ services:
     image: adolfintel/speedtest:latest
     container_name: librespeed-app
     restart: unless-stopped
+    ports:
+      - "8081:80"
     networks:
       - iahome-network
     environment:

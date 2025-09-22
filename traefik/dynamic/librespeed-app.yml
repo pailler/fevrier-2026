@@ -1,0 +1,16 @@
+# Configuration pour exposer l'application LibreSpeed sur le port 8080
+http:
+  routers:
+    # Route pour l'application LibreSpeed
+    librespeed-app:
+      rule: "Host(`192.168.1.150`) && Port(`8080`)"
+      entryPoints: ["web"]
+      service: librespeed-app-service
+      priority: 10
+
+  services:
+    # Service pour l'application LibreSpeed
+    librespeed-app-service:
+      loadBalancer:
+        servers:
+          - url: "http://librespeed-app:80"

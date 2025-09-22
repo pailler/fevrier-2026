@@ -2,49 +2,18 @@ version: '3.8'
 
 services:
   librespeed-auth:
-    build: .
+    image: python:3.11-slim
     container_name: librespeed-auth
     ports:
       - "7006:7006"
-    environment:
-      - IAHOME_JWT_SECRET=${IAHOME_JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
-      - DATABASE_URL=postgresql://qrcode_user:qrcode_password@postgres:5432/qrcode_db
-    depends_on:
-      - postgres
-    restart: unless-stopped
-    networks:
-      - iahome-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7006/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  postgres:
-    image: postgres:15-alpine
-    container_name: librespeed-postgres
-    environment:
-      - POSTGRES_DB=qrcode_db
-      - POSTGRES_USER=qrcode_user
-      - POSTGRES_PASSWORD=qrcode_password
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init_session_tokens.sql:/docker-entrypoint-initdb.d/init_session_tokens.sql
+      - ./simple_auth_page.py:/app/simple_auth_page.py
+    working_dir: /app
+    command: sh -c "pip install --no-cache-dir flask requests && python simple_auth_page.py"
+    restart: unless-stopped
     networks:
       - iahome-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U qrcode_user -d qrcode_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  postgres_data:
 
 networks:
   iahome-network:
     external: true
-
-

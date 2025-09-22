@@ -1,4 +1,4 @@
-# Configuration LibreSpeed pour Cloudflare SSL (même approche que QR codes)
+# Configuration LibreSpeed pour Cloudflare SSL - Service d'authentification
 http:
   routers:
     # Route pour les challenges Let's Encrypt (si nécessaire)
@@ -8,13 +8,13 @@ http:
       service: librespeed-direct
       priority: 1000
 
-    # Route principale (Cloudflare SSL - HTTP vers Traefik)
+    # Route principale - Service d'authentification LibreSpeed
     librespeed-main:
       rule: "Host(`librespeed.iahome.fr`)"
       entryPoints: ["web"]
-      service: librespeed-service
+      service: librespeed-auth-service
       middlewares: ["security-headers@file", "compress@file", "librespeed-proxy-headers@file"]
-      priority: 10
+      priority: 100
 
   services:
     # Service pour les challenges Let's Encrypt
@@ -23,8 +23,8 @@ http:
         servers:
           - url: "http://librespeed-auth:7006"
 
-    # Service principal pour LibreSpeed (service d'authentification)
-    librespeed-service:
+    # Service principal pour LibreSpeed - Service d'authentification
+    librespeed-auth-service:
       loadBalancer:
         servers:
           - url: "http://librespeed-auth:7006"
