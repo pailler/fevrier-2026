@@ -69,8 +69,8 @@ export default function QRCodeAccessButton({
       const sessionData = await sessionResponse.json();
       console.log('✅ QR Codes: Session créée:', sessionData.sessionId);
 
-      // 2. Rediriger vers l'interface QR codes avec la session
-      const qrUrl = `/qr-interface?session=${sessionData.sessionId}`;
+      // 2. Rediriger vers la page de redirection QR codes
+      const qrUrl = `/qrcodes-redirect?token=${sessionData.sessionId}`;
       console.log('🔗 QR Codes: URL finale:', qrUrl);
 
       onAccessGranted?.(qrUrl);

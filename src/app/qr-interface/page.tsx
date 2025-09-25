@@ -245,8 +245,14 @@ export default function QRInterfacePage() {
           <p className="text-gray-600">
             Créez et gérez vos QR codes dynamiques de manière sécurisée.
           </p>
-          <div className="mt-4 text-sm text-gray-500">
-            Connecté en tant que : {user?.email}
+          <div className="mt-4 flex items-center justify-between">
+            <div className="text-sm text-gray-500">
+              Connecté en tant que : {user?.email}
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-xs text-green-600 font-medium">Session active</span>
+            </div>
           </div>
         </div>
 
