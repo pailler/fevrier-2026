@@ -69,12 +69,12 @@ export default function QRCodeAccessButton({
       const sessionData = await sessionResponse.json();
       console.log('✅ QR Codes: Session créée:', sessionData.sessionId);
 
-      // 2. Rediriger vers la page de redirection QR codes
-      const qrUrl = `https://qrcodes.iahome.fr?token=${sessionData.sessionId}`;
-      console.log('🔗 QR Codes: URL finale:', qrUrl);
+            // 2. Rediriger vers le service QR codes dédié avec le token
+            const qrUrl = `https://qrcodes.iahome.fr?token=${sessionData.sessionId}`;
+            console.log('🔗 QR Codes: URL finale:', qrUrl);
 
-      onAccessGranted?.(qrUrl);
-      window.open(qrUrl, '_blank');
+            onAccessGranted?.(qrUrl);
+            window.open(qrUrl, '_blank');
 
     } catch (error) {
       console.error('❌ QR Codes: Erreur:', error);
