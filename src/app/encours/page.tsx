@@ -1150,7 +1150,7 @@ export default function EncoursPage() {
                           user={user}
                           onAccessGranted={(url) => {
                             console.log('🔗 QR Codes: Accès autorisé:', url);
-                            window.location.href = url;
+                            window.open(url, '_blank');
                           }}
                           onAccessDenied={(reason) => {
                             console.log('❌ QR Codes: Accès refusé:', reason);
