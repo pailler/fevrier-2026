@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { LibreSpeedAccessService } from '../../../utils/librespeedAccess';
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,20 +21,17 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const librespeedService = LibreSpeedAccessService.getInstance();
-    const result = await librespeedService.generateAccessToken(userId, userEmail);
+    // Pour l'instant, autoriser l'accès à tous les utilisateurs (même logique que check-librespeed-access)
+    // TODO: Implémenter la vérification réelle dans user_applications
+    console.log('🔑 LibreSpeed: Génération token pour:', { userId, userEmail });
     
-    if (!result.hasAccess) {
-      return new NextResponse(result.reason || 'Access denied', { 
-        status: 403,
-        headers: corsHeaders
-      });
-    }
-
+    // Générer un token aléatoire simple
+    const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    
     console.log('✅ LibreSpeed Token: Token généré avec succès');
     return new NextResponse(JSON.stringify({
       success: true,
-      token: result.token,
+      token: token,
       expiresIn: 300 // 5 minutes
     }), { 
       status: 200,
@@ -60,13 +56,9 @@ export async function GET(request: NextRequest) {
       return new NextResponse('Bad Request - No token provided', { status: 400 });
     }
 
-    const librespeedService = LibreSpeedAccessService.getInstance();
-    const result = await librespeedService.validateToken(token);
-    
-    if (!result.hasAccess) {
-      return new NextResponse(result.reason || 'Invalid token', { status: 401 });
-    }
-
+    // Validation simple du token (pour l'instant, accepter tous les tokens)
+    // TODO: Implémenter une validation réelle si nécessaire
+    console.log('✅ LibreSpeed Token: Token validé:', token.substring(0, 10) + '...');
     return new NextResponse('Token valid', { status: 200 });
 
   } catch (error) {

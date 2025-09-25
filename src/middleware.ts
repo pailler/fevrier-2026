@@ -53,6 +53,11 @@ export async function middleware(request: NextRequest) {
     const url = new URL(request.url);
     const hostname = request.headers.get('host') || '';
 
+    // Exceptions pour les APIs qui ne doivent pas être interceptées
+    if (pathname === '/api/librespeed-token' || pathname === '/api/check-librespeed-access' || pathname === '/api/increment-librespeed-access') {
+      return NextResponse.next();
+    }
+
     // Gestion spéciale pour librespeed.iahome.fr
     console.log('🔍 Middleware: hostname=', hostname, 'pathname=', pathname);
     if (hostname === 'librespeed.iahome.fr' && pathname === '/') {
