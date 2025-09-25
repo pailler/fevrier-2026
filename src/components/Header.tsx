@@ -108,7 +108,7 @@ export default function Header() {
                       className="text-blue-100 hover:text-white transition-colors text-sm"
                       onClick={() => router.push('/login')}
                     >
-                      Se connecter
+                      Se connecter à IAHome
                     </button>
                     <button 
                       className="bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors"
@@ -123,7 +123,7 @@ export default function Header() {
               /* Mode connecté */
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center space-x-3 text-sm">
-                  <span className="hidden sm:inline">Connecté en tant que</span>
+                  <span className="hidden sm:inline">Connecté à IAHome</span>
                   <span className="font-medium">{user?.email}</span>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>

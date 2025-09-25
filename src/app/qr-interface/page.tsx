@@ -38,6 +38,37 @@ export default function QRInterfacePage() {
 
   useEffect(() => {
     const getSession = async () => {
+      // Vérifier d'abord si on a une session QR codes dans l'URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const qrSessionId = urlParams.get('session');
+      
+      if (qrSessionId) {
+        // Valider la session QR codes
+        try {
+          const response = await fetch(`/api/qr-session?sessionId=${qrSessionId}`);
+          if (response.ok) {
+            const sessionData = await response.json();
+            console.log('✅ QR Session validée:', sessionData);
+            
+            // Récupérer les informations utilisateur depuis la session
+            const { data: { session: currentSession } } = await supabase.auth.getSession();
+            setSession(currentSession);
+            setUser(currentSession?.user || null);
+            setLoading(false);
+            return;
+          } else {
+            console.log('❌ QR Session invalide, redirection vers login');
+            window.location.href = '/login?redirect=/qr-interface';
+            return;
+          }
+        } catch (error) {
+          console.error('❌ Erreur validation QR session:', error);
+          window.location.href = '/login?redirect=/qr-interface';
+          return;
+        }
+      }
+
+      // Si pas de session QR codes, vérifier la session normale
       const { data: { session: currentSession } } = await supabase.auth.getSession();
       setSession(currentSession);
       setUser(currentSession?.user || null);

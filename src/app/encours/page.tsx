@@ -7,6 +7,7 @@ import Header from '../../components/Header';
 import LibreSpeedAccessButton from '../../components/LibreSpeedAccessButton';
 import MeTubeAccessButton from '../../components/MeTubeAccessButton';
 import ModuleAccessButton from '../../components/ModuleAccessButton';
+import QRCodeAccessButton from '../../components/QRCodeAccessButton';
 
 interface UserModule {
   id: string;
@@ -1141,6 +1142,18 @@ export default function EncoursPage() {
                           }}
                           onAccessDenied={(reason) => {
                             console.log('❌ MeTube: Accès refusé:', reason);
+                            alert(`Accès refusé: ${reason}`);
+                          }}
+                        />
+                      ) : module.module_title === 'QR Codes' ? (
+                        <QRCodeAccessButton
+                          user={user}
+                          onAccessGranted={(url) => {
+                            console.log('🔗 QR Codes: Accès autorisé:', url);
+                            window.location.href = url;
+                          }}
+                          onAccessDenied={(reason) => {
+                            console.log('❌ QR Codes: Accès refusé:', reason);
                             alert(`Accès refusé: ${reason}`);
                           }}
                         />
