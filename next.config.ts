@@ -8,8 +8,8 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['@supabase/supabase-js'],
   },
   
-  // Désactiver complètement les preloads automatiques
-  optimizeFonts: false,
+  // Configuration des polices optimisée
+  // optimizeFonts: false, // Option non reconnue dans Next.js 15
   
   // Désactiver les preloads de ressources
   compiler: {
