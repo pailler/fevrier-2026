@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  whisper-api:
+    image: onerahmet/openai-whisper-asr-webservice:latest
+    container_name: whisper-api-prod
+    ports:
+      - "8092:9000"
+    environment:
+      - ASR_MODEL=base
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - whisper-network
+
+  whisper-video:
+    image: onerahmet/openai-whisper-asr-webservice:latest
+    container_name: whisper-video-prod
+    ports:
+      - "8095:9000"
+    environment:
+      - ASR_MODEL=base
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - whisper-network
+
+  whisper-ocr:
+    image: python:3.11-slim
+    container_name: whisper-ocr-prod
+    ports:
+      - "8097:8080"
+    volumes:
+      - ./ocr-service.py:/app/ocr-service.py:ro
+      - ./requirements-ocr.txt:/app/requirements-ocr.txt:ro
+    working_dir: /app
+    command: >
+      sh -c "
+        pip install -r requirements-ocr.txt &&
+        python ocr-service.py
+      "
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - whisper-network
+
+  whisper-documents:
+    image: python:3.11-slim
+    container_name: whisper-documents-prod
+    ports:
+      - "8098:8080"
+    volumes:
+      - ./document-service.py:/app/document-service.py:ro
+      - ./requirements-document.txt:/app/requirements-document.txt:ro
+    working_dir: /app
+    command: >
+      sh -c "
+        apt-get update &&
+        apt-get install -y pandoc ffmpeg poppler-utils &&
+        pip install -r requirements-document.txt &&
+        python document-service.py
+      "
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - whisper-network
+
+  whisper-webui:
+    image: nginx:alpine
+    container_name: whisper-webui-prod
+    ports:
+      - "8093:80"
+    volumes:
+      - ./whisper-webui:/usr/share/nginx/html:ro
+    networks:
+      - whisper-network
+
+  whisper-proxy:
+    image: nginx:alpine
+    container_name: whisper-proxy
+    ports:
+      - "8096:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - whisper-api
+      - whisper-video
+      - whisper-ocr
+      - whisper-documents
+    networks:
+      - whisper-network
+
+networks:
+  whisper-network:
+    driver: bridge

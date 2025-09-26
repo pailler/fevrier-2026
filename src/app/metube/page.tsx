@@ -2,66 +2,105 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@supabase/auth-helpers-react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function MeTubePage() {
   const router = useRouter();
-  const user = useUser();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const checkAccess = async () => {
+    const checkAuthAndRedirect = async () => {
       try {
-        // Vérifier si l'utilisateur est connecté
-        if (!user) {
-          setError('Vous devez être connecté pour accéder à MeTube');
+        console.log('🔒 MeTube: Vérification de l\'authentification...');
+        
+        // Vérifier la session utilisateur
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('❌ MeTube: Erreur session:', error);
+          setError('Erreur de session');
           setIsLoading(false);
           return;
         }
 
-        // Vérifier si le module MeTube est activé pour l'utilisateur
-        const response = await fetch('/api/check-metube-access', {
+        if (!session) {
+          console.log('❌ MeTube: Aucune session - affichage page d\'authentification');
+          setIsLoading(false);
+          return;
+        }
+
+        setUser(session.user);
+        console.log('✅ MeTube: Utilisateur connecté:', session.user.email);
+
+        // Vérifier l'accès à MeTube
+        console.log('🔍 MeTube: Vérification de l\'accès...');
+        const accessResponse = await fetch('/api/check-module-access', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            userId: user.id,
+            userId: session.user.id,
+            userEmail: session.user.email,
             moduleId: 'metube'
           })
         });
 
-        if (!response.ok) {
-          setError('Vous n\'avez pas accès au module MeTube');
+        if (!accessResponse.ok) {
+          const errorData = await accessResponse.json().catch(() => ({}));
+          console.log('❌ MeTube: Accès refusé:', errorData);
+          setError(errorData.message || 'Accès refusé à MeTube');
           setIsLoading(false);
           return;
         }
 
-        // Si tout est OK, ouvrir MeTube dans un nouvel onglet
-        window.open('https://metube.iahome.fr', '_blank');
-        // Rediriger vers /encours après un court délai
-        setTimeout(() => {
-          router.replace('/encours');
-        }, 1000);
-        
-      } catch (error) {
-        console.error('Erreur lors de la vérification d\'accès:', error);
-        setError('Erreur lors de la vérification d\'accès');
+        // Générer un token d'accès et rediriger
+        console.log('🔑 MeTube: Génération du token d\'accès...');
+        const tokenResponse = await fetch('/api/metube-redirect', {
+          method: 'GET',
+          credentials: 'include'
+        });
+
+        if (tokenResponse.ok) {
+          console.log('✅ MeTube: Redirection vers MeTube local...');
+          // La redirection est gérée par l'API
+        } else {
+          const errorData = await tokenResponse.json().catch(() => ({}));
+          console.log('❌ MeTube: Erreur génération token:', errorData);
+          setError(errorData.reason || 'Erreur lors de la génération du token');
+          setIsLoading(false);
+        }
+
+      } catch (err) {
+        console.error('❌ MeTube Error:', err);
+        setError('Erreur lors de la vérification de l\'authentification');
         setIsLoading(false);
       }
     };
 
-    checkAccess();
-  }, [user, router]);
+    checkAuthAndRedirect();
+  }, [router]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Vérification de l'accès...</h2>
-          <p className="text-gray-600">Veuillez patienter pendant que nous vérifions vos permissions.</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-6"></div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Accès à MeTube</h1>
+          <p className="text-gray-600">Vérification de votre authentification...</p>
+          <div className="mt-4 space-y-2">
+            <div className="w-64 bg-gray-200 rounded-full h-2 mx-auto">
+              <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
+            </div>
+            <p className="text-sm text-gray-500">Veuillez patienter</p>
+          </div>
         </div>
       </div>
     );
@@ -69,29 +108,78 @@ export default function MeTubePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-6">
-          <div className="text-6xl mb-4">🚫</div>
-          <h2 className="text-2xl font-bold text-red-800 mb-4">Accès refusé</h2>
-          <p className="text-red-600 mb-6">{error}</p>
+          <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg mb-6">
+            <div className="flex items-center justify-center mb-2">
+              <svg className="w-8 h-8 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <h2 className="text-xl font-semibold">Accès refusé</h2>
+            </div>
+            <p className="text-sm">{error}</p>
+          </div>
           <div className="space-y-3">
-            <button
-              onClick={() => router.push('/encours')}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+            <a 
+              href="https://iahome.fr/encours" 
+              className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
-              Retour aux modules
-            </button>
-            <button
-              onClick={() => router.push('/')}
-              className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-            >
-              Retour à l'accueil
-            </button>
+              Retour à IAHome
+            </a>
+            <div>
+              <a 
+                href="https://iahome.fr/login" 
+                className="text-blue-600 hover:text-blue-800 text-sm underline"
+              >
+                Se connecter
+              </a>
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  return null; // Ne devrait jamais être atteint
+  // Page d'authentification pour utilisateurs non connectés
+  return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="text-center max-w-md mx-auto p-6">
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">Accès à MeTube</h1>
+            <p className="text-gray-600">Vous devez vous identifier pour accéder à MeTube</p>
+          </div>
+          
+          <div className="space-y-4">
+            <a 
+              href="https://iahome.fr/login?redirect=/metube" 
+              className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium inline-block"
+            >
+              Se connecter
+            </a>
+            <a 
+              href="https://iahome.fr/register?redirect=/metube" 
+              className="w-full bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium inline-block"
+            >
+              Créer un compte
+            </a>
+          </div>
+          
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <a 
+              href="https://iahome.fr" 
+              className="text-blue-600 hover:text-blue-800 text-sm underline"
+            >
+              Retour à IAHome
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

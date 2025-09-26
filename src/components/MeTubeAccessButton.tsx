@@ -61,37 +61,14 @@ export default function MeTubeAccessButton({
         }
       }
 
-      // 2. Générer un token provisoire simple
-      console.log('🔑 MeTube: Génération du token provisoire...');
-      const provisionalToken = generateProvisionalToken(user.id, user.email);
-      console.log('✅ MeTube: Token provisoire généré:', provisionalToken.substring(0, 10) + '...');
-
-      // 3. Vérifier les tokens d'accès existants
-      const accessTokens = await checkExistingAccessTokens(user.id, 'metube');
+      // 2. Utiliser le système d'authentification unifié
+      console.log('🔑 MeTube: Génération du token d\'accès...');
       
-      if (accessTokens.length > 0) {
-        console.log('📋 MeTube: Tokens d\'accès existants trouvés:', accessTokens.length);
-        // Utiliser le premier token d'accès valide
-        const validToken = accessTokens.find(token => 
-          token.is_active && 
-          (!token.expires_at || new Date(token.expires_at) > new Date()) &&
-          (!token.max_usage || token.current_usage < token.max_usage)
-        );
-        
-        if (validToken) {
-          console.log('✅ MeTube: Utilisation du token d\'accès existant');
-          const metubeUrl = `https://metube.iahome.fr?token=${validToken.id}`;
-          onAccessGranted?.(metubeUrl);
-          return;
-        }
-      }
-
-      // 4. Utiliser le token provisoire si aucun token d'accès valide
-      console.log('🔄 MeTube: Utilisation du token provisoire');
-      const metubeUrl = `https://metube.iahome.fr?token=${provisionalToken}`;
-      console.log('🔗 MeTube: URL finale:', metubeUrl);
-
+      // Rediriger directement vers l'API de redirection qui gère l'authentification
+      const metubeUrl = 'https://iahome.fr/api/metube-redirect';
+      console.log('✅ MeTube: Redirection vers API d\'authentification');
       onAccessGranted?.(metubeUrl);
+      return;
 
     } catch (error) {
       console.error('❌ MeTube: Erreur:', error);
@@ -102,42 +79,6 @@ export default function MeTubeAccessButton({
     }
   };
 
-  const generateProvisionalToken = (userId: string, userEmail: string): string => {
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).substring(2, 15);
-    const data = `${userId}-${userEmail}-${timestamp}-${random}`;
-    
-    // Simple hash pour le token provisoire
-    let hash = 0;
-    for (let i = 0; i < data.length; i++) {
-      const char = data.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32bit integer
-    }
-    
-    return `prov_${Math.abs(hash).toString(36)}_${timestamp.toString(36)}`;
-  };
-
-  const checkExistingAccessTokens = async (userId: string, moduleId: string) => {
-    try {
-      const response = await fetch('/api/check-module-access', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId, moduleId })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return data.tokens || [];
-      }
-      return [];
-    } catch (error) {
-      console.error('❌ Erreur vérification tokens d\'accès:', error);
-      return [];
-    }
-  };
 
   return (
     <div className="flex flex-col items-center space-y-2">
