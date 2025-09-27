@@ -202,56 +202,15 @@ export default function EncoursPage() {
         if (modulesError) {
           }
 
-        // Récupérer les tokens d'accès créés manuellement pour cet utilisateur
-        let accessTokensData: any[] | null = null;
-        let tokensError: any = null;
-        
-        try {
-          const result = await supabase
-            .from('access_tokens')
-            .select(`
-              id,
-              name,
-              description,
-              module_id,
-              module_name,
-              access_level,
-              permissions,
-              max_usage,
-              current_usage,
-              is_active,
-              created_by,
-              created_at,
-              expires_at
-            `)
-            .eq('created_by', user.id)
-            .eq('is_active', true)
-            .order('created_at', { ascending: false });
-
-          accessTokensData = result.data;
-          tokensError = result.error;
-        } catch (error) {
-          tokensError = error;
-        }
-
-        if (tokensError) {
-          const errorMessage = tokensError.message || tokensError.details || tokensError.hint || JSON.stringify(tokensError) || 'Erreur inconnue';
-          }
 
         // Vérifier que les données sont valides
         if (!moduleAccessData) {
           moduleAccessData = []; // Initialiser avec un tableau vide
         }
-        if (!accessTokensData) {
-          accessTokensData = []; // Initialiser avec un tableau vide
-        }
         
         // S'assurer que les données sont des tableaux
         if (!Array.isArray(moduleAccessData)) {
           moduleAccessData = [];
-        }
-        if (!Array.isArray(accessTokensData)) {
-          accessTokensData = [];
         }
         
         // Transformer les modules user_applications avec vérification de sécurité
@@ -324,70 +283,8 @@ export default function EncoursPage() {
           }
         }
 
-        // Transformer les tokens d'accès en modules
-        const transformedTokens: UserModule[] = (accessTokensData || [])
-          .filter(token => {
-            // Vérifier que le token est valide
-            if (!token || typeof token !== 'object') {
-              console.error('Token invalide:', token);
-              return false;
-            }
-            if (!token.id) {
-              return false;
-            }
-            // Filtrer les tokens non expirés
-            if (!token.expires_at) return true;
-            try {
-              return new Date(token.expires_at) > new Date();
-            } catch (error) {
-              return true; // Garder par défaut si erreur de date
-            }
-          })
-          .map(token => {
-            try {
-              // Essayer de trouver le module correspondant par nom
-              let moduleInfo: any = {};
-              let moduleId = 'unknown';
-              
-              if (token.module_name) {
-                // Chercher le module par nom dans les modules récupérés
-                const matchingModule = modulesData.find(module => 
-                  module.title.toLowerCase().includes(token.module_name.toLowerCase()) ||
-                  token.module_name.toLowerCase().includes(module.title.toLowerCase())
-                );
-                
-                if (matchingModule) {
-                  moduleInfo = matchingModule;
-                  moduleId = matchingModule.id;
-                }
-              }
-              
-              return {
-                id: `token-${token.id || 'unknown'}`,
-                module_id: moduleId,
-                module_title: token.name || token.module_name || `Token ${token.id || 'unknown'}`,
-                module_description: token.description || 'Accès via token créé par l\'admin',
-                module_category: 'Token d\'accès',
-                module_url: moduleInfo.url || '', // Utiliser l'URL du module si trouvé
-                access_type: `Token (${(token.access_level || 'standard').replace(/premium\d+/, 'premium')})`,
-                expires_at: token.expires_at || null,
-                is_active: token.is_active !== undefined ? token.is_active : true,
-                created_at: token.created_at || new Date().toISOString(),
-                current_usage: token.current_usage || 0,
-                max_usage: token.max_usage || null,
-                user_id: token.created_by, // Utiliser created_by comme user_id
-                created_by: token.created_by,
-                price: moduleInfo.price || 0, // Utiliser le prix du module si trouvé
-                is_free: moduleInfo.price === 0 || moduleInfo.price === '0' || !moduleInfo.price
-              };
-            } catch (error) {
-              return null;
-            }
-          })
-          .filter(Boolean) as UserModule[];
-
-        // Combiner les deux listes
-        const allModules = [...transformedModules, ...transformedTokens];
+        // Utiliser seulement les modules transformés
+        const allModules = transformedModules;
         
         setUserModules(allModules);
         setError(null);
@@ -493,29 +390,7 @@ export default function EncoursPage() {
       }
     }
 
-    // Recharger les tokens d'accès
-    const { data: accessTokensData, error: tokensError } = await supabase
-      .from('access_tokens')
-      .select(`
-        id,
-        name,
-        description,
-        module_id,
-        module_name,
-        access_level,
-        permissions,
-        max_usage,
-        current_usage,
-        is_active,
-        created_by,
-        created_at,
-        expires_at
-      `)
-      .eq('created_by', user.id)
-      .eq('is_active', true)
-      .order('created_at', { ascending: false });
-
-    if (!modulesError && !tokensError) {
+    if (!modulesError) {
       // Transformer les modules user_applications
       const transformedModules: UserModule[] = (userModulesData || [])
         .filter(access => {
@@ -546,52 +421,8 @@ export default function EncoursPage() {
           };
         });
 
-      // Transformer les tokens d'accès
-      const transformedTokens: UserModule[] = (accessTokensData || [])
-        .filter(token => {
-          if (!token.expires_at) return true;
-          return new Date(token.expires_at) > new Date();
-        })
-        .map(token => {
-          // Essayer de trouver le module correspondant par nom
-          let moduleInfo: any = {};
-          let moduleId = 'unknown';
-          
-          if (token.module_name) {
-            // Chercher le module par nom dans les modules récupérés
-            const matchingModule = refreshModulesData.find(module => 
-              module.title.toLowerCase().includes(token.module_name.toLowerCase()) ||
-              token.module_name.toLowerCase().includes(module.title.toLowerCase())
-            );
-            
-            if (matchingModule) {
-              moduleInfo = matchingModule;
-              moduleId = matchingModule.id;
-            }
-          }
-          
-          return {
-            id: `token-${token.id}`,
-            module_id: moduleId,
-            module_title: token.name || token.module_name || `Token ${token.id}`,
-            module_description: token.description || 'Accès via token créé par l\'admin',
-            module_category: 'Token d\'accès',
-            module_url: moduleInfo.url || '',
-            access_type: `Token (${(token.access_level || 'standard').replace(/premium\d+/, 'premium')})`,
-            expires_at: token.expires_at,
-            is_active: token.is_active,
-            created_at: token.created_at,
-            current_usage: token.current_usage || 0,
-            max_usage: token.max_usage || null,
-            user_id: token.created_by, // Utiliser created_by comme user_id
-            created_by: token.created_by,
-            price: moduleInfo.price || 0,
-            is_free: moduleInfo.price === 0 || moduleInfo.price === '0' || !moduleInfo.price
-          };
-        });
-
-      // Combiner les deux listes
-      const allModules = [...transformedModules, ...transformedTokens];
+      // Utiliser seulement les modules transformés
+      const allModules = transformedModules;
       setUserModules(allModules);
     }
     setRefreshing(false);
@@ -643,9 +474,6 @@ export default function EncoursPage() {
   };
 
   const getModuleTypeColor = (module: UserModule) => {
-    if (module.module_category === 'Token d\'accès') {
-      return 'from-purple-600 to-pink-600';
-    }
     if (module.is_free) {
       return 'from-green-600 to-emerald-600';
     }
@@ -653,9 +481,6 @@ export default function EncoursPage() {
   };
 
   const getModuleTypeIcon = (module: UserModule) => {
-    if (module.module_category === 'Token d\'accès') {
-      return '🔑';
-    }
     if (module.is_free) {
       return '🆓';
     }
@@ -663,10 +488,6 @@ export default function EncoursPage() {
   };
 
   const getModuleTypeLabel = (module: UserModule) => {
-    if (module.module_category === 'Token d\'accès') {
-      return 'Token d\'accès';
-    }
-    
     // Pour les modules essentiels, afficher "Module essentiel"
     const essentialModules = ['metube', 'psitransfer', 'universal-converter', 'pdf', 'librespeed', 'qrcodes'];
     const isEssential = essentialModules.some(essentialId => 
@@ -836,12 +657,6 @@ export default function EncoursPage() {
                   </div>
                   <div className="text-sm text-gray-600">Accès temporaires</div>
                 </div>
-                <div className="bg-indigo-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-indigo-600">
-                    {userModules.filter(m => m.module_category === 'Token d\'accès').length}
-                  </div>
-                  <div className="text-sm text-gray-600">Tokens d'accès</div>
-                </div>
                 <div className="bg-red-50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-red-600">
                     {userModules.filter(m => m.expires_at && new Date(m.expires_at) <= new Date()).length}
@@ -851,77 +666,6 @@ export default function EncoursPage() {
               </div>
             </div>
 
-            {/* Section Tokens Premium avec statistiques détaillées */}
-            {userModules.filter(m => m.module_category === 'Token d\'accès' && m.access_type.includes('premium')).length > 0 && (
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl shadow-sm border border-purple-200 p-6 mb-6">
-                <h2 className="text-xl font-bold text-purple-900 mb-4 flex items-center">
-                  <span className="text-2xl mr-2">🔑</span>
-                  Tokens Premium - Statistiques détaillées
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {userModules
-                    .filter(m => m.module_category === 'Token d\'accès' && m.access_type.includes('premium'))
-                    .map((token) => {
-                      const usagePercentage = token.max_usage ? ((token.current_usage || 0) / token.max_usage) * 100 : 0;
-                      const remainingUsage = token.max_usage ? token.max_usage - (token.current_usage || 0) : 0;
-                      const isQuotaExceeded = token.max_usage ? (token.current_usage || 0) >= token.max_usage : false;
-                      
-                      return (
-                        <div key={token.id} className="bg-white rounded-lg p-4 shadow-sm border border-purple-200">
-                          <div className="flex items-center justify-between mb-3">
-                            <h3 className="font-semibold text-purple-900 text-sm truncate">
-                              {token.module_title.replace('Premium ', '').replace(` - ${user?.email}`, '')}
-                            </h3>
-                            <span className="px-2 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800">
-                              PREMIUM
-                            </span>
-                          </div>
-                          
-                          {/* Barre de progression des utilisations */}
-                          <div className="mb-3">
-                            <div className="flex justify-between text-xs text-gray-600 mb-1">
-                              <span>Utilisations</span>
-                              <span>{token.current_usage}/{token.max_usage}</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div 
-                                className={`h-2 rounded-full transition-all duration-300 ${
-                                  isQuotaExceeded ? 'bg-red-500' :
-                                  usagePercentage > 80 ? 'bg-red-500' : 
-                                  usagePercentage > 60 ? 'bg-yellow-500' : 'bg-green-500'
-                                }`}
-                                style={{ width: `${Math.min(usagePercentage, 100)}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                          
-                          {/* Statistiques */}
-                          <div className="space-y-2 text-xs">
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Restantes:</span>
-                              <span className={`font-semibold ${isQuotaExceeded ? 'text-red-600' : 'text-purple-700'}`}>
-                                {isQuotaExceeded ? 'Quota épuisé' : remainingUsage}
-                              </span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Expire:</span>
-                              <span className="font-semibold text-purple-700">
-                                {token.expires_at ? formatTimeRemaining(token.expires_at) : 'Permanent'}
-                              </span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Créé:</span>
-                              <span className="font-semibold text-purple-700">
-                                {formatDate(token.created_at)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                </div>
-              </div>
-            )}
 
             {/* Grille des modules améliorée */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
