@@ -54,7 +54,15 @@ export async function middleware(request: NextRequest) {
     const hostname = request.headers.get('host') || '';
 
     // Exceptions pour les APIs qui ne doivent pas être interceptées
-    if (pathname === '/api/librespeed-token' || pathname === '/api/check-librespeed-access' || pathname === '/api/increment-librespeed-access') {
+    if (pathname === '/api/librespeed-token' || 
+        pathname === '/api/check-librespeed-access' || 
+        pathname === '/api/increment-librespeed-access' ||
+        pathname === '/api/user-tokens' ||
+        pathname === '/api/test-tokens' ||
+        pathname === '/api/test-simple' ||
+        pathname.startsWith('/api/user-tokens') ||
+        pathname.startsWith('/api/test-tokens') ||
+        pathname.startsWith('/api/test-simple')) {
       return NextResponse.next();
     }
 

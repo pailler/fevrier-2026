@@ -9,7 +9,24 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { items, customerEmail, type, testMode = false } = body;
+    const { 
+      items, 
+      customerEmail, 
+      type, 
+      testMode = false,
+      // Nouveau format pour les modules individuels
+      moduleId,
+      userId,
+      amount,
+      currency = 'eur',
+      moduleTitle,
+      moduleDescription,
+      moduleCategory,
+      moduleUrl,
+      // Support pour l'achat de tokens
+      tokenPackage,
+      tokens
+    } = body;
 
     // Déterminer si on est en mode production ou test
     const isProductionMode = process.env.STRIPE_MODE === 'production' && !testMode;
@@ -17,6 +34,107 @@ export async function POST(request: NextRequest) {
 
     console.log('🔍 Mode de paiement:', isProductionMode ? 'PRODUCTION' : 'TEST');
 
+    // Support pour l'achat de tokens
+    if (type === 'token_purchase' && tokenPackage && tokens && userId) {
+      const lineItems = [{
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: `${tokenPackage.name} - ${moduleTitle || 'Tokens'}`,
+            description: `${tokens} tokens pour ${moduleTitle || 'modules payants'}`,
+          },
+          unit_amount: Math.round(tokenPackage.price * 100), // Convertir en centimes
+        },
+        quantity: 1,
+      }];
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: lineItems,
+        mode: 'payment',
+        success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://iahome.fr'}/payment-success?session_id={CHECKOUT_SESSION_ID}&test_mode=${isTestMode}&type=token_purchase`,
+        cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://iahome.fr'}/payment-cancel`,
+        customer_email: customerEmail,
+        metadata: {
+          type: 'token_purchase',
+          moduleId: moduleId || '',
+          moduleTitle: moduleTitle || '',
+          userId: userId,
+          customerEmail: customerEmail,
+          tokenPackage: JSON.stringify(tokenPackage),
+          tokens: tokens.toString(),
+          testMode: isTestMode.toString(),
+          environment: isProductionMode ? 'production' : 'test',
+        },
+        billing_address_collection: 'required',
+      });
+
+      console.log('✅ Session Stripe créée (tokens):', {
+        sessionId: session.id,
+        mode: isProductionMode ? 'PRODUCTION' : 'TEST',
+        amount: session.amount_total,
+        tokens: tokens,
+        package: tokenPackage.name
+      });
+
+      return NextResponse.json({
+        clientSecret: session.client_secret,
+        url: session.url,
+        sessionId: session.id,
+        testMode: isTestMode,
+        productionMode: isProductionMode,
+      });
+    }
+
+    // Support du nouveau format pour les modules individuels
+    if (moduleId && userId && amount) {
+      const lineItems = [{
+        price_data: {
+          currency: currency,
+          product_data: {
+            name: moduleTitle || 'Module IA',
+            description: moduleDescription || 'Accès au module IA',
+          },
+          unit_amount: Math.round(amount), // amount est déjà en centimes
+        },
+        quantity: 1,
+      }];
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: lineItems,
+        mode: 'subscription',
+        success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://iahome.fr'}/payment-success?session_id={CHECKOUT_SESSION_ID}&test_mode=${isTestMode}`,
+        cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://iahome.fr'}/payment-cancel`,
+        customer_email: customerEmail,
+        metadata: {
+          moduleId: moduleId,
+          moduleTitle: moduleTitle || '',
+          userId: userId,
+          customerEmail: customerEmail,
+          testMode: isTestMode.toString(),
+          environment: isProductionMode ? 'production' : 'test',
+        },
+        billing_address_collection: 'required',
+      });
+
+      console.log('✅ Session Stripe créée (module individuel):', {
+        sessionId: session.id,
+        mode: isProductionMode ? 'PRODUCTION' : 'TEST',
+        amount: session.amount_total,
+        module: moduleTitle
+      });
+
+      return NextResponse.json({
+        clientSecret: session.client_secret,
+        url: session.url,
+        sessionId: session.id,
+        testMode: isTestMode,
+        productionMode: isProductionMode,
+      });
+    }
+
+    // Format original pour les items multiples
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
         { error: 'Items requis pour créer la session de paiement' },

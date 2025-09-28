@@ -327,7 +327,6 @@ export default function EncoursPage() {
       'pdf': 'https://pdf.iahome.fr',  // PDF direct avec token
       'psitransfer': 'https://psitransfer.iahome.fr',  // PsiTransfer direct avec token
       'qrcodes': 'https://qrcodes.iahome.fr',  // QR Codes direct avec token
-      'converter': 'https://convert.iahome.fr',  // Converter direct avec token
       'whisper': 'https://whisper.iahome.fr',  // Whisper direct avec token
       'stablediffusion': 'https://stablediffusion.iahome.fr',  // StableDiffusion direct avec token
       'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',  // RuinedFooocus direct avec token

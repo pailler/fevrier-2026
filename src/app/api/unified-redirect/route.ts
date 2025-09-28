@@ -15,7 +15,6 @@ const MODULE_URLS: { [key: string]: string } = {
   'pdf': 'https://pdf.iahome.fr',
   'psitransfer': 'https://psitransfer.iahome.fr',
   'qrcodes': 'https://qrcodes.iahome.fr',
-  'converter': 'https://convert.iahome.fr',
   'stablediffusion': 'https://stablediffusion.iahome.fr',
   'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
   'invoke': 'https://invoke.iahome.fr',

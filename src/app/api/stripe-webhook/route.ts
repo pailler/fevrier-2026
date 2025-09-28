@@ -76,9 +76,68 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
   const moduleTitle = session.metadata?.moduleTitle;
   const customerEmail = session.metadata?.customerEmail;
   const isTestMode = session.metadata?.testMode === 'true';
+  const paymentType = session.metadata?.type;
 
-  if (!moduleId || !moduleTitle || !customerEmail) {
-    console.log('❌ Métadonnées manquantes:', session.metadata);
+  if (!customerEmail) {
+    console.log('❌ Email client manquant:', session.metadata);
+    return;
+  }
+
+  // Récupérer l'utilisateur par email
+  const { data: userData, error: userError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', customerEmail)
+    .single();
+
+  if (userError || !userData) {
+    console.log('❌ Utilisateur non trouvé:', customerEmail);
+    return;
+  }
+
+  // Gérer l'achat de tokens
+  if (paymentType === 'token_purchase') {
+    const tokenPackage = session.metadata?.tokenPackage;
+    const tokens = parseInt(session.metadata?.tokens || '0');
+
+    if (!tokenPackage || !tokens) {
+      console.log('❌ Données de tokens manquantes:', session.metadata);
+      return;
+    }
+
+    console.log('🔄 Ajout de tokens via webhook:', {
+      userId: userData.id,
+      tokens,
+      package: tokenPackage
+    });
+
+    // Ajouter les tokens à l'utilisateur
+    const { error: tokenError } = await supabase
+      .from('user_tokens')
+      .upsert([
+        {
+          user_id: userData.id,
+          tokens: tokens,
+          package_name: tokenPackage,
+          purchase_date: new Date().toISOString(),
+          is_active: true
+        }
+      ], {
+        onConflict: 'user_id'
+      });
+
+    if (tokenError) {
+      console.error('❌ Erreur lors de l\'ajout des tokens:', tokenError);
+      return;
+    }
+
+    console.log('✅ Tokens ajoutés avec succès via webhook');
+    return;
+  }
+
+  // Gérer l'activation de module (logique existante)
+  if (!moduleId || !moduleTitle) {
+    console.log('❌ Métadonnées module manquantes:', session.metadata);
     return;
   }
 
@@ -88,18 +147,6 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     customerEmail,
     isTestMode
   });
-
-  // Récupérer l'utilisateur par email
-  const { data: userData, error: userError } = await supabase
-    .from('users')
-    .select('id')
-    .eq('email', customerEmail)
-    .single();
-
-  if (userError || !userData) {
-    console.log('❌ Utilisateur non trouvé:', customerEmail);
-    return;
-  }
 
   // Vérifier si l'utilisateur a déjà accès à ce module
   const { data: existingAccess } = await supabase

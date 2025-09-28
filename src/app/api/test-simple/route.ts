@@ -1,27 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: NextRequest) {
-  console.log('🧪 Test Simple API appelée');
-  
-  try {
-    const body = await request.json();
-    console.log('🧪 Body reçu:', body);
-    
-    return NextResponse.json({
-      success: true,
-      message: 'Test API fonctionne',
-      body: body
-    });
-  } catch (error) {
-    console.log('🧪 Erreur parsing JSON:', error);
-    return NextResponse.json({
-      success: false,
-      error: error.message
-    });
-  }
+export async function GET(request: NextRequest) {
+  return NextResponse.json({ message: 'API test fonctionne' }, { status: 200 });
 }
 
-
-
-
-
+export async function POST(request: NextRequest) {
+  return NextResponse.json({ message: 'POST test fonctionne' }, { status: 200 });
+}

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { UPLOAD_LIMITS, validateFileSize } from '@/utils/uploadLimits';
 
 // Configuration des limites pour cette route spécifique
 export const config = {
@@ -14,38 +13,61 @@ export async function POST(request: NextRequest) {
     const type = formData.get('type') as 'AUDIO' | 'VIDEO' | 'IMAGE';
     const userId = formData.get('userId') as string;
 
+    console.log('🎵 Whisper Upload - Fichier reçu:', file?.name, 'Type:', type, 'User:', userId);
+
     if (!file || !type || !userId) {
       return NextResponse.json(
         { error: 'Fichier, type et userId requis' },
-        { status: 400 }
+        { 
+          status: 400,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie, X-Requested-With',
+          }
+        }
       );
     }
 
-    // Valider la taille et le type du fichier
-    const validation = validateFileSize(file, type);
-    if (!validation.valid) {
+    // Validation simplifiée de la taille (100MB max)
+    const maxSize = 100 * 1024 * 1024; // 100MB
+    if (file.size > maxSize) {
       return NextResponse.json(
-        { error: validation.error },
-        { status: 413 }
+        { error: `Fichier trop volumineux. Maximum: ${maxSize / 1024 / 1024}MB` },
+        { 
+          status: 413,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie, X-Requested-With',
+          }
+        }
       );
     }
 
-    // Déterminer l'URL de destination selon le type
+    // Déterminer l'URL de destination selon le type (noms de conteneurs corrigés)
     let targetUrl: string;
     switch (type) {
       case 'AUDIO':
-        targetUrl = 'http://whisper-api:9000/asr';
+        targetUrl = 'http://192.168.1.150:8092/asr';
         break;
       case 'VIDEO':
-        targetUrl = 'http://whisper-video:9000/asr';
+        targetUrl = 'http://192.168.1.150:8095/asr';
         break;
       case 'IMAGE':
-        targetUrl = 'http://whisper-ocr:8080/ocr';
+        targetUrl = 'http://192.168.1.150:8094/ocr';
         break;
       default:
         return NextResponse.json(
           { error: 'Type de fichier non supporté' },
-          { status: 400 }
+          { 
+            status: 400,
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+              'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie, X-Requested-With',
+            }
+          }
         );
     }
 
@@ -58,7 +80,9 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       body: proxyFormData,
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Accept': 'application/json, text/plain, */*',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
       },
     });
 
@@ -70,22 +94,55 @@ export async function POST(request: NextRequest) {
           details: errorText,
           status: response.status
         },
-        { status: response.status }
+        { 
+          status: response.status,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie, X-Requested-With',
+          }
+        }
       );
     }
 
-    const result = await response.json();
+    const result = await response.text();
     
     return NextResponse.json({
       success: true,
       result: result
+    }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie, X-Requested-With',
+      }
     });
 
   } catch (error) {
     console.error('Erreur Whisper upload:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie, X-Requested-With',
+        }
+      }
     );
   }
+}
+
+export async function OPTIONS(request: NextRequest) {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie, X-Requested-With',
+      'Access-Control-Allow-Credentials': 'true',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
 }

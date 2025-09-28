@@ -12,7 +12,6 @@ export default function TestUrlsDirectPage() {
     'LibreSpeed': 'https://librespeed.iahome.fr',
     'PsiTransfer': 'https://psitransfer.iahome.fr',
     'QR Codes': 'https://qrcodes.iahome.fr',
-    'Converter': 'https://convert.iahome.fr'
   };
 
   const testUrl = async (name: string, url: string) => {
@@ -114,6 +113,7 @@ export default function TestUrlsDirectPage() {
     </div>
   );
 }
+
 
 
 

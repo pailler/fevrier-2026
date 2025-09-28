@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       type,
       chunks: new Map(),
       createdAt: new Date(),
-      totalChunks: Math.ceil(size / (50 * 1024 * 1024)) // 50MB par chunk
+      totalChunks: Math.ceil(size / (20 * 1024 * 1024)) // 20MB par chunk
     };
     
     uploadSessions.set(sessionId, sessionData);
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       sessionId,
       totalChunks: sessionData.totalChunks,
-      chunkSize: 50 * 1024 * 1024
+      chunkSize: 20 * 1024 * 1024
     }, {
       headers: {
         'Access-Control-Allow-Origin': '*',

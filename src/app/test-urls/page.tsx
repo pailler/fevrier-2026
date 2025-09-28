@@ -18,7 +18,6 @@ export default function TestUrlsPage() {
       'pdf': 'https://pdf.iahome.fr',  // PDF doit aller vers PDF
       'psitransfer': 'https://psitransfer.iahome.fr',
       'qrcodes': 'https://qrcodes.iahome.fr',
-      'converter': 'https://convert.iahome.fr',
       'stablediffusion': 'https://stablediffusion.iahome.fr',
       'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
       'invoke': 'https://invoke.iahome.fr',
@@ -115,6 +114,7 @@ export default function TestUrlsPage() {
     </div>
   );
 }
+
 
 
 

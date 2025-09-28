@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../utils/supabaseClient';
 import DynamicNavigation from './DynamicNavigation';
+import TokenBalance from './TokenBalance';
 import { NotificationServiceClient } from '../utils/notificationServiceClient';
 import { useIframeDetection } from '../utils/useIframeDetection';
 
@@ -138,6 +139,14 @@ export default function Header() {
                 </div>
                 
                 <div className="flex items-center space-x-3">
+                  {/* Solde de tokens - Visible seulement si connecté */}
+                  {session && (
+                    <TokenBalance 
+                      userId={session.user.id} 
+                      className="text-blue-100 hover:text-white transition-colors"
+                    />
+                  )}
+                  
                   <Link 
                     href="/encours" 
                     className="bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors flex items-center space-x-1"
@@ -221,6 +230,7 @@ export default function Header() {
               >
                 Essentiels
               </Link>
+              
             </div>
             
             {/* Boutons à droite - Desktop */}
@@ -269,6 +279,7 @@ export default function Header() {
                 >
                   Essentiels
                 </Link>
+                
                 
                 {/* Boutons mobile */}
                 <div className="flex flex-col space-y-2 pt-3 border-t border-gray-200">

@@ -41,8 +41,8 @@ export default function WhisperPage() {
   const [showActivateButton, setShowActivateButton] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
 
-  // Whisper IA est un module gratuit
-  const isFreeModule = true;
+  // Whisper IA est un module payant
+  const isFreeModule = false;
 
   // Fonction pour vérifier si un module est déjà activé
   const checkModuleActivation = useCallback(async (moduleId: string) => {
@@ -235,7 +235,7 @@ export default function WhisperPage() {
       // Pour les modules gratuits, afficher le bouton d'activation
       setShowActivateButton(true);
     } else {
-      // Logique d'abonnement pour les modules payants
+      // Logique d'abonnement pour les modules payants - redirection vers Stripe
       router.push(`/subscription/${card.id}`);
     }
   };
@@ -486,10 +486,10 @@ export default function WhisperPage() {
             <div className="text-left mb-8">
               <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
                 <div className="text-4xl font-bold mb-1">
-                  Free
+                  €9.99
                 </div>
                 <div className="text-sm opacity-90">
-                  Gratuit
+                  Par mois
                 </div>
               </div>
             </div>
@@ -524,8 +524,8 @@ export default function WhisperPage() {
                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
                     onClick={() => handleSubscribe(card!)}
                   >
-                    <span className="text-xl">🔐</span>
-                    <span>Choisir</span>
+                    <span className="text-xl">💳</span>
+                    <span>S'abonner</span>
                   </button>
                 )}
 
@@ -790,7 +790,7 @@ export default function WhisperPage() {
                 </div>
                 <div>
                   <h5 className="font-semibold text-gray-900">Prix</h5>
-                  <p className="text-gray-600 text-sm">Gratuit</p>
+                  <p className="text-gray-600 text-sm">€9.99/mois</p>
                 </div>
               </div>
               
@@ -830,7 +830,7 @@ export default function WhisperPage() {
                 Commencer maintenant
               </button>
               <span className="text-sm text-gray-500">
-                Accès instantané et gratuit
+                Abonnement mensuel requis
               </span>
             </div>
           </div>

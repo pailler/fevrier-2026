@@ -295,7 +295,7 @@ export default function Home() {
   const categories = ['Toutes les catégories', ...allCategories];
 
   // Modules essentiels à exclure de la page applications
-  const essentialModules = ['metube', 'psitransfer', 'universal-converter', 'pdf', 'librespeed', 'qrcodes'];
+  const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes'];
   
   // Filtrer et trier les modules
   const filteredAndSortedModules = modules

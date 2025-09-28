@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['@supabase/supabase-js'],
   },
   
+  // Configuration pour les gros uploads
+  serverRuntimeConfig: {
+    maxFileSize: 100 * 1024 * 1024, // 100MB
+  },
+  
   // Configuration des polices optimisée
   // optimizeFonts: false, // Option non reconnue dans Next.js 15
   
@@ -105,6 +110,31 @@ const nextConfig: NextConfig = {
           {
             key: 'Access-Control-Allow-Credentials',
             value: 'true'
+          }
+        ]
+      },
+      {
+        source: '/api/whisper-upload/(.*)',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*'
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, PUT, DELETE, OPTIONS'
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, Authorization, Cookie, X-Requested-With'
+          },
+          {
+            key: 'Access-Control-Allow-Credentials',
+            value: 'true'
+          },
+          {
+            key: 'Access-Control-Max-Age',
+            value: '86400'
           }
         ]
       },

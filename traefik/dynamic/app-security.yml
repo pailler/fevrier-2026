@@ -32,12 +32,6 @@ http:
         replacement: "https://iahome.fr/api/redirect-qrcodes$1"
         permanent: false
     
-    # Middleware de redirection sécurisée pour Universal Converter
-    converter-secure-redirect:
-      redirectRegex:
-        regex: "^https://convert\\.iahome\\.fr(.*)$"
-        replacement: "https://iahome.fr/api/redirect-converter$1"
-        permanent: false
     
     # Middleware de redirection sécurisée pour Stable Diffusion
     stablediffusion-secure-redirect:
@@ -119,14 +113,6 @@ http:
       tls: {}
       priority: 100
 
-    # Universal Converter - Redirection sécurisée
-    converter-secure:
-      rule: "Host(`convert.iahome.fr`)"
-      entryPoints: ["websecure"]
-      service: converter-redirect-service
-      middlewares: ["converter-secure-redirect", "security-headers@file", "compress@file"]
-      tls: {}
-      priority: 100
 
     # Stable Diffusion - Redirection sécurisée
     stablediffusion-secure:
@@ -209,11 +195,6 @@ http:
           - url: "http://iahome-app:3000"
         passHostHeader: true
 
-    converter-redirect-service:
-      loadBalancer:
-        servers:
-          - url: "http://iahome-app:3000"
-        passHostHeader: true
 
     stablediffusion-redirect-service:
       loadBalancer:
