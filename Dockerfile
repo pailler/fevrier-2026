@@ -42,9 +42,9 @@ RUN adduser --system --uid 1001 nextjs
 
 # Copier les fichiers nécessaires
 COPY --from=base /app/public ./public
-COPY --from=base /app/.next/standalone ./
-COPY --from=base /app/.next/static ./.next/static
+COPY --from=base /app/.next ./.next
 COPY --from=base /app/package.json ./package.json
+COPY --from=base /app/node_modules ./node_modules
 
 # S'assurer que tous les fichiers statiques sont copiés
 RUN ls -la ./.next/static || echo "Static files not found"
@@ -63,4 +63,4 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Commande de démarrage
-CMD ["node", "server.js"] 
+CMD ["npm", "start"] 

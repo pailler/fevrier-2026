@@ -346,7 +346,7 @@ export default function DemoPhotoPortfolioPage() {
             <div>
               <h4 className="font-medium text-blue-800 mb-2">Fonctionnalités :</h4>
               <ul className="text-sm text-blue-700 space-y-1">
-                <li>• Recherche sémantique intelligente</li>
+                <li>• Recherche sémantique</li>
                 <li>• Classification automatique</li>
                 <li>• Embeddings vectoriels</li>
                 <li>• Interface intuitive</li>

@@ -124,7 +124,7 @@ export default function Home() {
               // Ajouter des données aléatoires seulement pour l'affichage (pas stockées en DB)
               role: getRandomRole(),
               usage_count: Math.floor(Math.random() * 1000) + 1,
-              profession: getModuleProfession(module.title, primaryCategory) // CHANGÉ : attribution intelligente
+              profession: getModuleProfession(module.title, primaryCategory) // CHANGÉ : attribution automatique
             };
           });
           

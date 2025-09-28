@@ -99,14 +99,12 @@ export default function TokensPage() {
     try {
       setLoading(true);
       
-      // Charger les modules depuis la base de données
-      const { data: modulesData, error: modulesError } = await supabase
-        .from('modules')
-        .select('*')
-        .order('title', { ascending: true });
+      // Charger les modules depuis l'API
+      const response = await fetch('/api/modules');
+      const data = await response.json();
 
-      if (modulesError) {
-        console.error('Erreur lors du chargement des modules:', modulesError);
+      if (!response.ok || !data.success) {
+        console.error('Erreur lors du chargement des modules:', data.error);
         // Fallback avec des modules fictifs si la table n'existe pas
         const mockModules: Module[] = [
           {
@@ -152,7 +150,7 @@ export default function TokensPage() {
         ];
         setModules(mockModules);
       } else {
-        setModules(modulesData || []);
+        setModules(data.modules || []);
       }
       
       setLoading(false);
@@ -270,7 +268,7 @@ export default function TokensPage() {
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Achat de Tokens</h1>
-          <p className="text-gray-600">Achetez des tokens pour accéder aux modules payants d'IAHome</p>
+          <p className="text-gray-600">Achetez des tokens pour accéder aux modules d'IAHome</p>
         </div>
 
         {/* Étape 1: Sélection du module */}
@@ -403,7 +401,7 @@ export default function TokensPage() {
         <div className="bg-blue-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-blue-900 mb-3">Comment fonctionnent les tokens ?</h3>
           <div className="space-y-2 text-blue-800">
-            <p>• Chaque module payant consomme un certain nombre de tokens par utilisation</p>
+            <p>• Chaque module consomme un certain nombre de tokens par utilisation</p>
             <p>• Les tokens sont débités uniquement lors de l'utilisation effective du module</p>
             <p>• Les tokens n'expirent pas et restent disponibles dans votre compte</p>
             <p>• Vous pouvez acheter des tokens supplémentaires à tout moment</p>

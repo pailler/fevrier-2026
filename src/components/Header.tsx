@@ -109,7 +109,7 @@ export default function Header() {
                       className="text-blue-100 hover:text-white transition-colors text-sm"
                       onClick={() => router.push('/login')}
                     >
-                      Se connecter à IAHome
+                      Se connecter
                     </button>
                     <button 
                       className="bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors"

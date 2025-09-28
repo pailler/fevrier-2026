@@ -16,8 +16,6 @@ export const performanceConfig = {
   fonts: {
     display: 'swap',
     preload: [
-      '/fonts/geist-sans.woff2',
-      '/fonts/geist-mono.woff2'
     ],
     fallbacks: [
       'system-ui',
@@ -68,8 +66,6 @@ export const performanceConfig = {
       '/scripts/critical.js'
     ],
     fonts: [
-      '/fonts/geist-sans.woff2',
-      '/fonts/geist-mono.woff2'
     ],
     images: [
       '/og-image.jpg',
@@ -80,18 +76,6 @@ export const performanceConfig = {
   // Configuration des préchargements
   preload: {
     fonts: [
-      {
-        href: '/fonts/geist-sans.woff2',
-        as: 'font',
-        type: 'font/woff2',
-        crossOrigin: 'anonymous'
-      },
-      {
-        href: '/fonts/geist-mono.woff2',
-        as: 'font',
-        type: 'font/woff2',
-        crossOrigin: 'anonymous'
-      }
     ],
     images: [
       {

@@ -8,7 +8,7 @@ Ce document résume toutes les améliorations apportées au projet Blender 3D po
 
 ### ✅ **Fonctionnalités ajoutées**
 - **8 nouveaux matériaux** (métal, verre, bois, plastique, caoutchouc, tissu, pierre, céramique)
-- **11 couleurs** avec extraction intelligente
+- **11 couleurs** avec extraction automatique
 - **3 nouvelles formes** (pyramide, icosphère, monkey Suzanne)
 - **3 types d'animations** (rotation, redimensionnement, rebond)
 - **2 nouveaux formats d'export** (DAE, BLEND)
@@ -19,7 +19,7 @@ Ce document résume toutes les améliorations apportées au projet Blender 3D po
 - **API Flask v2.0** avec 605 lignes de code (vs 468 lignes v1.0)
 - **Script Blender amélioré** avec 400+ lignes (vs 145 lignes v1.0)
 - **Tests complets** avec 16 tests automatisés
-- **Script de démarrage intelligent** avec vérifications
+- **Script de démarrage automatique** avec vérifications
 - **Documentation complète** avec exemples d'utilisation
 
 ## 🎨 **Nouvelles fonctionnalités détaillées**
@@ -53,7 +53,7 @@ def create_cube(size=1.0, location=(0, 0, 0), color=None, material_type='plastic
 - **Pierre** : rugueux, naturel (roughness=0.7)
 - **Céramique** : lisse, brillant (roughness=0.2)
 
-### 2. **Extraction intelligente des couleurs**
+### 2. **Extraction automatique des couleurs**
 ```python
 def extract_color(text):
     colors = {
@@ -281,7 +281,7 @@ def run_all_tests():
 
 ## 🚀 **Scripts de démarrage améliorés**
 
-### Script de démarrage intelligent
+### Script de démarrage automatique
 ```powershell
 # Vérifications automatiques
 - Docker en cours d'exécution

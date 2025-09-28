@@ -8,8 +8,6 @@ export default function PerformanceOptimizer() {
       // Preload des ressources critiques
       const preloadCriticalResources = () => {
         const criticalResources = [
-          '/fonts/geist-sans.woff2',
-          '/fonts/geist-mono.woff2',
           '/og-image.jpg',
         ];
 
@@ -44,16 +42,14 @@ export default function PerformanceOptimizer() {
 
       // Optimisation des polices
       const optimizeFonts = () => {
-        // Ajouter font-display: swap pour les polices
+        // Ajouter font-display: swap pour les polices système
         const style = document.createElement('style');
         style.textContent = `
-          @font-face {
-            font-family: 'Geist';
-            font-display: swap;
+          * {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
           }
-          @font-face {
-            font-family: 'Geist Mono';
-            font-display: swap;
+          code, pre, .font-mono {
+            font-family: "SF Mono", Monaco, Inconsolata, "Roboto Mono", "Courier New", monospace;
           }
         `;
         document.head.appendChild(style);
@@ -63,34 +59,46 @@ export default function PerformanceOptimizer() {
       const measureWebVitals = () => {
         // Largest Contentful Paint (LCP)
         const measureLCP = () => {
-          new PerformanceObserver((entryList) => {
-            const entries = entryList.getEntries();
-            const lastEntry = entries[entries.length - 1];
-            // console.log('LCP:', lastEntry.startTime);
-          }).observe({ entryTypes: ['largest-contentful-paint'] });
+          try {
+            new PerformanceObserver((entryList) => {
+              const entries = entryList.getEntries();
+              const lastEntry = entries[entries.length - 1];
+              // console.log('LCP:', lastEntry.startTime);
+            }).observe({ entryTypes: ['largest-contentful-paint'] });
+          } catch (error) {
+            console.log('LCP measurement not supported');
+          }
         };
 
         // First Input Delay (FID)
         const measureFID = () => {
-          new PerformanceObserver((entryList) => {
-            const entries = entryList.getEntries();
-            entries.forEach((entry) => {
-              // console.log('FID:', (entry as any).processingStart - entry.startTime);
-            });
-          }).observe({ entryTypes: ['first-input'] });
+          try {
+            new PerformanceObserver((entryList) => {
+              const entries = entryList.getEntries();
+              entries.forEach((entry) => {
+                // console.log('FID:', (entry as any).processingStart - entry.startTime);
+              });
+            }).observe({ entryTypes: ['first-input'] });
+          } catch (error) {
+            console.log('FID measurement not supported');
+          }
         };
 
         // Cumulative Layout Shift (CLS)
         const measureCLS = () => {
-          let clsValue = 0;
-          new PerformanceObserver((entryList) => {
-            for (const entry of entryList.getEntries()) {
-              if (!(entry as any).hadRecentInput) {
-                clsValue += (entry as any).value;
+          try {
+            let clsValue = 0;
+            new PerformanceObserver((entryList) => {
+              for (const entry of entryList.getEntries()) {
+                if (!(entry as any).hadRecentInput) {
+                  clsValue += (entry as any).value;
+                }
               }
-            }
-            // console.log('CLS:', clsValue);
-          }).observe({ entryTypes: ['layout-shift'] });
+              // console.log('CLS:', clsValue);
+            }).observe({ entryTypes: ['layout-shift'] });
+          } catch (error) {
+            console.log('CLS measurement not supported');
+          }
         };
 
         if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {

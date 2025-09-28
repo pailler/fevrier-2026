@@ -893,34 +893,46 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             </>
           ) : isQRCodes ? (
             <>
-              {/* Style spécial pour QRcodes dynamiques - informations visibles en permanence */}
+              {/* Style spécial pour QRcodes - informations visibles en permanence */}
               {/* Badge catégorie en haut à gauche */}
               <div className="absolute top-3 left-3 z-20">
-                <span className="bg-gradient-to-r from-slate-500 to-gray-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                <span className="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
                   {module.category}
                 </span>
               </div>
               
-              {/* Logo QRcodes dynamiques au centre */}
+              {/* Logo QRcodes au centre */}
               <div className="absolute inset-0 flex items-center justify-center z-20">
-                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-slate-500/20">
-                  {/* Logo QRcodes dynamiques avec icône de code QR */}
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-green-500/20">
+                  {/* Logo QRcodes avec icône de code QR */}
                   <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
                     {/* Cercle de fond */}
-                    <circle cx="12" cy="12" r="10" fill="#4B5563" stroke="#374151" strokeWidth="1"/>
+                    <circle cx="12" cy="12" r="10" fill="#10B981" stroke="#059669" strokeWidth="1"/>
                     
                     {/* Icône de code QR */}
-                    <path d="M12 2 L12 4" stroke="white" strokeWidth="1"/>
-                    <path d="M12 20 L12 22" stroke="white" strokeWidth="1"/>
-                    <path d="M2 12 L4 12" stroke="white" strokeWidth="1"/>
-                    <path d="M20 12 L22 12" stroke="white" strokeWidth="1"/>
+                    <rect x="4" y="4" width="16" height="16" rx="2" stroke="white" strokeWidth="2" fill="none"/>
                     
-                    {/* Lignes de code QR */}
-                    <path d="M12 6 L12 18" stroke="white" strokeWidth="1"/>
-                    <path d="M6 12 L18 12" stroke="white" strokeWidth="1"/>
+                    {/* Modules du QR Code */}
+                    <rect x="6" y="6" width="2" height="2" fill="white"/>
+                    <rect x="10" y="6" width="2" height="2" fill="white"/>
+                    <rect x="14" y="6" width="2" height="2" fill="white"/>
+                    <rect x="6" y="10" width="2" height="2" fill="white"/>
+                    <rect x="10" y="10" width="2" height="2" fill="white"/>
+                    <rect x="14" y="10" width="2" height="2" fill="white"/>
+                    <rect x="6" y="14" width="2" height="2" fill="white"/>
+                    <rect x="10" y="14" width="2" height="2" fill="white"/>
+                    <rect x="14" y="14" width="2" height="2" fill="white"/>
                     
-                    {/* Points de connexion */}
-                    <circle cx="12" cy="12" r="1" fill="white"/>
+                    {/* Indicateurs de scan */}
+                    <circle cx="8" cy="8" r="0.5" fill="white" className="animate-pulse">
+                      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="16" cy="8" r="0.5" fill="white" className="animate-pulse">
+                      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
+                    </circle>
+                    <circle cx="8" cy="16" r="0.5" fill="white" className="animate-pulse">
+                      <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
+                    </circle>
                   </svg>
                 </div>
               </div>
@@ -939,10 +951,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                     {module.subtitle}
                   </p>
                 )}
-                {/* Badge "DYNAMIC" pour QRcodes dynamiques */}
+                {/* Badge "FREE" pour QRcodes */}
                 <div className="mt-2">
-                  <span className="bg-gradient-to-r from-slate-400 to-gray-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-                    🔄 DYNAMIC
+                  <span className="bg-gradient-to-r from-green-400 to-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    🆓 FREE
                   </span>
                 </div>
               </div>

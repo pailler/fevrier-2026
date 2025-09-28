@@ -184,7 +184,7 @@ export default function PhotoSearch({
 
       {/* Suggestions de recherche */}
       <div className="text-sm text-gray-600">
-        <p className="font-medium mb-2">Exemples de recherches intelligentes :</p>
+        <p className="font-medium mb-2">Exemples de recherches :</p>
         <div className="flex flex-wrap gap-2">
           {[
             'photos de mariage en extérieur',

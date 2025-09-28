@@ -39,6 +39,40 @@ services:
     networks:
       - essentiels-network
 
+  # PsiTransfer - Transfert de fichiers sécurisé
+  psitransfer:
+    image: psitrax/psitransfer:latest
+    container_name: psitransfer
+    restart: unless-stopped
+    ports:
+      - "8084:3000"
+    environment:
+      - PSITRANSFER_ADMIN_EMAIL=admin@iahome.fr
+      - PSITRANSFER_SITE_NAME=IAHome Transfer
+    volumes:
+      - ./psitransfer-data:/var/lib/psitransfer
+    networks:
+      - essentiels-network
+
+  # QR Codes - Générateur de QR codes statiques
+  qrcodes:
+    build:
+      context: ./qrcodes
+      dockerfile: Dockerfile
+    container_name: qrcodes
+    restart: unless-stopped
+    ports:
+      - "7005:7005"
+    environment:
+      - FLASK_ENV=production
+      - IAHOME_JWT_SECRET=qr-code-secret-key-change-in-production
+      - IAHOME_API_URL=http://localhost:3000
+    volumes:
+      - ./qrcodes/qr-codes:/app/qr_codes
+      - ./qrcodes/logs:/app/logs
+    networks:
+      - essentiels-network
+
 networks:
   essentiels-network:
     driver: bridge

@@ -13,7 +13,7 @@ export default function PhotoPortfolioPage() {
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4">Fonctionnalités disponibles :</h2>
           <ul className="space-y-2 text-gray-700">
-            <li>✅ Upload intelligent de photos</li>
+            <li>✅ Upload de photos</li>
             <li>✅ Analyse automatique par IA</li>
             <li>✅ Recherche sémantique</li>
             <li>✅ Gestion des collections</li>

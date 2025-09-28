@@ -2,13 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 // Initialiser Stripe avec la clé secrète (peut être test ou production selon l'environnement)
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-08-27.basil',
-});
+let stripe: Stripe;
+try {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+    apiVersion: '2025-08-27.basil',
+  });
+  console.log('✅ Stripe initialisé avec succès');
+} catch (error) {
+  console.error('❌ Erreur initialisation Stripe:', error);
+  throw error;
+}
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🔍 API create-payment-intent: Début de la requête');
+    
     const body = await request.json();
+    console.log('🔍 API create-payment-intent: Body reçu:', JSON.stringify(body, null, 2));
+    
     const { 
       items, 
       customerEmail, 
@@ -33,9 +44,26 @@ export async function POST(request: NextRequest) {
     const isTestMode = !isProductionMode || testMode;
 
     console.log('🔍 Mode de paiement:', isProductionMode ? 'PRODUCTION' : 'TEST');
+    console.log('🔍 Clé Stripe configurée:', !!process.env.STRIPE_SECRET_KEY);
+    console.log('🔍 Clé Stripe (premiers caractères):', process.env.STRIPE_SECRET_KEY?.substring(0, 10));
 
     // Support pour l'achat de tokens
+    console.log('🔍 Vérification des conditions token_purchase:', {
+      type,
+      hasTokenPackage: !!tokenPackage,
+      tokens,
+      userId,
+      condition: type === 'token_purchase' && tokenPackage && tokens && userId
+    });
+    
     if (type === 'token_purchase' && tokenPackage && tokens && userId) {
+      console.log('🔍 Création de session Stripe pour tokens:', {
+        tokenPackage,
+        tokens,
+        userId,
+        customerEmail
+      });
+      
       const lineItems = [{
         price_data: {
           currency: 'eur',
@@ -47,6 +75,8 @@ export async function POST(request: NextRequest) {
         },
         quantity: 1,
       }];
+
+      console.log('🔍 Line items créés:', lineItems);
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],

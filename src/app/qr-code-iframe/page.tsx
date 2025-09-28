@@ -72,7 +72,7 @@ export default function QRCodeIframePage() {
               </button>
               <div className="h-6 w-px bg-gray-300"></div>
               <h1 className="text-xl font-semibold text-gray-900">
-                QR Codes Intelligents
+                QR Codes
               </h1>
             </div>
             
@@ -105,7 +105,7 @@ export default function QRCodeIframePage() {
                   </span>
                 </div>
                 <div className="text-sm text-gray-500">
-                  Application QR Codes Intelligents
+                  Application QR Codes
                 </div>
               </div>
               
@@ -135,7 +135,7 @@ export default function QRCodeIframePage() {
               src={process.env.NEXT_PUBLIC_QR_CODE_SERVICE_URL || 'https://qrcode.iahome.fr'}
               className="w-full h-full border-0"
               onLoad={() => setIframeLoaded(true)}
-              title="QR Codes Intelligents"
+              title="QR Codes"
               sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-downloads"
             />
           </div>
@@ -147,7 +147,7 @@ export default function QRCodeIframePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="text-center text-sm text-gray-500">
             <p>
-              Application QR Codes Intelligents intégrée à IAHome.fr • 
+              Application QR Codes intégrée à IAHome.fr • 
               Créez, gérez et personnalisez vos QR codes directement depuis cette interface
             </p>
           </div>

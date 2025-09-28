@@ -624,7 +624,7 @@ export default function CogStudioPage() {
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Éditeur de code intelligent :</strong> Support pour Python, R, Julia et autres 
+                        <strong>Éditeur de code :</strong> Support pour Python, R, Julia et autres 
                         langages avec autocomplétion et débogage intégré.
                       </p>
                       <p className="text-lg leading-relaxed">

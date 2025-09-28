@@ -9,7 +9,7 @@ Ce dossier contient les services Docker pour Blender 3D virtualisé **version 2.
 ### 🎨 **Matériaux et couleurs**
 - **Matériaux** : métal, verre, bois, plastique, caoutchouc, tissu, pierre, céramique
 - **Couleurs** : rouge, vert, bleu, jaune, orange, violet, rose, marron, noir, blanc, gris
-- **Extraction intelligente** : détection automatique des matériaux et couleurs dans les descriptions
+- **Extraction automatique** : détection automatique des matériaux et couleurs dans les descriptions
 
 ### 🏛️ **Formes avancées**
 - **Formes de base** : cube, sphère, cylindre, cône, tore

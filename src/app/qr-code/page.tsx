@@ -93,7 +93,7 @@ export default function QRCodePage() {
               Service QR Code IAHome
             </h1>
             <p className="text-gray-600 text-lg">
-              Générez et gérez vos Qrcodes intelligents avec votre compte IAHome
+              Générez et gérez vos Qrcodes avec votre compte IAHome
             </p>
             
             {!session && (
@@ -145,7 +145,7 @@ export default function QRCodePage() {
                         Connexion...
                       </div>
                     ) : (
-                      'Activer Qrcodes Intelligents'
+                      'Activer Qrcodes'
                     )}
                   </button>
                   <p className="text-sm text-gray-500 mt-2">
@@ -174,7 +174,7 @@ export default function QRCodePage() {
                 Connexion requise
               </h2>
               <p className="text-yellow-700 mb-4">
-                Vous devez être connecté à votre compte IAHome pour accéder aux fonctionnalités de génération de QR codes intelligents.
+                Vous devez être connecté à votre compte IAHome pour accéder aux fonctionnalités de génération de QR codes.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
@@ -200,7 +200,7 @@ export default function QRCodePage() {
             <ul className="space-y-2 text-gray-600">
               <li className="flex items-center">
                 <span className={`${session ? 'text-green-500' : 'text-gray-400'} mr-2`}>✓</span>
-                Génération de QR codes statiques et dynamiques
+                Génération de QR codes
               </li>
               <li className="flex items-center">
                 <span className={`${session ? 'text-green-500' : 'text-gray-400'} mr-2`}>✓</span>
@@ -208,7 +208,7 @@ export default function QRCodePage() {
               </li>
               <li className="flex items-center">
                 <span className={`${session ? 'text-green-500' : 'text-gray-400'} mr-2`}>✓</span>
-                Modification des liens sans régénérer le QR code
+                Export en différents formats
               </li>
               <li className="flex items-center">
                 <span className={`${session ? 'text-green-500' : 'text-gray-400'} mr-2`}>✓</span>
@@ -230,7 +230,7 @@ export default function QRCodePage() {
             {!session && (
               <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-700">
-                  💡 <strong>Conseil :</strong> Connectez-vous pour débloquer toutes les fonctionnalités et commencer à créer vos QR codes intelligents !
+                  💡 <strong>Conseil :</strong> Connectez-vous pour débloquer toutes les fonctionnalités et commencer à créer vos QR codes !
                 </p>
               </div>
             )}

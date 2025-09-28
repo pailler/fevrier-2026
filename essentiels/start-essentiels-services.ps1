@@ -1,5 +1,5 @@
 # Script de démarrage des services essentiels
-# MeTube, Stirling PDF, Librespeed
+# MeTube, Stirling PDF, Librespeed, PsiTransfer, QR Codes
 
 Write-Host "🚀 Démarrage des services essentiels..." -ForegroundColor Green
 
@@ -11,16 +11,16 @@ if (!(docker info 2>$null)) {
 
 # Arrêter les conteneurs existants s'ils existent
 Write-Host "📦 Arrêt des conteneurs existants..." -ForegroundColor Yellow
-docker stop metube stirling-pdf librespeed-secure 2>$null
-docker rm metube stirling-pdf librespeed-secure 2>$null
+docker stop metube stirling-pdf librespeed-secure psitransfer qrcodes 2>$null
+docker rm metube stirling-pdf librespeed-secure psitransfer qrcodes 2>$null
 
-# Démarrer les services essentiels
+# Démarrer les services essentiels (incluant PsiTransfer et QR Codes)
 Write-Host "🚀 Démarrage des services essentiels..." -ForegroundColor Green
-docker-compose -f docker-compose.essentiels.yml up -d
+docker-compose -f docker-compose.essentiels.yml up -d --build
 
 # Attendre que les services soient prêts
 Write-Host "⏳ Attente du démarrage des services..." -ForegroundColor Yellow
-Start-Sleep -Seconds 10
+Start-Sleep -Seconds 15
 
 # Vérifier la santé des services
 Write-Host "🏥 Vérification de la santé des services..." -ForegroundColor Green
@@ -33,6 +33,8 @@ Write-Host "🌐 Services accessibles:" -ForegroundColor Cyan
 Write-Host "   - MeTube: http://localhost:8081" -ForegroundColor White
 Write-Host "   - Stirling PDF: http://localhost:8082" -ForegroundColor White
 Write-Host "   - Librespeed: http://localhost:8083" -ForegroundColor White
+Write-Host "   - PsiTransfer: http://localhost:8084" -ForegroundColor White
+Write-Host "   - QR Codes: http://localhost:7005" -ForegroundColor White
 Write-Host ""
 Write-Host "📝 Pour arrêter les services:" -ForegroundColor Yellow
 Write-Host "   docker-compose -f docker-compose.essentiels.yml down" -ForegroundColor White

@@ -15,15 +15,6 @@ import CSSPreloadManager from "../components/CSSPreloadManager";
 import AggressivePreloadCleaner from "../components/AggressivePreloadCleaner";
 
 // Utilisation de polices système pour éviter les preloads
-const geistSans = {
-  variable: "--font-sans",
-  className: "font-sans"
-};
-
-const geistMono = {
-  variable: "--font-mono", 
-  className: "font-mono"
-};
 
 export const metadata: Metadata = {
   title: {
@@ -128,7 +119,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="fr" className="font-system">
       <head>
         <FontAwesomeLocal />
       </head>

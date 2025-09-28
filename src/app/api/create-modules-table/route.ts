@@ -24,12 +24,12 @@ export async function POST(request: NextRequest) {
 
     // Si la table n'existe pas, créer des modules de test directement
     const modulesData = [
-      { title: 'Whisper IA', description: 'Transcription audio en texte avec IA', category: 'Audio', price: 0.10, icon: '🎤', is_paid: true },
-      { title: 'Stable Diffusion', description: 'Génération d\'images par IA', category: 'Image', price: 0.05, icon: '🎨', is_paid: true },
-      { title: 'PDF Converter', description: 'Conversion et manipulation de PDF', category: 'Document', price: 0.02, icon: '📄', is_paid: true },
-      { title: 'QR Code Generator', description: 'Génération de codes QR', category: 'Utilitaire', price: 0.01, icon: '📱', is_paid: true },
-      { title: 'LibreSpeed', description: 'Test de vitesse internet', category: 'Réseau', price: 0.00, icon: '⚡', is_paid: false },
-      { title: 'PsiTransfer', description: 'Transfert de fichiers sécurisé', category: 'Fichier', price: 0.00, icon: '📁', is_paid: false }
+      { id: 'whisper-ia', title: 'Whisper IA', description: 'Transcription audio en texte avec IA', category: 'Audio', price: 0.10, url: '/whisper' },
+      { id: 'stablediffusion', title: 'Stable Diffusion', description: 'Génération d\'images par IA avec diffusion stable', category: 'Image', price: 0.10, url: '/stablediffusion' },
+      { id: 'pdf-converter', title: 'PDF Converter', description: 'Conversion et manipulation de PDF', category: 'Document', price: 0.02, url: '/pdf' },
+      { id: 'qr-generator', title: 'QR Code Generator', description: 'Génération de codes QR', category: 'Utilitaire', price: 0.01, url: '/qrcodes' },
+      { id: 'librespeed', title: 'LibreSpeed', description: 'Test de vitesse internet', category: 'Réseau', price: 0.00, url: '/librespeed' },
+      { id: 'psitransfer', title: 'PsiTransfer', description: 'Transfert de fichiers sécurisé', category: 'Fichier', price: 0.00, url: '/psitransfer' }
     ];
 
     // Insérer les modules

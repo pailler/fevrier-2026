@@ -303,7 +303,7 @@ export default function PhotoPortfolioPage() {
 
           {activeTab === 'search' && (
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold mb-4">Recherche intelligente</h2>
+              <h2 className="text-xl font-semibold mb-4">Recherche</h2>
               <PhotoSearch
                 userId={user.id}
                 onSearchResults={handleSearchResults}

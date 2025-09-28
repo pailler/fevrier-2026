@@ -318,6 +318,7 @@ export default function EncoursPage() {
       '10': 'comfyui', // ComfyUI -> comfyui
       '11': 'cogstudio', // Cog Studio -> cogstudio
       '12': 'sdnext',  // SD.Next -> sdnext
+      'qrcodes-statiques': 'qrcodes-statiques', // QR Codes Statiques
     };
 
     // Mapping des slugs vers les URLs directes (sécurisées via tokens)
@@ -327,6 +328,7 @@ export default function EncoursPage() {
       'pdf': 'https://pdf.iahome.fr',  // PDF direct avec token
       'psitransfer': 'https://psitransfer.iahome.fr',  // PsiTransfer direct avec token
       'qrcodes': 'https://qrcodes.iahome.fr',  // QR Codes direct avec token
+      'qrcodes-statiques': 'http://localhost:7005',  // QR Codes Statiques local
       'whisper': 'https://whisper.iahome.fr',  // Whisper direct avec token
       'stablediffusion': 'https://stablediffusion.iahome.fr',  // StableDiffusion direct avec token
       'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',  // RuinedFooocus direct avec token
@@ -473,6 +475,10 @@ export default function EncoursPage() {
   };
 
   const getModuleTypeColor = (module: UserModule) => {
+    // QR Codes Statiques - couleur verte spéciale
+    if (module.module_id === 'qrcodes-statiques' || module.module_title.toLowerCase().includes('qrcodes-statiques')) {
+      return 'from-green-500 to-green-600';
+    }
     if (module.is_free) {
       return 'from-green-600 to-emerald-600';
     }
@@ -487,8 +493,13 @@ export default function EncoursPage() {
   };
 
   const getModuleTypeLabel = (module: UserModule) => {
+    // QR Codes Statiques - module gratuit spécial
+    if (module.module_id === 'qrcodes-statiques' || module.module_title.toLowerCase().includes('qrcodes-statiques')) {
+      return 'Module gratuit 🆓';
+    }
+    
     // Pour les modules essentiels, afficher "Module essentiel"
-    const essentialModules = ['metube', 'psitransfer', 'universal-converter', 'pdf', 'librespeed', 'qrcodes'];
+    const essentialModules = ['metube', 'psitransfer', 'universal-converter', 'pdf', 'librespeed', 'qrcodes', 'qrcodes-statiques'];
     const isEssential = essentialModules.some(essentialId => 
       module.module_id === essentialId || 
       module.module_title.toLowerCase().includes(essentialId.toLowerCase()) ||

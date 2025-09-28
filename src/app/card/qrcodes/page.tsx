@@ -5,6 +5,7 @@ import { supabase } from '../../../utils/supabaseClient';
 import Link from 'next/link';
 import Image from 'next/image';
 import Breadcrumb from '../../../components/Breadcrumb';
+import QRCodeAccessButton from '../../../components/QRCodeAccessButton';
 
 interface Card {
   id: string;
@@ -44,7 +45,7 @@ export default function QRCodesPage() {
   const [checkingActivation, setCheckingActivation] = useState(false);
 
   // Vérifier si c'est un module gratuit
-  const isFreeModule = false; // QR Codes est payant
+  const isFreeModule = true; // QR Codes est gratuit
 
   // Fonction pour vérifier si un module est déjà activé
   const checkModuleActivation = useCallback(async (moduleId: string) => {
@@ -237,8 +238,8 @@ export default function QRCodesPage() {
         }
 
         if (data) {
-          // Configurer QR Codes comme module payant (0.10€)
-          const cardData = { ...data, price: 0.10 };
+          // Configurer QR Codes comme module gratuit
+          const cardData = { ...data, price: 0 };
           setCard(cardData);
           console.log('QR Codes card data:', cardData);
           }
@@ -319,7 +320,7 @@ export default function QRCodesPage() {
       </div>
 
       {/* Bannière spéciale pour QR Codes */}
-      <section className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 py-8 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-700 py-8 relative overflow-hidden">
         {/* Effet de particules animées */}
         <div className="absolute inset-0">
           <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
@@ -337,74 +338,62 @@ export default function QRCodesPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Générez des QR codes dynamiques intelligents
+                Générez des QR codes
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
                 {(card?.category || 'QR CODE GENERATOR').toUpperCase()}
               </span>
-              <p className="text-xl text-blue-100 mb-6">
-                Créez des QR codes dynamiques avec suivi en temps réel, personnalisation avancée et analytics détaillés pour optimiser vos campagnes marketing.
+              <p className="text-xl text-green-100 mb-6">
+                Créez des QR codes avec suivi en temps réel, personnalisation avancée et analytics détaillés pour optimiser vos campagnes marketing.
               </p>
               
-              {/* Badges de fonctionnalités */}
-              <div className="flex flex-wrap gap-3 mb-6">
-                <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
-                  📱 QR codes dynamiques
-                </span>
-                <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
-                  📊 Analytics en temps réel
-                </span>
-                <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
-                  🎨 Personnalisation avancée
-                </span>
-              </div>
             </div>
             
             {/* Logo QR Codes animé */}
             <div className="flex-1 flex justify-center">
               <div className="relative w-80 h-64">
                 {/* Formes géométriques abstraites */}
-                <div className="absolute top-0 left-0 w-24 h-24 bg-blue-400 rounded-full opacity-80 animate-pulse"></div>
-                <div className="absolute top-16 right-0 w-20 h-20 bg-indigo-400 rounded-lg opacity-80 animate-bounce"></div>
-                <div className="absolute bottom-0 left-16 w-20 h-20 bg-purple-400 transform rotate-45 opacity-80 animate-pulse"></div>
+                <div className="absolute top-0 left-0 w-24 h-24 bg-green-400 rounded-full opacity-80 animate-pulse"></div>
+                <div className="absolute top-16 right-0 w-20 h-20 bg-emerald-400 rounded-lg opacity-80 animate-bounce"></div>
+                <div className="absolute bottom-0 left-16 w-20 h-20 bg-teal-400 transform rotate-45 opacity-80 animate-pulse"></div>
                 <div className="absolute bottom-16 right-16 w-16 h-16 bg-white rounded-full opacity-80 animate-bounce"></div>
                 
                 {/* Logo QR Code centré */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="bg-white/95 backdrop-blur-sm rounded-full p-6 shadow-2xl border-2 border-blue-500/20">
+                  <div className="bg-white/95 backdrop-blur-sm rounded-full p-6 shadow-2xl border-2 border-green-500/20">
                     <svg className="w-20 h-20" viewBox="0 0 24 24" fill="none">
                       {/* QR Code stylisé */}
-                      <rect x="2" y="2" width="20" height="20" rx="2" stroke="#3B82F6" strokeWidth="2" fill="none"/>
+                      <rect x="2" y="2" width="20" height="20" rx="2" stroke="#10B981" strokeWidth="2" fill="none"/>
                       
                       {/* Modules du QR Code */}
-                      <rect x="4" y="4" width="2" height="2" fill="#3B82F6"/>
-                      <rect x="8" y="4" width="2" height="2" fill="#3B82F6"/>
-                      <rect x="12" y="4" width="2" height="2" fill="#3B82F6"/>
-                      <rect x="16" y="4" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="4" y="4" width="2" height="2" fill="#10B981"/>
+                      <rect x="8" y="4" width="2" height="2" fill="#10B981"/>
+                      <rect x="12" y="4" width="2" height="2" fill="#10B981"/>
+                      <rect x="16" y="4" width="2" height="2" fill="#10B981"/>
                       
-                      <rect x="4" y="8" width="2" height="2" fill="#3B82F6"/>
-                      <rect x="8" y="8" width="2" height="2" fill="#3B82F6"/>
-                      <rect x="12" y="8" width="2" height="2" fill="#3B82F6"/>
-                      <rect x="16" y="8" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="4" y="8" width="2" height="2" fill="#10B981"/>
+                      <rect x="8" y="8" width="2" height="2" fill="#10B981"/>
+                      <rect x="12" y="8" width="2" height="2" fill="#10B981"/>
+                      <rect x="16" y="8" width="2" height="2" fill="#10B981"/>
                       
-                      <rect x="4" y="12" width="2" height="2" fill="#3B82F6"/>
-                      <rect x="8" y="12" width="2" height="2" fill="#3B82F6"/>
-                      <rect x="12" y="12" width="2" height="2" fill="#3B82F6"/>
-                      <rect x="16" y="12" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="4" y="12" width="2" height="2" fill="#10B981"/>
+                      <rect x="8" y="12" width="2" height="2" fill="#10B981"/>
+                      <rect x="12" y="12" width="2" height="2" fill="#10B981"/>
+                      <rect x="16" y="12" width="2" height="2" fill="#10B981"/>
                       
-                      <rect x="4" y="16" width="2" height="2" fill="#3B82F6"/>
-                      <rect x="8" y="16" width="2" height="2" fill="#3B82F6"/>
-                      <rect x="12" y="16" width="2" height="2" fill="#3B82F6"/>
-                      <rect x="16" y="16" width="2" height="2" fill="#3B82F6"/>
+                      <rect x="4" y="16" width="2" height="2" fill="#10B981"/>
+                      <rect x="8" y="16" width="2" height="2" fill="#10B981"/>
+                      <rect x="12" y="16" width="2" height="2" fill="#10B981"/>
+                      <rect x="16" y="16" width="2" height="2" fill="#10B981"/>
                       
                       {/* Indicateurs de scan */}
-                      <circle cx="6" cy="6" r="0.5" fill="#3B82F6" className="animate-pulse">
+                      <circle cx="6" cy="6" r="0.5" fill="#10B981" className="animate-pulse">
                         <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
                       </circle>
-                      <circle cx="18" cy="6" r="0.5" fill="#3B82F6" className="animate-pulse">
+                      <circle cx="18" cy="6" r="0.5" fill="#10B981" className="animate-pulse">
                         <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
                       </circle>
-                      <circle cx="6" cy="18" r="0.5" fill="#3B82F6" className="animate-pulse">
+                      <circle cx="6" cy="18" r="0.5" fill="#10B981" className="animate-pulse">
                         <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" begin="0.6s"/>
                       </circle>
                     </svg>
@@ -434,12 +423,12 @@ export default function QRCodesPage() {
           {/* Colonne 2 - Système de boutons */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
             <div className="text-left mb-8">
-              <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
+              <div className="w-3/4 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
                 <div className="text-4xl font-bold mb-1">
-                  €{card.price}
+                  Gratuit
                 </div>
                 <div className="text-sm opacity-90">
-                  50 utilisations pour 1 an
+                  Accès illimité
                 </div>
               </div>
             </div>
@@ -484,59 +473,22 @@ export default function QRCodesPage() {
                   </button>
                 )}
                 
-                {/* Bouton "Activer la sélection" pour les modules payants */}
-                {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (
-                  <button 
-                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                    onClick={async () => {
-                      if (!session) {
-                        window.location.href = '/login';
-                        return;
-                      }
-
-                      // Vérifier si le module est déjà activé avant de procéder au paiement
-                      if (alreadyActivatedModules.includes(card.id)) {
-                        alert(`ℹ️ Le module ${card.title} est déjà activé ! Vous pouvez l'utiliser depuis vos applications.`);
-                        return;
-                      }
-
-                      try {
-                        const response = await fetch('/api/create-payment-intent', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({
-                            items: [card],
-                            customerEmail: user?.email || '',
-                            type: 'payment',
-                            testMode: true, // Mode test activé pour éviter les erreurs Stripe
-                          }),
-                        });
-
-                        if (!response.ok) {
-                          throw new Error(`Erreur HTTP ${response.status}`);
-                        }
-
-                        const { url, error } = await response.json();
-
-                        if (error) {
-                          throw new Error(`Erreur API: ${error}`);
-                        }
-
-                        if (url) {
-                          window.location.href = url;
-                        } else {
-                          throw new Error('URL de session Stripe manquante.');
-                        }
-                      } catch (error) {
-                        alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
-                      }
-                    }}
-                  >
-                    <span className="text-xl">⚡</span>
-                    <span>Activer QR Codes</span>
-                  </button>
+                {/* Bouton d'accès QR Codes */}
+                {isCardSelected(card.id) && card.price === 0 && !alreadyActivatedModules.includes(card.id) && (
+                  <div className="w-3/4">
+                    <QRCodeAccessButton
+                      user={user}
+                      onAccessGranted={(url) => {
+                        console.log('✅ Accès QR Codes accordé:', url);
+                        // Optionnel: recharger la page ou mettre à jour l'état
+                        window.location.reload();
+                      }}
+                      onAccessDenied={(reason) => {
+                        console.log('❌ Accès QR Codes refusé:', reason);
+                        alert(`Accès refusé: ${reason}`);
+                      }}
+                    />
+                  </div>
                 )}
 
                 {/* Bouton JWT - visible seulement si l'utilisateur a accès au module ET que le module n'est pas déjà activé */}
@@ -574,7 +526,7 @@ export default function QRCodesPage() {
             <div className="prose max-w-none">
               <div className="text-center mb-12">
                 <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent mb-4">
-                  À propos des QR Codes Dynamiques
+                  À propos des QR Codes
                 </h3>
                 <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
               </div>
@@ -583,8 +535,8 @@ export default function QRCodesPage() {
                 {/* Description principale */}
                 <div className="text-center max-w-5xl mx-auto">
                   <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
-                    Les QR codes dynamiques révolutionnent la façon dont vous connectez le monde physique au numérique. 
-                    Créez des codes intelligents qui s'adaptent, se suivent et s'optimisent automatiquement.
+                    Les QR codes révolutionnent la façon dont vous connectez le monde physique au numérique. 
+                    Créez des codes qui s'adaptent, se suivent et s'optimisent automatiquement.
                   </p>
                   {card.subtitle && (
                     <p className="text-base sm:text-lg text-gray-600 italic mb-8">
@@ -601,18 +553,17 @@ export default function QRCodesPage() {
                       <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                         <span className="text-white text-xl font-bold">1</span>
                       </div>
-                      <h4 className="text-2xl font-bold text-blue-900">Qu'est-ce que les QR Codes Dynamiques ?</h4>
+                      <h4 className="text-2xl font-bold text-blue-900">Qu'est-ce que les QR Codes ?</h4>
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        Les QR codes dynamiques sont des codes QR intelligents qui peuvent être modifiés après leur création 
-                        sans avoir besoin de les régénérer physiquement. Contrairement aux QR codes statiques traditionnels, 
-                        ils redirigent vers une URL qui peut être mise à jour en temps réel.
+                        Les QR codes sont des codes bidimensionnels qui permettent de stocker et de transmettre des informations 
+                        de manière rapide et efficace. Ils peuvent contenir des URLs, du texte, des coordonnées ou tout autre type de données.
                       </p>
                       <p className="text-base leading-relaxed">
-                        Cette technologie révolutionnaire vous permet de changer la destination, le contenu ou les paramètres 
-                        de vos QR codes instantanément, tout en conservant le même code physique. Idéal pour les campagnes 
-                        marketing, les événements temporaires ou les contenus qui évoluent dans le temps.
+                        Cette technologie révolutionnaire vous permet de connecter le monde physique au numérique de manière 
+                        instantanée. Idéal pour les campagnes marketing, les événements, les menus de restaurants ou tout 
+                        contenu que vous souhaitez partager facilement.
                       </p>
                     </div>
                   </div>
@@ -623,12 +574,12 @@ export default function QRCodesPage() {
                       <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                         <span className="text-white text-xl font-bold">2</span>
                       </div>
-                      <h4 className="text-2xl font-bold text-indigo-900">Pourquoi choisir les QR Codes Dynamiques ?</h4>
+                      <h4 className="text-2xl font-bold text-indigo-900">Pourquoi choisir les QR Codes ?</h4>
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
-                        <strong>Flexibilité maximale :</strong> Modifiez vos destinations, contenus ou paramètres à tout moment 
-                        sans avoir à imprimer de nouveaux codes ou à modifier vos supports physiques.
+                        <strong>Simplicité d'utilisation :</strong> Créez et partagez vos QR codes en quelques secondes 
+                        avec notre interface intuitive et nos modèles personnalisables.
                       </p>
                       <p className="text-lg leading-relaxed">
                         <strong>Analytics détaillés :</strong> Suivez en temps réel les scans, les localisations, les appareils 
@@ -721,8 +672,8 @@ export default function QRCodesPage() {
                       <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                         <span className="text-2xl">📱</span>
                       </div>
-                      <h4 className="font-bold text-blue-900 mb-3 text-lg">QR Codes Dynamiques</h4>
-                      <p className="text-gray-700 text-sm">Créez et modifiez vos QR codes instantanément sans reimpression.</p>
+                      <h4 className="font-bold text-blue-900 mb-3 text-lg">QR Codes</h4>
+                      <p className="text-gray-700 text-sm">Créez et personnalisez vos QR codes instantanément.</p>
                     </div>
                   </div>
                   
@@ -768,7 +719,7 @@ export default function QRCodesPage() {
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          €{card.price} pour 50 utilisations (1 an)
+                          Gratuit - Accès illimité
                         </p>
                       </div>
                     </div>
@@ -798,7 +749,7 @@ export default function QRCodesPage() {
                 {/* Call to action */}
                 <div className="text-center pt-8">
                   <p className="text-lg sm:text-xl text-gray-700 mb-6 max-w-4xl mx-auto">
-                    Prêt à révolutionner vos campagnes avec des QR codes dynamiques ? Commencez dès maintenant et connectez le monde physique au numérique !
+                    Prêt à révolutionner vos campagnes avec des QR codes ? Commencez dès maintenant et connectez le monde physique au numérique !
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                     <Link href="/register" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">

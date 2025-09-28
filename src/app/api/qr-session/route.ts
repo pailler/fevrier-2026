@@ -20,19 +20,51 @@ export async function POST(request: NextRequest) {
       .eq('module_id', 'qrcodes')
       .single();
 
+    let userAppData = userApp;
+    let isNewActivation = false;
+
+    // Si l'utilisateur n'a pas encore accès au module QR codes, l'activer automatiquement (module gratuit)
     if (userAppError || !userApp) {
-      console.log('❌ QR Session: Aucun accès au module QR codes');
-      return new NextResponse('No access to QR codes module', { status: 403 });
+      console.log('🔄 QR Session: Activation automatique du module QR codes (gratuit)');
+      
+      const now = new Date();
+      const expiresAt = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate()); // 1 an
+
+      const { data: activationData, error: activationError } = await supabase
+        .from('user_applications')
+        .insert([
+          {
+            user_id: userId,
+            module_id: 'qrcodes',
+            module_title: 'QRcodes',
+            is_active: true,
+            access_level: 'free',
+            usage_count: 0,
+            max_usage: 20, // 20 utilisations pour les modules gratuits
+            expires_at: expiresAt.toISOString(),
+          }
+        ])
+        .select()
+        .single();
+
+      if (activationError) {
+        console.error('❌ QR Session: Erreur activation automatique:', activationError);
+        return new NextResponse('Error activating QR codes module', { status: 500 });
+      }
+
+      userAppData = activationData;
+      isNewActivation = true;
+      console.log('✅ QR Session: Module QR codes activé automatiquement');
     }
 
     // Vérifier si la session n'est pas expirée
-    if (userApp.expires_at && new Date(userApp.expires_at) < new Date()) {
+    if (userAppData.expires_at && new Date(userAppData.expires_at) < new Date()) {
       console.log('❌ QR Session: Session expirée');
       return new NextResponse('Session expired', { status: 403 });
     }
 
     // Vérifier le quota d'utilisation
-    if (userApp.max_usage && userApp.usage_count >= userApp.max_usage) {
+    if (userAppData.max_usage && userAppData.usage_count >= userAppData.max_usage) {
       console.log('❌ QR Session: Quota dépassé');
       return new NextResponse('Usage quota exceeded', { status: 403 });
     }
@@ -61,10 +93,10 @@ export async function POST(request: NextRequest) {
     const { error: incrementError } = await supabase
       .from('user_applications')
       .update({
-        usage_count: userApp.usage_count + 1,
+        usage_count: userAppData.usage_count + 1,
         last_used: new Date().toISOString()
       })
-      .eq('id', userApp.id);
+      .eq('id', userAppData.id);
 
     if (incrementError) {
       console.warn('⚠️ QR Session: Erreur incrémentation compteur:', incrementError);
@@ -76,8 +108,9 @@ export async function POST(request: NextRequest) {
       success: true,
       sessionId: sessionId,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      usageCount: userApp.usage_count + 1,
-      maxUsage: userApp.max_usage
+      usageCount: userAppData.usage_count + 1,
+      maxUsage: userAppData.max_usage,
+      isNewActivation: isNewActivation
     }), {
       status: 200,
       headers: {

@@ -380,12 +380,15 @@ export default function TermsPage() {
           </h2>
           <p className="text-gray-700 mb-4">
             Pour toute question concernant ces conditions d'utilisation, 
-            n'hésitez pas à nous contacter :
+            n'hésitez pas à nous contacter via notre page dédiée.
           </p>
-          <div className="space-y-2 text-gray-700">
-            <p><strong>E-mail :</strong> <a href="mailto:legal@iahome.fr" className="text-blue-600 hover:text-blue-800">legal@iahome.fr</a></p>
-            <p><strong>Support :</strong> <a href="mailto:support@iahome.fr" className="text-blue-600 hover:text-blue-800">support@iahome.fr</a></p>
-            <p><strong>Site web :</strong> <a href="https://iahome.fr" className="text-blue-600 hover:text-blue-800">https://iahome.fr</a></p>
+          <div className="text-center">
+            <Link 
+              href="/contact" 
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+            >
+              Accéder à la page contact
+            </Link>
           </div>
         </div>
 

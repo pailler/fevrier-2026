@@ -19,7 +19,6 @@ export default function Home() {
 
   const [priceFilter, setPriceFilter] = useState('all');
   const [professionFilter, setProfessionFilter] = useState('all'); // CHANGÉ : experienceFilter -> professionFilter
-  const [sortBy, setSortBy] = useState('most_used');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [userSubscriptions, setUserSubscriptions] = useState<{[key: string]: boolean}>({});
   const [showScrollToTop, setShowScrollToTop] = useState(false);
@@ -105,7 +104,7 @@ export default function Home() {
           });
           
           // Traiter les modules avec la structure simple
-          const modulesWithRoles = (modulesData || []).map(module => {
+          const modulesWithRoles = (modulesData || []).map((module, index) => {
             // Utiliser la catégorie directement depuis la table modules
             const primaryCategory = module.category || 'Non classé';
             
@@ -115,9 +114,9 @@ export default function Home() {
               category: cleanCategory(primaryCategory),
               // Catégories multiples (utiliser la même catégorie pour compatibilité)
               categories: [cleanCategory(primaryCategory)],
-              // Ajouter des données aléatoires seulement pour l'affichage (pas stockées en DB)
-              role: getRandomRole(),
-              usage_count: Math.floor(Math.random() * 1000) + 1,
+              // Ajouter des données déterministes seulement pour l'affichage (pas stockées en DB)
+              role: getRandomRole(index),
+              usage_count: (index * 47 + 23) % 1000 + 1, // Valeur déterministe basée sur l'index
               profession: getModuleProfession(module.title, primaryCategory)
             };
           });
@@ -244,15 +243,20 @@ export default function Home() {
     if (category.includes('bureautique') || category.includes('document')) return 'Rédacteur';
     if (category.includes('video') || category.includes('montage')) return 'Photographe';
 
-    // Fallback aléatoire pour les modules non classés
+    // Fallback déterministe pour les modules non classés
     const professions = ['Photographe', 'Rédacteur', 'Architecte', 'Avocat', 'Médecin'];
-    return professions[Math.floor(Math.random() * professions.length)];
+    // Utiliser un hash simple basé sur le titre pour une valeur déterministe
+    const hash = moduleTitle.split('').reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0);
+      return a & a;
+    }, 0);
+    return professions[Math.abs(hash) % professions.length];
   };
 
-  // Fonctions pour générer des données aléatoires
-  const getRandomRole = () => {
+  // Fonctions pour générer des données déterministes
+  const getRandomRole = (index: number) => {
     const roles = ['Développeur', 'Designer', 'Marketing', 'Business', 'Étudiant', 'Freelance'];
-    return roles[Math.floor(Math.random() * roles.length)];
+    return roles[index % roles.length];
   };
 
   // Générer la liste des catégories disponibles
@@ -286,7 +290,7 @@ export default function Home() {
   // Modules essentiels définis
   const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes'];
   
-  // Filtrer et trier les modules essentiels
+  // Filtrer les modules essentiels
   const filteredAndSortedModules = modules
     .filter(module => {
       // Filtre principal : seulement les modules essentiels
@@ -322,39 +326,24 @@ export default function Home() {
 
       return matchesSearch && matchesPrice && matchesProfession && matchesCategory;
     })
-         .sort((a, b) => {
-       // Tri spécial : librespeed toujours en premier
-       const aIsLibrespeed = a.title.toLowerCase().includes('librespeed') || a.id === 'librespeed';
-       const bIsLibrespeed = b.title.toLowerCase().includes('librespeed') || b.id === 'librespeed';
-       
-       if (aIsLibrespeed && !bIsLibrespeed) return -1; // librespeed en premier
-       if (!aIsLibrespeed && bIsLibrespeed) return 1;  // librespeed en premier
-       
-       // Tri principal : modules gratuits en premier, puis modules payants
-       const aIsFree = a.price === '0' || a.price === 0 || a.price === 'Gratuit' || a.price === 'gratuit' || a.price === 'FREE' || a.price === 'free';
-       const bIsFree = b.price === '0' || b.price === 0 || b.price === 'Gratuit' || b.price === 'gratuit' || b.price === 'FREE' || b.price === 'free';
-       
-       if (aIsFree && !bIsFree) return -1; // a (gratuit) avant b (payant)
-       if (!aIsFree && bIsFree) return 1;  // b (gratuit) avant a (payant)
-       
-       // Si les deux modules ont le même type (gratuit ou payant), appliquer le tri secondaire
-       switch (sortBy) {
-         case 'most_used':
-           return (b.usage_count || 0) - (a.usage_count || 0);
-         case 'least_used':
-           return (a.usage_count || 0) - (b.usage_count || 0);
-         case 'price_high':
-           return (b.price || 0) - (a.price || 0);
-         case 'price_low':
-           return (a.price || 0) - (b.price || 0);
-         case 'name_az':
-           return a.title.localeCompare(b.title);
-         case 'name_za':
-           return b.title.localeCompare(a.title);
-         default:
-           return 0;
-       }
-     });
+    .sort((a, b) => {
+      // Tri spécial : librespeed toujours en premier
+      const aIsLibrespeed = a.title.toLowerCase().includes('librespeed') || a.id === 'librespeed';
+      const bIsLibrespeed = b.title.toLowerCase().includes('librespeed') || b.id === 'librespeed';
+      
+      if (aIsLibrespeed && !bIsLibrespeed) return -1; // librespeed en premier
+      if (!aIsLibrespeed && bIsLibrespeed) return 1;  // librespeed en premier
+      
+      // Tri principal : modules gratuits en premier, puis modules payants
+      const aIsFree = a.price === '0' || a.price === 0 || a.price === 'Gratuit' || a.price === 'gratuit' || a.price === 'FREE' || a.price === 'free';
+      const bIsFree = b.price === '0' || b.price === 0 || b.price === 'Gratuit' || b.price === 'gratuit' || b.price === 'FREE' || b.price === 'free';
+      
+      if (aIsFree && !bIsFree) return -1; // a (gratuit) avant b (payant)
+      if (!aIsFree && bIsFree) return 1;  // b (gratuit) avant a (payant)
+      
+      // Tri par nom par défaut
+      return a.title.localeCompare(b.title);
+    });
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -384,7 +373,7 @@ export default function Home() {
   // Réinitialiser la pagination quand les filtres changent
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, priceFilter, professionFilter, sortBy, categoryFilter]); // CHANGÉ : experienceFilter -> professionFilter
+  }, [search, priceFilter, professionFilter, categoryFilter]); // CHANGÉ : experienceFilter -> professionFilter
 
   // Détecter le scroll pour afficher/masquer le bouton de retour en haut
   useEffect(() => {
@@ -595,21 +584,6 @@ export default function Home() {
                     </select>
                   </div>
                   
-                  {/* Boutons */}
-                  <div className="flex items-center gap-3">
-                    <select 
-                      className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                    >
-                      <option value="most_used">Trier par : Plus installés</option>
-                      <option value="least_used">Trier par : Moins installés</option>
-                      <option value="price_high">Trier par : Prix élevé à bas</option>
-                      <option value="price_low">Trier par : Prix bas à élevé</option>
-                      <option value="name_az">Trier par : Nom A-Z</option>
-                      <option value="name_za">Trier par : Nom Z-A</option>
-                    </select>
-                  </div>
                 </div>
               </div>
 

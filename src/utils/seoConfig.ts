@@ -110,8 +110,6 @@ export const seoConfig = {
     imageQuality: 85,
     imageSizes: "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
     preloadCritical: [
-      "/fonts/geist-sans.woff2",
-      "/fonts/geist-mono.woff2",
       "/og-image.jpg"
     ],
     lazyLoadImages: true,
