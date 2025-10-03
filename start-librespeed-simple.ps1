@@ -1,158 +1,131 @@
-# Script pour démarrer LibreSpeed de manière simple
-Write-Host "🚀 Démarrage de LibreSpeed simple..." -ForegroundColor Cyan
+# Script de démarrage LibreSpeed simple avec Docker
+Write-Host "🚀 DÉMARRAGE LIBRESPEED SIMPLE" -ForegroundColor Cyan
+Write-Host "===============================" -ForegroundColor Cyan
 
-# Vérifier si Python est disponible
+# 1. Vérifier Docker
+Write-Host "`n1. Vérification de Docker..." -ForegroundColor Yellow
 try {
-    $pythonVersion = python --version 2>&1
-    Write-Host "✅ Python trouvé: $pythonVersion" -ForegroundColor Green
+    $dockerVersion = docker --version 2>$null
+    if ($dockerVersion) {
+        Write-Host "✅ Docker installé: $dockerVersion" -ForegroundColor Green
+    } else {
+        Write-Host "❌ Docker non installé" -ForegroundColor Red
+        exit 1
+    }
 } catch {
-    Write-Host "❌ Python non trouvé. Installation nécessaire." -ForegroundColor Red
+    Write-Host "❌ Docker non installé" -ForegroundColor Red
     exit 1
 }
 
-# Créer un serveur LibreSpeed simple
-$librespeedHtml = @"
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LibreSpeed - Test de vitesse</title>
-    <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            max-width: 800px; 
-            margin: 50px auto; 
-            padding: 20px; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            min-height: 100vh;
-        }
-        .container {
-            background: rgba(255,255,255,0.1);
-            padding: 40px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            text-align: center;
-        }
-        h1 { font-size: 3em; margin-bottom: 20px; }
-        .status { 
-            background: rgba(0,255,0,0.2); 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin: 20px 0;
-            border: 2px solid #00ff00;
-        }
-        .info { 
-            background: rgba(255,255,255,0.1); 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin: 20px 0;
-        }
-        .button {
-            background: #4CAF50;
-            color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 25px;
-            font-size: 18px;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s;
-        }
-        .button:hover {
-            background: #45a049;
-            transform: translateY(-2px);
-        }
-        .test-results {
-            background: rgba(0,0,0,0.3);
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🚀 LibreSpeed</h1>
-        <div class="status">
-            <h2>✅ Service LibreSpeed Opérationnel</h2>
-            <p>Test de vitesse internet disponible</p>
-        </div>
-        
-        <div class="info">
-            <h3>📊 Informations du service</h3>
-            <p><strong>URL:</strong> https://librespeed.iahome.fr</p>
-            <p><strong>Port local:</strong> 8081</p>
-            <p><strong>Token:</strong> 6cryvpy2qivviufu88vm0g</p>
-            <p><strong>Statut:</strong> Actif</p>
-        </div>
-        
-        <button class="button" onclick="startSpeedTest()">🏃‍♂️ Démarrer le test de vitesse</button>
-        <button class="button" onclick="showInfo()">ℹ️ Informations</button>
-        
-        <div id="test-results" class="test-results">
-            <h3>📈 Résultats du test</h3>
-            <div id="speed-results"></div>
-        </div>
-    </div>
+# 2. Arrêter les conteneurs existants
+Write-Host "`n2. Arrêt des conteneurs LibreSpeed existants..." -ForegroundColor Yellow
+try {
+    docker-compose -f docker-compose-librespeed-simple.yml down 2>$null
+    Write-Host "✅ Conteneurs arrêtés" -ForegroundColor Green
+} catch {
+    Write-Host "ℹ️ Aucun conteneur à arrêter" -ForegroundColor Blue
+}
 
-    <script>
-        function startSpeedTest() {
-            document.getElementById('test-results').style.display = 'block';
-            document.getElementById('speed-results').innerHTML = '<p>🔄 Test en cours...</p>';
-            
-            // Simulation d'un test de vitesse
-            setTimeout(() => {
-                const downloadSpeed = (Math.random() * 100 + 50).toFixed(1);
-                const uploadSpeed = (Math.random() * 50 + 20).toFixed(1);
-                const ping = (Math.random() * 20 + 5).toFixed(0);
-                
-                document.getElementById('speed-results').innerHTML = `
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin: 20px 0;">
-                        <div style="background: rgba(0,255,0,0.2); padding: 15px; border-radius: 10px;">
-                            <h4>📥 Téléchargement</h4>
-                            <p style="font-size: 2em; margin: 10px 0;">${downloadSpeed} Mbps</p>
-                        </div>
-                        <div style="background: rgba(255,255,0,0.2); padding: 15px; border-radius: 10px;">
-                            <h4>📤 Upload</h4>
-                            <p style="font-size: 2em; margin: 10px 0;">${uploadSpeed} Mbps</p>
-                        </div>
-                        <div style="background: rgba(0,255,255,0.2); padding: 15px; border-radius: 10px;">
-                            <h4>🏓 Ping</h4>
-                            <p style="font-size: 2em; margin: 10px 0;">${ping} ms</p>
-                        </div>
-                    </div>
-                    <p style="text-align: center; font-size: 1.2em;">
-                        🎉 Test terminé avec succès !
-                    </p>
-                `;
-            }, 3000);
-        }
-        
-        function showInfo() {
-            alert('LibreSpeed - Service de test de vitesse internet\n\n' +
-                  '✅ Service opérationnel\n' +
-                  '🌐 Accessible via Cloudflare\n' +
-                  '🔐 Authentification par token\n' +
-                  '📊 Tests de vitesse en temps réel');
-        }
-    </script>
-</body>
-</html>
-"@
+# 3. Créer le réseau Docker si nécessaire
+Write-Host "`n3. Création du réseau Docker..." -ForegroundColor Yellow
+try {
+    docker network create iahome-network 2>$null
+    Write-Host "✅ Réseau iahome-network créé ou existant" -ForegroundColor Green
+} catch {
+    Write-Host "ℹ️ Réseau déjà existant" -ForegroundColor Blue
+}
 
-# Écrire le fichier HTML
-$librespeedHtml | Out-File -FilePath "librespeed-simple.html" -Encoding UTF8
+# 4. Démarrer LibreSpeed
+Write-Host "`n4. Démarrage de LibreSpeed..." -ForegroundColor Yellow
+try {
+    Write-Host "📦 Démarrage de LibreSpeed..." -ForegroundColor Blue
+    docker-compose -f docker-compose-librespeed-simple.yml up -d
+    
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "✅ LibreSpeed démarré avec succès" -ForegroundColor Green
+    } else {
+        Write-Host "❌ Erreur lors du démarrage de LibreSpeed" -ForegroundColor Red
+        exit 1
+    }
+} catch {
+    Write-Host "❌ Erreur lors du démarrage: $($_.Exception.Message)" -ForegroundColor Red
+    exit 1
+}
 
-# Démarrer un serveur HTTP simple sur le port 8081
-Write-Host "🌐 Démarrage du serveur LibreSpeed sur le port 8081..." -ForegroundColor Yellow
-Write-Host "📁 Fichier: librespeed-simple.html" -ForegroundColor Gray
-Write-Host "🔗 URL locale: http://localhost:8081" -ForegroundColor Gray
-Write-Host "🌍 URL publique: https://librespeed.iahome.fr" -ForegroundColor Gray
-Write-Host "`n🚀 Serveur démarré! Appuyez sur Ctrl+C pour arrêter." -ForegroundColor Green
+# 5. Attendre que le service soit prêt
+Write-Host "`n5. Attente de l'initialisation..." -ForegroundColor Yellow
+Write-Host "⏳ Attente de 20 secondes pour que LibreSpeed soit prêt..." -ForegroundColor Blue
+Start-Sleep -Seconds 20
 
-# Démarrer le serveur Python
-python -m http.server 8081
+# 6. Vérifier le statut du conteneur
+Write-Host "`n6. Vérification du statut du conteneur..." -ForegroundColor Yellow
+try {
+    $containers = docker ps --filter "name=librespeed" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+    Write-Host "📊 Conteneur LibreSpeed:" -ForegroundColor Cyan
+    Write-Host $containers -ForegroundColor White
+} catch {
+    Write-Host "❌ Erreur lors de la vérification du conteneur" -ForegroundColor Red
+}
 
+# 7. Tester l'accès local
+Write-Host "`n7. Test de l'accès local..." -ForegroundColor Yellow
+try {
+    $response = Invoke-WebRequest -Uri "http://localhost:8081" -UseBasicParsing -TimeoutSec 10
+    if ($response.StatusCode -eq 200) {
+        Write-Host "✅ LibreSpeed accessible sur http://localhost:8081" -ForegroundColor Green
+    } else {
+        Write-Host "❌ LibreSpeed non accessible (Code: $($response.StatusCode))" -ForegroundColor Red
+    }
+} catch {
+    Write-Host "❌ LibreSpeed erreur: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+# 8. Tester via Cloudflare
+Write-Host "`n8. Test via Cloudflare..." -ForegroundColor Yellow
+try {
+    $response = Invoke-WebRequest -Uri "https://librespeed.iahome.fr" -UseBasicParsing -TimeoutSec 15 -SkipCertificateCheck
+    if ($response.StatusCode -eq 200) {
+        Write-Host "✅ LibreSpeed accessible via https://librespeed.iahome.fr" -ForegroundColor Green
+    } else {
+        Write-Host "❌ LibreSpeed non accessible via Cloudflare (Code: $($response.StatusCode))" -ForegroundColor Red
+    }
+} catch {
+    Write-Host "❌ LibreSpeed via Cloudflare erreur: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+# 9. Tester avec token
+Write-Host "`n9. Test avec token..." -ForegroundColor Yellow
+try {
+    $testToken = "3un5vtl5gedzeyfarxg8zl"
+    $response = Invoke-WebRequest -Uri "https://librespeed.iahome.fr?token=$testToken" -UseBasicParsing -TimeoutSec 15 -SkipCertificateCheck
+    if ($response.StatusCode -eq 200) {
+        Write-Host "✅ LibreSpeed avec token accessible sur https://librespeed.iahome.fr?token=$testToken" -ForegroundColor Green
+    } else {
+        Write-Host "❌ LibreSpeed avec token non accessible (Code: $($response.StatusCode))" -ForegroundColor Red
+    }
+} catch {
+    Write-Host "❌ LibreSpeed avec token erreur: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+# 10. Résumé
+Write-Host "`n10. Résumé du déploiement..." -ForegroundColor Yellow
+Write-Host "=============================" -ForegroundColor Yellow
+
+Write-Host "`n📊 Service déployé:" -ForegroundColor Cyan
+Write-Host "• LibreSpeed: http://localhost:8081" -ForegroundColor White
+Write-Host "• LibreSpeed public: https://librespeed.iahome.fr" -ForegroundColor White
+
+Write-Host "`n🔗 URLs d'accès:" -ForegroundColor Cyan
+Write-Host "• https://librespeed.iahome.fr (accès public)" -ForegroundColor White
+Write-Host "• https://librespeed.iahome.fr?token=3un5vtl5gedzeyfarxg8zl (accès avec token)" -ForegroundColor White
+Write-Host "• http://localhost:8081 (accès direct local)" -ForegroundColor White
+
+Write-Host "`n🛠️ Commandes utiles:" -ForegroundColor Cyan
+Write-Host "• Arrêter: docker-compose -f docker-compose-librespeed-simple.yml down" -ForegroundColor White
+Write-Host "• Redémarrer: docker-compose -f docker-compose-librespeed-simple.yml restart" -ForegroundColor White
+Write-Host "• Logs: docker logs librespeed-iahome -f" -ForegroundColor White
+Write-Host "• Status: docker ps --filter name=librespeed" -ForegroundColor White
+
+Write-Host "`n✅ LIBRESPEED DÉMARRÉ AVEC SUCCÈS !" -ForegroundColor Green
+Write-Host "LibreSpeed est maintenant accessible sur https://librespeed.iahome.fr" -ForegroundColor Green
+Write-Host "Avec support des tokens d'accès" -ForegroundColor Green

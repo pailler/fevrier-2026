@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  librespeed:
+    image: adolfintel/speedtest:latest
+    container_name: librespeed-iahome
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - iahome-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.librespeed.rule=Host(`librespeed.iahome.fr`)"
+      - "traefik.http.routers.librespeed.entrypoints=websecure"
+      - "traefik.http.routers.librespeed.tls.certresolver=letsencrypt"
+      - "traefik.http.services.librespeed.loadbalancer.server.port=80"
+
+  librespeed-auth:
+    image: python:3.11-slim
+    container_name: librespeed-auth
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./librespeed-service/simple_auth_page.py:/app/simple_auth_page.py
+      - ./librespeed-service/librespeed_service.py:/app/librespeed_service.py
+    working_dir: /app
+    command: sh -c "pip install --no-cache-dir flask requests && python simple_auth_page.py"
+    restart: unless-stopped
+    networks:
+      - iahome-network
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.librespeed-auth.rule=Host(`librespeed.iahome.fr`) && PathPrefix(`/auth`)"
+      - "traefik.http.routers.librespeed-auth.entrypoints=websecure"
+      - "traefik.http.routers.librespeed-auth.tls.certresolver=letsencrypt"
+      - "traefik.http.services.librespeed-auth.loadbalancer.server.port=8083"
+
+networks:
+  iahome-network:
+    external: true
+

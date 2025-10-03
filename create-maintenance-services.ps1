@@ -236,3 +236,4 @@ Write-Host "   🚧 Whisper: http://localhost:8093 (maintenance)" -ForegroundCol
 Write-Host "   🚧 QR Codes: http://localhost:7005 (maintenance)" -ForegroundColor Yellow
 Write-Host "   🚧 ReMBG: http://localhost:8080 (maintenance)" -ForegroundColor Yellow
 
+

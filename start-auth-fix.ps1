@@ -22,3 +22,4 @@ Write-Host "2. Ou exécutez : node test-final-auth.js" -ForegroundColor White
 Write-Host "`n🎉 Instructions terminées !" -ForegroundColor Green
 
 
+

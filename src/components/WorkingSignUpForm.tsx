@@ -57,6 +57,16 @@ export default function WorkingSignUpForm({
         })
       });
 
+      // Vérifier le type de contenu de la réponse
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Réponse non-JSON reçue:', text);
+        setError('Erreur de communication avec le serveur');
+        onError?.(new Error('Réponse non-JSON'));
+        return;
+      }
+
       const result = await response.json();
 
       if (!response.ok) {

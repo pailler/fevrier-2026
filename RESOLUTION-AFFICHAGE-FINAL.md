@@ -103,3 +103,4 @@ Si le problème persiste :
 Une fois les données corrigées, l'utilisateur s'affichera correctement dans la bannière bleue et le header principal.
 
 
+

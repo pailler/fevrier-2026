@@ -186,3 +186,4 @@ Write-Host "`n🚀 CLOUDFLARE EST MAINTENANT OPÉRATIONNEL !" -ForegroundColor G
 Write-Host "Allez sur https://iahome.fr pour vérifier que tout fonctionne." -ForegroundColor Green
 
 
+

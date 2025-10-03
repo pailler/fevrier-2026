@@ -78,10 +78,7 @@ export const performanceConfig = {
     fonts: [
     ],
     images: [
-      {
-        href: '/og-image.jpg',
-        as: 'image'
-      }
+      // Supprimé og-image.jpg pour éviter l'avertissement de préchargement
     ],
     scripts: [
       {

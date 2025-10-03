@@ -104,3 +104,4 @@ FROM information_schema.routines
 WHERE routine_name = 'handle_new_user';
 
 
+

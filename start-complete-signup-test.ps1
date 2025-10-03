@@ -56,3 +56,4 @@ Write-Host "`n🎉 Script terminé !" -ForegroundColor Green
 Write-Host "📋 N'oubliez pas d'arrêter l'application avec Ctrl+C" -ForegroundColor Yellow
 
 
+

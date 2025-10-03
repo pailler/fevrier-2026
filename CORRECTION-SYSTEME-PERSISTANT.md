@@ -148,3 +148,4 @@ console.log('Header:', header?.textContent);
 L'utilisateur connecté s'affichera correctement dans toute l'interface et l'état persistera après rechargement de page.
 
 
+

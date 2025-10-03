@@ -833,7 +833,7 @@ export default function CardDetailPage() {
                       >
                         <span className="text-xl">🔑</span>
                         <span>
-                          {isAuthenticated && user ? 'Accéder à LibreSpeed' : 'Connectez-vous pour accéder'}
+                          {isAuthenticated && user ? 'Mes applis' : 'Connectez-vous pour accéder'}
                         </span>
                       </button>
                     )}
@@ -854,7 +854,7 @@ export default function CardDetailPage() {
                     )}
 
                     {/* Boutons d'activation pour les modules gratuits */}
-                    {isFreeModule && !alreadyActivatedModules.includes(card.id) && (
+                    {isFreeModule && !alreadyActivatedModules.includes(card.id) && !isLibrespeed && (
                       <div className="space-y-4">
                         {isAuthenticated && user ? (
                           <button 
