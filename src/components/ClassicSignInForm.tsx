@@ -25,19 +25,34 @@ export default function ClassicSignInForm({
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      // Utiliser l'API alternative pour la connexion
+      const response = await fetch('/api/auth/signin-alternative', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password
+        })
       });
 
-      if (error) {
-        console.error('Erreur de connexion:', error);
-        setError(error.message);
-        onError?.(error);
-      } else {
-        console.log('Connexion réussie:', data);
-        onSuccess?.(data.user);
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.error || 'Erreur lors de la connexion');
+        onError?.(new Error(result.error));
+        return;
       }
+
+      // Stocker le token dans le localStorage
+      if (result.token) {
+        localStorage.setItem('auth_token', result.token);
+        localStorage.setItem('user_data', JSON.stringify(result.user));
+      }
+
+      console.log('Connexion réussie:', result.user);
+      onSuccess?.(result.user);
     } catch (error) {
       console.error('Erreur lors de la connexion:', error);
       setError('Une erreur est survenue lors de la connexion');

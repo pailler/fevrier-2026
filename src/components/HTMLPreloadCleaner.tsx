@@ -8,24 +8,17 @@ export default function HTMLPreloadCleaner() {
     const removePreloads = () => {
       // Supprimer les preloads de polices Geist
       const geistFonts = document.querySelectorAll('link[rel="preload"][as="font"][href*="geist"]');
-      geistFonts.forEach(link => {
-        console.log('🗑️ HTMLPreloadCleaner: Suppression preload police Geist:', link.getAttribute('href'));
-        link.remove();
-      });
+      geistFonts.forEach(link => link.remove());
 
       // Supprimer les preloads d'images og-image
       const ogImages = document.querySelectorAll('link[rel="preload"][as="image"][href*="og-image"]');
-      ogImages.forEach(link => {
-        console.log('🗑️ HTMLPreloadCleaner: Suppression preload image og-image:', link.getAttribute('href'));
-        link.remove();
-      });
+      ogImages.forEach(link => link.remove());
 
       // Supprimer TOUS les preloads de polices (approche plus agressive)
       const allFonts = document.querySelectorAll('link[rel="preload"][as="font"]');
       allFonts.forEach(link => {
         const href = link.getAttribute('href');
         if (href && (href.includes('geist') || href.includes('woff2'))) {
-          console.log('🗑️ HTMLPreloadCleaner: Suppression preload police:', href);
           link.remove();
         }
       });
@@ -35,7 +28,6 @@ export default function HTMLPreloadCleaner() {
       allImages.forEach(link => {
         const href = link.getAttribute('href');
         if (href && (href.includes('og-image') || href.includes('.jpg') || href.includes('.png'))) {
-          console.log('🗑️ HTMLPreloadCleaner: Suppression preload image:', href);
           link.remove();
         }
       });
@@ -65,7 +57,6 @@ export default function HTMLPreloadCleaner() {
                   
                   if ((as === 'font' && href && (href.includes('geist') || href.includes('woff2'))) ||
                       (as === 'image' && href && (href.includes('og-image') || href.includes('.jpg') || href.includes('.png')))) {
-                    console.log('🗑️ HTMLPreloadCleaner: Suppression preload détecté:', href);
                     link.remove();
                     shouldRemove = true;
                   }
@@ -98,11 +89,3 @@ export default function HTMLPreloadCleaner() {
 
   return null;
 }
-
-
-
-
-
-
-
-

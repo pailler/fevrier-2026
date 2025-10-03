@@ -753,7 +753,7 @@
         });
 
         // Configuration pour l'upload par chunks
-        const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB par chunk (sous la limite Cloudflare)
+        const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB par chunk (optimisé pour Cloudflare)
         let uploadSessionId = null;
         let totalChunks = 0;
         let uploadedChunks = 0;
@@ -1005,6 +1005,11 @@
                     
                     // Mettre à jour la progression
                     updateProgress();
+                    
+                    // Délai entre les chunks pour éviter de surcharger le serveur
+                    if (chunkIndex < totalChunks - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 1000)); // 1 seconde de délai
+                    }
                 }
                 
                 // 4. Finaliser l'upload et traiter
@@ -1021,7 +1026,7 @@
         }
 
          async function initializeUploadSession() {
-             const response = await fetch('https://iahome.fr/api/whisper-upload/init', {
+             const response = await fetch('/api/whisper-upload/init', {
                  method: 'POST',
                  headers: {
                      'Content-Type': 'application/json',
@@ -1066,10 +1071,20 @@
              formData.append('totalChunks', totalChunks);
              formData.append('filename', selectedFile.name);
 
-             const response = await fetch('https://iahome.fr/api/whisper-upload/chunk', {
-                 method: 'POST',
-                 body: formData
-             });
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 secondes timeout
+            
+            const response = await fetch('/api/whisper-upload/chunk', {
+                method: 'POST',
+                body: formData,
+                signal: controller.signal,
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
+                }
+            });
+            
+            clearTimeout(timeoutId);
 
             if (!response.ok) {
                 throw new Error(`Erreur upload chunk ${chunkIndex + 1}/${totalChunks}`);
@@ -1094,19 +1109,26 @@
              }
          }
 
-         async function finalizeUpload(config) {
-             const response = await fetch('https://iahome.fr/api/whisper-upload/finalize', {
-                 method: 'POST',
-                 headers: {
-                     'Content-Type': 'application/json',
-                 },
-                 body: JSON.stringify({
-                     sessionId: uploadSessionId,
-                     type: currentProcessingType,
-                     endpoint: config.endpoint
-                 })
-             });
-
+        async function finalizeUpload(config) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 secondes timeout pour finalisation
+            
+            const response = await fetch('/api/whisper-upload/finalize', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
+                },
+                body: JSON.stringify({
+                    sessionId: uploadSessionId,
+                    type: currentProcessingType,
+                    endpoint: config.endpoint
+                }),
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
             await handleResponse(response);
         }
 

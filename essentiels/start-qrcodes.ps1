@@ -32,3 +32,11 @@ Write-Host "📊 Base de données PostgreSQL sur le port: 5433" -ForegroundColor
 # Revenir au dossier parent
 Set-Location -Path ".."
 
+
+
+
+
+
+
+
+

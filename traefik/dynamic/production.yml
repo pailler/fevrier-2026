@@ -143,12 +143,4 @@ tls:
         - "CurveP384"
       sniStrict: true
 
-# Configuration des certificats
-certificatesResolvers:
-  letsencrypt:
-    acme:
-      email: "admin@iahome.fr"
-      storage: "/letsencrypt/acme.json"
-      httpChallenge:
-        entryPoint: "web"
-      caServer: "https://acme-v02.api.letsencrypt.org/directory"
+# Configuration des certificats - définie dans traefik.yml principal

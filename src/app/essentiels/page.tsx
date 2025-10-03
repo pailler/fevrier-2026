@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
+import { useCustomAuth } from '../../hooks/useCustomAuth';
 import Breadcrumb from '../../components/Breadcrumb';
 import ModuleCard from '../../components/ModuleCard';
 
 export default function Home() {
   const router = useRouter();
-  const [session, setSession] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
+  const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
   const [role, setRole] = useState<string | null>(null);
   const [selectedModules, setSelectedModules] = useState<any[]>([]);
   const [search, setSearch] = useState('');
@@ -23,31 +23,24 @@ export default function Home() {
   const [userSubscriptions, setUserSubscriptions] = useState<{[key: string]: boolean}>({});
   const [showScrollToTop, setShowScrollToTop] = useState(false);
 
-  // Vérification de la configuration Supabase
+  // Vérification de l'authentification (optionnelle pour cette page)
   useEffect(() => {
-    // Récupérer la session actuelle
-    const getSession = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      setSession(currentSession);
-      setUser(currentSession?.user || null);
-    };
+    if (authLoading) return; // Attendre que l'authentification soit vérifiée
+    
+    if (isAuthenticated && user) {
+      console.log('Utilisateur authentifié:', user.email);
+    } else {
+      console.log('Utilisateur non authentifié - accès public autorisé');
+    }
+  }, [isAuthenticated, user, authLoading]);
 
-    getSession();
-
-    // Écouter les changements de session
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: any, session: any) => {
-        setSession(session);
-        setUser(session?.user || null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  // Effet pour surveiller les changements de session
+  // Récupérer le rôle de l'utilisateur
   useEffect(() => {
-    }, [session, user]);
+    if (!user) return;
+    
+    // Le rôle est déjà disponible dans l'objet user de notre système d'authentification
+    setRole(user.role || 'user');
+  }, [user]);
 
   // Vérifier les sélections actives de l'utilisateur
   useEffect(() => {
@@ -133,28 +126,8 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    // Charger le rôle de l'utilisateur
-    const fetchUserRole = async () => {
-      if (session && user) {
-        try {
-          // Essayer d'abord de récupérer depuis auth.users (plus fiable)
-          const { data: authData, error: authError } = await supabase.auth.getUser();
-          if (authError) {
-            setRole('user'); // Rôle par défaut
-          } else {
-            const userRole = authData.user?.user_metadata?.role || 'user';
-            setRole(userRole);
-          }
-        } catch (err) {
-          setRole('user'); // Rôle par défaut
-        }
-      } else {
-        setRole(null);
-      }
-    };
-    
-    fetchUserRole();
-  }, [session, user]);
+    // Le rôle est déjà géré dans l'effet précédent
+  }, [user]);
 
   useEffect(() => {
     // Charger les modules sélectionnés depuis le localStorage
@@ -455,7 +428,7 @@ export default function Home() {
                 </div>
                 
                 {/* Bouton Mes applications - Visible seulement si connecté */}
-                {session && (
+                {isAuthenticated && user && (
                   <Link 
                     href="/encours" 
                     className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-800 font-semibold px-6 py-4 rounded-xl hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105 min-w-[160px]"
@@ -708,7 +681,7 @@ export default function Home() {
       )}
 
       {/* Bouton flottant de gestion des modules seulement pour les admins */}
-      {session && role === 'admin' && (
+      {isAuthenticated && user && role === 'admin' && (
         <div className="fixed bottom-6 right-6 z-50">
           <button
             onClick={() => router.push('/admin')}

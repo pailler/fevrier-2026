@@ -1,136 +1,123 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '../../utils/supabaseClient';
 import GoogleSignInButton from '../../components/GoogleSignInButton';
-import GoogleSignInDebug from '../../components/GoogleSignInDebug';
-import SimpleGoogleTest from '../../components/SimpleGoogleTest';
 
-export default function TestGoogleAuth() {
-  const [activeTest, setActiveTest] = useState<'button' | 'debug' | 'simple'>('button');
+export default function TestGoogleAuthPage() {
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Vérifier la session actuelle
+    const getSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Erreur lors de la récupération de la session:', error);
+          setError(error.message);
+        } else {
+          setSession(session);
+        }
+      } catch (err: any) {
+        console.error('Erreur:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getSession();
+
+    // Écouter les changements de session
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log('Changement de session:', event, session);
+        setSession(session);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Erreur lors de la déconnexion:', error);
+        setError(error.message);
+      } else {
+        setSession(null);
+        setError(null);
+      }
+    } catch (err: any) {
+      console.error('Erreur:', err);
+      setError(err.message);
+    }
+  };
+
+  const handleGoogleError = (error: any) => {
+    console.error('Erreur Google OAuth:', error);
+    setError(`Erreur Google OAuth: ${error.message}`);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Test de Connexion Google
-          </h1>
-          <p className="text-gray-600">
-            Testez différents composants de connexion Google pour diagnostiquer les problèmes
-          </p>
-        </div>
+      <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+        <h1 className="text-2xl font-bold text-center mb-6">Test Google OAuth</h1>
+        
+        {error && (
+          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            <strong>Erreur:</strong> {error}
+          </div>
+        )}
 
-        {/* Navigation des tests */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1">
+        {session ? (
+          <div className="space-y-4">
+            <div className="p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+              <h2 className="font-bold">✅ Connecté avec succès!</h2>
+              <p><strong>Email:</strong> {session.user.email}</p>
+              <p><strong>Nom:</strong> {session.user.user_metadata?.full_name || 'Non disponible'}</p>
+              <p><strong>ID:</strong> {session.user.id}</p>
+            </div>
+            
             <button
-              onClick={() => setActiveTest('button')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTest === 'button'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
+              onClick={handleSignOut}
+              className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
             >
-              Bouton Standard
-            </button>
-            <button
-              onClick={() => setActiveTest('debug')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTest === 'debug'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Debug Avancé
-            </button>
-            <button
-              onClick={() => setActiveTest('simple')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTest === 'simple'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Test Simple
+              Se déconnecter
             </button>
           </div>
-        </div>
-
-        {/* Contenu des tests */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-          {activeTest === 'button' && (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Test avec le bouton standard
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Utilise le composant GoogleSignInButton standard utilisé dans l'application.
-              </p>
-              <div className="max-w-md mx-auto">
-                <GoogleSignInButton
-                  onSuccess={(user) => {
-                    console.log('✅ Connexion réussie:', user);
-                    alert('Connexion réussie !');
-                  }}
-                  onError={(error) => {
-                    console.error('❌ Erreur de connexion:', error);
-                    alert('Erreur de connexion: ' + error.message);
-                  }}
-                />
-              </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+              <p>Non connecté. Cliquez sur le bouton ci-dessous pour vous connecter avec Google.</p>
             </div>
-          )}
-
-          {activeTest === 'debug' && (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Test avec debug avancé
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Affiche des informations de debug détaillées pour diagnostiquer les problèmes.
-              </p>
-              <GoogleSignInDebug />
-            </div>
-          )}
-
-          {activeTest === 'simple' && (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Test simple
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Teste la configuration Supabase et la connexion Google avec des logs détaillés.
-              </p>
-              <SimpleGoogleTest />
-            </div>
-          )}
-        </div>
-
-        {/* Informations de debug */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-3">
-            Informations de Debug
-          </h3>
-          <div className="space-y-2 text-sm text-blue-800">
-            <p><strong>URL actuelle:</strong> {typeof window !== 'undefined' ? window.location.href : 'N/A'}</p>
-            <p><strong>Origin:</strong> {typeof window !== 'undefined' ? window.location.origin : 'N/A'}</p>
-            <p><strong>URL de callback:</strong> {typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : 'N/A'}</p>
-            <p><strong>User Agent:</strong> {typeof window !== 'undefined' ? window.navigator.userAgent : 'N/A'}</p>
+            
+            <GoogleSignInButton
+              onError={handleGoogleError}
+              className="w-full"
+            />
           </div>
-        </div>
+        )}
 
-        {/* Instructions */}
-        <div className="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-yellow-900 mb-3">
-            Instructions de Test
-          </h3>
-          <div className="space-y-2 text-sm text-yellow-800">
-            <p>1. Cliquez sur "Se connecter avec Google" dans l'un des tests ci-dessus</p>
-            <p>2. Autorisez l'application dans la popup Google</p>
-            <p>3. Vous devriez être redirigé vers <code>/auth/callback</code></p>
-            <p>4. Puis redirigé vers la page d'accueil</p>
-            <p>5. Vérifiez la console du navigateur pour les logs de debug</p>
-          </div>
+        <div className="mt-6 p-4 bg-gray-100 rounded">
+          <h3 className="font-bold mb-2">Informations de débogage:</h3>
+          <p><strong>URL actuelle:</strong> {typeof window !== 'undefined' ? window.location.href : 'N/A'}</p>
+          <p><strong>Origin:</strong> {typeof window !== 'undefined' ? window.location.origin : 'N/A'}</p>
+          <p><strong>Callback URL:</strong> {typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : 'N/A'}</p>
         </div>
       </div>
     </div>

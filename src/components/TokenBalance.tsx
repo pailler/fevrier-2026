@@ -48,9 +48,9 @@ export default function TokenBalance({ userId, className = '' }: TokenBalancePro
   }
 
   const getTokenColor = (tokenCount: number) => {
-    if (tokenCount === 0) return 'text-red-600';
-    if (tokenCount < 50) return 'text-yellow-600';
-    return 'text-green-600';
+    if (tokenCount === 0) return 'text-red-200';
+    if (tokenCount < 50) return 'text-yellow-200';
+    return 'text-green-200';
   };
 
   return (

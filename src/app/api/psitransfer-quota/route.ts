@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     // Récupérer l'accès utilisateur pour PSitransfer
     const { data: userAccess, error: accessError } = await supabase
       .from('user_applications')
-      .select('id, usage_count, max_usage, quota_used, quota_limit')
+      .select('id, usage_count, max_usage')
       .eq('user_id', userId)
       .eq('module_id', 'psitransfer')
       .eq('is_active', true)
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     // Convertir la taille du fichier en Go
     const fileSizeGB = fileSize / (1024 * 1024 * 1024);
-    const currentUsageGB = userAccess.quota_used || 0;
+    const currentUsageGB = 0; // Pas de quota_used dans la table
     const maxUsageGB = userAccess.max_usage || 10; // 10 Go par défaut
 
     if (action === 'check') {
@@ -80,7 +80,6 @@ export async function POST(request: NextRequest) {
       const { error: updateError } = await supabase
         .from('user_applications')
         .update({
-          quota_used: newUsageGB,
           usage_count: (userAccess.usage_count || 0) + 1,
           updated_at: new Date().toISOString()
         })
@@ -113,7 +112,6 @@ export async function POST(request: NextRequest) {
       const { error: updateError } = await supabase
         .from('user_applications')
         .update({
-          quota_used: newUsageGB,
           updated_at: new Date().toISOString()
         })
         .eq('id', userAccess.id);
@@ -161,6 +159,16 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

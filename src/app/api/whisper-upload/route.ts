@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // Configuration des limites pour cette route spécifique
 export const config = {
   // Configuration pour les uploads de fichiers
-  maxDuration: 600, // 10 minutes maximum pour les gros fichiers
+  maxDuration: 1800, // 30 minutes maximum pour les gros fichiers
 };
 
 export async function POST(request: NextRequest) {
@@ -29,8 +29,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validation simplifiée de la taille (100MB max)
-    const maxSize = 100 * 1024 * 1024; // 100MB
+    // Validation simplifiée de la taille (2GB max)
+    const maxSize = 2 * 1024 * 1024 * 1024; // 2GB
     if (file.size > maxSize) {
       return NextResponse.json(
         { error: `Fichier trop volumineux. Maximum: ${maxSize / 1024 / 1024}MB` },
@@ -49,13 +49,13 @@ export async function POST(request: NextRequest) {
     let targetUrl: string;
     switch (type) {
       case 'AUDIO':
-        targetUrl = 'http://192.168.1.150:8092/asr';
+        targetUrl = 'http://localhost:8092/asr';
         break;
       case 'VIDEO':
-        targetUrl = 'http://192.168.1.150:8095/asr';
+        targetUrl = 'http://localhost:8095/asr';
         break;
       case 'IMAGE':
-        targetUrl = 'http://192.168.1.150:8094/ocr';
+        targetUrl = 'http://localhost:8094/ocr';
         break;
       default:
         return NextResponse.json(

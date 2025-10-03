@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     // URL de destination
-    const targetUrl = 'http://192.168.1.150:8092/asr';
+    const targetUrl = 'http://localhost:8092/asr';
     console.log('🎯 Envoi vers:', targetUrl);
 
     // Créer FormData pour Whisper
@@ -127,6 +127,7 @@ export async function OPTIONS(request: NextRequest) {
     },
   });
 }
+
 
 
 

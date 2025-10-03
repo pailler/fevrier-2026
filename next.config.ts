@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
   
   // Configuration pour les gros uploads
   serverRuntimeConfig: {
-    maxFileSize: 100 * 1024 * 1024, // 100MB
+    maxFileSize: 200 * 1024 * 1024, // 200MB
   },
   
   // Configuration des polices optimisée

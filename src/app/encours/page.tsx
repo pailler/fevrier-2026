@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
-import Header from '../../components/Header';
+import { useCustomAuth } from '../../hooks/useCustomAuth';
 import LibreSpeedAccessButton from '../../components/LibreSpeedAccessButton';
 import MeTubeAccessButton from '../../components/MeTubeAccessButton';
 import ModuleAccessButton from '../../components/ModuleAccessButton';
@@ -30,13 +30,10 @@ interface UserModule {
 
 export default function EncoursPage() {
   const router = useRouter();
-  const [session, setSession] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
-  const [userProfile, setUserProfile] = useState<any>(null);
+  const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
   const [role, setRole] = useState<string | null>(null);
   const [userModules, setUserModules] = useState<UserModule[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sessionChecked, setSessionChecked] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [processingModule, setProcessingModule] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -48,20 +45,21 @@ export default function EncoursPage() {
   const [tokenError, setTokenError] = useState<string | null>(null);
   const [cacheBuster] = useState(() => Date.now() + Math.random() * 1000);
 
-  // Vérification de la session et des erreurs de token
+  // Vérification de l'authentification
   useEffect(() => {
-    const getSession = async () => {
-      try {
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
-        setSession(currentSession);
-        setUser(currentSession?.user || null);
-        setSessionChecked(true);
-        } catch (error) {
-        setSessionChecked(true);
-      }
-    };
+    if (authLoading) return; // Attendre que l'authentification soit vérifiée
+    
+    if (!isAuthenticated || !user) {
+      console.log('Utilisateur non authentifié, redirection vers /login');
+      router.push('/login');
+      return;
+    }
+    
+    console.log('Utilisateur authentifié:', user.email);
+  }, [isAuthenticated, user, authLoading, router]);
 
-    // Vérifier s'il y a des erreurs de token dans l'URL
+  // Vérifier s'il y a des erreurs de token dans l'URL
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const errorParam = urlParams.get('error');
     
@@ -83,45 +81,14 @@ export default function EncoursPage() {
       // Nettoyer l'URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-
-    getSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: any, session: any) => {
-        setSession(session);
-        setUser(session?.user || null);
-        setSessionChecked(true);
-      }
-    );
-
-    return () => subscription.unsubscribe();
   }, []);
 
   // Récupérer le rôle de l'utilisateur
   useEffect(() => {
-    const fetchUserRole = async () => {
-      if (!user) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-
-        if (!error && data) {
-          setRole(data.role);
-        } else {
-          setRole('user');
-        }
-        } catch (error) {
-        setRole('user');
-      }
-    };
-
-    if (user) {
-      fetchUserRole();
-    }
+    if (!user) return;
+    
+    // Le rôle est déjà disponible dans l'objet user de notre système d'authentification
+    setRole(user.role || 'user');
   }, [user]);
 
   // Charger les modules souscrits par l'utilisateur et les tokens d'accès
@@ -297,10 +264,10 @@ export default function EncoursPage() {
       }
     };
 
-    if (user && sessionChecked) {
+    if (user) {
       fetchUserModules();
     }
-  }, [user, sessionChecked]);
+  }, [user]);
 
   // Mapping des modules vers leurs URLs directes (sécurisées via tokens)
   const getModuleUrl = (moduleId: string): string => {
@@ -515,24 +482,35 @@ export default function EncoursPage() {
   };
 
   // Contrôles d'accès
-  if (!sessionChecked) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Vérification de la session...</p>
+            <p className="mt-4 text-gray-600">Chargement des applications...</p>
           </div>
         </div>
       </div>
     );
   }
 
-  if (!session) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Vérification de l'authentification...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Accès refusé</h1>
@@ -546,7 +524,6 @@ export default function EncoursPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
         {/* En-tête de la page */}

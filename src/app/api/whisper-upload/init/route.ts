@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       type,
       chunks: new Map(),
       createdAt: new Date(),
-      totalChunks: Math.ceil(size / (20 * 1024 * 1024)) // 20MB par chunk
+      totalChunks: Math.ceil(size / (50 * 1024 * 1024)) // 50MB par chunk pour gros fichiers
     };
     
     uploadSessions.set(sessionId, sessionData);
@@ -36,12 +36,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       sessionId,
       totalChunks: sessionData.totalChunks,
-      chunkSize: 20 * 1024 * 1024
+      chunkSize: 50 * 1024 * 1024
     }, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cache-Control',
       }
     });
   } catch (error) {
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cache-Control',
       }
     });
   }

@@ -3,12 +3,16 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Header from '../../components/Header';
+import { useCustomAuth } from '../../hooks/useCustomAuth';
 
 function TokenGeneratedContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user, isAuthenticated } = useCustomAuth();
   const [moduleName, setModuleName] = useState<string>('');
   const [countdown, setCountdown] = useState(10);
+  const [moduleAdded, setModuleAdded] = useState(false);
+  const [addingModule, setAddingModule] = useState(false);
 
   useEffect(() => {
     // Récupérer le nom du module depuis les paramètres d'URL
@@ -16,6 +20,42 @@ function TokenGeneratedContent() {
     if (module) {
       setModuleName(module);
     }
+
+    // Ajouter le module LibreSpeed aux applications de l'utilisateur
+    const addLibreSpeedModule = async () => {
+      if (isAuthenticated && user && module?.toLowerCase().includes('librespeed') && !moduleAdded) {
+        setAddingModule(true);
+        try {
+          console.log('🔧 Ajout du module LibreSpeed aux applications de l\'utilisateur...');
+          
+          const response = await fetch('/api/add-module-to-encours', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: user.id,
+              moduleId: 'librespeed'
+            })
+          });
+
+          const result = await response.json();
+
+          if (response.ok && result.success) {
+            console.log('✅ Module LibreSpeed ajouté avec succès:', result.message);
+            setModuleAdded(true);
+          } else {
+            console.error('❌ Erreur lors de l\'ajout du module LibreSpeed:', result.error);
+          }
+        } catch (error) {
+          console.error('❌ Erreur lors de l\'ajout du module LibreSpeed:', error);
+        } finally {
+          setAddingModule(false);
+        }
+      }
+    };
+
+    addLibreSpeedModule();
 
     // Compte à rebours automatique
     const timer = setInterval(() => {
@@ -30,7 +70,7 @@ function TokenGeneratedContent() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [searchParams, router]);
+  }, [searchParams, router, isAuthenticated, user, moduleAdded]);
 
   const getModuleColor = (module: string) => {
     switch (module.toLowerCase()) {
@@ -95,6 +135,29 @@ function TokenGeneratedContent() {
               <p className="text-lg text-gray-600 mb-2">
                 Utilisez-là dès maintenant !
               </p>
+
+              {/* Indicateur d'ajout du module */}
+              {moduleName.toLowerCase().includes('librespeed') && (
+                <div className="mb-4">
+                  {addingModule && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                      <div className="flex items-center justify-center space-x-3 text-blue-800">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                        <span className="text-sm font-medium">Ajout de LibreSpeed à vos applications...</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {moduleAdded && (
+                    <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
+                      <div className="flex items-center justify-center space-x-3 text-green-800">
+                        <span className="text-lg">✅</span>
+                        <span className="text-sm font-medium">LibreSpeed ajouté à vos applications !</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
               
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-8">
                 <div className="flex items-center justify-center space-x-4 text-sm text-green-800">

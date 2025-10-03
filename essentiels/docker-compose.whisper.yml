@@ -30,6 +30,8 @@ services:
       - DOCKER_ENABLE_SECURITY=true
       - DOCKER_ENABLE_UPDATE_CHECK=false
       - DOCKER_ENABLE_CORS=true
+      - MAX_FILE_SIZE=200MB
+      - UPLOAD_TIMEOUT=900
     volumes:
       - whisper-models:/app/models
       - whisper-uploads:/app/uploads
@@ -124,6 +126,8 @@ services:
       - DOCKER_ENABLE_CORS=true
       - VIDEO_PROCESSING=true
       - FFMPEG_ENABLED=true
+      - MAX_FILE_SIZE=200MB
+      - UPLOAD_TIMEOUT=900
     volumes:
       - whisper-video-models:/app/models
       - whisper-video-uploads:/app/uploads

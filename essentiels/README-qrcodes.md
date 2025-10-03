@@ -93,3 +93,11 @@ cd qrcodes
 docker-compose down -v
 ```
 
+
+
+
+
+
+
+
+

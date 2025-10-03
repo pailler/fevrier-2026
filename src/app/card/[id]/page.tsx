@@ -5,6 +5,7 @@ import { supabase } from '../../../utils/supabaseClient';
 import Link from 'next/link';
 import Image from 'next/image';
 import Breadcrumb from '../../../components/Breadcrumb';
+import { useCustomAuth } from '../../../hooks/useCustomAuth';
 // import { NotificationServiceClient } from '../../../utils/notificationServiceClient';
 // import AuthorizedAccessButton from '../../../components/AuthorizedAccessButton';
 
@@ -31,11 +32,10 @@ interface Card {
 export default function CardDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { user, isAuthenticated, loading: authLoading, token } = useCustomAuth();
   const [card, setCard] = useState<Card | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [session, setSession] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
   const [selectedCards, setSelectedCards] = useState<any[]>([]);
   const [userSubscriptions, setUserSubscriptions] = useState<{[key: string]: any}>({});
   const [iframeModal, setIframeModal] = useState<{isOpen: boolean, url: string, title: string}>({
@@ -63,7 +63,7 @@ export default function CardDetailPage() {
 
   // Fonction pour vérifier si un module est déjà activé
   const checkModuleActivation = useCallback(async (moduleId: string) => {
-    if (!session?.user?.id || !moduleId) return false;
+    if (!user?.id || !moduleId) return false;
     
     try {
       const response = await fetch('/api/check-module-activation', {
@@ -73,7 +73,7 @@ export default function CardDetailPage() {
         },
         body: JSON.stringify({
           moduleId: moduleId,
-          userId: session.user.id
+          userId: user.id
         }),
       });
 
@@ -85,11 +85,11 @@ export default function CardDetailPage() {
       console.error('Erreur lors de la vérification d\'activation:', error);
     }
     return false;
-  }, [session?.user?.id]);
+  }, [user?.id]);
 
   // Fonction pour accéder aux modules avec JWT
   const accessModuleWithJWT = useCallback(async (moduleTitle: string, moduleId: string) => {
-    if (!session?.user?.id) {
+    if (!user?.id) {
       alert('Vous devez être connecté pour accéder aux modules');
       return;
     }
@@ -148,7 +148,7 @@ export default function CardDetailPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token || ''}`
+          'Authorization': `Bearer ${token || ''}`
         },
         body: JSON.stringify({
           moduleId: moduleId,
@@ -222,32 +222,14 @@ export default function CardDetailPage() {
       console.error('❌ Erreur lors de l\'accès:', error);
       alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
-  }, [session, setIframeModal]);
+  }, [user, token, setIframeModal]);
 
-  // Vérifier la session
-  useEffect(() => {
-    const getSession = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      setSession(currentSession);
-      setUser(currentSession?.user || null);
-    };
-
-    getSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user || null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
+  // L'authentification est maintenant gérée par useCustomAuth
 
   // Récupérer les abonnements de l'utilisateur et vérifier l'activation du module
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!session?.user?.id) {
+      if (!user?.id) {
         setUserSubscriptions({});
         return;
       }
@@ -257,7 +239,7 @@ export default function CardDetailPage() {
         let { data: accessData, error: accessError } = await supabase
           .from('user_applications')
           .select('*')
-          .eq('user_id', session.user.id)
+          .eq('user_id', user.id)
           .eq('is_active', true);
 
         if (accessError) {
@@ -306,7 +288,7 @@ export default function CardDetailPage() {
     };
 
     fetchUserData();
-  }, [session?.user?.id, card?.id, checkModuleActivation]);
+  }, [user?.id, card?.id, checkModuleActivation]);
 
   // Charger les modules sélectionnés depuis le localStorage
   useEffect(() => {
@@ -393,7 +375,7 @@ export default function CardDetailPage() {
 
         if (data) {
           setCard(data);
-          console.log('🔍 Debug card:', data.title, 'price:', data.price, 'price type:', typeof data.price, 'session:', !!session);
+          console.log('🔍 Debug card:', data.title, 'price:', data.price, 'price type:', typeof data.price, 'user:', !!user);
         }
       } catch (error) {
         console.error('Erreur:', error);
@@ -415,7 +397,7 @@ export default function CardDetailPage() {
     };
 
     fetchCardDetails();
-  }, [params.id, router, session]);
+  }, [params.id, router, user]);
 
   // Gérer l'accès rapide
   useEffect(() => {
@@ -423,7 +405,7 @@ export default function CardDetailPage() {
       const urlParams = new URLSearchParams(window.location.search);
       const quickAccess = urlParams.get('quick_access');
       
-      if (quickAccess === 'true' && card && session && !quickAccessAttempted) {
+      if (quickAccess === 'true' && card && isAuthenticated && user && !quickAccessAttempted) {
         setQuickAccessAttempted(true);
         
         if (card.price === 0 || card.price === '0') {
@@ -441,10 +423,10 @@ export default function CardDetailPage() {
       }
     };
 
-    if (card && session) {
+    if (card && isAuthenticated && user) {
       handleQuickAccess();
     }
-  }, [card, session, quickAccessAttempted, accessModuleWithJWT]);
+  }, [card, isAuthenticated, user, quickAccessAttempted, accessModuleWithJWT]);
 
   const handleSubscribe = (card: Card) => {
     if (!card?.id) {
@@ -684,19 +666,19 @@ export default function CardDetailPage() {
 
               <div className="space-y-6">
                 {/* Boutons d'action */}
-                {(card.price === 0 || card.price === '0') && session ? (
-                  // Bouton d'accès gratuit pour les modules gratuits (uniquement si connecté)
+                {(card.price === 0 || card.price === '0') && isAuthenticated && user && !isLibrespeed ? (
+                  // Bouton d'accès gratuit pour les modules gratuits (uniquement si connecté, sauf LibreSpeed)
                   <>
                     <button 
                       className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                       onClick={async () => {
-                        if (!session) {
+                        if (!isAuthenticated || !user) {
                           alert('Connectez-vous pour accéder à ce module');
                           return;
                         }
 
                         // Générer le token premium automatiquement pour les modules gratuits
-                        if (session?.user?.id && (card.price === 0 || card.price === '0')) {
+                        if (user?.id && (card.price === 0 || card.price === '0')) {
                           try {
                             const response = await fetch('/api/generate-premium-token', {
                               method: 'POST',
@@ -705,7 +687,7 @@ export default function CardDetailPage() {
                               },
                               body: JSON.stringify({
                                 moduleName: card.title,
-                                userId: session.user.id
+                                userId: user.id
                               })
                             });
                             
@@ -730,8 +712,8 @@ export default function CardDetailPage() {
                       <span>Activer l'application {card.title}</span>
                     </button>
                   </>
-                ) : (card.price === 0 || card.price === '0') && !session ? (
-                  // Message pour les modules gratuits quand l'utilisateur n'est pas connecté
+                ) : (card.price === 0 || card.price === '0') && (!isAuthenticated || !user) && !isLibrespeed ? (
+                  // Message pour les modules gratuits quand l'utilisateur n'est pas connecté (sauf LibreSpeed)
                   <a 
                     href="/login"
                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
@@ -783,7 +765,7 @@ export default function CardDetailPage() {
                       <button 
                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                         onClick={async () => {
-                          if (!session) {
+                          if (!isAuthenticated || !user) {
                             window.location.href = '/login';
                             return;
                           }
@@ -833,8 +815,31 @@ export default function CardDetailPage() {
                       </button>
                     )}
 
-                    {/* Bouton d'accès - visible seulement si l'utilisateur a accès au module */}
-                    {session && userSubscriptions[`module_${card.id}`] && (
+                    {/* Bouton d'accès spécial pour LibreSpeed */}
+                    {isLibrespeed && (
+                      <button
+                        onClick={() => {
+                          if (isAuthenticated && user) {
+                            // Utilisateur connecté : aller à la page de transition puis /encours
+                            console.log('✅ Accès LibreSpeed - Utilisateur connecté');
+                            router.push(`/token-generated?module=${encodeURIComponent(card.title)}&redirect=/encours`);
+                          } else {
+                            // Utilisateur non connecté : aller à la page de connexion puis retour à LibreSpeed
+                            console.log('🔒 Accès LibreSpeed - Redirection vers connexion');
+                            router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
+                          }
+                        }}
+                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                      >
+                        <span className="text-xl">🔑</span>
+                        <span>
+                          {isAuthenticated && user ? 'Accéder à LibreSpeed' : 'Connectez-vous pour accéder'}
+                        </span>
+                      </button>
+                    )}
+
+                    {/* Bouton d'accès - visible seulement si l'utilisateur a accès au module (autres modules) */}
+                    {!isLibrespeed && isAuthenticated && user && userSubscriptions[`module_${card.id}`] && (
                       <button
                         onClick={() => {
                           console.log('✅ Accès à l\'application accordé');
@@ -851,10 +856,10 @@ export default function CardDetailPage() {
                     {/* Boutons d'activation pour les modules gratuits */}
                     {isFreeModule && !alreadyActivatedModules.includes(card.id) && (
                       <div className="space-y-4">
-                        {session ? (
+                        {isAuthenticated && user ? (
                           <button 
                             onClick={async () => {
-                              if (session?.user?.id) {
+                              if (user?.id) {
                                 try {
                                   // Générer le token premium automatiquement
                                   const response = await fetch('/api/generate-premium-token', {
@@ -862,10 +867,10 @@ export default function CardDetailPage() {
                                     headers: {
                                       'Content-Type': 'application/json',
                                     },
-                                    body: JSON.stringify({
-                                      moduleName: card.title,
-                                      userId: session.user.id
-                                    })
+                                  body: JSON.stringify({
+                                    moduleName: card.title,
+                                    userId: user.id
+                                  })
                                   });
                                   
                                   if (response.ok) {

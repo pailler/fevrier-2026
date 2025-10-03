@@ -6,6 +6,72 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.text();
+    console.log('Body reçu:', body);
+    
+    if (!body) {
+      return NextResponse.json({ error: 'Body manquant' }, { status: 400 });
+    }
+    
+    let data;
+    try {
+      data = JSON.parse(body);
+    } catch (parseError) {
+      console.error('Erreur de parsing JSON:', parseError);
+      return NextResponse.json({ error: 'JSON invalide' }, { status: 400 });
+    }
+    
+    const { email, name, avatar_url } = data;
+
+    if (!email) {
+      return NextResponse.json({ error: 'Email manquant' }, { status: 400 });
+    }
+
+    // Vérifier si l'utilisateur existe déjà
+    const { data: existingUser, error: userError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    if (userError && userError.code !== 'PGRST116') {
+      console.error('Erreur lors de la vérification de l\'utilisateur:', userError);
+      return NextResponse.json({ error: 'Erreur lors de la vérification de l\'utilisateur' }, { status: 500 });
+    }
+
+    // Si l'utilisateur n'existe pas, le créer
+    if (!existingUser) {
+      const { data: newUser, error: insertError } = await supabase
+        .from('profiles')
+        .insert({
+          email,
+          full_name: name || email,
+          role: 'user',
+          is_active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Erreur lors de la création de l\'utilisateur:', insertError);
+        return NextResponse.json({ error: 'Erreur lors de la création de l\'utilisateur' }, { status: 500 });
+      }
+
+      return NextResponse.json({ success: true, user: newUser });
+    }
+
+    return NextResponse.json({ success: true, user: existingUser });
+
+  } catch (error) {
+    console.error('Erreur lors du traitement POST:', error);
+    return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 });
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -33,25 +99,26 @@ export async function GET(request: NextRequest) {
     if (data.session?.user) {
       console.log('✅ Session créée pour:', data.session.user.email);
       
-      // Vérifier si l'utilisateur existe dans la table users
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', data.session.user.email)
-        .single();
+    // Vérifier si l'utilisateur existe dans la table profiles
+    const { data: userData, error: userError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('email', data.session.user.email)
+      .single();
 
-      // Si l'utilisateur n'existe pas, le créer
-      if (!userData && userError?.code === 'PGRST116') {
-        console.log('📝 Création du nouvel utilisateur...');
-        const { error: insertError } = await supabase
-          .from('users')
-          .insert({
-            email: data.session.user.email,
-            name: data.session.user.user_metadata?.full_name || data.session.user.email,
-            avatar_url: data.session.user.user_metadata?.avatar_url || null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
+    // Si l'utilisateur n'existe pas, le créer
+    if (!userData && userError?.code === 'PGRST116') {
+      console.log('📝 Création du nouvel utilisateur...');
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert({
+          email: data.session.user.email,
+          full_name: data.session.user.user_metadata?.full_name || data.session.user.email,
+          role: 'user',
+          is_active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
 
         if (insertError) {
           console.error('❌ Erreur lors de la création de l\'utilisateur:', insertError);

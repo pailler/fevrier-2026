@@ -1,20 +1,25 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-// Configuration Supabase
-const supabaseUrl = 'https://xemtoyzcihmncbrlsmhr.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlbXRveXpjaWhtbmNicmxzbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0MDUzMDUsImV4cCI6MjA2NTk4MTMwNX0.afcRGhlB5Jj-7kgCV6IzUDRdGUQkHkm1Fdl1kzDdj6M';
+// Configuration Supabase - Utiliser les variables d'environnement
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 // Instance singleton pour éviter les instances multiples
 let clientInstance: SupabaseClient | null = null;
 
 export const getSupabaseClient = (): SupabaseClient => {
   if (!clientInstance) {
+    if (!supabaseUrl || !supabaseAnonKey) {
+      throw new Error('Variables d\'environnement Supabase manquantes');
+    }
+    
     clientInstance = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
-        storage: typeof window !== 'undefined' ? window.localStorage : undefined
+        storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+        flowType: 'pkce'
       }
     });
   }

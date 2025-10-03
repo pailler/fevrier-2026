@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import FontAwesomeLocal from '@/components/FontAwesomeLocal';
 // import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "../components/Header";
+import CustomHeader from "../components/CustomHeader";
 import Footer from "../components/Footer";
 import AdaptiveLayout from "../components/AdaptiveLayout";
 import ConditionalComponents from "../components/ConditionalComponents";
 import CSSOptimizer from "../components/CSSOptimizer";
 import PerformanceOptimizer from "../components/PerformanceOptimizer";
-import WebVitals from "../components/WebVitals";
+import OptimizedWebVitals from "../components/OptimizedWebVitals";
 import ResourceOptimizer from "../components/ResourceOptimizer";
 import HTMLPreloadCleaner from "../components/HTMLPreloadCleaner";
 import CSSPreloadManager from "../components/CSSPreloadManager";
@@ -126,13 +126,13 @@ export default function RootLayout({
       <body className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <CSSOptimizer />
         <PerformanceOptimizer />
-        <WebVitals />
+        <OptimizedWebVitals />
         <ResourceOptimizer />
         <HTMLPreloadCleaner />
         <CSSPreloadManager />
         <AggressivePreloadCleaner />
         <AdaptiveLayout>
-          <Header />
+          <CustomHeader />
           <main className="flex-1">
             {children}
           </main>

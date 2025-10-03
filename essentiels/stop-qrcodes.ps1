@@ -17,3 +17,11 @@ Write-Host "✅ Service QR Codes arrêté avec succès!" -ForegroundColor Green
 # Revenir au dossier parent
 Set-Location -Path ".."
 
+
+
+
+
+
+
+
+

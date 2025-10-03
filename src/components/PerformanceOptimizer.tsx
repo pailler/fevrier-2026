@@ -8,7 +8,7 @@ export default function PerformanceOptimizer() {
       // Preload des ressources critiques
       const preloadCriticalResources = () => {
         const criticalResources = [
-          '/og-image.jpg',
+          '/images/og-image.jpg',
         ];
 
         criticalResources.forEach(resource => {

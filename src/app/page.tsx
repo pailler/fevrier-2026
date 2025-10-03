@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useState } from "react";
-import { supabase } from "../utils/supabaseClient";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
+import { useCustomAuth } from '../hooks/useCustomAuth';
 import Breadcrumb from '../components/Breadcrumb';
 import StructuredData from '../components/StructuredData';
 
@@ -11,10 +11,9 @@ export const dynamic = 'force-dynamic';
 
 export default function Home() {
   const router = useRouter();
-  const [session, setSession] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
+  const { user, isAuthenticated, loading } = useCustomAuth();
 
-  // Vérification de la configuration Supabase
+  // Vérification de la configuration et redirection
   useEffect(() => {
     // Redirection pour librespeed.iahome.fr
     if (typeof window !== 'undefined' && window.location.hostname === 'librespeed.iahome.fr') {
@@ -32,25 +31,8 @@ export default function Home() {
         return;
       }
     }
-    // Récupérer la session actuelle
-    const getSession = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      setSession(currentSession);
-      setUser(currentSession?.user || null);
-    };
 
-    getSession();
-
-    // Écouter les changements de session
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: any, session: any) => {
-        setSession(session);
-        setUser(session?.user || null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
+  }, [user, isAuthenticated, loading, router]);
 
   return (
     <>
@@ -60,6 +42,7 @@ export default function Home() {
       
       <div className="min-h-screen bg-blue-50 font-sans">
         <Breadcrumb />
+        
 
       {/* Section héros principale */}
       <section className="bg-gradient-to-br from-yellow-100 via-green-50 to-green-200 py-16 relative overflow-hidden">

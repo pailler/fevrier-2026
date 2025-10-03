@@ -3,39 +3,37 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import GoogleSignInButton from '../../components/GoogleSignInButton';
-import ClassicSignInForm from '../../components/ClassicSignInForm';
-import { supabase } from '../../utils/supabaseClient';
+import WorkingSignInForm from '../../components/WorkingSignInForm';
+import { useCustomAuth } from '../../hooks/useCustomAuth';
 
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, isAuthenticated, loading } = useCustomAuth();
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    // Vérifier si l'utilisateur est déjà connecté
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        router.push('/');
-      }
-      setLoading(false);
-    };
-
-    checkSession();
+    // Si l'utilisateur est déjà connecté, rediriger vers l'accueil
+    if (isAuthenticated && user) {
+      router.push('/');
+    }
 
     // Vérifier les erreurs dans l'URL
     const errorParam = searchParams.get('error');
     if (errorParam) {
       setError('Une erreur est survenue lors de la connexion. Veuillez réessayer.');
     }
-  }, [router, searchParams]);
+
+    // Vérifier les messages de succès dans l'URL
+    const messageParam = searchParams.get('message');
+    if (messageParam) {
+      setSuccess(decodeURIComponent(messageParam));
+    }
+  }, [isAuthenticated, user, router, searchParams]);
 
   const handleAuthSuccess = (user: any) => {
     if (user) {
-      setUser(user);
       router.push('/');
     }
   };
@@ -90,6 +88,12 @@ function LoginContent() {
             </div>
           )}
 
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+              {success}
+            </div>
+          )}
+
           <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
             <GoogleSignInButton
               onSuccess={handleAuthSuccess}
@@ -106,12 +110,21 @@ function LoginContent() {
               </div>
             </div>
 
-            <ClassicSignInForm
+            <WorkingSignInForm
               onSuccess={handleAuthSuccess}
               onError={handleAuthError}
             />
 
             <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600">
+                Vous n'avez pas de compte ?{' '}
+                <a href="/signup" className="text-green-600 hover:text-green-500 font-medium">
+                  Créer un compte
+                </a>
+              </p>
+            </div>
+
+            <div className="mt-4 text-center">
               <p className="text-sm text-gray-600">
                 En vous connectant, vous acceptez nos{' '}
                 <a href="/terms" className="text-blue-600 hover:text-blue-500 font-medium">

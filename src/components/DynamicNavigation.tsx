@@ -70,8 +70,8 @@ export default function DynamicNavigation({
       href: item.url || '#',
       target: item.is_external ? '_blank' : item.target,
       rel: item.is_external ? 'noopener noreferrer' : undefined,
-      className: `text-gray-700 hover:text-blue-600 font-medium transition-colors ${
-        isMobile ? 'block py-2 px-4 hover:bg-gray-50' : ''
+      className: `text-white hover:text-blue-100 font-medium transition-colors ${
+        isMobile ? 'block py-2 px-4 hover:bg-blue-500' : ''
       }`
     };
 
@@ -103,8 +103,8 @@ export default function DynamicNavigation({
                 target={child.is_external ? '_blank' : child.target}
                 rel={child.is_external ? 'noopener noreferrer' : undefined}
                 className={`
-                  block text-gray-700 hover:text-blue-600 transition-colors
-                  ${isMobile ? 'py-1 px-2' : 'px-4 py-2 hover:bg-gray-50'}
+                  block text-white hover:text-blue-100 transition-colors
+                  ${isMobile ? 'py-1 px-2' : 'px-4 py-2 hover:bg-blue-500'}
                 `}
               >
                 {child.icon && <span className="mr-2">{child.icon}</span>}

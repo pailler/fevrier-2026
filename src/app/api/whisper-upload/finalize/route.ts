@@ -66,7 +66,17 @@ export async function POST(request: NextRequest) {
     uploadSessions.set(`task_${taskId}`, task);
     
     // Démarrer le traitement asynchrone
-    processTranscriptionAsync(taskId, session, type, completeFile);
+    processTranscriptionAsync(taskId, session, type, completeFile).catch(error => {
+      console.error(`❌ Erreur traitement asynchrone pour la tâche ${taskId}:`, error);
+      
+      // Mettre à jour la tâche avec l'erreur
+      const task = uploadSessions.get(`task_${taskId}`);
+      if (task) {
+        task.status = 'error';
+        task.error = error instanceof Error ? error.message : String(error);
+        uploadSessions.set(`task_${taskId}`, task);
+      }
+    });
     
     console.log(`🚀 Tâche de transcription créée: ${taskId}`);
     
@@ -80,7 +90,7 @@ export async function POST(request: NextRequest) {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cache-Control',
       }
     });
     
@@ -97,7 +107,7 @@ export async function POST(request: NextRequest) {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cache-Control',
       }
     });
   }
@@ -119,11 +129,11 @@ async function processTranscriptionAsync(taskId: string, session: any, type: str
     // Envoyer vers le service Whisper approprié
     let targetUrl;
     if (type === 'video') {
-      targetUrl = 'http://192.168.1.150:8095/asr';
+      targetUrl = 'http://localhost:8095/asr';
     } else if (type === 'image' || type === 'document') {
-      targetUrl = 'http://192.168.1.150:8097/ocr';
+      targetUrl = 'http://localhost:8094/ocr';
     } else {
-      targetUrl = 'http://192.168.1.150:8092/asr';
+      targetUrl = 'http://localhost:8092/asr';
     }
     
     console.log(`🎯 Envoi vers: ${targetUrl} (type: ${type})`);

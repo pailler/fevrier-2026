@@ -1,28 +1,40 @@
 {
   "ingress": [
     {
-      "hostname": "librespeed.iahome.fr",
-      "service": "http://192.168.1.150:8081"
-    },
-    {
-      "hostname": "psitransfer.iahome.fr",
-      "service": "http://192.168.1.150:7009"
-    },
-    {
-      "hostname": "metube.iahome.fr",
-      "service": "http://192.168.1.150:7007"
+      "hostname": "iahome.fr",
+      "service": "http://localhost:3000"
     },
     {
       "hostname": "www.iahome.fr",
-      "service": "http://192.168.1.150:3000"
+      "service": "http://localhost:3000"
     },
     {
-      "hostname": "iahome.fr",
-      "service": "http://192.168.1.150:3000"
+      "hostname": "metube.iahome.fr",
+      "service": "http://localhost:8082"
+    },
+    {
+      "hostname": "librespeed.iahome.fr",
+      "service": "http://localhost:8083"
+    },
+    {
+      "hostname": "whisper.iahome.fr",
+      "service": "http://localhost:8093"
+    },
+    {
+      "hostname": "psitransfer.iahome.fr",
+      "service": "http://localhost:8084"
     },
     {
       "hostname": "qrcodes.iahome.fr",
-      "service": "http://192.168.1.150:3000/qrcodes-redirect"
+      "service": "http://localhost:7005"
+    },
+    {
+      "hostname": "pdf.iahome.fr",
+      "service": "http://localhost:8081"
+    },
+    {
+      "hostname": "rembg.iahome.fr",
+      "service": "http://localhost:8080"
     },
     {
       "service": "http_status:404"

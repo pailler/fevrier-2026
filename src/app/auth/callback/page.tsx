@@ -1,72 +1,54 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/utils/supabaseClient';
 
 export default function AuthCallback() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        console.log('🔄 Traitement du callback d\'authentification...');
+        // Vérifier s'il y a des paramètres d'erreur dans l'URL
+        const errorParam = searchParams.get('error');
+        const errorDescription = searchParams.get('error_description');
         
-        // Récupérer la session depuis l'URL
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('❌ Erreur lors de la récupération de la session:', error);
-          setError('Erreur lors de la connexion. Veuillez réessayer.');
-          setTimeout(() => router.push('/login?error=auth_failed'), 3000);
+        if (errorParam) {
+          setError(`Erreur d'authentification: ${errorDescription || errorParam}`);
+          setTimeout(() => router.push('/login?error=oauth_error'), 3000);
           return;
         }
 
-        if (data.session?.user) {
-          console.log('✅ Utilisateur connecté:', data.session.user.email);
+        // Attendre que Supabase traite la session
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          // Essayer de récupérer l'utilisateur directement
+          const { data: userData, error: userError } = await supabase.auth.getUser();
           
-          // Vérifier si l'utilisateur existe dans la table users
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('email', data.session.user.email)
-            .single();
-
-          if (userError && userError.code !== 'PGRST116') {
-            console.error('❌ Erreur lors de la vérification de l\'utilisateur:', userError);
+          if (userError || !userData.user) {
+            setError('Aucune session trouvée. Veuillez réessayer.');
+            setTimeout(() => router.push('/login?error=no_session'), 3000);
+            return;
           }
+          
+          // Traiter l'utilisateur trouvé
+          await processUser(userData.user);
+          return;
+        }
 
-          // Si l'utilisateur n'existe pas, le créer
-          if (!userData) {
-            console.log('📝 Création du nouvel utilisateur...');
-            const { error: insertError } = await supabase
-              .from('users')
-              .insert({
-                email: data.session.user.email,
-                name: data.session.user.user_metadata?.full_name || data.session.user.email,
-                avatar_url: data.session.user.user_metadata?.avatar_url || null,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-              });
-
-            if (insertError) {
-              console.error('❌ Erreur lors de la création de l\'utilisateur:', insertError);
-            } else {
-              console.log('✅ Utilisateur créé avec succès');
-            }
-          }
-
-          // Rediriger vers la page d'accueil
-          router.push('/');
+        if (sessionData.session?.user) {
+          await processUser(sessionData.session.user);
         } else {
-          console.log('❌ Aucune session trouvée');
           setError('Aucune session trouvée. Veuillez réessayer.');
           setTimeout(() => router.push('/login?error=no_session'), 3000);
         }
       } catch (error) {
-        console.error('❌ Erreur lors du traitement du callback:', error);
         setError('Une erreur est survenue. Veuillez réessayer.');
         setTimeout(() => router.push('/login?error=callback_failed'), 3000);
       } finally {
@@ -74,8 +56,36 @@ export default function AuthCallback() {
       }
     };
 
+    const processUser = async (user: any) => {
+      try {
+        // Utiliser l'API route pour créer l'utilisateur avec la clé de service
+        const response = await fetch('/api/auth/callback', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: user.email,
+            name: user.user_metadata?.full_name || user.email,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Erreur lors de la création de l\'utilisateur:', errorData);
+        }
+
+        // Rediriger vers la page d'accueil
+        router.push('/');
+      } catch (error) {
+        console.error('Erreur lors du traitement de l\'utilisateur:', error);
+        setError('Erreur lors du traitement de l\'utilisateur.');
+        setTimeout(() => router.push('/login?error=user_processing_failed'), 3000);
+      }
+    };
+
     handleAuthCallback();
-  }, [router]);
+  }, [router, searchParams]);
 
   if (loading) {
     return (

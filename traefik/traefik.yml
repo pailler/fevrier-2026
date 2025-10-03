@@ -27,10 +27,11 @@ providers:
 certificatesResolvers:
   letsencrypt:
     acme:
-      email: votre-email@example.com  # Remplacez par votre email
+      email: admin@iahome.fr
       storage: /letsencrypt/acme.json
       httpChallenge:
         entryPoint: web
+      caServer: "https://acme-v02.api.letsencrypt.org/directory"
 
 log:
   level: INFO

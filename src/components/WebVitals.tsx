@@ -57,31 +57,40 @@ export default function WebVitals() {
       // Cumulative Layout Shift (CLS)
       const measureCLS = () => {
         if ('PerformanceObserver' in window) {
-          let clsValue = 0;
-          let clsEntries: any[] = [];
-          
-          const observer = new PerformanceObserver((entryList) => {
-            for (const entry of entryList.getEntries()) {
-              if (!(entry as any).hadRecentInput) {
-                clsValue += (entry as any).value;
-                clsEntries.push(entry);
+          try {
+            let clsValue = 0;
+            let clsEntries: any[] = [];
+            
+            const observer = new PerformanceObserver((entryList) => {
+              for (const entry of entryList.getEntries()) {
+                if (!(entry as any).hadRecentInput) {
+                  clsValue += (entry as any).value;
+                  clsEntries.push(entry);
+                }
               }
-            }
+              
+              // Envoyer les données à Google Analytics
+              if (typeof (window as any).gtag !== 'undefined') {
+                (window as any).gtag('event', 'web_vitals', {
+                  event_category: 'Web Vitals',
+                  event_label: 'CLS',
+                  value: Math.round(clsValue * 1000),
+                  non_interaction: true,
+                });
+              }
+              
+              // console.log('CLS:', clsValue);
+            });
             
-            // Envoyer les données à Google Analytics
-            if (typeof (window as any).gtag !== 'undefined') {
-              (window as any).gtag('event', 'web_vitals', {
-                event_category: 'Web Vitals',
-                event_label: 'CLS',
-                value: Math.round(clsValue * 1000),
-                non_interaction: true,
-              });
+            // Vérifier si layout-shift est supporté avant d'observer
+            if (PerformanceObserver.supportedEntryTypes && 
+                PerformanceObserver.supportedEntryTypes.includes('layout-shift')) {
+              observer.observe({ entryTypes: ['layout-shift'] });
             }
-            
-            // console.log('CLS:', clsValue);
-          });
-          
-          observer.observe({ entryTypes: ['layout-shift'] });
+          } catch (error) {
+            // Ignorer silencieusement si layout-shift n'est pas supporté
+            console.debug('Layout-shift not supported:', error);
+          }
         }
       };
 

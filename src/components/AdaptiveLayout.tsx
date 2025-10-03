@@ -1,16 +1,13 @@
 'use client';
 
-import { useIframeDetection } from '../utils/useIframeDetection';
-
 interface AdaptiveLayoutProps {
   children: React.ReactNode;
 }
 
 export default function AdaptiveLayout({ children }: AdaptiveLayoutProps) {
-  const isInIframe = useIframeDetection();
-
+  // Toujours utiliser pt-0 maintenant que nous avons supprimé la zone blanche
   return (
-    <main className={isInIframe ? "pt-0" : "pt-20"}>
+    <main className="pt-0">
       {children}
     </main>
   );
