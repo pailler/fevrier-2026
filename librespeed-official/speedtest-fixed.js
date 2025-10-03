@@ -237,3 +237,4 @@ Speedtest.prototype.loadServerList = function(url, callback) {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = Speedtest;
 }
+

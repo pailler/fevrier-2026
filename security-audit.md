@@ -122,3 +122,4 @@ const securityHeaders = [
 - [ ] Tests de pénétration effectués
 - [ ] Documentation de sécurité mise à jour
 
+

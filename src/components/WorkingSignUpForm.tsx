@@ -80,9 +80,10 @@ export default function WorkingSignUpForm({
         // Connecter l'utilisateur automatiquement
         signIn(result.user, autoToken);
         
-        // Rediriger vers l'accueil après connexion
+        // Rediriger vers la page de succès avec les données utilisateur
         setTimeout(() => {
-          router.push('/?message=Compte créé et connecté avec succès !');
+          const userData = encodeURIComponent(JSON.stringify(result.user));
+          router.push(`/signup-success?user=${userData}`);
         }, 2000);
       }
 

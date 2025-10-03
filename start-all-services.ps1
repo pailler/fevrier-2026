@@ -123,3 +123,4 @@ Write-Host "   📁 PsiTransfer: http://localhost:8084" -ForegroundColor Yellow
 Write-Host "   🎤 Whisper: http://localhost:8093" -ForegroundColor Yellow
 Write-Host "   📱 QR Codes: http://localhost:7005" -ForegroundColor Yellow
 Write-Host "   🖼️ ReMBG: http://localhost:8080" -ForegroundColor Yellow
+

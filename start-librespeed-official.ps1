@@ -49,3 +49,4 @@ Write-Host "`n🚀 Serveur démarré! Appuyez sur Ctrl+C pour arrêter." -Foregr
 
 # Démarrer le serveur Node.js
 node server.js
+

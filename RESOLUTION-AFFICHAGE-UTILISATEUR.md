@@ -101,3 +101,4 @@ IAhome | [Navigation] | demo@example.com | Se déconnecter
 
 L'utilisateur connecté s'affichera correctement dans la bannière bleue et le header principal.
 
+

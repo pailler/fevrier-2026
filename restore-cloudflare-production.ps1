@@ -185,3 +185,4 @@ Write-Host "✅ Testez les routes dans votre navigateur" -ForegroundColor Green
 Write-Host "`n🚀 CLOUDFLARE EST MAINTENANT OPÉRATIONNEL !" -ForegroundColor Green
 Write-Host "Allez sur https://iahome.fr pour vérifier que tout fonctionne." -ForegroundColor Green
 
+

@@ -21,7 +21,11 @@ function SignUpContent() {
   const handleAuthSuccess = (user: any) => {
     if (user) {
       setSuccess('Compte créé et connecté avec succès ! Redirection en cours...');
-      // La redirection est gérée par WorkingSignUpForm
+      // Rediriger vers la page de succès avec les données utilisateur
+      setTimeout(() => {
+        const userData = encodeURIComponent(JSON.stringify(user));
+        router.push(`/signup-success?user=${userData}`);
+      }, 2000);
     }
   };
 
