@@ -53,7 +53,7 @@ export default function PsiTransferAccessButton({ user, onAccessGranted, onAcces
       window.open(psitransferUrl, '_blank');
       console.log('✅ PsiTransfer: Ouverture de PsiTransfer');
       
-      onAccessGranted(psitransferUrl);
+      // Ne pas appeler onAccessGranted pour éviter la double ouverture
       
     } catch (error) {
       console.error('❌ PsiTransfer: ERREUR GÉNÉRALE:', error);

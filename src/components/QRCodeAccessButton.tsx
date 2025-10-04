@@ -63,7 +63,7 @@ export default function QRCodeAccessButton({
       window.open(qrUrl, '_blank');
       console.log('✅ QR Codes: Ouverture de QR Codes');
       
-      onAccessGranted?.(qrUrl);
+      // Ne pas appeler onAccessGranted pour éviter la double ouverture
 
     } catch (error) {
       console.error('❌ QR Codes: Erreur:', error);

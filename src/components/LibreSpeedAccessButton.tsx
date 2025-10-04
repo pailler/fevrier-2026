@@ -62,7 +62,7 @@ export default function LibreSpeedAccessButton({
       const librespeedUrl = 'https://librespeed.iahome.fr';
       window.open(librespeedUrl, '_blank');
       
-      onAccessGranted?.(librespeedUrl);
+      // Ne pas appeler onAccessGranted pour éviter la double ouverture
 
     } catch (error) {
       console.error('❌ LibreSpeed: Erreur:', error);

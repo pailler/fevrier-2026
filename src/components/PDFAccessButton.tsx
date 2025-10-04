@@ -53,7 +53,7 @@ export default function PDFAccessButton({ user, onAccessGranted, onAccessDenied 
       window.open(pdfUrl, '_blank');
       console.log('✅ PDF+: Ouverture de PDF+');
       
-      onAccessGranted(pdfUrl);
+      // Ne pas appeler onAccessGranted pour éviter la double ouverture
       
     } catch (error) {
       console.error('❌ PDF+: ERREUR GÉNÉRALE:', error);

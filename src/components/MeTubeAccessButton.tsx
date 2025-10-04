@@ -66,7 +66,8 @@ export default function MeTubeAccessButton({
       const metubeUrl = 'https://metube.iahome.fr';
       window.open(metubeUrl, '_blank');
       console.log('✅ MeTube: Ouverture de MeTube');
-      onAccessGranted?.(metubeUrl);
+      
+      // Ne pas appeler onAccessGranted pour éviter la double ouverture
       return;
 
     } catch (error) {
