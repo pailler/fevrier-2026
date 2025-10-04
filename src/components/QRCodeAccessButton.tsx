@@ -31,55 +31,18 @@ export default function QRCodeAccessButton({
     setError(null);
 
     try {
-      // 1. Créer une session QR codes pour l'utilisateur
-      console.log('🔑 QR Codes: Création de session...');
-      const sessionResponse = await fetch('/api/qr-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          userEmail: user.email
-        })
-      });
-
-      if (!sessionResponse.ok) {
-        const errorData = await sessionResponse.json().catch(() => ({}));
-        console.log('❌ QR Codes: Erreur création session:', errorData);
-        
-        if (sessionResponse.status === 403) {
-          if (errorData.message?.includes('quota')) {
-            setError('Quota d\'utilisation dépassé');
-            onAccessDenied?.('Quota dépassé');
-          } else if (errorData.message?.includes('expired')) {
-            setError('Session expirée');
-            onAccessDenied?.('Session expirée');
-          } else {
-            setError('Accès refusé au module QR codes');
-            onAccessDenied?.('Accès refusé');
-          }
-        } else {
-          setError('Erreur lors de la création de la session');
-          onAccessDenied?.('Erreur session');
-        }
-        return;
-      }
-
-      const sessionData = await sessionResponse.json();
-      console.log('✅ QR Codes: Session créée:', sessionData.sessionId);
-
-            // 2. Rediriger vers le service QR codes dédié avec le token
-            const qrUrl = `https://qrcodes.iahome.fr?token=${sessionData.sessionId}`;
-            console.log('🔗 QR Codes: URL finale:', qrUrl);
-
-            onAccessGranted?.(qrUrl);
-            window.open(qrUrl, '_blank');
+      // 1. Ouvrir QR Codes dans un nouvel onglet
+      console.log('🔗 QR Codes: Ouverture dans un nouvel onglet...');
+      const qrUrl = 'https://qrcodes.iahome.fr';
+      window.open(qrUrl, '_blank');
+      console.log('✅ QR Codes: Ouverture de QR Codes');
+      
+      onAccessGranted?.(qrUrl);
 
     } catch (error) {
       console.error('❌ QR Codes: Erreur:', error);
-      setError('Erreur lors de l\'accès aux QR codes');
-      onAccessDenied?.('Erreur technique');
+      setError('Erreur lors de l\'ouverture des QR codes');
+      onAccessDenied?.('Erreur ouverture QR codes');
     } finally {
       setIsLoading(false);
     }
@@ -101,7 +64,7 @@ export default function QRCodeAccessButton({
         {isLoading ? (
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            <span>Création de session...</span>
+            <span>Ouverture...</span>
           </div>
         ) : (
           '📱 Accéder aux QR Codes'

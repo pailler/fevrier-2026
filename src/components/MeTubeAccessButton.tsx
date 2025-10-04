@@ -61,19 +61,18 @@ export default function MeTubeAccessButton({
         }
       }
 
-      // 2. Utiliser le système d'authentification unifié
-      console.log('🔑 MeTube: Génération du token d\'accès...');
-      
-      // Rediriger directement vers l'API de redirection qui gère l'authentification
-      const metubeUrl = 'https://iahome.fr/api/metube-redirect';
-      console.log('✅ MeTube: Redirection vers API d\'authentification');
+      // 2. Ouvrir MeTube dans un nouvel onglet
+      console.log('🔗 MeTube: Ouverture dans un nouvel onglet...');
+      const metubeUrl = 'https://metube.iahome.fr';
+      window.open(metubeUrl, '_blank');
+      console.log('✅ MeTube: Ouverture de MeTube');
       onAccessGranted?.(metubeUrl);
       return;
 
     } catch (error) {
       console.error('❌ MeTube: Erreur:', error);
-      setError('Erreur lors de la génération du token');
-      onAccessDenied?.('Erreur génération token');
+      setError('Erreur lors de l\'ouverture de MeTube');
+      onAccessDenied?.('Erreur ouverture MeTube');
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +95,7 @@ export default function MeTubeAccessButton({
         {isLoading ? (
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            <span>Génération du token...</span>
+            <span>Ouverture...</span>
           </div>
         ) : (
           '🎥 Accéder à MeTube'
