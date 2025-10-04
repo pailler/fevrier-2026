@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`📊 ${users.length} utilisateurs trouvés`);
 
-    // 3. Modules gratuits à ajouter pour tous les utilisateurs
+    // 3. Mes applis essentielles à ajouter pour tous les utilisateurs
     const freeModules = [
       { id: 'librespeed', title: 'LibreSpeed', maxUsage: 10 },
       { id: 'pdf', title: 'PDF+', maxUsage: 5 },

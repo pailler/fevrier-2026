@@ -217,7 +217,7 @@ export default function EncoursSimplePage() {
               <div className="text-3xl font-bold text-green-600 mb-2">
                 {userModules.filter(m => m.is_free).length}
               </div>
-              <div className="text-gray-600">Module gratuit</div>
+              <div className="text-gray-600">Appli essentielle</div>
             </div>
             <div className="bg-white rounded-lg shadow-md p-6 text-center">
               <div className="text-3xl font-bold text-purple-600 mb-2">
@@ -242,9 +242,9 @@ export default function EncoursSimplePage() {
                   </div>
                   
                   <div className="flex items-center space-x-4 text-sm opacity-90">
-                    {/* Ne pas afficher "Module gratuit" pour le module QR codes */}
+                    {/* Ne pas afficher "Appli essentielle" pour le module QR codes */}
                     {module.module_id !== '5' && module.module_id !== 'qrcodes' && (
-                      <span>🔑 Module gratuit</span>
+                      <span>🔑 Appli essentielle</span>
                     )}
                     {module.price && Number(module.price) > 0 && (
                       <span>💎 €{module.price}</span>

@@ -8,6 +8,8 @@ import LibreSpeedAccessButton from '../../components/LibreSpeedAccessButton';
 import MeTubeAccessButton from '../../components/MeTubeAccessButton';
 import ModuleAccessButton from '../../components/ModuleAccessButton';
 import QRCodeAccessButton from '../../components/QRCodeAccessButton';
+import PDFAccessButton from '../../components/PDFAccessButton';
+import PsiTransferAccessButton from '../../components/PsiTransferAccessButton';
 
 interface UserModule {
   id: string;
@@ -460,9 +462,9 @@ export default function EncoursPage() {
   };
 
   const getModuleTypeLabel = (module: UserModule) => {
-    // QR Codes Statiques - module gratuit spécial
+    // QR Codes Statiques - appli essentielle spéciale
     if (module.module_id === 'qrcodes-statiques' || module.module_title.toLowerCase().includes('qrcodes-statiques')) {
-      return 'Module gratuit 🆓';
+      return 'Appli essentielle 🆓';
     }
     
     // Pour les modules essentiels, afficher "Module essentiel"
@@ -630,7 +632,7 @@ export default function EncoursPage() {
                   <div className="text-2xl font-bold text-green-600">
                     {userModules.filter(m => m.is_free).length}
                   </div>
-                  <div className="text-sm text-gray-600">Modules gratuits</div>
+                  <div className="text-sm text-gray-600">Mes applis essentielles</div>
                 </div>
                 <div className="bg-purple-50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-purple-600">
@@ -700,9 +702,9 @@ export default function EncoursPage() {
                       </div>
                       
                       <div className="flex items-center space-x-4 text-sm opacity-90">
-                        {/* Ne pas afficher "Module gratuit" pour le module QR codes */}
+                        {/* Ne pas afficher "Appli essentielle" pour le module QR codes */}
                         {module.module_id !== '5' && module.module_id !== 'qrcodes' && (
-                          <span>🔑 Module gratuit</span>
+                          <span>🔑 Appli essentielle</span>
                         )}
                         {module.price && Number(module.price) > 0 && (
                           <span>💎 €{module.price}</span>
@@ -873,6 +875,30 @@ export default function EncoursPage() {
                           }}
                           onAccessDenied={(reason) => {
                             console.log('❌ MeTube: Accès refusé:', reason);
+                            alert(`Accès refusé: ${reason}`);
+                          }}
+                        />
+                      ) : module.module_title === 'PDF+' ? (
+                        <PDFAccessButton
+                          user={user}
+                          onAccessGranted={(url) => {
+                            console.log('🔗 PDF+: Accès autorisé:', url);
+                            window.open(url, '_blank');
+                          }}
+                          onAccessDenied={(reason) => {
+                            console.log('❌ PDF+: Accès refusé:', reason);
+                            alert(`Accès refusé: ${reason}`);
+                          }}
+                        />
+                      ) : module.module_title === 'PsiTransfer' ? (
+                        <PsiTransferAccessButton
+                          user={user}
+                          onAccessGranted={(url) => {
+                            console.log('🔗 PsiTransfer: Accès autorisé:', url);
+                            window.open(url, '_blank');
+                          }}
+                          onAccessDenied={(reason) => {
+                            console.log('❌ PsiTransfer: Accès refusé:', reason);
                             alert(`Accès refusé: ${reason}`);
                           }}
                         />

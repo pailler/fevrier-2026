@@ -33,6 +33,12 @@ function TokenGeneratedContent() {
             moduleId = 'librespeed';
           } else if (module.toLowerCase().includes('metube')) {
             moduleId = 'metube';
+          } else if (module.toLowerCase().includes('pdf')) {
+            moduleId = 'pdf';
+          } else if (module.toLowerCase().includes('psitransfer')) {
+            moduleId = 'psitransfer';
+          } else if (module.toLowerCase().includes('qrcodes') || module.toLowerCase().includes('qr codes')) {
+            moduleId = 'qrcodes';
           }
           
           if (moduleId) {

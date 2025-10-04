@@ -50,6 +50,30 @@ export async function POST(req: NextRequest) {
           access_level: 'premium',
           expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString() // 90 jours
         };
+      } else if (moduleId === 'pdf') {
+        // Configuration spécifique pour PDF+
+        moduleData = {
+          ...moduleData,
+          module_title: 'PDF+',
+          access_level: 'premium',
+          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString() // 90 jours
+        };
+      } else if (moduleId === 'psitransfer') {
+        // Configuration spécifique pour PsiTransfer
+        moduleData = {
+          ...moduleData,
+          module_title: 'PsiTransfer',
+          access_level: 'premium',
+          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString() // 90 jours
+        };
+      } else if (moduleId === 'qrcodes') {
+        // Configuration spécifique pour QR Codes
+        moduleData = {
+          ...moduleData,
+          module_title: 'QR Codes',
+          access_level: 'premium',
+          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString() // 90 jours
+        };
       } else {
         // Configuration par défaut pour les autres modules
         moduleData = {
@@ -88,6 +112,24 @@ export async function POST(req: NextRequest) {
       } else if (moduleId === 'metube') {
         updateData = {
           module_title: 'MeTube',
+          access_level: 'premium',
+          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+        };
+      } else if (moduleId === 'pdf') {
+        updateData = {
+          module_title: 'PDF+',
+          access_level: 'premium',
+          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+        };
+      } else if (moduleId === 'psitransfer') {
+        updateData = {
+          module_title: 'PsiTransfer',
+          access_level: 'premium',
+          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+        };
+      } else if (moduleId === 'qrcodes') {
+        updateData = {
+          module_title: 'QR Codes',
           access_level: 'premium',
           expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
         };

@@ -1,11 +1,12 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '../../../utils/supabaseClient';
 import Link from 'next/link';
 import Image from 'next/image';
 import Breadcrumb from '../../../components/Breadcrumb';
 import QRCodeAccessButton from '../../../components/QRCodeAccessButton';
+import { useCustomAuth } from '../../../hooks/useCustomAuth';
+import { supabase } from '../../../utils/supabaseClient';
 
 interface Card {
   id: string;
@@ -29,10 +30,9 @@ interface Card {
 
 export default function QRCodesPage() {
   const router = useRouter();
+  const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
   const [card, setCard] = useState<Card | null>(null);
   const [loading, setLoading] = useState(true);
-  const [session, setSession] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
   const [selectedCards, setSelectedCards] = useState<any[]>([]);
   const [userSubscriptions, setUserSubscriptions] = useState<{[key: string]: any}>({});
   const [iframeModal, setIframeModal] = useState<{isOpen: boolean, url: string, title: string}>({
@@ -49,7 +49,7 @@ export default function QRCodesPage() {
 
   // Fonction pour vérifier si un module est déjà activé
   const checkModuleActivation = useCallback(async (moduleId: string) => {
-    if (!session?.user?.id || !moduleId) return false;
+    if (!user?.id || !moduleId) return false;
     
     try {
       const response = await fetch('/api/check-module-activation', {
@@ -59,7 +59,7 @@ export default function QRCodesPage() {
         },
         body: JSON.stringify({
           moduleId: moduleId,
-          userId: session.user.id
+          userId: user.id
         }),
       });
 
@@ -70,11 +70,11 @@ export default function QRCodesPage() {
     } catch (error) {
       }
     return false;
-  }, [session?.user?.id]);
+  }, [user?.id]);
 
   // Fonction pour accéder aux modules avec JWT
   const accessModuleWithJWT = useCallback(async (moduleTitle: string, moduleId: string) => {
-    if (!session?.user?.id) {
+    if (!user?.id) {
       alert('Vous devez être connecté pour accéder aux modules');
       return;
     }
@@ -87,8 +87,7 @@ export default function QRCodesPage() {
       const response = await fetch('/api/generate-access-token', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token || ''}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           moduleId: moduleId,
@@ -125,32 +124,14 @@ export default function QRCodesPage() {
     } catch (error) {
       alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
-  }, [session, setIframeModal]);
+  }, [user, setIframeModal]);
 
-  // Vérifier la session
-  useEffect(() => {
-    const getSession = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      setSession(currentSession);
-      setUser(currentSession?.user || null);
-    };
-
-    getSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: any, session: any) => {
-        setSession(session);
-        setUser(session?.user || null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
+  // Utilisation du hook useCustomAuth pour la gestion de l'authentification
 
   // Récupérer les abonnements de l'utilisateur et vérifier l'activation du module
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!session?.user?.id) {
+      if (!user?.id) {
         setUserSubscriptions({});
         return;
       }
@@ -160,7 +141,7 @@ export default function QRCodesPage() {
         let { data: accessData, error: accessError } = await supabase
           .from('user_applications')
           .select('*')
-          .eq('user_id', session.user.id)
+          .eq('user_id', user.id)
           .eq('is_active', true);
 
         if (accessError) {
@@ -206,7 +187,7 @@ export default function QRCodesPage() {
     };
 
     fetchUserData();
-  }, [session?.user?.id, card?.id, checkModuleActivation]);
+  }, [user?.id, card?.id, checkModuleActivation]);
 
   // Charger les modules sélectionnés depuis le localStorage
   useEffect(() => {
@@ -251,7 +232,7 @@ export default function QRCodesPage() {
     };
 
     fetchCardDetails();
-  }, [router, session]);
+  }, [router, user]);
 
   const handleSubscribe = (card: Card) => {
     if (!card?.id) {
@@ -281,7 +262,7 @@ export default function QRCodesPage() {
     return selected;
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -435,62 +416,31 @@ export default function QRCodesPage() {
 
             <div className="space-y-6">
               {/* Boutons d'action */}
-              <div className="space-y-4">
-                {/* Message si le module est déjà activé */}
-                {alreadyActivatedModules.includes(card.id) && (
-                  <div className="w-3/4 mx-auto bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
-                    <div className="flex items-center justify-center space-x-3 text-green-800">
-                      <span className="text-2xl">✅</span>
-                      <div className="text-center">
-                        <p className="font-semibold">Module déjà activé !</p>
-                        <p className="text-sm opacity-80">Vous pouvez accéder à ce module depuis vos applications</p>
-                      </div>
-                    </div>
-                    <div className="mt-3 text-center">
-                      <button
-                        onClick={() => router.push('/encours')}
-                        className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
-                      >
-                        <span className="mr-2">📱</span>
-                        Voir mes applications
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                
-                {/* Bouton d'accès QR Codes */}
-                {isCardSelected(card.id) && card.price === 0 && !alreadyActivatedModules.includes(card.id) && (
-                  <div className="w-3/4">
-                    <QRCodeAccessButton
-                      user={user}
-                      onAccessGranted={(url) => {
-                        console.log('✅ Accès QR Codes accordé:', url);
-                        // Optionnel: recharger la page ou mettre à jour l'état
-                        window.location.reload();
-                      }}
-                      onAccessDenied={(reason) => {
-                        console.log('❌ Accès QR Codes refusé:', reason);
-                        alert(`Accès refusé: ${reason}`);
-                      }}
-                    />
-                  </div>
-                )}
-
-                {/* Bouton JWT - visible seulement si l'utilisateur a accès au module ET que le module n'est pas déjà activé */}
-                {session && userSubscriptions[`module_${card.id}`] && !alreadyActivatedModules.includes(card.id) && (
-                  <button 
-                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                    onClick={async () => {
-                      await accessModuleWithJWT(card.title, card.id);
-                    }}
-                  >
-                    <span className="text-xl">🔑</span>
-                    <span>Accéder à {card.title}</span>
-                  </button>
-                )}
-
-              </div>
+              {isAuthenticated && user ? (
+                // Utilisateur connecté : aller à la page de transition puis /encours
+                <button
+                  onClick={() => {
+                    console.log('✅ Accès QR Codes - Utilisateur connecté');
+                    router.push(`/token-generated?module=${encodeURIComponent('QR Codes')}&redirect=/encours`);
+                  }}
+                  className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                  <span className="text-xl">🔑</span>
+                  <span>Activer QR Codes</span>
+                </button>
+              ) : (
+                // Utilisateur non connecté : aller à la page de connexion puis retour à QR Codes
+                <button
+                  onClick={() => {
+                    console.log('🔒 Accès QR Codes - Redirection vers connexion');
+                    router.push(`/login?redirect=${encodeURIComponent('/card/qrcodes')}`);
+                  }}
+                  className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                  <span className="text-xl">🔒</span>
+                  <span>Connectez-vous pour activer QR Codes</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

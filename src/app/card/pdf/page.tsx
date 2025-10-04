@@ -1,14 +1,13 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
-import { supabase } from '../../../utils/supabaseClient';
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import Breadcrumb from '../../../components/Breadcrumb';
+import { useCustomAuth } from '../../../hooks/useCustomAuth';
 
 export default function PDFPage() {
   const router = useRouter();
-  const [session, setSession] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
+  const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
   const [card, setCard] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [iframeModal, setIframeModal] = useState<{isOpen: boolean, url: string, title: string}>({
@@ -29,27 +28,7 @@ export default function PDFPage() {
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
   };
 
-  // Vérification de la configuration Supabase
-  useEffect(() => {
-    // Récupérer la session actuelle
-    const getSession = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      setSession(currentSession);
-      setUser(currentSession?.user || null);
-    };
-
-    getSession();
-
-    // Écouter les changements de session
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: any, session: any) => {
-        setSession(session);
-        setUser(session?.user || null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
+  // Utilisation du hook useCustomAuth pour la gestion de l'authentification
 
   // Charger les données du module PDF
   useEffect(() => {
@@ -57,66 +36,22 @@ export default function PDFPage() {
     setLoading(false);
   }, []);
 
-  // Fonction pour accéder au module avec JWT
-  const accessModuleWithJWT = useCallback(async () => {
-    if (!user?.email) {
-      return;
+  // Mettre à jour le loading en fonction de l'état d'authentification
+  useEffect(() => {
+    if (!authLoading) {
+      setLoading(false);
     }
+  }, [authLoading]);
 
-    try {
-      const response = await fetch('/api/generate-module-access', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userEmail: user.email,
-          moduleId: 'pdf',
-          moduleName: 'PDF+'
-        }),
-      });
+  // Timeout de sécurité pour éviter le chargement infini
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000); // 5 secondes maximum
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.accessUrl) {
-          window.open(data.accessUrl, '_blank');
-        } else if (data.error) {
-          }
-      } else {
-        }
-    } catch (error) {
-      }
-  }, [user?.email]);
+    return () => clearTimeout(timeout);
+  }, []);
 
-  // Fonction pour gérer l'abonnement
-  const handleSubscribe = useCallback(async () => {
-    if (!user?.email) {
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/create-payment-intent', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customerEmail: user.email,
-          moduleId: 'pdf',
-          moduleName: 'PDF+'
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.clientSecret) {
-          // Rediriger vers Stripe ou ouvrir le modal de paiement
-          }
-      } else {
-        }
-    } catch (error) {
-      }
-  }, [user?.email]);
 
   // Fonction pour ouvrir le modal iframe
   const openIframeModal = useCallback((url: string, title: string) => {
@@ -136,7 +71,7 @@ export default function PDFPage() {
     });
   }, []);
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-blue-50 flex items-center justify-center">
         <div className="text-center">
@@ -276,38 +211,18 @@ export default function PDFPage() {
 
             <div className="space-y-6">
               {/* Boutons d'action */}
-              {session ? (
-                // Bouton d'accès gratuit pour les modules gratuits (uniquement si connecté)
+              {isAuthenticated && user ? (
+                // Bouton d'accès pour les applis essentielles (uniquement si connecté)
                 <button 
-                  onClick={async () => {
-                    if (session?.user?.id) {
-                      try {
-                        // Générer le token premium automatiquement
-                        const response = await fetch('/api/generate-premium-token', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({
-                            moduleName: 'PDF+',
-                            userId: session.user.id
-                          })
-                        });
-                        
-                        if (response.ok) {
-                          // Rediriger vers la page de transition
-                          router.push('/token-generated?module=PDF+');
-                        } else {
-                          // En cas d'erreur, rediriger quand même vers la page de transition
-                          router.push('/token-generated?module=PDF+');
-                        }
-                      } catch (error) {
-                        // En cas d'erreur, rediriger quand même vers la page de transition
-                        router.push('/token-generated?module=PDF+');
-                      }
+                  onClick={() => {
+                    if (isAuthenticated && user) {
+                      // Utilisateur connecté : aller à la page de transition puis /encours
+                      console.log('✅ Accès PDF+ - Utilisateur connecté');
+                      router.push(`/token-generated?module=${encodeURIComponent('PDF+')}&redirect=/encours`);
                     } else {
-                      // Si pas connecté, rediriger vers la page de transition
-                      router.push('/token-generated?module=PDF+');
+                      // Utilisateur non connecté : aller à la page de connexion puis retour à PDF+
+                      console.log('🔒 Accès PDF+ - Redirection vers connexion');
+                      router.push(`/login?redirect=${encodeURIComponent('/card/pdf')}`);
                     }
                   }}
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
@@ -316,14 +231,18 @@ export default function PDFPage() {
                   <span>Activer l'application PDF+</span>
                 </button>
               ) : (
-                // Message pour les modules gratuits quand l'utilisateur n'est pas connecté
-                <a 
-                  href="/login"
-                  className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
+                // Message pour les applis essentielles quand l'utilisateur n'est pas connecté
+                <button
+                  onClick={() => {
+                    // Utilisateur non connecté : aller à la page de connexion puis retour à PDF+
+                    console.log('🔒 Accès PDF+ - Redirection vers connexion');
+                    router.push(`/login?redirect=${encodeURIComponent('/card/pdf')}`);
+                  }}
+                  className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">🔒</span>
                   <span>Connectez-vous pour activer PDF+</span>
-                </a>
+                </button>
               )}
             </div>
           </div>

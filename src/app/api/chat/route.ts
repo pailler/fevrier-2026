@@ -252,7 +252,7 @@ Statistiques IAHome :
 
     const pricingText = `
 Tarification IAHome :
-- Modules gratuits disponibles
+- Mes applis essentielles disponibles
 - Abonnements à partir de 5€/mois
 - Paiements sécurisés via Stripe
 - Facturation automatique
