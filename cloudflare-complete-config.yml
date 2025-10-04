@@ -1,0 +1,23 @@
+tunnel: iahome-new
+credentials-file: C:\Users\AAA\.cloudflared\4cc75dfd-fd02-4496-97f9-23f40fc1943d.json
+
+ingress:
+  - hostname: librespeed.iahome.fr
+    service: http://localhost:8085
+  - hostname: metube.iahome.fr
+    service: http://localhost:8081
+  - hostname: whisper.iahome.fr
+    service: http://localhost:8093
+  - hostname: psitransfer.iahome.fr
+    service: http://localhost:8087
+  - hostname: qrcodes.iahome.fr
+    service: http://localhost:7006
+  - hostname: pdf.iahome.fr
+    service: http://localhost:8082
+  - hostname: rembg.iahome.fr
+    service: http://localhost:8080
+  - hostname: iahome.fr
+    service: http://localhost:3000
+  - hostname: www.iahome.fr
+    service: http://localhost:3000
+  - service: http_status:404
