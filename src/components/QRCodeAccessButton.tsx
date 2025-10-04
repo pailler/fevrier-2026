@@ -31,7 +31,33 @@ export default function QRCodeAccessButton({
     setError(null);
 
     try {
-      // 1. Ouvrir QR Codes dans un nouvel onglet
+      // 1. Incrémenter le compteur d'accès
+      console.log('📊 QR Codes: Incrémentation du compteur d\'accès...');
+      const incrementResponse = await fetch('/api/increment-module-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          userEmail: user.email,
+          moduleId: 'qrcodes'
+        })
+      });
+      
+      if (incrementResponse.ok) {
+        const incrementData = await incrementResponse.json();
+        console.log('✅ QR Codes: Compteur incrémenté:', incrementData.usage_count, '/', incrementData.max_usage);
+      } else {
+        const errorData = await incrementResponse.json().catch(() => ({}));
+        if (incrementResponse.status === 403 && errorData.error === 'Quota dépassé') {
+          console.log('❌ QR Codes: Quota dépassé');
+          setError('Quota d\'utilisation dépassé. Contactez l\'administrateur.');
+          onAccessDenied?.('Quota dépassé');
+          return;
+        }
+        console.log('⚠️ QR Codes: Erreur incrémentation compteur, continuons...');
+      }
+      
+      // 2. Ouvrir QR Codes dans un nouvel onglet
       console.log('🔗 QR Codes: Ouverture dans un nouvel onglet...');
       const qrUrl = 'https://qrcodes.iahome.fr';
       window.open(qrUrl, '_blank');
