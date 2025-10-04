@@ -320,7 +320,7 @@ export default function PsiTransferPage() {
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
                 >
                   <span className="text-xl">🔒</span>
-                  <span>Connectez-vous pour accéder</span>
+                  <span>Connectez-vous pour activer PsiTransfer</span>
                 </a>
               )}
             </div>
@@ -557,7 +557,7 @@ export default function PsiTransferPage() {
                 {/* Call to action */}
                 <div className="text-center mt-12">
                   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <Link href="/register" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <Link href="/signup" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                       <span className="text-xl mr-2">🚀</span>
                       Commencer maintenant
                     </Link>

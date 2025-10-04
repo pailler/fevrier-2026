@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  librespeed:
+    image: adolfintel/speedtest:latest
+    container_name: librespeed-essentiels
+    restart: unless-stopped
+    ports:
+      - "8083:80" # Mappé sur le port 8083
+    networks:
+      - iahome-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    environment:
+      - TZ=Europe/Paris
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.librespeed.rule=Host(`librespeed.iahome.fr`)"
+      - "traefik.http.routers.librespeed.entrypoints=websecure"
+      - "traefik.http.routers.librespeed.tls.certresolver=letsencrypt"
+      - "traefik.http.services.librespeed.loadbalancer.server.port=80"
+
+networks:
+  iahome-network:
+    external: true
+

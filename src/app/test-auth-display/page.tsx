@@ -148,13 +148,13 @@ export default function TestAuthDisplayPage() {
               {/* Actions */}
               <div className="flex space-x-4">
                 <a 
-                  href="/demo-login" 
+                  href="/login" 
                   className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Se connecter
                 </a>
                 <a 
-                  href="/demo-signup" 
+                  href="/signup" 
                   className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
                 >
                   S'inscrire

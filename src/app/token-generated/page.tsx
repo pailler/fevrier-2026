@@ -21,41 +21,52 @@ function TokenGeneratedContent() {
       setModuleName(module);
     }
 
-    // Ajouter le module LibreSpeed aux applications de l'utilisateur
-    const addLibreSpeedModule = async () => {
-      if (isAuthenticated && user && module?.toLowerCase().includes('librespeed') && !moduleAdded) {
+    // Ajouter le module aux applications de l'utilisateur
+    const addModuleToUser = async () => {
+      if (isAuthenticated && user && module && !moduleAdded) {
         setAddingModule(true);
         try {
-          console.log('🔧 Ajout du module LibreSpeed aux applications de l\'utilisateur...');
+          let moduleId = '';
           
-          const response = await fetch('/api/add-module-to-encours', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              userId: user.id,
-              moduleId: 'librespeed'
-            })
-          });
+          // Déterminer l'ID du module selon le nom
+          if (module.toLowerCase().includes('librespeed')) {
+            moduleId = 'librespeed';
+          } else if (module.toLowerCase().includes('metube')) {
+            moduleId = 'metube';
+          }
+          
+          if (moduleId) {
+            console.log(`🔧 Ajout du module ${module} aux applications de l'utilisateur...`);
+            
+            const response = await fetch('/api/add-module-to-encours', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userId: user.id,
+                moduleId: moduleId
+              })
+            });
 
-          const result = await response.json();
+            const result = await response.json();
 
-          if (response.ok && result.success) {
-            console.log('✅ Module LibreSpeed ajouté avec succès:', result.message);
-            setModuleAdded(true);
-          } else {
-            console.error('❌ Erreur lors de l\'ajout du module LibreSpeed:', result.error);
+            if (response.ok && result.success) {
+              console.log(`✅ Module ${module} ajouté avec succès:`, result.message);
+              setModuleAdded(true);
+            } else {
+              console.error(`❌ Erreur lors de l'ajout du module ${module}:`, result.error);
+            }
           }
         } catch (error) {
-          console.error('❌ Erreur lors de l\'ajout du module LibreSpeed:', error);
+          console.error(`❌ Erreur lors de l'ajout du module ${module}:`, error);
         } finally {
           setAddingModule(false);
         }
       }
     };
 
-    addLibreSpeedModule();
+    addModuleToUser();
 
     // Compte à rebours automatique
     const timer = setInterval(() => {

@@ -30,7 +30,7 @@ export default function DemoPage() {
               Créez un compte avec validation côté serveur, hachage bcrypt et protection contre les doublons.
             </p>
             <Link 
-              href="/demo-signup" 
+              href="/signup" 
               className="inline-flex items-center text-green-600 hover:text-green-700 font-medium"
             >
               Tester l'inscription →
@@ -46,7 +46,7 @@ export default function DemoPage() {
               Connectez-vous avec vos identifiants ou utilisez les comptes de démonstration pré-configurés.
             </p>
             <Link 
-              href="/demo-login" 
+              href="/login" 
               className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
             >
               Tester la connexion →
@@ -95,7 +95,7 @@ export default function DemoPage() {
               <div className="space-y-2 text-sm">
                 <p className="text-gray-600">Créez votre propre compte avec le formulaire d'inscription</p>
                 <Link 
-                  href="/demo-signup" 
+                  href="/signup" 
                   className="inline-flex items-center text-green-600 hover:text-green-700 font-medium"
                 >
                   Créer un compte →
@@ -179,13 +179,13 @@ export default function DemoPage() {
         <div className="text-center mt-12">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              href="/demo-login"
+              href="/login"
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors"
             >
               Tester la Connexion
             </Link>
             <Link 
-              href="/demo-signup"
+              href="/signup"
               className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium transition-colors"
             >
               Tester l'Inscription
@@ -202,6 +202,7 @@ export default function DemoPage() {
     </div>
   );
 }
+
 
 
 

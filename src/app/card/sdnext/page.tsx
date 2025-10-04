@@ -454,19 +454,6 @@ export default function SDNextPage() {
                   </div>
                 )}
 
-                {!alreadyActivatedModules.includes(card.id) && (
-                  <button 
-                    className={`w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
-                      isCardSelected(card.id)
-                        ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
-                        : 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white'
-                    }`}
-                    onClick={() => handleSubscribe(card)}
-                  >
-                    <span className="text-xl">🔐</span>
-                    <span>{isCardSelected(card.id) ? 'Sélectionné' : 'Choisir'}</span>
-                  </button>
-                )}
                 
                 {/* Bouton "Payer et activer" pour les modules payants */}
                 {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (

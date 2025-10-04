@@ -1,14 +1,13 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
-import { supabase } from '../../../utils/supabaseClient';
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import Breadcrumb from '../../../components/Breadcrumb';
+import { useCustomAuth } from '../../../hooks/useCustomAuth';
 
 export default function MeTubePage() {
   const router = useRouter();
-  const [session, setSession] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
+  const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
   const [card, setCard] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [iframeModal, setIframeModal] = useState<{isOpen: boolean, url: string, title: string}>({
@@ -29,33 +28,20 @@ export default function MeTubePage() {
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
   };
 
-  // Vérification de la configuration Supabase
-  useEffect(() => {
-    // Récupérer la session actuelle
-    const getSession = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      setSession(currentSession);
-      setUser(currentSession?.user || null);
-    };
-
-    getSession();
-
-    // Écouter les changements de session
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: any, session: any) => {
-        setSession(session);
-        setUser(session?.user || null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
+  // Utilisation du hook useCustomAuth pour la gestion de l'authentification
 
   // Charger les données du module MeTube
   useEffect(() => {
     setCard(metubeModule);
     setLoading(false);
   }, []);
+
+  // Mettre à jour le loading en fonction de l'état d'authentification
+  useEffect(() => {
+    if (!authLoading) {
+      setLoading(false);
+    }
+  }, [authLoading]);
 
   // Fonction pour accéder au module avec JWT
   const accessModuleWithJWT = useCallback(async () => {
@@ -81,11 +67,14 @@ export default function MeTubePage() {
         if (data.accessUrl) {
           window.open(data.accessUrl, '_blank');
         } else if (data.error) {
-          }
-      } else {
+          console.error('Erreur API:', data.error);
         }
-    } catch (error) {
+      } else {
+        console.error('Erreur de réponse API:', response.status);
       }
+    } catch (error) {
+      console.error('Erreur lors de l\'accès au module:', error);
+    }
   }, [user?.email]);
 
   // Fonction pour gérer l'abonnement
@@ -111,11 +100,16 @@ export default function MeTubePage() {
         const data = await response.json();
         if (data.clientSecret) {
           // Rediriger vers Stripe ou ouvrir le modal de paiement
-          }
-      } else {
+          console.log('Client secret reçu:', data.clientSecret);
+        } else {
+          console.error('Aucun client secret reçu');
         }
-    } catch (error) {
+      } else {
+        console.error('Erreur de réponse API:', response.status);
       }
+    } catch (error) {
+      console.error('Erreur lors de l\'abonnement:', error);
+    }
   }, [user?.email]);
 
   // Fonction pour ouvrir le modal iframe
@@ -136,7 +130,7 @@ export default function MeTubePage() {
     });
   }, []);
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-blue-50 flex items-center justify-center">
         <div className="text-center">
@@ -273,55 +267,25 @@ export default function MeTubePage() {
 
             <div className="space-y-6">
               {/* Boutons d'action */}
-              {session ? (
-                // Bouton d'accès gratuit pour les modules gratuits (uniquement si connecté)
-                <button 
-                  onClick={async () => {
-                    if (session?.user?.id) {
-                      try {
-                        // Générer le token premium automatiquement
-                        const response = await fetch('/api/generate-premium-token', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({
-                            moduleName: 'Metube',
-                            userId: session.user.id
-                          })
-                        });
-                        
-                        if (response.ok) {
-                          // Rediriger vers la page de transition
-                          router.push('/token-generated?module=Metube');
-                        } else {
-                          // En cas d'erreur, rediriger quand même vers la page de transition
-                          router.push('/token-generated?module=Metube');
-                        }
-                      } catch (error) {
-                        // En cas d'erreur, rediriger quand même vers la page de transition
-                        router.push('/token-generated?module=Metube');
-                      }
-                    } else {
-                      // Si pas connecté, rediriger vers la page de transition
-                      router.push('/token-generated?module=Metube');
-                    }
-                  }}
-                  className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                >
-                  <span className="text-xl">🆓</span>
-                  <span>Activer l'application MeTube</span>
-                </button>
-              ) : (
-                // Message pour les modules gratuits quand l'utilisateur n'est pas connecté
-                <a 
-                  href="/login"
-                  className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
-                >
-                  <span className="text-xl">🔒</span>
-                  <span>Connectez-vous pour accéder</span>
-                </a>
-              )}
+              <button
+                onClick={() => {
+                  if (isAuthenticated && user) {
+                    // Utilisateur connecté : aller à la page de transition puis /encours
+                    console.log('✅ Accès MeTube - Utilisateur connecté');
+                    router.push(`/token-generated?module=${encodeURIComponent('MeTube')}&redirect=/encours`);
+                  } else {
+                    // Utilisateur non connecté : aller à la page de connexion puis retour à MeTube
+                    console.log('🔒 Accès MeTube - Redirection vers connexion');
+                    router.push(`/login?redirect=${encodeURIComponent('/card/metube')}`);
+                  }
+                }}
+                className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              >
+                <span className="text-xl">🎥</span>
+                <span>
+                  {isAuthenticated && user ? 'Activez MeTube' : 'Connectez-vous pour activer MeTube'}
+                </span>
+              </button>
             </div>
           </div>
         </div>
@@ -556,7 +520,7 @@ export default function MeTubePage() {
                 {/* Call to action */}
                 <div className="text-center mt-12">
                   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <Link href="/register" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <Link href="/signup" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                       <span className="text-xl mr-2">🚀</span>
                       Commencer maintenant
                     </Link>

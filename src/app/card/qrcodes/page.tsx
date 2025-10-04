@@ -458,20 +458,6 @@ export default function QRCodesPage() {
                   </div>
                 )}
 
-                {/* Bouton "Choisir" pour tous les modules */}
-                {!alreadyActivatedModules.includes(card.id) && (
-                  <button 
-                    className={`w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
-                      isCardSelected(card.id)
-                        ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
-                        : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
-                    }`}
-                    onClick={() => handleSubscribe(card)}
-                  >
-                    <span className="text-xl">🔐</span>
-                    <span>{isCardSelected(card.id) ? 'Sélectionné' : 'Choisir'}</span>
-                  </button>
-                )}
                 
                 {/* Bouton d'accès QR Codes */}
                 {isCardSelected(card.id) && card.price === 0 && !alreadyActivatedModules.includes(card.id) && (

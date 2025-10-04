@@ -42,6 +42,14 @@ export async function POST(req: NextRequest) {
           access_level: 'premium',
           expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString() // 90 jours
         };
+      } else if (moduleId === 'metube') {
+        // Configuration spécifique pour MeTube
+        moduleData = {
+          ...moduleData,
+          module_title: 'MeTube',
+          access_level: 'premium',
+          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString() // 90 jours
+        };
       } else {
         // Configuration par défaut pour les autres modules
         moduleData = {
@@ -66,15 +74,32 @@ export async function POST(req: NextRequest) {
         data: data[0] 
       }, { status: 200 });
     } else {
-      // Mettre à jour le module existant avec la configuration LibreSpeed
+      // Mettre à jour le module existant avec la configuration appropriée
+      let updateData: any = {};
+      
+      console.log('🔧 Mise à jour module existant:', { moduleId, userId });
+      
       if (moduleId === 'librespeed') {
+        updateData = {
+          module_title: 'LibreSpeed',
+          access_level: 'premium',
+          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+        };
+      } else if (moduleId === 'metube') {
+        updateData = {
+          module_title: 'MeTube',
+          access_level: 'premium',
+          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+        };
+      }
+      
+      console.log('🔧 Données de mise à jour:', updateData);
+      console.log('🔧 Clés de mise à jour:', Object.keys(updateData));
+      
+      if (Object.keys(updateData).length > 0) {
         const { data, error } = await supabase
           .from('user_applications')
-          .update({
-            module_title: 'LibreSpeed',
-            access_level: 'premium',
-            expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
-          })
+          .update(updateData)
           .eq('user_id', userId)
           .eq('module_id', moduleId)
           .select();
@@ -86,7 +111,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ 
           success: true,
-          message: 'Module LibreSpeed mis à jour avec succès',
+          message: `Module ${moduleId} mis à jour avec succès`,
           data: data[0]
         }, { status: 200 });
       } else {

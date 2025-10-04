@@ -50,6 +50,17 @@ export default function CardDetailPage() {
   // Vérifier si c'est le module librespeed pour appliquer un style spécial
   const isLibrespeed = Boolean(card?.title?.toLowerCase().includes('librespeed') || card?.id === 'librespeed');
   
+  // Vérifier si c'est le module metube pour appliquer un style spécial
+  const isMetube = Boolean(card?.title?.toLowerCase().includes('metube') || card?.id === 'metube');
+  
+  // Debug MeTube
+  console.log('🔍 DEBUG METUBE:', {
+    cardId: card?.id,
+    cardTitle: card?.title,
+    isMetube: isMetube,
+    paramsId: params.id
+  });
+  
   // Vérifier si c'est un module gratuit
   const isFreeModule = Boolean(
     card?.price === 0 || 
@@ -308,6 +319,9 @@ export default function CardDetailPage() {
   useEffect(() => {
     const fetchCardDetails = async () => {
       if (!params.id) return;
+      
+      // Ne pas attendre l'authentification pour charger les détails de la carte
+      console.log('🔧 Chargement carte pour:', params.id);
 
       // Liste des modules qui ont des pages spécifiques
       const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'sdnext', 'invoke', 'cogstudio', 'ruinedfooocus', 'whisper'];
@@ -346,6 +360,36 @@ export default function CardDetailPage() {
           };
           setCard(librespeedCard);
           console.log('✅ LibreSpeed chargé avec succès');
+          setLoading(false);
+          return;
+        }
+
+        // Gestion spéciale pour MeTube
+        if (params.id === 'metube') {
+          console.log('🔧 Chargement spécial pour MeTube - params.id:', params.id);
+          const metubeCard = {
+            id: 'metube',
+            title: 'MeTube',
+            description: 'Téléchargez vos vidéos YouTube préférées de manière privée et sécurisée. Convertissez et gérez vos vidéos facilement.',
+            subtitle: 'Téléchargeur YouTube privé',
+            category: 'MEDIA TOOLS',
+            price: 0,
+            image_url: '/images/metube.jpg',
+            features: [
+              'Téléchargement vidéo',
+              'Conversion formats',
+              'Privé et sécurisé',
+              'Interface intuitive'
+            ],
+            requirements: [
+              'Connexion internet stable',
+              'Navigateur web moderne'
+            ],
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          setCard(metubeCard);
+          console.log('✅ MeTube chargé avec succès');
           setLoading(false);
           return;
         }
@@ -397,7 +441,7 @@ export default function CardDetailPage() {
     };
 
     fetchCardDetails();
-  }, [params.id, router, user]);
+  }, [params.id, router]);
 
   // Gérer l'accès rapide
   useEffect(() => {
@@ -635,6 +679,76 @@ export default function CardDetailPage() {
         </section>
       )}
 
+      {/* Bannière spéciale pour MeTube */}
+      {isMetube && (
+        <section className="bg-gradient-to-br from-red-400 via-pink-500 to-purple-600 py-8 relative overflow-hidden">
+          {/* Effet de particules animées */}
+          <div className="absolute inset-0">
+            <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+            <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
+            <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
+            <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
+            <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
+          </div>
+          
+          {/* Effet de vague en bas */}
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
+          
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+              {/* Contenu texte */}
+              <div className="flex-1 max-w-2xl">
+                <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
+                  Téléchargez vos vidéos YouTube préférées
+                </h1>
+                <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
+                  {(card?.category || 'MEDIA TOOLS').toUpperCase()}
+                </span>
+                <p className="text-xl text-red-100 mb-6">
+                  MeTube vous offre une solution complète pour télécharger, convertir et gérer vos vidéos YouTube de manière privée et sécurisée.
+                </p>
+                
+                {/* Badges de fonctionnalités */}
+                <div className="flex flex-wrap gap-3 mb-6">
+                  <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
+                    📹 Téléchargement vidéo
+                  </span>
+                  <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
+                    🔄 Conversion formats
+                  </span>
+                  <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
+                    🔒 Privé et sécurisé
+                  </span>
+                </div>
+              </div>
+              
+              {/* Logo MeTube animé */}
+              <div className="flex-1 flex justify-center">
+                <div className="relative w-80 h-64">
+                  {/* Formes géométriques abstraites */}
+                  <div className="absolute top-0 left-0 w-24 h-24 bg-red-400 rounded-full opacity-80 animate-pulse"></div>
+                  <div className="absolute top-16 right-0 w-20 h-20 bg-pink-400 rounded-lg opacity-80 animate-bounce"></div>
+                  <div className="absolute bottom-0 left-16 w-20 h-20 bg-purple-400 transform rotate-45 opacity-80 animate-pulse"></div>
+                  <div className="absolute bottom-16 right-16 w-16 h-16 bg-white rounded-full opacity-80 animate-bounce"></div>
+                  
+                  {/* Logo MeTube centré */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-white/95 backdrop-blur-sm rounded-full p-6 shadow-2xl border-2 border-red-500/20">
+                      <svg className="w-20 h-20" viewBox="0 0 24 24" fill="none">
+                        {/* Icône de vidéo/play */}
+                        <rect x="2" y="6" width="20" height="12" rx="2" fill="#EF4444" stroke="#DC2626" strokeWidth="1"/>
+                        <polygon points="9,9 9,15 15,12" fill="white"/>
+                        <circle cx="12" cy="12" r="8" fill="none" stroke="white" strokeWidth="1" opacity="0.3"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Vidéo LibreSpeed - Zone séparée après la bannière */}
       {isLibrespeed && (
         <div className="max-w-7xl mx-auto px-6 py-8">
@@ -673,7 +787,7 @@ export default function CardDetailPage() {
                       className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                       onClick={async () => {
                         if (!isAuthenticated || !user) {
-                          alert('Connectez-vous pour accéder à ce module');
+                          alert(`Connectez-vous pour activer ${card?.title || 'ce module'}`);
                           return;
                         }
 
@@ -719,7 +833,7 @@ export default function CardDetailPage() {
                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
                   >
                     <span className="text-xl">🔒</span>
-                    <span>Connectez-vous pour accéder</span>
+                    <span>Connectez-vous pour activer {card?.title || 'Module'}</span>
                   </a>
                 ) : (
                   // Boutons pour les modules payants
@@ -746,19 +860,6 @@ export default function CardDetailPage() {
                       </div>
                     )}
 
-                    {!['PSitransfer', 'PDF+', 'Librespeed'].includes(card.title) && !alreadyActivatedModules.includes(card.id) && (
-                      <button 
-                        className={`w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
-                          isCardSelected(card.id)
-                            ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
-                            : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white'
-                        }`}
-                        onClick={() => handleSubscribe(card)}
-                      >
-                        <span className="text-xl">🔐</span>
-                        <span>{isCardSelected(card.id) ? 'Sélectionné' : 'Choisir'}</span>
-                      </button>
-                    )}
                     
                     {/* Bouton "Activer la sélection" pour les modules payants */}
                     {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (
@@ -815,6 +916,7 @@ export default function CardDetailPage() {
                       </button>
                     )}
 
+
                     {/* Bouton d'accès spécial pour LibreSpeed */}
                     {isLibrespeed && (
                       <button
@@ -829,17 +931,40 @@ export default function CardDetailPage() {
                             router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
                           }
                         }}
-                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                       >
-                        <span className="text-xl">🔑</span>
+                        <span className="text-xl">⚡</span>
                         <span>
-                          {isAuthenticated && user ? 'Mes applis' : 'Connectez-vous pour accéder'}
+                          {isAuthenticated && user ? `Activer ${card?.title || 'Module'}` : `Connectez-vous pour activer ${card?.title || 'Module'}`}
+                        </span>
+                      </button>
+                    )}
+
+                    {/* Bouton d'accès spécial pour MeTube */}
+                    {isMetube && (
+                      <button
+                        onClick={() => {
+                          if (isAuthenticated && user) {
+                            // Utilisateur connecté : aller à la page de transition puis /encours
+                            console.log('✅ Accès MeTube - Utilisateur connecté');
+                            router.push(`/token-generated?module=${encodeURIComponent(card.title)}&redirect=/encours`);
+                          } else {
+                            // Utilisateur non connecté : aller à la page de connexion puis retour à MeTube
+                            console.log('🔒 Accès MeTube - Redirection vers connexion');
+                            router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
+                          }
+                        }}
+                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                      >
+                        <span className="text-xl">🎥</span>
+                        <span>
+                          {isAuthenticated && user ? `Activer ${card?.title || 'Module'}` : `Connectez-vous pour activer ${card?.title || 'Module'}`}
                         </span>
                       </button>
                     )}
 
                     {/* Bouton d'accès - visible seulement si l'utilisateur a accès au module (autres modules) */}
-                    {!isLibrespeed && isAuthenticated && user && userSubscriptions[`module_${card.id}`] && (
+                    {!isLibrespeed && !isMetube && isAuthenticated && user && userSubscriptions[`module_${card.id}`] && (
                       <button
                         onClick={() => {
                           console.log('✅ Accès à l\'application accordé');
@@ -854,7 +979,7 @@ export default function CardDetailPage() {
                     )}
 
                     {/* Boutons d'activation pour les modules gratuits */}
-                    {isFreeModule && !alreadyActivatedModules.includes(card.id) && !isLibrespeed && (
+                    {isFreeModule && !alreadyActivatedModules.includes(card.id) && !isLibrespeed && !isMetube && (
                       <div className="space-y-4">
                         {isAuthenticated && user ? (
                           <button 
@@ -903,7 +1028,7 @@ export default function CardDetailPage() {
                             className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
                           >
                             <span className="text-xl">🔒</span>
-                            <span>Connectez-vous pour accéder</span>
+                            <span>Connectez-vous pour activer {card?.title || 'Module'}</span>
                           </a>
                         )}
                       </div>
@@ -916,8 +1041,64 @@ export default function CardDetailPage() {
         </div>
       )}
 
-      {/* Contenu principal - seulement pour les modules non-LibreSpeed */}
-      {!isLibrespeed && (
+      {/* Vidéo MeTube - Zone séparée après la bannière */}
+      {isMetube && (
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {/* Colonne 1 - Vidéo */}
+            <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
+              <iframe
+                className="w-full h-full rounded-2xl"
+                src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&modestbranding=1"
+                title="Démonstration MeTube"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            
+            {/* Colonne 2 - Système de boutons */}
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
+              <div className="text-left mb-8">
+                <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
+                  <div className="text-4xl font-bold mb-1">
+                    {card.price === 0 || card.price === '0' ? 'Free' : `€${card.price}`}
+                  </div>
+                  <div className="text-sm opacity-90">
+                    {card.price === 0 || card.price === '0' ? 'Gratuit' : 'par mois'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {/* Boutons d'action */}
+                <button
+                  onClick={() => {
+                    if (isAuthenticated && user) {
+                      // Utilisateur connecté : aller à la page de transition puis /encours
+                      console.log('✅ Accès MeTube - Utilisateur connecté');
+                      router.push(`/token-generated?module=${encodeURIComponent(card.title)}&redirect=/encours`);
+                    } else {
+                      // Utilisateur non connecté : aller à la page de transition (comme LibreSpeed)
+                      console.log('🔒 Accès MeTube - Redirection vers page de transition');
+                      router.push(`/token-generated?module=${encodeURIComponent(card.title)}`);
+                    }
+                  }}
+                  className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                  <span className="text-xl">🎥</span>
+                  <span>
+                    {isAuthenticated && user ? 'Mes applis' : 'Connectez-vous pour accéder'}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contenu principal - seulement pour les modules non-LibreSpeed et non-MeTube */}
+      {!isLibrespeed && !isMetube && (
         <main className="max-w-7xl mx-auto px-6 py-12">
           <div className="space-y-12">
             {/* Grille principale */}
@@ -1187,7 +1368,7 @@ export default function CardDetailPage() {
                     Prêt à découvrir {card.title} ? Commencez dès maintenant et profitez de toutes ses fonctionnalités !
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <Link href="/register" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <Link href="/signup" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                       <span className="text-xl mr-2">🚀</span>
                       Commencer maintenant
                     </Link>
