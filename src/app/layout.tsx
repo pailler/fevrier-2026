@@ -13,6 +13,9 @@ import ResourceOptimizer from "../components/ResourceOptimizer";
 import HTMLPreloadCleaner from "../components/HTMLPreloadCleaner";
 import CSSPreloadManager from "../components/CSSPreloadManager";
 import AggressivePreloadCleaner from "../components/AggressivePreloadCleaner";
+import MobileOptimizer from "../components/MobileOptimizer";
+import ErrorBoundary from "../components/ErrorBoundary";
+import CacheManager from "../components/CacheManager";
 
 // Utilisation de polices système pour éviter les preloads
 
@@ -110,7 +113,9 @@ export const metadata: Metadata = {
     'application-name': 'IA Home',
     'msapplication-TileColor': '#2563eb',
     'theme-color': '#2563eb',
-  },
+    'format-detection': 'telephone=no',
+    'mobile-web-app-status-bar-style': 'black-translucent',
+  } as Record<string, string>,
 };
 
 export default function RootLayout({
@@ -121,6 +126,12 @@ export default function RootLayout({
   return (
     <html lang="fr" className="font-system">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="IA Home" />
         <FontAwesomeLocal />
       </head>
       <body className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -131,13 +142,17 @@ export default function RootLayout({
         <HTMLPreloadCleaner />
         <CSSPreloadManager />
         <AggressivePreloadCleaner />
-        <AdaptiveLayout>
-          <CustomHeader />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </AdaptiveLayout>
+        <MobileOptimizer />
+        <CacheManager />
+        <ErrorBoundary>
+          <AdaptiveLayout>
+            <CustomHeader />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </AdaptiveLayout>
+        </ErrorBoundary>
         <ConditionalComponents />
       </body>
     </html>
