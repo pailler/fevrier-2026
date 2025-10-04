@@ -1,0 +1,25 @@
+services:
+  psitransfer:
+    image: psitrax/psitransfer:latest
+    container_name: psitransfer
+    restart: unless-stopped
+    ports:
+      - "8087:3000"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - ./psitransfer-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - iahome-network
+
+networks:
+  iahome-network:
+    external: true

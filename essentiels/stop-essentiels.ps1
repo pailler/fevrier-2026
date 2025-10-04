@@ -1,23 +1,18 @@
-# Script d'arrêt des services essentiels IAhome
-# Auteur: IAhome
-# Date: 2025-09-11
+# Script pour arrêter tous les services essentiels
+Write-Host "🛑 Arrêt des services essentiels" -ForegroundColor Red
+Write-Host "=================================" -ForegroundColor Red
 
-Write-Host "🛑 Arrêt des services essentiels IAhome..." -ForegroundColor Yellow
-
-# Se déplacer dans le répertoire essentiels
-Set-Location $PSScriptRoot
-
-Write-Host "📦 Arrêt des containers essentiels..." -ForegroundColor Yellow
-
-# Arrêter les services essentiels
-docker-compose -f docker-compose.services.yml stop stirling-pdf metube librespeed psitransfer universal-converter
-
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "✅ Services essentiels arrêtés avec succès !" -ForegroundColor Green
-} else {
-    Write-Host "❌ Erreur lors de l'arrêt des services essentiels" -ForegroundColor Red
-    exit 1
+# Arrêter tous les containers essentiels
+$containers = @("librespeed", "metube", "pdf", "psitransfer", "qrcodes")
+foreach ($container in $containers) {
+    Write-Host "`n🛑 Arrêt de $container..." -ForegroundColor Yellow
+    docker stop $container 2>$null
+    docker rm $container 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "   ✅ $container arrêté et supprimé" -ForegroundColor Green
+    } else {
+        Write-Host "   ⚠️  $container n'était pas en cours d'exécution" -ForegroundColor Yellow
+    }
 }
 
-Write-Host ""
-Write-Host "🎉 Services essentiels arrêtés !" -ForegroundColor Green
+Write-Host "`n🎯 Tous les services essentiels arrêtés !" -ForegroundColor Green

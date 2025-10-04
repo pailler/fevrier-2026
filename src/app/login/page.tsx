@@ -4,20 +4,17 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import GoogleSignInButton from '../../components/GoogleSignInButton';
 import WorkingSignInForm from '../../components/WorkingSignInForm';
-import { useCustomAuth } from '../../hooks/useCustomAuth';
 
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, isAuthenticated, loading } = useCustomAuth();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // Si l'utilisateur est déjà connecté, rediriger vers l'accueil
-    if (isAuthenticated && user) {
-      router.push('/');
-    }
+    // Marquer que nous sommes côté client
+    setIsClient(true);
 
     // Vérifier les erreurs dans l'URL
     const errorParam = searchParams.get('error');
@@ -30,7 +27,7 @@ function LoginContent() {
     if (messageParam) {
       setSuccess(decodeURIComponent(messageParam));
     }
-  }, [isAuthenticated, user, router, searchParams]);
+  }, [searchParams]);
 
   const handleAuthSuccess = (user: any) => {
     if (user) {
@@ -43,24 +40,14 @@ function LoginContent() {
     setError('Erreur lors de la connexion. Veuillez réessayer.');
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (user) {
+  // Afficher un écran de chargement pendant l'hydratation
+  if (!isClient) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Vous êtes déjà connecté !
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Redirection vers la page d'accueil...
-          </p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Chargement...</h2>
+          <p className="text-gray-600">Veuillez patienter pendant le chargement de la page.</p>
         </div>
       </div>
     );

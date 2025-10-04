@@ -30,6 +30,18 @@ export function useCustomAuth() {
     // Vérifier l'état d'authentification au chargement
     const checkAuthState = () => {
       try {
+        // Vérifier si nous sommes côté client
+        if (typeof window === 'undefined') {
+          console.log('🔍 useCustomAuth - Côté serveur, pas de localStorage');
+          setAuthState({
+            user: null,
+            token: null,
+            isAuthenticated: false,
+            loading: false
+          });
+          return;
+        }
+
         const token = localStorage.getItem('auth_token');
         const userData = localStorage.getItem('user_data');
 
