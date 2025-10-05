@@ -57,9 +57,7 @@ export default function AdminModules() {
           return;
         }
 
-        console.log(`📊 ${modulesData?.length || 0} modules trouvés dans la base de données`);
-
-        // Récupérer les statistiques d'usage depuis user_applications avec les profils utilisateurs
+        // Récupérer les applications utilisateurs avec les profils en une seule requête
         const { data: usageData, error: usageError } = await supabase
           .from('user_applications')
           .select(`
@@ -71,7 +69,7 @@ export default function AdminModules() {
             created_at, 
             last_used_at,
             user_id,
-            profiles:user_id (
+            profiles!inner(
               id,
               email,
               full_name
@@ -82,6 +80,9 @@ export default function AdminModules() {
         if (usageError) {
           console.error('❌ Erreur lors de la récupération des statistiques d\'usage:', usageError);
         }
+
+        console.log(`📊 ${modulesData?.length || 0} modules trouvés dans la base de données`);
+        console.log(`📋 ${usageData?.length || 0} applications utilisateurs trouvées`);
 
         // Calculer les statistiques par module et récupérer les utilisateurs actifs
         const moduleStats = (usageData || []).reduce((acc, app) => {
@@ -106,12 +107,11 @@ export default function AdminModules() {
           }
           
           // Ajouter l'utilisateur actif
-          if (app.profiles && Array.isArray(app.profiles) && app.profiles.length > 0) {
-            const profile = app.profiles[0];
+          if (app.profiles) {
             acc[app.module_id].activeUsers.push({
               id: app.user_id,
-              email: profile.email,
-              fullName: profile.full_name || profile.email,
+              email: app.profiles.email,
+              fullName: app.profiles.full_name || app.profiles.email,
               usageCount: app.usage_count || 0,
               maxUsage: app.max_usage || 0,
               expiresAt: app.expires_at,
