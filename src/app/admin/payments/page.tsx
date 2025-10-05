@@ -10,6 +10,12 @@ interface Payment {
   method: string;
   date: string;
   description: string;
+  stripePaymentIntentId?: string;
+  stripeCustomerId?: string;
+  currency: string;
+  createdAt: string;
+  updatedAt: string;
+  metadata?: any;
 }
 
 export default function AdminPayments() {
@@ -20,47 +26,88 @@ export default function AdminPayments() {
   useEffect(() => {
     const loadPayments = async () => {
       try {
-        const mockPayments: Payment[] = [
-          {
-            id: 'pay_001',
-            userEmail: 'user1@example.com',
-            amount: 29.99,
-            status: 'completed',
-            method: 'Stripe',
-            date: '2024-01-20',
-            description: 'Abonnement Premium - 1 mois',
-          },
-          {
-            id: 'pay_002',
-            userEmail: 'user2@example.com',
-            amount: 99.99,
-            status: 'completed',
-            method: 'PayPal',
-            date: '2024-01-19',
-            description: 'Abonnement Premium - 6 mois',
-          },
-          {
-            id: 'pay_003',
-            userEmail: 'user3@example.com',
-            amount: 19.99,
-            status: 'pending',
-            method: 'Stripe',
-            date: '2024-01-20',
-            description: 'Module LibreSpeed - 1 mois',
-          },
-          {
-            id: 'pay_004',
-            userEmail: 'user4@example.com',
-            amount: 49.99,
-            status: 'failed',
-            method: 'Stripe',
-            date: '2024-01-18',
-            description: 'Abonnement Premium - 3 mois',
-          },
-        ];
-        setPayments(mockPayments);
+        console.log('🔍 Chargement des vrais paiements depuis la base de données...');
+        
+        // Récupération directe des données depuis Supabase
+        const { createClient } = await import('@supabase/supabase-js');
+        
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+
+        // Récupérer les paiements depuis la table payments
+        const { data: paymentsData, error: paymentsError } = await supabase
+          .from('payments')
+          .select(`
+            *,
+            profiles:user_id (
+              email,
+              full_name
+            )
+          `)
+          .order('created_at', { ascending: false });
+
+        if (paymentsError) {
+          console.error('❌ Erreur lors de la récupération des paiements:', paymentsError);
+          return;
+        }
+
+        console.log(`📊 ${paymentsData?.length || 0} paiements trouvés dans la base de données`);
+
+        // Mapper les paiements avec les vraies données
+        const paymentsWithRealData = (paymentsData || []).map(payment => {
+          // Déterminer le statut basé sur les données Stripe
+          let status: 'completed' | 'pending' | 'failed' | 'refunded' = 'pending';
+          if (payment.status === 'succeeded') {
+            status = 'completed';
+          } else if (payment.status === 'requires_payment_method' || payment.status === 'requires_confirmation') {
+            status = 'pending';
+          } else if (payment.status === 'canceled' || payment.status === 'requires_action') {
+            status = 'failed';
+          }
+
+          // Déterminer la méthode de paiement
+          let method = 'Stripe';
+          if (payment.payment_method_type) {
+            method = payment.payment_method_type.charAt(0).toUpperCase() + payment.payment_method_type.slice(1);
+          }
+
+          // Calculer le montant en euros (Stripe stocke en centimes)
+          const amount = payment.amount ? payment.amount / 100 : 0;
+
+          // Récupérer l'email de l'utilisateur
+          const userEmail = payment.profiles?.email || payment.customer_email || 'Utilisateur inconnu';
+
+          // Créer une description basée sur les métadonnées
+          let description = 'Paiement iAhome';
+          if (payment.metadata?.description) {
+            description = payment.metadata.description;
+          } else if (payment.metadata?.module_id) {
+            description = `Module ${payment.metadata.module_id}`;
+          }
+
+          return {
+            id: payment.id,
+            userEmail,
+            amount,
+            status,
+            method,
+            date: payment.created_at,
+            description,
+            stripePaymentIntentId: payment.payment_intent_id,
+            stripeCustomerId: payment.customer_id,
+            currency: payment.currency || 'eur',
+            createdAt: payment.created_at,
+            updatedAt: payment.updated_at || payment.created_at,
+            metadata: payment.metadata
+          };
+        });
+
+        console.log(`✅ ${paymentsWithRealData.length} paiements chargés avec les vraies données Stripe`);
+        setPayments(paymentsWithRealData);
       } catch (error) {
-        console.error('Erreur lors du chargement des paiements:', error);
+        console.error('❌ Erreur lors du chargement des paiements:', error);
       } finally {
         setLoading(false);
       }
@@ -218,6 +265,9 @@ export default function AdminPayments() {
                   Méthode
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Description
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -229,15 +279,29 @@ export default function AdminPayments() {
               {filteredPayments.map((payment) => (
                 <tr key={payment.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {payment.id}
+                    <div>
+                      <div className="font-mono text-xs">{payment.id}</div>
+                      {payment.stripePaymentIntentId && (
+                        <div className="text-xs text-gray-500">
+                          Stripe: {payment.stripePaymentIntentId.substring(0, 20)}...
+                        </div>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {payment.userEmail}
+                    <div>
+                      <div>{payment.userEmail}</div>
+                      {payment.stripeCustomerId && (
+                        <div className="text-xs text-gray-500">
+                          Customer: {payment.stripeCustomerId.substring(0, 20)}...
+                        </div>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {payment.amount.toLocaleString('fr-FR', { 
                       style: 'currency', 
-                      currency: 'EUR' 
+                      currency: payment.currency.toUpperCase() 
                     })}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -246,17 +310,48 @@ export default function AdminPayments() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {payment.method}
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <div className="max-w-xs truncate" title={payment.description}>
+                      {payment.description}
+                    </div>
+                    {payment.metadata && Object.keys(payment.metadata).length > 0 && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        {Object.entries(payment.metadata).slice(0, 2).map(([key, value]) => (
+                          <span key={key} className="mr-2">
+                            {key}: {String(value).substring(0, 20)}...
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(payment.date).toLocaleDateString('fr-FR')}
+                    <div>{new Date(payment.date).toLocaleDateString('fr-FR')}</div>
+                    <div className="text-xs text-gray-400">
+                      {new Date(payment.date).toLocaleTimeString('fr-FR')}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900">
+                      <button 
+                        className="text-blue-600 hover:text-blue-900"
+                        title="Voir les détails du paiement"
+                      >
                         Détails
                       </button>
                       {payment.status === 'completed' && (
-                        <button className="text-red-600 hover:text-red-900">
+                        <button 
+                          className="text-red-600 hover:text-red-900"
+                          title="Rembourser ce paiement"
+                        >
                           Rembourser
+                        </button>
+                      )}
+                      {payment.stripePaymentIntentId && (
+                        <button 
+                          className="text-green-600 hover:text-green-900"
+                          title="Voir dans Stripe Dashboard"
+                        >
+                          Stripe
                         </button>
                       )}
                     </div>
