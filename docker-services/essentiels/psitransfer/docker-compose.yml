@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  psitransfer:
+    image: psitrax/psitransfer:latest
+    container_name: psitransfer-iahome
+    restart: unless-stopped
+    ports:
+      - "8087:3000"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - iahome-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.psitransfer.rule=Host(`psitransfer.iahome.fr`)"
+      - "traefik.http.routers.psitransfer.entrypoints=websecure"
+      - "traefik.http.routers.psitransfer.tls.certresolver=letsencrypt"
+      - "traefik.http.services.psitransfer.loadbalancer.server.port=3000"
+
+networks:
+  iahome-network:
+    external: true

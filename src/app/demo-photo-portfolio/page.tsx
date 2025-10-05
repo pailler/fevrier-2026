@@ -209,7 +209,12 @@ export default function DemoPhotoPortfolioPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Recherchez des photos avec des descriptions naturelles..."
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch(searchQuery)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleSearch(searchQuery);
+                }
+              }}
             />
             <button
               onClick={() => handleSearch(searchQuery)}

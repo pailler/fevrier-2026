@@ -1,3 +1,5 @@
+'use client';
+
 import { OpenAI } from 'openai';
 import { supabase } from './supabaseClient';
 

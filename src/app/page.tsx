@@ -125,6 +125,84 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Section Admin - Visible uniquement pour les administrateurs */}
+      {isAuthenticated && user && user.role === 'admin' && (
+        <section className="py-8 bg-gradient-to-r from-red-50 to-orange-50 relative overflow-hidden border-t-4 border-red-200">
+          {/* Particules flottantes */}
+          <div className="absolute inset-0">
+            <div className="absolute top-16 left-16 w-2 h-2 bg-red-300/40 rounded-full animate-pulse"></div>
+            <div className="absolute top-24 right-24 w-1.5 h-1.5 bg-orange-300/50 rounded-full animate-bounce"></div>
+            <div className="absolute bottom-16 left-24 w-2 h-2 bg-red-400/30 rounded-full animate-pulse"></div>
+            <div className="absolute bottom-24 right-16 w-1 h-1 bg-orange-400/40 rounded-full animate-bounce"></div>
+          </div>
+
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+              {/* Contenu gauche */}
+              <div className="flex-1 max-w-2xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">👑</span>
+                  </div>
+                  <h2 className="text-3xl lg:text-4xl font-bold text-gray-800">
+                    Administration
+                  </h2>
+                </div>
+                <p className="text-lg text-gray-600 mb-6">
+                  Accédez aux outils d'administration pour gérer les utilisateurs, les modules et la configuration de la plateforme.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link 
+                    href="/admin" 
+                    className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center"
+                  >
+                    <span className="mr-2">⚙️</span>
+                    Tableau de bord Admin
+                  </Link>
+                  <Link 
+                    href="/admin/users" 
+                    className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center"
+                  >
+                    <span className="mr-2">👥</span>
+                    Gestion utilisateurs
+                  </Link>
+                </div>
+              </div>
+
+              {/* Illustration droite */}
+              <div className="flex-1 flex justify-center">
+                <div className="relative w-80 h-64">
+                  {/* Icône admin centrale */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="relative">
+                      {/* Cercle principal */}
+                      <div className="w-32 h-32 bg-red-100 border-4 border-red-300 rounded-full flex items-center justify-center relative">
+                        <div className="text-center">
+                          <div className="text-4xl font-bold text-red-600">👑</div>
+                          <div className="text-sm text-red-700 font-medium">Admin</div>
+                        </div>
+                      </div>
+                      
+                      {/* Éléments décoratifs */}
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-orange-400 rounded-full animate-pulse"></div>
+                      <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-red-400 rounded-full animate-bounce"></div>
+                      <div className="absolute top-0 left-0 w-3 h-3 bg-orange-500 rounded-full animate-ping"></div>
+                      <div className="absolute bottom-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Particules autour */}
+                  <div className="absolute top-12 left-12 w-1.5 h-1.5 bg-red-400 rounded-full animate-ping"></div>
+                  <div className="absolute top-20 right-12 w-1 h-1 bg-orange-400 rounded-full animate-pulse"></div>
+                  <div className="absolute bottom-12 left-16 w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce"></div>
+                  <div className="absolute bottom-20 right-16 w-1 h-1 bg-orange-500 rounded-full animate-ping"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Section Formation */}
       <section className="py-8 bg-gradient-to-r from-blue-50 to-green-50 relative overflow-hidden">

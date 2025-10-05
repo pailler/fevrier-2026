@@ -78,3 +78,5 @@ Write-Host "3. Vérifier les logs du serveur de production"
 Write-Host "4. S'assurer que la configuration Next.js est correcte"
 Write-Host ""
 Write-Host "💡 L'erreur 400 sur le fichier JS suggère un problème de cache ou de configuration serveur"
+
+

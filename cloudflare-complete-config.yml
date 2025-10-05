@@ -16,6 +16,8 @@ ingress:
     service: http://localhost:8082
   - hostname: rembg.iahome.fr
     service: http://localhost:8080
+  - hostname: converter.iahome.fr
+    service: http://localhost:8096
   - hostname: iahome.fr
     service: http://localhost:3000
   - hostname: www.iahome.fr
