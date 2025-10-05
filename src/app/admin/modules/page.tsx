@@ -11,6 +11,12 @@ interface Module {
   revenue: number;
   lastUpdate: string;
   version: string;
+  usageCount: number;
+  maxUsage: number;
+  expiresAt: string;
+  isActive: boolean;
+  createdAt: string;
+  lastUsedAt: string;
 }
 
 export default function AdminModules() {
@@ -20,71 +26,106 @@ export default function AdminModules() {
   useEffect(() => {
     const loadModules = async () => {
       try {
-        const mockModules: Module[] = [
-          {
-            id: 'librespeed',
-            name: 'LibreSpeed',
-            description: 'Test de vitesse de connexion internet',
-            status: 'active',
-            users: 1250,
-            revenue: 2500.00,
-            lastUpdate: '2024-01-20',
-            version: '1.2.3',
-          },
-          {
-            id: 'metube',
-            name: 'MeTube',
-            description: 'Téléchargement de vidéos YouTube',
-            status: 'active',
-            users: 890,
-            revenue: 1800.00,
-            lastUpdate: '2024-01-19',
-            version: '2.1.0',
-          },
-          {
-            id: 'whisper',
-            name: 'Whisper AI',
-            description: 'Transcription audio et vidéo avec IA',
-            status: 'active',
-            users: 650,
-            revenue: 3200.00,
-            lastUpdate: '2024-01-18',
-            version: '1.5.2',
-          },
-          {
-            id: 'psitransfer',
-            name: 'PsiTransfer',
-            description: 'Transfert de fichiers sécurisé',
-            status: 'maintenance',
-            users: 420,
-            revenue: 850.00,
-            lastUpdate: '2024-01-15',
-            version: '1.0.8',
-          },
-          {
-            id: 'qrcodes',
-            name: 'QR Codes',
-            description: 'Génération et gestion de codes QR',
-            status: 'active',
-            users: 780,
-            revenue: 1200.00,
-            lastUpdate: '2024-01-17',
-            version: '1.3.1',
-          },
-          {
-            id: 'pdf',
-            name: 'PDF Tools',
-            description: 'Outils de manipulation PDF',
-            status: 'inactive',
+        console.log('🔍 Chargement des vrais modules depuis la base de données...');
+        
+        // Récupération directe des données depuis Supabase
+        const { createClient } = await import('@supabase/supabase-js');
+        
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+
+        // Récupérer tous les modules depuis la table modules
+        const { data: modulesData, error: modulesError } = await supabase
+          .from('modules')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (modulesError) {
+          console.error('❌ Erreur lors de la récupération des modules:', modulesError);
+          return;
+        }
+
+        console.log(`📊 ${modulesData?.length || 0} modules trouvés dans la base de données`);
+
+        // Récupérer les statistiques d'usage depuis user_applications
+        const { data: usageData, error: usageError } = await supabase
+          .from('user_applications')
+          .select('module_id, usage_count, max_usage, expires_at, is_active, created_at, last_used_at')
+          .eq('is_active', true);
+
+        if (usageError) {
+          console.error('❌ Erreur lors de la récupération des statistiques d\'usage:', usageError);
+        }
+
+        // Calculer les statistiques par module
+        const moduleStats = (usageData || []).reduce((acc, app) => {
+          if (!acc[app.module_id]) {
+            acc[app.module_id] = {
+              users: 0,
+              totalUsage: 0,
+              totalMaxUsage: 0,
+              lastUsedAt: null,
+              createdAt: null
+            };
+          }
+          acc[app.module_id].users++;
+          acc[app.module_id].totalUsage += app.usage_count || 0;
+          acc[app.module_id].totalMaxUsage += app.max_usage || 0;
+          if (app.last_used_at && (!acc[app.module_id].lastUsedAt || new Date(app.last_used_at) > new Date(acc[app.module_id].lastUsedAt))) {
+            acc[app.module_id].lastUsedAt = app.last_used_at;
+          }
+          if (app.created_at && (!acc[app.module_id].createdAt || new Date(app.created_at) < new Date(acc[app.module_id].createdAt))) {
+            acc[app.module_id].createdAt = app.created_at;
+          }
+          return acc;
+        }, {} as Record<string, any>);
+
+        // Mapper les modules avec les vraies données
+        const modulesWithRealData = (modulesData || []).map(module => {
+          const stats = moduleStats[module.id] || {
             users: 0,
-            revenue: 0.00,
-            lastUpdate: '2024-01-10',
-            version: '1.0.0',
-          },
-        ];
-        setModules(mockModules);
+            totalUsage: 0,
+            totalMaxUsage: 0,
+            lastUsedAt: null,
+            createdAt: module.created_at
+          };
+
+          // Déterminer le statut basé sur l'activité
+          let status: 'active' | 'inactive' | 'maintenance' = 'inactive';
+          if (stats.users > 0) {
+            status = 'active';
+          }
+          if (module.status === 'maintenance') {
+            status = 'maintenance';
+          }
+
+          // Calculer les revenus estimés (basé sur l'usage)
+          const estimatedRevenue = stats.totalUsage * 0.5; // 0.5€ par utilisation
+
+          return {
+            id: module.id,
+            name: module.name || module.id,
+            description: module.description || `Module ${module.id}`,
+            status,
+            users: stats.users,
+            revenue: estimatedRevenue,
+            lastUpdate: stats.lastUsedAt || module.updated_at || module.created_at,
+            version: module.version || '1.0.0',
+            usageCount: stats.totalUsage,
+            maxUsage: stats.totalMaxUsage,
+            expiresAt: module.expires_at || '2025-12-31',
+            isActive: module.is_active !== false,
+            createdAt: stats.createdAt || module.created_at,
+            lastUsedAt: stats.lastUsedAt || null
+          };
+        });
+
+        console.log(`✅ ${modulesWithRealData.length} modules chargés avec les vraies données Supabase`);
+        setModules(modulesWithRealData);
       } catch (error) {
-        console.error('Erreur lors du chargement des modules:', error);
+        console.error('❌ Erreur lors du chargement des modules:', error);
       } finally {
         setLoading(false);
       }
@@ -141,7 +182,7 @@ export default function AdminModules() {
       </div>
 
       {/* Statistiques des modules */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
             <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
@@ -177,6 +218,20 @@ export default function AdminModules() {
               <p className="text-sm font-medium text-gray-600">Utilisateurs totaux</p>
               <p className="text-2xl font-bold text-gray-900">
                 {modules.reduce((sum, m) => sum + m.users, 0).toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">📊</span>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Utilisations totales</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {modules.reduce((sum, m) => sum + m.usageCount, 0).toLocaleString()}
               </p>
             </div>
           </div>
@@ -231,6 +286,14 @@ export default function AdminModules() {
                       {module.users.toLocaleString()} utilisateurs
                     </div>
                     <div className="flex items-center">
+                      <span className="mr-1">📊</span>
+                      {module.usageCount.toLocaleString()} utilisations
+                    </div>
+                    <div className="flex items-center">
+                      <span className="mr-1">🎯</span>
+                      {module.maxUsage.toLocaleString()} max
+                    </div>
+                    <div className="flex items-center">
                       <span className="mr-1">💰</span>
                       {module.revenue.toLocaleString('fr-FR', { 
                         style: 'currency', 
@@ -239,7 +302,7 @@ export default function AdminModules() {
                     </div>
                     <div className="flex items-center">
                       <span className="mr-1">📅</span>
-                      Mis à jour le {new Date(module.lastUpdate).toLocaleDateString('fr-FR')}
+                      {module.lastUsedAt ? `Utilisé le ${new Date(module.lastUsedAt).toLocaleDateString('fr-FR')}` : 'Jamais utilisé'}
                     </div>
                   </div>
                 </div>
