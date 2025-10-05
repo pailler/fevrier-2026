@@ -17,6 +17,16 @@ interface Module {
   isActive: boolean;
   createdAt: string;
   lastUsedAt: string;
+  activeUsers: Array<{
+    id: string;
+    email: string;
+    fullName: string;
+    usageCount: number;
+    maxUsage: number;
+    expiresAt: string;
+    lastUsedAt: string;
+    createdAt: string;
+  }>;
 }
 
 export default function AdminModules() {
@@ -49,17 +59,31 @@ export default function AdminModules() {
 
         console.log(`📊 ${modulesData?.length || 0} modules trouvés dans la base de données`);
 
-        // Récupérer les statistiques d'usage depuis user_applications
+        // Récupérer les statistiques d'usage depuis user_applications avec les profils utilisateurs
         const { data: usageData, error: usageError } = await supabase
           .from('user_applications')
-          .select('module_id, usage_count, max_usage, expires_at, is_active, created_at, last_used_at')
+          .select(`
+            module_id, 
+            usage_count, 
+            max_usage, 
+            expires_at, 
+            is_active, 
+            created_at, 
+            last_used_at,
+            user_id,
+            profiles:user_id (
+              id,
+              email,
+              full_name
+            )
+          `)
           .eq('is_active', true);
 
         if (usageError) {
           console.error('❌ Erreur lors de la récupération des statistiques d\'usage:', usageError);
         }
 
-        // Calculer les statistiques par module
+        // Calculer les statistiques par module et récupérer les utilisateurs actifs
         const moduleStats = (usageData || []).reduce((acc, app) => {
           if (!acc[app.module_id]) {
             acc[app.module_id] = {
@@ -67,7 +91,8 @@ export default function AdminModules() {
               totalUsage: 0,
               totalMaxUsage: 0,
               lastUsedAt: null,
-              createdAt: null
+              createdAt: null,
+              activeUsers: []
             };
           }
           acc[app.module_id].users++;
@@ -79,6 +104,21 @@ export default function AdminModules() {
           if (app.created_at && (!acc[app.module_id].createdAt || new Date(app.created_at) < new Date(acc[app.module_id].createdAt))) {
             acc[app.module_id].createdAt = app.created_at;
           }
+          
+          // Ajouter l'utilisateur actif
+          if (app.profiles) {
+            acc[app.module_id].activeUsers.push({
+              id: app.user_id,
+              email: app.profiles.email,
+              fullName: app.profiles.full_name || app.profiles.email,
+              usageCount: app.usage_count || 0,
+              maxUsage: app.max_usage || 0,
+              expiresAt: app.expires_at,
+              lastUsedAt: app.last_used_at,
+              createdAt: app.created_at
+            });
+          }
+          
           return acc;
         }, {} as Record<string, any>);
 
@@ -89,7 +129,8 @@ export default function AdminModules() {
             totalUsage: 0,
             totalMaxUsage: 0,
             lastUsedAt: null,
-            createdAt: module.created_at
+            createdAt: module.created_at,
+            activeUsers: []
           };
 
           // Déterminer le statut basé sur l'activité
@@ -118,7 +159,8 @@ export default function AdminModules() {
             expiresAt: module.expires_at || '2025-12-31',
             isActive: module.is_active !== false,
             createdAt: stats.createdAt || module.created_at,
-            lastUsedAt: stats.lastUsedAt || null
+            lastUsedAt: stats.lastUsedAt || null,
+            activeUsers: stats.activeUsers || []
           };
         });
 
@@ -150,16 +192,6 @@ export default function AdminModules() {
     );
   };
 
-  const toggleModuleStatus = (moduleId: string) => {
-    setModules(modules.map(module => 
-      module.id === moduleId 
-        ? { 
-            ...module, 
-            status: module.status === 'active' ? 'inactive' : 'active' 
-          }
-        : module
-    ));
-  };
 
   if (loading) {
     return (
@@ -264,7 +296,7 @@ export default function AdminModules() {
         <div className="divide-y divide-gray-200">
           {modules.map((module) => (
             <div key={module.id} className="p-6 hover:bg-gray-50">
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3">
                     <h3 className="text-lg font-medium text-gray-900">
@@ -305,20 +337,57 @@ export default function AdminModules() {
                       {module.lastUsedAt ? `Utilisé le ${new Date(module.lastUsedAt).toLocaleDateString('fr-FR')}` : 'Jamais utilisé'}
                     </div>
                   </div>
+
+                  {/* Liste des utilisateurs actifs */}
+                  {module.activeUsers && module.activeUsers.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">
+                        Utilisateurs actifs ({module.activeUsers.length})
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {module.activeUsers.map((user) => (
+                          <div key={user.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-gray-900 truncate">
+                                  {user.fullName}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">
+                                  {user.email}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+                              <div className="flex items-center">
+                                <span className="mr-1">📊</span>
+                                {user.usageCount}/{user.maxUsage}
+                              </div>
+                              <div className="flex items-center">
+                                <span className="mr-1">📅</span>
+                                {user.lastUsedAt ? new Date(user.lastUsedAt).toLocaleDateString('fr-FR') : 'Jamais'}
+                              </div>
+                            </div>
+                            <div className="mt-1 text-xs text-gray-400">
+                              Expire: {new Date(user.expiresAt).toLocaleDateString('fr-FR')}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {(!module.activeUsers || module.activeUsers.length === 0) && (
+                    <div className="mt-4">
+                      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <p className="text-sm text-gray-500 text-center">
+                          Aucun utilisateur actif pour ce module
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => toggleModuleStatus(module.id)}
-                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      module.status === 'active'
-                        ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                        : 'bg-green-100 text-green-700 hover:bg-green-200'
-                    }`}
-                  >
-                    {module.status === 'active' ? 'Désactiver' : 'Activer'}
-                  </button>
-                  
+                <div className="flex items-center space-x-2 ml-4">
                   <button className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors">
                     Configurer
                   </button>
@@ -333,23 +402,6 @@ export default function AdminModules() {
         </div>
       </div>
 
-      {/* Actions globales */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Actions globales
-        </h2>
-        <div className="flex space-x-4">
-          <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-            Activer tous les modules
-          </button>
-          <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-            Désactiver tous les modules
-          </button>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            Mettre à jour tous les modules
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
