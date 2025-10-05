@@ -106,11 +106,12 @@ export default function AdminModules() {
           }
           
           // Ajouter l'utilisateur actif
-          if (app.profiles) {
+          if (app.profiles && Array.isArray(app.profiles) && app.profiles.length > 0) {
+            const profile = app.profiles[0];
             acc[app.module_id].activeUsers.push({
               id: app.user_id,
-              email: app.profiles.email,
-              fullName: app.profiles.full_name || app.profiles.email,
+              email: profile.email,
+              fullName: profile.full_name || profile.email,
               usageCount: app.usage_count || 0,
               maxUsage: app.max_usage || 0,
               expiresAt: app.expires_at,
