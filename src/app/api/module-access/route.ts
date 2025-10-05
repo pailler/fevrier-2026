@@ -1,3 +1,5 @@
+'use client';
+
 import { NextRequest, NextResponse } from 'next/server';
 
 // Configuration des modules avec méthodes d'authentification

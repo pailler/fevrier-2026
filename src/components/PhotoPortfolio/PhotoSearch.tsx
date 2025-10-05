@@ -73,11 +73,6 @@ export default function PhotoSearch({
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
 
   const handleRecentSearch = (searchQuery: string) => {
     setQuery(searchQuery);
@@ -95,7 +90,12 @@ export default function PhotoSearch({
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleSearch();
+                }
+              }}
               placeholder="Recherchez vos photos... (ex: 'photos de mariage en extérieur au coucher du soleil')"
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={isSearching}

@@ -1,3 +1,5 @@
+'use client';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { NotificationService } from '../../../utils/notificationService';
 import { EmailService } from '../../../utils/emailService';

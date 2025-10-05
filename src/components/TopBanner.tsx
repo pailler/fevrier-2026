@@ -60,8 +60,12 @@ export default function TopBanner() {
         </nav>
         {session && (
           <div className="flex items-center gap-2 ml-4 pl-4 border-l border-gray-300">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-xs">
+            <div className={`w-2 h-2 rounded-full animate-pulse ${
+              role === 'admin' ? 'bg-red-500' : 'bg-green-500'
+            }`}></div>
+            <span className={`text-xs font-medium ${
+              role === 'admin' ? 'text-red-600' : 'text-green-600'
+            }`}>
               {role === 'admin' ? '👑 Admin connecté' : '👤 Utilisateur connecté'}
             </span>
           </div>

@@ -1,3 +1,5 @@
+'use client';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { validateAccessToken, hasPermission } from '../../../utils/accessToken';
 

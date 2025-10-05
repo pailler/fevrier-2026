@@ -124,16 +124,20 @@ export default function Header() {
               /* Mode connecté */
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center space-x-3 text-sm">
-                  <span className="hidden sm:inline">Connecté à IAHome</span>
+                  <span className="hidden sm:inline">
+                    {role === 'admin' ? 'Administrateur IAHome' : 'Connecté à IAHome'}
+                  </span>
                   <span className="font-medium">{user?.email}</span>
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <div className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                    <div className={`w-2 h-2 rounded-full animate-pulse ${
+                      role === 'admin' ? 'bg-red-400' : 'bg-green-400'
+                    }`}></div>
+                    <div className={`px-3 py-1 rounded-full text-xs font-bold shadow-md ${
                       role === 'admin' 
-                        ? 'bg-red-500 text-white' 
-                        : 'bg-green-500 text-white'
+                        ? 'bg-red-600 text-white border-2 border-red-400 hover:bg-red-700 transition-colors' 
+                        : 'bg-green-500 text-white hover:bg-green-600 transition-colors'
                     }`}>
-                      {role === 'admin' ? 'ADMIN' : 'CONNECTÉ'}
+                      {role === 'admin' ? '👑 ADMIN' : 'CONNECTÉ'}
                     </div>
                   </div>
                 </div>

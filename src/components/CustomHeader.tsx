@@ -31,9 +31,8 @@ export default function CustomHeader() {
   // Écouter les événements de connexion pour forcer la mise à jour
   useEffect(() => {
     const handleUserLoggedIn = () => {
-      console.log('🔄 CustomHeader - Événement userLoggedIn reçu, rechargement...');
-      // Forcer un rechargement de la page pour s'assurer que les données sont à jour
-      window.location.reload();
+      console.log('🔄 CustomHeader - Événement userLoggedIn reçu, mise à jour de l\'état...');
+      // L'état sera mis à jour automatiquement via useCustomAuth
     };
 
     window.addEventListener('userLoggedIn', handleUserLoggedIn);
@@ -79,16 +78,20 @@ export default function CustomHeader() {
                 ) : isAuthenticated && user ? (
                   /* Mode connecté */
                   <div className="flex items-center space-x-3 text-sm">
-                    <span className="hidden sm:inline">Connecté à IAHome</span>
+                    <span className="hidden sm:inline">
+                      {user.role === 'admin' ? 'Administrateur IAHome' : 'Connecté à IAHome'}
+                    </span>
                     <span className="font-medium">{user.email}</span>
                     <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <div className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                      <div className={`w-2 h-2 rounded-full animate-pulse ${
+                        user.role === 'admin' ? 'bg-red-400' : 'bg-green-400'
+                      }`}></div>
+                      <div className={`px-3 py-1 rounded-full text-xs font-bold shadow-md ${
                         user.role === 'admin' 
-                          ? 'bg-red-500 text-white' 
-                          : 'bg-green-500 text-white'
+                          ? 'bg-red-600 text-white border-2 border-red-400 hover:bg-red-700 transition-colors' 
+                          : 'bg-green-500 text-white hover:bg-green-600 transition-colors'
                       }`}>
-                        {user.role === 'admin' ? 'ADMIN' : 'CONNECTÉ'}
+                        {user.role === 'admin' ? '👑 ADMIN' : 'CONNECTÉ'}
                       </div>
                     </div>
                   </div>

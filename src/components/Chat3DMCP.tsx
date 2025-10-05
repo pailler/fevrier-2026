@@ -288,7 +288,12 @@ export default function Chat3DMCP() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Décrivez l'objet 3D que vous voulez créer..."
             className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+              }
+            }}
             disabled={processing || mcpStatus !== 'connected'}
           />
           <button
