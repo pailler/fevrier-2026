@@ -19,10 +19,10 @@ export async function POST(request: NextRequest) {
         console.log('✅ Service de notification chargé côté client');
         
         // Simuler l'appel exact comme dans le bouton
-        const result = await notificationService.notifyAppAccessed(
+        const result = await notificationService.sendModuleActivatedNotification(
           email,
-          appName,
-          userName
+          userName,
+          appName
         );
         
         console.log('📧 Résultat de la notification côté client:', result);

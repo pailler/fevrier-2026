@@ -81,3 +81,4 @@ Write-Host "1. Se connecter à l'application avec $userEmail" -ForegroundColor W
 Write-Host "2. Aller sur https://iahome.fr/admin pour accéder au dashboard" -ForegroundColor White
 Write-Host "3. Toutes les fonctionnalités admin sont maintenant disponibles" -ForegroundColor White
 
+

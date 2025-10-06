@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 interface User {
   id: string;
@@ -23,33 +23,35 @@ export function useCustomAuth() {
     user: null,
     token: null,
     isAuthenticated: false,
-    loading: true
+    loading: false
   });
 
+  const [isClient, setIsClient] = useState(false);
+
   useEffect(() => {
+    // Marquer que nous sommes côté client
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    // Ne pas exécuter côté serveur
+    if (!isClient) return;
+
     // Vérifier l'état d'authentification au chargement
     const checkAuthState = () => {
       try {
-        // Vérifier si nous sommes côté client
-        if (typeof window === 'undefined') {
-          console.log('🔍 useCustomAuth - Côté serveur, pas de localStorage');
-          setAuthState({
-            user: null,
-            token: null,
-            isAuthenticated: false,
-            loading: false
-          });
-          return;
-        }
-
         const token = localStorage.getItem('auth_token');
         const userData = localStorage.getItem('user_data');
 
-        console.log('🔍 useCustomAuth - Vérification:', { token: !!token, userData: !!userData });
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔍 useCustomAuth - Vérification:', { token: !!token, userData: !!userData });
+        }
 
         if (token && userData) {
           const user = JSON.parse(userData);
-          console.log('✅ useCustomAuth - Utilisateur trouvé:', user.email);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('✅ useCustomAuth - Utilisateur trouvé:', user.email);
+          }
           setAuthState({
             user,
             token,
@@ -57,7 +59,9 @@ export function useCustomAuth() {
             loading: false
           });
         } else {
-          console.log('❌ useCustomAuth - Pas d\'authentification');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('❌ useCustomAuth - Pas d\'authentification');
+          }
           setAuthState({
             user: null,
             token: null,
@@ -82,14 +86,18 @@ export function useCustomAuth() {
     // Écouter les changements dans localStorage
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'auth_token' || e.key === 'user_data') {
-        console.log('🔄 useCustomAuth - Changement localStorage détecté');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔄 useCustomAuth - Changement localStorage détecté');
+        }
         checkAuthState();
       }
     };
 
     // Écouter les événements personnalisés
     const handleCustomEvent = (e: CustomEvent) => {
-      console.log('🔄 useCustomAuth - Événement personnalisé détecté:', e.type);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔄 useCustomAuth - Événement personnalisé détecté:', e.type);
+      }
       checkAuthState();
     };
 
@@ -102,16 +110,20 @@ export function useCustomAuth() {
       window.removeEventListener('userLoggedIn', handleCustomEvent as EventListener);
       window.removeEventListener('userLoggedOut', handleCustomEvent as EventListener);
     };
-  }, []);
+  }, [isClient]);
 
   // Fonction pour se connecter
-  const signIn = (user: User, token: string) => {
-    console.log('🔄 useCustomAuth - signIn appelé:', { user: user.email, token: !!token });
+  const signIn = useCallback((user: User, token: string) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔄 useCustomAuth - signIn appelé:', { user: user.email, token: !!token });
+    }
     
     localStorage.setItem('auth_token', token);
     localStorage.setItem('user_data', JSON.stringify(user));
     
-    console.log('💾 useCustomAuth - Données sauvegardées dans localStorage');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('💾 useCustomAuth - Données sauvegardées dans localStorage');
+    }
     
     setAuthState({
       user,
@@ -125,16 +137,20 @@ export function useCustomAuth() {
       detail: { user, token } 
     }));
     
-    console.log('✅ useCustomAuth - État mis à jour:', { 
-      user: user.email, 
-      isAuthenticated: true, 
-      loading: false 
-    });
-  };
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ useCustomAuth - État mis à jour:', { 
+        user: user.email, 
+        isAuthenticated: true, 
+        loading: false 
+      });
+    }
+  }, []);
 
   // Fonction pour se déconnecter
-  const signOut = () => {
-    console.log('🔄 useCustomAuth - signOut appelé');
+  const signOut = useCallback(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔄 useCustomAuth - signOut appelé');
+    }
     
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_data');
@@ -149,11 +165,13 @@ export function useCustomAuth() {
     // Déclencher un événement personnalisé pour notifier les autres composants
     window.dispatchEvent(new CustomEvent('userLoggedOut'));
     
-    console.log('✅ useCustomAuth - Déconnexion réussie');
-  };
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ useCustomAuth - Déconnexion réussie');
+    }
+  }, []);
 
   // Fonction pour obtenir les headers d'authentification
-  const getAuthHeaders = () => {
+  const getAuthHeaders = useCallback(() => {
     if (!authState.token) {
       throw new Error('Aucun token d\'authentification disponible');
     }
@@ -162,10 +180,10 @@ export function useCustomAuth() {
       'Authorization': `Bearer ${authState.token}`,
       'Content-Type': 'application/json',
     };
-  };
+  }, [authState.token]);
 
   // Fonction pour faire une requête authentifiée
-  const authenticatedFetch = async (url: string, options: RequestInit = {}) => {
+  const authenticatedFetch = useCallback(async (url: string, options: RequestInit = {}) => {
     const headers = {
       ...getAuthHeaders(),
       ...options.headers,
@@ -183,13 +201,13 @@ export function useCustomAuth() {
     }
 
     return response;
-  };
+  }, [getAuthHeaders, signOut]);
 
-  return {
+  return useMemo(() => ({
     ...authState,
     signIn,
     signOut,
     getAuthHeaders,
     authenticatedFetch,
-  };
+  }), [authState, signIn, signOut, getAuthHeaders, authenticatedFetch]);
 }

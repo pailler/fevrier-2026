@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     
     console.log('📧 Tentative d\'envoi de notification user_login...');
     
-    const result = await notificationService.notifyUserLogin(
+    const result = await notificationService.sendUserLoginNotification(
       email,
       userName
     );

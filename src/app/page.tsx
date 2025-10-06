@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import Breadcrumb from '../components/Breadcrumb';
 import StructuredData from '../components/StructuredData';
+import ClientOnly from '../components/ClientOnly';
 
 // Désactiver le cache pour cette page
 export const dynamic = 'force-dynamic';
@@ -32,7 +33,7 @@ export default function Home() {
       }
     }
 
-  }, [user, isAuthenticated, loading, router]);
+  }, []); // Suppression des dépendances qui causaient la boucle
 
   return (
     <>

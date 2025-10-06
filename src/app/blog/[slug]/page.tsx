@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../../utils/supabaseClient";
 import Link from "next/link";
 import Breadcrumb from "../../../components/Breadcrumb";
-import Header from "../../../components/Header";
 import { useParams } from "next/navigation";
 
 interface BlogArticle {
@@ -99,7 +98,6 @@ export default function BlogArticlePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
         <div className="pt-20">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
@@ -115,7 +113,6 @@ export default function BlogArticlePage() {
   if (error || !article) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
         <div className="pt-20">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
@@ -140,8 +137,6 @@ export default function BlogArticlePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-      
       {/* Fil d'ariane avec espacement correct */}
       <div className="pt-20">
         <Breadcrumb />

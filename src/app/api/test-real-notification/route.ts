@@ -13,10 +13,10 @@ export async function POST(request: NextRequest) {
     
     console.log('📧 Tentative d\'envoi de notification app_accessed...');
     
-    const result = await notificationService.notifyAppAccessed(
+    const result = await notificationService.sendModuleActivatedNotification(
       email,
-      appName,
-      userName
+      userName,
+      appName
     );
 
     console.log('📧 Résultat de notifyAppAccessed:', result);

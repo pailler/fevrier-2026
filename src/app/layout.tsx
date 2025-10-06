@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import FontAwesomeLocal from '@/components/FontAwesomeLocal';
 // import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import CustomHeader from "../components/CustomHeader";
+import SimpleHeader from "../components/SimpleHeader";
 import Footer from "../components/Footer";
 import AdaptiveLayout from "../components/AdaptiveLayout";
 import ConditionalComponents from "../components/ConditionalComponents";
@@ -14,8 +14,6 @@ import HTMLPreloadCleaner from "../components/HTMLPreloadCleaner";
 import CSSPreloadManager from "../components/CSSPreloadManager";
 import AggressivePreloadCleaner from "../components/AggressivePreloadCleaner";
 import MobileOptimizer from "../components/MobileOptimizer";
-import ErrorBoundary from "../components/ErrorBoundary";
-import CacheManager from "../components/CacheManager";
 
 // Utilisation de polices système pour éviter les preloads
 
@@ -143,16 +141,13 @@ export default function RootLayout({
         <CSSPreloadManager />
         <AggressivePreloadCleaner />
         <MobileOptimizer />
-        <CacheManager />
-        <ErrorBoundary>
-          <AdaptiveLayout>
-            <CustomHeader />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
-          </AdaptiveLayout>
-        </ErrorBoundary>
+        <AdaptiveLayout>
+          <SimpleHeader />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </AdaptiveLayout>
         <ConditionalComponents />
       </body>
     </html>

@@ -20,40 +20,42 @@ export async function POST(request: NextRequest) {
     let result = false;
     
     switch (eventType) {
-      case 'user_created':
-        result = await notificationService.notifyUserCreated(
+      case 'user_signup':
+        result = await notificationService.sendUserSignupNotification(
           userEmail,
           eventData?.userName || 'Utilisateur Test'
         );
         break;
         
       case 'user_login':
-        result = await notificationService.notifyUserLogin(
+        result = await notificationService.sendUserLoginNotification(
           userEmail,
-          eventData?.userName || 'Utilisateur Test'
-        );
-        break;
-        
-      case 'user_logout':
-        result = await notificationService.notifyUserLogout(
-          userEmail,
-          eventData?.userName || 'Utilisateur Test'
-        );
-        break;
-        
-      case 'app_accessed':
-        result = await notificationService.notifyAppAccessed(
-          userEmail,
-          eventData?.appName || 'Application Test',
           eventData?.userName || 'Utilisateur Test'
         );
         break;
         
       case 'module_activated':
-        result = await notificationService.notifyModuleActivated(
+        result = await notificationService.sendModuleActivatedNotification(
           userEmail,
-          eventData?.moduleName || 'Module Test',
-          eventData?.userName || 'Utilisateur Test'
+          eventData?.userName || 'Utilisateur Test',
+          eventData?.moduleName || 'Module Test'
+        );
+        break;
+        
+      case 'app_accessed':
+        result = await notificationService.sendModuleActivatedNotification(
+          userEmail,
+          eventData?.userName || 'Utilisateur Test',
+          eventData?.appName || 'Application Test'
+        );
+        break;
+        
+      case 'payment_success':
+        result = await notificationService.sendPaymentSuccessNotification(
+          userEmail,
+          eventData?.userName || 'Utilisateur Test',
+          eventData?.amount || '29.99€',
+          eventData?.moduleName || 'Module Test'
         );
         break;
         

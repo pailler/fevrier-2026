@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getSupabaseClient } from '../../../utils/supabaseService';
 
 interface Payment {
   id: string;
@@ -29,12 +30,9 @@ export default function AdminPayments() {
         console.log('🔍 Chargement des vrais paiements depuis la base de données...');
         
         // Récupération directe des données depuis Supabase
-        const { createClient } = await import('@supabase/supabase-js');
         
-        const supabase = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        );
+        
+        const supabase = getSupabaseClient();
 
         // Récupérer les paiements depuis la table payments
         const { data: paymentsData, error: paymentsError } = await supabase

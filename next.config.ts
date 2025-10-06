@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Configuration pour la production avec Docker
-  output: 'standalone',
+  // Configuration pour la production
+  // output: 'standalone', // Désactivé pour résoudre les problèmes de fichiers statiques
   experimental: {
     // outputFileTracingRoot: undefined,
     optimizePackageImports: ['@supabase/supabase-js'],

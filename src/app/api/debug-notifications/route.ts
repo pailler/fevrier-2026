@@ -68,14 +68,12 @@ export async function GET() {
     try {
       const notificationService = NotificationService.getInstance();
       debug.services.notificationServiceInitialized = !!notificationService;
+      // debug.services.notificationServiceConfigured = notificationService.isConfigured();
       
-      // Récupérer les paramètres
-      const settings = await notificationService.getNotificationSettings();
-      debug.notificationSettings = settings;
-      
-      // Récupérer les logs récents
-      const logs = await notificationService.getNotificationLogs(10);
-      debug.recentLogs = logs;
+      // Note: Les méthodes getNotificationSettings et getNotificationLogs 
+      // ne sont pas implémentées dans le service actuel
+      debug.notificationSettings = [];
+      debug.recentLogs = [];
     } catch (error) {
       console.error('Erreur NotificationService:', error);
     }

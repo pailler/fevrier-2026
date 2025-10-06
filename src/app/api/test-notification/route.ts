@@ -17,10 +17,10 @@ export async function POST(request: NextRequest) {
     const notificationService = NotificationService.getInstance();
     
     // Test de la notification d'accès à l'application
-    const result = await notificationService.notifyAppAccessed(
+    const result = await notificationService.sendModuleActivatedNotification(
       email,
-      appName || 'Application Test',
-      userName || 'Utilisateur Test'
+      userName || 'Utilisateur Test',
+      appName || 'Application Test'
     );
 
     console.log('📧 Résultat du test:', result);

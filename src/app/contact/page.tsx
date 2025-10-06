@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import { supabase } from '../../utils/supabaseClient';
-import Header from '../../components/Header';
 import { Mail, Phone, MapPin, Facebook, Youtube, Send, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface ContactForm {
@@ -96,7 +95,6 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
         {/* En-tête de la page */}

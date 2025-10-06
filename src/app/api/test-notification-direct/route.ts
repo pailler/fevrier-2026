@@ -70,14 +70,10 @@ export async function POST(request: NextRequest) {
     console.log('✅ Service de notification initialisé');
 
     // Test 2: Envoi via NotificationService
-    const result = await notificationService.sendNotification(
-      'app_accessed',
+    const result = await notificationService.sendModuleActivatedNotification(
       email,
-      {
-        appName: 'Test Application',
-        userName: 'Utilisateur Test',
-        timestamp: new Date().toISOString()
-      }
+      'Utilisateur Test',
+      'Test Application'
     );
 
     console.log('📧 Résultat NotificationService:', result);

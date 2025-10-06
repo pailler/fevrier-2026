@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseClient } from '../../../utils/supabaseService';
 
 interface NotificationSetting {
   id: string;
@@ -44,12 +44,7 @@ export default function AdminNotifications() {
     try {
       console.log('🔍 Chargement des paramètres de notifications...');
       
-      const { createClient } = await import('@supabase/supabase-js');
-      
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
+      const supabase = getSupabaseClient();
 
       // Charger les paramètres de notifications
       const { data: settingsData, error: settingsError } = await supabase
@@ -97,12 +92,7 @@ export default function AdminNotifications() {
   const toggleNotification = async (id: string, enabled: boolean) => {
     setSaving(true);
     try {
-      const { createClient } = await import('@supabase/supabase-js');
-      
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
+      const supabase = getSupabaseClient();
 
       const { error } = await supabase
         .from('notification_settings')

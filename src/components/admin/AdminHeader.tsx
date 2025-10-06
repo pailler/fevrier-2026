@@ -2,17 +2,21 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useCustomAuth } from '@/hooks/useCustomAuth';
+import TokenBalance from '../TokenBalance';
 
 interface AdminHeaderProps {
   user: {
     email: string;
     role: string;
+    id: string;
   };
 }
 
 export default function AdminHeader({ user }: AdminHeaderProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { signOut } = useCustomAuth();
   const router = useRouter();
 
@@ -22,18 +26,78 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className="bg-blue-600 text-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <h1 className="text-2xl font-bold text-gray-900">
-                🛡️ Admin Dashboard
-              </h1>
+        {/* Section supérieure - Informations de connexion */}
+        <div className="flex items-center justify-between h-10">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center space-x-3">
+              <span className="hidden sm:inline">Administrateur IAHome</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-3">
+                <span className="text-blue-100 text-sm">
+                  Administrateur IAHome
+                </span>
+                <span className="text-blue-100 text-sm font-medium">
+                  {user.email}
+                </span>
+                <div className="px-3 py-1 rounded-full text-xs font-bold bg-red-600 text-white">
+                  👑 ADMIN
+                </div>
+              </div>
             </div>
           </div>
-          
-          <div className="flex items-center space-x-4">
+        </div>
+
+        {/* Section principale - Navigation et utilisateur */}
+        <div className="flex items-center justify-between h-16 border-t border-blue-500">
+          <div className="flex items-center space-x-6">
+            <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                <span className="text-blue-600 font-bold text-lg">I</span>
+              </div>
+              <span className="text-xl font-bold text-white">IAhome</span>
+            </Link>
+
+            {/* Navigation admin */}
+            <nav className="hidden md:flex items-center space-x-6">
+              <Link 
+                href="/admin" 
+                className="text-white hover:text-blue-100 font-medium transition-colors"
+              >
+                🛡️ Dashboard
+              </Link>
+              <Link 
+                href="/admin/users" 
+                className="text-white hover:text-blue-100 font-medium transition-colors"
+              >
+                Utilisateurs
+              </Link>
+              <Link 
+                href="/admin/modules" 
+                className="text-white hover:text-blue-100 font-medium transition-colors"
+              >
+                Modules
+              </Link>
+              <Link 
+                href="/admin/statistics" 
+                className="text-white hover:text-blue-100 font-medium transition-colors"
+              >
+                Statistiques
+              </Link>
+            </nav>
+          </div>
+
+          <div className="hidden md:flex items-center space-x-4">
+            <TokenBalance userId={user.id} />
+            <Link
+              href="/encours"
+              className="bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors flex items-center space-x-1"
+            >
+              <span>📱</span>
+              <span className="hidden sm:inline">Mes applis</span>
+            </Link>
             <div className="relative">
               <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -43,8 +107,8 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
                   <span className="text-white font-bold text-sm">👑</span>
                 </div>
                 <div className="text-left">
-                  <p className="font-medium text-gray-900">{user.email}</p>
-                  <p className="text-sm text-red-600 font-semibold">Administrateur</p>
+                  <p className="font-medium text-white">{user.email}</p>
+                  <p className="text-sm text-red-200 font-semibold">Administrateur</p>
                 </div>
               </button>
               
@@ -60,9 +124,79 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
               )}
             </div>
           </div>
+
+          {/* Menu mobile */}
+          <div className="md:hidden">
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-white hover:text-blue-100 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+          </div>
         </div>
+
+        {/* Menu mobile déroulant */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-blue-500 py-4">
+            <div className="space-y-2">
+              {/* Navigation admin mobile */}
+              <div className="px-4 py-2 border-b border-blue-500">
+                <div className="text-sm text-blue-100 mb-2">Administration</div>
+                <Link
+                  href="/admin"
+                  className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors"
+                >
+                  🛡️ Dashboard
+                </Link>
+                <Link
+                  href="/admin/users"
+                  className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors"
+                >
+                  Utilisateurs
+                </Link>
+                <Link
+                  href="/admin/modules"
+                  className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors"
+                >
+                  Modules
+                </Link>
+                <Link
+                  href="/admin/statistics"
+                  className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors"
+                >
+                  Statistiques
+                </Link>
+              </div>
+
+              {/* Actions utilisateur mobile */}
+              <div className="px-4 py-2 border-b border-blue-500">
+                <div className="text-sm text-blue-100 mb-2">Compte</div>
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-white">{user.email}</span>
+                  <TokenBalance userId={user.id} />
+                </div>
+                <Link
+                  href="/encours"
+                  className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors"
+                >
+                  Mes applis
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors w-full text-left"
+                >
+                  Se déconnecter
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
 }
+
 

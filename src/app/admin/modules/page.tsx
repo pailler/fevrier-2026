@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getSupabaseClient } from '../../../utils/supabaseService';
 
 interface Module {
   id: string;
@@ -39,12 +40,9 @@ export default function AdminModules() {
         console.log('🔍 Chargement des vrais modules depuis la base de données...');
         
         // Récupération directe des données depuis Supabase
-        const { createClient } = await import('@supabase/supabase-js');
         
-        const supabase = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        );
+        
+        const supabase = getSupabaseClient();
 
         // Récupérer tous les modules depuis la table modules
         const { data: modulesData, error: modulesError } = await supabase

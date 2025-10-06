@@ -79,16 +79,15 @@ export async function POST(request: NextRequest) {
     // Envoyer une notification d'activation de module
     try {
       const notificationService = NotificationService.getInstance();
-      await notificationService.sendNotification('module_activated', userData.email, {
-        userName: userData.email.split('@')[0],
-        moduleName: moduleTitle,
-        moduleId: moduleId,
-        timestamp: new Date().toISOString(),
-        userId: userId,
-        accessId: accessData.id
-      });
-      } catch (notificationError) {
-      }
+      await notificationService.sendModuleActivatedNotification(
+        userData.email,
+        userData.email.split('@')[0] || 'Utilisateur',
+        moduleTitle
+      );
+    } catch (notificationError) {
+      console.error('Erreur lors de l\'envoi de la notification:', notificationError);
+      // Ne pas faire échouer l'activation si la notification échoue
+    }
 
     // Note: La création automatique de token est désactivée car il y a une incohérence
     // entre les types de module_id (string dans modules vs integer dans access_tokens)

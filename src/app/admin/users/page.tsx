@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getSupabaseClient } from '../../../utils/supabaseService';
 
 interface UserApplication {
   moduleId: string;
@@ -36,12 +37,9 @@ export default function AdminUsers() {
         console.log('🔍 Chargement des vrais utilisateurs depuis la base de données...');
         
         // Récupération directe des données depuis Supabase
-        const { createClient } = await import('@supabase/supabase-js');
         
-        const supabase = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        );
+        
+        const supabase = getSupabaseClient();
 
         // Récupérer tous les profils utilisateurs
         const { data: profiles, error: profilesError } = await supabase

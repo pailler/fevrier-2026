@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCustomAuth } from '../../hooks/useCustomAuth';
-import CustomHeader from '../../components/CustomHeader';
+import SimpleHeader from '../../components/SimpleHeader';
 import CustomTopBanner from '../../components/CustomTopBanner';
 import UserDataDisplay from '../../components/UserDataDisplay';
 
@@ -74,7 +74,7 @@ export default function SignUpSuccessPage() {
       <CustomTopBanner />
       
       <div className="pt-20">
-        <CustomHeader />
+        <SimpleHeader />
         
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="bg-white rounded-xl shadow-lg p-8">

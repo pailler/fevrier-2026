@@ -13,13 +13,21 @@ export const getSupabaseClient = (): SupabaseClient => {
       throw new Error('Variables d\'environnement Supabase manquantes');
     }
     
+    // Configuration optimisée pour éviter les conflits
     clientInstance = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
         storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-        flowType: 'pkce'
+        flowType: 'pkce',
+        // Configuration pour éviter les instances multiples
+        debug: false
+      },
+      global: {
+        headers: {
+          'X-Client-Info': 'iahome-app'
+        }
       }
     });
   }
@@ -27,7 +35,7 @@ export const getSupabaseClient = (): SupabaseClient => {
 };
 
 // Export pour compatibilité - utiliser getSupabaseClient() pour éviter les instances multiples
-// export const supabase = getSupabaseClient();
+export const supabase = getSupabaseClient();
 
 
 

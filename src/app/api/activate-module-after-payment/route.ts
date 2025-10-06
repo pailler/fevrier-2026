@@ -194,10 +194,10 @@ export async function POST(request: NextRequest) {
       const { NotificationService } = await import('../../../utils/notificationService');
       const notificationService = NotificationService.getInstance();
       
-      await notificationService.notifyAppAccessed(
+      await notificationService.sendModuleActivatedNotification(
         userEmail,
-        moduleTitle,
-        userEmail.split('@')[0] || 'Utilisateur'
+        userEmail.split('@')[0] || 'Utilisateur',
+        moduleTitle
       );
     } catch (notificationError) {
       console.error('Erreur lors de l\'envoi de la notification:', notificationError);

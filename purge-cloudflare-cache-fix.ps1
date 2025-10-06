@@ -83,3 +83,4 @@ Write-Host "4. Vérifier que les erreurs de chunks ont disparu" -ForegroundColor
 
 Write-Host "`n✨ Le problème de chunks devrait être résolu après la purge !" -ForegroundColor Green
 
+

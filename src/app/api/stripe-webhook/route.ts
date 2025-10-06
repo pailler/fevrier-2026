@@ -197,10 +197,10 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     const { NotificationService } = await import('../../../utils/notificationService');
     const notificationService = NotificationService.getInstance();
     
-    await notificationService.notifyAppAccessed(
+    await notificationService.sendModuleActivatedNotification(
       customerEmail,
-      moduleTitle,
-      customerEmail.split('@')[0] || 'Utilisateur'
+      customerEmail.split('@')[0] || 'Utilisateur',
+      moduleTitle
     );
   } catch (notificationError) {
     console.error('Erreur lors de l\'envoi de la notification:', notificationError);

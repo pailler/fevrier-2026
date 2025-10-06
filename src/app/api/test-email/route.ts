@@ -18,25 +18,26 @@ export async function POST(request: NextRequest) {
     let result = false;
     
     switch (eventType) {
-      case 'user_created':
-        result = await notificationService.notifyUserCreated(email, 'Utilisateur Test');
+      case 'user_signup':
+        result = await notificationService.sendUserSignupNotification(email, 'Utilisateur Test');
         break;
       case 'user_login':
-        result = await notificationService.notifyUserLogin(email, 'Utilisateur Test');
+        result = await notificationService.sendUserLoginNotification(email, 'Utilisateur Test');
         break;
       case 'module_activated':
-        result = await notificationService.notifyModuleActivated(email, 'Module Test', 'Utilisateur Test');
+        result = await notificationService.sendModuleActivatedNotification(email, 'Utilisateur Test', 'Module Test');
         break;
-      case 'app_accessed':
-        result = await notificationService.notifyAppAccessed(email, 'Application Test', 'Utilisateur Test');
+      case 'payment_success':
+        result = await notificationService.sendPaymentSuccessNotification(email, 'Utilisateur Test', '29.99€', 'Module Test');
+        break;
+      case 'usage_limit':
+        result = await notificationService.sendUsageLimitNotification(email, 'Utilisateur Test', 'Module Test', 20, 20);
+        break;
+      case 'admin_alert':
+        result = await notificationService.sendAdminAlert(email, 'Test système', 'Ceci est un test', 'medium');
         break;
       default:
-        result = await notificationService.sendNotification(eventType, email, {
-          userName: 'Utilisateur Test',
-          moduleName: 'Module Test',
-          appName: 'Application Test',
-          timestamp: new Date().toISOString()
-        });
+        result = await notificationService.sendTestEmail(email);
     }
 
     return NextResponse.json({
