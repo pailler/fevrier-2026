@@ -13,11 +13,7 @@ ingress:
   - hostname: qrcodes.iahome.fr
     service: http://localhost:7006
   - hostname: pdf.iahome.fr
-    service: http://localhost:8082
-  - hostname: rembg.iahome.fr
-    service: http://localhost:8080
-  - hostname: converter.iahome.fr
-    service: http://localhost:8096
+    service: http://localhost:8086
   - hostname: iahome.fr
     service: http://localhost:3000
   - hostname: www.iahome.fr

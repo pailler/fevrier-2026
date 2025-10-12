@@ -57,7 +57,7 @@ export default function SimpleHeader() {
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated && user ? (
               <>
-                <TokenBalance userId={user.id} />
+                <TokenBalance />
                 <Link
                   href="/encours"
                   className="bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors flex items-center space-x-1"

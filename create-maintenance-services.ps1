@@ -5,8 +5,7 @@ $services = @(
     @{Name="metube"; Port=8082; Domain="metube.iahome.fr"},
     @{Name="psitransfer"; Port=8084; Domain="psitransfer.iahome.fr"},
     @{Name="whisper"; Port=8093; Domain="whisper.iahome.fr"},
-    @{Name="qrcodes"; Port=7005; Domain="qrcodes.iahome.fr"},
-    @{Name="rembg"; Port=8080; Domain="rembg.iahome.fr"}
+    @{Name="qrcodes"; Port=7005; Domain="qrcodes.iahome.fr"}
 )
 
 foreach ($service in $services) {
@@ -234,7 +233,6 @@ Write-Host "   🚧 MeTube: http://localhost:8082 (maintenance)" -ForegroundColo
 Write-Host "   🚧 PsiTransfer: http://localhost:8084 (maintenance)" -ForegroundColor Yellow
 Write-Host "   🚧 Whisper: http://localhost:8093 (maintenance)" -ForegroundColor Yellow
 Write-Host "   🚧 QR Codes: http://localhost:7005 (maintenance)" -ForegroundColor Yellow
-Write-Host "   🚧 ReMBG: http://localhost:8080 (maintenance)" -ForegroundColor Yellow
 
 
 

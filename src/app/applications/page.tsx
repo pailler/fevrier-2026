@@ -18,7 +18,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [priceFilter, setPriceFilter] = useState('all');
+  const [tokenFilter, setTokenFilter] = useState('all');
   const [professionFilter, setProfessionFilter] = useState('all'); // CHANGÉ : experienceFilter -> professionFilter
   const [sortBy, setSortBy] = useState('most_used');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -290,11 +290,11 @@ export default function Home() {
           cat.toLowerCase().includes(search.toLowerCase())
         );
 
-      // Filtre de prix - Amélioré pour gérer différents formats
+      // Filtre de tokens - Amélioré pour gérer différents formats
       const isModuleFree = module.price === '0' || module.price === 0 || module.price === 'Gratuit' || module.price === 'gratuit' || module.price === 'FREE' || module.price === 'free';
-      const matchesPrice = priceFilter === 'all' || 
-        (priceFilter === 'free' && isModuleFree) ||
-        (priceFilter === 'paid' && !isModuleFree);
+      const matchesToken = tokenFilter === 'all' || 
+        (tokenFilter === 'free' && isModuleFree) ||
+        (tokenFilter === 'paid' && !isModuleFree);
 
       // CHANGÉ : matchesExperience -> matchesProfession
       const matchesProfession = professionFilter === 'all' || 
@@ -304,7 +304,7 @@ export default function Home() {
       const matchesCategory = categoryFilter === 'all' || 
         (module.categories || [module.category]).includes(categoryFilter);
 
-      return matchesSearch && matchesPrice && matchesProfession && matchesCategory;
+      return matchesSearch && matchesToken && matchesProfession && matchesCategory;
     })
          .sort((a, b) => {
        // Tri spécial : librespeed toujours en premier
@@ -327,9 +327,9 @@ export default function Home() {
            return (b.usage_count || 0) - (a.usage_count || 0);
          case 'least_used':
            return (a.usage_count || 0) - (b.usage_count || 0);
-         case 'price_high':
+         case 'token_high':
            return (b.price || 0) - (a.price || 0);
-         case 'price_low':
+         case 'token_low':
            return (a.price || 0) - (b.price || 0);
          case 'name_az':
            return a.title.localeCompare(b.title);
@@ -368,7 +368,7 @@ export default function Home() {
   // Réinitialiser la pagination quand les filtres changent
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, priceFilter, professionFilter, sortBy, categoryFilter]); // CHANGÉ : experienceFilter -> professionFilter
+  }, [search, tokenFilter, professionFilter, sortBy, categoryFilter]); // CHANGÉ : experienceFilter -> professionFilter
 
   // Détecter le scroll pour afficher/masquer le bouton de retour en haut
   useEffect(() => {
@@ -506,8 +506,8 @@ export default function Home() {
                   <div className="flex flex-col sm:flex-row gap-2 lg:gap-3 flex-1">
                     <select 
                       className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      value={priceFilter}
-                      onChange={(e) => setPriceFilter(e.target.value)}
+                      value={tokenFilter}
+                      onChange={(e) => setTokenFilter(e.target.value)}
                     >
                       <option value="all">Gratuit et payant</option>
                       <option value="free">Gratuit uniquement</option>
@@ -538,8 +538,8 @@ export default function Home() {
                     >
                       <option value="most_used">Trier par : Plus installés</option>
                       <option value="least_used">Trier par : Moins installés</option>
-                      <option value="price_high">Trier par : Prix élevé à bas</option>
-                      <option value="price_low">Trier par : Prix bas à élevé</option>
+                      <option value="token_high">Trier par : Tokens élevé à bas</option>
+                      <option value="token_low">Trier par : Tokens bas à élevé</option>
                       <option value="name_az">Trier par : Nom A-Z</option>
                       <option value="name_za">Trier par : Nom Z-A</option>
                     </select>

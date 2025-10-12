@@ -5,8 +5,7 @@ $services = @(
     @{Name="metube"; Port=8082; Path="metube-service"},
     @{Name="psitransfer"; Port=8084; Path="psitransfer-service"},
     @{Name="whisper"; Port=8093; Path="whisper-service"},
-    @{Name="qrcodes"; Port=7005; Path="qr-codes-service"},
-    @{Name="rembg"; Port=8080; Path="docker-services/rembg-web"}
+    @{Name="qrcodes"; Port=7005; Path="qr-codes-service"}
 )
 
 foreach ($service in $services) {
@@ -137,7 +136,6 @@ Write-Host "   📹 MeTube: http://localhost:8082" -ForegroundColor Yellow
 Write-Host "   📁 PsiTransfer: http://localhost:8084" -ForegroundColor Yellow
 Write-Host "   🎤 Whisper: http://localhost:8093" -ForegroundColor Yellow
 Write-Host "   📱 QR Codes: http://localhost:7005" -ForegroundColor Yellow
-Write-Host "   🖼️ ReMBG: http://localhost:8080" -ForegroundColor Yellow
 
 
 

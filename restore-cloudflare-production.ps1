@@ -117,8 +117,7 @@ $routes = @(
     @{url="https://whisper.iahome.fr"; name="Whisper"},
     @{url="https://psitransfer.iahome.fr"; name="PsiTransfer"},
     @{url="https://qrcodes.iahome.fr"; name="QR Codes"},
-    @{url="https://pdf.iahome.fr"; name="PDF"},
-    @{url="https://rembg.iahome.fr"; name="REMBG"}
+    @{url="https://pdf.iahome.fr"; name="PDF"}
 )
 
 $successCount = 0

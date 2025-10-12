@@ -58,7 +58,7 @@ try {
         Write-Host "   • Accès au dashboard admin: /admin/dashboard" -ForegroundColor White
         Write-Host "   • Gestion des utilisateurs: /admin/users" -ForegroundColor White
         Write-Host "   • Gestion des modules: /admin/modules" -ForegroundColor White
-        Write-Host "   • Gestion des tokens: /admin/tokens" -ForegroundColor White
+        Write-Host "   • Gestion des tokens: /pricing" -ForegroundColor White
         Write-Host "   • Statistiques: /admin/statistics" -ForegroundColor White
         Write-Host "   • Gestion des paiements: /admin/payments" -ForegroundColor White
         

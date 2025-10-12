@@ -50,18 +50,15 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
       
       // Vérifier si le prix est 0, null, undefined ou NaN
-      if (numericPrice === 0 || numericPrice === null || numericPrice === undefined || isNaN(numericPrice)) return 'Free';
+      if (numericPrice === 0 || numericPrice === null || numericPrice === undefined || isNaN(numericPrice)) return 'Gratuit';
       
-      // Formater le prix avec la devise
-      return new Intl.NumberFormat('fr-FR', {
-        style: 'currency',
-        currency: 'EUR'
-      }).format(numericPrice);
+      // Formater le prix en tokens
+      return `${numericPrice} tokens`;
     } catch (error) {
       // Fallback simple
       const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
-      if (numericPrice === 0 || numericPrice === null || numericPrice === undefined || isNaN(numericPrice)) return 'Free';
-      return `${numericPrice}€`;
+      if (numericPrice === 0 || numericPrice === null || numericPrice === undefined || isNaN(numericPrice)) return 'Gratuit';
+      return `${numericPrice} tokens`;
     }
   };
 
@@ -99,7 +96,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       return '/images/librespeed.jpg'; // Utiliser l'image spécifique librespeed.jpg
     }
     
-    if (titleLower.includes('converter') || titleLower.includes('convert')) {
+    if (titleLower.includes('convert')) {
       return '/images/converter.jpg'; // Utiliser l'image spécifique converter.jpg
     }
     
@@ -164,7 +161,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   const isQRCodes = module.title.toLowerCase().includes('qrcodes') || module.title.toLowerCase().includes('qr codes') || module.title.toLowerCase().includes('qr-codes') || module.title.toLowerCase().includes('qrcode') || module.id === 'qrcodes';
   
   // Vérifier si c'est le module Universal Converter pour appliquer un style spécial
-  const isConverter = module.title.toLowerCase().includes('converter') || module.title.toLowerCase().includes('universal converter') || module.id === 'converter';
+  const isConverter = module.title.toLowerCase().includes('universal converter') || module.id === 'converter';
   
   // Vérifier si c'est le module Whisper IA pour appliquer un style spécial
   const isWhisper = module.title.toLowerCase().includes('whisper') || module.title.toLowerCase().includes('transcription') || module.id === 'whisper';

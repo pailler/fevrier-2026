@@ -12,9 +12,49 @@ export async function POST(request: NextRequest) {
       return new NextResponse('Missing userId', { status: 400 });
     }
 
-    // Pour l'instant, autoriser l'accès à tous les utilisateurs
-    // TODO: Implémenter la vérification réelle dans user_applications
-    console.log('✅ Check LibreSpeed Access: Accès autorisé pour userId:', userId);
+    // 🪙 NOUVELLE VÉRIFICATION DES TOKENS : Vérifier que l'utilisateur a au moins 1 token
+    try {
+      // Récupérer le solde actuel
+      const { data: userTokens, error: tokensError } = await supabase
+        .from('user_tokens')
+        .select('tokens')
+        .eq('user_id', userId)
+        .single();
+
+      let currentTokens = 10; // Valeur par défaut
+      
+      if (!tokensError && userTokens) {
+        currentTokens = userTokens.tokens;
+      } else {
+        // Créer une entrée par défaut si elle n'existe pas
+        const { error: insertError } = await supabase
+          .from('user_tokens')
+          .insert([{
+            user_id: userId,
+            tokens: 10
+          }]);
+
+        if (insertError) {
+          console.log('⚠️ LibreSpeed: Table user_tokens non disponible, autorisation par défaut');
+        }
+      }
+
+      // Vérifier si l'utilisateur a assez de tokens (10 tokens requis)
+      if (currentTokens < 10) {
+        console.log('❌ LibreSpeed Access: Tokens insuffisants pour userId:', userId);
+        return NextResponse.json({
+          hasAccess: false,
+          error: 'Tokens insuffisants',
+          currentTokens: currentTokens,
+          requiredTokens: 10
+        });
+      }
+
+      console.log('✅ LibreSpeed Access: Accès autorisé pour userId:', userId, 'avec', currentTokens, 'tokens');
+
+    } catch (error) {
+      console.log('⚠️ LibreSpeed: Table user_tokens non disponible, autorisation par défaut');
+    }
 
     return NextResponse.json({
       hasAccess: true,

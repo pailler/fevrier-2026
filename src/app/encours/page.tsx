@@ -10,7 +10,8 @@ import ModuleAccessButton from '../../components/ModuleAccessButton';
 import QRCodeAccessButton from '../../components/QRCodeAccessButton';
 import PDFAccessButton from '../../components/PDFAccessButton';
 import PsiTransferAccessButton from '../../components/PsiTransferAccessButton';
-import { TokenActionService } from '../../utils/tokenActionService';
+import ModuleAccessButtonNew from '../../components/ModuleAccessButton';
+import { TokenActionServiceClient } from '../../utils/tokenActionServiceClient';
 
 interface UserModule {
   id: string;
@@ -73,6 +74,8 @@ export default function EncoursPage() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const errorParam = urlParams.get('error');
+    const balanceParam = urlParams.get('balance');
+    const moduleParam = urlParams.get('module');
     
     if (errorParam) {
       switch (errorParam) {
@@ -85,8 +88,16 @@ export default function EncoursPage() {
         case 'token_verification_failed':
           setTokenError('Erreur de vérification du token. Veuillez réessayer.');
           break;
+        case 'insufficient_tokens':
+          const moduleName = moduleParam || 'cette application';
+          const balance = balanceParam || '0';
+          setTokenError(`🪙 Tokens insuffisants pour accéder à ${moduleName}. Solde actuel: ${balance} token(s). Veuillez acheter des tokens pour continuer.`);
+          break;
+        case 'token_check_failed':
+          setTokenError('Erreur lors de la vérification des tokens. Veuillez réessayer ou contacter le support.');
+          break;
         default:
-          setTokenError('Erreur d\'accès à LibreSpeed. Veuillez réessayer.');
+          setTokenError('Erreur d\'accès à l\'application. Veuillez réessayer.');
       }
       
       // Nettoyer l'URL
@@ -110,7 +121,7 @@ export default function EncoursPage() {
       setLoadingTokens(true);
       
       // Charger le solde de tokens
-      const tokenService = TokenActionService.getInstance();
+      const tokenService = TokenActionServiceClient.getInstance();
       const balance = await tokenService.getUserTokenBalance(user.id);
       setTokenBalance(balance);
       
@@ -313,7 +324,6 @@ export default function EncoursPage() {
       '3': 'librespeed', // LibreSpeed -> librespeed
       '4': 'psitransfer', // PsiTransfer -> psitransfer
       '5': 'qrcodes',  // QR Codes -> qrcodes
-      '6': 'converter', // Universal Converter -> converter
       '7': 'stablediffusion', // Stable Diffusion -> stablediffusion
       '8': 'ruinedfooocus', // Ruined Fooocus -> ruinedfooocus
       '9': 'invoke',   // Invoke AI -> invoke
@@ -348,6 +358,31 @@ export default function EncoursPage() {
     return url;
   };
 
+  // Mapping des modules vers leurs coûts en tokens
+  const getModuleCost = (moduleId: string): number => {
+    const moduleCosts: { [key: string]: number } = {
+      '1': 10,      // PDF+ -> 10 tokens
+      '2': 10,      // MeTube -> 10 tokens
+      '3': 10,      // LibreSpeed -> 10 tokens
+      '4': 10,      // PsiTransfer -> 10 tokens
+      '5': 10,      // QR Codes -> 10 tokens
+      '7': 100,     // Stable Diffusion -> 100 tokens
+      '8': 100,     // Ruined Fooocus -> 100 tokens
+      '9': 100,     // Invoke AI -> 100 tokens
+      '10': 100,    // ComfyUI -> 100 tokens
+      '11': 100,    // Cog Studio -> 100 tokens
+      '12': 100,    // SD.Next -> 100 tokens
+      'stablediffusion': 100,
+      'ruinedfooocus': 100,
+      'invoke': 100,
+      'comfyui': 100,
+      'cogstudio': 100,
+      'sdnext': 100,
+      'whisper': 100,
+    };
+    
+    return moduleCosts[moduleId] || 10; // Par défaut 10 tokens
+  };
 
   // Fonction pour rafraîchir les données
   const refreshData = async () => {
@@ -501,7 +536,7 @@ export default function EncoursPage() {
     }
     
     // Pour les modules essentiels, afficher "Module essentiel"
-    const essentialModules = ['metube', 'psitransfer', 'universal-converter', 'pdf', 'librespeed', 'qrcodes', 'qrcodes-statiques'];
+    const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'qrcodes-statiques'];
     const isEssential = essentialModules.some(essentialId => 
       module.module_id === essentialId || 
       module.module_title.toLowerCase().includes(essentialId.toLowerCase()) ||
@@ -714,7 +749,7 @@ export default function EncoursPage() {
                   </div>
                   <div className="mt-4">
                     <Link 
-                      href="/tokens" 
+                      href="/pricing" 
                       className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
                     >
                       Acheter des tokens
@@ -722,28 +757,6 @@ export default function EncoursPage() {
                   </div>
                 </div>
 
-                {/* Coûts par action */}
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4">
-                  <h3 className="text-sm font-medium text-gray-600 mb-3">Coûts par action</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">🎵 MeTube - Téléchargement</span>
-                      <span className="font-semibold text-green-600">1 token</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">🎵 MeTube - Conversion</span>
-                      <span className="font-semibold text-green-600">2 tokens</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">📄 PDF - Conversion</span>
-                      <span className="font-semibold text-green-600">1 token</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">🚀 LibreSpeed - Test</span>
-                      <span className="font-semibold text-green-600">1 token</span>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               {/* Historique d'utilisation */}
@@ -829,7 +842,7 @@ export default function EncoursPage() {
                           <span>🔑 Appli essentielle</span>
                         )}
                         {module.price && Number(module.price) > 0 && (
-                          <span>💎 €{module.price}</span>
+                          <span>🪙 {module.price} tokens</span>
                         )}
                       </div>
                     </div>
@@ -841,37 +854,12 @@ export default function EncoursPage() {
                         {module.module_description}
                       </p>
 
-                      {/* Informations d'utilisation pour tous les modules */}
-                      {(module.max_usage || module.is_free) && (
-                        <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                                                     <div className="flex justify-between text-sm text-gray-600 mb-2">
-                             <span>Utilisations : {module.current_usage || 0} / {maxUsage}</span>
-                             <span>{Math.round(((module.current_usage || 0) / maxUsage) * 100)}%</span>
-                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                                                         <div 
-                               className={`h-2 rounded-full transition-all duration-500 ${
-                                 isQuotaExceeded ? 'bg-red-500' :
-                                 getUsageColor(module.current_usage || 0, maxUsage).includes('red') ? 'bg-red-500' :
-                                 getUsageColor(module.current_usage || 0, maxUsage).includes('orange') ? 'bg-orange-500' :
-                                 getUsageColor(module.current_usage || 0, maxUsage).includes('yellow') ? 'bg-yellow-500' :
-                                 'bg-green-500'
-                               }`}
-                               style={{ width: `${Math.min(((module.current_usage || 0) / maxUsage) * 100, 100)}%` }}
-                             ></div>
-                          </div>
-                          {isQuotaExceeded && (
-                            <p className="text-red-600 text-xs mt-2 font-semibold">
-                              ⚠️ Quota épuisé
-                            </p>
-                          )}
-                                                     {!isQuotaExceeded && (
-                             <p className="text-blue-600 text-xs mt-2 font-semibold">
-                               📊 Quota : {maxUsage} utilisations maximum
-                             </p>
-                           )}
+                      {/* Informations d'utilisation pour tous les modules (affichage uniquement) */}
+                      <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div className="flex justify-between text-sm text-gray-600 mb-2">
+                          <span>Utilisations : {module.current_usage || 0}</span>
                         </div>
-                      )}
+                      </div>
 
                       {/* Informations de date */}
                       <div className="space-y-2 mb-4">
@@ -891,217 +879,29 @@ export default function EncoursPage() {
 
                       {/* Bouton d'accès */}
                       {module.module_title === 'LibreSpeed' ? (
-                        <div className="flex flex-col items-center space-y-2">
-                          <button
-                            onClick={async () => {
-                              console.log('🚀 LibreSpeed: Clic sur le bouton d\'accès');
-                              
-                              if (!user) {
-                                console.log('❌ LibreSpeed: Utilisateur non connecté - redirection vers login');
-                                window.location.href = 'https://iahome.fr/login';
-                                return;
-                              }
-                              
-                              try {
-                                // ÉTAPE 1: Vérifier l'autorisation d'accès
-                                console.log('🔐 LibreSpeed: ÉTAPE 1 - Vérification de l\'autorisation...');
-                                const accessResponse = await fetch('/api/check-librespeed-access', {
-                                  method: 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({
-                                    userId: user.id
-                                  })
-                                });
-                                
-                                if (!accessResponse.ok) {
-                                  console.log('❌ LibreSpeed: ÉTAPE 1 ÉCHEC - Pas d\'autorisation');
-                                  window.location.href = 'https://iahome.fr/login';
-                                  return;
-                                }
-                                
-                                const accessData = await accessResponse.json();
-                                if (!accessData.hasAccess) {
-                                  console.log('❌ LibreSpeed: ÉTAPE 1 ÉCHEC - Accès refusé');
-                                  window.location.href = 'https://iahome.fr/login';
-                                  return;
-                                }
-                                
-                                console.log('✅ LibreSpeed: ÉTAPE 1 RÉUSSIE - Autorisation confirmée');
-                                
-                                // ÉTAPE 2: Incrémenter le compteur d'usage
-                                console.log('📊 LibreSpeed: ÉTAPE 2 - Incrémentation du compteur...');
-                                const incrementResponse = await fetch('/api/increment-librespeed-access', {
-                                  method: 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({
-                                    userId: user.id,
-                                    userEmail: user.email
-                                  })
-                                });
-                                
-                                if (incrementResponse.ok) {
-                                  const incrementData = await incrementResponse.json();
-                                  console.log('✅ LibreSpeed: ÉTAPE 2 RÉUSSIE - Compteur incrémenté:', incrementData.usage_count, '/', incrementData.max_usage);
-                                } else {
-                                  const errorData = await incrementResponse.json().catch(() => ({}));
-                                  if (incrementResponse.status === 403 && errorData.error === 'Quota dépassé') {
-                                    console.log('❌ LibreSpeed: ÉTAPE 2 ÉCHEC - Quota dépassé');
-                                    alert('Quota d\'utilisation dépassé. Contactez l\'administrateur.');
-                                    return;
-                                  }
-                                  console.log('⚠️ LibreSpeed: ÉTAPE 2 WARNING - Erreur compteur, continuons...');
-                                }
-                                
-                                // ÉTAPE 3: Générer un token d'accès
-                                console.log('🔑 LibreSpeed: ÉTAPE 3 - Génération du token d\'accès...');
-                                const tokenResponse = await fetch('/api/librespeed-token', {
-                                  method: 'POST',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({
-                                    userId: user.id,
-                                    userEmail: user.email
-                                  })
-                                });
-                                
-                                if (!tokenResponse.ok) {
-                                  console.log('❌ LibreSpeed: ÉTAPE 3 ÉCHEC - Erreur génération token');
-                                  window.location.href = 'https://iahome.fr/login';
-                                  return;
-                                }
-                                
-                                const tokenData = await tokenResponse.json();
-                                console.log('✅ LibreSpeed: ÉTAPE 3 RÉUSSIE - Token généré:', tokenData.token ? tokenData.token.substring(0, 10) + '...' : 'N/A');
-                                
-                                // ÉTAPE 4: Ouvrir LibreSpeed avec le token
-                                console.log('🔗 LibreSpeed: ÉTAPE 4 - Ouverture de LibreSpeed avec token...');
-                                const librespeedUrl = `https://librespeed.iahome.fr?token=${tokenData.token}`;
-                                console.log('✅ LibreSpeed: ÉTAPE 4 RÉUSSIE - URL finale:', librespeedUrl);
-                                window.open(librespeedUrl, '_blank');
-                                
-                              } catch (error) {
-                                console.error('❌ LibreSpeed: ERREUR GÉNÉRALE:', error);
-                                alert('Erreur lors de l\'accès à LibreSpeed. Veuillez réessayer.');
-                              }
-                            }}
-                            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 hover:shadow-lg"
-                          >
-                            🚀 Accéder à LibreSpeed
-                          </button>
-                        </div>
+                        <LibreSpeedAccessButton
+                          user={user}
+                          onAccessGranted={(url) => {
+                            console.log('🔗 LibreSpeed: Accès autorisé:', url);
+                            window.open(url, '_blank');
+                          }}
+                          onAccessDenied={(reason) => {
+                            console.log('❌ LibreSpeed: Accès refusé:', reason);
+                            alert(`Accès refusé: ${reason}`);
+                          }}
+                        />
                       ) : module.module_title === 'MeTube' ? (
-                        <div className="space-y-3">
-                          {/* Affichage des coûts de tokens pour MeTube */}
-                          <div className="bg-blue-50 rounded-lg p-3 text-sm">
-                            <div className="flex justify-between items-center mb-2">
-                              <span className="text-blue-700 font-medium">Coûts en tokens :</span>
-                              <span className="text-blue-600 font-semibold">{tokenBalance} disponibles</span>
-                            </div>
-                            <div className="space-y-1 text-xs text-blue-600">
-                              <div className="flex justify-between">
-                                <span>🎵 Téléchargement vidéo</span>
-                                <span className="font-semibold">1 token</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span>🎵 Conversion MP4</span>
-                                <span className="font-semibold">2 tokens</span>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* Boutons d'action MeTube avec tokens */}
-                          <div className="grid grid-cols-2 gap-2">
-                            <button
-                              onClick={async () => {
-                                if (!user) return;
-                                
-                                try {
-                                  const response = await fetch('/api/metube-action', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                      userId: user.id,
-                                      actionType: 'download',
-                                      videoUrl: 'https://youtube.com/watch?v=dQw4w9WgXcQ', // URL exemple
-                                      userEmail: user.email
-                                    })
-                                  });
-                                  
-                                  const result = await response.json();
-                                  
-                                  if (response.ok) {
-                                    alert(`✅ ${result.message}\nTokens consommés: ${result.tokensConsumed}\nTokens restants: ${result.tokensRemaining}`);
-                                    // Actualiser les données de tokens
-                                    fetchTokenData();
-                                  } else {
-                                    alert(`❌ ${result.reason}`);
-                                  }
-                                } catch (error) {
-                                  alert('❌ Erreur de connexion');
-                                }
-                              }}
-                              disabled={tokenBalance < 1}
-                              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                                tokenBalance >= 1
-                                  ? 'bg-green-600 text-white hover:bg-green-700'
-                                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                              }`}
-                            >
-                              🎵 Télécharger (1 token)
-                            </button>
-                            
-                            <button
-                              onClick={async () => {
-                                if (!user) return;
-                                
-                                try {
-                                  const response = await fetch('/api/metube-action', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                      userId: user.id,
-                                      actionType: 'convert',
-                                      videoUrl: 'https://youtube.com/watch?v=dQw4w9WgXcQ', // URL exemple
-                                      userEmail: user.email
-                                    })
-                                  });
-                                  
-                                  const result = await response.json();
-                                  
-                                  if (response.ok) {
-                                    alert(`✅ ${result.message}\nTokens consommés: ${result.tokensConsumed}\nTokens restants: ${result.tokensRemaining}`);
-                                    // Actualiser les données de tokens
-                                    fetchTokenData();
-                                  } else {
-                                    alert(`❌ ${result.reason}`);
-                                  }
-                                } catch (error) {
-                                  alert('❌ Erreur de connexion');
-                                }
-                              }}
-                              disabled={tokenBalance < 2}
-                              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                                tokenBalance >= 2
-                                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                              }`}
-                            >
-                              🎵 Convertir (2 tokens)
-                            </button>
-                          </div>
-                          
-                          {/* Bouton d'accès classique MeTube */}
-                          <MeTubeAccessButton
-                            user={user}
-                            onAccessGranted={(url) => {
-                              console.log('🔗 MeTube: Accès autorisé:', url);
-                              window.open(url, '_blank');
-                            }}
-                            onAccessDenied={(reason) => {
-                              console.log('❌ MeTube: Accès refusé:', reason);
-                              alert(`Accès refusé: ${reason}`);
-                            }}
-                          />
-                        </div>
+                        <MeTubeAccessButton
+                          user={user}
+                          onAccessGranted={(url) => {
+                            console.log('🔗 MeTube: Accès autorisé:', url);
+                            window.open(url, '_blank');
+                          }}
+                          onAccessDenied={(reason) => {
+                            console.log('❌ MeTube: Accès refusé:', reason);
+                            alert(`Accès refusé: ${reason}`);
+                          }}
+                        />
                       ) : module.module_title === 'PDF+' ? (
                         <PDFAccessButton
                           user={user}
@@ -1139,13 +939,14 @@ export default function EncoursPage() {
                           }}
                         />
                       ) : (
-                        <ModuleAccessButton
+                        <ModuleAccessButtonNew
                           user={user}
                           moduleId={module.module_id}
-                          moduleTitle={module.module_title}
+                          moduleName={module.module_title}
                           moduleUrl={getModuleUrl(module.module_id) || ''}
+                          moduleCost={getModuleCost(module.module_id)}
                           onAccessGranted={(url) => {
-                            console.log(`🔗 ${module.module_title}: Accès autorisé (NOUVEAU CODE):`, url);
+                            console.log(`🔗 ${module.module_title}: Accès autorisé:`, url);
                             window.open(url, '_blank');
                           }}
                           onAccessDenied={(reason) => {

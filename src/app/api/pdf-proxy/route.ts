@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from '../../../utils/supabaseClient';
+import { TokenActionService } from '../../../utils/tokenActionService';
 
 const PDF_SERVICE_URL = process.env.PDF_SERVICE_URL || 'https://pdf.iahome.fr';
 
@@ -96,6 +97,27 @@ export async function GET(request: NextRequest) {
     if (!hasBasicAccess) {
       console.log('PDF Proxy: Aucun accès PDF trouvé pour:', session.user.email);
       return NextResponse.redirect('https://iahome.fr/essentiels', 302);
+    }
+
+    // 🪙 NOUVELLE VÉRIFICATION : Vérifier les tokens disponibles
+    console.log('PDF Proxy: Vérification des tokens pour:', session.user.email);
+    const tokenService = TokenActionService.getInstance();
+    
+    try {
+      const tokenBalance = await tokenService.getUserTokenBalance(session.user.id);
+      console.log('PDF Proxy: Solde de tokens:', tokenBalance);
+      
+      // Vérifier qu'il y a au moins 1 token pour une action PDF de base
+      if (tokenBalance < 1) {
+        console.log('PDF Proxy: Tokens insuffisants pour:', session.user.email, 'Solde:', tokenBalance);
+        return NextResponse.redirect(`https://iahome.fr/encours?error=insufficient_tokens&balance=${tokenBalance}&module=pdf`, 302);
+      }
+      
+      console.log('PDF Proxy: Tokens suffisants pour accès PDF');
+    } catch (tokenError) {
+      console.error('PDF Proxy: Erreur lors de la vérification des tokens:', tokenError);
+      // En cas d'erreur de vérification des tokens, bloquer l'accès par sécurité
+      return NextResponse.redirect('https://iahome.fr/encours?error=token_check_failed&module=pdf', 302);
     }
     
     console.log('PDF Proxy: Accès autorisé pour utilisateur:', session.user.email);

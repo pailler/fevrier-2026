@@ -5,6 +5,7 @@ import { supabase } from '../../../utils/supabaseClient';
 import Link from 'next/link';
 import Image from 'next/image';
 import Breadcrumb from '../../../components/Breadcrumb';
+import ModuleActivationButton from '../../../components/ModuleActivationButton';
 
 interface Card {
   id: string;
@@ -436,10 +437,10 @@ export default function StableDiffusionPage() {
             <div className="text-left mb-8">
               <div className="w-3/4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
                 <div className="text-4xl font-bold mb-1">
-                  {card.price === 0 || card.price === '0' ? 'Free' : `€${card.price}`}
+                  {card.price === 0 || card.price === '0' ? 'Free' : '100 tokens'}
                 </div>
                 <div className="text-sm opacity-90">
-                  {card.price === 0 || card.price === '0' ? 'Gratuit' : 'par mois'}
+                  {card.price === 0 || card.price === '0' ? 'Gratuit' : 'par utilisation'}
                 </div>
               </div>
             </div>
@@ -470,6 +471,25 @@ export default function StableDiffusionPage() {
                 )}
 
                 
+                {/* Bouton d'activation avec tokens */}
+                {!alreadyActivatedModules.includes(card.id) && (
+                  <div className="w-3/4 mx-auto">
+                    <ModuleActivationButton
+                      moduleId={card.id}
+                      moduleName={card.title}
+                      moduleCost={100}
+                      moduleDescription={card.description}
+                      onActivationSuccess={() => {
+                        setAlreadyActivatedModules(prev => [...prev, card.id]);
+                        alert(`✅ Module ${card.title} activé avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
+                      }}
+                      onActivationError={(error) => {
+                        console.error('Erreur activation:', error);
+                      }}
+                    />
+                  </div>
+                )}
+
                 {/* Bouton "Payer et activer" pour les modules payants */}
                 {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (
                   <button 
@@ -740,7 +760,7 @@ export default function StableDiffusionPage() {
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          {card.price === 0 || card.price === '0' ? 'Gratuit' : `€${card.price} par mois`}
+                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 tokens par utilisation'}
                         </p>
                       </div>
                     </div>

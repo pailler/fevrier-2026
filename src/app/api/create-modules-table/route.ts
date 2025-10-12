@@ -26,7 +26,6 @@ export async function POST(request: NextRequest) {
     const modulesData = [
       { id: 'whisper-ia', title: 'Whisper IA', description: 'Transcription audio en texte avec IA', category: 'Audio', price: 0.10, url: '/whisper' },
       { id: 'stablediffusion', title: 'Stable Diffusion', description: 'Génération d\'images par IA avec diffusion stable', category: 'Image', price: 0.10, url: '/stablediffusion' },
-      { id: 'pdf-converter', title: 'PDF Converter', description: 'Conversion et manipulation de PDF', category: 'Document', price: 0.02, url: '/pdf' },
       { id: 'qr-generator', title: 'QR Code Generator', description: 'Génération de codes QR', category: 'Utilitaire', price: 0.01, url: '/qrcodes' },
       { id: 'librespeed', title: 'LibreSpeed', description: 'Test de vitesse internet', category: 'Réseau', price: 0.00, url: '/librespeed' },
       { id: 'psitransfer', title: 'PsiTransfer', description: 'Transfert de fichiers sécurisé', category: 'Fichier', price: 0.00, url: '/psitransfer' }

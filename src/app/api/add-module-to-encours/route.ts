@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
         // Configuration par défaut pour les autres modules
         moduleData = {
           ...moduleData,
-          module_title: 'Universal Converter'
+          module_title: 'Module'
         };
       }
 

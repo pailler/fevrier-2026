@@ -33,10 +33,6 @@
       "service": "http://localhost:8081"
     },
     {
-      "hostname": "rembg.iahome.fr",
-      "service": "http://localhost:8080"
-    },
-    {
       "service": "http_status:404"
     }
   ]

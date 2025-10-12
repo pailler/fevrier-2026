@@ -97,23 +97,6 @@ try {
     }
 }
 
-# ReMBG (port 8080) - Service Docker
-Write-Host "🖼️ ReMBG (port 8080):" -ForegroundColor Cyan
-try {
-    $response = Invoke-WebRequest -Uri "http://localhost:8080" -UseBasicParsing -TimeoutSec 3
-    Write-Host "✅ ReMBG - Code: $($response.StatusCode)" -ForegroundColor Green
-} catch {
-    Write-Host "❌ ReMBG - Erreur: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "🔄 Tentative de démarrage ReMBG via Docker..." -ForegroundColor Yellow
-    try {
-        docker-compose -f docker-compose.prod.yml up -d rembg
-        Start-Sleep -Seconds 10
-        Write-Host "✅ ReMBG démarré via Docker" -ForegroundColor Green
-    } catch {
-        Write-Host "❌ Impossible de démarrer ReMBG" -ForegroundColor Red
-    }
-}
-
 Write-Host "`n🎉 Démarrage des services terminé!" -ForegroundColor Green
 Write-Host "📋 Services disponibles:" -ForegroundColor Cyan
 Write-Host "   ✅ Next.js: http://localhost:3000" -ForegroundColor Green
@@ -122,7 +105,6 @@ Write-Host "   📹 MeTube: http://localhost:8082" -ForegroundColor Yellow
 Write-Host "   📁 PsiTransfer: http://localhost:8084" -ForegroundColor Yellow
 Write-Host "   🎤 Whisper: http://localhost:8093" -ForegroundColor Yellow
 Write-Host "   📱 QR Codes: http://localhost:7005" -ForegroundColor Yellow
-Write-Host "   🖼️ ReMBG: http://localhost:8080" -ForegroundColor Yellow
 
 
 

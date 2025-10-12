@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { TokenActionServiceClient } from '../utils/tokenActionServiceClient';
+import { useTokenContext } from '../contexts/TokenContext';
 
 interface LibreSpeedAccessButtonProps {
   user?: any;
@@ -15,6 +17,7 @@ export default function LibreSpeedAccessButton({
 }: LibreSpeedAccessButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { consumeTokens, refreshTokens } = useTokenContext();
 
   console.log('🔍 LibreSpeedAccessButton: Rendu avec user:', user ? 'présent' : 'absent');
 
@@ -29,40 +32,62 @@ export default function LibreSpeedAccessButton({
     setError(null);
 
     try {
-      // 1. Incrémenter le compteur d'accès
-      console.log('📊 LibreSpeed: Incrémentation du compteur d\'accès...');
-      const incrementResponse = await fetch('/api/increment-librespeed-access', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          userEmail: user.email
-        })
-      });
+      console.log('🪙 LibreSpeed: Vérification et consommation des tokens pour:', user.email);
+      
+      // Utiliser le service pour la consommation côté serveur (plus fiable)
+      const tokenService = TokenActionServiceClient.getInstance();
+      const consumeResult = await tokenService.checkAndConsumeTokens(
+        user.id,
+        'librespeed',
+        'access',
+        'LibreSpeed'
+      );
+      
+      if (!consumeResult.success) {
+        console.log('🪙 LibreSpeed: Échec consommation tokens:', consumeResult.reason);
+        setError(consumeResult.reason || 'Erreur lors de la consommation des tokens');
+        onAccessDenied?.(consumeResult.reason || 'Erreur tokens');
+        return;
+      }
+      
+      console.log('🪙 LibreSpeed: Tokens consommés avec succès:', consumeResult.tokensConsumed);
+      console.log('🪙 LibreSpeed: Tokens restants:', consumeResult.tokensRemaining);
+      
+      // Mettre à jour le contexte côté client
+      await refreshTokens();
 
-      if (incrementResponse.ok) {
-        const incrementData = await incrementResponse.json();
-        console.log('✅ LibreSpeed: Compteur incrémenté:', incrementData.usage_count, '/', incrementData.max_usage);
-      } else {
-        const errorData = await incrementResponse.json().catch(() => ({}));
-        if (incrementResponse.status === 403 && errorData.error === 'Quota dépassé') {
-          console.log('❌ LibreSpeed: Quota dépassé');
-          setError(errorData.message || 'Quota dépassé');
-          onAccessDenied?.(errorData.message || 'Quota dépassé');
-          return;
+      // Incrémenter le compteur d'accès (pour affichage uniquement)
+      console.log('📊 LibreSpeed: Incrémentation du compteur d\'accès...');
+      try {
+        const incrementResponse = await fetch('/api/increment-librespeed-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            userEmail: user.email
+          })
+        });
+
+        if (incrementResponse.ok) {
+          const incrementData = await incrementResponse.json();
+          console.log('✅ LibreSpeed: Compteur incrémenté:', incrementData.usage_count);
         } else {
           console.warn('⚠️ LibreSpeed: Erreur incrémentation compteur, continuons...');
         }
+      } catch (incrementError) {
+        console.warn('⚠️ LibreSpeed: Erreur incrémentation compteur:', incrementError);
       }
 
-      // 2. Ouvrir LibreSpeed dans un nouvel onglet
+      // Ouvrir LibreSpeed dans un nouvel onglet
       console.log('🔗 LibreSpeed: Ouverture dans un nouvel onglet...');
       const librespeedUrl = 'https://librespeed.iahome.fr';
       window.open(librespeedUrl, '_blank');
+      console.log('✅ LibreSpeed: Ouverture de LibreSpeed');
       
       // Ne pas appeler onAccessGranted pour éviter la double ouverture
+      return;
 
     } catch (error) {
       console.error('❌ LibreSpeed: Erreur:', error);
@@ -72,7 +97,6 @@ export default function LibreSpeedAccessButton({
       setIsLoading(false);
     }
   };
-
 
   return (
     <div className="flex flex-col items-center space-y-2">
@@ -93,7 +117,7 @@ export default function LibreSpeedAccessButton({
             <span>Ouverture...</span>
           </div>
         ) : (
-          '🚀 Accéder à LibreSpeed'
+          '🚀 Accéder à LibreSpeed (10 tokens)'
         )}
       </button>
       

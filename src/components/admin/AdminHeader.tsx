@@ -90,7 +90,7 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
-            <TokenBalance userId={user.id} />
+            <TokenBalance />
             <Link
               href="/encours"
               className="bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors flex items-center space-x-1"
@@ -176,7 +176,7 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
                 <div className="text-sm text-blue-100 mb-2">Compte</div>
                 <div className="flex items-center justify-between py-2">
                   <span className="text-white">{user.email}</span>
-                  <TokenBalance userId={user.id} />
+                  <TokenBalance />
                 </div>
                 <Link
                   href="/encours"

@@ -86,7 +86,7 @@ async function promoteUserToAdmin() {
         console.log('   • Dashboard admin: /admin/dashboard');
         console.log('   • Gestion utilisateurs: /admin/users');
         console.log('   • Gestion modules: /admin/modules');
-        console.log('   • Gestion tokens: /admin/tokens');
+        console.log('   • Gestion tokens: /pricing');
         console.log('   • Statistiques: /admin/statistics');
         console.log('   • Gestion paiements: /admin/payments');
         console.log('   • Applications actives: /admin/applications-actives');

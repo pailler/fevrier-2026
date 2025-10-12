@@ -46,22 +46,10 @@ export async function POST(request: NextRequest) {
     }
 
     const currentUsage = userApp.usage_count || 0;
-    const maxUsage = userApp.max_usage || 50; // Limite par défaut de 50
+    const maxUsage = userApp.max_usage || 50; // Limite par défaut de 50 (affichage uniquement)
     
-    // Vérifier si le quota est dépassé
-    if (currentUsage >= maxUsage) {
-      console.log('❌ Module Access: Quota dépassé:', currentUsage, '/', maxUsage);
-      return new NextResponse(JSON.stringify({
-        success: false,
-        error: 'Quota dépassé',
-        current_usage: currentUsage,
-        max_usage: maxUsage,
-        message: `Vous avez atteint la limite de ${maxUsage} accès pour ${moduleId}. Votre quota sera renouvelé le mois prochain.`
-      }), {
-        status: 403,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
+    // Plus de vérification de quota - le système de tokens gère les limites
+    console.log('📊 Module Access: Compteur actuel:', currentUsage, '/', maxUsage, '(quota désactivé)');
 
     // Incrémenter le compteur dans user_applications
     const newUsageCount = currentUsage + 1;

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { TokenActionServiceClient } from '../utils/tokenActionServiceClient';
 
 interface QRCodeAccessButtonProps {
   user: any;
@@ -31,6 +32,36 @@ export default function QRCodeAccessButton({
     setError(null);
 
     try {
+      // 🪙 NOUVELLE VÉRIFICATION ET CONSOMMATION : Vérifier et consommer les tokens
+      console.log('🪙 QR Codes: Vérification et consommation des tokens pour:', user.email);
+      const tokenService = TokenActionServiceClient.getInstance();
+      
+      try {
+        // Consommer 1 token pour l'accès aux QR Codes
+        const consumeResult = await tokenService.checkAndConsumeTokens(
+          user.id,
+          'qrcodes',
+          'access',
+          'QR Codes'
+        );
+        
+        if (!consumeResult.success) {
+          console.log('🪙 QR Codes: Échec consommation tokens:', consumeResult.reason);
+          setError(consumeResult.reason || 'Erreur lors de la consommation des tokens');
+          onAccessDenied?.(consumeResult.reason || 'Erreur tokens');
+          return;
+        }
+        
+        console.log('🪙 QR Codes: Tokens consommés avec succès:', consumeResult.tokensConsumed);
+        console.log('🪙 QR Codes: Tokens restants:', consumeResult.tokensRemaining);
+        
+      } catch (tokenError) {
+        console.error('🪙 QR Codes: Erreur lors de la consommation des tokens:', tokenError);
+        setError('Erreur lors de la consommation des tokens. Veuillez réessayer.');
+        onAccessDenied?.('Erreur consommation tokens');
+        return;
+      }
+
       // 1. Incrémenter le compteur d'accès
       console.log('📊 QR Codes: Incrémentation du compteur d\'accès...');
       const incrementResponse = await fetch('/api/increment-module-access', {
@@ -93,7 +124,7 @@ export default function QRCodeAccessButton({
             <span>Ouverture...</span>
           </div>
         ) : (
-          '📱 Accéder aux QR Codes'
+          '📱 Accéder aux QR Codes (10 tokens)'
         )}
       </button>
       

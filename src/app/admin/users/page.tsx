@@ -306,7 +306,7 @@ export default function AdminUsers() {
                         {user.applications.map((app, index) => (
                           <div key={index} className="flex items-center gap-2">
                             <span>{app.moduleId}:</span>
-                            <span className="font-medium">{app.usageCount}/{app.maxUsage}</span>
+                            <span className="font-medium">{app.usageCount}</span>
                             {app.expiresAt && (
                               <span className="text-gray-400">
                                 (exp: {new Date(app.expiresAt).toLocaleDateString('fr-FR')})

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { TokenActionServiceClient } from '../utils/tokenActionServiceClient';
 
 interface PDFAccessButtonProps {
   user: any;
@@ -10,16 +11,49 @@ interface PDFAccessButtonProps {
 
 export default function PDFAccessButton({ user, onAccessGranted, onAccessDenied }: PDFAccessButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleAccess = async () => {
     if (!user) {
+      setError('Vous devez être connecté');
       onAccessDenied('Utilisateur non connecté');
       return;
     }
 
     setIsLoading(true);
+    setError(null);
 
     try {
+      // 🪙 NOUVELLE VÉRIFICATION ET CONSOMMATION : Vérifier et consommer les tokens
+      console.log('🪙 PDF: Vérification et consommation des tokens pour:', user.email);
+      const tokenService = TokenActionServiceClient.getInstance();
+      
+      try {
+        // Consommer 1 token pour l'accès à PDF+
+        const consumeResult = await tokenService.checkAndConsumeTokens(
+          user.id,
+          'pdf',
+          'access',
+          'PDF+'
+        );
+        
+        if (!consumeResult.success) {
+          console.log('🪙 PDF: Échec consommation tokens:', consumeResult.reason);
+          setError(consumeResult.reason || 'Erreur lors de la consommation des tokens');
+          onAccessDenied(consumeResult.reason || 'Erreur tokens');
+          return;
+        }
+        
+        console.log('🪙 PDF: Tokens consommés avec succès:', consumeResult.tokensConsumed);
+        console.log('🪙 PDF: Tokens restants:', consumeResult.tokensRemaining);
+        
+      } catch (tokenError) {
+        console.error('🪙 PDF: Erreur lors de la consommation des tokens:', tokenError);
+        setError('Erreur lors de la consommation des tokens. Veuillez réessayer.');
+        onAccessDenied('Erreur consommation tokens');
+        return;
+      }
+
       console.log('📄 PDF+: Début de la procédure d\'accès...');
       
       // 1. Incrémenter le compteur d'accès
@@ -41,6 +75,7 @@ export default function PDFAccessButton({ user, onAccessGranted, onAccessDenied 
         const errorData = await incrementResponse.json().catch(() => ({}));
         if (incrementResponse.status === 403 && errorData.error === 'Quota dépassé') {
           console.log('❌ PDF+: Quota dépassé');
+          setError(errorData.message || 'Quota d\'utilisation dépassé. Contactez l\'administrateur.');
           onAccessDenied('Quota d\'utilisation dépassé. Contactez l\'administrateur.');
           return;
         }
@@ -57,6 +92,7 @@ export default function PDFAccessButton({ user, onAccessGranted, onAccessDenied 
       
     } catch (error) {
       console.error('❌ PDF+: ERREUR GÉNÉRALE:', error);
+      setError('Erreur lors de l\'ouverture de PDF+. Veuillez réessayer.');
       onAccessDenied('Erreur lors de l\'ouverture de PDF+. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
@@ -80,9 +116,15 @@ export default function PDFAccessButton({ user, onAccessGranted, onAccessDenied 
             <span>Chargement...</span>
           </div>
         ) : (
-          '📄 Accéder à PDF+'
+          '📄 Accéder à PDF+ (10 tokens)'
         )}
       </button>
+      
+      {error && (
+        <div className="text-red-600 text-sm text-center max-w-xs">
+          {error}
+        </div>
+      )}
     </div>
   );
 }

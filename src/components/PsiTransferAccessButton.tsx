@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { TokenActionServiceClient } from '../utils/tokenActionServiceClient';
 
 interface PsiTransferAccessButtonProps {
   user: any;
@@ -10,17 +11,48 @@ interface PsiTransferAccessButtonProps {
 
 export default function PsiTransferAccessButton({ user, onAccessGranted, onAccessDenied }: PsiTransferAccessButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleAccess = async () => {
     if (!user) {
+      setError('Vous devez être connecté');
       onAccessDenied('Utilisateur non connecté');
       return;
     }
 
     setIsLoading(true);
+    setError(null);
 
     try {
-      console.log('📁 PsiTransfer: Début de la procédure d\'accès...');
+      // 🪙 NOUVELLE VÉRIFICATION ET CONSOMMATION : Vérifier et consommer les tokens
+      console.log('🪙 PsiTransfer: Vérification et consommation des tokens pour:', user.email);
+      const tokenService = TokenActionServiceClient.getInstance();
+      
+      try {
+        // Consommer 1 token pour l'accès à PsiTransfer
+        const consumeResult = await tokenService.checkAndConsumeTokens(
+          user.id,
+          'psitransfer',
+          'access',
+          'PsiTransfer'
+        );
+        
+        if (!consumeResult.success) {
+          console.log('🪙 PsiTransfer: Échec consommation tokens:', consumeResult.reason);
+          setError(consumeResult.reason || 'Erreur lors de la consommation des tokens');
+          onAccessDenied(consumeResult.reason || 'Erreur tokens');
+          return;
+        }
+        
+        console.log('🪙 PsiTransfer: Tokens consommés avec succès:', consumeResult.tokensConsumed);
+        console.log('🪙 PsiTransfer: Tokens restants:', consumeResult.tokensRemaining);
+        
+      } catch (tokenError) {
+        console.error('🪙 PsiTransfer: Erreur lors de la consommation des tokens:', tokenError);
+        setError('Erreur lors de la consommation des tokens. Veuillez réessayer.');
+        onAccessDenied('Erreur consommation tokens');
+        return;
+      }
       
       // 1. Incrémenter le compteur d'accès
       console.log('📊 PsiTransfer: Incrémentation du compteur d\'accès...');
@@ -80,9 +112,15 @@ export default function PsiTransferAccessButton({ user, onAccessGranted, onAcces
             <span>Chargement...</span>
           </div>
         ) : (
-          '📁 Accéder à PsiTransfer'
+          '📁 Accéder à PsiTransfer (10 tokens)'
         )}
       </button>
+      
+      {error && (
+        <div className="text-red-600 text-sm text-center max-w-xs">
+          {error}
+        </div>
+      )}
     </div>
   );
 }

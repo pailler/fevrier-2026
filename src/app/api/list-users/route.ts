@@ -3,43 +3,35 @@ import { supabase } from '../../../utils/supabaseClient';
 
 export async function GET(request: NextRequest) {
   try {
-    // Récupérer tous les utilisateurs de la vue users_view
+    console.log('🔍 Liste des utilisateurs dans la table profiles...');
+
+    // Récupérer tous les utilisateurs
     const { data: users, error: usersError } = await supabase
-      .from('users_view')
-      .select('*')
+      .from('profiles')
+      .select('id, email, full_name, tokens')
       .order('created_at', { ascending: false });
 
     if (usersError) {
+      console.error('❌ Erreur récupération utilisateurs:', usersError);
       return NextResponse.json({
-        success: false,
-        error: 'Erreur lors de la récupération des utilisateurs'
+        error: 'Erreur récupération utilisateurs',
+        details: usersError
       }, { status: 500 });
     }
 
-    // Récupérer aussi les modules disponibles
-    const { data: modules, error: modulesError } = await supabase
-      .from('modules')
-      .select('id, title, description, category')
-      .order('title', { ascending: true });
-
-    if (modulesError) {
-      }
+    console.log(`📊 ${users?.length || 0} utilisateurs trouvés`);
 
     return NextResponse.json({
       success: true,
-      users: users || [],
-      modules: modules || [],
-      summary: {
-        totalUsers: users?.length || 0,
-        totalModules: modules?.length || 0
-      }
+      count: users?.length || 0,
+      users: users || []
     });
 
   } catch (error) {
+    console.error('❌ Erreur générale:', error);
     return NextResponse.json({
-      success: false,
-      error: 'Erreur interne du serveur'
+      error: 'Erreur générale',
+      details: error.message
     }, { status: 500 });
   }
 }
-

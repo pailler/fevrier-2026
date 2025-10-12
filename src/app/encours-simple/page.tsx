@@ -74,7 +74,6 @@ export default function EncoursSimplePage() {
       '3': 'librespeed', // LibreSpeed -> librespeed
       '4': 'psitransfer', // PsiTransfer -> psitransfer
       '5': 'qrcodes',  // QR Codes -> qrcodes
-      '6': 'converter', // Universal Converter -> converter
       '7': 'stablediffusion', // Stable Diffusion -> stablediffusion
       '8': 'ruinedfooocus', // Ruined Fooocus -> ruinedfooocus
       '9': 'invoke',   // Invoke AI -> invoke
@@ -90,7 +89,6 @@ export default function EncoursSimplePage() {
       'pdf': '/api/redirect-pdf',  // Redirection sécurisée PDF
       'psitransfer': '/api/redirect-psitransfer',  // Redirection sécurisée PsiTransfer
       'qrcodes': '/api/redirect-qrcodes',  // Redirection sécurisée QR Codes
-      'converter': '/api/redirect-converter',  // Redirection sécurisée Converter
       'stablediffusion': '/api/redirect-stablediffusion',  // Redirection sécurisée StableDiffusion
       'ruinedfooocus': '/api/redirect-ruinedfooocus',  // Redirection sécurisée RuinedFooocus
       'invoke': '/api/redirect-invoke',  // Redirection sécurisée Invoke
@@ -127,7 +125,7 @@ export default function EncoursSimplePage() {
     }
     
     // Pour les modules essentiels, afficher "Module essentiel"
-    const essentialModules = ['metube', 'psitransfer', 'universal-converter', 'pdf', 'librespeed', 'qrcodes'];
+    const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes'];
     const isEssential = essentialModules.some(essentialId => 
       module.module_id === essentialId || 
       module.module_title.toLowerCase().includes(essentialId.toLowerCase()) ||
@@ -149,7 +147,7 @@ export default function EncoursSimplePage() {
     }
     
     // Pour les modules essentiels
-    const essentialModules = ['metube', 'psitransfer', 'universal-converter', 'pdf', 'librespeed', 'qrcodes'];
+    const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes'];
     const isEssential = essentialModules.some(essentialId => 
       module.module_id === essentialId || 
       module.module_title.toLowerCase().includes(essentialId.toLowerCase()) ||

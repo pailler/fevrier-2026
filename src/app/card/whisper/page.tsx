@@ -6,6 +6,7 @@ import { supabase } from '../../../utils/supabaseClient';
 import Breadcrumb from '../../../components/Breadcrumb';
 import WhisperLimits from '../../../components/WhisperLimits';
 import Link from 'next/link';
+import ModuleActivationButton from '../../../components/ModuleActivationButton';
 
 interface Card {
   id: string;
@@ -516,6 +517,25 @@ export default function WhisperPage() {
                         Voir mes applications
                       </button>
                     </div>
+                  </div>
+                )}
+
+                {/* Bouton d'activation avec tokens */}
+                {!alreadyActivatedModules.includes(card?.id || '') && (
+                  <div className="w-3/4 mx-auto">
+                    <ModuleActivationButton
+                      moduleId={card?.id || 'whisper'}
+                      moduleName={card?.title || 'Whisper'}
+                      moduleCost={100}
+                      moduleDescription={card?.description || 'Module Whisper activé'}
+                      onActivationSuccess={() => {
+                        setAlreadyActivatedModules(prev => [...prev, card?.id || 'whisper']);
+                        alert(`✅ Module ${card?.title || 'Whisper'} activé avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
+                      }}
+                      onActivationError={(error) => {
+                        console.error('Erreur activation:', error);
+                      }}
+                    />
                   </div>
                 )}
 

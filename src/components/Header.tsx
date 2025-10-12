@@ -179,8 +179,7 @@ export default function Header() {
           <div className="hidden md:flex items-center space-x-4">
             {session && (
               <>
-                <TokenBalance 
-                  userId={session.user.id} 
+                <TokenBalance
                   className="text-blue-100 hover:text-white transition-colors"
                 />
                 <Link
@@ -289,10 +288,9 @@ export default function Header() {
                     <div className="text-sm text-blue-100 mb-2">Compte</div>
                     <div className="flex items-center justify-between py-2">
                       <span className="text-white">{user?.email}</span>
-                      <TokenBalance 
-                        userId={session.user.id} 
-                        className="text-blue-100 hover:text-white transition-colors"
-                      />
+                <TokenBalance
+                  className="text-blue-100 hover:text-white transition-colors"
+                />
                     </div>
                     <Link
                       href="/encours"

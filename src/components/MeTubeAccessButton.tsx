@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { TokenActionServiceClient } from '../utils/tokenActionServiceClient';
+import { useTokenContext } from '../contexts/TokenContext';
 
 interface MeTubeAccessButtonProps {
   user?: any;
@@ -15,6 +17,7 @@ export default function MeTubeAccessButton({
 }: MeTubeAccessButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { consumeTokens, refreshTokens } = useTokenContext();
 
   const handleAccess = async () => {
     if (!user) {
@@ -27,7 +30,42 @@ export default function MeTubeAccessButton({
     setError(null);
 
     try {
-      // 1. Incrémenter le compteur d'accès
+      // 🪙 NOUVELLE VÉRIFICATION ET CONSOMMATION : Vérifier et consommer les tokens
+      console.log('🪙 MeTube: Vérification et consommation des tokens pour:', user.email);
+      
+      // Consommer 10 tokens pour l'accès à MeTube
+      const tokenConsumed = await consumeTokens(10);
+      
+      if (!tokenConsumed) {
+        console.log('🪙 MeTube: Échec consommation tokens - tokens insuffisants');
+        setError('Tokens insuffisants pour accéder à MeTube');
+        onAccessDenied?.('Tokens insuffisants');
+        return;
+      }
+      
+      console.log('🪙 MeTube: Tokens consommés avec succès');
+      
+      // Utiliser le service pour la consommation côté serveur
+      const tokenService = TokenActionServiceClient.getInstance();
+      const consumeResult = await tokenService.checkAndConsumeTokens(
+        user.id,
+        'metube',
+        'access',
+        'MeTube'
+      );
+      
+      if (!consumeResult.success) {
+        console.log('🪙 MeTube: Échec consommation côté serveur:', consumeResult.reason);
+        // Restaurer les tokens côté client
+        await refreshTokens();
+        setError(consumeResult.reason || 'Erreur lors de la consommation des tokens');
+        onAccessDenied?.(consumeResult.reason || 'Erreur tokens');
+        return;
+      }
+      
+      console.log('🪙 MeTube: Tokens consommés avec succès côté serveur:', consumeResult.tokensConsumed);
+
+      // Incrémenter le compteur d'accès (pour affichage uniquement, pas de quota)
       console.log('📊 MeTube: Incrémentation du compteur d\'accès...');
       const incrementResponse = await fetch('/api/increment-module-access', {
         method: 'POST',
@@ -45,20 +83,7 @@ export default function MeTubeAccessButton({
         const incrementData = await incrementResponse.json();
         console.log('✅ MeTube: Compteur incrémenté:', incrementData.usage_count, '/', incrementData.max_usage);
       } else {
-        const errorData = await incrementResponse.json().catch(() => ({}));
-        if (incrementResponse.status === 403 && errorData.error === 'Quota dépassé') {
-          console.log('❌ MeTube: Quota dépassé');
-          setError(errorData.message || 'Quota dépassé');
-          onAccessDenied?.(errorData.message || 'Quota dépassé');
-          return;
-        } else if (incrementResponse.status === 403 && errorData.error === 'Accès expiré') {
-          console.log('❌ MeTube: Accès expiré');
-          setError(errorData.message || 'Accès expiré');
-          onAccessDenied?.(errorData.message || 'Accès expiré');
-          return;
-        } else {
-          console.warn('⚠️ MeTube: Erreur incrémentation compteur, continuons...');
-        }
+        console.warn('⚠️ MeTube: Erreur incrémentation compteur, continuons...');
       }
 
       // 2. Ouvrir MeTube dans un nouvel onglet
@@ -99,7 +124,7 @@ export default function MeTubeAccessButton({
             <span>Ouverture...</span>
           </div>
         ) : (
-          '🎥 Accéder à MeTube'
+              '🎥 Accéder à MeTube (10 tokens)'
         )}
       </button>
       

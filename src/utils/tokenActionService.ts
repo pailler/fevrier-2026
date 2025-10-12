@@ -20,13 +20,53 @@ export class TokenActionService {
 
   // Coûts par action pour chaque application
   private static readonly ACTION_COSTS: ModuleActionCosts = {
+    // Modules IA : 100 tokens
+    stablediffusion: {
+      access: 100,           // 100 tokens pour accéder à StableDiffusion
+      generate: 100,         // 100 tokens par génération d'image
+      batch_generate: 200    // 200 tokens pour génération multiple
+    },
+    comfyui: {
+      access: 100,           // 100 tokens pour accéder à ComfyUI
+      workflow: 100,         // 100 tokens par workflow
+      batch_process: 200     // 200 tokens pour traitement multiple
+    },
+    whisper: {
+      access: 100,           // 100 tokens pour accéder à Whisper
+      transcribe: 100,       // 100 tokens par transcription
+      batch_transcribe: 200  // 200 tokens pour transcription multiple
+    },
+    invoke: {
+      access: 100,           // 100 tokens pour accéder à Invoke AI
+      generate: 100,         // 100 tokens par génération
+      batch_generate: 200    // 200 tokens pour génération multiple
+    },
+    cogstudio: {
+      access: 100,           // 100 tokens pour accéder à CogStudio
+      generate: 100,         // 100 tokens par génération
+      batch_generate: 200    // 200 tokens pour génération multiple
+    },
+    sdnext: {
+      access: 100,           // 100 tokens pour accéder à SD.Next
+      generate: 100,         // 100 tokens par génération
+      batch_generate: 200    // 200 tokens pour génération multiple
+    },
+    ruinedfooocus: {
+      access: 100,           // 100 tokens pour accéder à RuinedFooocus
+      generate: 100,         // 100 tokens par génération
+      batch_generate: 200    // 200 tokens pour génération multiple
+    },
+    
+    // Modules essentiels : 10 tokens
     metube: {
-      download: 1,        // 1 token par téléchargement
-      convert: 2,         // 2 tokens par conversion
-      batch_download: 5,  // 5 tokens pour téléchargement multiple
-      playlist: 3         // 3 tokens pour playlist
+      access: 10,         // 10 tokens pour accéder à MeTube
+      download: 10,       // 10 tokens par téléchargement
+      convert: 20,        // 20 tokens par conversion
+      batch_download: 50, // 50 tokens pour téléchargement multiple
+      playlist: 30        // 30 tokens pour playlist
     },
     pdf: {
+      access: 10,         // 10 tokens pour accéder à PDF+
       convert: 1,         // 1 token par conversion
       merge: 2,           // 2 tokens pour fusion
       split: 1,           // 1 token pour division
@@ -34,15 +74,18 @@ export class TokenActionService {
       ocr: 2              // 2 tokens pour OCR
     },
     qrcodes: {
+      access: 10,         // 10 tokens pour accéder aux QR Codes
       generate: 1,        // 1 token par QR code
       batch_generate: 3,  // 3 tokens pour génération multiple
       custom_design: 2,   // 2 tokens pour design personnalisé
       analytics: 1         // 1 token pour analytics
     },
     librespeed: {
-      test: 1             // 1 token par test de vitesse
+      access: 10,         // 10 tokens pour accéder à LibreSpeed
+      test: 10            // 10 tokens par test de vitesse
     },
     psitransfer: {
+      access: 10,         // 10 tokens pour accéder à PsiTransfer
       upload: 1,          // 1 token par upload
       download: 1,        // 1 token par téléchargement
       share: 1            // 1 token par partage

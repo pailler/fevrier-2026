@@ -30,16 +30,49 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Si l'utilisateur n'a pas de tokens, retourner 0
-    const tokens = userTokens?.tokens || 0;
-    const packageName = userTokens?.package_name || null;
-    const purchaseDate = userTokens?.purchase_date || null;
+    // Si l'utilisateur n'a pas de tokens, créer un enregistrement avec 10 tokens par défaut
+    if (!userTokens) {
+      console.log('🪙 Création automatique de 10 tokens pour le nouvel utilisateur:', userId);
+      
+      const { error: createError } = await supabase
+        .from('user_tokens')
+        .upsert([{
+          user_id: userId,
+          tokens: 10, // 10 tokens par défaut pour les nouveaux utilisateurs
+          package_name: 'Welcome Package',
+          purchase_date: new Date().toISOString(),
+          is_active: true
+        }], {
+          onConflict: 'user_id'
+        });
+
+      if (createError) {
+        console.error('Erreur lors de la création des tokens par défaut:', createError);
+        return NextResponse.json(
+          { error: 'Erreur lors de la création des tokens par défaut' },
+          { status: 500 }
+        );
+      }
+
+      // Retourner les tokens créés
+      return NextResponse.json({
+        tokens: 10,
+        packageName: 'Welcome Package',
+        purchaseDate: new Date().toISOString(),
+        isActive: true
+      });
+    }
+
+    // Si l'utilisateur a déjà des tokens, retourner les données existantes
+    const tokens = userTokens.tokens;
+    const packageName = userTokens.package_name || null;
+    const purchaseDate = userTokens.purchase_date || null;
 
     return NextResponse.json({
       tokens,
       packageName,
       purchaseDate,
-      isActive: userTokens?.is_active || false
+      isActive: userTokens.is_active || false
     });
 
   } catch (error) {
@@ -80,7 +113,85 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const currentTokens = userTokens?.tokens || 0;
+    // Si l'utilisateur n'a pas de tokens, créer un enregistrement avec 10 tokens par défaut
+    if (!userTokens) {
+      console.log('🪙 Création automatique de 10 tokens pour la consommation:', userId);
+      
+      const { error: createError } = await supabase
+        .from('user_tokens')
+        .upsert([{
+          user_id: userId,
+          tokens: 10, // 10 tokens par défaut pour les nouveaux utilisateurs
+          package_name: 'Welcome Package',
+          purchase_date: new Date().toISOString(),
+          is_active: true
+        }], {
+          onConflict: 'user_id'
+        });
+
+      if (createError) {
+        console.error('Erreur lors de la création des tokens par défaut:', createError);
+        return NextResponse.json(
+          { error: 'Erreur lors de la création des tokens par défaut' },
+          { status: 500 }
+        );
+      }
+
+      // Maintenant vérifier si l'utilisateur a assez de tokens après création
+      if (10 < tokensToConsume) {
+        return NextResponse.json(
+          { 
+            error: 'Tokens insuffisants',
+            currentTokens: 10,
+            requiredTokens: tokensToConsume,
+            insufficient: true
+          },
+          { status: 400 }
+        );
+      }
+
+      // Consommer les tokens
+      const newTokenCount = 10 - tokensToConsume;
+      
+      const { error: updateError } = await supabase
+        .from('user_tokens')
+        .update({
+          tokens: newTokenCount
+        })
+        .eq('user_id', userId);
+
+      if (updateError) {
+        console.error('Erreur lors de la mise à jour des tokens:', updateError);
+        return NextResponse.json(
+          { error: 'Erreur lors de la consommation des tokens' },
+          { status: 500 }
+        );
+      }
+
+      // Enregistrer l'utilisation des tokens
+      const { error: usageError } = await supabase
+        .from('token_usage')
+        .insert([{
+          user_id: userId,
+          module_id: moduleId,
+          module_name: moduleName || 'Unknown Module',
+          tokens_consumed: tokensToConsume,
+          usage_date: new Date().toISOString()
+        }]);
+
+      if (usageError) {
+        console.error('Erreur lors de l\'enregistrement de l\'utilisation:', usageError);
+        // Ne pas faire échouer la transaction pour cette erreur
+      }
+
+      return NextResponse.json({
+        success: true,
+        tokensRemaining: newTokenCount,
+        tokensConsumed: tokensToConsume
+      });
+    }
+
+    const currentTokens = userTokens.tokens;
 
     if (currentTokens < tokensToConsume) {
       return NextResponse.json(
