@@ -1,9 +1,9 @@
 'use client';
 import { useEffect, useState } from "react";
-import { supabase } from "../../utils/supabaseClient";
+import { useCustomAuth } from "../../hooks/useCustomAuth";
 import Link from "next/link";
 import Breadcrumb from "../../components/Breadcrumb";
-import Header from '../../components/Header';
+import { useRouter } from 'next/navigation';
 
 interface Module {
   id: number;
@@ -26,9 +26,8 @@ interface TokenPackage {
 }
 
 export default function TokensPage() {
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
+  const router = useRouter();
   const [modules, setModules] = useState<Module[]>([]);
   const [selectedModule, setSelectedModule] = useState<Module | null>(null);
   const [selectedTokenPackage, setSelectedTokenPackage] = useState<TokenPackage | null>(null);
@@ -67,38 +66,27 @@ export default function TokensPage() {
     }
   ];
 
+  // Vérification de l'authentification
   useEffect(() => {
-    const getSession = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      setSession(currentSession);
-      if (currentSession?.user) {
-        setCurrentUser(currentSession.user);
-        fetchModules();
-      } else {
-        setLoading(false);
+    if (authLoading) return; // Attendre que l'authentification soit vérifiée
+    
+    // Ajouter un petit délai pour s'assurer que l'authentification est bien chargée
+    const timer = setTimeout(() => {
+      if (!isAuthenticated || !user) {
+        console.log('Utilisateur non authentifié, redirection vers /login');
+        router.push('/login');
+        return;
       }
-    };
-    getSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: any, session: any) => {
-        setSession(session);
-        setCurrentUser(session?.user || null);
-        if (session?.user) {
-          fetchModules();
-        } else {
-          setLoading(false);
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
+      
+      console.log('Utilisateur authentifié:', user.email);
+      fetchModules();
+    }, 100); // 100ms de délai
+    
+    return () => clearTimeout(timer);
+  }, [isAuthenticated, user, authLoading, router]);
 
   const fetchModules = async () => {
     try {
-      setLoading(true);
-      
       // Charger les modules depuis l'API
       const response = await fetch('/api/modules');
       const data = await response.json();
@@ -153,10 +141,8 @@ export default function TokensPage() {
         setModules(data.modules || []);
       }
       
-      setLoading(false);
     } catch (error) {
       console.error('Erreur lors du chargement des modules:', error);
-      setLoading(false);
     }
   };
 
@@ -179,7 +165,7 @@ export default function TokensPage() {
   };
 
   const handlePurchase = async () => {
-    if (!selectedModule || !selectedTokenPackage || !session?.user) return;
+    if (!selectedModule || !selectedTokenPackage || !user) return;
 
     try {
       setIsProcessing(true);
@@ -198,10 +184,10 @@ export default function TokensPage() {
             price: selectedTokenPackage.price,
             image_url: ''
           }],
-          customerEmail: session.user.email,
+          customerEmail: user.email,
           type: 'token_purchase',
           moduleId: selectedModule.id,
-          userId: session.user.id,
+          userId: user.id,
           tokenPackage: selectedTokenPackage,
           tokens: selectedTokenPackage.tokens
         }),
@@ -229,7 +215,20 @@ export default function TokensPage() {
   };
 
   // Contrôles d'accès
-  if (!session) {
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="w-full px-4 sm:px-6 lg:px-8 pt-20">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Chargement...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
     return (
       <div className="min-h-screen bg-gray-50 pt-20">
         <div className="w-full px-4 sm:px-6 lg:px-8">
@@ -243,23 +242,8 @@ export default function TokensPage() {
     );
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="w-full px-4 sm:px-6 lg:px-8 pt-20">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Chargement...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-20">
         <Breadcrumb items={[
           { label: 'Accueil', href: '/' },

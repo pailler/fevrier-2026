@@ -82,3 +82,5 @@ Write-Host "2. Aller sur https://iahome.fr/admin pour accéder au dashboard" -Fo
 Write-Host "3. Toutes les fonctionnalités admin sont maintenant disponibles" -ForegroundColor White
 
 
+
+

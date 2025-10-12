@@ -10,6 +10,7 @@ import ModuleAccessButton from '../../components/ModuleAccessButton';
 import QRCodeAccessButton from '../../components/QRCodeAccessButton';
 import PDFAccessButton from '../../components/PDFAccessButton';
 import PsiTransferAccessButton from '../../components/PsiTransferAccessButton';
+import { TokenActionService } from '../../utils/tokenActionService';
 
 interface UserModule {
   id: string;
@@ -46,18 +47,26 @@ export default function EncoursPage() {
   });
   const [tokenError, setTokenError] = useState<string | null>(null);
   const [cacheBuster] = useState(() => Date.now() + Math.random() * 1000);
+  const [tokenBalance, setTokenBalance] = useState<number>(0);
+  const [tokenHistory, setTokenHistory] = useState<any[]>([]);
+  const [loadingTokens, setLoadingTokens] = useState(false);
 
   // Vérification de l'authentification
   useEffect(() => {
     if (authLoading) return; // Attendre que l'authentification soit vérifiée
     
-    if (!isAuthenticated || !user) {
-      console.log('Utilisateur non authentifié, redirection vers /login');
-      router.push('/login');
-      return;
-    }
+    // Ajouter un petit délai pour s'assurer que l'authentification est bien chargée
+    const timer = setTimeout(() => {
+      if (!isAuthenticated || !user) {
+        console.log('Utilisateur non authentifié, redirection vers /login');
+        router.push('/login');
+        return;
+      }
+      
+      console.log('Utilisateur authentifié:', user.email);
+    }, 100); // 100ms de délai
     
-    console.log('Utilisateur authentifié:', user.email);
+    return () => clearTimeout(timer);
   }, [isAuthenticated, user, authLoading, router]);
 
   // Vérifier s'il y a des erreurs de token dans l'URL
@@ -92,6 +101,29 @@ export default function EncoursPage() {
     // Le rôle est déjà disponible dans l'objet user de notre système d'authentification
     setRole(user.role || 'user');
   }, [user]);
+
+  // Charger les données de tokens
+  const fetchTokenData = async () => {
+    if (!user?.id) return;
+    
+    try {
+      setLoadingTokens(true);
+      
+      // Charger le solde de tokens
+      const tokenService = TokenActionService.getInstance();
+      const balance = await tokenService.getUserTokenBalance(user.id);
+      setTokenBalance(balance);
+      
+      // Charger l'historique d'utilisation
+      const history = await tokenService.getUserTokenHistory(user.id, 20);
+      setTokenHistory(history);
+      
+    } catch (error) {
+      console.error('Erreur chargement tokens:', error);
+    } finally {
+      setLoadingTokens(false);
+    }
+  };
 
   // Charger les modules souscrits par l'utilisateur et les tokens d'accès
   useEffect(() => {
@@ -268,6 +300,7 @@ export default function EncoursPage() {
 
     if (user) {
       fetchUserModules();
+      fetchTokenData(); // Charger aussi les données de tokens
     }
   }, [user]);
 
@@ -655,6 +688,95 @@ export default function EncoursPage() {
               </div>
             </div>
 
+            {/* Section Tokens */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">🪙 Mes Tokens</h2>
+                <button
+                  onClick={fetchTokenData}
+                  disabled={loadingTokens}
+                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                >
+                  {loadingTokens ? 'Actualisation...' : 'Actualiser'}
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Solde de tokens */}
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-600">Solde disponible</h3>
+                      <p className="text-3xl font-bold text-blue-600 mt-1">{tokenBalance}</p>
+                      <p className="text-xs text-gray-500 mt-1">tokens restants</p>
+                    </div>
+                    <div className="text-4xl">🪙</div>
+                  </div>
+                  <div className="mt-4">
+                    <Link 
+                      href="/tokens" 
+                      className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                    >
+                      Acheter des tokens
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Coûts par action */}
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-600 mb-3">Coûts par action</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">🎵 MeTube - Téléchargement</span>
+                      <span className="font-semibold text-green-600">1 token</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">🎵 MeTube - Conversion</span>
+                      <span className="font-semibold text-green-600">2 tokens</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">📄 PDF - Conversion</span>
+                      <span className="font-semibold text-green-600">1 token</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">🚀 LibreSpeed - Test</span>
+                      <span className="font-semibold text-green-600">1 token</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Historique d'utilisation */}
+              {tokenHistory.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-sm font-medium text-gray-600 mb-3">📊 Dernières utilisations</h3>
+                  <div className="bg-gray-50 rounded-lg p-4 max-h-48 overflow-y-auto">
+                    <div className="space-y-2">
+                      {tokenHistory.slice(0, 10).map((usage, index) => (
+                        <div key={index} className="flex justify-between items-center text-sm">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-gray-500">
+                              {new Date(usage.usage_date).toLocaleDateString('fr-FR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                            <span className="text-gray-700">
+                              {usage.module_name} - {usage.action_type || 'action'}
+                            </span>
+                          </div>
+                          <span className="font-semibold text-red-600">
+                            -{usage.tokens_consumed} token{usage.tokens_consumed > 1 ? 's' : ''}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Grille des modules améliorée */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -867,17 +989,119 @@ export default function EncoursPage() {
                           </button>
                         </div>
                       ) : module.module_title === 'MeTube' ? (
-                        <MeTubeAccessButton
-                          user={user}
-                          onAccessGranted={(url) => {
-                            console.log('🔗 MeTube: Accès autorisé:', url);
-                            window.open(url, '_blank');
-                          }}
-                          onAccessDenied={(reason) => {
-                            console.log('❌ MeTube: Accès refusé:', reason);
-                            alert(`Accès refusé: ${reason}`);
-                          }}
-                        />
+                        <div className="space-y-3">
+                          {/* Affichage des coûts de tokens pour MeTube */}
+                          <div className="bg-blue-50 rounded-lg p-3 text-sm">
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="text-blue-700 font-medium">Coûts en tokens :</span>
+                              <span className="text-blue-600 font-semibold">{tokenBalance} disponibles</span>
+                            </div>
+                            <div className="space-y-1 text-xs text-blue-600">
+                              <div className="flex justify-between">
+                                <span>🎵 Téléchargement vidéo</span>
+                                <span className="font-semibold">1 token</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>🎵 Conversion MP4</span>
+                                <span className="font-semibold">2 tokens</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Boutons d'action MeTube avec tokens */}
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              onClick={async () => {
+                                if (!user) return;
+                                
+                                try {
+                                  const response = await fetch('/api/metube-action', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                      userId: user.id,
+                                      actionType: 'download',
+                                      videoUrl: 'https://youtube.com/watch?v=dQw4w9WgXcQ', // URL exemple
+                                      userEmail: user.email
+                                    })
+                                  });
+                                  
+                                  const result = await response.json();
+                                  
+                                  if (response.ok) {
+                                    alert(`✅ ${result.message}\nTokens consommés: ${result.tokensConsumed}\nTokens restants: ${result.tokensRemaining}`);
+                                    // Actualiser les données de tokens
+                                    fetchTokenData();
+                                  } else {
+                                    alert(`❌ ${result.reason}`);
+                                  }
+                                } catch (error) {
+                                  alert('❌ Erreur de connexion');
+                                }
+                              }}
+                              disabled={tokenBalance < 1}
+                              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                tokenBalance >= 1
+                                  ? 'bg-green-600 text-white hover:bg-green-700'
+                                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              }`}
+                            >
+                              🎵 Télécharger (1 token)
+                            </button>
+                            
+                            <button
+                              onClick={async () => {
+                                if (!user) return;
+                                
+                                try {
+                                  const response = await fetch('/api/metube-action', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                      userId: user.id,
+                                      actionType: 'convert',
+                                      videoUrl: 'https://youtube.com/watch?v=dQw4w9WgXcQ', // URL exemple
+                                      userEmail: user.email
+                                    })
+                                  });
+                                  
+                                  const result = await response.json();
+                                  
+                                  if (response.ok) {
+                                    alert(`✅ ${result.message}\nTokens consommés: ${result.tokensConsumed}\nTokens restants: ${result.tokensRemaining}`);
+                                    // Actualiser les données de tokens
+                                    fetchTokenData();
+                                  } else {
+                                    alert(`❌ ${result.reason}`);
+                                  }
+                                } catch (error) {
+                                  alert('❌ Erreur de connexion');
+                                }
+                              }}
+                              disabled={tokenBalance < 2}
+                              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                tokenBalance >= 2
+                                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              }`}
+                            >
+                              🎵 Convertir (2 tokens)
+                            </button>
+                          </div>
+                          
+                          {/* Bouton d'accès classique MeTube */}
+                          <MeTubeAccessButton
+                            user={user}
+                            onAccessGranted={(url) => {
+                              console.log('🔗 MeTube: Accès autorisé:', url);
+                              window.open(url, '_blank');
+                            }}
+                            onAccessDenied={(reason) => {
+                              console.log('❌ MeTube: Accès refusé:', reason);
+                              alert(`Accès refusé: ${reason}`);
+                            }}
+                          />
+                        </div>
                       ) : module.module_title === 'PDF+' ? (
                         <PDFAccessButton
                           user={user}

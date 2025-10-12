@@ -17,8 +17,6 @@ export default function Home() {
   const [modules, setModules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [priceFilter, setPriceFilter] = useState('all');
-  const [professionFilter, setProfessionFilter] = useState('all'); // CHANGÉ : experienceFilter -> professionFilter
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [userSubscriptions, setUserSubscriptions] = useState<{[key: string]: boolean}>({});
   const [showScrollToTop, setShowScrollToTop] = useState(false);
@@ -285,19 +283,12 @@ export default function Home() {
 
       // Filtre de prix - Amélioré pour gérer différents formats
       const isModuleFree = module.price === '0' || module.price === 0 || module.price === 'Gratuit' || module.price === 'gratuit' || module.price === 'FREE' || module.price === 'free';
-      const matchesPrice = priceFilter === 'all' || 
-        (priceFilter === 'free' && isModuleFree) ||
-        (priceFilter === 'paid' && !isModuleFree);
-
-      // CHANGÉ : matchesExperience -> matchesProfession
-      const matchesProfession = professionFilter === 'all' || 
-        module.profession === professionFilter;
 
       // Filtre de catégorie
       const matchesCategory = categoryFilter === 'all' || 
         (module.categories || [module.category]).includes(categoryFilter);
 
-      return matchesSearch && matchesPrice && matchesProfession && matchesCategory;
+      return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
       // Tri spécial : librespeed toujours en premier
@@ -346,7 +337,7 @@ export default function Home() {
   // Réinitialiser la pagination quand les filtres changent
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, priceFilter, professionFilter, categoryFilter]); // CHANGÉ : experienceFilter -> professionFilter
+  }, [search, categoryFilter]);
 
   // Détecter le scroll pour afficher/masquer le bouton de retour en haut
   useEffect(() => {
@@ -527,39 +518,7 @@ export default function Home() {
 
             {/* Contenu principal */}
             <div className="flex-1 order-1 lg:order-2">
-              {/* Filtres */}
-              <div className="bg-white rounded-xl p-4 lg:p-6 shadow-sm border border-gray-100 mb-6 lg:mb-8">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3 lg:gap-4">
-                  {/* Dropdowns */}
-                  <div className="flex flex-col sm:flex-row gap-2 lg:gap-3 flex-1">
-                    <select 
-                      className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      value={priceFilter}
-                      onChange={(e) => setPriceFilter(e.target.value)}
-                    >
-                      <option value="all">Gratuit et payant</option>
-                      <option value="free">Gratuit uniquement</option>
-                      <option value="paid">Payant uniquement</option>
-                    </select>
-                    
-                    {/* CHANGÉ : Filtre par métier traditionnel au lieu de niveau d'expérience */}
-                    <select 
-                      className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      value={professionFilter}
-                      onChange={(e) => setProfessionFilter(e.target.value)}
-                    >
-                      <option value="all">Tous les métiers</option>
-                      <option value="Photographe">📸 Photographes</option>
-                      <option value="Rédacteur">✍️ Rédacteurs & Journalistes</option>
-                      <option value="Architecte">🏗️ Architectes & Designers</option>
-                      <option value="Avocat">⚖️ Avocats & Juristes</option>
-                      <option value="Médecin">🩺 Médecins & Santé</option>
-                    </select>
-                  </div>
-                  
-                </div>
-              </div>
-
+              
               {/* Grille de templates */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {loading ? (

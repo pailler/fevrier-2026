@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Header from '../../components/Header';
 import Breadcrumb from '../../components/Breadcrumb';
 import Link from 'next/link';
 
@@ -10,7 +9,6 @@ export default function TermsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
       
       {/* Fil d'ariane avec espacement correct */}
       <div className="pt-20">

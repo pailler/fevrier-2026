@@ -23,7 +23,7 @@ export function useCustomAuth() {
     user: null,
     token: null,
     isAuthenticated: false,
-    loading: false
+    loading: true
   });
 
   const [isClient, setIsClient] = useState(false);

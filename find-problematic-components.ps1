@@ -29,3 +29,5 @@ foreach ($file in $problematicFiles) {
 Write-Host "`nTotal de fichiers problématiques: $($problematicFiles.Count)" -ForegroundColor Red
 
 
+
+

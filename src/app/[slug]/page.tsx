@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { supabase } from '../../utils/supabaseClient';
-import Header from '../../components/Header';
+import SimpleHeader from '../../components/SimpleHeader';
 import Footer from '../../components/Footer';
 import Breadcrumb from '../../components/Breadcrumb';
 
@@ -88,7 +88,7 @@ export default function DynamicPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
+        <SimpleHeader />
         <div className="pt-20">
           <div className="max-w-7xl mx-auto px-6 py-12">
             <div className="animate-pulse">
@@ -110,7 +110,7 @@ export default function DynamicPage() {
   if (error || !page) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
+        <SimpleHeader />
         <div className="pt-20">
           <div className="max-w-7xl mx-auto px-6 py-12">
             <div className="text-center">
@@ -134,7 +134,7 @@ export default function DynamicPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <SimpleHeader />
       
       {/* Breadcrumb */}
       <div className="pt-20">

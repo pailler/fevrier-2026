@@ -132,3 +132,5 @@ ON CONFLICT (event_type) DO UPDATE SET
   email_template_body = EXCLUDED.email_template_body,
   updated_at = NOW();
 
+
+
