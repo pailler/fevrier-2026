@@ -10,13 +10,19 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🔄 Webhook Stripe reçu');
+    
     const body = await request.text();
     const signature = request.headers.get('stripe-signature')!;
+
+    console.log('📝 Signature reçue:', signature ? 'Oui' : 'Non');
+    console.log('📦 Body length:', body.length);
 
     let event: Stripe.Event;
 
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      console.log('✅ Événement Stripe validé:', event.type);
     } catch (err) {
       console.error('❌ Erreur signature webhook:', err);
       return NextResponse.json(
@@ -91,14 +97,14 @@ async function addTokensToUser(userEmail: string, tokens: number, packageType: s
     const currentTokens = existingTokens?.tokens || 0;
     const newTokenCount = currentTokens + tokens;
 
-    // Mettre à jour ou créer l'entrée tokens
+    // Mettre à jour les tokens
     const { error: updateError } = await supabase
       .from('user_tokens')
-      .upsert({
-        user_id: profile.id,
+      .update({
         tokens: newTokenCount,
         updated_at: new Date().toISOString()
-      });
+      })
+      .eq('user_id', profile.id);
 
     if (updateError) {
       console.error('❌ Erreur mise à jour tokens:', updateError);

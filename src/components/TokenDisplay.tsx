@@ -1,12 +1,12 @@
 'use client';
 import { useTokenContext } from '../contexts/TokenContext';
 
-interface TokenBalanceProps {
+interface TokenDisplayProps {
   className?: string;
   showIcon?: boolean;
 }
 
-export default function TokenBalance({ className = '', showIcon = true }: TokenBalanceProps) {
+export default function TokenDisplay({ className = '', showIcon = true }: TokenDisplayProps) {
   const { tokens, loading, error } = useTokenContext();
 
   if (loading) {

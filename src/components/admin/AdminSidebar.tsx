@@ -7,12 +7,12 @@ import { useCustomAuth } from '@/hooks/useCustomAuth';
 import TokenBalance from '../TokenBalance';
 
 const navigation = [
-  { name: 'Tableau de bord', href: '/admin', icon: '📊' },
   { name: 'Utilisateurs', href: '/admin/users', icon: '👥' },
-  { name: 'Modules', href: '/admin/modules', icon: '🧩' },
+  { name: 'Applications', href: '/admin/applications', icon: '📱' },
   { name: 'Paiements', href: '/admin/payments', icon: '💳' },
   { name: 'Tokens', href: '/pricing', icon: '🔑' },
-  { name: 'Applications', href: '/admin/applications', icon: '📱' },
+  { name: 'Contenu', href: '/admin/content', icon: '📝' },
+  { name: 'Événements', href: '/admin/events', icon: '📋' },
   { name: 'Statistiques', href: '/admin/statistics', icon: '📈' },
   { name: 'Notifications', href: '/admin/notifications', icon: '🔔' },
   { name: 'Paramètres', href: '/admin/settings', icon: '⚙️' },
@@ -70,17 +70,6 @@ export default function AdminSidebar() {
       <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
         {!isCollapsed && user && (
           <div className="space-y-3">
-            {/* Informations utilisateur */}
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">👑</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>
-                <p className="text-xs text-red-600 font-semibold">Administrateur</p>
-              </div>
-            </div>
-
             {/* Tokens */}
             <div className="flex items-center justify-between">
               <TokenBalance className="text-sm" />
@@ -108,9 +97,6 @@ export default function AdminSidebar() {
         {/* Version collapsed */}
         {isCollapsed && user && (
           <div className="flex flex-col items-center space-y-2">
-            <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">👑</span>
-            </div>
             <TokenBalance className="text-xs" />
             <Link
               href="/encours"

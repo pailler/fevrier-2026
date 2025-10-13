@@ -155,13 +155,6 @@ export default function Home() {
                 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Link 
-                    href="/admin" 
-                    className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center"
-                  >
-                    <span className="mr-2">⚙️</span>
-                    Tableau de bord Admin
-                  </Link>
-                  <Link 
                     href="/admin/users" 
                     className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center"
                   >

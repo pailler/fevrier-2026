@@ -9,7 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 const TOKEN_PACKAGES = {
   basic: {
     name: 'Pack Basique',
-    price: 490, // 4,9€ en centimes
+    price: 50, // 0,5€ en centimes
     tokens: 100,
     pricePerToken: 0.049,
     description: 'Idéal pour débuter'
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     console.log('📦 Package sélectionné:', packageData);
 
     // Définir l'URL de base
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://iahome.fr';
     console.log('🌐 URL de base:', baseUrl);
 
     // Créer la session de paiement Stripe

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import TokenBalance from './TokenBalance';
+import TokenBalanceLink from './TokenBalanceLink';
 
 export default function SimpleHeader() {
   const router = useRouter();
@@ -57,7 +58,7 @@ export default function SimpleHeader() {
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated && user ? (
               <>
-                <TokenBalance />
+                <TokenBalanceLink />
                 <Link
                   href="/encours"
                   className="bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors flex items-center space-x-1"
@@ -65,9 +66,14 @@ export default function SimpleHeader() {
                   <span>📱</span>
                   <span className="hidden sm:inline">Mes applis</span>
                 </Link>
-                <span className="text-white font-medium px-3 py-1 rounded-lg">
-                  {user.full_name || user.email}
-                </span>
+                <div className="flex items-center space-x-2">
+                  <div className={`w-2 h-2 rounded-full animate-pulse ${
+                    user.role === 'admin' ? 'bg-red-400' : 'bg-green-400'
+                  }`}></div>
+                  <span className="text-white font-medium px-3 py-1 rounded-lg">
+                    {user.full_name || user.email}
+                  </span>
+                </div>
                 <button
                   onClick={() => {
                     signOut();
@@ -97,7 +103,24 @@ export default function SimpleHeader() {
           </div>
 
           {/* Menu mobile */}
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center space-x-2">
+            {/* Affichage du nom/prénom pour mobile */}
+            {isAuthenticated && user && (
+              <div className="flex items-center space-x-2">
+                <div className={`w-2 h-2 rounded-full animate-pulse ${
+                  user.role === 'admin' ? 'bg-red-400' : 'bg-green-400'
+                }`}></div>
+                <div className="text-white text-sm font-medium truncate max-w-20">
+                  {user.full_name || user.email}
+                </div>
+              </div>
+            )}
+            
+            {/* Affichage des tokens pour mobile */}
+            {isAuthenticated && user && (
+              <TokenBalanceLink className="text-yellow-400 font-bold text-sm hover:text-yellow-300 transition-colors" showIcon={true} />
+            )}
+            
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-white hover:text-blue-100 transition-colors"
@@ -150,6 +173,27 @@ export default function SimpleHeader() {
               {isAuthenticated && user && (
                 <div className="px-4 py-2">
                   <div className="text-sm text-blue-100 mb-2">Mon compte</div>
+                  
+                  {/* Affichage du nom/prénom de l'utilisateur */}
+                  <div className="px-4 py-2 bg-blue-500 rounded-lg mb-2">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <div className={`w-2 h-2 rounded-full animate-pulse ${
+                        user.role === 'admin' ? 'bg-red-400' : 'bg-green-400'
+                      }`}></div>
+                      <div className="text-xs text-blue-100">
+                        {user.role === 'admin' ? 'Administrateur connecté :' : 'Connecté en tant que :'}
+                      </div>
+                    </div>
+                    <div className="text-white font-medium">
+                      {user.full_name || user.email}
+                    </div>
+                  </div>
+                  
+                  {/* Affichage des tokens */}
+                  <div className="px-4 py-2 mb-2">
+                    <TokenBalance className="text-white" />
+                  </div>
+                  
                   <Link
                     href="/encours"
                     className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors"

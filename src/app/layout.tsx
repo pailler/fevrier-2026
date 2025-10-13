@@ -14,7 +14,7 @@ import HTMLPreloadCleaner from "../components/HTMLPreloadCleaner";
 import CSSPreloadManager from "../components/CSSPreloadManager";
 import AggressivePreloadCleaner from "../components/AggressivePreloadCleaner";
 import MobileOptimizer from "../components/MobileOptimizer";
-import { TokenProvider } from "../contexts/TokenContext";
+import ClientTokenProvider from "../components/ClientTokenProvider";
 
 // Utilisation de polices système pour éviter les preloads
 
@@ -143,13 +143,13 @@ export default function RootLayout({
         <AggressivePreloadCleaner />
         <MobileOptimizer />
         <AdaptiveLayout>
-          <TokenProvider>
+          <ClientTokenProvider>
             <SimpleHeader />
             <main className="flex-1">
               {children}
             </main>
             <Footer />
-          </TokenProvider>
+          </ClientTokenProvider>
         </AdaptiveLayout>
         <ConditionalComponents />
       </body>
