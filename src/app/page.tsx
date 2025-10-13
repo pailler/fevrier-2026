@@ -146,7 +146,7 @@ export default function Home() {
                     <span className="text-white font-bold text-lg">👑</span>
                   </div>
                   <h2 className="text-3xl lg:text-4xl font-bold text-gray-800">
-                    Administration
+                    Gestion administrateur IAHome
                   </h2>
                 </div>
                 <p className="text-lg text-gray-600 mb-6">
@@ -159,7 +159,7 @@ export default function Home() {
                     className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center"
                   >
                     <span className="mr-2">👥</span>
-                    Gestion utilisateurs
+                    Accès admin
                   </Link>
                 </div>
               </div>

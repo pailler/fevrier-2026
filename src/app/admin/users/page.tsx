@@ -68,21 +68,36 @@ export default function AdminUsers() {
               console.error(`❌ Erreur applications pour ${profile.email}:`, appsError);
             }
 
-            // Récupérer la dernière connexion depuis les logs d'accès
-            const { data: lastAccess, error: accessError } = await supabase
-              .from('access_logs')
-              .select('created_at')
-              .eq('user_id', profile.id)
-              .order('created_at', { ascending: false })
-              .limit(1)
-              .single();
+            // Calculer la dernière connexion basée sur l'activité réelle
+            let lastLogin: Date | null = null;
+            
+            // 1. Vérifier la dernière utilisation d'un module
+            if (applications && applications.length > 0) {
+              const lastUsedDates = applications
+                .filter(app => app.last_used_at)
+                .map(app => new Date(app.last_used_at!))
+                .sort((a, b) => b.getTime() - a.getTime());
+              
+              if (lastUsedDates.length > 0) {
+                lastLogin = lastUsedDates[0];
+              }
+            }
+            
+            // 2. Si pas d'utilisation de module, utiliser la date de mise à jour du profil
+            if (!lastLogin && profile.updated_at) {
+              lastLogin = new Date(profile.updated_at);
+            }
+            
+            // 3. Si pas de mise à jour, utiliser la date de création
+            if (!lastLogin) {
+              lastLogin = new Date(profile.created_at);
+            }
 
             // Calculer les modules actifs
             const activeModules = applications?.map(app => app.module_id) || [];
             
             // Calculer le statut basé sur l'activité
             const now = new Date();
-            const lastLogin = lastAccess?.created_at ? new Date(lastAccess.created_at) : null;
             const daysSinceLastLogin = lastLogin ? Math.floor((now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60 * 24)) : null;
             
             let status: 'active' | 'inactive' | 'suspended' = 'active';
@@ -90,6 +105,10 @@ export default function AdminUsers() {
               status = 'suspended';
             } else if (daysSinceLastLogin && daysSinceLastLogin > 30) {
               status = 'inactive';
+            } else if (daysSinceLastLogin && daysSinceLastLogin > 7) {
+              status = 'inactive';
+            } else {
+              status = 'active';
             }
 
             return {
@@ -162,6 +181,61 @@ export default function AdminUsers() {
     );
   };
 
+  const formatLastActivity = (lastLogin: string | null) => {
+    if (!lastLogin) {
+      return <span className="text-gray-400">Jamais</span>;
+    }
+
+    const now = new Date();
+    const lastActivity = new Date(lastLogin);
+    const daysSince = Math.floor((now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24));
+    const hoursSince = Math.floor((now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60));
+    const minutesSince = Math.floor((now.getTime() - lastActivity.getTime()) / (1000 * 60));
+
+    let timeText = '';
+    let colorClass = '';
+
+    if (minutesSince < 60) {
+      timeText = minutesSince <= 1 ? 'À l\'instant' : `Il y a ${minutesSince} min`;
+      colorClass = 'text-green-600';
+    } else if (hoursSince < 24) {
+      timeText = hoursSince === 1 ? 'Il y a 1h' : `Il y a ${hoursSince}h`;
+      colorClass = 'text-green-600';
+    } else if (daysSince === 0) {
+      timeText = 'Aujourd\'hui';
+      colorClass = 'text-green-600';
+    } else if (daysSince === 1) {
+      timeText = 'Hier';
+      colorClass = 'text-green-600';
+    } else if (daysSince <= 7) {
+      timeText = `Il y a ${daysSince} jours`;
+      colorClass = 'text-yellow-600';
+    } else if (daysSince <= 30) {
+      timeText = `Il y a ${daysSince} jours`;
+      colorClass = 'text-orange-600';
+    } else {
+      timeText = `Il y a ${daysSince} jours`;
+      colorClass = 'text-red-600';
+    }
+
+    return (
+      <div>
+        <div className="font-medium">
+          {lastActivity.toLocaleDateString('fr-FR')}
+        </div>
+        <div className="text-xs text-gray-400">
+          {lastActivity.toLocaleTimeString('fr-FR', {
+            hour: '2-digit',
+            minute: '2-digit'
+          })}
+        </div>
+        <div className={`text-xs font-medium ${colorClass}`}>
+          {timeText}
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -175,7 +249,7 @@ export default function AdminUsers() {
       {/* En-tête */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Gestion des utilisateurs
+          Gestion administrateur IAHome
         </h1>
         <p className="text-gray-600">
           Gérez les comptes utilisateurs, les rôles et les permissions
@@ -250,7 +324,7 @@ export default function AdminUsers() {
                   Modules
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Dernière connexion
+                  Dernière activité
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -318,7 +392,7 @@ export default function AdminUsers() {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('fr-FR') : 'Jamais'}
+                    {formatLastActivity(user.lastLogin)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">

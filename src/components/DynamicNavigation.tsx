@@ -42,9 +42,15 @@ export default function DynamicNavigation({
     loadMenuItems();
   }, [menuName, userRole]);
 
-  // Ne pas rendre côté serveur pour éviter l'erreur d'hydratation
+  // Rendre un contenu statique côté serveur pour éviter l'erreur d'hydratation
   if (!isClient) {
-    return null;
+    return (
+      <div className={`flex items-center space-x-6 ${className}`}>
+        <div className="animate-pulse bg-gray-200 h-4 w-16 rounded"></div>
+        <div className="animate-pulse bg-gray-200 h-4 w-20 rounded"></div>
+        <div className="animate-pulse bg-gray-200 h-4 w-14 rounded"></div>
+      </div>
+    );
   }
 
   if (loading) {

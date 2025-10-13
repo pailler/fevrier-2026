@@ -176,22 +176,6 @@ function TokenGeneratedContent() {
                 </div>
               )}
               
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-8">
-                <div className="flex items-center justify-center space-x-4 text-sm text-green-800">
-                  <div className="flex items-center">
-                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                    <span>20 utilisations</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                    <span>3 mois de validité</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                    <span>Accès premium</span>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Options de navigation */}
