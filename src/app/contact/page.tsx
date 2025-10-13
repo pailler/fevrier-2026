@@ -46,9 +46,24 @@ export default function ContactPage() {
         throw new Error('Veuillez entrer une adresse email valide');
       }
 
-      // Envoyer le message (ici vous pouvez intégrer votre logique d'envoi)
-      // Pour l'instant, on simule un envoi réussi
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('📧 Envoi du message de contact...', formData);
+
+      // Envoyer le message via l'API
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Erreur lors de l\'envoi du message');
+      }
+
+      console.log('✅ Message envoyé avec succès:', result);
 
       setSubmitStatus('success');
       setSubmitMessage('Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.');
@@ -62,6 +77,7 @@ export default function ContactPage() {
       });
 
     } catch (error) {
+      console.error('❌ Erreur lors de l\'envoi:', error);
       setSubmitStatus('error');
       setSubmitMessage(error instanceof Error ? error.message : 'Une erreur est survenue lors de l\'envoi du message.');
     } finally {

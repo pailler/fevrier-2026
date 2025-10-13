@@ -248,19 +248,6 @@ export default function AdminNotifications() {
               </div>
             )}
             
-            {/* Recommandations */}
-            {resendStatus.recommendations && resendStatus.recommendations.length > 0 && (
-              <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                <h3 className="text-sm font-medium text-blue-900 mb-2">Recommandations :</h3>
-                <ul className="space-y-1">
-                  {resendStatus.recommendations.map((rec: string, index: number) => (
-                    <li key={index} className="text-sm text-blue-800">
-                      {rec}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
             
             {/* Informations de debug */}
             {resendStatus.config && (

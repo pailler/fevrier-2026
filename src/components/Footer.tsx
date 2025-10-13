@@ -40,9 +40,9 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Section Produits */}
+          {/* Section Le projet */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Produits</h3>
+            <h3 className="text-lg font-semibold mb-4">Le projet</h3>
             <DynamicNavigation 
               menuName="footer" 
               className="space-y-2"

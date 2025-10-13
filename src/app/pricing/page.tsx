@@ -1,4 +1,3 @@
-import Footer from '../../components/Footer';
 import Link from 'next/link';
 import StripeButton from '../../components/StripeButton';
 
@@ -315,7 +314,6 @@ export default function PricingPage() {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

@@ -1,5 +1,3 @@
-import Footer from '../../components/Footer';
-
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -103,7 +101,6 @@ export default function AboutPage() {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }
