@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
             .from('user_tokens')
             .insert([{
               user_id: profile.id,
-              tokens: 10, // 10 tokens par défaut
+              tokens: 100, // 100 tokens par défaut
               package_name: 'Welcome Package',
               purchase_date: new Date().toISOString(),
               is_active: true
@@ -53,21 +53,21 @@ export async function POST(request: NextRequest) {
           if (insertError) {
             console.error(`❌ Erreur création tokens pour ${profile.email}:`, insertError);
           } else {
-            console.log(`✅ 10 tokens créés pour ${profile.email}`);
+            console.log(`✅ 100 tokens créés pour ${profile.email}`);
             totalCreated++;
           }
         } else {
-          // Vérifier si l'utilisateur a moins de 10 tokens et les compléter
-          if (existingTokens.tokens < 10) {
+          // Vérifier si l'utilisateur a moins de 100 tokens et les compléter
+          if (existingTokens.tokens < 100) {
             const { error: updateError } = await supabase
               .from('user_tokens')
-              .update({ tokens: 10 })
+              .update({ tokens: 100 })
               .eq('user_id', profile.id);
 
             if (updateError) {
               console.error(`❌ Erreur mise à jour tokens pour ${profile.email}:`, updateError);
             } else {
-              console.log(`✅ Tokens complétés à 10 pour ${profile.email}`);
+              console.log(`✅ Tokens complétés à 100 pour ${profile.email}`);
               totalUpdated++;
             }
           } else {

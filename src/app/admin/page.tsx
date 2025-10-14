@@ -270,7 +270,7 @@ export default function AdminDashboard() {
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
           Actions rapides
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <a href="/admin/users" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block">
             <div className="text-2xl mb-2">👥</div>
             <h3 className="font-medium text-gray-900">Gérer les utilisateurs</h3>
@@ -283,17 +283,7 @@ export default function AdminDashboard() {
             <p className="text-sm text-gray-600">{stats.totalModules} modules disponibles</p>
           </a>
           
-          <a href="/pricing" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block">
-            <div className="text-2xl mb-2">🔑</div>
-            <h3 className="font-medium text-gray-900">Générer des tokens</h3>
-            <p className="text-sm text-gray-600">{stats.totalTokens} tokens générés</p>
-          </a>
           
-          <a href="/admin/statistics" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block">
-            <div className="text-2xl mb-2">📊</div>
-            <h3 className="font-medium text-gray-900">Voir les rapports</h3>
-            <p className="text-sm text-gray-600">Analyser les performances</p>
-          </a>
         </div>
       </div>
 

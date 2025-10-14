@@ -425,10 +425,10 @@ export default function CogStudioPage() {
             <div className="text-left mb-8">
               <div className="w-3/4 bg-gradient-to-r from-cyan-600 to-teal-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
                 <div className="text-4xl font-bold mb-1">
-                  {card.price === 0 || card.price === '0' ? 'Free' : '100 tokens'}
+                  100 tokens
                 </div>
                 <div className="text-sm opacity-90">
-                  {card.price === 0 || card.price === '0' ? 'Gratuit' : 'par utilisation'}
+                  par utilisation
                 </div>
               </div>
             </div>

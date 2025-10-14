@@ -73,7 +73,8 @@ export default function AdminEvents() {
         const { data: userApps, error: userAppsError } = await supabase
           .from('user_applications')
           .select(`
-            id, module_id, user_id, is_active, usage_count, created_at, last_used_at
+            id, module_id, user_id, is_active, usage_count, created_at, last_used_at,
+            modules(max_usage)
           `)
           .order('created_at', { ascending: false })
           .limit(50);
@@ -341,18 +342,18 @@ export default function AdminEvents() {
             const profile = profilesMap[app.user_id];
             const module = modulesMap[app.module_id];
             
-            if (profile && module && app.max_usage && app.usage_count >= app.max_usage) {
+            if (profile && module && app.modules?.[0]?.max_usage && app.usage_count >= app.modules[0].max_usage) {
               allEvents.push({
                 id: `quota_exceeded_${app.id}`,
                 type: 'quota_exceeded',
                 title: 'Quota dépassé',
-                description: `${profile.full_name || profile.email} a dépassé le quota de ${module.name} (${app.usage_count}/${app.max_usage})`,
+                description: `${profile.full_name || profile.email} a dépassé le quota de ${module.name} (${app.usage_count}/${app.modules?.[0]?.max_usage})`,
                 timestamp: app.last_used_at || app.created_at,
                 user: profile,
                 metadata: { 
                   module: module.name, 
                   usage_count: app.usage_count,
-                  max_usage: app.max_usage
+                  max_usage: app.modules?.[0]?.max_usage
                 },
                 icon: '⚠️',
                 color: 'bg-red-100 text-red-800'
@@ -443,7 +444,7 @@ export default function AdminEvents() {
                 metadata: { 
                   module: module.name,
                   usage_count: app.usage_count,
-                  max_usage: app.max_usage
+                  max_usage: app.modules?.[0]?.max_usage
                 },
                 icon: '📊',
                 color: 'bg-purple-100 text-purple-800'
@@ -460,7 +461,7 @@ export default function AdminEvents() {
               type: 'module_activated',
               title: 'Module créé',
               description: `Nouveau module "${module.name}" ajouté à la plateforme`,
-              timestamp: module.created_at || new Date().toISOString(),
+              timestamp: new Date().toISOString(),
               metadata: { module: module.name },
               icon: '🧩',
               color: 'bg-indigo-100 text-indigo-800'

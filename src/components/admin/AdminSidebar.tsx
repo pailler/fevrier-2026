@@ -10,10 +10,9 @@ const navigation = [
   { name: 'Utilisateurs', href: '/admin/users', icon: '👥' },
   { name: 'Applications', href: '/admin/applications', icon: '📱' },
   { name: 'Paiements', href: '/admin/payments', icon: '💳' },
-  { name: 'Tokens', href: '/pricing', icon: '🔑' },
+  { name: 'Tokens', href: '/admin/tokens', icon: '🪙' },
   { name: 'Contenu', href: '/admin/content', icon: '📝' },
   { name: 'Événements', href: '/admin/events', icon: '📋' },
-  { name: 'Statistiques', href: '/admin/statistics', icon: '📈' },
   { name: 'Notifications', href: '/admin/notifications', icon: '🔔' },
   { name: 'Paramètres', href: '/admin/settings', icon: '⚙️' },
 ];

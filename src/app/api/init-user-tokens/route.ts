@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
           .from('user_tokens')
           .insert([{
             user_id: user.id,
-            tokens: 10, // 10 tokens par défaut
+            tokens: 100, // 100 tokens par défaut
             package_name: 'Welcome Package',
             purchase_date: new Date().toISOString(),
             is_active: true
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         if (insertError) {
           console.error(`❌ Erreur création tokens pour ${user.email}:`, insertError);
         } else {
-          console.log(`✅ 10 tokens créés pour ${user.email}`);
+          console.log(`✅ 100 tokens créés pour ${user.email}`);
           totalCreated++;
         }
       } else {

@@ -61,6 +61,24 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Erreur lors de la création de l\'utilisateur' }, { status: 500 });
       }
 
+      // Créer automatiquement 100 tokens pour le nouvel utilisateur
+      const { error: tokenError } = await supabase
+        .from('user_tokens')
+        .insert([{
+          user_id: newUser.id,
+          tokens: 100, // 100 tokens par défaut
+          package_name: 'Welcome Package',
+          purchase_date: new Date().toISOString(),
+          is_active: true
+        }]);
+
+      if (tokenError) {
+        console.error('Erreur lors de la création des tokens:', tokenError);
+        // Ne pas faire échouer la création du compte pour les tokens
+      } else {
+        console.log(`✅ 100 tokens créés pour le nouvel utilisateur ${email}`);
+      }
+
       return NextResponse.json({ success: true, user: newUser });
     }
 
@@ -124,6 +142,24 @@ export async function GET(request: NextRequest) {
           console.error('❌ Erreur lors de la création de l\'utilisateur:', insertError);
         } else {
           console.log('✅ Utilisateur créé avec succès');
+          
+          // Créer automatiquement 100 tokens pour le nouvel utilisateur
+          const { error: tokenError } = await supabase
+            .from('user_tokens')
+            .insert([{
+              user_id: data.session.user.id,
+              tokens: 100, // 100 tokens par défaut
+              package_name: 'Welcome Package',
+              purchase_date: new Date().toISOString(),
+              is_active: true
+            }]);
+
+          if (tokenError) {
+            console.error('❌ Erreur lors de la création des tokens:', tokenError);
+            // Ne pas faire échouer la création du compte pour les tokens
+          } else {
+            console.log(`✅ 100 tokens créés pour le nouvel utilisateur ${data.session.user.email}`);
+          }
         }
       }
 

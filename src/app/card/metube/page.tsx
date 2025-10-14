@@ -257,10 +257,10 @@ export default function MeTubePage() {
             <div className="text-left mb-8">
               <div className="w-3/4 bg-gradient-to-r from-red-600 to-pink-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
                 <div className="text-4xl font-bold mb-1">
-                  Gratuit
+                  10 tokens
                 </div>
                 <div className="text-sm opacity-90">
-                  Aucun coût
+                  par utilisation
                 </div>
               </div>
             </div>

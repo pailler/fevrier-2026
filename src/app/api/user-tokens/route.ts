@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
         .from('user_tokens')
         .upsert([{
           user_id: userId,
-          tokens: 10, // 10 tokens par défaut pour les nouveaux utilisateurs
+          tokens: 100, // 100 tokens par défaut pour les nouveaux utilisateurs
           package_name: 'Welcome Package',
           purchase_date: new Date().toISOString(),
           is_active: true
@@ -115,13 +115,13 @@ export async function POST(request: NextRequest) {
 
     // Si l'utilisateur n'a pas de tokens, créer un enregistrement avec 10 tokens par défaut
     if (!userTokens) {
-      console.log('🪙 Création automatique de 10 tokens pour la consommation:', userId);
+      console.log('🪙 Création automatique de 100 tokens pour la consommation:', userId);
       
       const { error: createError } = await supabase
         .from('user_tokens')
         .upsert([{
           user_id: userId,
-          tokens: 10, // 10 tokens par défaut pour les nouveaux utilisateurs
+          tokens: 100, // 100 tokens par défaut pour les nouveaux utilisateurs
           package_name: 'Welcome Package',
           purchase_date: new Date().toISOString(),
           is_active: true
@@ -138,11 +138,11 @@ export async function POST(request: NextRequest) {
       }
 
       // Maintenant vérifier si l'utilisateur a assez de tokens après création
-      if (10 < tokensToConsume) {
+      if (100 < tokensToConsume) {
         return NextResponse.json(
           { 
             error: 'Tokens insuffisants',
-            currentTokens: 10,
+            currentTokens: 100,
             requiredTokens: tokensToConsume,
             insufficient: true
           },
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Consommer les tokens
-      const newTokenCount = 10 - tokensToConsume;
+      const newTokenCount = 100 - tokensToConsume;
       
       const { error: updateError } = await supabase
         .from('user_tokens')

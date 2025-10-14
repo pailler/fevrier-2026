@@ -487,10 +487,10 @@ export default function WhisperPage() {
             <div className="text-left mb-8">
               <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
                 <div className="text-4xl font-bold mb-1">
-                  €9.99
+                  100 tokens
                 </div>
                 <div className="text-sm opacity-90">
-                  Par mois
+                  par utilisation
                 </div>
               </div>
             </div>

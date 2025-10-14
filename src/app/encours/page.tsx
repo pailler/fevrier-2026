@@ -677,7 +677,7 @@ export default function EncoursPage() {
             <div className="text-8xl mb-6">📱</div>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Aucune application activée</h2>
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Vous n'avez pas encore souscrit à des modules. Découvrez notre collection d'applications IA et commencez à explorer !
+              Vous n'avez pas encore souscrit à des applications. Découvrez notre collection de nos modules essentiels et applis IA et commencez à explorer !
             </p>
             <Link 
               href="/modules" 

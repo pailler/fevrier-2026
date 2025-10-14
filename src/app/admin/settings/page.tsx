@@ -206,10 +206,10 @@ export default function AdminSettings() {
 
       // Statut système (simulation basée sur les données)
       const systemStatus = {
-        database: 'online',
-        api: 'operational',
-        notifications: 'active',
-        cloudflare: 'connected'
+        database: 'online' as const,
+        api: 'operational' as const,
+        notifications: 'active' as const,
+        cloudflare: 'connected' as const
       };
 
       setStats({

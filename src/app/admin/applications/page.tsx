@@ -389,10 +389,6 @@ export default function AdminApplications() {
                             {application.usageCount.toLocaleString()} utilisations
                           </div>
                           <div className="flex items-center">
-                            <span className="mr-1">🎯</span>
-                            {application.maxUsage.toLocaleString()} max
-                          </div>
-                          <div className="flex items-center">
                             <span className="mr-1">🪙</span>
                             {(application as any).tokenCost} tokens/utilisation
                           </div>
@@ -431,15 +427,12 @@ export default function AdminApplications() {
                             <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
                               <div className="flex items-center">
                                 <span className="mr-1">📊</span>
-                                {user.usageCount}/{user.maxUsage}
+                                {user.usageCount} utilisations
                               </div>
                               <div className="flex items-center">
                                 <span className="mr-1">📅</span>
                                 {user.lastUsedAt ? new Date(user.lastUsedAt).toLocaleDateString('fr-FR') : 'Jamais'}
                               </div>
-                            </div>
-                            <div className="mt-1 text-xs text-gray-400">
-                              Expire: {new Date(user.expiresAt).toLocaleDateString('fr-FR')}
                             </div>
                           </div>
                         ))}
