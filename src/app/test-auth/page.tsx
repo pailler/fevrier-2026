@@ -11,7 +11,7 @@ export default function TestAuthPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        console.log('🔍 Test d\'authentification...');
+        ;
         const { data: { session }, error } = await supabase.auth.getSession();
         console.log('📊 Session data:', { session, user: session?.user, error });
         

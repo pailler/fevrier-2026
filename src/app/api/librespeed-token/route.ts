@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
     // Générer un token aléatoire simple
     const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     
-    console.log('✅ LibreSpeed Token: Token généré avec succès');
+    ;
     return new NextResponse(JSON.stringify({
       success: true,
       token: token,
@@ -160,7 +160,7 @@ export async function GET(request: NextRequest) {
 
     // Validation simple du token (pour l'instant, accepter tous les tokens)
     // TODO: Implémenter une validation réelle si nécessaire
-    console.log('✅ LibreSpeed Token: Token validé:', token.substring(0, 10) + '...');
+    ;
     return new NextResponse('Token valid', { status: 200 });
 
   } catch (error) {

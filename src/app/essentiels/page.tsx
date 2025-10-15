@@ -25,11 +25,7 @@ export default function Home() {
   useEffect(() => {
     if (authLoading) return; // Attendre que l'authentification soit vérifiée
     
-    if (isAuthenticated && user) {
-      console.log('Utilisateur authentifié:', user.email);
-    } else {
-      console.log('Utilisateur non authentifié - accès public autorisé');
-    }
+    // Authentification vérifiée
   }, [isAuthenticated, user, authLoading]);
 
   // Récupérer le rôle de l'utilisateur
@@ -90,9 +86,7 @@ export default function Home() {
         
         if (modulesError) {
           } else {
-          modulesData.forEach((module: any) => {
-            console.log('Module traité:', module.title);
-          });
+          // Modules chargés avec succès
           
           // Traiter les modules avec la structure simple
           const modulesWithRoles = (modulesData || []).map((module, index) => {
@@ -489,9 +483,7 @@ export default function Home() {
         </div>
       </section>
 
-
-
-      {/* Section principale avec filtres et contenu */}
+{/* Section principale avec filtres et contenu */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col lg:flex-row gap-6">

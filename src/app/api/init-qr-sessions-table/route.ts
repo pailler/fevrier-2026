@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse('Error creating table', { status: 500 });
     }
 
-    console.log('✅ QR Sessions: Table créée avec succès');
+    ;
     
     return new NextResponse(JSON.stringify({
       success: true,

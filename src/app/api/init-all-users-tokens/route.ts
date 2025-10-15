@@ -3,7 +3,7 @@ import { supabase } from '../../../utils/supabaseClient';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔄 Initialisation des tokens pour tous les utilisateurs...');
+    ;
 
     // 1. Récupérer tous les utilisateurs existants
     const { data: profiles, error: profilesError } = await supabase

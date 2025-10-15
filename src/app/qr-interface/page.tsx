@@ -57,7 +57,7 @@ export default function QRInterfacePage() {
             setLoading(false);
             return;
           } else {
-            console.log('❌ QR Session invalide, redirection vers login');
+            ;
             window.location.href = '/login?redirect=/qr-interface';
             return;
           }

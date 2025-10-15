@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const hasLibreSpeedAccess = await checkLibreSpeedAccess(sessionToken.value);
     
     if (!hasLibreSpeedAccess) {
-      console.log('LibreSpeed Auth: Accès au module LibreSpeed refusé');
+      ;
       return new NextResponse('Forbidden', { status: 403 });
     }
 
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     const isModuleActive = await checkModuleInEncours(sessionToken.value);
     
     if (!isModuleActive) {
-      console.log('LibreSpeed Auth: Module LibreSpeed non actif dans /encours');
+      ;
       return new NextResponse('Forbidden', { status: 403 });
     }
 

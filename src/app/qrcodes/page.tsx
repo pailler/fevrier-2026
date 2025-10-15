@@ -23,7 +23,7 @@ export default function QRCodesPage() {
           // Rediriger vers la page directe qui affiche l'utilisateur
           router.replace('/qrcodes-direct');
         } else {
-          console.log('❌ QR Codes: Aucun utilisateur connecté');
+          ;
           // Rediriger vers la page de login
           router.push('/login?redirect=' + encodeURIComponent(window.location.href));
         }

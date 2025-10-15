@@ -21,7 +21,7 @@ export default function MeTubeRedirectPage() {
 
         if (response.ok) {
           // L'API gère la redirection vers MeTube
-          console.log('✅ MeTube Redirect: Redirection vers MeTube');
+          ;
           // La redirection est gérée par l'API
           return;
         } else {

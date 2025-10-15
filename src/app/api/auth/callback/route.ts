@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
 
     // Si l'utilisateur n'existe pas, le créer
     if (!userData && userError?.code === 'PGRST116') {
-      console.log('📝 Création du nouvel utilisateur...');
+      ;
       const { error: insertError } = await supabase
         .from('profiles')
         .insert({
@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
         if (insertError) {
           console.error('❌ Erreur lors de la création de l\'utilisateur:', insertError);
         } else {
-          console.log('✅ Utilisateur créé avec succès');
+          ;
           
           // Créer automatiquement 100 tokens pour le nouvel utilisateur
           const { error: tokenError } = await supabase

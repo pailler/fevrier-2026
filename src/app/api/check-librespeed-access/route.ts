@@ -3,7 +3,7 @@ import { supabase } from '../../../utils/supabaseClient';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 Check LibreSpeed Access: API appelée');
+    ;
     
     const body = await request.json();
     const { userId } = body;
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      console.log('✅ LibreSpeed Access: Accès autorisé pour userId:', userId, 'avec', currentTokens, 'tokens');
+      ;
 
     } catch (error) {
       console.log('⚠️ LibreSpeed: Table user_tokens non disponible, autorisation par défaut');

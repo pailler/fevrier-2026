@@ -19,7 +19,7 @@ export default function QRCodeAccessButton({
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  console.log('🔍 QRCodeAccessButton: Rendu avec user:', user ? 'présent' : 'absent');
+  ;
 
   const handleAccess = async () => {
     if (!user) {
@@ -63,7 +63,7 @@ export default function QRCodeAccessButton({
       }
 
       // 1. Incrémenter le compteur d'accès
-      console.log('📊 QR Codes: Incrémentation du compteur d\'accès...');
+      ;
       const incrementResponse = await fetch('/api/increment-module-access', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -80,7 +80,7 @@ export default function QRCodeAccessButton({
       } else {
         const errorData = await incrementResponse.json().catch(() => ({}));
         if (incrementResponse.status === 403 && errorData.error === 'Quota dépassé') {
-          console.log('❌ QR Codes: Quota dépassé');
+          ;
           setError('Quota d\'utilisation dépassé. Contactez l\'administrateur.');
           onAccessDenied?.('Quota dépassé');
           return;
@@ -92,7 +92,7 @@ export default function QRCodeAccessButton({
       console.log('🔗 QR Codes: Ouverture dans un nouvel onglet...');
       const qrUrl = 'https://qrcodes.iahome.fr';
       window.open(qrUrl, '_blank');
-      console.log('✅ QR Codes: Ouverture de QR Codes');
+      ;
       
       // Ne pas appeler onAccessGranted pour éviter la double ouverture
 

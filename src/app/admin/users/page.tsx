@@ -34,12 +34,11 @@ export default function AdminUsers() {
   useEffect(() => {
     const loadUsers = async () => {
       try {
-        console.log('🔍 Chargement des vrais utilisateurs depuis la base de données...');
+        ;
         
         // Récupération directe des données depuis Supabase
-        
-        
-        const supabase = getSupabaseClient();
+
+const supabase = getSupabaseClient();
 
         // Récupérer tous les profils utilisateurs
         const { data: profiles, error: profilesError } = await supabase

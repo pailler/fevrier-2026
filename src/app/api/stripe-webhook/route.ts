@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get('stripe-signature');
 
     if (!signature) {
-      console.log('❌ Signature Stripe manquante');
+      ;
       return NextResponse.json(
         { error: 'Signature manquante' },
         { status: 400 }
@@ -133,7 +133,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       return;
     }
 
-    console.log('✅ Tokens ajoutés avec succès via webhook');
+    ;
     return;
   }
 
@@ -160,7 +160,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     .single();
 
   if (existingAccess) {
-    console.log('ℹ️ Module déjà activé pour l\'utilisateur');
+    ;
     return;
   }
 

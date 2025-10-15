@@ -7,7 +7,7 @@ try {
   stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
     apiVersion: '2025-08-27.basil',
   });
-  console.log('✅ Stripe initialisé avec succès');
+  ;
 } catch (error) {
   console.error('❌ Erreur initialisation Stripe:', error);
   throw error;
@@ -15,7 +15,7 @@ try {
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 API create-payment-intent: Début de la requête');
+    ;
     
     const body = await request.json();
     console.log('🔍 API create-payment-intent: Body reçu:', JSON.stringify(body, null, 2));
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     const isProductionMode = process.env.STRIPE_MODE === 'production' && !testMode;
     const isTestMode = !isProductionMode || testMode;
 
-    console.log('🔍 Mode de paiement:', isProductionMode ? 'PRODUCTION' : 'TEST');
+    ;
     console.log('🔍 Clé Stripe configurée:', !!process.env.STRIPE_SECRET_KEY);
     console.log('🔍 Clé Stripe (premiers caractères):', process.env.STRIPE_SECRET_KEY?.substring(0, 10));
 

@@ -55,7 +55,7 @@ export default function PsiTransferAccessButton({ user, onAccessGranted, onAcces
       }
       
       // 1. Incrémenter le compteur d'accès
-      console.log('📊 PsiTransfer: Incrémentation du compteur d\'accès...');
+      ;
       const incrementResponse = await fetch('/api/increment-module-access', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -72,7 +72,7 @@ export default function PsiTransferAccessButton({ user, onAccessGranted, onAcces
       } else {
         const errorData = await incrementResponse.json().catch(() => ({}));
         if (incrementResponse.status === 403 && errorData.error === 'Quota dépassé') {
-          console.log('❌ PsiTransfer: Quota dépassé');
+          ;
           onAccessDenied('Quota d\'utilisation dépassé. Contactez l\'administrateur.');
           return;
         }
@@ -83,7 +83,7 @@ export default function PsiTransferAccessButton({ user, onAccessGranted, onAcces
       console.log('🔗 PsiTransfer: Ouverture dans un nouvel onglet...');
       const psitransferUrl = 'https://psitransfer.iahome.fr';
       window.open(psitransferUrl, '_blank');
-      console.log('✅ PsiTransfer: Ouverture de PsiTransfer');
+      ;
       
       // Ne pas appeler onAccessGranted pour éviter la double ouverture
       

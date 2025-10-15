@@ -11,31 +11,3 @@ export interface UploadSession {
   totalChunks: number;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const cookieHeader = request.headers.get('cookie');
     
     if (!cookieHeader) {
-      console.log('❌ LibreSpeed Auth Check: Aucun cookie trouvé');
+      ;
       return new NextResponse('Unauthorized - No cookies', { 
         status: 401,
         headers: {
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     const { data: { session }, error } = await supabaseWithCookies.auth.getSession();
     
     if (error || !session) {
-      console.log('❌ LibreSpeed Auth Check: Session invalide');
+      ;
       return new NextResponse('Unauthorized - Invalid session', { 
         status: 401,
         headers: {

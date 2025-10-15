@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       .limit(1);
 
     if (tableError && tableError.code === '42P01') {
-      console.log('❌ Table user_tokens n\'existe pas');
+      ;
       return NextResponse.json({ 
         error: 'Table user_tokens n\'existe pas. Veuillez d\'abord créer la table via l\'interface Supabase.',
         code: 'TABLE_NOT_EXISTS',
@@ -52,7 +52,7 @@ CREATE INDEX IF NOT EXISTS idx_token_usage_date ON token_usage(usage_date);
       }, { status: 400 });
     }
 
-    console.log('✅ Table user_tokens existe');
+    ;
 
     // 2. Tester l'insertion d'un enregistrement de test
     const testUserId = '77e8d61e-dbec-49fe-bd5a-517fc495c84a';

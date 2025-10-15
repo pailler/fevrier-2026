@@ -34,6 +34,7 @@ export default function AdminNotifications() {
   const [testEmail, setTestEmail] = useState('');
   const [testSending, setTestSending] = useState(false);
   const [resendStatus, setResendStatus] = useState<any>(null);
+  const [testingNotifications, setTestingNotifications] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
     loadData();
@@ -42,7 +43,7 @@ export default function AdminNotifications() {
 
   const loadData = async () => {
     try {
-      console.log('🔍 Chargement des paramètres de notifications...');
+      ;
       
       const supabase = getSupabaseClient();
 
@@ -141,6 +142,52 @@ export default function AdminNotifications() {
       alert('❌ Erreur lors de l\'envoi du test');
     } finally {
       setTestSending(false);
+    }
+  };
+
+  const testNotification = async (eventType: string, setting: NotificationSetting) => {
+    let emailToUse = testEmail;
+    
+    if (!emailToUse) {
+      emailToUse = prompt('Veuillez saisir l\'email de test pour cette notification:');
+      if (!emailToUse) {
+        return;
+      }
+    }
+
+    setTestingNotifications(prev => ({ ...prev, [eventType]: true }));
+    
+    try {
+      const response = await fetch('/api/test-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventType,
+          email: emailToUse,
+          subject: setting.email_template_subject,
+          body: setting.email_template_body,
+          eventData: {
+            user_email: emailToUse,
+            user_name: 'Utilisateur Test',
+            timestamp: new Date().toISOString()
+          }
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        alert(`✅ Notification de test "${setting.name}" envoyée avec succès !`);
+        // Recharger les logs pour voir la nouvelle entrée
+        loadData();
+      } else {
+        alert(`❌ Erreur lors de l'envoi de la notification "${setting.name}": ${data.error}`);
+      }
+    } catch (error) {
+      console.error('❌ Erreur lors du test de notification:', error);
+      alert(`❌ Erreur lors du test de la notification "${setting.name}"`);
+    } finally {
+      setTestingNotifications(prev => ({ ...prev, [eventType]: false }));
     }
   };
 
@@ -247,9 +294,8 @@ export default function AdminNotifications() {
                 </span>
               </div>
             )}
-            
-            
-            {/* Informations de debug */}
+
+{/* Informations de debug */}
             {resendStatus.config && (
               <details className="mt-4">
                 <summary className="text-sm font-medium text-gray-700 cursor-pointer hover:text-gray-900">
@@ -329,6 +375,25 @@ export default function AdminNotifications() {
                 </div>
                 
                 <div className="flex items-center space-x-2 ml-4">
+                  <button
+                    onClick={() => testNotification(setting.event_type, setting)}
+                    disabled={testingNotifications[setting.event_type]}
+                    className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title={`Tester la notification ${setting.name}`}
+                  >
+                    {testingNotifications[setting.event_type] ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                        Test...
+                      </>
+                    ) : (
+                      <>
+                        <span className="mr-1">🧪</span>
+                        Tester
+                      </>
+                    )}
+                  </button>
+                  
                   <button
                     onClick={() => toggleNotification(setting.id, !setting.is_enabled)}
                     disabled={saving}

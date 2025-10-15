@@ -31,8 +31,6 @@ export default function Chat3DMCP() {
 
   const checkMCPConnection = async () => {
     try {
-      console.log('🔍 Test de connexion MCP...');
-      
       const response = await fetch('/api/blender-3d', {
         method: 'GET',
         headers: { 
@@ -41,14 +39,11 @@ export default function Chat3DMCP() {
       });
       
       if (response.ok) {
-        console.log('✅ MCP connecté');
         setMcpStatus('connected');
       } else {
-        console.log('❌ Erreur MCP:', response.status);
         setMcpStatus('error');
       }
     } catch (error) {
-      console.log('❌ Erreur connexion MCP:', error);
       setMcpStatus('error');
     }
   };
@@ -204,19 +199,7 @@ export default function Chat3DMCP() {
            'Erreur MCP'}
         </div>
         
-        {/* Lien vers l'interface web Blender */}
-        <div className="mt-2">
-          <a
-            href="http://localhost:9091"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-800 rounded-lg text-sm hover:bg-blue-200 transition-colors"
-          >
-            <span>🔗</span>
-            <span>Interface Web Blender</span>
-            <span className="text-xs">(Port 9091)</span>
-          </a>
-        </div>
+        {/* Lien vers l'interface web Blender - Supprimé en production */}
       </div>
 
       {/* Messages */}

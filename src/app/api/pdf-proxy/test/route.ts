@@ -4,7 +4,7 @@ const PDF_SERVICE_URL = process.env.PDF_SERVICE_URL || 'https://pdf.iahome.fr';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 Test du proxy PDF+...');
+    ;
     
     const testUrl = `${PDF_SERVICE_URL}/`;
     const response = await fetch(testUrl, {
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     if (response.ok) {
       const contentType = response.headers.get('content-type') || '';
-      console.log('✅ Test PDF+ réussi');
+      ;
       
       return NextResponse.json({
         success: true,
@@ -58,5 +58,4 @@ export async function GET(request: NextRequest) {
     }, { status: 500 });
   }
 }
-
 

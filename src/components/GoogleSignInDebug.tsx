@@ -14,7 +14,7 @@ export default function GoogleSignInDebug() {
       setError(null);
       setDebugInfo('Début de la connexion Google...');
       
-      console.log('🔍 DEBUG: Tentative de connexion Google');
+      ;
       console.log('🔍 DEBUG: URL actuelle:', window.location.href);
       console.log('🔍 DEBUG: Origin:', window.location.origin);
       
@@ -32,7 +32,7 @@ export default function GoogleSignInDebug() {
         setError(`Erreur: ${error.message}`);
         setDebugInfo(`Erreur: ${error.message}`);
       } else {
-        console.log('✅ Redirection vers Google OAuth...');
+        ;
         setDebugInfo('Redirection vers Google OAuth...');
       }
     } catch (error: any) {

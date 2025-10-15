@@ -11,7 +11,7 @@ export default function GradioAccessPage() {
   useEffect(() => {
     const checkAuthAndRedirect = async () => {
       try {
-        console.log('🔍 Début vérification authentification...');
+        ;
         
         // Créer un client Supabase côté client
         const supabase = createClient(
@@ -19,7 +19,7 @@ export default function GradioAccessPage() {
           process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
         );
 
-        console.log('🔍 Client Supabase créé, vérification session...');
+        ;
 
         // Vérifier la session
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -29,7 +29,7 @@ export default function GradioAccessPage() {
         if (error || !session) {
           console.log('❌ Erreur session:', error);
           console.log('❌ Session:', session);
-          console.log('❌ Redirection vers /access-denied');
+          ;
           router.push('/access-denied');
           return;
         }
@@ -63,7 +63,7 @@ export default function GradioAccessPage() {
         }
 
         const { token } = await response.json();
-        console.log('✅ Token généré avec succès');
+        ;
 
         // Rediriger vers le wrapper sécurisé
         const wrapperUrl = `/api/secure-app-wrapper?app=gradio&auth_token=${token}&user_id=${user.id}&module=${moduleName}`;

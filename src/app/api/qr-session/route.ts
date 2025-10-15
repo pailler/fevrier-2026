@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     // Si l'utilisateur n'a pas encore accès au module QR codes, l'activer automatiquement (module gratuit)
     if (userAppError || !userApp) {
-      console.log('🔄 QR Session: Activation automatique du module QR codes (gratuit)');
+      ;
       
       const now = new Date();
       const expiresAt = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate()); // 1 an
@@ -56,18 +56,18 @@ export async function POST(request: NextRequest) {
 
       userAppData = activationData;
       isNewActivation = true;
-      console.log('✅ QR Session: Module QR codes activé automatiquement');
+      ;
     }
 
     // Vérifier si la session n'est pas expirée
     if (userAppData.expires_at && new Date(userAppData.expires_at) < new Date()) {
-      console.log('❌ QR Session: Session expirée');
+      ;
       return new NextResponse('Session expired', { status: 403 });
     }
 
     // Vérifier le quota d'utilisation
     if (userAppData.max_usage && userAppData.usage_count >= userAppData.max_usage) {
-      console.log('❌ QR Session: Quota dépassé');
+      ;
       return new NextResponse('Usage quota exceeded', { status: 403 });
     }
 
@@ -147,13 +147,13 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (error || !session) {
-      console.log('❌ QR Session: Session invalide ou expirée');
+      ;
       return new NextResponse('Invalid or expired session', { status: 403 });
     }
 
     // Vérifier si la session n'est pas expirée
     if (new Date(session.expires_at) < new Date()) {
-      console.log('❌ QR Session: Session expirée');
+      ;
       return new NextResponse('Session expired', { status: 403 });
     }
 

@@ -113,8 +113,7 @@ export default function ChatAI() {
     }
   };
 
-
-  const clearChat = () => {
+const clearChat = () => {
     setMessages([
       {
         id: '1',

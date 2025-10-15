@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('🎉 Mise à jour terminée !');
-    console.log('📊 Résumé des changements:');
+    ;
     updates.forEach(update => {
       console.log(`  - ${update.title}: ${update.old_price}€ → ${update.new_token_cost} tokens`);
     });

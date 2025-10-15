@@ -167,8 +167,3 @@ export const generatePageMetadata = (page: keyof typeof seoConfig.pages, customD
   };
 };
 
-
-
-
-
-

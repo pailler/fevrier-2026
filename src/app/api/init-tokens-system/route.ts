@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     } else {
-      console.log('✅ Colonne tokens disponible');
+      ;
       return NextResponse.json({
         success: true,
         message: 'Colonne tokens déjà disponible',

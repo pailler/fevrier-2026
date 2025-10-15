@@ -70,7 +70,7 @@ export default function AdminSettings() {
       setLoading(true);
       const supabase = getSupabaseClient();
 
-      console.log('🔍 Chargement des données réelles du tableau de bord...');
+      ;
 
       // Charger toutes les données en parallèle
       const [
@@ -234,7 +234,7 @@ export default function AdminSettings() {
         systemStatus
       });
 
-      console.log('✅ Données du tableau de bord chargées avec succès');
+      ;
     } catch (error) {
       console.error('❌ Erreur lors du chargement des données:', error);
     } finally {

@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 
     // 2. Créer le module s'il n'existe pas
     if (!moduleData) {
-      console.log('📝 Création du module LibreSpeed...');
+      ;
       
       const { data: newModule, error: createError } = await supabase
         .from('modules')
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
       console.log('⚠️ Erreur récupération accès utilisateur:', accessError.message);
     }
 
-    console.log('✅ Test de base de données terminé avec succès');
+    ;
 
     return NextResponse.json({
       success: true,

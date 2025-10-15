@@ -3,7 +3,7 @@ import { supabase } from '../../../utils/supabaseClient';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('📊 Module Access: Incrémentation du compteur d\'accès');
+    ;
     
     const body = await request.json();
     const { userId, userEmail, moduleId } = body;
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     // Vérifier l'expiration
     if (userApp.expires_at && new Date(userApp.expires_at) < new Date()) {
-      console.log('❌ Module Access: Accès expiré');
+      ;
       return new NextResponse(JSON.stringify({
         success: false,
         error: 'Accès expiré',
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     const maxUsage = userApp.max_usage || 50; // Limite par défaut de 50 (affichage uniquement)
     
     // Plus de vérification de quota - le système de tokens gère les limites
-    console.log('📊 Module Access: Compteur actuel:', currentUsage, '/', maxUsage, '(quota désactivé)');
+    ;
 
     // Incrémenter le compteur dans user_applications
     const newUsageCount = currentUsage + 1;

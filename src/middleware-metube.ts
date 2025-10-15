@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
     const token = url.searchParams.get('token');
     
     if (!token) {
-      console.log('❌ MeTube Middleware: Aucun token fourni');
+      ;
       return NextResponse.redirect('https://iahome.fr/login?redirect=/encours', 302);
     }
     
@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
       await metubeService.incrementUsage(tokenValidation.userId);
     }
     
-    console.log('✅ MeTube Middleware: Accès autorisé');
+    ;
     return NextResponse.next();
   }
   

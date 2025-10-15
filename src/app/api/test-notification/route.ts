@@ -1,75 +1,97 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { NotificationService } from '../../../utils/notificationService';
+import { Resend } from 'resend';
+import { getSupabaseClient } from '../../../utils/supabaseService';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, appName, userName } = await request.json();
-    
-    if (!email) {
+    const { eventType, email, subject, body, eventData } = await request.json();
+
+    if (!eventType || !email || !subject || !body) {
       return NextResponse.json(
-        { error: 'Email requis' },
+        { success: false, error: 'Paramètres manquants' },
         { status: 400 }
       );
     }
 
-    console.log('🧪 Test de notification pour:', { email, appName, userName });
+    console.log(`🧪 Test de notification: ${eventType} vers ${email}`);
 
-    const notificationService = NotificationService.getInstance();
-    
-    // Test de la notification d'accès à l'application
-    const result = await notificationService.sendModuleActivatedNotification(
-      email,
-      userName || 'Utilisateur Test',
-      appName || 'Application Test'
-    );
+    // Envoyer l'email de test via Resend
+    const { data: emailData, error: emailError } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'noreply@iahome.fr',
+      to: [email],
+      subject: `[TEST] ${subject}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #007bff;">
+            <h2 style="margin: 0; color: #007bff;">🧪 Email de Test - ${eventType}</h2>
+            <p style="margin: 5px 0 0 0; color: #6c757d; font-size: 14px;">
+              Ceci est un email de test pour vérifier la configuration des notifications.
+            </p>
+          </div>
+          
+          <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef;">
+            <h3 style="color: #333; margin-top: 0;">Contenu de la notification :</h3>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin: 15px 0;">
+              ${body.replace(/\n/g, '<br>')}
+            </div>
+            
+            <h4 style="color: #333; margin-top: 20px;">Données de l'événement :</h4>
+            <div style="background: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px;">
+              <pre>${JSON.stringify(eventData, null, 2)}</pre>
+            </div>
+          </div>
+          
+          <div style="text-align: center; margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 8px;">
+            <p style="margin: 0; color: #6c757d; font-size: 12px;">
+              Email de test envoyé depuis l'interface d'administration iahome.fr
+            </p>
+          </div>
+        </div>
+      `,
+    });
 
-    console.log('📧 Résultat du test:', result);
+    if (emailError) {
+      console.error('❌ Erreur Resend:', emailError);
+      return NextResponse.json(
+        { success: false, error: `Erreur Resend: ${emailError.message}` },
+        { status: 500 }
+      );
+    }
+
+    // Enregistrer le test dans les logs de notifications
+    const supabase = getSupabaseClient();
+    const { error: logError } = await supabase
+      .from('notification_logs')
+      .insert({
+        event_type: eventType,
+        user_email: email,
+        event_data: eventData,
+        email_sent: true,
+        email_sent_at: new Date().toISOString(),
+        created_at: new Date().toISOString()
+      });
+
+    if (logError) {
+      console.error('❌ Erreur lors de l\'enregistrement du log:', logError);
+      // Ne pas faire échouer la requête pour une erreur de log
+    }
+
+    console.log(`✅ Email de test envoyé avec succès: ${emailData?.id}`);
 
     return NextResponse.json({
-      success: result,
-      message: result ? 'Notification de test envoyée avec succès' : 'Échec de l\'envoi de la notification',
-      debug: {
-        email,
-        appName: appName || 'Application Test',
-        userName: userName || 'Utilisateur Test',
-        timestamp: new Date().toISOString()
-      }
+      success: true,
+      message: 'Email de test envoyé avec succès',
+      emailId: emailData?.id,
+      eventType,
+      email
     });
 
   } catch (error) {
     console.error('❌ Erreur lors du test de notification:', error);
     return NextResponse.json(
-      { 
-        success: false,
-        error: 'Erreur interne du serveur',
-        details: error instanceof Error ? error.message : 'Erreur inconnue'
-      },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET() {
-  try {
-    const notificationService = NotificationService.getInstance();
-    
-    return NextResponse.json({
-      success: true,
-      message: 'Service de notification disponible',
-      debug: {
-        serviceInitialized: !!notificationService,
-        timestamp: new Date().toISOString()
-      }
-    });
-
-  } catch (error) {
-    console.error('❌ Erreur lors du test du service:', error);
-    return NextResponse.json(
-      { 
-        success: false,
-        error: 'Erreur interne du serveur',
-        details: error instanceof Error ? error.message : 'Erreur inconnue'
-      },
+      { success: false, error: 'Erreur interne du serveur' },
       { status: 500 }
     );
   }

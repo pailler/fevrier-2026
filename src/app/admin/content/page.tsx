@@ -31,7 +31,7 @@ export default function AdminContent() {
   useEffect(() => {
     const loadContent = async () => {
       try {
-        console.log('🔍 Chargement du contenu du site...');
+        ;
         
         const supabase = getSupabaseClient();
         const allContent: ContentItem[] = [];

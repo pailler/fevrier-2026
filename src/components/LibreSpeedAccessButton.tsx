@@ -19,7 +19,7 @@ export default function LibreSpeedAccessButton({
   const [error, setError] = useState<string | null>(null);
   const { consumeTokens, refreshTokens } = useTokenContext();
 
-  console.log('🔍 LibreSpeedAccessButton: Rendu avec user:', user ? 'présent' : 'absent');
+  ;
 
   const handleAccess = async () => {
     if (!user) {
@@ -57,7 +57,7 @@ export default function LibreSpeedAccessButton({
       await refreshTokens();
 
       // Incrémenter le compteur d'accès (pour affichage uniquement)
-      console.log('📊 LibreSpeed: Incrémentation du compteur d\'accès...');
+      ;
       try {
         const incrementResponse = await fetch('/api/increment-librespeed-access', {
           method: 'POST',
@@ -84,7 +84,7 @@ export default function LibreSpeedAccessButton({
       console.log('🔗 LibreSpeed: Ouverture dans un nouvel onglet...');
       const librespeedUrl = 'https://librespeed.iahome.fr';
       window.open(librespeedUrl, '_blank');
-      console.log('✅ LibreSpeed: Ouverture de LibreSpeed');
+      ;
       
       // Ne pas appeler onAccessGranted pour éviter la double ouverture
       return;

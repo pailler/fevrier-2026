@@ -27,12 +27,11 @@ export default function AdminPayments() {
   useEffect(() => {
     const loadPayments = async () => {
       try {
-        console.log('🔍 Chargement des vrais paiements depuis la base de données...');
+        ;
         
         // Récupération directe des données depuis Supabase
-        
-        
-        const supabase = getSupabaseClient();
+
+const supabase = getSupabaseClient();
 
         // Récupérer les paiements depuis la table payments
         const { data: paymentsData, error: paymentsError } = await supabase

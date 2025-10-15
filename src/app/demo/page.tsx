@@ -146,7 +146,7 @@ export default function DemoPage() {
                 <span className="text-green-600 text-xl">✅</span>
               </div>
               <h3 className="font-semibold text-gray-900">Application</h3>
-              <p className="text-sm text-gray-600">localhost:3000</p>
+              <p className="text-sm text-gray-600">Production</p>
             </div>
 
             <div className="text-center">
@@ -202,7 +202,4 @@ export default function DemoPage() {
     </div>
   );
 }
-
-
-
 

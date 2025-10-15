@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('✅ Colonne tokens ajoutée à la table profiles avec succès');
+    ;
 
     return NextResponse.json({
       success: true,

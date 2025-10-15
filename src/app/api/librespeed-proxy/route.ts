@@ -4,7 +4,7 @@ const LIBRESPEED_SERVICE_URL = process.env.LIBRESPEED_SERVICE_URL || 'https://li
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 Proxy LibreSpeed racine - redirection vers le service');
+    ;
     
     // Rediriger vers le service LibreSpeed
     const response = await fetch(LIBRESPEED_SERVICE_URL, {
@@ -67,5 +67,4 @@ function rewriteLibrespeedUrls(html: string): string {
   
   return modified;
 }
-
 

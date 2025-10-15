@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
         const { NotificationService } = await import('../../../utils/notificationService');
         const notificationService = NotificationService.getInstance();
         
-        console.log('✅ Service de notification chargé');
+        ;
         
         const result = await notificationService.sendModuleActivatedNotification(
           email,
@@ -27,14 +27,14 @@ export async function POST(request: NextRequest) {
         console.log('📧 Résultat de la notification:', result);
         
         if (result) {
-          console.log('✅ Notification envoyée avec succès');
+          ;
           return NextResponse.json({
             success: true,
             message: 'Notification envoyée avec succès (simulation /encours)',
             debug: { email, appName, userName, timestamp: new Date().toISOString() }
           });
         } else {
-          console.log('❌ Échec de l\'envoi de la notification');
+          ;
           return NextResponse.json({
             success: false,
             message: 'Échec de l\'envoi de la notification (simulation /encours)',
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
         }, { status: 500 });
       }
     } else {
-      console.log('⚠️ Pas d\'email utilisateur disponible pour la notification');
+      ;
       return NextResponse.json({
         success: false,
         message: 'Pas d\'email utilisateur disponible',

@@ -4,6 +4,9 @@ import { NextRequest, NextResponse } from 'next/server';
 export const config = {
   // Configuration pour les uploads de fichiers
   maxDuration: 1800, // 30 minutes maximum pour les gros fichiers
+  bodyParser: {
+    sizeLimit: '10gb'
+  }
 };
 
 export async function POST(request: NextRequest) {
@@ -29,11 +32,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validation simplifiée de la taille (2GB max)
-    const maxSize = 2 * 1024 * 1024 * 1024; // 2GB
+    // Validation simplifiée de la taille (10GB max)
+    const maxSize = 10 * 1024 * 1024 * 1024; // 10GB
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: `Fichier trop volumineux. Maximum: ${maxSize / 1024 / 1024}MB` },
+        { error: `Fichier trop volumineux. Maximum: ${maxSize / 1024 / 1024 / 1024}GB` },
         { 
           status: 413,
           headers: {
@@ -49,13 +52,13 @@ export async function POST(request: NextRequest) {
     let targetUrl: string;
     switch (type) {
       case 'AUDIO':
-        targetUrl = 'http://localhost:8092/asr';
+        targetUrl = 'http://host.docker.internal:8092/asr';
         break;
       case 'VIDEO':
-        targetUrl = 'http://localhost:8095/asr';
+        targetUrl = 'http://host.docker.internal:8095/asr';
         break;
       case 'IMAGE':
-        targetUrl = 'http://localhost:8094/ocr';
+        targetUrl = 'http://host.docker.internal:8094/ocr';
         break;
       default:
         return NextResponse.json(
@@ -73,7 +76,11 @@ export async function POST(request: NextRequest) {
 
     // Créer un nouveau FormData pour le proxy
     const proxyFormData = new FormData();
-    proxyFormData.append('audio_file', file);
+    if (type === 'IMAGE') {
+      proxyFormData.append('image_file', file);
+    } else {
+      proxyFormData.append('audio_file', file);
+    }
 
     // Faire l'appel au service Whisper
     const response = await fetch(targetUrl, {

@@ -37,7 +37,7 @@ export default function AdminApplications() {
   useEffect(() => {
     const loadApplications = async () => {
       try {
-        console.log('🔍 Chargement des vraies applications depuis la base de données...');
+        ;
         
         const supabase = getSupabaseClient();
 

@@ -4,29 +4,3 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ message: 'MeTube test API works!' });
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

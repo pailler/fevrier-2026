@@ -12,7 +12,7 @@ export default function MeTubeSecurity() {
       
       if (!token) {
         // Aucun token - rediriger vers la page de connexion
-        console.log('❌ MeTube: Aucun token - redirection vers login');
+        ;
         window.location.href = 'https://iahome.fr/login';
         return;
       }
@@ -27,7 +27,7 @@ export default function MeTubeSecurity() {
           
           // Token provisoire valide pendant 1 heure
           if (tokenAge < 3600000) {
-            console.log('✅ MeTube: Token provisoire valide - accès autorisé');
+            ;
             // Supprimer le token de l'URL pour un accès propre
             const newUrl = new URL(window.location.href);
             newUrl.searchParams.delete('token');
@@ -39,7 +39,7 @@ export default function MeTubeSecurity() {
       
       // Vérifier si c'est un token d'accès valide
       if (!token.startsWith('prov_')) {
-        console.log('✅ MeTube: Token d\'accès détecté - accès autorisé');
+        ;
         // Supprimer le token de l'URL pour un accès propre
         const newUrl = new URL(window.location.href);
         newUrl.searchParams.delete('token');
@@ -48,7 +48,7 @@ export default function MeTubeSecurity() {
       }
       
       // Token invalide - rediriger vers la page de connexion
-      console.log('❌ MeTube: Token invalide - redirection vers login');
+      ;
       window.location.href = 'https://iahome.fr/login';
     }
   }, []);

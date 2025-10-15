@@ -31,7 +31,7 @@ export default function MeTubePage() {
         }
 
         if (!session) {
-          console.log('❌ MeTube: Aucune session - affichage page d\'authentification');
+          ;
           setIsLoading(false);
           return;
         }
@@ -40,7 +40,7 @@ export default function MeTubePage() {
         console.log('✅ MeTube: Utilisateur connecté:', session.user.email);
 
         // Vérifier l'accès à MeTube
-        console.log('🔍 MeTube: Vérification de l\'accès...');
+        ;
         const accessResponse = await fetch('/api/check-module-access', {
           method: 'POST',
           headers: {
@@ -69,7 +69,7 @@ export default function MeTubePage() {
         });
 
         if (tokenResponse.ok) {
-          console.log('✅ MeTube: Redirection vers MeTube local...');
+          ;
           // La redirection est gérée par l'API
         } else {
           const errorData = await tokenResponse.json().catch(() => ({}));

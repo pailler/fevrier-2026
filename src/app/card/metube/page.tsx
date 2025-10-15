@@ -271,7 +271,7 @@ export default function MeTubePage() {
                 onClick={() => {
                   if (isAuthenticated && user) {
                     // Utilisateur connecté : aller à la page de transition puis /encours
-                    console.log('✅ Accès MeTube - Utilisateur connecté');
+                    ;
                     router.push(`/token-generated?module=${encodeURIComponent('MeTube')}&redirect=/encours`);
                   } else {
                     // Utilisateur non connecté : aller à la page de connexion puis retour à MeTube

@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse('Error checking table', { status: 500 });
     }
 
-    console.log('✅ QR Sessions: Table créée/vérifiée avec succès');
+    ;
     
     return new NextResponse(JSON.stringify({
       success: true,

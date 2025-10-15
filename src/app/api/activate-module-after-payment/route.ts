@@ -14,11 +14,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { sessionId, userId, userEmail, testMode = false } = body;
 
-    console.log('🔍 Début de l\'activation du module après paiement');
+    ;
     console.log('📋 Paramètres reçus:', { sessionId, userId, userEmail, testMode });
 
     if (!sessionId || !userId || !userEmail) {
-      console.log('❌ Paramètres manquants');
+      ;
       return NextResponse.json(
         { success: false, error: 'Paramètres manquants' },
         { status: 400 }
@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingAccess) {
-      console.log('ℹ️ Module déjà activé pour l\'utilisateur');
+      ;
       return NextResponse.json({
         success: true,
         message: 'Module déjà activé',
@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    console.log('🔄 Activation du module pour l\'utilisateur...');
+    ;
 
     // Activer le module pour l'utilisateur avec quota de 50 utilisations par mois
     const now = new Date();
@@ -232,7 +232,7 @@ export async function POST(request: NextRequest) {
               }
             }
           ]);
-        console.log('✅ Paiement enregistré avec succès');
+        ;
       } else {
         console.log('⚠️ Table payments non disponible, paiement non enregistré');
       }

@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
         const { NotificationService } = await import('../../../utils/notificationService');
         const notificationService = NotificationService.getInstance();
         
-        console.log('🔘 Service de notification chargé après clic');
+        ;
         
         // Simuler l'appel exact du bouton
         const result = await notificationService.sendModuleActivatedNotification(
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
         console.log('🔘 Résultat après clic sur bouton:', result);
         
         if (result) {
-          console.log('✅ Notification envoyée après clic sur bouton');
+          ;
           return NextResponse.json({
             success: true,
             message: 'Notification envoyée après clic sur bouton',
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
             }
           });
         } else {
-          console.log('❌ Échec notification après clic sur bouton');
+          ;
           return NextResponse.json({
             success: false,
             message: 'Échec notification après clic sur bouton',

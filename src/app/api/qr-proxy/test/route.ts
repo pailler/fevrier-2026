@@ -4,7 +4,7 @@ const QR_CODE_SERVICE_URL = process.env.QR_CODE_SERVICE_URL || 'https://qrcode.i
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 Test du proxy QR Code...');
+    ;
     
     // Test de connexion directe au service QR
     const healthUrl = `${QR_CODE_SERVICE_URL}/health`;
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     
     if (response.ok) {
       const data = await response.json();
-      console.log('✅ Connexion au service QR réussie');
+      ;
       
       return NextResponse.json({
         success: true,
@@ -57,5 +57,4 @@ export async function GET(request: NextRequest) {
     }, { status: 500 });
   }
 }
-
 

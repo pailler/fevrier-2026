@@ -16,6 +16,19 @@ import AggressivePreloadCleaner from "../components/AggressivePreloadCleaner";
 import MobileOptimizer from "../components/MobileOptimizer";
 import ClientTokenProvider from "../components/ClientTokenProvider";
 
+// Supprimer les messages de développement React
+if (typeof window !== 'undefined') {
+  const originalConsoleLog = console.log;
+  console.log = function(...args) {
+    const message = args.join(' ');
+    if (message.includes('Download the React DevTools') || 
+        message.includes('react.dev/link/react-devtools')) {
+      return;
+    }
+    originalConsoleLog.apply(console, args);
+  };
+}
+
 // Utilisation de polices système pour éviter les preloads
 
 export const metadata: Metadata = {

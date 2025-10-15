@@ -38,7 +38,7 @@ export class LibreSpeedAccessService {
         .single();
 
       if (accessError || !userAccess) {
-        console.log('❌ LibreSpeed: Aucun accès trouvé');
+        ;
         return {
           hasAccess: false,
           reason: 'LibreSpeed non activé pour votre compte'
@@ -51,7 +51,7 @@ export class LibreSpeedAccessService {
         const now = new Date();
         
         if (expirationDate <= now) {
-          console.log('❌ LibreSpeed: Accès expiré');
+          ;
           return {
             hasAccess: false,
             reason: 'Votre accès LibreSpeed a expiré'
@@ -59,7 +59,7 @@ export class LibreSpeedAccessService {
         }
       }
 
-      console.log('✅ LibreSpeed: Accès confirmé');
+      ;
       return { hasAccess: true };
     } catch (error) {
       console.error('❌ LibreSpeed: Erreur vérification accès:', error);
@@ -107,7 +107,7 @@ export class LibreSpeedAccessService {
         };
       }
 
-      console.log('✅ LibreSpeed: Token généré:', token.substring(0, 10) + '...');
+      ;
       return {
         hasAccess: true,
         token: token
@@ -126,7 +126,7 @@ export class LibreSpeedAccessService {
    */
   async validateToken(token: string): Promise<LibreSpeedAccessResult> {
     try {
-      console.log('🔍 LibreSpeed: Validation token:', token.substring(0, 10) + '...');
+      ;
 
       const { data: tokenData, error: tokenError } = await supabase
         .from('librespeed_tokens')
@@ -136,7 +136,7 @@ export class LibreSpeedAccessService {
         .single();
 
       if (tokenError || !tokenData) {
-        console.log('❌ LibreSpeed: Token invalide');
+        ;
         return {
           hasAccess: false,
           reason: 'Token invalide ou expiré'
@@ -149,7 +149,7 @@ export class LibreSpeedAccessService {
         const now = new Date();
         
         if (expirationDate <= now) {
-          console.log('❌ LibreSpeed: Token expiré');
+          ;
           return {
             hasAccess: false,
             reason: 'Token expiré'

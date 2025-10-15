@@ -43,9 +43,8 @@ export default function Home() {
       
       <div className="min-h-screen bg-blue-50 font-sans">
         <Breadcrumb />
-        
 
-      {/* Section héros principale */}
+{/* Section héros principale */}
       <section className="bg-gradient-to-br from-yellow-100 via-green-50 to-green-200 py-16 relative overflow-hidden">
         {/* Effet de particules en arrière-plan */}
         <div className="absolute inset-0">

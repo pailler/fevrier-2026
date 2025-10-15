@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       .limit(1);
 
     if (existingSettings && existingSettings.length > 0) {
-      console.log('✅ Paramètres de notifications déjà configurés');
+      ;
       return NextResponse.json({
         success: true,
         message: 'Système de notifications déjà configuré',

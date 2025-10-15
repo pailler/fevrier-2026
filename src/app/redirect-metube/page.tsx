@@ -12,7 +12,7 @@ export default function RedirectMeTube() {
     const checkTokenAndRedirect = async () => {
       const token = searchParams.get('token');
       
-      console.log('🔍 MeTube Redirect: Token reçu:', token ? token.substring(0, 10) + '...' : 'aucun');
+      ;
       
       // Si un token est fourni, vérifier s'il est valide
       if (token) {
@@ -26,7 +26,7 @@ export default function RedirectMeTube() {
             
             // Token provisoire valide pendant 1 heure
             if (tokenAge < 3600000) {
-              console.log('✅ MeTube Redirect: Token provisoire valide - autoriser accès direct');
+              ;
               // Rediriger vers MeTube directement
               window.location.href = 'https://metube.iahome.fr';
               return;
@@ -36,14 +36,14 @@ export default function RedirectMeTube() {
         
         // Vérifier si c'est un token d'accès valide
         if (!token.startsWith('prov_')) {
-          console.log('✅ MeTube Redirect: Token d\'accès détecté - autoriser accès direct');
+          ;
           window.location.href = 'https://metube.iahome.fr';
           return;
         }
       }
       
       // Aucun token ou token invalide - rediriger vers la page de connexion
-      console.log('❌ MeTube Redirect: Aucun token valide - redirection vers login');
+      ;
       window.location.href = 'https://iahome.fr/login';
     };
 

@@ -305,7 +305,7 @@ function SelectionsContent() {
                               try {
                                 const notificationService = NotificationServiceClient.getInstance();
                                 await notificationService.notifyAppAccessed(user?.email || '', module.title, user?.email?.split('@')[0] || 'Utilisateur');
-                                console.log('✅ Notification d\'accès à l\'application envoyée');
+                                ;
                               } catch (notificationError) {
                                 console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
                               }

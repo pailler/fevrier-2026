@@ -67,7 +67,7 @@ export default function DebugSignInForm({
       }
 
       if (result.token) {
-        console.log('✅ Connexion réussie, stockage du token...');
+        ;
         
         // Stocker le token et les données utilisateur
         localStorage.setItem('auth_token', result.token);
@@ -224,12 +224,4 @@ export default function DebugSignInForm({
     </div>
   );
 }
-
-
-
-
-
-
-
-
 

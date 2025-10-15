@@ -82,9 +82,7 @@ export default function QRCodePage() {
     );
   }
 
-
-
-  return (
+return (
     <div className="min-h-screen bg-blue-50 py-12">
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white rounded-lg shadow-md p-8">

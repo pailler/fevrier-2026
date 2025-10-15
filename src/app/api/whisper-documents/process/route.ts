@@ -117,7 +117,7 @@ async function processDocumentAsync(taskId: string, file: File) {
     }
     
     const result = await documentResponse.json();
-    console.log('✅ Document traité avec succès');
+    ;
     
     // Mettre à jour la tâche avec le résultat
     const task = uploadSessions.get(`task_${taskId}`);

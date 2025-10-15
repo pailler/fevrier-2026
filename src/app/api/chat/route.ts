@@ -34,10 +34,10 @@ async function generateAIResponse(message: string, conversationHistory: any[], u
     // Configuration OpenAI
     const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
     
-    console.log('🔍 Diagnostic Chatbot:');
+    ;
     console.log('- OPENAI_API_KEY présent:', !!OPENAI_API_KEY);
     console.log('- NODE_ENV:', process.env.NODE_ENV);
-    console.log('- Message utilisateur:', message.substring(0, 100) + '...');
+    ;
     
     if (!OPENAI_API_KEY) {
       console.log('⚠️ Pas de clé OpenAI - Utilisation du fallback');
@@ -45,13 +45,13 @@ async function generateAIResponse(message: string, conversationHistory: any[], u
       return await generateSimpleResponse(message, userId);
     }
 
-    console.log('✅ Clé OpenAI trouvée - Utilisation de GPT-4');
+    ;
     
     // Récupérer toutes les données contextuelles du projet IAHome
     const contextData = await getCompleteContextData(message, userId);
     
-    console.log('📊 Données contextuelles récupérées:');
-    console.log('- Modules:', contextData.modules ? 'Oui' : 'Non');
+    ;
+    ;
     console.log('- Articles:', contextData.blogArticles ? 'Oui' : 'Non');
     console.log('- Services:', contextData.servicesData ? 'Oui' : 'Non');
 
@@ -146,7 +146,7 @@ Réponds de manière détaillée et utile en te basant sur les vraies données d
     }
 
     const data = await response.json();
-    console.log('✅ Réponse OpenAI reçue avec succès');
+    ;
     
     return data.choices[0]?.message?.content || 'Désolé, je n\'ai pas pu traiter votre demande.';
   } catch (error) {
@@ -363,6 +363,26 @@ async function generateSimpleResponse(message: string, userId: string) {
 
 async function saveConversation(userId: string, userMessage: string, aiResponse: string) {
   try {
+    // Vérifier si userId est un UUID valide
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    
+    if (!uuidRegex.test(userId)) {
+      console.log('⚠️ userId non-UUID, sauvegarde ignorée:', userId);
+      return;
+    }
+
+    // Vérifier si l'utilisateur existe dans la table users
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', userId)
+      .single();
+
+    if (userError || !user) {
+      console.log('⚠️ Utilisateur non trouvé, sauvegarde ignorée:', userId);
+      return;
+    }
+
     const { error } = await supabase
       .from('chat_conversations')
       .insert({
@@ -374,6 +394,8 @@ async function saveConversation(userId: string, userMessage: string, aiResponse:
 
     if (error) {
       console.error('Erreur sauvegarde conversation:', error);
+    } else {
+      console.log('✅ Conversation sauvegardée pour user:', userId);
     }
   } catch (error) {
     console.error('Erreur sauvegarde conversation:', error);

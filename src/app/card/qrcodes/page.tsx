@@ -420,7 +420,7 @@ export default function QRCodesPage() {
                 // Utilisateur connecté : aller à la page de transition puis /encours
                 <button
                   onClick={() => {
-                    console.log('✅ Accès QR Codes - Utilisateur connecté');
+                    ;
                     router.push(`/token-generated?module=${encodeURIComponent('QR Codes')}&redirect=/encours`);
                   }}
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"

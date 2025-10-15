@@ -66,7 +66,7 @@ export default function MeTubeAccessButton({
       console.log('🪙 MeTube: Tokens consommés avec succès côté serveur:', consumeResult.tokensConsumed);
 
       // Incrémenter le compteur d'accès (pour affichage uniquement, pas de quota)
-      console.log('📊 MeTube: Incrémentation du compteur d\'accès...');
+      ;
       const incrementResponse = await fetch('/api/increment-module-access', {
         method: 'POST',
         headers: {
@@ -90,7 +90,7 @@ export default function MeTubeAccessButton({
       console.log('🔗 MeTube: Ouverture dans un nouvel onglet...');
       const metubeUrl = 'https://metube.iahome.fr';
       window.open(metubeUrl, '_blank');
-      console.log('✅ MeTube: Ouverture de MeTube');
+      ;
       
       // Ne pas appeler onAccessGranted pour éviter la double ouverture
       return;
@@ -104,8 +104,7 @@ export default function MeTubeAccessButton({
     }
   };
 
-
-  return (
+return (
     <div className="flex flex-col items-center space-y-2">
       <button
         onClick={handleAccess}

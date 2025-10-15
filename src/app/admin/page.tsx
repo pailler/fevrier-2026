@@ -69,7 +69,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const loadStats = async () => {
       try {
-        console.log('🔍 Chargement des statistiques admin...');
+        ;
         
         // Données simulées basées sur la structure réelle de la base de données
         // Ces données reflètent les vraies valeurs de votre système
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
           ]
         };
         
-        console.log('✅ Statistiques admin chargées (données simulées basées sur la DB)');
+        ;
         setStats(mockStats);
       } catch (error) {
         console.error('❌ Erreur lors du chargement des statistiques:', error);
@@ -282,9 +282,8 @@ export default function AdminDashboard() {
             <h3 className="font-medium text-gray-900">Configurer les modules</h3>
             <p className="text-sm text-gray-600">{stats.totalModules} modules disponibles</p>
           </a>
-          
-          
-        </div>
+
+</div>
       </div>
 
       {/* Activité récente */}

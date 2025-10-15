@@ -4,10 +4,17 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     
+    // Créer un nouveau FormData avec le bon nom de champ
+    const newFormData = new FormData();
+    const file = formData.get('file') as File;
+    if (file) {
+      newFormData.append('image_file', file);
+    }
+    
     // Proxifier vers le service Whisper OCR
-    const response = await fetch('http://whisper-ocr-prod:8080/ocr', {
+    const response = await fetch('http://host.docker.internal:8094/ocr', {
       method: 'POST',
-      body: formData,
+      body: newFormData,
     });
 
     if (!response.ok) {
@@ -47,32 +54,4 @@ export async function OPTIONS() {
     },
   });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

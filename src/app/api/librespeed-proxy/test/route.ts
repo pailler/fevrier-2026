@@ -4,7 +4,7 @@ const LIBRESPEED_SERVICE_URL = process.env.LIBRESPEED_SERVICE_URL || 'https://li
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 Test du proxy LibreSpeed...');
+    ;
     
     // Test de connexion directe au service LibreSpeed
     const testUrl = `${LIBRESPEED_SERVICE_URL}/`;
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     
     if (response.ok) {
       const contentType = response.headers.get('content-type') || '';
-      console.log('✅ Connexion au service LibreSpeed réussie');
+      ;
       
       return NextResponse.json({
         success: true,
@@ -58,5 +58,4 @@ export async function GET(request: NextRequest) {
     }, { status: 500 });
   }
 }
-
 

@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     // Test 1: Service de notification
     const notificationService = NotificationService.getInstance();
-    console.log('✅ Service de notification initialisé');
+    ;
 
     // Test 2: Envoi via NotificationService
     const result = await notificationService.sendModuleActivatedNotification(

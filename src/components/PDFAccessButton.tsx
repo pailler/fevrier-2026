@@ -57,7 +57,7 @@ export default function PDFAccessButton({ user, onAccessGranted, onAccessDenied 
       console.log('📄 PDF+: Début de la procédure d\'accès...');
       
       // 1. Incrémenter le compteur d'accès
-      console.log('📊 PDF+: Incrémentation du compteur d\'accès...');
+      ;
       const incrementResponse = await fetch('/api/increment-module-access', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -74,7 +74,7 @@ export default function PDFAccessButton({ user, onAccessGranted, onAccessDenied 
       } else {
         const errorData = await incrementResponse.json().catch(() => ({}));
         if (incrementResponse.status === 403 && errorData.error === 'Quota dépassé') {
-          console.log('❌ PDF+: Quota dépassé');
+          ;
           setError(errorData.message || 'Quota d\'utilisation dépassé. Contactez l\'administrateur.');
           onAccessDenied('Quota d\'utilisation dépassé. Contactez l\'administrateur.');
           return;
@@ -86,7 +86,7 @@ export default function PDFAccessButton({ user, onAccessGranted, onAccessDenied 
       console.log('🔗 PDF+: Ouverture dans un nouvel onglet...');
       const pdfUrl = 'https://pdf.iahome.fr';
       window.open(pdfUrl, '_blank');
-      console.log('✅ PDF+: Ouverture de PDF+');
+      ;
       
       // Ne pas appeler onAccessGranted pour éviter la double ouverture
       

@@ -134,11 +134,3 @@ export default function ForgotPasswordPage() {
   );
 }
 
-
-
-
-
-
-
-
-

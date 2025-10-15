@@ -22,13 +22,13 @@ export async function GET(request: NextRequest) {
       const tokenValidation = await librespeedService.validateToken(token);
       
       if (!tokenValidation.hasAccess) {
-        console.log('❌ Token invalide ou expiré');
+        ;
         return NextResponse.redirect('https://iahome.fr/encours?error=invalid_token', 302);
       }
       
       // Rediriger vers LibreSpeed avec le token
       const librespeedUrl = `https://librespeed.iahome.fr/?token=${token}`;
-      console.log('✅ Redirection vers LibreSpeed avec token');
+      ;
       return NextResponse.redirect(librespeedUrl, 302);
     }
     
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     const cookieHeader = request.headers.get('cookie');
     
     if (!cookieHeader) {
-      console.log('❌ LibreSpeed Redirect: Aucun cookie trouvé');
+      ;
       return NextResponse.redirect('https://iahome.fr/login?redirect=/encours', 302);
     }
 
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
     const { data: { session }, error } = await supabaseWithCookies.auth.getSession();
     
     if (error || !session) {
-      console.log('❌ LibreSpeed Redirect: Session invalide');
+      ;
       return NextResponse.redirect('https://iahome.fr/login?redirect=/encours', 302);
     }
 
@@ -78,13 +78,13 @@ export async function GET(request: NextRequest) {
     const tokenResult = await librespeedService.generateAccessToken(session.user.id, session.user.email!);
     
     if (!tokenResult.hasAccess || !tokenResult.token) {
-      console.log('❌ LibreSpeed Redirect: Erreur génération token');
+      ;
       return NextResponse.redirect('https://iahome.fr/encours?error=token_generation_failed', 302);
     }
 
     // Rediriger vers LibreSpeed avec le token
     const librespeedUrl = `https://librespeed.iahome.fr/?token=${tokenResult.token}`;
-    console.log('✅ LibreSpeed Redirect: Redirection vers LibreSpeed avec token');
+    ;
     return NextResponse.redirect(librespeedUrl, 302);
 
   } catch (error) {

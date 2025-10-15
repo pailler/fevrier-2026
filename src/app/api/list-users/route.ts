@@ -3,7 +3,7 @@ import { supabase } from '../../../utils/supabaseClient';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 Liste des utilisateurs dans la table profiles...');
+    ;
 
     // Récupérer tous les utilisateurs
     const { data: users, error: usersError } = await supabase

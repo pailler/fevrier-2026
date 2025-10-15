@@ -58,15 +58,13 @@ function generateQRCodeToken(user: any) {
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 DEBUG: Début GET /api/qr-token');
+    ;
     
     // Redirection directe vers l'application locale sans authentification
-    console.log('✅ Redirection directe vers l\'application QR Code locale');
+    ;
     return NextResponse.redirect(QR_CODE_CONFIG.url);
 
-
-
-  } catch (error) {
+} catch (error) {
     console.error('❌ Erreur GET /api/qr-token:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
@@ -77,15 +75,13 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 DEBUG: Début POST /api/qr-token');
+    ;
     
     // Redirection directe vers l'application locale sans authentification
-    console.log('✅ Redirection directe vers l\'application QR Code locale');
+    ;
     return NextResponse.redirect(QR_CODE_CONFIG.url);
 
-
-
-  } catch (error) {
+} catch (error) {
     console.error('❌ Erreur POST /api/qr-token:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },

@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     const token = url.searchParams.get('token');
     
     if (!moduleId) {
-      console.log('❌ Unified Redirect: Module non spécifié');
+      ;
       return NextResponse.redirect('https://iahome.fr/encours?error=no_module', 302);
     }
 
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
         const tokenValidation = await librespeedService.validateToken(token);
         
         if (!tokenValidation.hasAccess) {
-          console.log('❌ Token LibreSpeed invalide');
+          ;
           return NextResponse.redirect('https://iahome.fr/encours?error=invalid_token', 302);
         }
         
@@ -65,13 +65,13 @@ export async function GET(request: NextRequest) {
           .single();
         
         if (tokenError || !tokenData) {
-          console.log('❌ Token invalide');
+          ;
           return NextResponse.redirect('https://iahome.fr/encours?error=invalid_token', 302);
         }
         
         // Vérifier l'expiration
         if (tokenData.expires_at && new Date(tokenData.expires_at) <= new Date()) {
-          console.log('❌ Token expiré');
+          ;
           return NextResponse.redirect('https://iahome.fr/encours?error=token_expired', 302);
         }
         
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
     
     const cookieHeader = request.headers.get('cookie');
     if (!cookieHeader) {
-      console.log('❌ Aucun cookie trouvé');
+      ;
       return NextResponse.redirect('https://iahome.fr/login?redirect=/encours', 302);
     }
 
@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
     const { data: { session }, error } = await supabaseWithCookies.auth.getSession();
     
     if (error || !session) {
-      console.log('❌ Session invalide');
+      ;
       return NextResponse.redirect('https://iahome.fr/login?redirect=/encours', 302);
     }
 
@@ -148,7 +148,7 @@ export async function GET(request: NextRequest) {
       const tokenResult = await librespeedService.generateAccessToken(session.user.id, session.user.email!);
       
       if (!tokenResult.hasAccess || !tokenResult.token) {
-        console.log('❌ Erreur génération token LibreSpeed');
+        ;
         return NextResponse.redirect('https://iahome.fr/encours?error=token_generation_failed', 302);
       }
       

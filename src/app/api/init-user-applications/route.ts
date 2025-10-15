@@ -8,7 +8,7 @@ const supabase = createClient(
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔧 Initialisation des applications utilisateur...');
+    ;
 
     // 1. Vérifier si la table user_applications existe
     const { data: tableCheck, error: tableError } = await supabase

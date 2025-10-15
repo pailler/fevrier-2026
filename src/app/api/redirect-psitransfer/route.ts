@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
         .single();
       
       if (tokenError || !tokenData) {
-        console.log('❌ Token invalide ou expiré');
+        ;
         return NextResponse.redirect('https://iahome.fr/encours?error=invalid_token', 302);
       }
       
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
         const now = new Date();
         
         if (expirationDate <= now) {
-          console.log('❌ Token expiré');
+          ;
           return NextResponse.redirect('https://iahome.fr/encours?error=token_expired', 302);
         }
       }
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
     const isFromIAHome = referer?.includes('iahome.fr') || origin?.includes('iahome.fr') || host?.includes('iahome.fr');
     
     if (!isFromIAHome) {
-      console.log('❌ Accès direct bloqué - redirection vers login');
+      ;
       return NextResponse.redirect('https://iahome.fr/login?error=direct_access_denied', 302);
     }
     
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
     const cookieHeader = request.headers.get('cookie');
     
     if (!cookieHeader) {
-      console.log('❌ Aucun cookie trouvé - redirection vers login');
+      ;
       return NextResponse.redirect('https://iahome.fr/login?error=no_session', 302);
     }
     
@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
     const { data: { session }, error } = await supabaseWithCookies.auth.getSession();
     
     if (error || !session) {
-      console.log('❌ Session invalide - redirection vers login');
+      ;
       return NextResponse.redirect('https://iahome.fr/login?error=invalid_session', 302);
     }
     

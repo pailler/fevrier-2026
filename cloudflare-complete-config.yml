@@ -2,20 +2,32 @@ tunnel: iahome-new
 credentials-file: C:\Users\AAA\.cloudflared\4cc75dfd-fd02-4496-97f9-23f40fc1943d.json
 
 ingress:
-  - hostname: librespeed.iahome.fr
-    service: http://localhost:8085
-  - hostname: metube.iahome.fr
-    service: http://localhost:8081
-  - hostname: whisper.iahome.fr
-    service: http://localhost:8093
-  - hostname: psitransfer.iahome.fr
-    service: http://localhost:8087
-  - hostname: qrcodes.iahome.fr
-    service: http://localhost:7006
-  - hostname: pdf.iahome.fr
-    service: http://localhost:8086
   - hostname: iahome.fr
     service: http://localhost:3000
   - hostname: www.iahome.fr
     service: http://localhost:3000
+  - hostname: metube.iahome.fr
+    service: http://localhost:8082
+  - hostname: librespeed.iahome.fr
+    service: http://localhost:8083
+  - hostname: whisper.iahome.fr
+    service: http://localhost:8093
+  - hostname: psitransfer.iahome.fr
+    service: http://localhost:8084
+  - hostname: qrcodes.iahome.fr
+    service: http://localhost:8091
+  - hostname: pdf.iahome.fr
+    service: http://localhost:8081
+  - hostname: converter.iahome.fr
+    service: http://localhost:8096
+  - hostname: stablediffusion.iahome.fr
+    service: http://localhost:8085
+  - hostname: ruinedfooocus.iahome.fr
+    service: http://localhost:8087
+  - hostname: comfyui.iahome.fr
+    service: http://localhost:8088
+  - hostname: sdnext.iahome.fr
+    service: http://localhost:8089
+  - hostname: invoke.iahome.fr
+    service: http://localhost:8090
   - service: http_status:404

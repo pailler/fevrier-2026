@@ -50,7 +50,7 @@ export class EmailService {
 
       const { to, subject, html, from = process.env.RESEND_FROM_EMAIL || 'IAHome <noreply@iahome.fr>' } = emailData;
 
-      console.log('🔍 DEBUG: Appel de emailService.sendEmail...');
+      ;
       
       const result = await this.resend.emails.send({
         from,

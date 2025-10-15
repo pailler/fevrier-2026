@@ -78,7 +78,7 @@ export default function PhotoPortfolioPage() {
 
   const checkAuth = async () => {
     try {
-      console.log('🔍 Vérification de l\'authentification...');
+      ;
       const { data: { session }, error } = await supabase.auth.getSession();
       console.log('📊 Session data:', { session: !!session, user: !!session?.user, error });
       
@@ -86,7 +86,7 @@ export default function PhotoPortfolioPage() {
         console.log('✅ Utilisateur connecté:', session.user.email);
         setUser(session.user);
       } else {
-        console.log('❌ Aucune session active, redirection vers /login');
+        ;
         // Rediriger vers la page de connexion existante d'iAhome
         router.push('/login');
       }

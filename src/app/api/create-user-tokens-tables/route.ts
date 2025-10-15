@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('✅ Tables user_tokens et token_usage créées avec succès');
+    ;
     console.log(`✅ ${profiles.length} utilisateurs ont reçu 100 tokens par défaut`);
 
     return NextResponse.json({

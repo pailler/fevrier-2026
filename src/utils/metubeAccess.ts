@@ -49,7 +49,7 @@ export class MeTubeAccessService {
         .single();
 
       if (userAppError || !userApp) {
-        console.log('❌ MeTube Access: Aucun accès trouvé pour l\'utilisateur');
+        ;
         return {
           hasAccess: false,
           reason: 'Aucun accès MeTube trouvé pour votre compte'
@@ -58,7 +58,7 @@ export class MeTubeAccessService {
 
       // Vérifier l'expiration
       if (userApp.expires_at && new Date(userApp.expires_at) <= new Date()) {
-        console.log('❌ MeTube Access: Accès expiré');
+        ;
         return {
           hasAccess: false,
           reason: 'Votre accès MeTube a expiré'
@@ -67,14 +67,14 @@ export class MeTubeAccessService {
 
       // Vérifier la limite d'utilisation
       if (userApp.usage_count >= userApp.max_usage) {
-        console.log('❌ MeTube Access: Limite d\'utilisation atteinte');
+        ;
         return {
           hasAccess: false,
           reason: `Limite d'utilisation atteinte (${userApp.usage_count}/${userApp.max_usage})`
         };
       }
 
-      console.log('✅ MeTube Access: Accès autorisé');
+      ;
       return { hasAccess: true };
 
     } catch (error) {
@@ -126,7 +126,7 @@ export class MeTubeAccessService {
         };
       }
 
-      console.log('✅ MeTube Token: Token généré avec succès');
+      ;
       return {
         hasAccess: true,
         token: token
@@ -146,7 +146,7 @@ export class MeTubeAccessService {
    */
   async validateToken(token: string): Promise<MeTubeTokenValidation> {
     try {
-      console.log('🔍 MeTube Token: Validation du token', token.substring(0, 10) + '...');
+      ;
 
       // Vérifier si c'est un token provisoire
       if (token.startsWith('prov_')) {
@@ -158,7 +158,7 @@ export class MeTubeAccessService {
           
           // Token provisoire valide pendant 1 heure
           if (tokenAge < 3600000) {
-            console.log('✅ MeTube Token: Token provisoire valide');
+            ;
             return {
               hasAccess: true,
               userId: tokenParts[1],
@@ -178,7 +178,7 @@ export class MeTubeAccessService {
         .single();
 
       if (tokenError || !tokenData) {
-        console.log('❌ MeTube Token: Token invalide');
+        ;
         return {
           hasAccess: false,
           reason: 'Token invalide'
@@ -187,7 +187,7 @@ export class MeTubeAccessService {
 
       // Vérifier l'expiration
       if (tokenData.expires_at && new Date(tokenData.expires_at) <= new Date()) {
-        console.log('❌ MeTube Token: Token expiré');
+        ;
         return {
           hasAccess: false,
           reason: 'Token expiré'
@@ -201,7 +201,7 @@ export class MeTubeAccessService {
         .eq('id', tokenData.created_by)
         .single();
 
-      console.log('✅ MeTube Token: Token valide');
+      ;
       return {
         hasAccess: true,
         userId: tokenData.created_by,
@@ -245,7 +245,7 @@ export class MeTubeAccessService {
       if (error) {
         console.error('❌ MeTube Usage: Erreur incrémentation', error);
       } else {
-        console.log('✅ MeTube Usage: Compteur incrémenté');
+        ;
       }
     } catch (error) {
       console.error('❌ MeTube Usage Error:', error);

@@ -276,8 +276,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   </div>
                 </div>
                
-                               {/* Badge prix en haut à droite */}
-                <div className="absolute top-3 right-3 z-20">
+                               {/* Badge prix et nom du module en haut à droite */}
+                <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                  <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                    LibreSpeed
+                  </span>
                   <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
                     {formatPrice(module.price)}
                   </span>
@@ -332,8 +335,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                 </div>
               </div>
               
-              {/* Badge prix en haut à droite */}
-              <div className="absolute top-3 right-3 z-20">
+              {/* Badge prix et nom du module en haut à droite */}
+              <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                <span className="bg-gradient-to-r from-green-500 to-teal-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  PSITransfer
+                </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
                   {formatPrice(module.price)}
                 </span>
@@ -391,8 +397,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                 </div>
               </div>
               
-              {/* Badge prix en haut à droite */}
-              <div className="absolute top-3 right-3 z-20">
+              {/* Badge prix et nom du module en haut à droite */}
+              <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                <span className="bg-gradient-to-r from-red-500 to-pink-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  PDF+
+                </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
                   {formatPrice(module.price)}
                 </span>
@@ -450,8 +459,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                 </div>
               </div>
               
-              {/* Badge prix en haut à droite */}
-              <div className="absolute top-3 right-3 z-20">
+              {/* Badge prix et nom du module en haut à droite */}
+              <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                <span className="bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  MeTube
+                </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
                   {formatPrice(module.price)}
                 </span>
@@ -934,8 +946,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                 </div>
               </div>
               
-              {/* Badge prix en haut à droite */}
-              <div className="absolute top-3 right-3 z-20">
+              {/* Badge prix et nom du module en haut à droite */}
+              <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                <span className="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  QRCodes
+                </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
                   {formatPrice(module.price)}
                 </span>
@@ -1278,6 +1293,457 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                 </div>
               </div>
             </>
+          ) : isStableDiffusion ? (
+            <>
+              {/* Style spécial pour Stable Diffusion IA - informations visibles en permanence */}
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-emerald-500 to-green-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Logo Stable Diffusion au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-emerald-500/20">
+                  {/* Logo Stable Diffusion avec icône de création d'images */}
+                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
+                    {/* Cercle de fond */}
+                    <circle cx="12" cy="12" r="10" fill="#10B981" stroke="#059669" strokeWidth="1"/>
+                    
+                    {/* Cadre d'image */}
+                    <rect x="7" y="7" width="10" height="10" rx="1" fill="white" opacity="0.9"/>
+                    
+                    {/* Éléments créatifs - palette et pinceau */}
+                    <circle cx="10" cy="10" r="1.5" fill="#10B981"/>
+                    <circle cx="14" cy="10" r="1.5" fill="#059669"/>
+                    <path d="M10 13 L14 13 L12 16 Z" fill="#10B981"/>
+                    
+                    {/* Étincelles de création */}
+                    <circle cx="8" cy="8" r="0.5" fill="white" opacity="0.8"/>
+                    <circle cx="16" cy="8" r="0.5" fill="white" opacity="0.8"/>
+                    <circle cx="8" cy="16" r="0.5" fill="white" opacity="0.8"/>
+                    <circle cx="16" cy="16" r="0.5" fill="white" opacity="0.8"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Badge prix et nom du module en haut à droite */}
+              <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                <span className="bg-gradient-to-r from-emerald-500 to-green-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  Stable diffusion
+                </span>
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "AI IMAGE" pour Stable Diffusion */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-emerald-400 to-green-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    🎨 AI IMAGE
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : isComfyUI ? (
+            <>
+              {/* Style spécial pour ComfyUI IA - informations visibles en permanence */}
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Logo ComfyUI au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-teal-500/20">
+                  {/* Logo ComfyUI avec icône de workflow */}
+                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
+                    {/* Cercle de fond */}
+                    <circle cx="12" cy="12" r="10" fill="#14B8A6" stroke="#0D9488" strokeWidth="1"/>
+                    
+                    {/* Nœuds de workflow */}
+                    <circle cx="8" cy="8" r="2" fill="white" opacity="0.9"/>
+                    <circle cx="16" cy="8" r="2" fill="white" opacity="0.9"/>
+                    <circle cx="8" cy="16" r="2" fill="white" opacity="0.9"/>
+                    <circle cx="16" cy="16" r="2" fill="white" opacity="0.9"/>
+                    <circle cx="12" cy="12" r="2.5" fill="white" opacity="0.9"/>
+                    
+                    {/* Connexions entre nœuds */}
+                    <path d="M10 8 L14 8" stroke="white" strokeWidth="1.5" opacity="0.8"/>
+                    <path d="M8 10 L10 10" stroke="white" strokeWidth="1.5" opacity="0.8"/>
+                    <path d="M14 10 L16 10" stroke="white" strokeWidth="1.5" opacity="0.8"/>
+                    <path d="M10 16 L14 16" stroke="white" strokeWidth="1.5" opacity="0.8"/>
+                    <path d="M8 14 L10 14" stroke="white" strokeWidth="1.5" opacity="0.8"/>
+                    <path d="M14 14 L16 14" stroke="white" strokeWidth="1.5" opacity="0.8"/>
+                    
+                    {/* Flèches de flux */}
+                    <path d="M9.5 8 L10.5 8" stroke="#14B8A6" strokeWidth="1" strokeLinecap="round"/>
+                    <path d="M13.5 8 L14.5 8" stroke="#14B8A6" strokeWidth="1" strokeLinecap="round"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Badge prix et nom du module en haut à droite */}
+              <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                <span className="bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  ComfyUI
+                </span>
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "WORKFLOW" pour ComfyUI */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-teal-400 to-cyan-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    🔄 WORKFLOW
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : isWhisper ? (
+            <>
+              {/* Style spécial pour Whisper IA - informations visibles en permanence */}
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Logo Whisper au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-blue-500/20">
+                  {/* Logo Whisper avec icône de microphone et ondes sonores */}
+                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
+                    {/* Cercle de fond */}
+                    <circle cx="12" cy="12" r="10" fill="#3B82F6" stroke="#2563EB" strokeWidth="1"/>
+                    
+                    {/* Microphone central */}
+                    <rect x="10" y="6" width="4" height="8" rx="2" fill="white" opacity="0.9"/>
+                    <rect x="11" y="14" width="2" height="3" fill="white" opacity="0.9"/>
+                    <rect x="9" y="17" width="6" height="1" fill="white" opacity="0.9"/>
+                    
+                    {/* Ondes sonores */}
+                    <path d="M6 8 Q8 6 10 8 Q12 10 14 8 Q16 6 18 8" stroke="white" strokeWidth="1.5" fill="none" opacity="0.8"/>
+                    <path d="M5 10 Q8 7 11 10 Q14 13 17 10 Q19 8 21 10" stroke="white" strokeWidth="1.5" fill="none" opacity="0.6"/>
+                    <path d="M4 12 Q8 8 12 12 Q16 16 20 12 Q22 10 24 12" stroke="white" strokeWidth="1.5" fill="none" opacity="0.4"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Badge prix et nom du module en haut à droite */}
+              <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  Whisper IA
+                </span>
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "AUDIO TO TEXT" pour Whisper */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    🎤 AUDIO TO TEXT
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : isRuinedFooocus ? (
+            <>
+              {/* Style spécial pour Ruinedfooocus IA - informations visibles en permanence */}
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-violet-500 to-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Logo Ruinedfooocus au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-violet-500/20">
+                  {/* Logo Ruinedfooocus avec icône de création d'images simplifiée */}
+                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
+                    {/* Cercle de fond */}
+                    <circle cx="12" cy="12" r="10" fill="#8B5CF6" stroke="#7C3AED" strokeWidth="1"/>
+                    
+                    {/* Cadre d'image simplifié */}
+                    <rect x="6" y="6" width="12" height="12" rx="2" fill="white" opacity="0.9"/>
+                    
+                    {/* Éléments de création simplifiés */}
+                    <circle cx="9" cy="9" r="1.5" fill="#8B5CF6"/>
+                    <circle cx="15" cy="9" r="1.5" fill="#7C3AED"/>
+                    <path d="M9 12 L15 12" stroke="#8B5CF6" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M9 15 L12 15" stroke="#8B5CF6" strokeWidth="1.5" strokeLinecap="round"/>
+                    
+                    {/* Étoiles de créativité */}
+                    <path d="M7 7 L7.5 8 L8 7 L7.5 6 Z" fill="white" opacity="0.8"/>
+                    <path d="M16 7 L16.5 8 L17 7 L16.5 6 Z" fill="white" opacity="0.8"/>
+                    <path d="M7 16 L7.5 17 L8 16 L7.5 15 Z" fill="white" opacity="0.8"/>
+                    <path d="M16 16 L16.5 17 L17 16 L16.5 15 Z" fill="white" opacity="0.8"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Badge prix et nom du module en haut à droite */}
+              <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                <span className="bg-gradient-to-r from-violet-500 to-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  Ruinedfooocus
+                </span>
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "SIMPLE AI" pour Ruinedfooocus */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-violet-400 to-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    ✨ SIMPLE AI
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : isCogStudio ? (
+            <>
+              {/* Style spécial pour Cogstudio IA - informations visibles en permanence */}
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Logo Cogstudio au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-indigo-500/20">
+                  {/* Logo Cogstudio avec icône de vidéo et IA */}
+                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
+                    {/* Cercle de fond */}
+                    <circle cx="12" cy="12" r="10" fill="#6366F1" stroke="#4F46E5" strokeWidth="1"/>
+                    
+                    {/* Caméra vidéo */}
+                    <rect x="7" y="8" width="10" height="7" rx="1" fill="white" opacity="0.9"/>
+                    <rect x="8" y="9" width="8" height="5" rx="0.5" fill="#6366F1"/>
+                    
+                    {/* Objectif de caméra */}
+                    <circle cx="12" cy="11.5" r="2" fill="white" opacity="0.9"/>
+                    <circle cx="12" cy="11.5" r="1" fill="#6366F1"/>
+                    
+                    {/* Support de caméra */}
+                    <rect x="11" y="15" width="2" height="2" fill="white" opacity="0.9"/>
+                    
+                    {/* Ondes d'IA */}
+                    <path d="M4 6 Q6 4 8 6 Q10 8 12 6 Q14 4 16 6 Q18 8 20 6" stroke="white" strokeWidth="1.5" fill="none" opacity="0.8"/>
+                    <path d="M3 8 Q6 5 9 8 Q12 11 15 8 Q18 5 21 8" stroke="white" strokeWidth="1.5" fill="none" opacity="0.6"/>
+                    
+                    {/* Étoiles de créativité */}
+                    <path d="M5 4 L5.5 5 L6 4 L5.5 3 Z" fill="white" opacity="0.8"/>
+                    <path d="M18 4 L18.5 5 L19 4 L18.5 3 Z" fill="white" opacity="0.8"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Badge prix et nom du module en haut à droite */}
+              <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                <span className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  Cogstudio IA
+                </span>
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "AI VIDEO" pour Cogstudio */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-indigo-400 to-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    🎬 AI VIDEO
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : isInvokeIA ? (
+            <>
+              {/* Style spécial pour InvokeAI IA - informations visibles en permanence */}
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-orange-500 to-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Logo InvokeAI au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-orange-500/20">
+                  {/* Logo InvokeAI avec icône de retouche et IA */}
+                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
+                    {/* Cercle de fond */}
+                    <circle cx="12" cy="12" r="10" fill="#F97316" stroke="#EA580C" strokeWidth="1"/>
+                    
+                    {/* Image de base */}
+                    <rect x="6" y="6" width="12" height="12" rx="2" fill="white" opacity="0.9"/>
+                    
+                    {/* Outils de retouche */}
+                    <circle cx="9" cy="9" r="1.5" fill="#F97316"/>
+                    <circle cx="15" cy="9" r="1.5" fill="#EA580C"/>
+                    <path d="M9 12 L15 12" stroke="#F97316" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M9 15 L12 15" stroke="#F97316" strokeWidth="1.5" strokeLinecap="round"/>
+                    
+                    {/* Pinceau de retouche */}
+                    <path d="M16 6 L18 4 L19 5 L17 7 Z" fill="white" opacity="0.9"/>
+                    <path d="M17 5 L18 6" stroke="#F97316" strokeWidth="1" strokeLinecap="round"/>
+                    
+                    {/* Ondes d'IA */}
+                    <path d="M4 4 Q6 2 8 4 Q10 6 12 4 Q14 2 16 4 Q18 6 20 4" stroke="white" strokeWidth="1.5" fill="none" opacity="0.8"/>
+                    <path d="M3 6 Q6 3 9 6 Q12 9 15 6 Q18 3 21 6" stroke="white" strokeWidth="1.5" fill="none" opacity="0.6"/>
+                    
+                    {/* Étoiles de créativité */}
+                    <path d="M5 3 L5.5 4 L6 3 L5.5 2 Z" fill="white" opacity="0.8"/>
+                    <path d="M18 3 L18.5 4 L19 3 L18.5 2 Z" fill="white" opacity="0.8"/>
+                    <path d="M5 17 L5.5 18 L6 17 L5.5 16 Z" fill="white" opacity="0.8"/>
+                    <path d="M18 17 L18.5 18 L19 17 L18.5 16 Z" fill="white" opacity="0.8"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Badge prix et nom du module en haut à droite */}
+              <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                <span className="bg-gradient-to-r from-orange-500 to-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  InvokeAI
+                </span>
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "AI EDIT" pour InvokeAI */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-orange-400 to-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    ✨ AI EDIT
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : isSDnext ? (
+            <>
+              {/* Style spécial pour SDnext AI - informations visibles en permanence */}
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-rose-500 to-pink-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Logo SDnext au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-rose-500/20">
+                  {/* Logo SDnext avec icône de génération avancée */}
+                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
+                    {/* Cercle de fond */}
+                    <circle cx="12" cy="12" r="10" fill="#F43F5E" stroke="#E11D48" strokeWidth="1"/>
+                    
+                    {/* Cadre d'image haute résolution */}
+                    <rect x="6" y="6" width="12" height="12" rx="2" fill="white" opacity="0.9"/>
+                    
+                    {/* Détails de haute qualité */}
+                    <rect x="7" y="7" width="10" height="10" rx="1" fill="#F43F5E" opacity="0.3"/>
+                    <circle cx="9" cy="9" r="0.5" fill="white" opacity="0.9"/>
+                    <circle cx="15" cy="9" r="0.5" fill="white" opacity="0.9"/>
+                    <circle cx="9" cy="15" r="0.5" fill="white" opacity="0.9"/>
+                    <circle cx="15" cy="15" r="0.5" fill="white" opacity="0.9"/>
+                    <circle cx="12" cy="12" r="1" fill="white" opacity="0.9"/>
+                    
+                    {/* Indicateurs de vitesse et précision */}
+                    <path d="M4 4 L6 6 L8 4" stroke="white" strokeWidth="1.5" fill="none" opacity="0.8"/>
+                    <path d="M16 4 L18 6 L20 4" stroke="white" strokeWidth="1.5" fill="none" opacity="0.8"/>
+                    <path d="M4 20 L6 18 L8 20" stroke="white" strokeWidth="1.5" fill="none" opacity="0.8"/>
+                    <path d="M16 20 L18 18 L20 20" stroke="white" strokeWidth="1.5" fill="none" opacity="0.8"/>
+                    
+                    {/* Étoiles de qualité */}
+                    <path d="M5 3 L5.5 4 L6 3 L5.5 2 Z" fill="white" opacity="0.8"/>
+                    <path d="M18 3 L18.5 4 L19 3 L18.5 2 Z" fill="white" opacity="0.8"/>
+                    <path d="M5 19 L5.5 20 L6 19 L5.5 18 Z" fill="white" opacity="0.8"/>
+                    <path d="M18 19 L18.5 20 L19 19 L18.5 18 Z" fill="white" opacity="0.8"/>
+                    
+                    {/* Flèches de performance */}
+                    <path d="M3 8 L5 8" stroke="white" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
+                    <path d="M19 8 L21 8" stroke="white" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
+                    <path d="M3 16 L5 16" stroke="white" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
+                    <path d="M19 16 L21 16" stroke="white" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Badge prix et nom du module en haut à droite */}
+              <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                <span className="bg-gradient-to-r from-rose-500 to-pink-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  SDnext AI
+                </span>
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "NEXT GEN" pour SDnext */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-rose-400 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    🚀 NEXT GEN
+                  </span>
+                </div>
+              </div>
+            </>
           ) : (
             <>
               {/* Style normal pour les autres modules */}
@@ -1301,13 +1767,13 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
         <Link href={`/card/${module.id}`} className="block group">
           {/* Titre du module - affiché pour tous les modules */}
           <h3 className="text-3xl sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
-            {module.title}
+            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "Générez des QRcodes pros" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "Transformez vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isInvokeIA ? "Retouche intelligente avec l'IA" : isSDnext ? "Des visuels plus réalistes, plus rapides, plus précis" : module.title}
           </h3>
           {/* Pour les modules spéciaux, afficher seulement la description si pas de sous-titre */}
           {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isInvokeIA || isComfyUI || isStableDiffusion || isRuinedFooocus || isSDnext || isQRCodes || isConverter || isWhisper || isChatGPT || isIAPhoto || isIATube || isStirlingPDF ? (
             !module.subtitle && (
               <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
-                {module.description}
+                {isComfyUI ? "Un contrôle total sur chaque étape de la création d'image" : module.description}
               </p>
             )
           ) : (

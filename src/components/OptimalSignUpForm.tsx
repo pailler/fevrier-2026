@@ -271,11 +271,3 @@ export default function OptimalSignUpForm({
   );
 }
 
-
-
-
-
-
-
-
-

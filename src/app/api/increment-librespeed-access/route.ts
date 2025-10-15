@@ -3,7 +3,7 @@ import { supabase } from '../../../utils/supabaseClient';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('📊 LibreSpeed Access: Incrémentation du compteur d\'accès');
+    ;
     
     const body = await request.json();
     const { userId, userEmail } = body;
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     // Vérifier l'expiration
     if (userApp.expires_at && new Date(userApp.expires_at) < new Date()) {
-      console.log('❌ LibreSpeed Access: Accès expiré');
+      ;
       return new NextResponse(JSON.stringify({
         success: false,
         error: 'Accès expiré',

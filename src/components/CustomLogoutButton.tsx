@@ -22,7 +22,7 @@ export default function CustomLogoutButton({
       
       signOut();
       
-      console.log('✅ Déconnexion réussie');
+      ;
       router.push('/');
     } catch (error) {
       console.error('❌ Erreur lors de la déconnexion:', error);

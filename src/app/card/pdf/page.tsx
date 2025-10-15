@@ -52,8 +52,7 @@ export default function PDFPage() {
     return () => clearTimeout(timeout);
   }, []);
 
-
-  // Fonction pour ouvrir le modal iframe
+// Fonction pour ouvrir le modal iframe
   const openIframeModal = useCallback((url: string, title: string) => {
     setIframeModal({
       isOpen: true,
@@ -217,7 +216,7 @@ export default function PDFPage() {
                   onClick={() => {
                     if (isAuthenticated && user) {
                       // Utilisateur connecté : aller à la page de transition puis /encours
-                      console.log('✅ Accès PDF+ - Utilisateur connecté');
+                      ;
                       router.push(`/token-generated?module=${encodeURIComponent('PDF+')}&redirect=/encours`);
                     } else {
                       // Utilisateur non connecté : aller à la page de connexion puis retour à PDF+

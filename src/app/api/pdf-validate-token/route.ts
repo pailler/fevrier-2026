@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (error || !tokenData) {
-      console.log('❌ PDF - Token invalide ou non trouvé');
+      ;
       return new NextResponse('Unauthorized - Invalid token', { status: 401 });
     }
 
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     const expiresAt = new Date(tokenData.expires_at);
     
     if (now > expiresAt) {
-      console.log('❌ PDF - Token expiré');
+      ;
       return new NextResponse('Unauthorized - Token expired', { status: 401 });
     }
 
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       })
       .eq('id', tokenData.id);
 
-    console.log('✅ PDF - Token validé avec succès pour:', tokenData.description.split('pour ')[1] || 'unknown');
+    ;
 
     return NextResponse.json({
       success: true,

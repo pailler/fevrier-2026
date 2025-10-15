@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (accessError || !userAccess) {
-      console.log('❌ PSitransfer Quota - Aucun accès trouvé pour l\'utilisateur');
+      ;
       return NextResponse.json(
         { error: 'Aucun accès PSitransfer trouvé' },
         { status: 404 }
@@ -159,27 +159,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

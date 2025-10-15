@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 DEBUG: Début POST /api/qr-code-access');
+    ;
     
     // Utiliser des données utilisateur simulées pour les tests
     const testUser = {
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       QR_CODE_CONFIG.jwtSecret
     );
 
-    console.log('✅ DEBUG: Token généré avec succès');
+    ;
 
     // Retourner les informations d'accès
     const response = {
@@ -71,5 +71,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
 

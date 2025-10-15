@@ -25,11 +25,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validation de la taille (100MB max)
-    const maxSize = 100 * 1024 * 1024;
+    // Validation de la taille (500MB max)
+    const maxSize = 500 * 1024 * 1024;
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: `Fichier trop volumineux. Maximum: 100MB` },
+        { error: `Fichier trop volumineux. Maximum: 500MB` },
         { 
           status: 413,
           headers: {
@@ -127,7 +127,4 @@ export async function OPTIONS(request: NextRequest) {
     },
   });
 }
-
-
-
 

@@ -457,8 +457,7 @@ export default function InvokePage() {
                   </div>
                 )}
 
-                
-                {/* Bouton d'activation avec tokens */}
+{/* Bouton d'activation avec tokens */}
                 {!alreadyActivatedModules.includes(card.id) && (
                   <div className="w-3/4 mx-auto">
                     <ModuleActivationButton

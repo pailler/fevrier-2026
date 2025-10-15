@@ -52,8 +52,7 @@ export default function PsiTransferPage() {
     return () => clearTimeout(timeout);
   }, []);
 
-
-  // Fonction pour ouvrir le modal iframe
+// Fonction pour ouvrir le modal iframe
   const openIframeModal = useCallback((url: string, title: string) => {
     setIframeModal({
       isOpen: true,
@@ -215,7 +214,7 @@ export default function PsiTransferPage() {
                   onClick={() => {
                     if (isAuthenticated && user) {
                       // Utilisateur connecté : aller à la page de transition puis /encours
-                      console.log('✅ Accès PsiTransfer - Utilisateur connecté');
+                      ;
                       router.push(`/token-generated?module=${encodeURIComponent('PsiTransfer')}&redirect=/encours`);
                     } else {
                       // Utilisateur non connecté : aller à la page de connexion puis retour à PsiTransfer

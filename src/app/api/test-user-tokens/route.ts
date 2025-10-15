@@ -3,7 +3,7 @@ import { supabase } from '../../../utils/supabaseClient';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 Test de la table user_tokens...');
+    ;
 
     // 1. Tester l'accès à la table user_tokens
     const { data: testData, error: testError } = await supabase
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       }, { status: 500 });
     }
 
-    console.log('✅ Table user_tokens accessible');
+    ;
     console.log('📊 Données de test:', testData);
 
     // 2. Tester l'insertion d'un enregistrement de test

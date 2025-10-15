@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
         const { NotificationService } = await import('../../../utils/notificationService');
         const notificationService = NotificationService.getInstance();
         
-        console.log('✅ Service de notification chargé côté client');
+        ;
         
         // Simuler l'appel exact comme dans le bouton
         const result = await notificationService.sendModuleActivatedNotification(
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
         console.log('📧 Résultat de la notification côté client:', result);
         
         if (result) {
-          console.log('✅ Notification envoyée avec succès côté client');
+          ;
           return NextResponse.json({
             success: true,
             message: 'Notification envoyée avec succès (simulation côté client)',
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
             }
           });
         } else {
-          console.log('❌ Échec de l\'envoi de la notification côté client');
+          ;
           return NextResponse.json({
             success: false,
             message: 'Échec de l\'envoi de la notification (simulation côté client)',
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
         }, { status: 500 });
       }
     } else {
-      console.log('⚠️ Pas d\'email utilisateur disponible côté client');
+      ;
       return NextResponse.json({
         success: false,
         message: 'Pas d\'email utilisateur disponible (simulation côté client)',

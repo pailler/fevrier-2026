@@ -43,15 +43,11 @@ export function useCustomAuth() {
         const token = localStorage.getItem('auth_token');
         const userData = localStorage.getItem('user_data');
 
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🔍 useCustomAuth - Vérification:', { token: !!token, userData: !!userData });
-        }
+        // Vérification de l'authentification
 
         if (token && userData) {
           const user = JSON.parse(userData);
-          if (process.env.NODE_ENV === 'development') {
-            console.log('✅ useCustomAuth - Utilisateur trouvé:', user.email);
-          }
+          // Utilisateur authentifié
           setAuthState({
             user,
             token,
@@ -60,7 +56,7 @@ export function useCustomAuth() {
           });
         } else {
           if (process.env.NODE_ENV === 'development') {
-            console.log('❌ useCustomAuth - Pas d\'authentification');
+            ;
           }
           setAuthState({
             user: null,
@@ -86,18 +82,14 @@ export function useCustomAuth() {
     // Écouter les changements dans localStorage
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'auth_token' || e.key === 'user_data') {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🔄 useCustomAuth - Changement localStorage détecté');
-        }
+        // Changement localStorage détecté
         checkAuthState();
       }
     };
 
     // Écouter les événements personnalisés
     const handleCustomEvent = (e: CustomEvent) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🔄 useCustomAuth - Événement personnalisé détecté:', e.type);
-      }
+      // Événement personnalisé détecté
       checkAuthState();
     };
 
@@ -114,16 +106,12 @@ export function useCustomAuth() {
 
   // Fonction pour se connecter
   const signIn = useCallback((user: User, token: string) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔄 useCustomAuth - signIn appelé:', { user: user.email, token: !!token });
-    }
+    // Connexion utilisateur
     
     localStorage.setItem('auth_token', token);
     localStorage.setItem('user_data', JSON.stringify(user));
     
-    if (process.env.NODE_ENV === 'development') {
-      console.log('💾 useCustomAuth - Données sauvegardées dans localStorage');
-    }
+    // Données sauvegardées
     
     setAuthState({
       user,
@@ -137,20 +125,12 @@ export function useCustomAuth() {
       detail: { user, token } 
     }));
     
-    if (process.env.NODE_ENV === 'development') {
-      console.log('✅ useCustomAuth - État mis à jour:', { 
-        user: user.email, 
-        isAuthenticated: true, 
-        loading: false 
-      });
-    }
+    // État mis à jour
   }, []);
 
   // Fonction pour se déconnecter
   const signOut = useCallback(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔄 useCustomAuth - signOut appelé');
-    }
+    // Déconnexion utilisateur
     
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_data');
@@ -166,7 +146,7 @@ export function useCustomAuth() {
     window.dispatchEvent(new CustomEvent('userLoggedOut'));
     
     if (process.env.NODE_ENV === 'development') {
-      console.log('✅ useCustomAuth - Déconnexion réussie');
+      ;
     }
   }, []);
 

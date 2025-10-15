@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (existingSettings && existingSettings.length > 0) {
-      console.log('✅ Paramètres de notifications déjà initialisés');
+      ;
       return NextResponse.json({
         success: true,
         message: 'Paramètres de notifications déjà initialisés',

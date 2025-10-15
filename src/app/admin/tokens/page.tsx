@@ -32,7 +32,7 @@ export default function AdminTokens() {
 
   const loadTokenConsumptions = async () => {
     try {
-      console.log('🔍 Chargement des consommations de tokens...');
+      ;
       
       const supabase = getSupabaseClient();
 

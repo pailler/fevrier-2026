@@ -126,12 +126,3 @@ export default function VerifyEmailPage() {
   );
 }
 
-
-
-
-
-
-
-
-
-

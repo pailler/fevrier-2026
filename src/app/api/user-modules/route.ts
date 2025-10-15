@@ -3,7 +3,7 @@ import { supabase } from '../../../utils/supabaseClient';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 API user-modules appelée');
+    ;
     
     // Récupérer les modules de l'utilisateur
     const { data: userModules, error: userModulesError } = await supabase

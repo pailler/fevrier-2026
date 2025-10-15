@@ -8,7 +8,7 @@ const supabase = createClient(
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 Admin Users API: Récupération des utilisateurs...');
+    ;
 
     // Récupérer tous les profils utilisateurs
     const { data: profiles, error: profilesError } = await supabase

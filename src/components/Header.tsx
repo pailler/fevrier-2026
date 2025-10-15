@@ -196,20 +196,20 @@ export default function Header() {
                   onClick={async () => { 
                     // Envoyer une notification de déconnexion avant de se déconnecter
                     try {
-                      console.log('🔍 DEBUG: Tentative d\'envoi de notification de déconnexion...');
+                      ;
                       console.log('🔍 DEBUG: Email:', user?.email);
-                      console.log('🔍 DEBUG: UserName:', user?.email?.split('@')[0] || 'Utilisateur');
+                      ;
                       
                       const notificationService = NotificationServiceClient.getInstance();
-                      console.log('🔍 DEBUG: Service de notification chargé');
+                      ;
                       
                       const result = await notificationService.notifyUserLogout(user?.email || '', user?.email?.split('@')[0] || 'Utilisateur');
                       console.log('🔍 DEBUG: Résultat notification:', result);
                       
                       if (result) {
-                        console.log('✅ Notification de déconnexion envoyée avec succès');
+                        ;
                       } else {
-                        console.log('❌ Échec de l\'envoi de la notification de déconnexion');
+                        ;
                       }
                     } catch (notificationError) {
                       console.error('❌ Erreur lors de l\'envoi de la notification de déconnexion:', notificationError);

@@ -4,9 +4,16 @@ export async function POST(request: NextRequest) {
     try {
         const formData = await request.formData();
         
-        const response = await fetch('http://localhost:8094/ocr', {
+        // Créer un nouveau FormData avec le bon nom de champ
+        const newFormData = new FormData();
+        const file = formData.get('file') as File;
+        if (file) {
+            newFormData.append('image_file', file);
+        }
+        
+        const response = await fetch('http://host.docker.internal:8094/ocr', {
             method: 'POST',
-            body: formData,
+            body: newFormData,
         });
         
         if (!response.ok) {

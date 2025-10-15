@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (moduleError || !existingModule) {
-      console.log('📝 Création du module LibreSpeed...');
+      ;
       
       const { data: newModule, error: createError } = await supabase
         .from('modules')
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingAccess) {
-      console.log('ℹ️ Accès LibreSpeed déjà existant pour l\'utilisateur');
+      ;
       return NextResponse.json({
         success: true,
         message: 'Accès LibreSpeed déjà activé',

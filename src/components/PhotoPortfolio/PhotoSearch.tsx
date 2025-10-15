@@ -73,8 +73,7 @@ export default function PhotoSearch({
     }
   };
 
-
-  const handleRecentSearch = (searchQuery: string) => {
+const handleRecentSearch = (searchQuery: string) => {
     setQuery(searchQuery);
     handleSearch(searchQuery);
   };

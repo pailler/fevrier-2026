@@ -3,7 +3,7 @@ import { supabase } from '../../../utils/supabaseClient';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔄 Insertion du module Whisper IA...');
+    ;
 
     const moduleData = {
       id: 'whisper',
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingModule) {
-      console.log('⚠️ Le module Whisper IA existe déjà, mise à jour...');
+      ;
       
       const { data, error } = await supabase
         .from('modules')
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         }, { status: 500 });
       }
 
-      console.log('✅ Module Whisper IA mis à jour avec succès');
+      ;
       return NextResponse.json({ 
         success: true, 
         message: 'Module Whisper IA mis à jour avec succès',
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    console.log('✅ Module Whisper IA inséré avec succès');
+    ;
     return NextResponse.json({ 
       success: true, 
       message: 'Module Whisper IA inséré avec succès',

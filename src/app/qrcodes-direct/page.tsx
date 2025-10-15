@@ -48,7 +48,7 @@ export default function QRCodesDirectPage() {
           // Charger les QR codes existants
           await loadQRCodes();
         } else {
-          console.log('❌ QR Codes Direct: Aucun utilisateur connecté');
+          ;
           setError('Vous devez être connecté pour accéder aux QR codes');
         }
       } catch (error) {

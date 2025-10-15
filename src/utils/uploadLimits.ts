@@ -2,15 +2,15 @@
 export const UPLOAD_LIMITS = {
   // Limites par type de fichier
   AUDIO: {
-    maxSize: 100 * 1024 * 1024, // 100MB
+    maxSize: 500 * 1024 * 1024, // 500MB
     allowedTypes: ['audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/ogg', 'audio/flac', 'audio/aac']
   },
   VIDEO: {
-    maxSize: 2 * 1024 * 1024 * 1024, // 2GB
+    maxSize: 10 * 1024 * 1024 * 1024, // 10GB
     allowedTypes: ['video/mp4', 'video/avi', 'video/mov', 'video/webm', 'video/quicktime']
   },
   IMAGE: {
-    maxSize: 50 * 1024 * 1024, // 50MB
+    maxSize: 200 * 1024 * 1024, // 200MB
     allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/tiff', 'image/bmp']
   }
 };

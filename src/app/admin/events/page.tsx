@@ -27,7 +27,7 @@ export default function AdminEvents() {
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        console.log('🔍 Chargement des événements récents...');
+        ;
         
         const supabase = getSupabaseClient();
         const allEvents: Event[] = [];

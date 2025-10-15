@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
       // Ne pas échouer pour le trigger
     }
 
-    console.log('✅ Tables de notifications créées avec succès');
+    ;
 
     return NextResponse.json({
       success: true,

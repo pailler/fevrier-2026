@@ -59,7 +59,7 @@ export default function EncoursPage() {
     // Ajouter un petit délai pour s'assurer que l'authentification est bien chargée
     const timer = setTimeout(() => {
       if (!isAuthenticated || !user) {
-        console.log('Utilisateur non authentifié, redirection vers /login');
+        ;
         router.push('/login');
         return;
       }
@@ -214,8 +214,7 @@ export default function EncoursPage() {
         if (modulesError) {
           }
 
-
-        // Vérifier que les données sont valides
+// Vérifier que les données sont valides
         if (!moduleAccessData) {
           moduleAccessData = []; // Initialiser avec un tableau vide
         }

@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (tokenError || !tokenData) {
-      console.log('❌ LibreSpeed Token: Token invalide ou expiré');
+      ;
       return new NextResponse(JSON.stringify({
         success: false,
         error: 'Token invalide ou expiré'
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     // Vérifier l'expiration
     if (tokenData.expires_at && new Date(tokenData.expires_at) < new Date()) {
-      console.log('❌ LibreSpeed Token: Token expiré');
+      ;
       return new NextResponse(JSON.stringify({
         success: false,
         error: 'Token expiré'
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (appError || !userApp) {
-      console.log('❌ LibreSpeed Token: Module non activé pour l\'utilisateur');
+      ;
       return new NextResponse(JSON.stringify({
         success: false,
         error: 'Module LibreSpeed non activé'
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     // Vérifier l'expiration de l'accès
     if (userApp.expires_at && new Date(userApp.expires_at) < new Date()) {
-      console.log('❌ LibreSpeed Token: Accès expiré');
+      ;
       return new NextResponse(JSON.stringify({
         success: false,
         error: 'Accès expiré'
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     const maxUsage = userApp.max_usage || 50;
 
     if (currentUsage >= maxUsage) {
-      console.log('❌ LibreSpeed Token: Quota dépassé');
+      ;
       return new NextResponse(JSON.stringify({
         success: false,
         error: 'Quota dépassé',
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    console.log('✅ LibreSpeed Token: Token validé avec succès');
+    ;
 
     return new NextResponse(JSON.stringify({
       success: true,
