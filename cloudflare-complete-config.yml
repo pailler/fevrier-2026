@@ -18,8 +18,6 @@ ingress:
     service: http://localhost:8091
   - hostname: pdf.iahome.fr
     service: http://localhost:8081
-  - hostname: converter.iahome.fr
-    service: http://localhost:8096
   - hostname: stablediffusion.iahome.fr
     service: http://localhost:8085
   - hostname: ruinedfooocus.iahome.fr

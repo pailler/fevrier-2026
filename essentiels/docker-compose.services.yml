@@ -113,33 +113,6 @@ services:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
 
-  # Service Universal Converter
-  universal-converter:
-    build:
-      context: ./universal-converter
-      dockerfile: Dockerfile
-    container_name: universal-converter
-    restart: unless-stopped
-    ports:
-      - "8096:8080"  # Port pour Universal Converter
-    environment:
-      - IAHOME_API_URL=http://host.docker.internal:3000
-    volumes:
-      - ./universal-converter/uploads:/app/uploads
-      - ./universal-converter/downloads:/app/downloads
-    networks:
-      - services-network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.universal-converter.rule=Host(`converter.iahome.fr`)"
-      - "traefik.http.routers.universal-converter.entrypoints=websecure"
-      - "traefik.http.routers.universal-converter.tls=true"
-      - "traefik.http.services.universal-converter.loadbalancer.server.port=8080"
-      - "traefik.http.routers.universal-converter-http.rule=Host(`converter.iahome.fr`)"
-      - "traefik.http.routers.universal-converter-http.entrypoints=web"
-      - "traefik.http.routers.universal-converter-http.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
 
 
   # Service StableDiffusion

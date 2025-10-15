@@ -6,15 +6,15 @@ export async function POST(request: NextRequest) {
     ;
 
     const moduleData = {
-      id: 'whisper',
-      title: 'Whisper IA',
-      description: 'Whisper IA : Transformez vos fichiers audio, vidéo et images en texte avec une précision exceptionnelle grâce aux technologies OpenAI Whisper et Tesseract OCR.',
-      subtitle: 'Transcription audio, vidéo et reconnaissance de texte (OCR)',
-      category: 'Productivité',
-      price: 0,
+      id: 'cogstudio',
+      title: 'CogStudio',
+      description: 'CogStudio IA : Plateforme node-based de nouvelle génération pour créer, organiser et exécuter des pipelines d\'IA génératives',
+      subtitle: 'CogStudio IA : Plateforme node-based de nouvelle génération pour créer, organiser et exécuter des pipelines d\'IA génératives',
+      category: 'AI WORKFLOW',
+      price: 8,
       youtube_url: '',
-      url: 'https://whisper.iahome.fr',
-      image_url: '/images/module-visuals/whisper-module.svg',
+      url: 'https://cogstudio.iahome.fr',
+      image_url: '/images/chatgpt.jpg',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const { data: existingModule, error: checkError } = await supabase
       .from('modules')
       .select('id')
-      .eq('id', 'whisper')
+      .eq('id', 'cogstudio')
       .single();
 
     if (existingModule) {
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       const { data, error } = await supabase
         .from('modules')
         .update(moduleData)
-        .eq('id', 'whisper')
+        .eq('id', 'cogstudio')
         .select();
 
       if (error) {
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       ;
       return NextResponse.json({ 
         success: true, 
-        message: 'Module Whisper IA mis à jour avec succès',
+        message: 'Module CogStudio mis à jour avec succès',
         data: data[0]
       });
     }
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     ;
     return NextResponse.json({ 
       success: true, 
-      message: 'Module Whisper IA inséré avec succès',
+      message: 'Module CogStudio inséré avec succès',
       data: data[0]
     });
 
