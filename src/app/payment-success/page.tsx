@@ -13,7 +13,7 @@ export default function PaymentSuccessPage() {
   } | null>(null);
 
   const packageDetails = {
-    basic: { tokens: 100, price: 5, name: 'Pack Basique' },
+    basic: { tokens: 100, price: 4.99, name: 'Pack Basique' },
     standard: { tokens: 500, price: 19.99, name: 'Pack Standard' },
     premium: { tokens: 1000, price: 29.99, name: 'Pack Premium' },
     enterprise: { tokens: 10000, price: 199, name: 'Pack Entreprise' }

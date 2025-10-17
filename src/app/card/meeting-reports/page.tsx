@@ -77,6 +77,8 @@ export default function MeetingReportsPage() {
       return;
     }
 
+    console.log(`🔗 Tentative d'accès au module ${moduleId} avec l'URL: ${moduleUrl}`);
+
     try {
       // Générer un JWT pour l'accès au module
       const response = await fetch('/api/generate-module-jwt', {
@@ -94,15 +96,18 @@ export default function MeetingReportsPage() {
       if (response.ok) {
         const { token } = await response.json();
         const urlWithToken = `${moduleUrl}?token=${token}`;
+        console.log(`✅ JWT généré, ouverture de: ${urlWithToken}`);
         window.open(urlWithToken, '_blank');
       } else {
-        console.error('Erreur lors de la génération du JWT');
+        console.error('❌ Erreur lors de la génération du JWT, fallback vers URL directe');
         // Fallback: ouvrir directement l'URL
+        console.log(`🔗 Fallback: ouverture directe de ${moduleUrl}`);
         window.open(moduleUrl, '_blank');
       }
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error('❌ Erreur:', error);
       // Fallback: ouvrir directement l'URL
+      console.log(`🔗 Fallback après erreur: ouverture directe de ${moduleUrl}`);
       window.open(moduleUrl, '_blank');
     }
   }, [session?.user?.id]);
@@ -277,12 +282,14 @@ export default function MeetingReportsPage() {
   };
 
   const handleQuickAccess = () => {
-    if (card?.url) {
-      if (isFreeModule) {
-        window.open(card.url, '_blank');
-      } else {
-        accessModuleWithJWT(card.id, card.url);
-      }
+    // URL par défaut pour Meeting Reports
+    const meetingReportsUrl = 'https://meeting-reports.iahome.fr';
+    const moduleUrl = card?.url || meetingReportsUrl;
+    
+    if (isFreeModule) {
+      window.open(moduleUrl, '_blank');
+    } else {
+      accessModuleWithJWT(card?.id || 'meeting-reports', moduleUrl);
     }
   };
 

@@ -9,7 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 const TOKEN_PACKAGES = {
   basic: {
     name: 'Pack Basique',
-    price: 50, // 0,5€ en centimes
+    price: 499, // 4,99€ en centimes
     tokens: 100,
     pricePerToken: 0.049,
     description: 'Idéal pour débuter'

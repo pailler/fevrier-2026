@@ -53,6 +53,27 @@ export default function ModuleActivationButton({
     try {
       console.log(`🔄 Activation du module ${moduleName} (${moduleId}) pour ${user.email}`);
 
+      // Vérifier d'abord si le module est déjà activé
+      const checkResponse = await fetch('/api/check-module-activation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          moduleId: moduleId,
+          userId: user.id
+        }),
+      });
+
+      if (checkResponse.ok) {
+        const checkData = await checkResponse.json();
+        if (checkData.isActivated) {
+          setError('Module déjà activé');
+          onActivationError?.('Module déjà activé');
+          return;
+        }
+      }
+
       // Appeler l'API d'activation du module
       const response = await fetch('/api/activate-module', {
         method: 'POST',
