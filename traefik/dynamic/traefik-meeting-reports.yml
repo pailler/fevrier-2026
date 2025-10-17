@@ -1,0 +1,35 @@
+# Configuration Traefik pour Meeting Reports Generator
+# Placez ce fichier dans votre répertoire traefik/dynamic/
+
+http:
+  routers:
+    meeting-reports:
+      rule: "Host(`meeting-reports.iahome.fr`)"
+      service: meeting-reports-service
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - meeting-reports-headers
+
+  services:
+    meeting-reports-service:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:3001"
+        healthCheck:
+          path: "/"
+          interval: "30s"
+          timeout: "5s"
+        passHostHeader: true
+
+  middlewares:
+    meeting-reports-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-For: ""
+        customResponseHeaders:
+          X-Frame-Options: "SAMEORIGIN"
+          X-Content-Type-Options: "nosniff"
+          Referrer-Policy: "strict-origin-when-cross-origin"
+

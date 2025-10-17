@@ -116,8 +116,41 @@ export async function POST(request: NextRequest) {
       console.log(`✅ 100 tokens créés pour le nouvel utilisateur ${email}`);
     }
 
-    // TODO: Envoyer un email de vérification
-    // await sendVerificationEmail(email, emailVerificationToken);
+    // Envoyer une notification d'inscription à l'utilisateur
+    console.log('📧 Tentative d\'envoi d\'email de bienvenue à:', email);
+    try {
+      const { EmailService } = await import('../../../../utils/emailService');
+      const emailService = EmailService.getInstance();
+      
+      const emailResult = await emailService.sendNotificationEmail('user_signup', email, {
+        user_name: fullName,
+        user_email: email,
+        signup_date: new Date().toLocaleDateString('fr-FR'),
+        signup_time: new Date().toLocaleTimeString('fr-FR')
+      });
+      console.log('📧 Résultat email utilisateur:', emailResult);
+    } catch (emailError) {
+      console.error('❌ Erreur lors de l\'envoi de l\'email de bienvenue:', emailError);
+      // Ne pas faire échouer la création du compte pour l'email
+    }
+
+    // Envoyer une notification à l'admin
+    console.log('📧 Tentative d\'envoi de notification admin pour:', email);
+    try {
+      const { EmailService } = await import('../../../../utils/emailService');
+      const emailService = EmailService.getInstance();
+      
+      const adminResult = await emailService.sendNotificationEmail('admin_user_signup', 'formateur_tic@hotmail.com', {
+        user_name: fullName,
+        user_email: email,
+        signup_date: new Date().toLocaleDateString('fr-FR'),
+        signup_time: new Date().toLocaleTimeString('fr-FR')
+      });
+      console.log('📧 Résultat email admin:', adminResult);
+    } catch (emailError) {
+      console.error('❌ Erreur lors de l\'envoi de la notification admin:', emailError);
+      // Ne pas faire échouer la création du compte pour l'email admin
+    }
 
     return NextResponse.json({
       success: true,

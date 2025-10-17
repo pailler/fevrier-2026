@@ -79,6 +79,38 @@ export async function POST(request: NextRequest) {
         console.log(`✅ 100 tokens créés pour le nouvel utilisateur ${email}`);
       }
 
+      // Envoyer une notification d'inscription à l'utilisateur (OAuth)
+      try {
+        const { EmailService } = await import('../../../../utils/emailService');
+        const emailService = EmailService.getInstance();
+        
+        await emailService.sendNotificationEmail('user_signup', email, {
+          user_name: name || email,
+          user_email: email,
+          signup_date: new Date().toLocaleDateString('fr-FR'),
+          signup_time: new Date().toLocaleTimeString('fr-FR'),
+          signup_method: 'OAuth'
+        });
+      } catch (emailError) {
+        console.error('Erreur lors de l\'envoi de l\'email de bienvenue:', emailError);
+      }
+
+      // Envoyer une notification à l'admin
+      try {
+        const { EmailService } = await import('../../../../utils/emailService');
+        const emailService = EmailService.getInstance();
+        
+        await emailService.sendNotificationEmail('admin_user_signup', 'formateur_tic@hotmail.com', {
+          user_name: name || email,
+          user_email: email,
+          signup_date: new Date().toLocaleDateString('fr-FR'),
+          signup_time: new Date().toLocaleTimeString('fr-FR'),
+          signup_method: 'OAuth'
+        });
+      } catch (emailError) {
+        console.error('Erreur lors de l\'envoi de la notification admin:', emailError);
+      }
+
       return NextResponse.json({ success: true, user: newUser });
     }
 

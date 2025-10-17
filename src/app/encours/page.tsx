@@ -325,7 +325,6 @@ export default function EncoursPage() {
       '5': 'qrcodes',  // QR Codes -> qrcodes
       '7': 'stablediffusion', // Stable Diffusion -> stablediffusion
       '8': 'ruinedfooocus', // Ruined Fooocus -> ruinedfooocus
-      '9': 'invoke',   // Invoke AI -> invoke
       '10': 'comfyui', // ComfyUI -> comfyui
       '11': 'cogstudio', // Cog Studio -> cogstudio
       '12': 'sdnext',  // SD.Next -> sdnext
@@ -343,7 +342,6 @@ export default function EncoursPage() {
       'whisper': 'https://whisper.iahome.fr',  // Whisper direct avec token
       'stablediffusion': 'https://stablediffusion.iahome.fr',  // StableDiffusion direct avec token
       'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',  // RuinedFooocus direct avec token
-      'invoke': 'https://invoke.iahome.fr',  // Invoke direct avec token
       'comfyui': 'https://comfyui.iahome.fr',  // ComfyUI direct avec token
       'cogstudio': 'https://cogstudio.iahome.fr',  // CogStudio direct avec token
       'sdnext': 'https://sdnext.iahome.fr',  // SDNext direct avec token
@@ -367,13 +365,11 @@ export default function EncoursPage() {
       '5': 10,      // QR Codes -> 10 tokens
       '7': 100,     // Stable Diffusion -> 100 tokens
       '8': 100,     // Ruined Fooocus -> 100 tokens
-      '9': 100,     // Invoke AI -> 100 tokens
       '10': 100,    // ComfyUI -> 100 tokens
       '11': 100,    // Cog Studio -> 100 tokens
       '12': 100,    // SD.Next -> 100 tokens
       'stablediffusion': 100,
       'ruinedfooocus': 100,
-      'invoke': 100,
       'comfyui': 100,
       'cogstudio': 100,
       'sdnext': 100,
@@ -836,8 +832,15 @@ export default function EncoursPage() {
                       </div>
                       
                       <div className="flex items-center space-x-4 text-sm opacity-90">
-                        {/* Ne pas afficher "Appli essentielle" pour le module QR codes */}
-                        {module.module_id !== '5' && module.module_id !== 'qrcodes' && (
+                        {/* Ne pas afficher "Appli essentielle" pour les modules IA et QR codes */}
+                        {module.module_id !== '5' && 
+                         module.module_id !== 'qrcodes' && 
+                         module.module_id !== 'stablediffusion' && 
+                         module.module_id !== 'ruinedfooocus' && 
+                         module.module_id !== 'cogstudio' && 
+                         module.module_id !== 'whisper' && 
+                         module.module_id !== 'comfyui' && 
+                         module.module_id !== 'sdnext' && (
                           <span>🔑 Appli essentielle</span>
                         )}
                         {module.price && Number(module.price) > 0 && (

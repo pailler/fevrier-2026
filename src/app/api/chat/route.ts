@@ -82,7 +82,7 @@ ${contextData.servicesData}
 ${contextData.statsData}
 
 🎨 FONCTIONNALITÉS SPÉCIALES :
-- Génération d'images avec Stable Diffusion, ComfyUI, InvokeAI
+- Génération d'images avec Stable Diffusion, ComfyUI
 - Traitement de documents PDF avec Stirling PDF
 - Téléchargement de vidéos avec MeTube
 - Transfert de fichiers avec PsiTransfer
@@ -215,7 +215,6 @@ async function getCompleteContextData(message: string, userId: string) {
 Services IA disponibles :
 - Stable Diffusion (génération d'images)
 - ComfyUI (workflows IA avancés)
-- InvokeAI (interface moderne)
 - RuinedFooocus (génération rapide)
 - SDNext (optimisations)
 - CogStudio (modèles personnalisés)
@@ -307,7 +306,7 @@ async function generateSimpleResponse(message: string, userId: string) {
     } catch (error) {
       console.error('Erreur récupération modules:', error);
     }
-    return "Nos modules IA sont disponibles dans la section 'Mes applis' de votre tableau de bord. Nous proposons Stable Diffusion, ComfyUI, InvokeAI, et bien d'autres outils d'intelligence artificielle.";
+    return "Nos modules IA sont disponibles dans la section 'Mes applis' de votre tableau de bord. Nous proposons Stable Diffusion, ComfyUI, et bien d'autres outils d'intelligence artificielle.";
   }
   
   if (lowerMessage.includes('prix') || lowerMessage.includes('tarif') || lowerMessage.includes('coût') || lowerMessage.includes('abonnement')) {
@@ -347,7 +346,7 @@ async function generateSimpleResponse(message: string, userId: string) {
   }
   
   if (lowerMessage.includes('stable diffusion') || lowerMessage.includes('génération') || lowerMessage.includes('image')) {
-    return "Stable Diffusion est notre module phare de génération d'images IA. Il vous permet de créer des images à partir de descriptions textuelles. Nous proposons plusieurs interfaces : Stable Diffusion WebUI, ComfyUI, et InvokeAI. Chaque interface a ses avantages selon vos besoins.";
+    return "Stable Diffusion est notre module phare de génération d'images IA. Il vous permet de créer des images à partir de descriptions textuelles. Nous proposons plusieurs interfaces : Stable Diffusion WebUI et ComfyUI. Chaque interface a ses avantages selon vos besoins.";
   }
   
   if (lowerMessage.includes('technique') || lowerMessage.includes('bug') || lowerMessage.includes('erreur')) {

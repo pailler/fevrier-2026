@@ -111,7 +111,6 @@ export default function ModuleAccessButton({
       'stablediffusion': '🎨',
       'comfyui': '⚙️',
       'whisper': '🎤',
-      'invoke': '🖼️',
       'sdnext': '🚀',
       'cogstudio': '🎯',
       'ruinedfooocus': '🎭'
@@ -124,7 +123,6 @@ export default function ModuleAccessButton({
       'stablediffusion': 'bg-purple-600 hover:bg-purple-700',
       'comfyui': 'bg-blue-600 hover:bg-blue-700',
       'whisper': 'bg-green-600 hover:bg-green-700',
-      'invoke': 'bg-indigo-600 hover:bg-indigo-700',
       'sdnext': 'bg-orange-600 hover:bg-orange-700',
       'cogstudio': 'bg-pink-600 hover:bg-pink-700',
       'ruinedfooocus': 'bg-red-600 hover:bg-red-700'

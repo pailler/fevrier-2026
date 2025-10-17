@@ -109,9 +109,6 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       return '/images/cogstudio.jpg';
     }
     
-    if (titleLower.includes('invoke')) {
-      return '/images/invoke.jpg';
-    }
     
     if (titleLower.includes('sdnext')) {
       return '/images/sdnext.jpg';
@@ -144,7 +141,6 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       'whisper': { displayTitle: 'Transformez vos fichiers en texte', appName: 'Whisper IA' },
       'ruinedfooocus': { displayTitle: 'Création d\'images IA, simple et précise', appName: 'Ruinedfooocus' },
       'cogstudio': { displayTitle: 'Générez des vidéos IA uniques', appName: 'Cogstudio IA' },
-      'invoke': { displayTitle: 'Retouche intelligente avec l\'IA', appName: 'InvokeAI' },
       'sdnext': { displayTitle: 'Des visuels plus réalistes, plus rapides, plus précis', appName: 'SDnext AI' }
     };
     
@@ -250,4 +246,5 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     </div>
   );
 }
+
 

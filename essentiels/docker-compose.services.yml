@@ -217,32 +217,6 @@ services:
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
 
-  # Service Invoke
-  invoke:
-    image: invokeai/invokeai:latest
-    container_name: invoke
-    restart: unless-stopped
-    ports:
-      - "8090:9090"  # Port pour Invoke
-    environment:
-      - INVOKEAI_ROOT=/app/invokeai
-    volumes:
-      - ./invoke-models:/app/invokeai/models
-      - ./invoke-outputs:/app/invokeai/outputs
-    networks:
-      - services-network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.invoke.rule=Host(`invoke.iahome.fr`)"
-      - "traefik.http.routers.invoke.entrypoints=websecure"
-      - "traefik.http.routers.invoke.tls=true"
-      - "traefik.http.services.invoke.loadbalancer.server.port=9090"
-      - "traefik.http.routers.invoke-http.rule=Host(`invoke.iahome.fr`)"
-      - "traefik.http.routers.invoke-http.entrypoints=web"
-      - "traefik.http.routers.invoke-http.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
-
   # Service QR Codes
   qrcodes:
     build: ../qr-code-service

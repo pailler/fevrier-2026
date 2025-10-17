@@ -36,11 +36,6 @@ export class TokenActionService {
       transcribe: 100,       // 100 tokens par transcription
       batch_transcribe: 200  // 200 tokens pour transcription multiple
     },
-    invoke: {
-      access: 100,           // 100 tokens pour accéder à Invoke AI
-      generate: 100,         // 100 tokens par génération
-      batch_generate: 200    // 200 tokens pour génération multiple
-    },
     cogstudio: {
       access: 100,           // 100 tokens pour accéder à CogStudio
       generate: 100,         // 100 tokens par génération

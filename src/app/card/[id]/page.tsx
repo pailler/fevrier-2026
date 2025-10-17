@@ -200,8 +200,7 @@ export default function CardDetailPage() {
         'pdf': 'https://pdf.iahome.fr',
         'aiassistant': 'https://aiassistant.iahome.fr',
         'cogstudio': 'https://cogstudio.iahome.fr',
-        'ruinedfooocus': '/api/gradio-secure',
-        'invoke': 'https://invoke.iahome.fr'
+        'ruinedfooocus': '/api/gradio-secure'
       };
 
       const normalizedName = (moduleName || '').toLowerCase().replace(/\s+/g, '');
@@ -324,13 +323,12 @@ export default function CardDetailPage() {
       console.log('🔧 Chargement carte pour:', params.id);
 
       // Liste des modules qui ont des pages spécifiques
-      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'sdnext', 'invoke', 'cogstudio', 'ruinedfooocus', 'whisper'];
+      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'sdnext', 'cogstudio', 'ruinedfooocus', 'whisper', 'meeting-reports'];
       
-      // Si c'est un module avec une page spécifique, rediriger
+      // Si c'est un module avec une page spécifique, charger la page spécifique
       if (specificPages.includes(params.id as string)) {
-        console.log(`🔄 Redirection vers la page spécifique pour ${params.id}`);
-        router.push(`/card/${params.id}`);
-        return;
+        console.log(`📄 Chargement de la page spécifique pour ${params.id}`);
+        // Ne pas rediriger, continuer avec le chargement normal
       }
 
       try {

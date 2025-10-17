@@ -14,7 +14,7 @@ async function updateComfyUISubtitle() {
     const { data, error } = await supabase
       .from('modules')
       .update({ 
-        description: 'ComfyUI : Un contrôle total sur chaque étape de la création d\'image'
+        description: 'ComfyUI : contrôle total sur chaque étape de la création d\'image'
       })
       .eq('id', 'comfyui')
       .select();

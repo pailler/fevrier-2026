@@ -47,12 +47,6 @@ http:
         replacement: "https://iahome.fr/api/redirect-ruinedfooocus$1"
         permanent: false
     
-    # Middleware de redirection sécurisée pour Invoke AI
-    invoke-secure-redirect:
-      redirectRegex:
-        regex: "^https://invoke\\.iahome\\.fr(.*)$"
-        replacement: "https://iahome.fr/api/redirect-invoke$1"
-        permanent: false
     
     # Middleware de redirection sécurisée pour ComfyUI
     comfyui-secure-redirect:
@@ -132,14 +126,6 @@ http:
       tls: {}
       priority: 100
 
-    # Invoke AI - Redirection sécurisée
-    invoke-secure:
-      rule: "Host(`invoke.iahome.fr`)"
-      entryPoints: ["websecure"]
-      service: invoke-redirect-service
-      middlewares: ["invoke-secure-redirect", "security-headers@file", "compress@file"]
-      tls: {}
-      priority: 100
 
     # ComfyUI - Redirection sécurisée
     comfyui-secure:
@@ -203,12 +189,6 @@ http:
         passHostHeader: true
 
     ruinedfooocus-redirect-service:
-      loadBalancer:
-        servers:
-          - url: "http://iahome-app:3000"
-        passHostHeader: true
-
-    invoke-redirect-service:
       loadBalancer:
         servers:
           - url: "http://iahome-app:3000"

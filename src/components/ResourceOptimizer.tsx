@@ -56,3 +56,4 @@ export default function ResourceOptimizer() {
   return null; // Ce composant ne rend rien
 }
 
+

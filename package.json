@@ -40,7 +40,7 @@
         "resend": "^6.0.1",
         "stripe": "^18.4.0",
         "tailwindcss": "^4.1.12",
-        "uuid": "^11.0.3"
+        "uuid": "^11.1.0"
     },
     "name": "iahome",
     "private": true,

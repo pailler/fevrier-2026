@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     // Essayer de récupérer les tokens depuis la table user_tokens existante
     // Si la table n'existe pas ou a des problèmes, utiliser la valeur par défaut
-    let tokens = 10; // Valeur par défaut
+    let tokens = 100; // Valeur par défaut
     
     try {
       const { data: userTokens, error: tokensError } = await supabase
@@ -48,13 +48,16 @@ export async function GET(request: NextRequest) {
           .from('user_tokens')
           .insert([{
             user_id: userId,
-            tokens: 10
+            tokens: 100,
+            package_name: 'Welcome Package',
+            purchase_date: new Date().toISOString(),
+            is_active: true
           }]);
 
         if (insertError) {
           console.log('⚠️ Table user_tokens non disponible ou contrainte incorrecte, utilisation de la valeur par défaut');
         } else {
-          tokens = 10;
+          tokens = 100;
         }
       }
     } catch (error) {
@@ -115,7 +118,7 @@ export async function POST(request: NextRequest) {
         .eq('user_id', userId)
         .single();
 
-      let currentTokens = 10; // Valeur par défaut
+      let currentTokens = 100; // Valeur par défaut
       
       if (!tokensError && userTokens) {
         currentTokens = userTokens.tokens;
@@ -125,7 +128,10 @@ export async function POST(request: NextRequest) {
           .from('user_tokens')
           .insert([{
             user_id: userId,
-            tokens: 10
+            tokens: 100,
+            package_name: 'Welcome Package',
+            purchase_date: new Date().toISOString(),
+            is_active: true
           }]);
 
         if (insertError) {
@@ -183,7 +189,7 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       console.log('⚠️ Table user_tokens non disponible, simulation de la consommation');
       // Simuler la consommation
-      const currentTokens = 10;
+      const currentTokens = 100;
       const newTokenCount = Math.max(0, currentTokens - tokensToConsume);
       console.log('🪙 Simulation consommation:', tokensToConsume, 'tokens pour:', userProfile.email);
       console.log('🪙 Tokens restants:', newTokenCount);

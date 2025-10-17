@@ -1,0 +1,59 @@
+# Configuration Traefik pour l'API Meeting Reports Generator
+# Placez ce fichier dans votre répertoire traefik/dynamic/
+
+http:
+  routers:
+    meeting-reports-api:
+      rule: "Host(`meeting-reports.iahome.fr`) && PathPrefix(`/api`)"
+      service: meeting-reports-api-service
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - meeting-reports-stripprefix
+        - meeting-reports-api-headers
+        - meeting-reports-cors
+
+  services:
+    meeting-reports-api-service:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:8001"
+        healthCheck:
+          path: "/health"
+          interval: "30s"
+          timeout: "5s"
+
+  middlewares:
+    meeting-reports-stripprefix:
+      stripPrefix:
+        prefixes:
+          - "/api"
+    
+    meeting-reports-api-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-For: ""
+        customResponseHeaders:
+          X-Frame-Options: "SAMEORIGIN"
+          X-Content-Type-Options: "nosniff"
+          Referrer-Policy: "strict-origin-when-cross-origin"
+    
+    meeting-reports-cors:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        accessControlAllowHeaders:
+          - Content-Type
+          - Authorization
+          - X-Requested-With
+        accessControlAllowOriginList:
+          - "https://meeting-reports.iahome.fr"
+          - "http://localhost:3001"
+        accessControlMaxAge: 100
+        addVaryHeader: true
+

@@ -11,7 +11,6 @@ export async function POST(request: NextRequest) {
       'whisper-ia': 100,
       'stablediffusion': 100,
       'whisper': 100,
-      'invoke': 100,
       'comfyui': 100,
       'sdnext': 100,
       'cogstudio': 100,

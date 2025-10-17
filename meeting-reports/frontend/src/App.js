@@ -1,0 +1,448 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import FileUpload from './components/FileUpload';
+import AudioRecorder from './components/AudioRecorder';
+import ReportList from './components/ReportList';
+import ReportViewer from './components/ReportViewer';
+import './App.css';
+
+// Utiliser l'API locale pour éviter les problèmes de routage
+const API_BASE_URL = 'http://localhost:8001';
+
+function App() {
+  const [reports, setReports] = useState([]);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload' or 'record'
+  const [currentStep, setCurrentStep] = useState(1); // 1: Enregistrement, 2: Upload, 3: Résumé
+  const [processingStatus, setProcessingStatus] = useState(''); // Status du traitement
+
+  // Ne pas charger les anciens rapports au démarrage
+  // Chaque session commence avec une liste vide
+  useEffect(() => {
+    // Initialiser avec une liste vide pour une nouvelle session
+    setReports([]);
+  }, []);
+
+  const loadReports = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_BASE_URL}/reports`);
+      
+      // Dédupliquer les rapports par ID pour éviter les doublons
+      const uniqueReports = response.data.filter((report, index, self) => 
+        index === self.findIndex(r => r.id === report.id)
+      );
+      
+      // Ne garder que les rapports de la session actuelle (générés récemment)
+      const sessionReports = uniqueReports.filter(report => {
+        const reportDate = new Date(report.created_at);
+        const now = new Date();
+        const timeDiff = now - reportDate;
+        // Garder seulement les rapports générés dans les dernières 24h
+        return timeDiff < 24 * 60 * 60 * 1000;
+      });
+      
+      setReports(sessionReports);
+      setError(null);
+    } catch (err) {
+      setError('Erreur lors du chargement des rapports');
+      console.error('Error loading reports:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFileUpload = async (file) => {
+    try {
+      setLoading(true);
+      setError(null);
+      setCurrentStep(2); // Passer à l'étape d'upload
+      setProcessingStatus('Upload du fichier en cours...');
+
+      // Upload du fichier
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const uploadResponse = await axios.post(`${API_BASE_URL}/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      const fileId = uploadResponse.data.file_id;
+      setProcessingStatus('Démarrage de la transcription...');
+
+      // Démarrer le traitement
+      await axios.post(`${API_BASE_URL}/process/${fileId}`);
+
+      // Polling pour vérifier le statut
+      const pollStatus = async () => {
+        try {
+          const statusResponse = await axios.get(`${API_BASE_URL}/status/${fileId}`);
+          const status = statusResponse.data;
+
+          if (status.status === 'completed') {
+            setCurrentStep(3); // Passer à l'étape du résumé
+            setProcessingStatus('Résumé généré avec succès !');
+            setLoading(false);
+            // Recharger la liste des rapports seulement à la fin
+            await loadReports();
+            // Ne pas revenir à l'étape 1, rester sur l'étape 3 pour afficher le rapport
+            setTimeout(() => {
+              setProcessingStatus('');
+            }, 3000);
+          } else if (status.status === 'error') {
+            setError(status.message || 'Erreur lors du traitement');
+            setLoading(false);
+            setCurrentStep(1);
+            setProcessingStatus('');
+          } else {
+            // Continuer le polling
+            setProcessingStatus(`Transcription en cours... ${status.progress || ''}`);
+            setTimeout(pollStatus, 2000);
+          }
+        } catch (err) {
+          setError('Erreur lors de la vérification du statut');
+          setLoading(false);
+          setCurrentStep(1);
+          setProcessingStatus('');
+        }
+      };
+
+      pollStatus();
+    } catch (err) {
+      setError('Erreur lors de l\'upload du fichier');
+      setLoading(false);
+      setCurrentStep(1);
+      setProcessingStatus('');
+      console.error('Error uploading file:', err);
+    }
+  };
+
+  const handleAudioRecord = async (audioBlob) => {
+    const file = new File([audioBlob], 'recording.webm', { type: 'audio/webm' });
+    await handleFileUpload(file);
+  };
+
+  const handleReportSelect = (report) => {
+    setSelectedReport(report);
+  };
+
+  const handleDeleteReport = async (reportId) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/reports/${reportId}`);
+      setReports(reports.filter(r => r.id !== reportId));
+      if (selectedReport && selectedReport.id === reportId) {
+        setSelectedReport(null);
+      }
+    } catch (err) {
+      console.error('Error deleting report:', err);
+      setError('Erreur lors de la suppression du rapport');
+    }
+  };
+
+  const handleCleanAllReports = async () => {
+    try {
+      setLoading(true);
+      await axios.post(`${API_BASE_URL}/clean`);
+      setReports([]);
+      setSelectedReport(null);
+      setError(null);
+    } catch (err) {
+      setError('Erreur lors du nettoyage des rapports');
+      console.error('Error cleaning reports:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBackToList = () => {
+    setSelectedReport(null);
+  };
+
+  if (selectedReport) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+        <ReportViewer 
+          report={selectedReport} 
+          onBack={handleBackToList}
+          onDelete={handleDeleteReport}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+      {/* Bannière principale */}
+      <section className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 py-8">
+        
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+            {/* Contenu texte */}
+            <div className="flex-1 max-w-2xl">
+              <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
+                Générateur de Rapports de Réunions IA
+              </h1>
+              <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
+                PRODUCTIVITÉ
+              </span>
+              <p className="text-xl text-blue-100 mb-6">
+                Transformez vos enregistrements de réunions en rapports détaillés avec l'intelligence artificielle. 
+                Transcription automatique, résumé intelligent et points d'action.
+              </p>
+              
+              {/* Badges de fonctionnalités */}
+              <div className="flex flex-wrap gap-3 mb-6">
+                <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
+                  🎤 Transcription automatique
+                </span>
+                <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
+                  🤖 Résumé IA
+                </span>
+                <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
+                  📝 Points d'action
+                </span>
+                <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
+                  📊 Rapports PDF
+                </span>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+
+      {/* Indicateur des 3 étapes */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-white/50 p-8 hover:shadow-3xl transition-all duration-300">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent mb-4">
+              Processus en 3 Étapes
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
+          </div>
+
+          {/* Barre de progression des étapes */}
+          <div className="flex items-center justify-center space-x-8 mb-12">
+            {/* Étape 1: Enregistrement */}
+            <div className={`flex flex-col items-center space-y-3 ${currentStep >= 1 ? 'text-blue-600' : 'text-gray-400'}`}>
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold transition-all duration-300 ${
+                currentStep === 1 
+                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg scale-110' 
+                  : currentStep > 1 
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg' 
+                    : 'bg-gray-200 text-gray-500'
+              }`}>
+                1
+              </div>
+              <div className="text-center">
+                <h3 className="font-semibold text-lg">Étape 1 : Enregistrement</h3>
+                <p className="text-sm opacity-80">Audio de la réunion</p>
+              </div>
+            </div>
+
+            {/* Flèche */}
+            <div className={`w-12 h-1 rounded-full transition-all duration-300 ${
+              currentStep > 1 ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gray-300'
+            }`}></div>
+
+            {/* Étape 2: Transcription */}
+            <div className={`flex flex-col items-center space-y-3 ${currentStep >= 2 ? 'text-blue-600' : 'text-gray-400'}`}>
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold transition-all duration-300 ${
+                currentStep === 2 
+                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg scale-110' 
+                  : currentStep > 2 
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg' 
+                    : 'bg-gray-200 text-gray-500'
+              }`}>
+                2
+              </div>
+              <div className="text-center">
+                <h3 className="font-semibold text-lg">Étape 2 : Upload</h3>
+                <p className="text-sm opacity-80">Fichier → Traitement</p>
+              </div>
+            </div>
+
+            {/* Flèche */}
+            <div className={`w-12 h-1 rounded-full transition-all duration-300 ${
+              currentStep > 2 ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gray-300'
+            }`}></div>
+
+            {/* Étape 3: Résumé */}
+            <div className={`flex flex-col items-center space-y-3 ${currentStep >= 3 ? 'text-blue-600' : 'text-gray-400'}`}>
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold transition-all duration-300 ${
+                currentStep === 3 
+                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg scale-110' 
+                  : 'bg-gray-200 text-gray-500'
+              }`}>
+                3
+              </div>
+              <div className="text-center">
+                <h3 className="font-semibold text-lg">Étape 3 : Résumé</h3>
+                <p className="text-sm opacity-80">Rapports générés</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Statut du traitement */}
+          {processingStatus && (
+            <div className="text-center mb-8">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6">
+                <div className="flex items-center justify-center space-x-3 mb-4">
+                  <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                  <span className="text-lg font-semibold text-blue-800">{processingStatus}</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full animate-pulse" style={{width: '60%'}}></div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Onglets pour l'enregistrement */}
+          <div className="flex space-x-1 mb-8 bg-gray-100 rounded-xl p-1">
+            <button
+              onClick={() => setActiveTab('upload')}
+              className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-all duration-300 ${
+                activeTab === 'upload'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-white'
+              }`}
+            >
+              📁 Upload de Fichier
+            </button>
+            <button
+              onClick={() => setActiveTab('record')}
+              className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-all duration-300 ${
+                activeTab === 'record'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-white'
+              }`}
+            >
+              🎤 Enregistrement
+            </button>
+          </div>
+
+          {/* Contenu des onglets */}
+          <div className="min-h-[400px]">
+            {activeTab === 'upload' && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    Étape 2 : Glissez-déposez votre fichier
+                  </h3>
+                  <p className="text-gray-600">
+                    Glissez-déposez ou sélectionnez un fichier audio pour commencer le processus
+                  </p>
+                </div>
+                <FileUpload onFileUpload={handleFileUpload} />
+              </div>
+            )}
+
+            {activeTab === 'record' && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    Étape 1 : Enregistrez votre réunion
+                  </h3>
+                  <p className="text-gray-600">
+                    Utilisez l'enregistreur intégré pour capturer votre réunion en temps réel
+                  </p>
+                </div>
+                <AudioRecorder onRecordingComplete={handleAudioRecord} />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Section des rapports */}
+      <div className="max-w-7xl mx-auto px-6 pb-8">
+        <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-white/50 p-8 hover:shadow-3xl transition-all duration-300">
+          <div className="text-center mb-8">
+            <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent mb-4">
+              Étape 3 : Résumé du rapport de réunion
+            </h3>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full mb-4"></div>
+            
+            {/* Bouton de nettoyage */}
+            {reports.length > 0 && (
+              <button
+                onClick={handleCleanAllReports}
+                disabled={loading}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Nettoyage...' : '🗑️ Supprimer tous les rapports'}
+              </button>
+            )}
+          </div>
+          
+          {/* Message de traitement en cours */}
+          {loading && (
+            <div className="text-center py-12">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-8 max-w-md mx-auto">
+                <div className="animate-spin text-blue-600 text-4xl mb-4">⚙️</div>
+                <h4 className="text-lg font-semibold text-blue-900 mb-2">
+                  Génération en cours...
+                </h4>
+                <p className="text-blue-700 text-sm mb-4">
+                  {processingStatus || 'Traitement de votre fichier audio...'}
+                </p>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Message informatif pour nouvelle session */}
+          {reports.length === 0 && !loading && (
+            <div className="text-center py-12">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md mx-auto">
+                <div className="text-blue-600 text-4xl mb-4">📝</div>
+                <h4 className="text-lg font-semibold text-blue-900 mb-2">
+                  Aucun rapport généré
+                </h4>
+                <p className="text-blue-700 text-sm">
+                  Commencez par enregistrer ou uploader un fichier audio pour générer votre premier rapport de réunion.
+                </p>
+              </div>
+            </div>
+          )}
+          
+          {/* Affichage des rapports uniquement quand pas de génération en cours */}
+          {!loading && reports.length > 0 && (
+            <ReportList 
+              reports={reports} 
+              onReportSelect={handleReportSelect}
+              onDeleteReport={handleDeleteReport}
+              loading={loading}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Message d'erreur */}
+      {error && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl text-center max-w-md">
+            <div className="text-red-500 text-4xl mb-4">⚠️</div>
+            <p className="text-gray-700 font-semibold mb-4">Erreur</p>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <button
+              onClick={() => setError(null)}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;

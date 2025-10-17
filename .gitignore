@@ -67,3 +67,4 @@ Thumbs.db
 # Fichiers de backup
 *.backup
 *.bakdocker-services/essentiels/pdf/temp/
+ffmpeg.zip

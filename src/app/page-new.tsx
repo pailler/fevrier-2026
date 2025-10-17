@@ -17,10 +17,6 @@ export default function Home() {
   const [modules, setModules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [priceFilter, setPriceFilter] = useState('all');
-  const [professionFilter, setProfessionFilter] = useState('all'); // CHANGÉ : experienceFilter -> professionFilter
-  const [sortBy, setSortBy] = useState('most_used');
-  const [categoryFilter, setCategoryFilter] = useState('all');
   const [userSubscriptions, setUserSubscriptions] = useState<{[key: string]: boolean}>({});
   const [showScrollToTop, setShowScrollToTop] = useState(false);
 
@@ -118,13 +114,13 @@ export default function Home() {
             return {
               ...module,
               // Catégorie principale (pour compatibilité)
-              category: cleanCategory(primaryCategory),
+              category: primaryCategory,
               // Nouvelles catégories multiples
-              categories: categories.map(cleanCategory),
+              categories: categories,
               // Ajouter des données aléatoires seulement pour l'affichage (pas stockées en DB)
               role: getRandomRole(),
               usage_count: Math.floor(Math.random() * 1000) + 1,
-              profession: getModuleProfession(module.title, primaryCategory) // CHANGÉ : attribution automatique
+              profession: 'Généraliste'
             };
           });
           
@@ -195,65 +191,7 @@ export default function Home() {
     return selectedModules.some(module => module.id === moduleId);
   };
 
-  // Fonction pour convertir en majuscules
-  const toUpperCase = (str: string) => str.toUpperCase();
 
-  // Fonction pour nettoyer les catégories supprimées
-  const cleanCategory = (category: string) => {
-    return category.replace(/[^a-zA-Z0-9\s]/g, '').trim();
-  };
-
-  // Fonction pour attribuer une profession selon le nom du module
-  const getModuleProfession = (moduleTitle: string, moduleCategory: string) => {
-    const title = moduleTitle.toLowerCase();
-    const category = moduleCategory.toLowerCase();
-
-    // Photographes
-    if (title.includes('photo') || title.includes('image') || title.includes('camera') || 
-        title.includes('photoshop') || title.includes('lightroom') || title.includes('canon') ||
-        title.includes('nikon') || title.includes('sony') || category.includes('photo')) {
-      return 'Photographe';
-    }
-
-    // Rédacteurs & Journalistes
-    if (title.includes('chatgpt') || title.includes('rédaction') || title.includes('texte') ||
-        title.includes('word') || title.includes('notion') || title.includes('écriture') ||
-        title.includes('article') || title.includes('blog') || category.includes('assistant')) {
-      return 'Rédacteur';
-    }
-
-    // Architectes & Designers d'intérieur
-    if (title.includes('autocad') || title.includes('sketchup') || title.includes('revit') ||
-        title.includes('3d') || title.includes('blender') || title.includes('design') ||
-        title.includes('architecture') || title.includes('maquette') || category.includes('design')) {
-      return 'Architecte';
-    }
-
-    // Avocats & Juristes
-    if (title.includes('droit') || title.includes('juridique') || title.includes('contrat') ||
-        title.includes('legal') || title.includes('avocat') || title.includes('justice') ||
-        title.includes('loi') || title.includes('procédure')) {
-      return 'Avocat';
-    }
-
-    // Médecins & Professionnels de santé
-    if (title.includes('médical') || title.includes('santé') || title.includes('diagnostic') ||
-        title.includes('radiologie') || title.includes('analyse') || title.includes('patient') ||
-        title.includes('clinique') || title.includes('hôpital')) {
-      return 'Médecin';
-    }
-
-    // Par défaut, attribuer selon la catégorie
-    if (category.includes('photo') || category.includes('image')) return 'Photographe';
-    if (category.includes('assistant') || category.includes('texte')) return 'Rédacteur';
-    if (category.includes('design') || category.includes('3d')) return 'Architecte';
-    if (category.includes('bureautique') || category.includes('document')) return 'Rédacteur';
-    if (category.includes('video') || category.includes('montage')) return 'Photographe';
-
-    // Fallback aléatoire pour les modules non classés
-    const professions = ['Photographe', 'Rédacteur', 'Architecte', 'Avocat', 'Médecin'];
-    return professions[Math.floor(Math.random() * professions.length)];
-  };
 
   // Fonctions pour générer des données aléatoires
   const getRandomRole = () => {
@@ -261,33 +199,6 @@ export default function Home() {
     return roles[Math.floor(Math.random() * roles.length)];
   };
 
-  // Générer la liste des catégories disponibles
-  const existingCategories = Array.from(new Set(
-    modules.flatMap(module => module.categories || [module.category]).filter(Boolean)
-  ));
-
-  // Catégories autorisées (mise à jour avec les nouvelles catégories)
-  const authorizedCategories = [
-    'IA ASSISTANT', 
-    'IA BUREAUTIQUE', 
-    'IA PHOTO', 
-    'IA VIDEO', 
-    'IA AUDIO', 
-    'IA PROMPTS', 
-    'IA MARKETING', 
-    'IA DESIGN', 
-    'Web Tools', 
-    'IA FORMATION', 
-    'IA DEVELOPPEMENT',
-  ];
-
-  // Filtrer et combiner les catégories
-  const filteredExistingCategories = existingCategories.filter(cat => authorizedCategories.includes(cat));
-  const missingCategories = authorizedCategories.filter(cat => !filteredExistingCategories.includes(cat));
-  const allCategories = [...filteredExistingCategories, ...missingCategories];
-
-  // Ajouter "Toutes les catégories" au début
-  const categories = ['Toutes les catégories', ...allCategories];
 
   // Filtrer et trier les modules
   const filteredAndSortedModules = modules
@@ -300,20 +211,7 @@ export default function Home() {
           cat.toLowerCase().includes(search.toLowerCase())
         );
 
-      // Filtre de prix
-      const matchesPrice = priceFilter === 'all' || 
-        (priceFilter === 'free' && module.price === '0') ||
-        (priceFilter === 'paid' && module.price !== '0');
-
-      // CHANGÉ : matchesExperience -> matchesProfession
-      const matchesProfession = professionFilter === 'all' || 
-        module.profession === professionFilter;
-
-      // Filtre de catégorie
-      const matchesCategory = categoryFilter === 'all' || 
-        (module.categories || [module.category]).includes(categoryFilter);
-
-      return matchesSearch && matchesPrice && matchesProfession && matchesCategory;
+      return matchesSearch;
     })
     .sort((a, b) => {
       // Tri principal : modules gratuits en premier, puis modules payants
@@ -323,23 +221,8 @@ export default function Home() {
       if (aIsFree && !bIsFree) return -1; // a (gratuit) avant b (payant)
       if (!aIsFree && bIsFree) return 1;  // b (gratuit) avant a (payant)
       
-      // Si les deux modules ont le même type (gratuit ou payant), appliquer le tri secondaire
-      switch (sortBy) {
-        case 'most_used':
-          return (b.usage_count || 0) - (a.usage_count || 0);
-        case 'least_used':
-          return (a.usage_count || 0) - (b.usage_count || 0);
-        case 'price_high':
-          return (b.price || 0) - (a.price || 0);
-        case 'price_low':
-          return (a.price || 0) - (b.price || 0);
-        case 'name_az':
-          return a.title.localeCompare(b.title);
-        case 'name_za':
-          return b.title.localeCompare(a.title);
-        default:
-          return 0;
-      }
+      // Si les deux modules ont le même type, trier par nom
+      return a.title.localeCompare(b.title);
     });
 
   // Pagination
@@ -370,7 +253,7 @@ export default function Home() {
   // Réinitialiser la pagination quand les filtres changent
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, priceFilter, professionFilter, sortBy, categoryFilter]); // CHANGÉ : experienceFilter -> professionFilter
+  }, [search]);
 
   // Détecter le scroll pour afficher/masquer le bouton de retour en haut
   useEffect(() => {
@@ -464,80 +347,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section principale avec filtres et contenu */}
+      {/* Section principale avec contenu */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Sidebar gauche - Catégories */}
-            <aside className="lg:w-64 shrink-0 order-2 lg:order-1">
-              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                <div className="flex flex-wrap gap-2">
-                  {categories.map((cat) => (
-                    <button 
-                      key={cat} 
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                        categoryFilter === (cat === 'Toutes les catégories' ? 'all' : cat)
-                          ? 'bg-blue-600 text-white shadow-md' 
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm'
-                      }`}
-                      onClick={() => setCategoryFilter(cat === 'Toutes les catégories' ? 'all' : cat)}
-                    >
-                      {cat === 'Toutes les catégories' ? 'Toutes' : toUpperCase(cleanCategory(cat))}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </aside>
-
-            {/* Contenu principal */}
-            <div className="flex-1 order-1 lg:order-2">
-              {/* Filtres */}
-              <div className="bg-white rounded-xl p-4 lg:p-6 shadow-sm border border-gray-100 mb-6 lg:mb-8">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3 lg:gap-4">
-                  {/* Dropdowns */}
-                  <div className="flex flex-col sm:flex-row gap-2 lg:gap-3 flex-1">
-                    <select 
-                      className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      value={priceFilter}
-                      onChange={(e) => setPriceFilter(e.target.value)}
-                    >
-                      <option value="all">Gratuit et payant</option>
-                      <option value="free">Gratuit uniquement</option>
-                      <option value="paid">Payant uniquement</option>
-                    </select>
-                    
-                    {/* CHANGÉ : Filtre par métier traditionnel au lieu de niveau d'expérience */}
-                    <select 
-                      className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      value={professionFilter}
-                      onChange={(e) => setProfessionFilter(e.target.value)}
-                    >
-                      <option value="all">Tous les métiers</option>
-                      <option value="Photographe">📸 Photographes</option>
-                      <option value="Rédacteur">✍️ Rédacteurs & Journalistes</option>
-                      <option value="Architecte">🏗️ Architectes & Designers</option>
-                      <option value="Avocat">⚖️ Avocats & Juristes</option>
-                      <option value="Médecin">🩺 Médecins & Santé</option>
-                    </select>
-                  </div>
-                  
-                  {/* Boutons */}
-                  <div className="flex items-center gap-3">
-                    <select 
-                      className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                    >
-                      <option value="most_used">Trier par : Plus installés</option>
-                      <option value="least_used">Trier par : Moins installés</option>
-                      <option value="price_high">Trier par : Prix élevé à bas</option>
-                      <option value="price_low">Trier par : Prix bas à élevé</option>
-                      <option value="name_az">Trier par : Nom A-Z</option>
-                      <option value="name_za">Trier par : Nom Z-A</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
+          {/* Contenu principal */}
+          <div className="w-full">
 
               {/* Grille de templates */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -629,7 +443,6 @@ export default function Home() {
                   Affichage de {indexOfFirstModule + 1} à {Math.min(indexOfLastModule, filteredAndSortedModules.length)} sur {filteredAndSortedModules.length} templates
                 </div>
               )}
-            </div>
           </div>
         </div>
       </section>

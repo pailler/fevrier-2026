@@ -76,7 +76,6 @@ export default function EncoursSimplePage() {
       '5': 'qrcodes',  // QR Codes -> qrcodes
       '7': 'stablediffusion', // Stable Diffusion -> stablediffusion
       '8': 'ruinedfooocus', // Ruined Fooocus -> ruinedfooocus
-      '9': 'invoke',   // Invoke AI -> invoke
       '10': 'comfyui', // ComfyUI -> comfyui
       '11': 'cogstudio', // Cog Studio -> cogstudio
       '12': 'sdnext',  // SD.Next -> sdnext
@@ -91,7 +90,6 @@ export default function EncoursSimplePage() {
       'qrcodes': '/api/redirect-qrcodes',  // Redirection sécurisée QR Codes
       'stablediffusion': '/api/redirect-stablediffusion',  // Redirection sécurisée StableDiffusion
       'ruinedfooocus': '/api/redirect-ruinedfooocus',  // Redirection sécurisée RuinedFooocus
-      'invoke': '/api/redirect-invoke',  // Redirection sécurisée Invoke
       'comfyui': '/api/redirect-comfyui',  // Redirection sécurisée ComfyUI
       'cogstudio': '/api/redirect-cogstudio',  // Redirection sécurisée CogStudio
       'sdnext': '/api/redirect-sdnext',  // Redirection sécurisée SDNext

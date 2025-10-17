@@ -7,17 +7,19 @@ ingress:
   - hostname: www.iahome.fr
     service: http://localhost:3000
   - hostname: metube.iahome.fr
-    service: http://localhost:8082
+    service: http://localhost:8081
   - hostname: librespeed.iahome.fr
-    service: http://localhost:8083
+    service: http://localhost:8085
   - hostname: whisper.iahome.fr
     service: http://localhost:8093
   - hostname: psitransfer.iahome.fr
-    service: http://localhost:8084
+    service: http://localhost:8087
   - hostname: qrcodes.iahome.fr
-    service: http://localhost:8091
+    service: http://localhost:7006
   - hostname: pdf.iahome.fr
-    service: http://localhost:8081
+    service: http://localhost:8086
+  - hostname: converter.iahome.fr
+    service: http://localhost:8096
   - hostname: stablediffusion.iahome.fr
     service: http://localhost:8085
   - hostname: ruinedfooocus.iahome.fr
@@ -28,4 +30,6 @@ ingress:
     service: http://localhost:8089
   - hostname: invoke.iahome.fr
     service: http://localhost:8090
+  - hostname: meeting-reports.iahome.fr
+    service: http://localhost:3050
   - service: http_status:404

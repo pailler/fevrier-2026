@@ -17,7 +17,6 @@ const MODULE_URLS: { [key: string]: string } = {
   'qrcodes': 'https://qrcodes.iahome.fr',
   'stablediffusion': 'https://stablediffusion.iahome.fr',
   'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
-  'invoke': 'https://invoke.iahome.fr',
   'comfyui': 'https://comfyui.iahome.fr',
   'cogstudio': 'https://cogstudio.iahome.fr',
   'sdnext': 'https://sdnext.iahome.fr'

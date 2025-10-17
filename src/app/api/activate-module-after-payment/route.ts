@@ -56,10 +56,6 @@ export async function POST(request: NextRequest) {
           moduleId = 'cogstudio';
           moduleTitle = 'CogStudio';
           paymentAmount = 990; // 9.90 EUR en centimes
-        } else if (sessionId.includes('invoke')) {
-          moduleId = 'invoke';
-          moduleTitle = 'Invoke IA';
-          paymentAmount = 990; // 9.90 EUR en centimes
         } else if (sessionId.includes('stablediffusion')) {
           moduleId = 'stablediffusion';
           moduleTitle = 'Stable diffusion IA';
