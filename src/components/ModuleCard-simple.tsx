@@ -135,7 +135,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       'qrcodes': { displayTitle: 'Générez des QRcodes pros', appName: 'QRCodes' },
       'stablediffusion': { displayTitle: 'Génération d\'images par IA pour créateurs', appName: 'Stable diffusion' },
       'comfyui': { displayTitle: 'Votre flux IA sur mesure', appName: 'ComfyUI', description: 'Un contrôle total sur chaque étape de la création d\'image' },
-      'whisper': { displayTitle: 'Transformez vos fichiers en texte', appName: 'Whisper IA' },
+      'whisper': { displayTitle: 'l\'IA transcrit vos fichiers en texte', appName: 'Whisper IA' },
       'ruinedfooocus': { displayTitle: 'Création d\'images IA, simple et précise', appName: 'Ruinedfooocus' },
       'cogstudio': { displayTitle: 'Générez des vidéos IA uniques', appName: 'Cogstudio IA' },
     };
