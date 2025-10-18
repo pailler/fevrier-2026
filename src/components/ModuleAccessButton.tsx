@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { TokenActionServiceClient } from '../utils/tokenActionServiceClient';
 import { useTokenContext } from '../contexts/TokenContext';
 
@@ -12,27 +12,29 @@ interface ModuleAccessButtonProps {
   moduleCost: number;
   onAccessGranted?: (url: string) => void;
   onAccessDenied?: (reason: string) => void;
-  className?: string;
 }
 
 export default function ModuleAccessButton({ 
-  user,
-  moduleId,
-  moduleName,
-  moduleUrl,
+  user, 
+  moduleId, 
+  moduleName, 
+  moduleUrl, 
   moduleCost,
   onAccessGranted, 
-  onAccessDenied,
-  className = ''
+  onAccessDenied 
 }: ModuleAccessButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { consumeTokens, refreshTokens } = useTokenContext();
+  const { refreshTokens } = useTokenContext();
 
   const handleAccess = async () => {
     if (!user) {
       setError('Vous devez être connecté');
       onAccessDenied?.('Non connecté');
+      return;
+    }
+
+    if (isLoading) {
       return;
     }
 
@@ -46,7 +48,7 @@ export default function ModuleAccessButton({
       const tokenService = TokenActionServiceClient.getInstance();
       const consumeResult = await tokenService.checkAndConsumeTokens(
         user.id,
-        moduleId,
+        moduleId as any,
         'access',
         moduleName
       );
@@ -64,8 +66,7 @@ export default function ModuleAccessButton({
       // Mettre à jour le contexte côté client
       await refreshTokens();
 
-      // Incrémenter le compteur d'accès (pour affichage uniquement)
-      console.log(`📊 ${moduleName}: Incrémentation du compteur d'accès...`);
+      // Incrémenter le compteur d'accès
       try {
         const incrementResponse = await fetch('/api/increment-module-access', {
           method: 'POST',
@@ -89,76 +90,56 @@ export default function ModuleAccessButton({
         console.warn(`⚠️ ${moduleName}: Erreur incrémentation compteur:`, incrementError);
       }
 
-      // Ouvrir le module dans un nouvel onglet
-      console.log(`🔗 ${moduleName}: Ouverture dans un nouvel onglet...`);
-      window.open(moduleUrl, '_blank');
-      console.log(`✅ ${moduleName}: Ouverture de ${moduleName}`);
-      
-      // Ne pas appeler onAccessGranted pour éviter la double ouverture
-      return;
+      // Générer un token d'accès
+      const tokenResponse = await fetch('/api/generate-access-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          userEmail: user.email,
+          moduleId: moduleId
+        })
+      });
 
-    } catch (error) {
-      console.error(`❌ ${moduleName}: Erreur:`, error);
-      setError(`Erreur lors de l'ouverture de ${moduleName}`);
-      onAccessDenied?.(`Erreur ouverture ${moduleName}`);
+      if (!tokenResponse.ok) {
+        throw new Error('Erreur génération token');
+      }
+
+      const tokenData = await tokenResponse.json();
+      
+      // Ouvrir l'application avec le token
+      const accessUrl = `${tokenData.url}?token=${tokenData.token}`;
+      console.log(`🔗 ${moduleName}: Accès sécurisé à:`, accessUrl);
+      window.open(accessUrl, '_blank');
+      
+      // Appeler le callback pour notifier l'accès accordé
+      onAccessGranted?.(accessUrl);
+    } catch (err) {
+      console.error(`❌ ${moduleName}: Erreur inattendue:`, err);
+      setError('Une erreur inattendue est survenue.');
+      onAccessDenied?.('Erreur inattendue');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const getModuleIcon = (moduleId: string) => {
-    const icons: { [key: string]: string } = {
-      'stablediffusion': '🎨',
-      'comfyui': '⚙️',
-      'whisper': '🎤',
-      'cogstudio': '🎯',
-      'ruinedfooocus': '🎭'
-    };
-    return icons[moduleId] || '🔧';
-  };
-
-  const getModuleColor = (moduleId: string) => {
-    const colors: { [key: string]: string } = {
-      'stablediffusion': 'bg-purple-600 hover:bg-purple-700',
-      'comfyui': 'bg-blue-600 hover:bg-blue-700',
-      'whisper': 'bg-green-600 hover:bg-green-700',
-      'cogstudio': 'bg-pink-600 hover:bg-pink-700',
-      'ruinedfooocus': 'bg-red-600 hover:bg-red-700'
-    };
-    return colors[moduleId] || 'bg-gray-600 hover:bg-gray-700';
-  };
-
   return (
-    <div className={`flex flex-col items-center space-y-2 ${className}`}>
+    <div className="flex flex-col items-center space-y-4">
       <button
         onClick={handleAccess}
         disabled={isLoading || !user}
-        className={`
-          px-6 py-3 rounded-lg font-medium transition-all duration-200
+        className={`px-6 py-3 rounded-lg text-white font-semibold transition-colors duration-300
           ${isLoading || !user
-            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            : `${getModuleColor(moduleId)} text-white hover:shadow-lg`
-          }
-        `}
+            ? 'bg-gray-400 cursor-not-allowed'
+            : 'bg-blue-600 hover:bg-blue-700'
+          }`}
       >
-        {isLoading ? (
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            <span>Ouverture...</span>
-          </div>
-        ) : (
-          <div className="flex items-center space-x-2">
-            <span>{getModuleIcon(moduleId)}</span>
-            <span>Accéder à {moduleName} ({moduleCost} tokens)</span>
-          </div>
-        )}
+        {isLoading ? '⏳ Ouverture...' : `🚀 Accéder à ${moduleName} (${moduleCost} tokens)`}
       </button>
-      
-      {error && (
-        <div className="text-red-600 text-sm text-center max-w-xs">
-          {error}
-        </div>
-      )}
+
+      {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 }

@@ -1,6 +1,6 @@
-# Script pour démarrer LibreSpeed depuis le dossier essentiels
-Write-Host "🚀 Démarrage de LibreSpeed (Essentiels)" -ForegroundColor Cyan
-Write-Host "=====================================" -ForegroundColor Cyan
+# Script pour démarrer LibreSpeed
+Write-Host "🚀 Démarrage de LibreSpeed" -ForegroundColor Cyan
+Write-Host "===========================" -ForegroundColor Cyan
 
 # Vérifier si Docker est en cours d'exécution
 Write-Host "`n1. Vérification de Docker..." -ForegroundColor Yellow
@@ -10,11 +10,10 @@ try {
         Write-Host "   ✅ Docker est en cours d'exécution" -ForegroundColor Green
     } else {
         Write-Host "   ❌ Docker n'est pas en cours d'exécution" -ForegroundColor Red
-        Write-Host "   Veuillez démarrer Docker Desktop et réessayer" -ForegroundColor Red
         exit 1
     }
 } catch {
-    Write-Host "   ❌ Erreur lors de la vérification de Docker: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "   ❌ Erreur lors de la vérification de Docker" -ForegroundColor Red
     exit 1
 }
 
@@ -35,62 +34,57 @@ try {
         }
     }
 } catch {
-    Write-Host "   ❌ Erreur lors de la vérification du réseau: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "   ❌ Erreur lors de la vérification du réseau" -ForegroundColor Red
     exit 1
 }
 
-# Arrêter les anciens containers LibreSpeed s'ils existent
-Write-Host "`n3. Arrêt des anciens containers LibreSpeed..." -ForegroundColor Yellow
-try {
-    $oldContainers = @("librespeed-iahome", "librespeed-auth", "librespeed-official")
-    foreach ($container in $oldContainers) {
-        $containerExists = docker ps -a --filter name=$container --format "{{.Names}}" 2>$null
-        if ($containerExists -eq $container) {
-            Write-Host "   🛑 Arrêt de $container..." -ForegroundColor Yellow
-            docker stop $container 2>$null
-            docker rm $container 2>$null
-            Write-Host "   ✅ $container arrêté et supprimé" -ForegroundColor Green
-        }
-    }
-} catch {
-    Write-Host "   ⚠️  Erreur lors de l'arrêt des anciens containers: $($_.Exception.Message)" -ForegroundColor Yellow
+# Arrêter l'ancien container
+Write-Host "`n3. Arrêt de l'ancien container..." -ForegroundColor Yellow
+$oldContainer = "librespeed-prod"
+$containerExists = docker ps -a --filter name=$oldContainer --format "{{.Names}}" 2>$null
+if ($containerExists -eq $oldContainer) {
+    Write-Host "   🛑 Arrêt de $oldContainer..." -ForegroundColor Yellow
+    docker stop $oldContainer 2>$null
+    docker rm $oldContainer 2>$null
+    Write-Host "   ✅ $oldContainer arrêté et supprimé" -ForegroundColor Green
 }
 
-# Démarrer les services LibreSpeed
-Write-Host "`n4. Démarrage des services LibreSpeed..." -ForegroundColor Yellow
+# Démarrer LibreSpeed
+Write-Host "`n4. Démarrage de LibreSpeed..." -ForegroundColor Yellow
+Set-Location librespeed
+docker-compose up -d
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "   ✅ LibreSpeed démarré" -ForegroundColor Green
+} else {
+    Write-Host "   ❌ Erreur LibreSpeed" -ForegroundColor Red
+    exit 1
+}
+
+# Vérifier le statut
+Write-Host "`n5. Vérification du statut..." -ForegroundColor Yellow
+Start-Sleep -Seconds 3
+
 try {
-    docker-compose up -d
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "   ✅ Services LibreSpeed démarrés avec succès" -ForegroundColor Green
+    $container = docker ps --filter name=librespeed-prod --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+    Write-Host "   📊 Statut de LibreSpeed:" -ForegroundColor Cyan
+    Write-Host $container -ForegroundColor White
+} catch {
+    Write-Host "   ⚠️  Erreur lors de la vérification du statut" -ForegroundColor Yellow
+}
+
+# Test de connectivité
+Write-Host "`n6. Test de connectivité..." -ForegroundColor Yellow
+try {
+    $response = Invoke-WebRequest -Uri "http://localhost:8085" -Method Head -TimeoutSec 10
+    if ($response.StatusCode -eq 200) {
+        Write-Host "   ✅ LibreSpeed accessible localement" -ForegroundColor Green
     } else {
-        Write-Host "   ❌ Erreur lors du démarrage des services" -ForegroundColor Red
-        exit 1
+        Write-Host "   ⚠️  LibreSpeed répond avec le code: $($response.StatusCode)" -ForegroundColor Yellow
     }
 } catch {
-    Write-Host "   ❌ Erreur lors du démarrage: $($_.Exception.Message)" -ForegroundColor Red
-    exit 1
+    Write-Host "   ⚠️  LibreSpeed n'est pas encore accessible localement" -ForegroundColor Yellow
 }
 
-# Vérifier le statut des containers
-Write-Host "`n5. Vérification du statut des containers..." -ForegroundColor Yellow
-Start-Sleep -Seconds 5
-
-try {
-    $containers = docker ps --filter name=librespeed --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-    Write-Host "   📊 Statut des containers LibreSpeed:" -ForegroundColor Cyan
-    Write-Host $containers -ForegroundColor White
-} catch {
-    Write-Host "   ⚠️  Erreur lors de la vérification du statut: $($_.Exception.Message)" -ForegroundColor Yellow
-}
-
-Write-Host "`n🎯 LibreSpeed démarré depuis le dossier essentiels !" -ForegroundColor Green
-Write-Host "   🌐 LibreSpeed: https://librespeed.iahome.fr" -ForegroundColor Cyan
-Write-Host "   🔐 LibreSpeed Auth: https://librespeed.iahome.fr/auth" -ForegroundColor Cyan
-
-
-
-
-
-
-
-
+Write-Host "`n🎯 LibreSpeed démarré avec succès !" -ForegroundColor Green
+Write-Host "   🌐 Accès local: http://localhost:8085" -ForegroundColor Cyan
+Write-Host "   🌐 Accès public: https://librespeed.iahome.fr" -ForegroundColor Cyan

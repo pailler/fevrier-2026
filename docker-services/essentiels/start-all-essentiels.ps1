@@ -53,7 +53,7 @@ foreach ($container in $oldContainers) {
 
 # Démarrer LibreSpeed
 Write-Host "`n4. Démarrage de LibreSpeed..." -ForegroundColor Yellow
-docker-compose -f docker-compose.yml up -d
+docker-compose -f librespeed/docker-compose.yml up -d
 if ($LASTEXITCODE -eq 0) {
     Write-Host "   ✅ LibreSpeed démarré" -ForegroundColor Green
 } else {

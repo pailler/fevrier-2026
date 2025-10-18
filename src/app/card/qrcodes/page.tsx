@@ -177,6 +177,9 @@ export default function QRCodesPage() {
           const isActivated = await checkModuleActivation(card.id);
           if (isActivated) {
             setAlreadyActivatedModules(prev => [...prev, card.id]);
+            console.log('✅ QR Codes détecté comme déjà activé');
+          } else {
+            console.log('❌ QR Codes pas encore activé');
           }
           setCheckingActivation(false);
         }
@@ -417,49 +420,66 @@ export default function QRCodesPage() {
             <div className="space-y-6">
               {/* Boutons d'action */}
               {isAuthenticated && user ? (
-                // Utilisateur connecté : activer QR Codes via API
-                <button
-                  onClick={async () => {
-                    if (!isAuthenticated || !user) {
-                      console.log('❌ Accès QR Codes - Utilisateur non connecté');
-                      router.push(`/login?redirect=${encodeURIComponent('/card/qrcodes')}`);
-                      return;
-                    }
+                // Utilisateur connecté
+                <>
+                  {!alreadyActivatedModules.includes('qrcodes') ? (
+                    // Module pas encore activé : bouton d'activation
+                    <button
+                      onClick={async () => {
+                        if (!isAuthenticated || !user) {
+                          console.log('❌ Accès QR Codes - Utilisateur non connecté');
+                          router.push(`/login?redirect=${encodeURIComponent('/card/qrcodes')}`);
+                          return;
+                        }
 
-                    try {
-                      console.log('🔄 Activation QR Codes pour:', user.email);
-                      
-                      const response = await fetch('/api/activate-qrcodes', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                          userId: user.id,
-                          email: user.email
-                        }),
-                      });
+                        try {
+                          console.log('🔄 Activation QR Codes pour:', user.email);
+                          
+                          const response = await fetch('/api/activate-qrcodes', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              userId: user.id,
+                              email: user.email
+                            }),
+                          });
 
-                      const result = await response.json();
+                          const result = await response.json();
 
-                      if (result.success) {
-                        console.log('✅ QR Codes activé avec succès');
-                        alert('QR Codes activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
-                        router.push('/encours');
-                      } else {
-                        console.error('❌ Erreur activation QR Codes:', result.error);
-                        alert(`Erreur lors de l'activation: ${result.error}`);
-                      }
-                    } catch (error) {
-                      console.error('❌ Erreur activation QR Codes:', error);
-                      alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
-                    }
-                  }}
-                  className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                >
-                  <span className="text-xl">🔑</span>
-                  <span>Activer QR Codes (10 tokens)</span>
-                </button>
+                          if (result.success) {
+                            console.log('✅ QR Codes activé avec succès');
+                            alert('QR Codes activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
+                            router.push('/encours');
+                          } else {
+                            console.error('❌ Erreur activation QR Codes:', result.error);
+                            alert(`Erreur lors de l'activation: ${result.error}`);
+                          }
+                        } catch (error) {
+                          console.error('❌ Erreur activation QR Codes:', error);
+                          alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                        }
+                      }}
+                      className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                    >
+                      <span className="text-xl">🔑</span>
+                      <span>Activer QR Codes (10 tokens)</span>
+                    </button>
+                  ) : (
+                    // Module déjà activé : bouton d'accès
+                    <button
+                      onClick={() => {
+                        console.log('✅ Accès QR Codes - Module déjà activé');
+                        window.open('https://qrcodes.iahome.fr', '_blank');
+                      }}
+                      className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                    >
+                      <span className="text-xl">🚀</span>
+                      <span>Accéder à QR Codes</span>
+                    </button>
+                  )}
+                </>
               ) : (
                 // Utilisateur non connecté : aller à la page de connexion puis retour à QR Codes
                 <button

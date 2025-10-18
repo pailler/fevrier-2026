@@ -1,24 +1,36 @@
-# Script pour arrêter LibreSpeed depuis le dossier essentiels
-Write-Host "🛑 Arrêt de LibreSpeed (Essentiels)" -ForegroundColor Red
-Write-Host "===================================" -ForegroundColor Red
+# Script pour arrêter LibreSpeed
+Write-Host "🛑 Arrêt de LibreSpeed" -ForegroundColor Red
+Write-Host "=====================" -ForegroundColor Red
 
-# Arrêter les services LibreSpeed
-Write-Host "`n1. Arrêt des services LibreSpeed..." -ForegroundColor Yellow
-try {
-    docker-compose down
+# Arrêter le container LibreSpeed
+Write-Host "`n1. Arrêt du container LibreSpeed..." -ForegroundColor Yellow
+$containerName = "librespeed-prod"
+$containerExists = docker ps -a --filter name=$containerName --format "{{.Names}}" 2>$null
+
+if ($containerExists -eq $containerName) {
+    Write-Host "   🛑 Arrêt de $containerName..." -ForegroundColor Yellow
+    docker stop $containerName
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "   ✅ Services LibreSpeed arrêtés avec succès" -ForegroundColor Green
+        Write-Host "   ✅ $containerName arrêté" -ForegroundColor Green
     } else {
-        Write-Host "   ⚠️  Aucun service LibreSpeed en cours d'exécution" -ForegroundColor Yellow
+        Write-Host "   ❌ Erreur lors de l'arrêt de $containerName" -ForegroundColor Red
     }
-} catch {
-    Write-Host "   ❌ Erreur lors de l'arrêt: $($_.Exception.Message)" -ForegroundColor Red
+    
+    Write-Host "   🗑️  Suppression de $containerName..." -ForegroundColor Yellow
+    docker rm $containerName
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "   ✅ $containerName supprimé" -ForegroundColor Green
+    } else {
+        Write-Host "   ❌ Erreur lors de la suppression de $containerName" -ForegroundColor Red
+    }
+} else {
+    Write-Host "   ℹ️  Le container $containerName n'existe pas" -ForegroundColor Blue
 }
 
-# Vérifier le statut des containers
-Write-Host "`n2. Vérification du statut des containers..." -ForegroundColor Yellow
+# Vérifier le statut final
+Write-Host "`n2. Vérification du statut final..." -ForegroundColor Yellow
 try {
-    $containers = docker ps -a --filter name=librespeed --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+    $containers = docker ps -a --filter name=librespeed --format "table {{.Names}}\t{{.Status}}"
     if ($containers -match "librespeed") {
         Write-Host "   📊 Containers LibreSpeed restants:" -ForegroundColor Cyan
         Write-Host $containers -ForegroundColor White
@@ -26,15 +38,7 @@ try {
         Write-Host "   ✅ Aucun container LibreSpeed en cours d'exécution" -ForegroundColor Green
     }
 } catch {
-    Write-Host "   ⚠️  Erreur lors de la vérification: $($_.Exception.Message)" -ForegroundColor Yellow
+    Write-Host "   ⚠️  Erreur lors de la vérification du statut" -ForegroundColor Yellow
 }
 
-Write-Host "`n🎯 LibreSpeed arrêté depuis le dossier essentiels !" -ForegroundColor Green
-
-
-
-
-
-
-
-
+Write-Host "`n🎯 LibreSpeed arrêté avec succès !" -ForegroundColor Green

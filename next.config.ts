@@ -122,7 +122,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Type',
-            value: 'text/css; charset=utf-8'
+            value: 'text/css'
           }
         ]
       },
@@ -135,7 +135,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Type',
-            value: 'application/javascript; charset=utf-8'
+            value: 'application/javascript'
           }
         ]
       },

@@ -17,7 +17,7 @@ http:
     meeting-reports-api-service:
       loadBalancer:
         servers:
-          - url: "http://localhost:8001"
+          - url: "http://localhost:8000"
         healthCheck:
           path: "/health"
           interval: "30s"

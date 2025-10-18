@@ -120,9 +120,10 @@ export default function AdminTokens() {
             moduleId.includes('stablediffusion') || moduleId.includes('ruinedfooocus')) {
           return 100; // Applications IA
         } else if (moduleId.includes('metube') || moduleId.includes('librespeed') ||
-                   moduleId.includes('pdf') || moduleId.includes('qrcodes') || 
-                   moduleId.includes('psitransfer')) {
+                   moduleId.includes('pdf') || moduleId.includes('psitransfer')) {
           return 10; // Applications essentielles
+        } else if (moduleId.includes('qrcodes')) {
+          return 100; // QR Codes
         }
         return 10; // Par défaut
       };

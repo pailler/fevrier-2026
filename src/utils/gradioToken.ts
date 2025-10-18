@@ -1,24 +1,33 @@
-import { verify } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
-// Clé secrète pour les tokens (à stocker dans les variables d'environnement)
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
+const JWT_SECRET = process.env.JWT_SECRET || 'iahome-super-secret-jwt-key-2025-change-in-production';
 
-// Interface pour le token Gradio
 export interface GradioToken {
   userId: string;
+  userEmail: string;
   moduleId: string;
   moduleTitle: string;
+  accessLevel: string;
   expiresAt: number;
-  ip: string;
+  permissions: string[];
   issuedAt: number;
+  iat: number;
+  exp: number;
 }
 
-// Fonction utilitaire pour vérifier un token Gradio
 export function verifyGradioToken(token: string): GradioToken | null {
   try {
-    const decoded = verify(token, JWT_SECRET) as GradioToken;
+    const decoded = jwt.verify(token, JWT_SECRET) as GradioToken;
+    
+    // Vérifier si le token n'est pas expiré
+    if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
+      return null;
+    }
+    
     return decoded;
   } catch (error) {
+    console.error('Erreur vérification token:', error);
     return null;
   }
 }
+

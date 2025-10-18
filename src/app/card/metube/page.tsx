@@ -268,11 +268,39 @@ export default function MeTubePage() {
             <div className="space-y-6">
               {/* Boutons d'action */}
               <button
-                onClick={() => {
+                onClick={async () => {
                   if (isAuthenticated && user) {
-                    // Utilisateur connecté : aller à la page de transition puis /encours
-                    ;
-                    router.push(`/token-generated?module=${encodeURIComponent('MeTube')}&redirect=/encours`);
+                    // Utilisateur connecté : activer MeTube via API
+                    try {
+                      const response = await fetch('/api/activate-metube', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          userId: user.id,
+                          email: user.email
+                        }),
+                      });
+
+                      if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                          console.log('✅ MeTube activé avec succès');
+                          // Rediriger vers la page des modules actifs
+                          router.push('/encours');
+                        } else {
+                          console.error('❌ Erreur activation MeTube:', data.error);
+                          alert('Erreur lors de l\'activation de MeTube: ' + data.error);
+                        }
+                      } else {
+                        console.error('❌ Erreur réponse API:', response.status);
+                        alert('Erreur lors de l\'activation de MeTube');
+                      }
+                    } catch (error) {
+                      console.error('❌ Erreur lors de l\'activation de MeTube:', error);
+                      alert('Erreur lors de l\'activation de MeTube');
+                    }
                   } else {
                     // Utilisateur non connecté : aller à la page de connexion puis retour à MeTube
                     console.log('🔒 Accès MeTube - Redirection vers connexion');
@@ -283,7 +311,7 @@ export default function MeTubePage() {
               >
                 <span className="text-xl">🎥</span>
                 <span>
-                  {isAuthenticated && user ? 'Activez MeTube' : 'Connectez-vous pour activer MeTube'}
+                  {isAuthenticated && user ? 'Activez MeTube (10 tokens)' : 'Connectez-vous pour activer MeTube (10 tokens)'}
                 </span>
               </button>
             </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { TokenActionServiceClient } from '../utils/tokenActionServiceClient';
 import { useTokenContext } from '../contexts/TokenContext';
 
@@ -17,14 +17,16 @@ export default function LibreSpeedAccessButton({
 }: LibreSpeedAccessButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { consumeTokens, refreshTokens } = useTokenContext();
-
-  ;
+  const { refreshTokens } = useTokenContext();
 
   const handleAccess = async () => {
     if (!user) {
       setError('Vous devez être connecté');
       onAccessDenied?.('Non connecté');
+      return;
+    }
+
+    if (isLoading) {
       return;
     }
 
@@ -34,7 +36,7 @@ export default function LibreSpeedAccessButton({
     try {
       console.log('🪙 LibreSpeed: Vérification et consommation des tokens pour:', user.email);
       
-      // Utiliser le service pour la consommation côté serveur (plus fiable)
+      // Utiliser le service pour la consommation côté serveur
       const tokenService = TokenActionServiceClient.getInstance();
       const consumeResult = await tokenService.checkAndConsumeTokens(
         user.id,
@@ -56,8 +58,7 @@ export default function LibreSpeedAccessButton({
       // Mettre à jour le contexte côté client
       await refreshTokens();
 
-      // Incrémenter le compteur d'accès (pour affichage uniquement)
-      ;
+      // Incrémenter le compteur d'accès
       try {
         const incrementResponse = await fetch('/api/increment-librespeed-access', {
           method: 'POST',
@@ -80,52 +81,56 @@ export default function LibreSpeedAccessButton({
         console.warn('⚠️ LibreSpeed: Erreur incrémentation compteur:', incrementError);
       }
 
-      // Ouvrir LibreSpeed dans un nouvel onglet
-      console.log('🔗 LibreSpeed: Ouverture dans un nouvel onglet...');
-      const librespeedUrl = 'https://librespeed.iahome.fr';
-      window.open(librespeedUrl, '_blank');
-      ;
-      
-      // Ne pas appeler onAccessGranted pour éviter la double ouverture
-      return;
+      // Générer un token d'accès
+      const tokenResponse = await fetch('/api/generate-access-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          userEmail: user.email,
+          moduleId: 'librespeed'
+        })
+      });
 
-    } catch (error) {
-      console.error('❌ LibreSpeed: Erreur:', error);
-      setError('Erreur lors de l\'ouverture de LibreSpeed');
-      onAccessDenied?.('Erreur ouverture LibreSpeed');
+      if (!tokenResponse.ok) {
+        throw new Error('Erreur génération token');
+      }
+
+      const tokenData = await tokenResponse.json();
+      
+      // Ouvrir LibreSpeed avec le token
+      const accessUrl = `${tokenData.url}?token=${tokenData.token}`;
+      console.log('🔗 LibreSpeed: Accès sécurisé à:', accessUrl);
+      window.open(accessUrl, '_blank');
+      
+      // Appeler le callback pour notifier l'accès accordé
+      onAccessGranted?.(accessUrl);
+    } catch (err) {
+      console.error('❌ LibreSpeed: Erreur inattendue:', err);
+      setError('Une erreur inattendue est survenue.');
+      onAccessDenied?.('Erreur inattendue');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center space-y-2">
+    <div className="flex flex-col items-center space-y-4">
       <button
         onClick={handleAccess}
         disabled={isLoading || !user}
-        className={`
-          px-6 py-3 rounded-lg font-medium transition-all duration-200
+        className={`px-6 py-3 rounded-lg text-white font-semibold transition-colors duration-300
           ${isLoading || !user
-            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg'
-          }
-        `}
+            ? 'bg-gray-400 cursor-not-allowed'
+            : 'bg-blue-600 hover:bg-blue-700'
+          }`}
       >
-        {isLoading ? (
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            <span>Ouverture...</span>
-          </div>
-        ) : (
-          '🚀 Accéder à LibreSpeed (10 tokens)'
-        )}
+        {isLoading ? '⏳ Ouverture...' : '🚀 Accéder à LibreSpeed (10 tokens)'}
       </button>
-      
-      {error && (
-        <div className="text-red-600 text-sm text-center max-w-xs">
-          {error}
-        </div>
-      )}
+
+      {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 }

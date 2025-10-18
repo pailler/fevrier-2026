@@ -19,9 +19,9 @@ export async function POST(request: NextRequest) {
       'metube': 10,
       'librespeed': 10,
       
-      // QR Codes, PDF, PsiTransfer : 10 tokens
-      'qr-generator': 10,
-      'qrcodes': 10,
+      // QR Codes : 100 tokens, PDF, PsiTransfer : 10 tokens
+      'qr-generator': 100,
+      'qrcodes': 100,
       'pdf': 10,
       'psitransfer': 10
     };

@@ -6,12 +6,13 @@ import Link from "next/link";
 import { useCustomAuth } from '../../hooks/useCustomAuth';
 import LibreSpeedAccessButton from '../../components/LibreSpeedAccessButton';
 import MeTubeAccessButton from '../../components/MeTubeAccessButton';
+import AIAccessButton from '../../components/AIAccessButton';
+import EssentialAccessButton from '../../components/EssentialAccessButton';
 import ModuleAccessButton from '../../components/ModuleAccessButton';
 import QRCodeAccessButton from '../../components/QRCodeAccessButton';
 import PDFAccessButton from '../../components/PDFAccessButton';
 import PsiTransferAccessButton from '../../components/PsiTransferAccessButton';
 import MeetingReportsAccessButton from '../../components/MeetingReportsAccessButton';
-import ModuleAccessButtonNew from '../../components/ModuleAccessButton';
 import { TokenActionServiceClient } from '../../utils/tokenActionServiceClient';
 
 interface UserModule {
@@ -332,19 +333,19 @@ export default function EncoursPage() {
       'qrcodes-statiques': 'qrcodes-statiques', // QR Codes Statiques
     };
 
-    // Mapping des slugs vers les URLs directes (sécurisées via tokens)
+    // Mapping des slugs vers les URLs directes des applications
     const directUrls: { [key: string]: string } = {
-      'metube': 'https://metube.iahome.fr',  // MeTube direct avec token
-      'librespeed': 'https://librespeed.iahome.fr',  // LibreSpeed direct avec token
-      'pdf': 'https://pdf.iahome.fr',  // PDF direct avec token
-      'psitransfer': 'https://psitransfer.iahome.fr',  // PsiTransfer direct avec token
-      'qrcodes': 'https://qrcodes.iahome.fr',  // QR Codes direct avec token
+      'metube': 'http://localhost:8081',  // MeTube accès direct
+      'librespeed': 'http://localhost:8085',  // LibreSpeed accès direct
+      'pdf': 'http://localhost:8080',  // PDF accès direct
+      'psitransfer': 'http://localhost:8082',  // PsiTransfer accès direct
+      'qrcodes': 'http://localhost:8083',  // QR Codes accès direct
       'qrcodes-statiques': 'http://localhost:7005',  // QR Codes Statiques local
-      'whisper': 'https://whisper.iahome.fr',  // Whisper direct avec token
-      'stablediffusion': 'https://stablediffusion.iahome.fr',  // StableDiffusion direct avec token
-      'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',  // RuinedFooocus direct avec token
-      'comfyui': 'https://comfyui.iahome.fr',  // ComfyUI direct avec token
-      'cogstudio': 'https://cogstudio.iahome.fr',  // CogStudio direct avec token
+      'whisper': 'http://localhost:8084',  // Whisper accès direct
+      'stablediffusion': 'http://localhost:7860',  // StableDiffusion accès direct
+      'ruinedfooocus': 'http://localhost:7861',  // RuinedFooocus accès direct
+      'comfyui': 'http://localhost:8188',  // ComfyUI accès direct
+      'cogstudio': 'http://localhost:8086',  // CogStudio accès direct
       'meeting-reports': 'https://meeting-reports.iahome.fr',  // Meeting Reports direct avec token
     };
     
@@ -359,21 +360,31 @@ export default function EncoursPage() {
   // Mapping des modules vers leurs coûts en tokens
   const getModuleCost = (moduleId: string): number => {
     const moduleCosts: { [key: string]: number } = {
+      // Applications IA (100 tokens)
+      'whisper': 100,
+      'stablediffusion': 100,
+      'ruinedfooocus': 100,
+      'comfyui': 100,
+      
+      // Applications essentielles (10 tokens)
+      'librespeed': 10,
+      'metube': 10,
+      'psitransfer': 10,
+      'qrcodes': 10,
+      'pdf': 10,
+      'meeting-reports': 10,
+      'cogstudio': 10,
+      
+      // Anciens IDs numériques (pour compatibilité)
       '1': 10,      // PDF+ -> 10 tokens
       '2': 10,      // MeTube -> 10 tokens
       '3': 10,      // LibreSpeed -> 10 tokens
       '4': 10,      // PsiTransfer -> 10 tokens
-      '5': 10,      // QR Codes -> 10 tokens
+      '5': 10,      // QR Codes -> 10 tokens (changé de 100 à 10)
       '7': 100,     // Stable Diffusion -> 100 tokens
       '8': 100,     // Ruined Fooocus -> 100 tokens
       '10': 100,    // ComfyUI -> 100 tokens
-      '11': 100,    // Cog Studio -> 100 tokens
-      'stablediffusion': 100,
-      'ruinedfooocus': 100,
-      'comfyui': 100,
-      'cogstudio': 100,
-      'whisper': 100,
-      'meeting-reports': 100,
+      '11': 10,     // Cog Studio -> 10 tokens (changé de 100 à 10)
     };
     
     return moduleCosts[moduleId] || 10; // Par défaut 10 tokens
@@ -833,16 +844,6 @@ export default function EncoursPage() {
                       
                       <div className="flex items-center space-x-4 text-sm opacity-90">
                         {/* Ne pas afficher "Appli essentielle" pour les modules IA et QR codes */}
-                        {module.module_id !== '5' && 
-                         module.module_id !== 'qrcodes' && 
-                         module.module_id !== 'stablediffusion' && 
-                         module.module_id !== 'ruinedfooocus' && 
-                         module.module_id !== 'cogstudio' && 
-                         module.module_id !== 'whisper' && 
-                         module.module_id !== 'comfyui' && 
-                         (
-                          <span>🔑 Appli essentielle</span>
-                        )}
                         {module.price && Number(module.price) > 0 && (
                           <span>🪙 {module.price} tokens</span>
                         )}
@@ -880,95 +881,67 @@ export default function EncoursPage() {
                       </div>
 
                       {/* Bouton d'accès */}
-                      {module.module_title === 'LibreSpeed' ? (
-                        <LibreSpeedAccessButton
-                          user={user}
-                          onAccessGranted={(url) => {
-                            console.log('🔗 LibreSpeed: Accès autorisé:', url);
-                            window.open(url, '_blank');
-                          }}
-                          onAccessDenied={(reason) => {
-                            console.log('❌ LibreSpeed: Accès refusé:', reason);
-                            alert(`Accès refusé: ${reason}`);
-                          }}
-                        />
-                      ) : module.module_title === 'MeTube' ? (
-                        <MeTubeAccessButton
-                          user={user}
-                          onAccessGranted={(url) => {
-                            console.log('🔗 MeTube: Accès autorisé:', url);
-                            window.open(url, '_blank');
-                          }}
-                          onAccessDenied={(reason) => {
-                            console.log('❌ MeTube: Accès refusé:', reason);
-                            alert(`Accès refusé: ${reason}`);
-                          }}
-                        />
-                      ) : module.module_title === 'PDF+' ? (
-                        <PDFAccessButton
-                          user={user}
-                          onAccessGranted={(url) => {
-                            console.log('🔗 PDF+: Accès autorisé:', url);
-                            window.open(url, '_blank');
-                          }}
-                          onAccessDenied={(reason) => {
-                            console.log('❌ PDF+: Accès refusé:', reason);
-                            alert(`Accès refusé: ${reason}`);
-                          }}
-                        />
-                      ) : module.module_title === 'PsiTransfer' ? (
-                        <PsiTransferAccessButton
-                          user={user}
-                          onAccessGranted={(url) => {
-                            console.log('🔗 PsiTransfer: Accès autorisé:', url);
-                            window.open(url, '_blank');
-                          }}
-                          onAccessDenied={(reason) => {
-                            console.log('❌ PsiTransfer: Accès refusé:', reason);
-                            alert(`Accès refusé: ${reason}`);
-                          }}
-                        />
-                      ) : module.module_title === 'QR Codes' ? (
-                        <QRCodeAccessButton
-                          user={user}
-                          onAccessGranted={(url) => {
-                            console.log('🔗 QR Codes: Accès autorisé:', url);
-                            window.open(url, '_blank');
-                          }}
-                          onAccessDenied={(reason) => {
-                            console.log('❌ QR Codes: Accès refusé:', reason);
-                            alert(`Accès refusé: ${reason}`);
-                          }}
-                        />
-                      ) : module.module_title === 'Compte-rendus automatiques' || module.module_title === 'Meeting Reports' ? (
-                        <MeetingReportsAccessButton
-                          user={user}
-                          onAccessGranted={(url) => {
-                            console.log('🔗 Meeting Reports: Accès autorisé:', url);
-                            window.open(url, '_blank');
-                          }}
-                          onAccessDenied={(reason) => {
-                            console.log('❌ Meeting Reports: Accès refusé:', reason);
-                            alert(`Accès refusé: ${reason}`);
-                          }}
-                        />
-                      ) : (
-                        <ModuleAccessButtonNew
-                          user={user}
-                          moduleId={module.module_id}
-                          moduleName={module.module_title}
-                          moduleUrl={getModuleUrl(module.module_id) || ''}
-                          moduleCost={getModuleCost(module.module_id)}
-                          onAccessGranted={(url) => {
-                            console.log(`🔗 ${module.module_title}: Accès autorisé:`, url);
-                            window.open(url, '_blank');
-                          }}
-                          onAccessDenied={(reason) => {
-                            console.log(`❌ ${module.module_title}: Accès refusé:`, reason);
-                            alert(`Accès refusé: ${reason}`);
-                          }}
-                        />
-                      )}
+                      {(() => {
+                        const moduleId = module.module_id;
+                        const moduleTitle = module.module_title;
+                        
+                        // Applications IA (100 tokens)
+                        if (['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui'].includes(moduleId)) {
+                          return (
+                            <AIAccessButton
+                              user={user}
+                              moduleId={moduleId}
+                              moduleTitle={moduleTitle}
+                              onAccessGranted={(url) => {
+                                console.log(`🔗 ${moduleTitle}: Accès autorisé:`, url);
+                                window.open(url, '_blank');
+                              }}
+                              onAccessDenied={(reason) => {
+                                console.log(`❌ ${moduleTitle}: Accès refusé:`, reason);
+                                alert(`Accès refusé: ${reason}`);
+                              }}
+                            />
+                          );
+                        }
+                        
+                        // Applications essentielles (10 tokens)
+                        if (['librespeed', 'metube', 'psitransfer', 'qrcodes', 'pdf', 'meeting-reports', 'cogstudio'].includes(moduleId)) {
+                          return (
+                            <EssentialAccessButton
+                              user={user}
+                              moduleId={moduleId}
+                              moduleTitle={moduleTitle}
+                              onAccessGranted={(url) => {
+                                console.log(`🔗 ${moduleTitle}: Accès autorisé:`, url);
+                                window.open(url, '_blank');
+                              }}
+                              onAccessDenied={(reason) => {
+                                console.log(`❌ ${moduleTitle}: Accès refusé:`, reason);
+                                alert(`Accès refusé: ${reason}`);
+                              }}
+                            />
+                          );
+                        }
+                        
+                        // Fallback pour les autres modules
+                        return (
+                          <ModuleAccessButton
+                            user={user}
+                            moduleId={module.module_id}
+                            moduleName={module.module_title}
+                            moduleUrl={getModuleUrl(module.module_id) || ''}
+                            moduleCost={getModuleCost(module.module_id)}
+                            onAccessGranted={(url) => {
+                              console.log(`🔗 ${module.module_title}: Accès autorisé:`, url);
+                              window.open(url, '_blank');
+                            }}
+                            onAccessDenied={(reason) => {
+                              console.log(`❌ ${module.module_title}: Accès refusé:`, reason);
+                              alert(`Accès refusé: ${reason}`);
+                            }}
+                          />
+                        );
+                      })()}
                     </div>
                   </div>
                 );

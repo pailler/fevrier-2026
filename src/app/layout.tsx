@@ -15,6 +15,7 @@ import CSSPreloadManager from "../components/CSSPreloadManager";
 import AggressivePreloadCleaner from "../components/AggressivePreloadCleaner";
 import MobileOptimizer from "../components/MobileOptimizer";
 import ClientTokenProvider from "../components/ClientTokenProvider";
+import { TokenProvider } from "../contexts/TokenContext";
 
 // Supprimer les messages de développement React
 if (typeof window !== 'undefined') {
@@ -157,11 +158,13 @@ export default function RootLayout({
         <MobileOptimizer />
         <AdaptiveLayout>
           <ClientTokenProvider>
-            <SimpleHeader />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
+            <TokenProvider>
+              <SimpleHeader />
+              <main className="flex-1">
+                {children}
+              </main>
+              <Footer />
+            </TokenProvider>
           </ClientTokenProvider>
         </AdaptiveLayout>
         <ConditionalComponents />

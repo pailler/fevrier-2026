@@ -1,115 +1,78 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/utils/supabaseClient';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'iahome-super-secret-jwt-key-2025-change-in-production';
 
+// Configuration des applications avec leurs coûts en tokens
+const APPLICATION_CONFIG = {
+  // Applications IA (100 tokens)
+  'whisper': { cost: 100, url: 'https://whisper.iahome.fr' },
+  'stablediffusion': { cost: 100, url: 'https://stablediffusion.iahome.fr' },
+  'ruinedfooocus': { cost: 100, url: 'https://ruinedfooocus.iahome.fr' },
+  'comfyui': { cost: 100, url: 'https://comfyui.iahome.fr' },
+  
+  // Applications essentielles (10 tokens)
+  'metube': { cost: 10, url: 'https://metube.iahome.fr' },
+  'librespeed': { cost: 10, url: 'https://librespeed.iahome.fr' },
+  'psitransfer': { cost: 10, url: 'https://psitransfer.iahome.fr' },
+  'qrcodes': { cost: 10, url: 'https://qrcodes.iahome.fr' },
+  'pdf': { cost: 10, url: 'https://pdf.iahome.fr' },
+  'meeting-reports': { cost: 10, url: 'https://meeting-reports.iahome.fr' },
+  'cogstudio': { cost: 10, url: 'https://cogstudio.iahome.fr' }
+};
+
 export async function POST(request: NextRequest) {
   try {
-    const { moduleId, moduleName, expirationHours } = await request.json();
-    
-    if (!moduleId || !moduleName) {
+    const { userId, userEmail, moduleId } = await request.json();
+
+    if (!userId || !userEmail || !moduleId) {
       return NextResponse.json(
-        { error: 'moduleId et moduleName requis' },
+        { error: 'userId, userEmail et moduleId sont requis' },
         { status: 400 }
       );
     }
 
-    // Définir la durée d'expiration (par défaut 72h, ou la valeur spécifiée)
-    const defaultExpirationHours = 72;
-    const hours = expirationHours || defaultExpirationHours;
-
-    // Vérifier l'authentification
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader) {
+    // Vérifier si l'application existe
+    const appConfig = APPLICATION_CONFIG[moduleId as keyof typeof APPLICATION_CONFIG];
+    if (!appConfig) {
       return NextResponse.json(
-        { error: 'Token d\'authentification requis' },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-    
-    if (error || !user) {
-      return NextResponse.json(
-        { error: 'Utilisateur non authentifié' },
-        { status: 401 }
-      );
-    }
-
-    // Générer le token JWT directement (sans vérifier l'abonnement)
-    const payload = {
-      userId: user.id,
-      userEmail: user.email,
-      moduleId: moduleId,
-      moduleName: moduleName,
-      accessLevel: 'premium',
-      expiresAt: Date.now() + (hours * 60 * 60 * 1000), // Heures spécifiées
-      permissions: ['read', 'access', 'write', 'advanced_features'],
-      issuedAt: Date.now()
-    };
-
-    const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: `${hours}h` });
-    
-    // Récupérer les informations du module
-    const { data: moduleData, error: moduleError } = await supabase
-      .from('modules')
-      .select('title, category, price')
-      .eq('id', moduleId)
-      .single();
-
-    if (moduleError) {
-      return NextResponse.json(
-        { error: 'Module non trouvé' },
+        { error: `Application ${moduleId} non trouvée` },
         { status: 404 }
       );
     }
 
-    // Stocker le token dans la base de données
-    const tokenData = {
-      name: `Token ${moduleData.title} - ${user.email}`,
-      description: `Token d'accès pour ${moduleData.title} généré automatiquement`,
-      module_id: moduleId,
-      module_name: moduleData.title,
-      access_level: 'premium',
-      permissions: payload.permissions,
-      max_usage: 100,
-      current_usage: 0,
-      is_active: true,
-      created_by: user.id,
-      expires_at: new Date(Date.now() + (hours * 60 * 60 * 1000)).toISOString(),
-      jwt_token: accessToken
+    // Créer le token JWT
+    const tokenPayload = {
+      userId,
+      userEmail,
+      moduleId,
+      moduleTitle: moduleId.charAt(0).toUpperCase() + moduleId.slice(1),
+      accessLevel: 'premium',
+      expiresAt: Date.now() + (24 * 60 * 60 * 1000), // 24 heures
+      permissions: ['read', 'access', 'write', 'advanced_features'],
+      issuedAt: Date.now(),
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 heures en secondes
     };
 
-    const { data: storedToken, error: storeError } = await supabase
-      .from('access_tokens')
-      .insert([tokenData])
-      .select()
-      .single();
-
-    if (storeError) {
-      return NextResponse.json(
-        { error: `Erreur lors du stockage du token: ${storeError.message}` },
-        { status: 500 }
-      );
-    }
+    const token = jwt.sign(tokenPayload, JWT_SECRET);
 
     return NextResponse.json({
       success: true,
-      accessToken,
-      expiresIn: `${hours}h`,
-      moduleName,
-      permissions: payload.permissions,
-      userEmail: user.email,
-      issuedAt: new Date().toISOString(),
-      token: storedToken
+      token,
+      moduleId,
+      moduleTitle: tokenPayload.moduleTitle,
+      cost: appConfig.cost,
+      url: appConfig.url,
+      expiresAt: tokenPayload.expiresAt
     });
 
   } catch (error) {
+    console.error('Erreur génération token:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
     );
   }
-} 
+}
+

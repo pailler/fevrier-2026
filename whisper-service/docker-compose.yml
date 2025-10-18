@@ -4,8 +4,10 @@ services:
   whisper-api:
     image: onerahmet/openai-whisper-asr-webservice:latest
     container_name: whisper-api-prod
-    ports:
-      - "8092:9000"
+    restart: unless-stopped
+    # SUPPRIMER l'exposition de port - plus d'accès direct
+    # ports:
+    #   - "8092:9000"
     environment:
       - ASR_MODEL=base
     healthcheck:
@@ -19,8 +21,10 @@ services:
   whisper-video:
     image: onerahmet/openai-whisper-asr-webservice:latest
     container_name: whisper-video-prod
-    ports:
-      - "8095:9000"
+    restart: unless-stopped
+    # SUPPRIMER l'exposition de port - plus d'accès direct
+    # ports:
+    #   - "8095:9000"
     environment:
       - ASR_MODEL=base
     healthcheck:
@@ -34,8 +38,10 @@ services:
   whisper-ocr:
     image: python:3.11-slim
     container_name: whisper-ocr-prod
-    ports:
-      - "8097:8080"
+    restart: unless-stopped
+    # SUPPRIMER l'exposition de port - plus d'accès direct
+    # ports:
+    #   - "8097:8080"
     volumes:
       - ./ocr-service.py:/app/ocr-service.py:ro
       - ./requirements-ocr.txt:/app/requirements-ocr.txt:ro
@@ -56,8 +62,10 @@ services:
   whisper-documents:
     image: python:3.11-slim
     container_name: whisper-documents-prod
-    ports:
-      - "8098:8080"
+    restart: unless-stopped
+    # SUPPRIMER l'exposition de port - plus d'accès direct
+    # ports:
+    #   - "8098:8080"
     volumes:
       - ./document-service.py:/app/document-service.py:ro
       - ./requirements-document.txt:/app/requirements-document.txt:ro

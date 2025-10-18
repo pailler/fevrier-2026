@@ -191,18 +191,23 @@ export default function CardDetailPage() {
       console.log('✅ Token JWT généré avec succès');
       
       const moduleUrls: { [key: string]: string } = {
-        'stablediffusion': 'https://stablediffusion.iahome.fr',
-        'iaphoto': 'https://iaphoto.iahome.fr', 
-        'metube': 'https://metube.iahome.fr',
-        'ia metube': 'https://metube.iahome.fr',
-        'librespeed': 'https://librespeed.iahome.fr',
-        'psitransfer': 'https://psitransfer.iahome.fr',
-        'pdf+': 'https://pdf.iahome.fr',
-        'pdf': 'https://pdf.iahome.fr',
-        'cogstudio': 'https://cogstudio.iahome.fr',
-        'ruinedfooocus': '/api/gradio-secure',
-        'meeting-reports': 'https://meeting-reports.iahome.fr',
-        'whisper': 'https://whisper.iahome.fr'
+        'stablediffusion': '/api/gradio-proxy?service=stablediffusion',
+        'comfyui': '/api/gradio-proxy?service=comfyui',
+        'ruinedfooocus': '/api/gradio-secure', // Garde l'ancien système pour RuinedFooocus
+        'librespeed': '/api/gradio-proxy?service=librespeed',
+        'whisper': '/api/gradio-proxy?service=whisper',
+        'whisper-video': '/api/gradio-proxy?service=whisper-video',
+        'whisper-ocr': '/api/gradio-proxy?service=whisper-ocr',
+        'whisper-documents': '/api/gradio-proxy?service=whisper-documents',
+        'metube': '/api/gradio-proxy?service=metube',
+        'ia metube': '/api/gradio-proxy?service=metube',
+        'psitransfer': '/api/gradio-proxy?service=psitransfer',
+        'qrcodes': '/api/gradio-proxy?service=qrcodes',
+        'pdf': '/api/gradio-proxy?service=stirling-pdf',
+        'pdf+': '/api/gradio-proxy?service=stirling-pdf',
+        'iaphoto': '/api/gradio-proxy?service=stablediffusion', 
+        'cogstudio': '/api/gradio-proxy?service=cogstudio',
+        'meeting-reports': 'https://meeting-reports.iahome.fr'
       };
 
       const normalizedName = (moduleName || '').toLowerCase().replace(/\s+/g, '');
@@ -341,7 +346,7 @@ export default function CardDetailPage() {
             id: 'librespeed',
             title: 'LibreSpeed',
             description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision. Coûte 10 tokens par utilisation.',
-            subtitle: 'Test de vitesse internet (10 tokens)',
+            subtitle: 'Test de vitesse internet complet - mesurez la qualité de votre bande passante (10 tokens)',
             category: 'WEB TOOLS',
             price: 10,
             image_url: '/images/librespeed.jpg',

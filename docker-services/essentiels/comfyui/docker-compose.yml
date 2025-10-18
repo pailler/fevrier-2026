@@ -3,8 +3,9 @@ services:
     image: yanwk/comfyui:latest
     container_name: comfyui
     restart: unless-stopped
-    ports:
-      - "8188:8188"
+    # SUPPRIMER l'exposition de port - plus d'accès direct
+    # ports:
+    #   - "8188:8188"
     volumes:
       - ./models:/app/models
       - ./output:/app/output
@@ -14,14 +15,15 @@ services:
       - CLI_ARGS=--listen 0.0.0.0 --port 8188
     networks:
       - iahome-network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.comfyui.rule=Host(`comfyui.iahome.fr`)"
-      - "traefik.http.routers.comfyui.entrypoints=websecure"
-      - "traefik.http.routers.comfyui.tls=true"
-      - "traefik.http.routers.comfyui.tls.certresolver=letsencrypt"
-      - "traefik.http.services.comfyui.loadbalancer.server.port=8188"
-      - "traefik.docker.network=iahome-network"
+    # SUPPRIMER les labels Traefik - plus d'accès direct
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.comfyui.rule=Host(`comfyui.iahome.fr`)"
+    #   - "traefik.http.routers.comfyui.entrypoints=websecure"
+    #   - "traefik.http.routers.comfyui.tls=true"
+    #   - "traefik.http.routers.comfyui.tls.certresolver=letsencrypt"
+    #   - "traefik.http.services.comfyui.loadbalancer.server.port=8188"
+    #   - "traefik.docker.network=iahome-network"
 
 networks:
   iahome-network:

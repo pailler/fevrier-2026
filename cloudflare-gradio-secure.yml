@@ -1,0 +1,102 @@
+tunnel: iahome-gradio
+credentials-file: C:\Users\AAA\.cloudflared\YOUR_TUNNEL_ID.json
+
+ingress:
+  # Application principale
+  - hostname: iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: iahome.fr
+      noTLSVerify: true
+
+  # Services Docker sécurisés - tous pointent vers l'app principale
+  - hostname: librespeed.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: librespeed.iahome.fr
+      noTLSVerify: true
+
+  - hostname: comfyui.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: comfyui.iahome.fr
+      noTLSVerify: true
+
+  - hostname: metube.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: metube.iahome.fr
+      noTLSVerify: true
+
+  - hostname: pdf.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: pdf.iahome.fr
+      noTLSVerify: true
+
+  - hostname: psitransfer.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: psitransfer.iahome.fr
+      noTLSVerify: true
+
+  - hostname: qrcodes.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: qrcodes.iahome.fr
+      noTLSVerify: true
+
+  # Services Whisper
+  - hostname: whisper.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: whisper.iahome.fr
+      noTLSVerify: true
+
+  - hostname: whisper-video.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: whisper-video.iahome.fr
+      noTLSVerify: true
+
+  - hostname: whisper-ocr.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: whisper-ocr.iahome.fr
+      noTLSVerify: true
+
+  - hostname: whisper-documents.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: whisper-documents.iahome.fr
+      noTLSVerify: true
+
+  # Services externes
+  - hostname: stablediffusion.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: stablediffusion.iahome.fr
+      noTLSVerify: true
+
+  - hostname: cogstudio.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: cogstudio.iahome.fr
+      noTLSVerify: true
+
+  - hostname: ruinedfooocus.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: ruinedfooocus.iahome.fr
+      noTLSVerify: true
+
+  # Meeting Reports (service spécial)
+  - hostname: meeting-reports.iahome.fr
+    service: http://127.0.0.1:3050
+    originRequest:
+      httpHostHeader: meeting-reports.iahome.fr
+      noTLSVerify: true
+
+  # Redirection par défaut
+  - service: http_status:404
+
