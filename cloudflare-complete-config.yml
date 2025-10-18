@@ -55,17 +55,12 @@ ingress:
       httpHostHeader: pdf.iahome.fr
       noTLSVerify: true
   - hostname: stablediffusion.iahome.fr
-    service: http://localhost:7880
+    service: http://192.168.1.150:7880
     originRequest:
       httpHostHeader: stablediffusion.iahome.fr
       noTLSVerify: true
-  - hostname: ruinedfooocus.iahome.fr
-    service: http://localhost:8087
-    originRequest:
-      httpHostHeader: ruinedfooocus.iahome.fr
-      noTLSVerify: true
   - hostname: comfyui.iahome.fr
-    service: http://localhost:8188
+    service: http://192.168.1.150:8188
     originRequest:
       httpHostHeader: comfyui.iahome.fr
       noTLSVerify: true
