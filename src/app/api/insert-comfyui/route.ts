@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       price: 7,
       youtube_url: '',
       url: 'https://comfyui.iahome.fr',
-      image_url: '/images/chatgpt.jpg',
+      image_url: '/images/comfyui.jpg',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };

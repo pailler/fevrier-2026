@@ -222,7 +222,6 @@ Services IA disponibles :
 - PsiTransfer (transfert fichiers)
 - LibreSpeed (tests de vitesse)
 - QR Codes (génération QR)
-- ChatGPT (assistance IA)
 - IA Photo (traitement photos)
 - IA Tube (plateforme vidéo)
 `;

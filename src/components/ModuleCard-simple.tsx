@@ -57,9 +57,6 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   const getModuleImage = (title: string, imageUrl?: string) => {
     const titleLower = title.toLowerCase();
     
-    if (titleLower.includes('chatgpt') || titleLower.includes('chat')) {
-      return '/images/chatgpt.jpg';
-    }
     
     if (titleLower.includes('stable') || titleLower.includes('diffusion') || titleLower.includes('sd')) {
       return '/images/stablediffusion.jpg';

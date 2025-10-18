@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       price: 8,
       youtube_url: '',
       url: 'https://cogstudio.iahome.fr',
-      image_url: '/images/chatgpt.jpg',
+      image_url: '/images/cogstudio.jpg',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
