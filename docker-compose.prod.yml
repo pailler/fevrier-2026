@@ -38,22 +38,7 @@ services:
           cpus: '0.25'
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.iahome.rule=Host(`iahome.fr`) || Host(`www.iahome.fr`)"
-      - "traefik.http.routers.iahome.entrypoints=websecure"
-      - "traefik.http.routers.iahome.tls=true"
-      - "traefik.http.routers.iahome.tls.certresolver=letsencrypt"
       - "traefik.http.services.iahome.loadbalancer.server.port=3000"
-      - "traefik.http.routers.iahome.middlewares=security-headers,compress"
-      - "traefik.http.routers.iahome-http.rule=Host(`iahome.fr`) || Host(`www.iahome.fr`)"
-      - "traefik.http.routers.iahome-http.entrypoints=web"
-      - "traefik.http.routers.iahome-http.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
-      - "traefik.http.middlewares.security-headers.headers.customresponseheaders.Strict-Transport-Security=max-age=31536000; includeSubDomains"
-      - "traefik.http.middlewares.security-headers.headers.customresponseheaders.X-Content-Type-Options=nosniff"
-      - "traefik.http.middlewares.security-headers.headers.customresponseheaders.X-Frame-Options=DENY"
-      - "traefik.http.middlewares.security-headers.headers.customresponseheaders.X-XSS-Protection=1; mode=block"
-      - "traefik.http.middlewares.compress.compress=true"
 
   # iahome-nginx:
   #   image: nginx:alpine

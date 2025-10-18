@@ -75,12 +75,12 @@ http:
         certResolver: "letsencrypt"
         options: "modern"
 
-    # Route HTTP avec redirection
-    iahome-http-redirect:
-      rule: "Host(`iahome.fr`) || Host(`www.iahome.fr`)"
-      entryPoints: ["web"]
-      service: iahome-service
-      middlewares: ["redirect-https"]
+    # Route HTTP avec redirection (désactivée pour Cloudflare)
+    # iahome-http-redirect:
+    #   rule: "Host(`iahome.fr`) || Host(`www.iahome.fr`)"
+    #   entryPoints: ["web"]
+    #   service: iahome-service
+    #   middlewares: ["redirect-https"]
 
     # Route pour les assets statiques
     iahome-assets:

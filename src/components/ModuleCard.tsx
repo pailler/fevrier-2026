@@ -1679,13 +1679,13 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
         <Link href={`/card/${module.id}`} className="block group">
           {/* Titre du module - affiché pour tous les modules */}
           <h3 className="text-3xl sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
-            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "Générez des QRcodes pros" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "Transformez vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isSDnext ? "Des visuels plus réalistes, plus rapides, plus précis" : isMeetingReports ? "Transformez vos réunions en rapports professionnels" : module.title}
+            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "Générez des QRcodes pros" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "Transformez vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isSDnext ? "Des visuels plus réalistes, plus rapides, plus précis" : isMeetingReports ? "Compte-rendus automatiques" : module.title}
           </h3>
           {/* Pour les modules spéciaux, afficher seulement la description si pas de sous-titre */}
           {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isSDnext || isQRCodes || isWhisper || isChatGPT || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports ? (
             !module.subtitle && (
               <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
-                {isComfyUI ? "Un contrôle total sur chaque étape de la création d'image" : isMeetingReports ? "Enregistrez, transcrivez et résumez automatiquement vos réunions avec l'IA" : module.description}
+                {isComfyUI ? "Un contrôle total sur chaque étape de la création d'image" : isMeetingReports ? "Transformez automatiquement vos réunions en rapports professionnels avec l'IA" : module.description}
               </p>
             )
           ) : (

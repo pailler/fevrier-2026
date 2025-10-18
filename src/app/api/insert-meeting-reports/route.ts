@@ -7,8 +7,8 @@ export async function POST(request: NextRequest) {
 
     const moduleData = {
       id: 'meeting-reports',
-      title: 'Meeting Reports',
-      description: 'Meeting Reports : Transformez automatiquement vos réunions en rapports professionnels avec l\'intelligence artificielle. Enregistrez, transcrivez et résumez vos réunions avec une précision exceptionnelle.',
+      title: 'Compte-rendus automatiques',
+      description: 'Compte-rendus automatiques : Transformez automatiquement vos réunions en rapports professionnels avec l\'intelligence artificielle. Enregistrez, transcrivez et résumez vos réunions avec une précision exceptionnelle.',
       category: 'Productivité',
       price: 100, // 100 tokens par utilisation
       youtube_url: '',
