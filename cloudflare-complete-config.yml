@@ -37,5 +37,5 @@ ingress:
   - hostname: invoke.iahome.fr
     service: http://localhost:8090
   - hostname: meeting-reports.iahome.fr
-    service: http://localhost:3050
+    service: http://localhost:3000
   - service: http_status:404
