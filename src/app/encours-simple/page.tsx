@@ -78,7 +78,6 @@ export default function EncoursSimplePage() {
       '8': 'ruinedfooocus', // Ruined Fooocus -> ruinedfooocus
       '10': 'comfyui', // ComfyUI -> comfyui
       '11': 'cogstudio', // Cog Studio -> cogstudio
-      '12': 'sdnext',  // SD.Next -> sdnext
     };
 
     // Mapping des slugs vers les routes de redirection sécurisées
@@ -92,7 +91,6 @@ export default function EncoursSimplePage() {
       'ruinedfooocus': '/api/redirect-ruinedfooocus',  // Redirection sécurisée RuinedFooocus
       'comfyui': '/api/redirect-comfyui',  // Redirection sécurisée ComfyUI
       'cogstudio': '/api/redirect-cogstudio',  // Redirection sécurisée CogStudio
-      'sdnext': '/api/redirect-sdnext',  // Redirection sécurisée SDNext
     };
     
     // Convertir module_id numérique en slug si nécessaire

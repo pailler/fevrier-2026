@@ -22,7 +22,6 @@ export default function TestUrlsPage() {
       'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
       'comfyui': 'https://comfyui.iahome.fr',
       'cogstudio': 'https://cogstudio.iahome.fr',
-      'sdnext': 'https://sdnext.iahome.fr',
     };
     
     const url = moduleUrls[moduleId] || '';

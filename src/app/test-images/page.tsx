@@ -13,7 +13,6 @@ export default function TestImagesPage() {
     '/images/canvas-framework.svg',
     '/images/iavideo-interface.svg',
     '/images/iaphoto-interface.svg',
-    '/images/sdnext-interface.svg'
   ];
 
   return (

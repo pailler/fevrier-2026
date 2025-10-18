@@ -60,9 +60,6 @@ export async function POST(request: NextRequest) {
           moduleId = 'stablediffusion';
           moduleTitle = 'Stable diffusion IA';
           paymentAmount = 990; // 9.90 EUR en centimes
-        } else if (sessionId.includes('sdnext')) {
-          moduleId = 'sdnext';
-          moduleTitle = 'SDnext IA';
           paymentAmount = 1990; // 19.90 EUR en centimes
         } else if (sessionId.includes('qrcodes')) {
           moduleId = 'qrcodes';

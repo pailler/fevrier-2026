@@ -162,7 +162,7 @@ export default function AdminApplications() {
           let description = '';
           
           // Définir les paramètres selon le type d'application
-          if (moduleId.includes('sdnext') || moduleId.includes('cogstudio') || moduleId.includes('stablediffusion') || moduleId.includes('ruinedfooocus')) {
+          if (moduleId.includes('cogstudio') || moduleId.includes('stablediffusion') || moduleId.includes('ruinedfooocus')) {
             // Applications IA : 100 tokens par utilisation
             tokenCost = 100;
             estimatedRevenue = stats.totalUsage * tokenCost * 0.01; // 0.01€ par token
@@ -243,7 +243,7 @@ export default function AdminApplications() {
   };
 
   const getApplicationIcon = (appName: string) => {
-    if (appName.includes('sdnext') || appName.includes('cogstudio') || appName.includes('stablediffusion') || appName.includes('ruinedfooocus')) {
+    if (appName.includes('cogstudio') || appName.includes('stablediffusion') || appName.includes('ruinedfooocus')) {
       return '🤖'; // IA
     } else if (appName.includes('metube')) {
       return '📺'; // Vidéo

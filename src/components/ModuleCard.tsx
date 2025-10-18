@@ -153,8 +153,6 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   // Vérifier si c'est le module RuinedFooocus IA pour appliquer un style spécial
   const isRuinedFooocus = module.title.toLowerCase().includes('ruinedfooocus') || module.title.toLowerCase().includes('ruined') || module.title.toLowerCase().includes('fooocus') || module.id === 'ruinedfooocus';
   
-  // Vérifier si c'est le module SDnext IA pour appliquer un style spécial
-  const isSDnext = module.title.toLowerCase().includes('sdnext') || module.title.toLowerCase().includes('sd next') || module.title.toLowerCase().includes('sd-next') || module.id === 'sdnext';
   
   // Vérifier si c'est le module QRcodes dynamiques pour appliquer un style spécial
   const isQRCodes = module.title.toLowerCase().includes('qrcodes') || module.title.toLowerCase().includes('qr codes') || module.title.toLowerCase().includes('qr-codes') || module.title.toLowerCase().includes('qrcode') || module.id === 'qrcodes';
@@ -179,7 +177,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   const isMeetingReports = module.title.toLowerCase().includes('meeting reports') || module.title.toLowerCase().includes('meeting') || module.id === 'meeting-reports';
 
   return (
-    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isSDnext ? 'ring-2 ring-rose-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isChatGPT ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isIAPhoto ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isIATube ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isStirlingPDF ? 'ring-2 ring-gray-500 ring-opacity-50' : ''} ${isMeetingReports ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''}`}>
+    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isChatGPT ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isIAPhoto ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isIATube ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isStirlingPDF ? 'ring-2 ring-gray-500 ring-opacity-50' : ''} ${isMeetingReports ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''}`}>
       
       {/* Image du module - Cliquable */}
       <Link href={`/card/${module.id}`} className="block">
@@ -219,7 +217,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
           />
           
           {/* Overlay au survol - seulement pour les modules non-spéciaux */}
-          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isSDnext && !isQRCodes && !isWhisper && !isChatGPT && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && (
+          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isQRCodes && !isWhisper && !isChatGPT && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && (
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
               <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white bg-opacity-90 rounded-full p-3">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -748,77 +746,6 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                     <circle cx="16" cy="12" r="0.5" fill="#9333EA" opacity="0.7"/>
                     <circle cx="12" cy="8" r="0.5" fill="#9333EA" opacity="0.7"/>
                     <circle cx="12" cy="16" r="0.5" fill="#9333EA" opacity="0.7"/>
-                    
-                    {/* Indicateurs de stabilité */}
-                    <rect x="7" y="7" width="1" height="1" fill="white" opacity="0.6"/>
-                    <rect x="16" y="7" width="1" height="1" fill="white" opacity="0.6"/>
-                    <rect x="7" y="16" width="1" height="1" fill="white" opacity="0.6"/>
-                    <rect x="16" y="16" width="1" height="1" fill="white" opacity="0.6"/>
-                  </svg>
-                </div>
-              </div>
-              
-              {/* Badge prix en haut à droite */}
-              <div className="absolute top-3 right-3 z-20">
-                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
-                </span>
-              </div>
-            
-              {/* Overlay avec sous-titre en bas - visible en permanence */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
-                {module.subtitle && (
-                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
-                    {module.subtitle}
-                  </p>
-                )}
-                {/* Badge "STABLE" pour Stable Diffusion IA */}
-                <div className="mt-2">
-                  <span className="bg-gradient-to-r from-emerald-400 to-green-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-                    🎯 STABLE
-                  </span>
-                </div>
-              </div>
-            </>
-          ) : isSDnext ? (
-            <>
-              {/* Style spécial pour SDnext IA - informations visibles en permanence */}
-              {/* Badge catégorie en haut à gauche */}
-              <div className="absolute top-3 left-3 z-20">
-                <span className="bg-gradient-to-r from-rose-500 to-pink-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                  {module.category}
-                </span>
-              </div>
-              
-              {/* Logo SDnext IA au centre */}
-              <div className="absolute inset-0 flex items-center justify-center z-20">
-                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-rose-500/20">
-                  {/* Logo SDnext IA avec icône de génération d'images avancée */}
-                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
-                    {/* Cercle de fond */}
-                    <circle cx="12" cy="12" r="10" fill="#F43F5E" stroke="#EC4899" strokeWidth="1"/>
-                    
-                    {/* Image générée - cadre */}
-                    <rect x="6" y="6" width="12" height="12" rx="2" fill="white" opacity="0.9"/>
-                    
-                    {/* Éléments de l'image générée */}
-                    <circle cx="9" cy="9" r="1.5" fill="#F43F5E"/>
-                    <circle cx="15" cy="9" r="1.5" fill="#F43F5E"/>
-                    <circle cx="9" cy="15" r="1.5" fill="#F43F5E"/>
-                    <circle cx="15" cy="15" r="1.5" fill="#F43F5E"/>
-                    
-                    {/* Lignes de connexion - diffusion */}
-                    <path d="M9 9 L15 15" stroke="#F43F5E" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M15 9 L9 15" stroke="#F43F5E" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M12 6 L12 18" stroke="#F43F5E" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M6 12 L18 12" stroke="#F43F5E" strokeWidth="1.5" strokeLinecap="round"/>
-                    
-                    {/* Particules de diffusion */}
-                    <circle cx="12" cy="12" r="0.8" fill="#F43F5E"/>
-                    <circle cx="8" cy="12" r="0.5" fill="#F43F5E" opacity="0.7"/>
-                    <circle cx="16" cy="12" r="0.5" fill="#F43F5E" opacity="0.7"/>
-                    <circle cx="12" cy="8" r="0.5" fill="#F43F5E" opacity="0.7"/>
-                    <circle cx="12" cy="16" r="0.5" fill="#F43F5E" opacity="0.7"/>
                     
                     {/* Indicateurs de stabilité */}
                     <rect x="7" y="7" width="1" height="1" fill="white" opacity="0.6"/>
@@ -1679,10 +1606,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
         <Link href={`/card/${module.id}`} className="block group">
           {/* Titre du module - affiché pour tous les modules */}
           <h3 className="text-3xl sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
-            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "Générez des QRcodes pros" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "Transformez vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isSDnext ? "Des visuels plus réalistes, plus rapides, plus précis" : isMeetingReports ? "Compte-rendus automatiques" : module.title}
+            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "Générez des QRcodes pros" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "Transformez vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : module.title}
           </h3>
           {/* Pour les modules spéciaux, afficher seulement la description si pas de sous-titre */}
-          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isSDnext || isQRCodes || isWhisper || isChatGPT || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports ? (
+          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isQRCodes || isWhisper || isChatGPT || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports ? (
             !module.subtitle && (
               <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
                 {isComfyUI ? "Un contrôle total sur chaque étape de la création d'image" : isMeetingReports ? "Transformez automatiquement vos réunions en rapports professionnels avec l'IA" : module.description}

@@ -327,7 +327,6 @@ export default function EncoursPage() {
       '8': 'ruinedfooocus', // Ruined Fooocus -> ruinedfooocus
       '10': 'comfyui', // ComfyUI -> comfyui
       '11': 'cogstudio', // Cog Studio -> cogstudio
-      '12': 'sdnext',  // SD.Next -> sdnext
       'qrcodes-statiques': 'qrcodes-statiques', // QR Codes Statiques
     };
 
@@ -344,7 +343,6 @@ export default function EncoursPage() {
       'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',  // RuinedFooocus direct avec token
       'comfyui': 'https://comfyui.iahome.fr',  // ComfyUI direct avec token
       'cogstudio': 'https://cogstudio.iahome.fr',  // CogStudio direct avec token
-      'sdnext': 'https://sdnext.iahome.fr',  // SDNext direct avec token
     };
     
     // Convertir module_id numérique en slug si nécessaire
@@ -367,12 +365,10 @@ export default function EncoursPage() {
       '8': 100,     // Ruined Fooocus -> 100 tokens
       '10': 100,    // ComfyUI -> 100 tokens
       '11': 100,    // Cog Studio -> 100 tokens
-      '12': 100,    // SD.Next -> 100 tokens
       'stablediffusion': 100,
       'ruinedfooocus': 100,
       'comfyui': 100,
       'cogstudio': 100,
-      'sdnext': 100,
       'whisper': 100,
     };
     
@@ -840,7 +836,7 @@ export default function EncoursPage() {
                          module.module_id !== 'cogstudio' && 
                          module.module_id !== 'whisper' && 
                          module.module_id !== 'comfyui' && 
-                         module.module_id !== 'sdnext' && (
+                         (
                           <span>🔑 Appli essentielle</span>
                         )}
                         {module.price && Number(module.price) > 0 && (

@@ -69,11 +69,6 @@ export class TokenActionServiceClient {
         generate: 100,         // 100 tokens par génération
         batch_generate: 200    // 200 tokens pour génération multiple
       },
-      sdnext: {
-        access: 100,           // 100 tokens pour accéder à SD.Next
-        generate: 100,         // 100 tokens par génération
-        batch_generate: 200    // 200 tokens pour génération multiple
-      },
       ruinedfooocus: {
         access: 100,           // 100 tokens pour accéder à RuinedFooocus
         generate: 100,         // 100 tokens par génération

@@ -19,7 +19,6 @@ const MODULE_URLS: { [key: string]: string } = {
   'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
   'comfyui': 'https://comfyui.iahome.fr',
   'cogstudio': 'https://cogstudio.iahome.fr',
-  'sdnext': 'https://sdnext.iahome.fr'
 };
 
 export async function GET(request: NextRequest) {

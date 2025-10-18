@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
       'stablediffusion': 100,
       'whisper': 100,
       'comfyui': 100,
-      'sdnext': 100,
       'cogstudio': 100,
       'ruinedfooocus': 100,
       

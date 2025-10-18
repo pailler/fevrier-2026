@@ -116,7 +116,7 @@ export default function AdminTokens() {
       
       // Calculer les coûts par module
       const getTokenCost = (moduleId: string) => {
-        if (moduleId.includes('sdnext') || moduleId.includes('cogstudio') || 
+        if (moduleId.includes('cogstudio') || 
             moduleId.includes('stablediffusion') || moduleId.includes('ruinedfooocus')) {
           return 100; // Applications IA
         } else if (moduleId.includes('metube') || moduleId.includes('librespeed') ||
@@ -182,7 +182,7 @@ export default function AdminTokens() {
   });
 
   const getModuleIcon = (moduleName: string) => {
-    if (moduleName.includes('sdnext') || moduleName.includes('cogstudio') || 
+    if (moduleName.includes('cogstudio') || 
         moduleName.includes('stablediffusion') || moduleName.includes('ruinedfooocus')) {
       return '🤖';
     } else if (moduleName.includes('metube')) {

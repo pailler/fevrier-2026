@@ -216,7 +216,6 @@ Services IA disponibles :
 - Stable Diffusion (génération d'images)
 - ComfyUI (workflows IA avancés)
 - RuinedFooocus (génération rapide)
-- SDNext (optimisations)
 - CogStudio (modèles personnalisés)
 - Stirling PDF (traitement PDF)
 - MeTube (téléchargement vidéos)
