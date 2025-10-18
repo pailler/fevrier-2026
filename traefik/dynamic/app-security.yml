@@ -62,12 +62,6 @@ http:
         replacement: "https://iahome.fr/api/redirect-cogstudio$1"
         permanent: false
     
-    # Middleware de redirection sécurisée pour SD.Next
-    sdnext-secure-redirect:
-      redirectRegex:
-        regex: "^https://sdnext\\.iahome\\.fr(.*)$"
-        replacement: "https://iahome.fr/api/redirect-sdnext$1"
-        permanent: false
 
   routers:
 
@@ -145,14 +139,6 @@ http:
       tls: {}
       priority: 100
 
-    # SD.Next - Redirection sécurisée
-    sdnext-secure:
-      rule: "Host(`sdnext.iahome.fr`)"
-      entryPoints: ["websecure"]
-      service: sdnext-redirect-service
-      middlewares: ["sdnext-secure-redirect", "security-headers@file", "compress@file"]
-      tls: {}
-      priority: 100
 
   services:
     # Services de redirection vers l'application iahome
@@ -206,8 +192,3 @@ http:
           - url: "http://iahome-app:3000"
         passHostHeader: true
 
-    sdnext-redirect-service:
-      loadBalancer:
-        servers:
-          - url: "http://iahome-app:3000"
-        passHostHeader: true

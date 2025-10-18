@@ -187,3 +187,5 @@ if __name__ == "__main__":
         print("L'application fonctionne avec une transcription simulée pour la démonstration.")
 
 
+
+

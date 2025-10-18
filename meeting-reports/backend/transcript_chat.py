@@ -232,3 +232,5 @@ class TranscriptChat:
 transcript_chat = TranscriptChat()
 
 
+
+

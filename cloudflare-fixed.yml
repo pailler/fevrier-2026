@@ -1,0 +1,40 @@
+tunnel: iahome-new
+credentials-file: C:\Users\AAA\.cloudflared\02a960c5-edd6-4b3f-844f-410b16247262.json
+
+ingress:
+  - hostname: iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: iahome.fr
+      noTLSVerify: true
+  - hostname: www.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: www.iahome.fr
+      noTLSVerify: true
+  - hostname: meeting-reports.iahome.fr
+    service: http://localhost:3050
+    originRequest:
+      httpHostHeader: meeting-reports.iahome.fr
+      noTLSVerify: true
+  - hostname: metube.iahome.fr
+    service: http://localhost:8081
+  - hostname: librespeed.iahome.fr
+    service: http://localhost:8085
+  - hostname: whisper.iahome.fr
+    service: http://localhost:8093
+  - hostname: psitransfer.iahome.fr
+    service: http://localhost:8087
+  - hostname: qrcodes.iahome.fr
+    service: http://localhost:7006
+  - hostname: pdf.iahome.fr
+    service: http://localhost:8086
+  - hostname: stablediffusion.iahome.fr
+    service: http://localhost:8085
+  - hostname: ruinedfooocus.iahome.fr
+    service: http://localhost:8087
+  - hostname: comfyui.iahome.fr
+    service: http://localhost:8088
+  - service: http_status:404
+
+

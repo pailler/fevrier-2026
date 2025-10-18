@@ -82,3 +82,5 @@ La seule limitation est la transcription Whisper sur Windows, mais l'application
 **L'application est prête à l'utilisation !** 🚀
 
 
+
+

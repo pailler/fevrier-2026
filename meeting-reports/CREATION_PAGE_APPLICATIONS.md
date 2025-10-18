@@ -37,7 +37,7 @@ Générez des rapports détaillés en quelques minutes."
 #### **Ajout aux Pages Spécifiques**
 **Fichier** : `src/app/card/[id]/page.tsx`
 ```javascript
-const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'sdnext', 'cogstudio', 'ruinedfooocus', 'whisper', 'meeting-reports'];
+const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'cogstudio', 'ruinedfooocus', 'whisper', 'meeting-reports'];
 ```
 
 #### **Redirection Automatique**

@@ -70,3 +70,5 @@ L'application a été testée avec succès :
 **Plus de simulation ! L'application utilise maintenant Whisper pour de vraies transcriptions !** 🚀
 
 
+
+

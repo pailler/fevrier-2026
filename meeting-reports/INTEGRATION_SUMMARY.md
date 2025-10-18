@@ -148,3 +148,5 @@ Le projet Meeting Reports Generator dispose maintenant de **toutes les fonctionn
 L'application est maintenant **complète** et offre une expérience utilisateur comparable à Scriberr.app ! 🚀
 
 
+
+
