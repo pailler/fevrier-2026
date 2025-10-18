@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 3. Créer l'accès de test
+    // 3. Créer l'accès sans consommation de tokens
     const now = new Date();
     const expiresAt = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
 
@@ -113,9 +113,9 @@ export async function POST(request: NextRequest) {
         module_id: moduleId,
         module_title: 'LibreSpeed',
         is_active: true,
-        access_level: 'test',
+        access_level: 'premium',
         usage_count: 0,
-        max_usage: 100, // 100 utilisations de test
+        max_usage: null, // Pas de limite d'usage
         expires_at: expiresAt.toISOString(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -135,11 +135,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Accès LibreSpeed activé avec succès',
+      message: 'LibreSpeed activé avec succès',
       accessId: accessData.id,
       moduleId: moduleId,
-      expiresAt: expiresAt.toISOString(),
-      maxUsage: 100
+      expiresAt: expiresAt.toISOString()
     });
 
   } catch (error) {

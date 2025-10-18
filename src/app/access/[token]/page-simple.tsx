@@ -84,6 +84,9 @@ export default function AccessPageSimple() {
             'IAphoto': 'https://iaphoto.iahome.fr',
             'IAvideo': 'https://iavideo.iahome.fr',
             'test-module': 'https://test.example.com',
+            'Meeting Reports': 'https://meeting-reports.iahome.fr',
+            'Whisper IA': 'https://whisper.iahome.fr',
+            'LibreSpeed': 'https://librespeed.iahome.fr',
           };
 
           const targetUrl = moduleUrls[data.module_name];

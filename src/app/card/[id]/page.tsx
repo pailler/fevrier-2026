@@ -53,6 +53,9 @@ export default function CardDetailPage() {
   // Vérifier si c'est le module metube pour appliquer un style spécial
   const isMetube = Boolean(card?.title?.toLowerCase().includes('metube') || card?.id === 'metube');
   
+  // Vérifier si c'est le module psitransfer pour appliquer un style spécial
+  const isPsitransfer = Boolean(card?.title?.toLowerCase().includes('psitransfer') || card?.id === 'psitransfer');
+  
   // Debug MeTube
   console.log('🔍 DEBUG METUBE:', {
     cardId: card?.id,
@@ -66,7 +69,6 @@ export default function CardDetailPage() {
     card?.price === 0 || 
     card?.price === '0' || 
     card?.price === null ||
-    card?.title?.toLowerCase().includes('librespeed') ||
     card?.title?.toLowerCase().includes('metube') ||
     card?.title?.toLowerCase().includes('pdf') ||
     card?.title?.toLowerCase().includes('psitransfer')
@@ -200,7 +202,9 @@ export default function CardDetailPage() {
         'pdf': 'https://pdf.iahome.fr',
         'aiassistant': 'https://aiassistant.iahome.fr',
         'cogstudio': 'https://cogstudio.iahome.fr',
-        'ruinedfooocus': '/api/gradio-secure'
+        'ruinedfooocus': '/api/gradio-secure',
+        'meeting-reports': 'https://meeting-reports.iahome.fr',
+        'whisper': 'https://whisper.iahome.fr'
       };
 
       const normalizedName = (moduleName || '').toLowerCase().replace(/\s+/g, '');
@@ -323,7 +327,7 @@ export default function CardDetailPage() {
       console.log('🔧 Chargement carte pour:', params.id);
 
       // Liste des modules qui ont des pages spécifiques
-      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'cogstudio', 'ruinedfooocus', 'whisper', 'meeting-reports'];
+      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'cogstudio', 'ruinedfooocus', 'whisper', 'meeting-reports', 'psitransfer'];
       
       // Si c'est un module avec une page spécifique, charger la page spécifique
       if (specificPages.includes(params.id as string)) {
@@ -338,20 +342,22 @@ export default function CardDetailPage() {
           const librespeedCard = {
             id: 'librespeed',
             title: 'LibreSpeed',
-            description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision.',
-            subtitle: 'Test de vitesse internet',
+            description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision. Coûte 10 tokens par utilisation.',
+            subtitle: 'Test de vitesse internet (10 tokens)',
             category: 'WEB TOOLS',
-            price: 0,
+            price: 10,
             image_url: '/images/librespeed.jpg',
             features: [
               'Test de vitesse précis',
               'Interface moderne et intuitive',
               'Résultats détaillés',
-              'Compatible tous navigateurs'
+              'Compatible tous navigateurs',
+              '10 tokens par utilisation'
             ],
             requirements: [
               'Connexion internet stable',
-              'Navigateur web moderne'
+              'Navigateur web moderne',
+              '10 tokens disponibles'
             ],
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
@@ -388,6 +394,39 @@ export default function CardDetailPage() {
           };
           setCard(metubeCard);
           console.log('✅ MeTube chargé avec succès');
+          setLoading(false);
+          return;
+        }
+
+        // Gestion spéciale pour PsiTransfer
+        if (params.id === 'psitransfer') {
+          console.log('🔧 Chargement spécial pour PsiTransfer - params.id:', params.id);
+          const psitransferCard = {
+            id: 'psitransfer',
+            title: 'PsiTransfer',
+            description: 'Transfert de fichiers sécurisé et privé. Envoyez vos fichiers sans surveillance, sans publicité. Quota maximum: 10 Go.',
+            subtitle: 'Transfert de fichiers sécurisé (10 tokens)',
+            category: 'WEB TOOLS',
+            price: 10,
+            image_url: '/images/psitransfer.jpg',
+            features: [
+              'Transfert de fichiers sécurisé',
+              'Aucune limite de taille de fichier',
+              'Chiffrement end-to-end',
+              'Partage par lien temporaire',
+              'Interface simple et intuitive',
+              '10 tokens par utilisation'
+            ],
+            requirements: [
+              'Connexion internet stable',
+              'Navigateur web moderne',
+              '10 tokens disponibles'
+            ],
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          setCard(psitransferCard);
+          console.log('✅ PsiTransfer chargé avec succès');
           setLoading(false);
           return;
         }
@@ -770,7 +809,7 @@ export default function CardDetailPage() {
                   <div className="text-4xl font-bold mb-1">
                     {card.price === 0 || card.price === '0' ? 
                       (isFreeModule ? '10 tokens' : 'Free') : 
-                      '100 tokens'
+                      `${card.price} tokens`
                     }
                   </div>
                   <div className="text-sm opacity-90">
@@ -922,25 +961,65 @@ export default function CardDetailPage() {
 
 
                     {/* Bouton d'accès spécial pour LibreSpeed */}
-                    {isLibrespeed && (
+                    {isLibrespeed && !alreadyActivatedModules.includes(card.id) && (
                       <button
-                        onClick={() => {
-                          if (isAuthenticated && user) {
-                            // Utilisateur connecté : aller à la page de transition puis /encours
-                            console.log('✅ Accès LibreSpeed - Utilisateur connecté');
-                            router.push(`/token-generated?module=${encodeURIComponent(card.title)}&redirect=/encours`);
-                          } else {
-                            // Utilisateur non connecté : aller à la page de connexion puis retour à LibreSpeed
-                            console.log('🔒 Accès LibreSpeed - Redirection vers connexion');
+                        onClick={async () => {
+                          if (!isAuthenticated || !user) {
+                            console.log('❌ Accès LibreSpeed - Utilisateur non connecté');
                             router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
+                            return;
+                          }
+
+                          try {
+                            console.log('🔄 Activation LibreSpeed pour:', user.email);
+                            
+                            const response = await fetch('/api/activate-librespeed-test', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({
+                                userId: user.id,
+                                email: user.email
+                              }),
+                            });
+
+                            const result = await response.json();
+
+                            if (result.success) {
+                              console.log('✅ LibreSpeed activé avec succès');
+                              setAlreadyActivatedModules(prev => [...prev, card.id]);
+                              alert('LibreSpeed activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
+                              router.push('/encours');
+                            } else {
+                              console.error('❌ Erreur activation LibreSpeed:', result.error);
+                              alert(`Erreur lors de l'activation: ${result.error}`);
+                            }
+                          } catch (error) {
+                            console.error('❌ Erreur activation LibreSpeed:', error);
+                            alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                           }
                         }}
                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                       >
                         <span className="text-xl">⚡</span>
                         <span>
-                          {isAuthenticated && user ? `Activer ${card?.title || 'Module'}` : `Connectez-vous pour activer ${card?.title || 'Module'}`}
+                          {isAuthenticated && user ? `Activer LibreSpeed (10 tokens)` : `Connectez-vous pour activer LibreSpeed (10 tokens)`}
                         </span>
+                      </button>
+                    )}
+
+                    {/* Bouton d'accès pour LibreSpeed déjà activé */}
+                    {isLibrespeed && alreadyActivatedModules.includes(card.id) && (
+                      <button
+                        onClick={() => {
+                          console.log('✅ Accès LibreSpeed - Module déjà activé');
+                          window.open('https://librespeed.iahome.fr', '_blank');
+                        }}
+                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                      >
+                        <span className="text-xl">🔑</span>
+                        <span>Accéder à {card?.title || 'LibreSpeed'}</span>
                       </button>
                     )}
 
@@ -1068,7 +1147,7 @@ export default function CardDetailPage() {
                   <div className="text-4xl font-bold mb-1">
                     {card.price === 0 || card.price === '0' ? 
                       (isFreeModule ? '10 tokens' : 'Free') : 
-                      '100 tokens'
+                      `${card.price} tokens`
                     }
                   </div>
                   <div className="text-sm opacity-90">
@@ -1107,8 +1186,126 @@ export default function CardDetailPage() {
         </div>
       )}
 
-      {/* Contenu principal - seulement pour les modules non-LibreSpeed et non-MeTube */}
-      {!isLibrespeed && !isMetube && (
+      {/* Section PsiTransfer - Transfert de fichiers sécurisé */}
+      {isPsitransfer && (
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {/* Colonne 1 - Interface PsiTransfer */}
+            <div className="w-full aspect-video bg-gradient-to-br from-blue-100 to-indigo-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600">
+                <div className="text-center text-white">
+                  <div className="text-6xl mb-4">📁</div>
+                  <h3 className="text-2xl font-bold mb-2">PsiTransfer</h3>
+                  <p className="text-blue-100">Transfert de fichiers sécurisé</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Colonne 2 - Système de boutons */}
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
+              <div className="text-left mb-8">
+                <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
+                  <div className="text-4xl font-bold mb-1">
+                    {card.price === 0 || card.price === '0' ? 
+                      (isFreeModule ? '10 tokens' : 'Free') : 
+                      `${card.price} tokens`
+                    }
+                  </div>
+                  <div className="text-sm opacity-90">
+                    {card.price === 0 || card.price === '0' ? 
+                      (isFreeModule ? 'par utilisation' : 'Gratuit') : 
+                      'par utilisation'
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {/* Boutons d'action pour PsiTransfer */}
+                {!alreadyActivatedModules.includes(card.id) && (
+                  <button
+                    onClick={async () => {
+                      if (!isAuthenticated || !user) {
+                        console.log('❌ Accès PsiTransfer - Utilisateur non connecté');
+                        router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
+                        return;
+                      }
+
+                      try {
+                        console.log('🔄 Activation PsiTransfer pour:', user.email);
+                        
+                        const response = await fetch('/api/activate-psitransfer', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            userId: user.id,
+                            email: user.email
+                          }),
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                          console.log('✅ PsiTransfer activé avec succès');
+                          setAlreadyActivatedModules(prev => [...prev, card.id]);
+                          alert('PsiTransfer activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
+                          router.push('/encours');
+                        } else {
+                          console.error('❌ Erreur activation PsiTransfer:', result.error);
+                          alert(`Erreur lors de l'activation: ${result.error}`);
+                        }
+                      } catch (error) {
+                        console.error('❌ Erreur activation PsiTransfer:', error);
+                        alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                      }
+                    }}
+                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  >
+                    <span className="text-xl">📁</span>
+                    <span>
+                      {isAuthenticated && user ? `Activer PsiTransfer (10 tokens)` : `Connectez-vous pour activer PsiTransfer (10 tokens)`}
+                    </span>
+                  </button>
+                )}
+
+                {/* Bouton d'accès pour PsiTransfer déjà activé */}
+                {alreadyActivatedModules.includes(card.id) && (
+                  <button
+                    onClick={() => {
+                      console.log('✅ Accès PsiTransfer - Module déjà activé');
+                      window.open('https://psitransfer.iahome.fr', '_blank');
+                    }}
+                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  >
+                    <span className="text-xl">🔑</span>
+                    <span>Accéder à {card?.title || 'PsiTransfer'}</span>
+                  </button>
+                )}
+
+                {/* Informations sur PsiTransfer */}
+                <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
+                  <h4 className="font-bold text-blue-900 mb-3 flex items-center">
+                    <span className="text-xl mr-2">ℹ️</span>
+                    À propos de PsiTransfer
+                  </h4>
+                  <ul className="text-sm text-blue-800 space-y-2">
+                    <li>• Transfert de fichiers sécurisé et privé</li>
+                    <li>• Aucune limite de taille de fichier</li>
+                    <li>• Chiffrement end-to-end</li>
+                    <li>• Partage par lien temporaire</li>
+                    <li>• Interface simple et intuitive</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contenu principal - seulement pour les modules non-LibreSpeed, non-MeTube et non-PsiTransfer */}
+      {!isLibrespeed && !isMetube && !isPsitransfer && (
         <main className="max-w-7xl mx-auto px-6 py-12">
           <div className="space-y-12">
             {/* Grille principale */}

@@ -46,6 +46,11 @@ export class TokenActionService {
       generate: 100,         // 100 tokens par génération
       batch_generate: 200    // 200 tokens pour génération multiple
     },
+    'meeting-reports': {
+      access: 100,           // 100 tokens pour accéder à Meeting Reports
+      generate: 100,         // 100 tokens par génération de rapport
+      batch_generate: 200    // 200 tokens pour génération multiple
+    },
     
     // Modules essentiels : 10 tokens
     metube: {

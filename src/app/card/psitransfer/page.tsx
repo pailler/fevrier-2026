@@ -209,26 +209,51 @@ export default function PsiTransferPage() {
             <div className="space-y-6">
               {/* Boutons d'action */}
               {isAuthenticated && user ? (
-                // Bouton d'accès pour les applis essentielles (uniquement si connecté)
+                // Bouton d'activation PsiTransfer (utilisateur connecté)
                 <button 
-                  onClick={() => {
-                    if (isAuthenticated && user) {
-                      // Utilisateur connecté : aller à la page de transition puis /encours
-                      ;
-                      router.push(`/token-generated?module=${encodeURIComponent('PsiTransfer')}&redirect=/encours`);
-                    } else {
-                      // Utilisateur non connecté : aller à la page de connexion puis retour à PsiTransfer
-                      console.log('🔒 Accès PsiTransfer - Redirection vers connexion');
+                  onClick={async () => {
+                    if (!isAuthenticated || !user) {
+                      console.log('❌ Accès PsiTransfer - Utilisateur non connecté');
                       router.push(`/login?redirect=${encodeURIComponent('/card/psitransfer')}`);
+                      return;
+                    }
+
+                    try {
+                      console.log('🔄 Activation PsiTransfer pour:', user.email);
+                      
+                      const response = await fetch('/api/activate-psitransfer', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          userId: user.id,
+                          email: user.email
+                        }),
+                      });
+
+                      const result = await response.json();
+
+                      if (result.success) {
+                        console.log('✅ PsiTransfer activé avec succès');
+                        alert('PsiTransfer activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
+                        router.push('/encours');
+                      } else {
+                        console.error('❌ Erreur activation PsiTransfer:', result.error);
+                        alert(`Erreur lors de l'activation: ${result.error}`);
+                      }
+                    } catch (error) {
+                      console.error('❌ Erreur activation PsiTransfer:', error);
+                      alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                     }
                   }}
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
-                  <span className="text-xl">🆓</span>
-                  <span>Activer l'application PsiTransfer</span>
+                  <span className="text-xl">📁</span>
+                  <span>Activer PsiTransfer (10 tokens)</span>
                 </button>
               ) : (
-                // Message pour les applis essentielles quand l'utilisateur n'est pas connecté
+                // Message pour les utilisateurs non connectés
                 <button
                   onClick={() => {
                     // Utilisateur non connecté : aller à la page de connexion puis retour à PsiTransfer
@@ -238,7 +263,7 @@ export default function PsiTransferPage() {
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">🔒</span>
-                  <span>Connectez-vous pour activer PsiTransfer</span>
+                  <span>Connectez-vous pour activer PsiTransfer (10 tokens)</span>
                 </button>
               )}
             </div>

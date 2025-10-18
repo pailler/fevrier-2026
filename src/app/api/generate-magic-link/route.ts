@@ -62,6 +62,8 @@ export async function POST(request: NextRequest) {
       'IAphoto': 'https://iaphoto.iahome.fr',
       'IAvideo': 'https://iavideo.iahome.fr',
       'LibreSpeed': 'https://librespeed.iahome.fr',
+      'Meeting Reports': 'https://meeting-reports.iahome.fr',
+      'Whisper IA': 'https://whisper.iahome.fr',
     };
 
     const baseUrl = moduleUrls[moduleName];

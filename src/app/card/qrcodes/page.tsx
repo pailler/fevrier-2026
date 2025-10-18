@@ -417,16 +417,48 @@ export default function QRCodesPage() {
             <div className="space-y-6">
               {/* Boutons d'action */}
               {isAuthenticated && user ? (
-                // Utilisateur connecté : aller à la page de transition puis /encours
+                // Utilisateur connecté : activer QR Codes via API
                 <button
-                  onClick={() => {
-                    ;
-                    router.push(`/token-generated?module=${encodeURIComponent('QR Codes')}&redirect=/encours`);
+                  onClick={async () => {
+                    if (!isAuthenticated || !user) {
+                      console.log('❌ Accès QR Codes - Utilisateur non connecté');
+                      router.push(`/login?redirect=${encodeURIComponent('/card/qrcodes')}`);
+                      return;
+                    }
+
+                    try {
+                      console.log('🔄 Activation QR Codes pour:', user.email);
+                      
+                      const response = await fetch('/api/activate-qrcodes', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          userId: user.id,
+                          email: user.email
+                        }),
+                      });
+
+                      const result = await response.json();
+
+                      if (result.success) {
+                        console.log('✅ QR Codes activé avec succès');
+                        alert('QR Codes activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
+                        router.push('/encours');
+                      } else {
+                        console.error('❌ Erreur activation QR Codes:', result.error);
+                        alert(`Erreur lors de l'activation: ${result.error}`);
+                      }
+                    } catch (error) {
+                      console.error('❌ Erreur activation QR Codes:', error);
+                      alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                    }
                   }}
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">🔑</span>
-                  <span>Activer QR Codes</span>
+                  <span>Activer QR Codes (10 tokens)</span>
                 </button>
               ) : (
                 // Utilisateur non connecté : aller à la page de connexion puis retour à QR Codes
@@ -438,7 +470,7 @@ export default function QRCodesPage() {
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">🔒</span>
-                  <span>Connectez-vous pour activer QR Codes</span>
+                  <span>Connectez-vous pour activer QR Codes (10 tokens)</span>
                 </button>
               )}
             </div>

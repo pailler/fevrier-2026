@@ -1,5 +1,6 @@
 # Configuration Traefik pour la sécurisation des applications iahome
-# Redirection sécurisée vers les applications avec vérification des modules dans /encours
+# Tous les sous-domaines sont maintenant gérés par le tunnel Cloudflare
+# Traefik ne gère que l'application principale et les redirections internes
 
 http:
   middlewares:
@@ -32,7 +33,6 @@ http:
         replacement: "https://iahome.fr/api/redirect-qrcodes$1"
         permanent: false
     
-    
     # Middleware de redirection sécurisée pour Stable Diffusion
     stablediffusion-secure-redirect:
       redirectRegex:
@@ -45,14 +45,6 @@ http:
       redirectRegex:
         regex: "^https://ruinedfooocus\\.iahome\\.fr(.*)$"
         replacement: "https://iahome.fr/api/redirect-ruinedfooocus$1"
-        permanent: false
-    
-    
-    # Middleware de redirection sécurisée pour ComfyUI
-    comfyui-secure-redirect:
-      redirectRegex:
-        regex: "^https://comfyui\\.iahome\\.fr(.*)$"
-        replacement: "https://iahome.fr/api/redirect-comfyui$1"
         permanent: false
     
     # Middleware de redirection sécurisée pour Cog Studio
@@ -121,14 +113,7 @@ http:
       priority: 100
 
 
-    # ComfyUI - Redirection sécurisée
-    comfyui-secure:
-      rule: "Host(`comfyui.iahome.fr`)"
-      entryPoints: ["websecure"]
-      service: comfyui-redirect-service
-      middlewares: ["comfyui-secure-redirect", "security-headers@file", "compress@file"]
-      tls: {}
-      priority: 100
+    # ComfyUI - Géré directement par le tunnel Cloudflare
 
     # Cog Studio - Redirection sécurisée
     cogstudio-secure:
@@ -180,11 +165,7 @@ http:
           - url: "http://iahome-app:3000"
         passHostHeader: true
 
-    comfyui-redirect-service:
-      loadBalancer:
-        servers:
-          - url: "http://iahome-app:3000"
-        passHostHeader: true
+    # ComfyUI - Géré directement par le tunnel Cloudflare
 
     cogstudio-redirect-service:
       loadBalancer:

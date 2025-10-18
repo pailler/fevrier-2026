@@ -10,6 +10,7 @@ import ModuleAccessButton from '../../components/ModuleAccessButton';
 import QRCodeAccessButton from '../../components/QRCodeAccessButton';
 import PDFAccessButton from '../../components/PDFAccessButton';
 import PsiTransferAccessButton from '../../components/PsiTransferAccessButton';
+import MeetingReportsAccessButton from '../../components/MeetingReportsAccessButton';
 import ModuleAccessButtonNew from '../../components/ModuleAccessButton';
 import { TokenActionServiceClient } from '../../utils/tokenActionServiceClient';
 
@@ -327,6 +328,7 @@ export default function EncoursPage() {
       '8': 'ruinedfooocus', // Ruined Fooocus -> ruinedfooocus
       '10': 'comfyui', // ComfyUI -> comfyui
       '11': 'cogstudio', // Cog Studio -> cogstudio
+      'meeting-reports': 'meeting-reports', // Meeting Reports -> meeting-reports
       'qrcodes-statiques': 'qrcodes-statiques', // QR Codes Statiques
     };
 
@@ -343,6 +345,7 @@ export default function EncoursPage() {
       'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',  // RuinedFooocus direct avec token
       'comfyui': 'https://comfyui.iahome.fr',  // ComfyUI direct avec token
       'cogstudio': 'https://cogstudio.iahome.fr',  // CogStudio direct avec token
+      'meeting-reports': 'https://meeting-reports.iahome.fr',  // Meeting Reports direct avec token
     };
     
     // Convertir module_id numérique en slug si nécessaire
@@ -370,6 +373,7 @@ export default function EncoursPage() {
       'comfyui': 100,
       'cogstudio': 100,
       'whisper': 100,
+      'meeting-reports': 100,
     };
     
     return moduleCosts[moduleId] || 10; // Par défaut 10 tokens
@@ -933,6 +937,18 @@ export default function EncoursPage() {
                           }}
                           onAccessDenied={(reason) => {
                             console.log('❌ QR Codes: Accès refusé:', reason);
+                            alert(`Accès refusé: ${reason}`);
+                          }}
+                        />
+                      ) : module.module_title === 'Compte-rendus automatiques' || module.module_title === 'Meeting Reports' ? (
+                        <MeetingReportsAccessButton
+                          user={user}
+                          onAccessGranted={(url) => {
+                            console.log('🔗 Meeting Reports: Accès autorisé:', url);
+                            window.open(url, '_blank');
+                          }}
+                          onAccessDenied={(reason) => {
+                            console.log('❌ Meeting Reports: Accès refusé:', reason);
                             alert(`Accès refusé: ${reason}`);
                           }}
                         />

@@ -63,6 +63,56 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Vérifier et consommer 10 tokens
+    const { data: userTokens, error: tokensError } = await supabase
+      .from('user_tokens')
+      .select('tokens')
+      .eq('user_id', userId)
+      .single();
+
+    if (tokensError || !userTokens) {
+      console.error('❌ LibreSpeed Access: Erreur récupération tokens:', tokensError);
+      return new NextResponse(JSON.stringify({
+        success: false,
+        error: 'Profil utilisateur non trouvé'
+      }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (userTokens.tokens < 10) {
+      console.log('❌ LibreSpeed Access: Tokens insuffisants:', userTokens.tokens);
+      return new NextResponse(JSON.stringify({
+        success: false,
+        error: 'Tokens insuffisants',
+        message: '10 tokens requis pour utiliser LibreSpeed. Tokens disponibles: ' + userTokens.tokens
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Consommer 10 tokens
+    const { error: updateTokensError } = await supabase
+      .from('user_tokens')
+      .update({ 
+        tokens: userTokens.tokens - 10,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId);
+
+    if (updateTokensError) {
+      console.error('❌ LibreSpeed Access: Erreur consommation tokens:', updateTokensError);
+      return new NextResponse(JSON.stringify({
+        success: false,
+        error: 'Erreur lors de la consommation des tokens'
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // Incrémenter le compteur dans user_applications
     const newUsageCount = currentUsage + 1;
     const { data: updatedApp, error: updateAppError } = await supabase
@@ -76,10 +126,19 @@ export async function POST(request: NextRequest) {
 
     if (updateAppError) {
       console.error('❌ LibreSpeed Access: Erreur mise à jour user_applications:', updateAppError);
+      // Rollback: remettre les tokens
+      await supabase
+        .from('user_tokens')
+        .update({ 
+          tokens: userTokens.tokens,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', userId);
       return new NextResponse('Error updating usage count', { status: 500 });
     }
 
     console.log('✅ LibreSpeed Access: Compteur incrémenté:', newUsageCount, '/', maxUsage);
+    console.log('✅ LibreSpeed Access: 10 tokens consommés. Restants:', userTokens.tokens - 10);
 
     // Enregistrer l'accès dans les logs
     const { error: logError } = await supabase
@@ -102,7 +161,9 @@ export async function POST(request: NextRequest) {
       success: true,
       usage_count: updatedApp.usage_count,
       max_usage: updatedApp.max_usage,
-      last_accessed_at: updatedApp.last_accessed_at
+      last_accessed_at: updatedApp.last_accessed_at,
+      tokens_consumed: 10,
+      tokens_remaining: userTokens.tokens - 10
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
