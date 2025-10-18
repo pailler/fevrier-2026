@@ -265,6 +265,58 @@ export default function AdminDashboard() {
         ))}
       </div>
 
+      {/* Analyse des fichiers */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+          <span className="text-2xl mr-3">🔍</span>
+          Analyse des fichiers
+        </h2>
+        <p className="text-gray-600 mb-6">Outils d'analyse et de gestion des fichiers du projet</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <a href="/admin/large-files" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block group">
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">📁</div>
+            <h3 className="font-medium text-gray-900">Gros fichiers</h3>
+            <p className="text-sm text-gray-600">Identifier et analyser les fichiers volumineux</p>
+            <div className="mt-2 text-xs text-blue-600 font-medium">Analyse en temps réel</div>
+          </a>
+
+          <a href="/admin/file-structure" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block group">
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">🌳</div>
+            <h3 className="font-medium text-gray-900">Structure des dossiers</h3>
+            <p className="text-sm text-gray-600">Visualiser l'arborescence du projet</p>
+            <div className="mt-2 text-xs text-blue-600 font-medium">Bientôt disponible</div>
+          </a>
+
+          <a href="/admin/duplicate-files" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block group">
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">🔄</div>
+            <h3 className="font-medium text-gray-900">Fichiers dupliqués</h3>
+            <p className="text-sm text-gray-600">Détecter les fichiers en double</p>
+            <div className="mt-2 text-xs text-blue-600 font-medium">Bientôt disponible</div>
+          </a>
+
+          <a href="/admin/file-types" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block group">
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">📊</div>
+            <h3 className="font-medium text-gray-900">Types de fichiers</h3>
+            <p className="text-sm text-gray-600">Statistiques par extension</p>
+            <div className="mt-2 text-xs text-blue-600 font-medium">Bientôt disponible</div>
+          </a>
+
+          <a href="/admin/security-scan" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block group">
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">🔒</div>
+            <h3 className="font-medium text-gray-900">Analyse de sécurité</h3>
+            <p className="text-sm text-gray-600">Scanner les vulnérabilités</p>
+            <div className="mt-2 text-xs text-blue-600 font-medium">Bientôt disponible</div>
+          </a>
+
+          <a href="/admin/performance-audit" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block group">
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">⚡</div>
+            <h3 className="font-medium text-gray-900">Audit de performance</h3>
+            <p className="text-sm text-gray-600">Optimiser les performances</p>
+            <div className="mt-2 text-xs text-blue-600 font-medium">Bientôt disponible</div>
+          </a>
+        </div>
+      </div>
+
       {/* Actions rapides */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
@@ -283,12 +335,6 @@ export default function AdminDashboard() {
             <p className="text-sm text-gray-600">{stats.totalModules} modules disponibles</p>
           </a>
 
-          <a href="/admin/large-files" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block">
-            <div className="text-2xl mb-2">📁</div>
-            <h3 className="font-medium text-gray-900">Analyser les gros fichiers</h3>
-            <p className="text-sm text-gray-600">Identifier les fichiers volumineux</p>
-          </a>
-
           <a href="/admin/statistics" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block">
             <div className="text-2xl mb-2">📊</div>
             <h3 className="font-medium text-gray-900">Statistiques détaillées</h3>
@@ -305,6 +351,12 @@ export default function AdminDashboard() {
             <div className="text-2xl mb-2">💳</div>
             <h3 className="font-medium text-gray-900">Paiements</h3>
             <p className="text-sm text-gray-600">Gestion des transactions</p>
+          </a>
+
+          <a href="/admin/settings" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block">
+            <div className="text-2xl mb-2">⚙️</div>
+            <h3 className="font-medium text-gray-900">Paramètres</h3>
+            <p className="text-sm text-gray-600">Configuration système</p>
           </a>
         </div>
       </div>
