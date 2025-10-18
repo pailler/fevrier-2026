@@ -1537,7 +1537,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
           {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isQRCodes || isWhisper || isChatGPT || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports ? (
             !module.subtitle && (
               <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
-                {isComfyUI ? "Un contrôle total sur chaque étape de la création d'image" : isMeetingReports ? "Transformez automatiquement vos réunions en rapports professionnels avec l'IA" : module.description}
+                {isComfyUI ? "ComfyUI : contrôle total sur chaque étape de la création d'image" : isMeetingReports ? "Transformez automatiquement vos réunions en rapports professionnels avec l'IA" : module.description}
               </p>
             )
           ) : (
