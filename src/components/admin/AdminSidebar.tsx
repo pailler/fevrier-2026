@@ -14,6 +14,7 @@ const navigation = [
   { name: 'Contenu', href: '/admin/content', icon: '📝' },
   { name: 'Événements', href: '/admin/events', icon: '📋' },
   { name: 'Notifications', href: '/admin/notifications', icon: '🔔' },
+  { name: 'Fichiers volumineux', href: '/admin/large-files', icon: '📁' },
   { name: 'Paramètres', href: '/admin/settings', icon: '⚙️' },
 ];
 

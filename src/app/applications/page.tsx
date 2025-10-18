@@ -176,8 +176,8 @@ export default function Home() {
   // Modules essentiels à exclure de la page applications
   const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes'];
   
-  // Filtrer et trier les modules
-  const filteredAndSortedModules = modules
+  // Filtrer les modules
+  const filteredModules = modules
     .filter(module => {
       // Exclure les modules essentiels (affichés dans la page essentiels)
       const isEssential = essentialModules.some(essentialId => 
@@ -197,18 +197,7 @@ export default function Home() {
         );
 
       return matchesSearch;
-    })
-         .sort((a, b) => {
-       // Tri simple : modules gratuits en premier, puis modules payants
-       const aIsFree = a.price === '0' || a.price === 0 || a.price === 'Gratuit' || a.price === 'gratuit' || a.price === 'FREE' || a.price === 'free';
-       const bIsFree = b.price === '0' || b.price === 0 || b.price === 'Gratuit' || b.price === 'gratuit' || b.price === 'FREE' || b.price === 'free';
-       
-       if (aIsFree && !bIsFree) return -1; // a (gratuit) avant b (payant)
-       if (!aIsFree && bIsFree) return 1;  // b (gratuit) avant a (payant)
-       
-       // Si les deux modules ont le même type, trier par nom
-       return a.title.localeCompare(b.title);
-     });
+    });
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -217,10 +206,10 @@ export default function Home() {
   // Calculer les indices pour la pagination
   const indexOfLastModule = currentPage * modulesPerPage;
   const indexOfFirstModule = indexOfLastModule - modulesPerPage;
-  const currentModules = filteredAndSortedModules.slice(indexOfFirstModule, indexOfLastModule);
+  const currentModules = filteredModules.slice(indexOfFirstModule, indexOfLastModule);
   
   // Calculer le nombre total de pages
-  const totalPages = Math.ceil(filteredAndSortedModules.length / modulesPerPage);
+  const totalPages = Math.ceil(filteredModules.length / modulesPerPage);
   
   // Fonctions de navigation
   const goToPage = (pageNumber: number) => {
@@ -235,7 +224,7 @@ export default function Home() {
     setCurrentPage(prev => Math.max(prev - 1, 1));
   };
   
-  // Réinitialiser la pagination quand les filtres changent
+  // Réinitialiser la pagination quand la recherche change
   useEffect(() => {
     setCurrentPage(1);
   }, [search]);
@@ -373,14 +362,14 @@ export default function Home() {
                       Réessayer
                     </button>
                   </div>
-                ) : filteredAndSortedModules.length === 0 ? (
+                ) : filteredModules.length === 0 ? (
                   <div className="col-span-full text-left py-12">
                     <div className="text-gray-500">Aucun template trouvé pour "{search}"</div>
                   </div>
                 ) : currentModules.length === 0 ? (
                   <div className="col-span-full text-left py-12">
                     <div className="text-gray-500">Aucun module à afficher (currentModules vide)</div>
-                    <div className="text-sm text-gray-400 mt-2">Total modules: {filteredAndSortedModules.length}</div>
+                    <div className="text-sm text-gray-400 mt-2">Total modules: {filteredModules.length}</div>
                   </div>
                 ) : (
                   currentModules.map((module) => (
@@ -452,9 +441,9 @@ export default function Home() {
               )}
               
               {/* Informations de pagination */}
-              {filteredAndSortedModules.length > 0 && (
+              {filteredModules.length > 0 && (
                 <div className="text-left text-gray-600 text-sm mt-4">
-                  Affichage de {indexOfFirstModule + 1} à {Math.min(indexOfLastModule, filteredAndSortedModules.length)} sur {filteredAndSortedModules.length} templates
+                  Affichage de {indexOfFirstModule + 1} à {Math.min(indexOfLastModule, filteredModules.length)} sur {filteredModules.length} templates
                 </div>
               )}
           </div>
