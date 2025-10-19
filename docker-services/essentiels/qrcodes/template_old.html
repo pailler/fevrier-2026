@@ -1,0 +1,2828 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator - IAHome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .user-info {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+            gap: 5px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 2px solid #6c757d;
+            background: #ffffff;
+            color: #495057;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 5px 5px 0 0;
+            margin-right: 2px;
+            transition: all 0.3s ease;
+        }
+        .tab:hover {
+            background-color: #e9ecef;
+        }
+        .tab.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #0056b3;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .qr-code {
+            max-width: 300px;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .qr-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .qr-item {
+            border: 1px solid #eee;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+        }
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            color: #155724;
+            background-color: #d4edda;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            min-height: 80px;
+            resize: vertical;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            background-color: white;
+        }
+        small {
+            color: #666;
+            font-size: 12px;
+            display: block;
+            margin-top: 5px;
+        }
+        
+        /* Styles pour la personnalisation */
+        .customize-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .customize-left {
+            flex: 1;
+            max-width: 400px;
+        }
+        
+        .customize-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .accordion-section {
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .accordion-header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #333;
+            transition: background-color 0.3s;
+        }
+        
+        .accordion-header:hover {
+            background-color: #e9ecef;
+        }
+        
+        .accordion-icon {
+            font-size: 18px;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        
+        .accordion-content {
+            padding: 15px;
+            display: none;
+            background-color: white;
+        }
+        
+        .accordion-content.active {
+            display: block;
+        }
+        
+        .file-upload-hint {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin: 20px 0;
+        }
+        
+        .create-button {
+            background-color: #28a745;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        .create-button:hover {
+            background-color: #218838;
+        }
+        
+        .templates-button {
+            background-color: #6c757d;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        .templates-button:hover {
+            background-color: #5a6268;
+        }
+        
+        .qr-preview {
+            width: 300px;
+            height: 300px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .qr-preview-image {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .qr-preview-image img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+        }
+        
+        .quality-control {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .quality-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .quality-slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .quality-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+        }
+        
+        .quality-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .quality-label {
+            font-size: 12px;
+            color: #666;
+            white-space: nowrap;
+        }
+        
+        .quality-value {
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+            margin-top: 5px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        
+        .create-btn {
+            flex: 1;
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .create-btn:hover {
+            background-color: #218838;
+        }
+        
+        .download-btn {
+            flex: 1;
+            background-color: #17a2b8;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .download-btn:hover {
+            background-color: #138496;
+        }
+        
+        .format-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .format-btn {
+            background-color: #17a2b8;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .format-btn:hover {
+            background-color: #138496;
+        }
+        
+        .format-note {
+            text-align: center;
+            color: #666;
+            font-size: 11px;
+        }
+        
+        input[type="color"] {
+            width: 60px;
+            height: 40px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .tab-button.active {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        /* Workflow Styles */
+        .workflow-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .workflow-step {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .workflow-step h3 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+        
+        .style-options, .target-options, .type-options {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .style-option, .type-option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .style-option:hover, .type-option:hover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        
+        .style-option input[type="radio"], .type-option input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.2);
+        }
+        
+        .style-option label, .type-option label {
+            cursor: pointer;
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .target-category {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .target-category h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 8px;
+        }
+        
+        .target-option {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .target-option:last-child {
+            border-bottom: none;
+        }
+        
+        .target-option input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.1);
+        }
+        
+        .target-option label {
+            cursor: pointer;
+            color: #495057;
+        }
+        
+        .workflow-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .workflow-navigation button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .workflow-navigation .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .workflow-navigation .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        
+        .workflow-navigation .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .workflow-navigation .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        
+        .workflow-navigation .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .workflow-navigation .btn-success:hover {
+            background-color: #1e7e34;
+        }
+        
+        #content-config {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .content-form {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .content-form label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .content-form input, .content-form textarea, .content-form select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .content-form input:focus, .content-form textarea:focus, .content-form select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Progress indicator */
+        .workflow-progress {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .progress-step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 0 10px;
+            position: relative;
+        }
+        
+        .progress-step.active {
+            background: #007bff;
+            color: white;
+        }
+        
+        .progress-step.completed {
+            background: #28a745;
+            color: white;
+        }
+        
+        .progress-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 2px;
+            background: #e9ecef;
+        }
+        
+        .progress-step.completed:not(:last-child)::after {
+            background: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="user-info">
+            <h3>👤 Connecté via IAHome.fr</h3>
+            <p>Service QR Code Generator</p>
+        </div>
+        
+        <h1>🎯 QR Code Generator</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('static')">QR Code Statique</button>
+            <button class="tab" onclick="showTab('social')">Réseaux Sociaux</button>
+            <button class="tab" onclick="showTab('contact')">Contact</button>
+            <button class="tab" onclick="showTab('media')">Contenus Multimédia</button>
+            <button class="tab" onclick="showTab('interactive')">Actions Interactives</button>
+            <button class="tab" onclick="showTab('customize')">Personnalisation</button>
+            <button class="tab" onclick="showTab('dynamic')">QR Code Dynamique</button>
+            <button class="tab-button" onclick="showTab('workflow')">Workflow</button>
+            <button class="tab-button" onclick="showTab('manage')">Gérer les QR Codes</button>
+        </div>
+        
+        <!-- QR Code Statique -->
+        <div id="static" class="tab-content active">
+            <h2>Générer un QR Code Statique</h2>
+            <form id="staticForm">
+                <div class="form-group">
+                    <label for="staticText">Texte ou URL :</label>
+                    <input type="text" id="staticText" name="text" placeholder="https://example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="staticSize">Taille (px) :</label>
+                    <input type="number" id="staticSize" name="size" value="300" min="100" max="1000">
+                </div>
+                
+                <button type="submit">Générer QR Code Statique</button>
+            </form>
+            
+            <div id="staticResult" class="result" style="display: none;">
+                <h3>QR Code généré :</h3>
+                <div id="staticQrCode" class="qr-code"></div>
+                <button onclick="downloadQR('static')">Télécharger PNG</button>
+            </div>
+        </div>
+        
+        <!-- Réseaux Sociaux -->
+        <div id="social" class="tab-content">
+            <h2>QR Code pour Réseaux Sociaux</h2>
+            <form id="socialForm">
+                <div class="form-group">
+                    <label for="socialPlatform">Plateforme :</label>
+                    <select id="socialPlatform" name="platform" required>
+                        <option value="">Sélectionner une plateforme</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="linkedin">LinkedIn</option>
+                        <option value="tiktok">TikTok</option>
+                        <option value="facebook">Facebook</option>
+                        <option value="twitter">Twitter/X</option>
+                        <option value="youtube">YouTube</option>
+                        <option value="snapchat">Snapchat</option>
+                        <option value="whatsapp">WhatsApp</option>
+                        <option value="telegram">Telegram</option>
+                        <option value="discord">Discord</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="socialUsername">Nom d'utilisateur :</label>
+                    <input type="text" id="socialUsername" name="username" placeholder="@username ou nom d'utilisateur" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="socialSize">Taille (px) :</label>
+                    <input type="number" id="socialSize" name="size" value="300" min="100" max="1000">
+                </div>
+                
+                <button type="submit">Générer QR Code Réseau Social</button>
+            </form>
+            
+            <div id="socialResult" class="result" style="display: none;">
+                <h3>QR Code généré :</h3>
+                <div id="socialQrCode" class="qr-code"></div>
+                <button onclick="downloadQR('social')">Télécharger PNG</button>
+            </div>
+        </div>
+        
+        <!-- Contact -->
+        <div id="contact" class="tab-content">
+            <h2>QR Code pour Contact</h2>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="contactType">Type de contact :</label>
+                    <select id="contactType" name="type" required>
+                        <option value="">Sélectionner un type</option>
+                        <option value="email">Email</option>
+                        <option value="phone">Téléphone</option>
+                        <option value="sms">SMS</option>
+                        <option value="vcard">Carte de visite (vCard)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="emailGroup" style="display: none;">
+                    <label for="contactEmail">Adresse email :</label>
+                    <input type="email" id="contactEmail" name="email" placeholder="contact@example.com">
+                </div>
+                
+                <div class="form-group" id="phoneGroup" style="display: none;">
+                    <label for="contactPhone">Numéro de téléphone :</label>
+                    <input type="tel" id="contactPhone" name="phone" placeholder="+33123456789">
+                </div>
+                
+                <div class="form-group" id="smsGroup" style="display: none;">
+                    <label for="contactSmsPhone">Numéro de téléphone :</label>
+                    <input type="tel" id="contactSmsPhone" name="smsPhone" placeholder="+33123456789">
+                    <label for="contactSmsMessage">Message (optionnel) :</label>
+                    <textarea id="contactSmsMessage" name="smsMessage" placeholder="Bonjour, je vous contacte..."></textarea>
+                </div>
+                
+                <div class="form-group" id="vcardGroup" style="display: none;">
+                    <label for="vcardName">Nom complet :</label>
+                    <input type="text" id="vcardName" name="vcardName" placeholder="Prénom Nom">
+                    <label for="vcardPhone">Téléphone :</label>
+                    <input type="tel" id="vcardPhone" name="vcardPhone" placeholder="+33123456789">
+                    <label for="vcardEmail">Email :</label>
+                    <input type="email" id="vcardEmail" name="vcardEmail" placeholder="contact@example.com">
+                    <label for="vcardCompany">Entreprise (optionnel) :</label>
+                    <input type="text" id="vcardCompany" name="vcardCompany" placeholder="Nom de l'entreprise">
+                    <label for="vcardTitle">Poste (optionnel) :</label>
+                    <input type="text" id="vcardTitle" name="vcardTitle" placeholder="Titre du poste">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactSize">Taille (px) :</label>
+                    <input type="number" id="contactSize" name="size" value="300" min="100" max="1000">
+                </div>
+                
+                <button type="submit">Générer QR Code Contact</button>
+            </form>
+            
+            <div id="contactResult" class="result" style="display: none;">
+                <h3>QR Code généré :</h3>
+                <div id="contactQrCode" class="qr-code"></div>
+                <button onclick="downloadQR('contact')">Télécharger PNG</button>
+            </div>
+        </div>
+        
+        <!-- Contenus Multimédia -->
+        <div id="media" class="tab-content">
+            <h2>QR Code pour Contenus Multimédia</h2>
+            <form id="mediaForm">
+                <div class="form-group">
+                    <label for="mediaType">Type de contenu :</label>
+                    <select id="mediaType" name="type" required>
+                        <option value="">Sélectionner un type</option>
+                        <option value="youtube">Vidéo YouTube</option>
+                        <option value="vimeo">Vidéo Vimeo</option>
+                        <option value="mp4">Vidéo MP4 hébergée</option>
+                        <option value="spotify">Audio Spotify</option>
+                        <option value="anchor">Podcast Anchor</option>
+                        <option value="mp3">Audio MP3 direct</option>
+                        <option value="image">Image/Galerie</option>
+                        <option value="pdf">Document PDF</option>
+                        <option value="slides">Présentation Google Slides</option>
+                        <option value="brochure">Brochure/Fiche produit</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="youtubeGroup" style="display: none;">
+                    <label for="youtubeUrl">URL YouTube :</label>
+                    <input type="url" id="youtubeUrl" name="youtubeUrl" placeholder="https://www.youtube.com/watch?v=...">
+                    <small>Collez l'URL complète de la vidéo YouTube</small>
+                </div>
+                
+                <div class="form-group" id="vimeoGroup" style="display: none;">
+                    <label for="vimeoUrl">URL Vimeo :</label>
+                    <input type="url" id="vimeoUrl" name="vimeoUrl" placeholder="https://vimeo.com/...">
+                    <small>Collez l'URL complète de la vidéo Vimeo</small>
+                </div>
+                
+                <div class="form-group" id="mp4Group" style="display: none;">
+                    <label for="mp4Url">URL de la vidéo MP4 :</label>
+                    <input type="url" id="mp4Url" name="mp4Url" placeholder="https://example.com/video.mp4">
+                    <small>URL directe vers le fichier MP4</small>
+                </div>
+                
+                <div class="form-group" id="spotifyGroup" style="display: none;">
+                    <label for="spotifyUrl">URL Spotify :</label>
+                    <input type="url" id="spotifyUrl" name="spotifyUrl" placeholder="https://open.spotify.com/track/...">
+                    <small>URL d'une piste, album ou playlist Spotify</small>
+                </div>
+                
+                <div class="form-group" id="anchorGroup" style="display: none;">
+                    <label for="anchorUrl">URL Anchor/Podcast :</label>
+                    <input type="url" id="anchorUrl" name="anchorUrl" placeholder="https://anchor.fm/...">
+                    <small>URL du podcast sur Anchor ou autre plateforme</small>
+                </div>
+                
+                <div class="form-group" id="mp3Group" style="display: none;">
+                    <label for="mp3Url">URL de l'audio MP3 :</label>
+                    <input type="url" id="mp3Url" name="mp3Url" placeholder="https://example.com/audio.mp3">
+                    <small>URL directe vers le fichier MP3</small>
+                </div>
+                
+                <div class="form-group" id="imageGroup" style="display: none;">
+                    <label for="imageUrl">URL de l'image/galerie :</label>
+                    <input type="url" id="imageUrl" name="imageUrl" placeholder="https://example.com/image.jpg">
+                    <small>URL d'une image ou d'une galerie d'images</small>
+                </div>
+                
+                <div class="form-group" id="pdfGroup" style="display: none;">
+                    <label for="pdfUrl">URL du document PDF :</label>
+                    <input type="url" id="pdfUrl" name="pdfUrl" placeholder="https://example.com/document.pdf">
+                    <small>URL directe vers le fichier PDF</small>
+                </div>
+                
+                <div class="form-group" id="slidesGroup" style="display: none;">
+                    <label for="slidesUrl">URL Google Slides :</label>
+                    <input type="url" id="slidesUrl" name="slidesUrl" placeholder="https://docs.google.com/presentation/d/...">
+                    <small>URL de la présentation Google Slides</small>
+                </div>
+                
+                <div class="form-group" id="brochureGroup" style="display: none;">
+                    <label for="brochureUrl">URL de la brochure/fiche :</label>
+                    <input type="url" id="brochureUrl" name="brochureUrl" placeholder="https://example.com/brochure.pdf">
+                    <small>URL de la brochure, fiche produit ou document</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="mediaSize">Taille (px) :</label>
+                    <input type="number" id="mediaSize" name="size" value="300" min="100" max="1000">
+                </div>
+                
+                <button type="submit">Générer QR Code Multimédia</button>
+            </form>
+            
+            <div id="mediaResult" class="result" style="display: none;">
+                <h3>QR Code généré :</h3>
+                <div id="mediaQrCode" class="qr-code"></div>
+                <button onclick="downloadQR('media')">Télécharger PNG</button>
+            </div>
+        </div>
+        
+        <!-- Actions Interactives -->
+        <div id="interactive" class="tab-content">
+            <h2>QR Code pour Actions Interactives</h2>
+            <form id="interactiveForm">
+                <div class="form-group">
+                    <label for="interactiveType">Type d'action :</label>
+                    <select id="interactiveType" name="type" required>
+                        <option value="">Sélectionner un type</option>
+                        <option value="wifi">Connexion Wi-Fi</option>
+                        <option value="location">Géolocalisation</option>
+                        <option value="calendar">Événement Calendrier</option>
+                        <option value="paypal">Paiement PayPal</option>
+                        <option value="stripe">Paiement Stripe</option>
+                        <option value="crypto">Paiement Crypto</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="wifiGroup" style="display: none;">
+                    <label for="wifiSSID">Nom du réseau Wi-Fi (SSID) :</label>
+                    <input type="text" id="wifiSSID" name="wifiSSID" placeholder="MonWiFi">
+                    <label for="wifiPassword">Mot de passe :</label>
+                    <input type="password" id="wifiPassword" name="wifiPassword" placeholder="MotDePasse123">
+                    <label for="wifiEncryption">Type de chiffrement :</label>
+                    <select id="wifiEncryption" name="wifiEncryption">
+                        <option value="WPA">WPA/WPA2/WPA3</option>
+                        <option value="WEP">WEP</option>
+                        <option value="nopass">Aucun (réseau ouvert)</option>
+                    </select>
+                    <small>Le QR code permettra de se connecter automatiquement au réseau Wi-Fi</small>
+                </div>
+                
+                <div class="form-group" id="locationGroup" style="display: none;">
+                    <label for="locationLat">Latitude :</label>
+                    <input type="number" id="locationLat" name="locationLat" step="any" placeholder="48.8566">
+                    <label for="locationLng">Longitude :</label>
+                    <input type="number" id="locationLng" name="locationLng" step="any" placeholder="2.3522">
+                    <label for="locationName">Nom du lieu (optionnel) :</label>
+                    <input type="text" id="locationName" name="locationName" placeholder="Tour Eiffel">
+                    <small>Ouvre Google Maps avec les coordonnées spécifiées</small>
+                </div>
+                
+                <div class="form-group" id="calendarGroup" style="display: none;">
+                    <label for="eventTitle">Titre de l'événement :</label>
+                    <input type="text" id="eventTitle" name="eventTitle" placeholder="Réunion importante">
+                    <label for="eventDate">Date :</label>
+                    <input type="date" id="eventDate" name="eventDate">
+                    <label for="eventTime">Heure :</label>
+                    <input type="time" id="eventTime" name="eventTime">
+                    <label for="eventDuration">Durée (minutes) :</label>
+                    <input type="number" id="eventDuration" name="eventDuration" value="60" min="15" max="480">
+                    <label for="eventLocation">Lieu (optionnel) :</label>
+                    <input type="text" id="eventLocation" name="eventLocation" placeholder="Salle de réunion">
+                    <label for="eventDescription">Description (optionnel) :</label>
+                    <textarea id="eventDescription" name="eventDescription" placeholder="Description de l'événement..."></textarea>
+                    <small>Génère un fichier .ics pour ajout automatique dans Google Calendar ou Outlook</small>
+                </div>
+                
+                <div class="form-group" id="paypalGroup" style="display: none;">
+                    <label for="paypalEmail">Email PayPal :</label>
+                    <input type="email" id="paypalEmail" name="paypalEmail" placeholder="votre@email.com">
+                    <label for="paypalAmount">Montant (optionnel) :</label>
+                    <input type="number" id="paypalAmount" name="paypalAmount" step="0.01" placeholder="10.00">
+                    <label for="paypalCurrency">Devise :</label>
+                    <select id="paypalCurrency" name="paypalCurrency">
+                        <option value="EUR">EUR (Euro)</option>
+                        <option value="USD">USD (Dollar US)</option>
+                        <option value="GBP">GBP (Livre Sterling)</option>
+                    </select>
+                    <label for="paypalDescription">Description (optionnel) :</label>
+                    <input type="text" id="paypalDescription" name="paypalDescription" placeholder="Paiement pour services">
+                    <small>Redirige vers PayPal pour un paiement direct</small>
+                </div>
+                
+                <div class="form-group" id="stripeGroup" style="display: none;">
+                    <label for="stripeLink">Lien de paiement Stripe :</label>
+                    <input type="url" id="stripeLink" name="stripeLink" placeholder="https://checkout.stripe.com/...">
+                    <small>Collez le lien de paiement Stripe généré depuis votre dashboard</small>
+                </div>
+                
+                <div class="form-group" id="cryptoGroup" style="display: none;">
+                    <label for="cryptoType">Type de crypto-monnaie :</label>
+                    <select id="cryptoType" name="cryptoType">
+                        <option value="bitcoin">Bitcoin (BTC)</option>
+                        <option value="ethereum">Ethereum (ETH)</option>
+                        <option value="litecoin">Litecoin (LTC)</option>
+                        <option value="dogecoin">Dogecoin (DOGE)</option>
+                        <option value="cardano">Cardano (ADA)</option>
+                        <option value="polkadot">Polkadot (DOT)</option>
+                    </select>
+                    <label for="cryptoAddress">Adresse de portefeuille :</label>
+                    <input type="text" id="cryptoAddress" name="cryptoAddress" placeholder="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa">
+                    <label for="cryptoAmount">Montant (optionnel) :</label>
+                    <input type="number" id="cryptoAmount" name="cryptoAmount" step="0.00000001" placeholder="0.001">
+                    <label for="cryptoMessage">Message (optionnel) :</label>
+                    <input type="text" id="cryptoMessage" name="cryptoMessage" placeholder="Paiement pour services">
+                    <small>Génère un QR code pour transfert crypto direct</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="interactiveSize">Taille (px) :</label>
+                    <input type="number" id="interactiveSize" name="size" value="300" min="100" max="1000">
+                </div>
+                
+                <button type="submit">Générer QR Code Interactif</button>
+            </form>
+            
+            <div id="interactiveResult" class="result" style="display: none;">
+                <h3>QR Code généré :</h3>
+                <div id="interactiveQrCode" class="qr-code"></div>
+                <button onclick="downloadQR('interactive')">Télécharger PNG</button>
+            </div>
+        </div>
+        
+        <!-- Personnalisation -->
+        <div id="customize" class="tab-content">
+            <h2>Personnaliser votre QR Code</h2>
+            <div class="customize-container">
+                <div class="customize-left">
+                    <form id="customizeForm">
+                        <!-- Saisir le contenu -->
+                        <div class="accordion-section">
+                            <div class="accordion-header" onclick="toggleAccordion('content-section')">
+                                <span>📱 SAISISSEZ LE CONTENU</span>
+                                <span class="accordion-icon">+</span>
+                            </div>
+                            <div id="content-section" class="accordion-content">
+                                <div class="form-group">
+                                    <label for="customizeText">Texte ou URL :</label>
+                                    <input type="text" id="customizeText" name="text" placeholder="https://example.com" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="customizeSize">Taille (px) :</label>
+                                    <input type="number" id="customizeSize" name="size" value="1000" min="100" max="2000">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sélectionner les couleurs -->
+                        <div class="accordion-section">
+                            <div class="accordion-header" onclick="toggleAccordion('colors-section')">
+                                <span>🎨 SÉLECTIONNEZ LES COULEURS</span>
+                                <span class="accordion-icon">+</span>
+                            </div>
+                            <div id="colors-section" class="accordion-content">
+                                <div class="form-group">
+                                    <label for="foregroundColor">Couleur principale :</label>
+                                    <input type="color" id="foregroundColor" name="foregroundColor" value="#000000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="backgroundColor">Couleur d'arrière-plan :</label>
+                                    <input type="color" id="backgroundColor" name="backgroundColor" value="#FFFFFF">
+                                </div>
+                                <div class="form-group">
+                                    <label for="gradientType">Type de dégradé :</label>
+                                    <select id="gradientType" name="gradientType">
+                                        <option value="none">Aucun dégradé</option>
+                                        <option value="linear">Dégradé linéaire</option>
+                                        <option value="radial">Dégradé radial</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="gradientColorsGroup" style="display: none;">
+                                    <label for="gradientColor1">Couleur de dégradé 1 :</label>
+                                    <input type="color" id="gradientColor1" name="gradientColor1" value="#000000">
+                                    <label for="gradientColor2">Couleur de dégradé 2 :</label>
+                                    <input type="color" id="gradientColor2" name="gradientColor2" value="#0000FF">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ajouter un logo -->
+                        <div class="accordion-section">
+                            <div class="accordion-header" onclick="toggleAccordion('logo-section')">
+                                <span>🖼️ AJOUTEZ L'IMAGE D'UN LOGO</span>
+                                <span class="accordion-icon">+</span>
+                            </div>
+                            <div id="logo-section" class="accordion-content">
+                                <div class="form-group">
+                                    <label for="logoFile">Sélectionner une image :</label>
+                                    <input type="file" id="logoFile" name="logoFile" accept="image/*">
+                                    <small>Formats acceptés : PNG, JPG, JPEG, SVG (max 2MB)</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="logoSize">Taille du logo (%) :</label>
+                                    <input type="range" id="logoSize" name="logoSize" min="5" max="30" value="15">
+                                    <span id="logoSizeValue">15%</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="logoPosition">Position du logo :</label>
+                                    <select id="logoPosition" name="logoPosition">
+                                        <option value="center">Centre</option>
+                                        <option value="top-left">Haut-gauche</option>
+                                        <option value="top-right">Haut-droite</option>
+                                        <option value="bottom-left">Bas-gauche</option>
+                                        <option value="bottom-right">Bas-droite</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Personnaliser le style -->
+                        <div class="accordion-section">
+                            <div class="accordion-header" onclick="toggleAccordion('style-section')">
+                                <span>🔲 PERSONNALISEZ LE STYLE</span>
+                                <span class="accordion-icon">+</span>
+                            </div>
+                            <div id="style-section" class="accordion-content">
+                                <div class="form-group">
+                                    <label for="qrStyle">Style des modules :</label>
+                                    <select id="qrStyle" name="qrStyle">
+                                        <option value="square">Carrés</option>
+                                        <option value="rounded">Arrondis</option>
+                                        <option value="dots">Points</option>
+                                        <option value="hexagon">Hexagones</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cornerStyle">Style des coins :</label>
+                                    <select id="cornerStyle" name="cornerStyle">
+                                        <option value="square">Carrés</option>
+                                        <option value="rounded">Arrondis</option>
+                                        <option value="dots">Points</option>
+                                        <option value="extra-rounded">Très arrondis</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eyeStyle">Style des yeux :</label>
+                                    <select id="eyeStyle" name="eyeStyle">
+                                        <option value="square">Carrés</option>
+                                        <option value="rounded">Arrondis</option>
+                                        <option value="dots">Points</option>
+                                        <option value="circle">Cercles</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="margin">Marge :</label>
+                                    <input type="range" id="margin" name="margin" min="0" max="10" value="4">
+                                    <span id="marginValue">4</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <p class="file-upload-hint">Importez un fichier MP3, PDF ou autre pour votre code QR.</p>
+                        </div>
+
+                        <button type="submit" class="create-button">Créer mon code</button>
+                        <button type="button" class="templates-button" onclick="showTemplates()">📋 Modèles de codes QR</button>
+                    </form>
+                </div>
+
+                <div class="customize-right">
+                    <div class="qr-preview">
+                        <div id="qrPreview" class="qr-preview-image">
+                            <p>Votre QR code apparaîtra ici</p>
+                        </div>
+                    </div>
+                    
+                    <div class="quality-control">
+                        <label for="qualitySlider">Qualité :</label>
+                        <div class="quality-slider-container">
+                            <span class="quality-label">Faible qualité</span>
+                            <input type="range" id="qualitySlider" min="100" max="2000" value="1000" class="quality-slider">
+                            <span class="quality-label">Haute qualité</span>
+                        </div>
+                        <div class="quality-value">
+                            <span id="qualityValue">1000 x 1000 Px</span>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="button" class="create-btn" onclick="generateCustomQR()">Créer mon code</button>
+                        <button type="button" class="download-btn" onclick="downloadCustomQR('png')">Fichier PNG</button>
+                    </div>
+
+                    <div class="format-buttons">
+                        <button type="button" class="format-btn" onclick="downloadCustomQR('svg')">.SVG</button>
+                        <button type="button" class="format-btn" onclick="downloadCustomQR('pdf')">.PDF*</button>
+                        <button type="button" class="format-btn" onclick="downloadCustomQR('eps')">.EPS*</button>
+                    </div>
+
+                    <div class="format-note">
+                        <small>* dégradés de couleurs non pris en charge</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- QR Code Dynamique -->
+        <div id="dynamic" class="tab-content">
+            <h2>Créer un QR Code Dynamique</h2>
+            <form id="dynamicForm">
+                <div class="form-group">
+                    <label for="dynamicUrl">URL de destination :</label>
+                    <input type="url" id="dynamicUrl" name="url" placeholder="https://example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dynamicName">Nom du QR Code (optionnel) :</label>
+                    <input type="text" id="dynamicName" name="name" placeholder="Mon QR Code">
+                </div>
+                
+                <button type="submit">Créer QR Code Dynamique</button>
+            </form>
+            
+            <div id="dynamicResult" class="result" style="display: none;">
+                <h3>QR Code Dynamique créé :</h3>
+                <div id="dynamicQrCode" class="qr-code"></div>
+                <p><strong>URL du QR Code :</strong> <span id="dynamicQrUrl"></span></p>
+                <p><strong>ID unique :</strong> <span id="dynamicQrId"></span></p>
+                <button onclick="downloadQR('dynamic')">Télécharger PNG</button>
+            </div>
+        </div>
+        
+        <!-- Gérer les QR Codes -->
+        <div id="manage" class="tab-content">
+            <h2>Gérer les QR Codes Dynamiques</h2>
+            <button onclick="loadDynamicQRCodes()">Actualiser la liste</button>
+            <div id="qrList" class="qr-list"></div>
+        </div>
+        
+        <!-- Workflow Tab -->
+        <div id="workflow" class="tab-content" style="display: none;">
+            <h2>Workflow de Création de QR Code</h2>
+            <div class="workflow-container">
+                <!-- Step 1: Style Selection -->
+                <div class="workflow-step" id="step1">
+                    <h3>Étape 1: Choisir le style du QR Code</h3>
+                    <div class="style-options">
+                        <div class="style-option">
+                            <input type="radio" name="qrStyle" value="square" id="style-square" checked>
+                            <label for="style-square">Carré classique</label>
+                        </div>
+                        <div class="style-option">
+                            <input type="radio" name="qrStyle" value="rounded" id="style-rounded">
+                            <label for="style-rounded">Carrés arrondis</label>
+                        </div>
+                        <div class="style-option">
+                            <input type="radio" name="qrStyle" value="dots" id="style-dots">
+                            <label for="style-dots">Points</label>
+                        </div>
+                        <div class="style-option">
+                            <input type="radio" name="qrStyle" value="artistic" id="style-artistic">
+                            <label for="style-artistic">Artistique</label>
+                        </div>
+                    </div>
+                    <div class="workflow-navigation">
+                        <button onclick="nextStep(2)" class="btn btn-primary">Suivant</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Target Selection -->
+                <div class="workflow-step" id="step2" style="display: none;">
+                    <h3>Étape 2: Choisir la cible du QR Code</h3>
+                    <div class="target-options">
+                        <div class="target-category">
+                            <h4>Web & Réseaux sociaux</h4>
+                            <div class="target-option">
+                                <input type="radio" name="qrTarget" value="web" id="target-web" checked>
+                                <label for="target-web">Site web / URL</label>
+                            </div>
+                            <div class="target-option">
+                                <input type="radio" name="qrTarget" value="youtube" id="target-youtube">
+                                <label for="target-youtube">YouTube</label>
+                            </div>
+                            <div class="target-option">
+                                <input type="radio" name="qrTarget" value="facebook" id="target-facebook">
+                                <label for="target-facebook">Facebook</label>
+                            </div>
+                            <div class="target-option">
+                                <input type="radio" name="qrTarget" value="instagram" id="target-instagram">
+                                <label for="target-instagram">Instagram</label>
+                            </div>
+                            <div class="target-option">
+                                <input type="radio" name="qrTarget" value="linkedin" id="target-linkedin">
+                                <label for="target-linkedin">LinkedIn</label>
+                            </div>
+                        </div>
+                        
+                        <div class="target-category">
+                            <h4>Communication</h4>
+                            <div class="target-option">
+                                <input type="radio" name="qrTarget" value="email" id="target-email">
+                                <label for="target-email">Email</label>
+                            </div>
+                            <div class="target-option">
+                                <input type="radio" name="qrTarget" value="sms" id="target-sms">
+                                <label for="target-sms">SMS</label>
+                            </div>
+                            <div class="target-option">
+                                <input type="radio" name="qrTarget" value="phone" id="target-phone">
+                                <label for="target-phone">Téléphone</label>
+                            </div>
+                        </div>
+
+                        <div class="target-category">
+                            <h4>Multimédia</h4>
+                            <div class="target-option">
+                                <input type="radio" name="qrTarget" value="video" id="target-video">
+                                <label for="target-video">Vidéo (MP4, Vimeo)</label>
+                            </div>
+                            <div class="target-option">
+                                <input type="radio" name="qrTarget" value="audio" id="target-audio">
+                                <label for="target-audio">Audio / Podcast</label>
+                            </div>
+                            <div class="target-option">
+                                <input type="radio" name="qrTarget" value="pdf" id="target-pdf">
+                                <label for="target-pdf">PDF / Document</label>
+                            </div>
+                        </div>
+
+                        <div class="target-category">
+                            <h4>Actions interactives</h4>
+                            <div class="target-option">
+                                <input type="radio" name="qrTarget" value="wifi" id="target-wifi">
+                                <label for="target-wifi">Connexion Wi-Fi</label>
+                            </div>
+                            <div class="target-option">
+                                <input type="radio" name="qrTarget" value="geo" id="target-geo">
+                                <label for="target-geo">Géolocalisation</label>
+                            </div>
+                            <div class="target-option">
+                                <input type="radio" name="qrTarget" value="calendar" id="target-calendar">
+                                <label for="target-calendar">Événement calendrier</label>
+                            </div>
+                            <div class="target-option">
+                                <input type="radio" name="qrTarget" value="payment" id="target-payment">
+                                <label for="target-payment">Paiement</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="workflow-navigation">
+                        <button onclick="prevStep(1)" class="btn btn-secondary">Précédent</button>
+                        <button onclick="nextStep(3)" class="btn btn-primary">Suivant</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Type Selection -->
+                <div class="workflow-step" id="step3" style="display: none;">
+                    <h3>Étape 3: Choisir le type de QR Code</h3>
+                    <div class="type-options">
+                        <div class="type-option">
+                            <input type="radio" name="qrType" value="static" id="type-static" checked>
+                            <label for="type-static">
+                                <strong>QR Code Statique</strong><br>
+                                <small>Le contenu ne peut pas être modifié après création. Plus rapide à scanner.</small>
+                            </label>
+                        </div>
+                        <div class="type-option">
+                            <input type="radio" name="qrType" value="dynamic" id="type-dynamic">
+                            <label for="type-dynamic">
+                                <strong>QR Code Dynamique</strong><br>
+                                <small>Le contenu peut être modifié après création. Stocké en base de données.</small>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="workflow-navigation">
+                        <button onclick="prevStep(2)" class="btn btn-secondary">Précédent</button>
+                        <button onclick="nextStep(4)" class="btn btn-primary">Suivant</button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Content Configuration -->
+                <div class="workflow-step" id="step4" style="display: none;">
+                    <h3>Étape 4: Configurer le contenu</h3>
+                    <div id="content-config">
+                        <!-- Dynamic content based on target selection -->
+                    </div>
+                    <div class="workflow-navigation">
+                        <button onclick="prevStep(3)" class="btn btn-secondary">Précédent</button>
+                        <button onclick="generateWorkflowQR()" class="btn btn-success">Créer le QR Code</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStaticQR = null;
+        let currentDynamicQR = null;
+        let currentSocialQR = null;
+        let currentContactQR = null;
+        let currentMediaQR = null;
+        let currentInteractiveQR = null;
+        let currentCustomQR = null;
+        
+        // Charger les QR codes au démarrage
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDynamicQRCodes();
+            
+            // Gestionnaire pour le formulaire de contact
+            document.getElementById('contactType').addEventListener('change', function() {
+                const type = this.value;
+                const emailGroup = document.getElementById('emailGroup');
+                const phoneGroup = document.getElementById('phoneGroup');
+                const smsGroup = document.getElementById('smsGroup');
+                const vcardGroup = document.getElementById('vcardGroup');
+                
+                // Masquer tous les groupes
+                emailGroup.style.display = 'none';
+                phoneGroup.style.display = 'none';
+                smsGroup.style.display = 'none';
+                vcardGroup.style.display = 'none';
+                
+                // Afficher le groupe approprié
+                switch(type) {
+                    case 'email':
+                        emailGroup.style.display = 'block';
+                        break;
+                    case 'phone':
+                        phoneGroup.style.display = 'block';
+                        break;
+                    case 'sms':
+                        smsGroup.style.display = 'block';
+                        break;
+                    case 'vcard':
+                        vcardGroup.style.display = 'block';
+                        break;
+                }
+            });
+            
+            // Gestionnaire pour le formulaire multimédia
+            document.getElementById('mediaType').addEventListener('change', function() {
+                const type = this.value;
+                const groups = ['youtubeGroup', 'vimeoGroup', 'mp4Group', 'spotifyGroup', 'anchorGroup', 'mp3Group', 'imageGroup', 'pdfGroup', 'slidesGroup', 'brochureGroup'];
+                
+                // Masquer tous les groupes
+                groups.forEach(groupId => {
+                    document.getElementById(groupId).style.display = 'none';
+                });
+                
+                // Afficher le groupe approprié
+                switch(type) {
+                    case 'youtube':
+                        document.getElementById('youtubeGroup').style.display = 'block';
+                        break;
+                    case 'vimeo':
+                        document.getElementById('vimeoGroup').style.display = 'block';
+                        break;
+                    case 'mp4':
+                        document.getElementById('mp4Group').style.display = 'block';
+                        break;
+                    case 'spotify':
+                        document.getElementById('spotifyGroup').style.display = 'block';
+                        break;
+                    case 'anchor':
+                        document.getElementById('anchorGroup').style.display = 'block';
+                        break;
+                    case 'mp3':
+                        document.getElementById('mp3Group').style.display = 'block';
+                        break;
+                    case 'image':
+                        document.getElementById('imageGroup').style.display = 'block';
+                        break;
+                    case 'pdf':
+                        document.getElementById('pdfGroup').style.display = 'block';
+                        break;
+                    case 'slides':
+                        document.getElementById('slidesGroup').style.display = 'block';
+                        break;
+                    case 'brochure':
+                        document.getElementById('brochureGroup').style.display = 'block';
+                        break;
+                }
+            });
+            
+            // Gestionnaire pour le formulaire interactif
+            document.getElementById('interactiveType').addEventListener('change', function() {
+                const type = this.value;
+                const groups = ['wifiGroup', 'locationGroup', 'calendarGroup', 'paypalGroup', 'stripeGroup', 'cryptoGroup'];
+                
+                // Masquer tous les groupes
+                groups.forEach(groupId => {
+                    document.getElementById(groupId).style.display = 'none';
+                });
+                
+                // Afficher le groupe approprié
+                switch(type) {
+                    case 'wifi':
+                        document.getElementById('wifiGroup').style.display = 'block';
+                        break;
+                    case 'location':
+                        document.getElementById('locationGroup').style.display = 'block';
+                        break;
+                    case 'calendar':
+                        document.getElementById('calendarGroup').style.display = 'block';
+                        break;
+                    case 'paypal':
+                        document.getElementById('paypalGroup').style.display = 'block';
+                        break;
+                    case 'stripe':
+                        document.getElementById('stripeGroup').style.display = 'block';
+                        break;
+                    case 'crypto':
+                        document.getElementById('cryptoGroup').style.display = 'block';
+                        break;
+                }
+            });
+            
+            // Initialiser les accordéons de personnalisation
+            initializeCustomization();
+        });
+        
+        // Fonctions pour la personnalisation
+        function initializeCustomization() {
+            // Ouvrir le premier accordéon par défaut
+            toggleAccordion('content-section');
+            
+            // Gestionnaires pour les sliders
+            document.getElementById('logoSize').addEventListener('input', function() {
+                document.getElementById('logoSizeValue').textContent = this.value + '%';
+            });
+            
+            document.getElementById('margin').addEventListener('input', function() {
+                document.getElementById('marginValue').textContent = this.value;
+            });
+            
+            document.getElementById('qualitySlider').addEventListener('input', function() {
+                const value = this.value;
+                document.getElementById('qualityValue').textContent = value + ' x ' + value + ' Px';
+                document.getElementById('customizeSize').value = value;
+            });
+            
+            // Gestionnaire pour le type de dégradé
+            document.getElementById('gradientType').addEventListener('change', function() {
+                const gradientGroup = document.getElementById('gradientColorsGroup');
+                if (this.value === 'none') {
+                    gradientGroup.style.display = 'none';
+                } else {
+                    gradientGroup.style.display = 'block';
+                }
+            });
+            
+            // Gestionnaire pour le formulaire de personnalisation
+            document.getElementById('customizeForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                generateCustomQR();
+            });
+        }
+        
+        function toggleAccordion(sectionId) {
+            const content = document.getElementById(sectionId);
+            const header = content.previousElementSibling;
+            const icon = header.querySelector('.accordion-icon');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                icon.textContent = '+';
+            } else {
+                content.classList.add('active');
+                icon.textContent = '-';
+            }
+        }
+        
+        function generateCustomQR() {
+            const formData = new FormData(document.getElementById('customizeForm'));
+            const text = formData.get('text');
+            
+            if (!text) {
+                alert('Veuillez saisir un texte ou une URL');
+                return;
+            }
+            
+            // Construire les paramètres de personnalisation
+            const params = {
+                text: text,
+                size: parseInt(formData.get('size') || '1000'),
+                foreground_color: formData.get('foregroundColor') || '#000000',
+                background_color: formData.get('backgroundColor') || '#FFFFFF',
+                gradient_type: formData.get('gradientType') || 'none',
+                gradient_color1: formData.get('gradientColor1') || '#000000',
+                gradient_color2: formData.get('gradientColor2') || '#0000FF',
+                qr_style: formData.get('qrStyle') || 'square',
+                corner_style: formData.get('cornerStyle') || 'square',
+                eye_style: formData.get('eyeStyle') || 'square',
+                margin: parseInt(formData.get('margin') || '4'),
+                logo_size: parseInt(formData.get('logoSize') || '15'),
+                logo_position: formData.get('logoPosition') || 'center'
+            };
+            
+            // Gérer le logo si sélectionné
+            const logoFile = formData.get('logoFile');
+            if (logoFile && logoFile.size > 0) {
+                // Convertir le fichier en base64
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Logo = e.target.result.split(',')[1];
+                    params.logo = base64Logo;
+                    
+                    // Appeler l'API avec le logo
+                    callCustomQRAPI(params);
+                };
+                reader.readAsDataURL(logoFile);
+            } else {
+                // Appeler l'API sans logo
+                callCustomQRAPI(params);
+            }
+        }
+        
+        function callCustomQRAPI(params) {
+            const apiUrl = '/api/qr/custom';
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(params)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        currentCustomQR = data.qr_code;
+                        document.getElementById('qrPreview').innerHTML = 
+                            '<img src="data:image/png;base64,' + data.qr_code + '" alt="QR Code personnalisé" style="max-width: 100%; max-height: 100%; border-radius: 8px;">';
+                    } else {
+                        alert('Erreur: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors de la génération du QR code personnalisé');
+                });
+        }
+        
+        function downloadCustomQR(format) {
+            if (!currentCustomQR) {
+                alert('Veuillez d\'abord générer un QR code');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.href = 'data:image/png;base64,' + currentCustomQR;
+            
+            switch(format) {
+                case 'png':
+                    link.download = 'qrcode-personnalise-' + Date.now() + '.png';
+                    break;
+                case 'svg':
+                    link.download = 'qrcode-personnalise-' + Date.now() + '.svg';
+                    // Note: Pour SVG, il faudrait une API séparée
+                    break;
+                case 'pdf':
+                    link.download = 'qrcode-personnalise-' + Date.now() + '.pdf';
+                    // Note: Pour PDF, il faudrait une API séparée
+                    break;
+                case 'eps':
+                    link.download = 'qrcode-personnalise-' + Date.now() + '.eps';
+                    // Note: Pour EPS, il faudrait une API séparée
+                    break;
+            }
+            
+            link.click();
+        }
+        
+        function showTemplates() {
+            alert('Fonctionnalité des modèles à venir !');
+        }
+        
+        function showTab(tabName) {
+            // Masquer tous les contenus
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Afficher le contenu sélectionné
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activer le bouton correspondant
+            const activeButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
+        }
+        
+        // QR Code Statique
+        document.getElementById('staticForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const params = new URLSearchParams();
+            
+            for (let [key, value] of formData.entries()) {
+                params.append(key, value);
+            }
+            
+            const url = '/api/qr?' + params.toString();
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        currentStaticQR = data.qr_code;
+                        document.getElementById('staticQrCode').innerHTML = 
+                            '<img src="data:image/png;base64,' + data.qr_code + '" alt="QR Code" style="max-width: 100%;">';
+                        document.getElementById('staticResult').style.display = 'block';
+                    } else {
+                        alert('Erreur: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors de la génération du QR code');
+                });
+        });
+        
+        // QR Code Dynamique
+        document.getElementById('dynamicForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            // Récupérer le token d'authentification depuis l'URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const authToken = urlParams.get('auth_token');
+            
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            
+            // Ajouter le token d'authentification si disponible
+            if (authToken) {
+                headers['Authorization'] = 'Bearer ' + authToken;
+            }
+            
+            fetch('/api/dynamic/qr', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentDynamicQR = data.qr_code;
+                    document.getElementById('dynamicQrCode').innerHTML = 
+                        '<img src="data:image/png;base64,' + data.qr_code + '" alt="QR Code" style="max-width: 100%;">';
+                    document.getElementById('dynamicQrUrl').textContent = data.qr_url;
+                    document.getElementById('dynamicQrId').textContent = data.qr_id;
+                    document.getElementById('dynamicResult').style.display = 'block';
+                } else {
+                    alert('Erreur: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la création du QR code dynamique');
+            });
+        });
+        
+        // Réseaux Sociaux
+        document.getElementById('socialForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const platform = formData.get('platform');
+            const username = formData.get('username');
+            const size = formData.get('size');
+            
+            if (!platform || !username) {
+                alert('Veuillez remplir tous les champs requis');
+                return;
+            }
+            
+            // Générer l'URL selon la plateforme
+            let url = '';
+            switch(platform) {
+                case 'instagram':
+                    url = 'https://www.instagram.com/' + username.replace('@', '');
+                    break;
+                case 'linkedin':
+                    url = 'https://www.linkedin.com/in/' + username.replace('@', '');
+                    break;
+                case 'tiktok':
+                    url = 'https://www.tiktok.com/@' + username.replace('@', '');
+                    break;
+                case 'facebook':
+                    url = 'https://www.facebook.com/' + username.replace('@', '');
+                    break;
+                case 'twitter':
+                    url = 'https://twitter.com/' + username.replace('@', '');
+                    break;
+                case 'youtube':
+                    url = 'https://www.youtube.com/@' + username.replace('@', '');
+                    break;
+                case 'snapchat':
+                    url = 'https://www.snapchat.com/add/' + username.replace('@', '');
+                    break;
+                case 'whatsapp':
+                    url = 'https://wa.me/' + username.replace(/[^\d]/g, '');
+                    break;
+                case 'telegram':
+                    url = 'https://t.me/' + username.replace('@', '');
+                    break;
+                case 'discord':
+                    url = 'https://discord.gg/' + username.replace('@', '');
+                    break;
+            }
+            
+            const params = new URLSearchParams();
+            params.append('text', url);
+            params.append('size', size);
+            
+            const apiUrl = '/api/qr?' + params.toString();
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        currentSocialQR = data.qr_code;
+                        document.getElementById('socialQrCode').innerHTML = 
+                            '<img src="data:image/png;base64,' + data.qr_code + '" alt="QR Code" style="max-width: 100%;">';
+                        document.getElementById('socialResult').style.display = 'block';
+                    } else {
+                        alert('Erreur: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors de la génération du QR code');
+                });
+        });
+        
+        // Contact
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const type = formData.get('type');
+            const size = formData.get('size');
+            
+            if (!type) {
+                alert('Veuillez sélectionner un type de contact');
+                return;
+            }
+            
+            let url = '';
+            switch(type) {
+                case 'email':
+                    const email = formData.get('email');
+                    if (!email) {
+                        alert('Veuillez saisir une adresse email');
+                        return;
+                    }
+                    url = 'mailto:' + email;
+                    break;
+                    
+                case 'phone':
+                    const phone = formData.get('phone');
+                    if (!phone) {
+                        alert('Veuillez saisir un numéro de téléphone');
+                        return;
+                    }
+                    url = 'tel:' + phone;
+                    break;
+                    
+                case 'sms':
+                    const smsPhone = formData.get('smsPhone');
+                    const smsMessage = formData.get('smsMessage');
+                    if (!smsPhone) {
+                        alert('Veuillez saisir un numéro de téléphone');
+                        return;
+                    }
+                    url = 'sms:' + smsPhone;
+                    if (smsMessage) {
+                        url += '?body=' + encodeURIComponent(smsMessage);
+                    }
+                    break;
+                    
+                case 'vcard':
+                    const vcardName = formData.get('vcardName');
+                    const vcardPhone = formData.get('vcardPhone');
+                    const vcardEmail = formData.get('vcardEmail');
+                    const vcardCompany = formData.get('vcardCompany');
+                    const vcardTitle = formData.get('vcardTitle');
+                    
+                    if (!vcardName || !vcardPhone || !vcardEmail) {
+                        alert('Veuillez remplir au minimum le nom, téléphone et email');
+                        return;
+                    }
+                    
+                    // Générer une vCard
+                    let vcard = 'BEGIN:VCARD\nVERSION:3.0\n';
+                    vcard += 'FN:' + vcardName + '\n';
+                    vcard += 'TEL:' + vcardPhone + '\n';
+                    vcard += 'EMAIL:' + vcardEmail + '\n';
+                    if (vcardCompany) vcard += 'ORG:' + vcardCompany + '\n';
+                    if (vcardTitle) vcard += 'TITLE:' + vcardTitle + '\n';
+                    vcard += 'END:VCARD';
+                    
+                    url = vcard;
+                    break;
+            }
+            
+            const params = new URLSearchParams();
+            params.append('text', url);
+            params.append('size', size);
+            
+            const apiUrl = '/api/qr?' + params.toString();
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        currentContactQR = data.qr_code;
+                        document.getElementById('contactQrCode').innerHTML = 
+                            '<img src="data:image/png;base64,' + data.qr_code + '" alt="QR Code" style="max-width: 100%;">';
+                        document.getElementById('contactResult').style.display = 'block';
+                    } else {
+                        alert('Erreur: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors de la génération du QR code');
+                });
+        });
+        
+        // Contenus Multimédia
+        document.getElementById('mediaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const type = formData.get('type');
+            const size = formData.get('size');
+            
+            if (!type) {
+                alert('Veuillez sélectionner un type de contenu');
+                return;
+            }
+            
+            let url = '';
+            switch(type) {
+                case 'youtube':
+                    const youtubeUrl = formData.get('youtubeUrl');
+                    if (!youtubeUrl) {
+                        alert('Veuillez saisir l\'URL YouTube');
+                        return;
+                    }
+                    url = youtubeUrl;
+                    break;
+                    
+                case 'vimeo':
+                    const vimeoUrl = formData.get('vimeoUrl');
+                    if (!vimeoUrl) {
+                        alert('Veuillez saisir l\'URL Vimeo');
+                        return;
+                    }
+                    url = vimeoUrl;
+                    break;
+                    
+                case 'mp4':
+                    const mp4Url = formData.get('mp4Url');
+                    if (!mp4Url) {
+                        alert('Veuillez saisir l\'URL de la vidéo MP4');
+                        return;
+                    }
+                    url = mp4Url;
+                    break;
+                    
+                case 'spotify':
+                    const spotifyUrl = formData.get('spotifyUrl');
+                    if (!spotifyUrl) {
+                        alert('Veuillez saisir l\'URL Spotify');
+                        return;
+                    }
+                    url = spotifyUrl;
+                    break;
+                    
+                case 'anchor':
+                    const anchorUrl = formData.get('anchorUrl');
+                    if (!anchorUrl) {
+                        alert('Veuillez saisir l\'URL du podcast');
+                        return;
+                    }
+                    url = anchorUrl;
+                    break;
+                    
+                case 'mp3':
+                    const mp3Url = formData.get('mp3Url');
+                    if (!mp3Url) {
+                        alert('Veuillez saisir l\'URL de l\'audio MP3');
+                        return;
+                    }
+                    url = mp3Url;
+                    break;
+                    
+                case 'image':
+                    const imageUrl = formData.get('imageUrl');
+                    if (!imageUrl) {
+                        alert('Veuillez saisir l\'URL de l\'image');
+                        return;
+                    }
+                    url = imageUrl;
+                    break;
+                    
+                case 'pdf':
+                    const pdfUrl = formData.get('pdfUrl');
+                    if (!pdfUrl) {
+                        alert('Veuillez saisir l\'URL du document PDF');
+                        return;
+                    }
+                    url = pdfUrl;
+                    break;
+                    
+                case 'slides':
+                    const slidesUrl = formData.get('slidesUrl');
+                    if (!slidesUrl) {
+                        alert('Veuillez saisir l\'URL Google Slides');
+                        return;
+                    }
+                    url = slidesUrl;
+                    break;
+                    
+                case 'brochure':
+                    const brochureUrl = formData.get('brochureUrl');
+                    if (!brochureUrl) {
+                        alert('Veuillez saisir l\'URL de la brochure');
+                        return;
+                    }
+                    url = brochureUrl;
+                    break;
+            }
+            
+            const params = new URLSearchParams();
+            params.append('text', url);
+            params.append('size', size);
+            
+            const apiUrl = '/api/qr?' + params.toString();
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        currentMediaQR = data.qr_code;
+                        document.getElementById('mediaQrCode').innerHTML = 
+                            '<img src="data:image/png;base64,' + data.qr_code + '" alt="QR Code" style="max-width: 100%;">';
+                        document.getElementById('mediaResult').style.display = 'block';
+                    } else {
+                        alert('Erreur: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors de la génération du QR code');
+                });
+        });
+        
+        // Actions Interactives
+        document.getElementById('interactiveForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const type = formData.get('type');
+            const size = formData.get('size');
+            
+            if (!type) {
+                alert('Veuillez sélectionner un type d\'action');
+                return;
+            }
+            
+            let url = '';
+            switch(type) {
+                case 'wifi':
+                    const ssid = formData.get('wifiSSID');
+                    const password = formData.get('wifiPassword');
+                    const encryption = formData.get('wifiEncryption');
+                    
+                    if (!ssid) {
+                        alert('Veuillez saisir le nom du réseau Wi-Fi');
+                        return;
+                    }
+                    
+                    // Format Wi-Fi QR Code
+                    url = `WIFI:T:${encryption};S:${ssid};`;
+                    if (password) {
+                        url += `P:${password};`;
+                    }
+                    url += ';';
+                    break;
+                    
+                case 'location':
+                    const lat = formData.get('locationLat');
+                    const lng = formData.get('locationLng');
+                    const locationName = formData.get('locationName');
+                    
+                    if (!lat || !lng) {
+                        alert('Veuillez saisir la latitude et longitude');
+                        return;
+                    }
+                    
+                    // Format géolocalisation
+                    url = `geo:${lat},${lng}`;
+                    if (locationName) {
+                        url += `?q=${encodeURIComponent(locationName)}`;
+                    }
+                    break;
+                    
+                case 'calendar':
+                    const eventTitle = formData.get('eventTitle');
+                    const eventDate = formData.get('eventDate');
+                    const eventTime = formData.get('eventTime');
+                    const eventDuration = formData.get('eventDuration');
+                    const eventLocation = formData.get('eventLocation');
+                    const eventDescription = formData.get('eventDescription');
+                    
+                    if (!eventTitle || !eventDate || !eventTime) {
+                        alert('Veuillez remplir le titre, la date et l\'heure de l\'événement');
+                        return;
+                    }
+                    
+                    // Générer un fichier .ics
+                    const startDate = new Date(`${eventDate}T${eventTime}`);
+                    const endDate = new Date(startDate.getTime() + (parseInt(eventDuration) * 60000));
+                    
+                    let ics = 'BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\n';
+                    ics += `SUMMARY:${eventTitle}\n`;
+                    ics += `DTSTART:${startDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z\n`;
+                    ics += `DTEND:${endDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z\n`;
+                    if (eventLocation) ics += `LOCATION:${eventLocation}\n`;
+                    if (eventDescription) ics += `DESCRIPTION:${eventDescription}\n`;
+                    ics += 'END:VEVENT\nEND:VCALENDAR';
+                    
+                    url = ics;
+                    break;
+                    
+                case 'paypal':
+                    const paypalEmail = formData.get('paypalEmail');
+                    const paypalAmount = formData.get('paypalAmount');
+                    const paypalCurrency = formData.get('paypalCurrency');
+                    const paypalDescription = formData.get('paypalDescription');
+                    
+                    if (!paypalEmail) {
+                        alert('Veuillez saisir l\'email PayPal');
+                        return;
+                    }
+                    
+                    // Format PayPal
+                    url = `https://www.paypal.com/paypalme/${paypalEmail}`;
+                    if (paypalAmount) {
+                        url += `/${paypalAmount}${paypalCurrency}`;
+                    }
+                    if (paypalDescription) {
+                        url += `?description=${encodeURIComponent(paypalDescription)}`;
+                    }
+                    break;
+                    
+                case 'stripe':
+                    const stripeLink = formData.get('stripeLink');
+                    
+                    if (!stripeLink) {
+                        alert('Veuillez saisir le lien de paiement Stripe');
+                        return;
+                    }
+                    
+                    url = stripeLink;
+                    break;
+                    
+                case 'crypto':
+                    const cryptoType = formData.get('cryptoType');
+                    const cryptoAddress = formData.get('cryptoAddress');
+                    const cryptoAmount = formData.get('cryptoAmount');
+                    const cryptoMessage = formData.get('cryptoMessage');
+                    
+                    if (!cryptoAddress) {
+                        alert('Veuillez saisir l\'adresse de portefeuille');
+                        return;
+                    }
+                    
+                    // Format crypto selon le type
+                    switch(cryptoType) {
+                        case 'bitcoin':
+                            url = `bitcoin:${cryptoAddress}`;
+                            break;
+                        case 'ethereum':
+                            url = `ethereum:${cryptoAddress}`;
+                            break;
+                        case 'litecoin':
+                            url = `litecoin:${cryptoAddress}`;
+                            break;
+                        case 'dogecoin':
+                            url = `dogecoin:${cryptoAddress}`;
+                            break;
+                        case 'cardano':
+                            url = `cardano:${cryptoAddress}`;
+                            break;
+                        case 'polkadot':
+                            url = `polkadot:${cryptoAddress}`;
+                            break;
+                    }
+                    
+                    if (cryptoAmount) {
+                        url += `?amount=${cryptoAmount}`;
+                    }
+                    if (cryptoMessage) {
+                        url += `${cryptoAmount ? '&' : '?'}message=${encodeURIComponent(cryptoMessage)}`;
+                    }
+                    break;
+            }
+            
+            const params = new URLSearchParams();
+            params.append('text', url);
+            params.append('size', size);
+            
+            const apiUrl = '/api/qr?' + params.toString();
+            
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        currentInteractiveQR = data.qr_code;
+                        document.getElementById('interactiveQrCode').innerHTML = 
+                            '<img src="data:image/png;base64,' + data.qr_code + '" alt="QR Code" style="max-width: 100%;">';
+                        document.getElementById('interactiveResult').style.display = 'block';
+                    } else {
+                        alert('Erreur: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors de la génération du QR code');
+                });
+        });
+        
+        function downloadQR(type) {
+            let qrData = null;
+            switch(type) {
+                case 'static':
+                    qrData = currentStaticQR;
+                    break;
+                case 'dynamic':
+                    qrData = currentDynamicQR;
+                    break;
+                case 'social':
+                    qrData = currentSocialQR;
+                    break;
+                case 'contact':
+                    qrData = currentContactQR;
+                    break;
+                case 'media':
+                    qrData = currentMediaQR;
+                    break;
+                case 'interactive':
+                    qrData = currentInteractiveQR;
+                    break;
+                case 'customize':
+                    qrData = currentCustomQR;
+                    break;
+            }
+            
+            if (!qrData) return;
+            
+            const link = document.createElement('a');
+            link.href = 'data:image/png;base64,' + qrData;
+            link.download = 'qrcode-' + type + '-' + Date.now() + '.png';
+            link.click();
+        }
+        
+        function loadDynamicQRCodes() {
+            console.log('Chargement des QR codes dynamiques...');
+            
+            // Récupérer le token d'authentification depuis l'URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const authToken = urlParams.get('auth_token');
+            console.log('Token trouvé:', authToken ? 'Oui' : 'Non');
+            
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            
+            // Ajouter le token d'authentification si disponible
+            if (authToken) {
+                headers['Authorization'] = 'Bearer ' + authToken;
+                console.log('Headers d\'authentification ajoutés');
+            }
+            
+            console.log('Envoi de la requête à /api/dynamic/qr...');
+            fetch('/api/dynamic/qr', {
+                headers: headers
+            })
+                .then(response => {
+                    console.log('Réponse reçue:', response.status, response.statusText);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Données reçues:', data);
+                    if (data.success) {
+                        console.log('Affichage des QR codes...');
+                        displayQRCodes(data.qr_codes);
+                    } else {
+                        console.error('Erreur dans la réponse:', data.error);
+                        document.getElementById('qrList').innerHTML = '<div class="error">Erreur: ' + data.error + '</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement:', error);
+                    document.getElementById('qrList').innerHTML = '<div class="error">Erreur lors du chargement des QR codes</div>';
+                });
+        }
+        
+        function displayQRCodes(qrCodes) {
+            const container = document.getElementById('qrList');
+            
+            if (Object.keys(qrCodes).length === 0) {
+                container.innerHTML = '<p>Aucun QR code dynamique créé.</p>';
+                return;
+            }
+            
+            let html = '';
+            for (const [id, qr] of Object.entries(qrCodes)) {
+                html += '<div class="qr-item">';
+                html += '<h4>' + (qr.name || 'QR Code sans nom') + '</h4>';
+                html += '<p><strong>ID :</strong> ' + id + '</p>';
+                html += '<p><strong>URL de destination :</strong> ' + qr.url + '</p>';
+                html += '<p><strong>URL du QR Code :</strong> ' + qr.qr_url + '</p>';
+                html += '<p><strong>Créé le :</strong> ' + new Date(qr.created_at).toLocaleString() + '</p>';
+                html += '<p><strong>Scans :</strong> ' + (qr.scans || 0) + '</p>';
+                html += '<button onclick="editQRCode(\'' + id + '\')">Modifier l\'URL</button>';
+                html += '<button onclick="deleteQRCode(\'' + id + '\')">Supprimer</button>';
+                html += '</div>';
+            }
+            container.innerHTML = html;
+        }
+        
+        function editQRCode(id) {
+            const newUrl = prompt('Nouvelle URL de destination :');
+            if (!newUrl) return;
+            
+            // Récupérer le token d'authentification depuis l'URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const authToken = urlParams.get('auth_token');
+            
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            
+            // Ajouter le token d'authentification si disponible
+            if (authToken) {
+                headers['Authorization'] = 'Bearer ' + authToken;
+            }
+            
+            fetch('/api/dynamic/qr/' + id, {
+                method: 'PUT',
+                headers: headers,
+                body: JSON.stringify({url: newUrl})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('QR Code modifié avec succès !');
+                    loadDynamicQRCodes();
+                } else {
+                    alert('Erreur: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la modification du QR code');
+            });
+        }
+        
+        function deleteQRCode(id) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce QR code ?')) {
+                return;
+            }
+            
+            // Récupérer le token d'authentification depuis l'URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const authToken = urlParams.get('auth_token');
+            
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            
+            // Ajouter le token d'authentification si disponible
+            if (authToken) {
+                headers['Authorization'] = 'Bearer ' + authToken;
+            }
+            
+            fetch('/api/dynamic/qr/' + id, {
+                method: 'DELETE',
+                headers: headers
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('QR Code supprimé avec succès !');
+                    loadDynamicQRCodes();
+                } else {
+                    alert('Erreur: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la suppression du QR code');
+            });
+        }
+        
+        // Workflow functions
+        function nextStep(step) {
+            // Hide current step
+            document.querySelectorAll('.workflow-step').forEach(s => s.style.display = 'none');
+            
+            // Show next step
+            document.getElementById('step' + step).style.display = 'block';
+            
+            // If moving to step 4, configure content based on selections
+            if (step === 4) {
+                configureContentStep();
+            }
+        }
+        
+        function prevStep(step) {
+            // Hide current step
+            document.querySelectorAll('.workflow-step').forEach(s => s.style.display = 'none');
+            
+            // Show previous step
+            document.getElementById('step' + step).style.display = 'block';
+        }
+        
+        function configureContentStep() {
+            const target = document.querySelector('input[name="qrTarget"]:checked').value;
+            const qrType = document.querySelector('input[name="qrType"]:checked').value;
+            const contentConfig = document.getElementById('content-config');
+            
+            let formHTML = '';
+            
+            switch(target) {
+                case 'web':
+                    formHTML = `
+                        <div class="content-form">
+                            <label for="workflow-url">URL du site web</label>
+                            <input type="url" id="workflow-url" placeholder="https://example.com" required>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'youtube':
+                    formHTML = `
+                        <div class="content-form">
+                            <label for="workflow-youtube-url">URL YouTube</label>
+                            <input type="url" id="workflow-youtube-url" placeholder="https://www.youtube.com/watch?v=..." required>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'facebook':
+                    formHTML = `
+                        <div class="content-form">
+                            <label for="workflow-facebook-url">URL Facebook</label>
+                            <input type="url" id="workflow-facebook-url" placeholder="https://www.facebook.com/..." required>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'instagram':
+                    formHTML = `
+                        <div class="content-form">
+                            <label for="workflow-instagram-url">URL Instagram</label>
+                            <input type="url" id="workflow-instagram-url" placeholder="https://www.instagram.com/..." required>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'linkedin':
+                    formHTML = `
+                        <div class="content-form">
+                            <label for="workflow-linkedin-url">URL LinkedIn</label>
+                            <input type="url" id="workflow-linkedin-url" placeholder="https://www.linkedin.com/..." required>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'email':
+                    formHTML = `
+                        <div class="content-form">
+                            <div class="form-row">
+                                <div>
+                                    <label for="workflow-email-to">Adresse email</label>
+                                    <input type="email" id="workflow-email-to" placeholder="destinataire@example.com" required>
+                                </div>
+                                <div>
+                                    <label for="workflow-email-subject">Sujet</label>
+                                    <input type="text" id="workflow-email-subject" placeholder="Sujet de l'email">
+                                </div>
+                            </div>
+                            <label for="workflow-email-body">Message</label>
+                            <textarea id="workflow-email-body" rows="4" placeholder="Contenu de l'email"></textarea>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'sms':
+                    formHTML = `
+                        <div class="content-form">
+                            <div class="form-row">
+                                <div>
+                                    <label for="workflow-sms-number">Numéro de téléphone</label>
+                                    <input type="tel" id="workflow-sms-number" placeholder="+33123456789" required>
+                                </div>
+                                <div>
+                                    <label for="workflow-sms-message">Message</label>
+                                    <input type="text" id="workflow-sms-message" placeholder="Votre message SMS" required>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'phone':
+                    formHTML = `
+                        <div class="content-form">
+                            <label for="workflow-phone-number">Numéro de téléphone</label>
+                            <input type="tel" id="workflow-phone-number" placeholder="+33123456789" required>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'video':
+                    formHTML = `
+                        <div class="content-form">
+                            <label for="workflow-video-url">URL de la vidéo</label>
+                            <input type="url" id="workflow-video-url" placeholder="https://example.com/video.mp4 ou https://vimeo.com/..." required>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'audio':
+                    formHTML = `
+                        <div class="content-form">
+                            <label for="workflow-audio-url">URL audio</label>
+                            <input type="url" id="workflow-audio-url" placeholder="https://example.com/audio.mp3 ou https://open.spotify.com/..." required>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'pdf':
+                    formHTML = `
+                        <div class="content-form">
+                            <label for="workflow-pdf-url">URL du document PDF</label>
+                            <input type="url" id="workflow-pdf-url" placeholder="https://example.com/document.pdf" required>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'wifi':
+                    formHTML = `
+                        <div class="content-form">
+                            <div class="form-row">
+                                <div>
+                                    <label for="workflow-wifi-ssid">Nom du réseau (SSID)</label>
+                                    <input type="text" id="workflow-wifi-ssid" placeholder="MonWiFi" required>
+                                </div>
+                                <div>
+                                    <label for="workflow-wifi-password">Mot de passe</label>
+                                    <input type="text" id="workflow-wifi-password" placeholder="Mot de passe WiFi">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div>
+                                    <label for="workflow-wifi-encryption">Type de chiffrement</label>
+                                    <select id="workflow-wifi-encryption">
+                                        <option value="WPA">WPA/WPA2/WPA3</option>
+                                        <option value="WEP">WEP</option>
+                                        <option value="nopass">Aucun</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="workflow-wifi-hidden">Réseau caché</label>
+                                    <select id="workflow-wifi-hidden">
+                                        <option value="false">Non</option>
+                                        <option value="true">Oui</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'geo':
+                    formHTML = `
+                        <div class="content-form">
+                            <div class="form-row">
+                                <div>
+                                    <label for="workflow-geo-lat">Latitude</label>
+                                    <input type="number" id="workflow-geo-lat" step="any" placeholder="48.8566" required>
+                                </div>
+                                <div>
+                                    <label for="workflow-geo-lng">Longitude</label>
+                                    <input type="number" id="workflow-geo-lng" step="any" placeholder="2.3522" required>
+                                </div>
+                            </div>
+                            <label for="workflow-geo-alt">Altitude (optionnel)</label>
+                            <input type="number" id="workflow-geo-alt" step="any" placeholder="35">
+                        </div>
+                    `;
+                    break;
+                    
+                case 'calendar':
+                    formHTML = `
+                        <div class="content-form">
+                            <div class="form-row">
+                                <div>
+                                    <label for="workflow-calendar-title">Titre de l'événement</label>
+                                    <input type="text" id="workflow-calendar-title" placeholder="Mon événement" required>
+                                </div>
+                                <div>
+                                    <label for="workflow-calendar-location">Lieu</label>
+                                    <input type="text" id="workflow-calendar-location" placeholder="Paris, France">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div>
+                                    <label for="workflow-calendar-start">Date et heure de début</label>
+                                    <input type="datetime-local" id="workflow-calendar-start" required>
+                                </div>
+                                <div>
+                                    <label for="workflow-calendar-end">Date et heure de fin</label>
+                                    <input type="datetime-local" id="workflow-calendar-end" required>
+                                </div>
+                            </div>
+                            <label for="workflow-calendar-description">Description</label>
+                            <textarea id="workflow-calendar-description" rows="3" placeholder="Description de l'événement"></textarea>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'payment':
+                    formHTML = `
+                        <div class="content-form">
+                            <div class="form-row">
+                                <div>
+                                    <label for="workflow-payment-type">Type de paiement</label>
+                                    <select id="workflow-payment-type">
+                                        <option value="paypal">PayPal</option>
+                                        <option value="stripe">Stripe</option>
+                                        <option value="bitcoin">Bitcoin</option>
+                                        <option value="ethereum">Ethereum</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="workflow-payment-amount">Montant</label>
+                                    <input type="number" id="workflow-payment-amount" step="0.01" placeholder="10.00">
+                                </div>
+                            </div>
+                            <label for="workflow-payment-address">Adresse de paiement</label>
+                            <input type="text" id="workflow-payment-address" placeholder="Adresse email PayPal ou adresse crypto" required>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            contentConfig.innerHTML = formHTML;
+        }
+        
+        function generateWorkflowQR() {
+            const target = document.querySelector('input[name="qrTarget"]:checked').value;
+            const qrType = document.querySelector('input[name="qrType"]:checked').value;
+            const qrStyle = document.querySelector('input[name="qrStyle"]:checked').value;
+            
+            let content = '';
+            
+            // Build content based on target and form inputs
+            switch(target) {
+                case 'web':
+                    content = document.getElementById('workflow-url').value;
+                    break;
+                case 'youtube':
+                    content = document.getElementById('workflow-youtube-url').value;
+                    break;
+                case 'facebook':
+                    content = document.getElementById('workflow-facebook-url').value;
+                    break;
+                case 'instagram':
+                    content = document.getElementById('workflow-instagram-url').value;
+                    break;
+                case 'linkedin':
+                    content = document.getElementById('workflow-linkedin-url').value;
+                    break;
+                case 'email':
+                    const emailTo = document.getElementById('workflow-email-to').value;
+                    const emailSubject = document.getElementById('workflow-email-subject').value;
+                    const emailBody = document.getElementById('workflow-email-body').value;
+                    content = `mailto:${emailTo}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+                    break;
+                case 'sms':
+                    const smsNumber = document.getElementById('workflow-sms-number').value;
+                    const smsMessage = document.getElementById('workflow-sms-message').value;
+                    content = `sms:${smsNumber}?body=${encodeURIComponent(smsMessage)}`;
+                    break;
+                case 'phone':
+                    content = `tel:${document.getElementById('workflow-phone-number').value}`;
+                    break;
+                case 'video':
+                    content = document.getElementById('workflow-video-url').value;
+                    break;
+                case 'audio':
+                    content = document.getElementById('workflow-audio-url').value;
+                    break;
+                case 'pdf':
+                    content = document.getElementById('workflow-pdf-url').value;
+                    break;
+                case 'wifi':
+                    const ssid = document.getElementById('workflow-wifi-ssid').value;
+                    const password = document.getElementById('workflow-wifi-password').value;
+                    const encryption = document.getElementById('workflow-wifi-encryption').value;
+                    const hidden = document.getElementById('workflow-wifi-hidden').value;
+                    content = `WIFI:T:${encryption};S:${ssid};P:${password};H:${hidden};;`;
+                    break;
+                case 'geo':
+                    const lat = document.getElementById('workflow-geo-lat').value;
+                    const lng = document.getElementById('workflow-geo-lng').value;
+                    const alt = document.getElementById('workflow-geo-alt').value;
+                    content = `geo:${lat},${lng}${alt ? ',' + alt : ''}`;
+                    break;
+                case 'calendar':
+                    const title = document.getElementById('workflow-calendar-title').value;
+                    const location = document.getElementById('workflow-calendar-location').value;
+                    const start = document.getElementById('workflow-calendar-start').value;
+                    const end = document.getElementById('workflow-calendar-end').value;
+                    const description = document.getElementById('workflow-calendar-description').value;
+                    
+                    const startDate = new Date(start);
+                    const endDate = new Date(end);
+                    
+                    content = `BEGIN:VEVENT
+SUMMARY:${title}
+LOCATION:${location}
+DTSTART:${startDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z
+DTEND:${endDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z
+DESCRIPTION:${description}
+END:VEVENT`;
+                    break;
+                case 'payment':
+                    const paymentType = document.getElementById('workflow-payment-type').value;
+                    const amount = document.getElementById('workflow-payment-amount').value;
+                    const address = document.getElementById('workflow-payment-address').value;
+                    
+                    if (paymentType === 'paypal') {
+                        content = `https://www.paypal.com/paypalme/${address}?amount=${amount}`;
+                    } else if (paymentType === 'stripe') {
+                        content = `https://checkout.stripe.com/pay/${address}#fidkdXx0Ymxr`;
+                    } else {
+                        content = `${paymentType}:${address}?amount=${amount}`;
+                    }
+                    break;
+            }
+            
+            if (!content) {
+                alert('Veuillez remplir tous les champs requis');
+                return;
+            }
+            
+            // Generate QR code based on type
+            if (qrType === 'static') {
+                // Generate static QR code
+                const params = {
+                    text: content,
+                    size: 1000,
+                    qr_style: qrStyle
+                };
+                
+                callCustomQRAPI(params);
+                
+                // Show success message
+                setTimeout(() => {
+                    alert('QR Code statique généré avec succès !');
+                    showTab('static');
+                }, 1000);
+                
+            } else {
+                // Generate dynamic QR code
+                const params = {
+                    original_url: content,
+                    custom_alias: '',
+                    qr_style: qrStyle
+                };
+                
+                // Call dynamic QR creation API
+                fetch('/api/qr/dynamic', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getAuthToken()
+                    },
+                    body: JSON.stringify(params)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('QR Code dynamique créé avec succès !');
+                        showTab('manage');
+                        loadDynamicQRCodes(); // Refresh the list
+                    } else {
+                        alert('Erreur: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Erreur lors de la création du QR code dynamique');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

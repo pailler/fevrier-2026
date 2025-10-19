@@ -2,33 +2,30 @@ version: '3.8'
 
 services:
   qrcodes:
-    image: jamedeus/qr-generator:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: qrcodes-iahome
     restart: unless-stopped
-    # SUPPRIMER l'exposition de port - plus d'accès direct
-    # ports:
-    #   - "7006:5000"
     environment:
+      - FLASK_ENV=production
+      - PORT=7006
+      - IAHOME_JWT_SECRET=qr-code-secret-key-change-in-production
+      - IAHOME_API_URL=http://iahome-app:3000
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Paris
     volumes:
-      - ./data:/app/data
+      - ./data:/app/qr_codes
+      - ./logs:/app/logs
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000"]
+      test: ["CMD", "curl", "-f", "http://localhost:7006/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     networks:
       - iahome-network
-    # SUPPRIMER les labels Traefik - plus d'accès direct
-    # labels:
-    #   - "traefik.enable=true"
-    #   - "traefik.http.routers.qrcodes.rule=Host(`qrcodes.iahome.fr`)"
-    #   - "traefik.http.routers.qrcodes.entrypoints=websecure"
-    #   - "traefik.http.routers.qrcodes.tls.certresolver=letsencrypt"
-    #   - "traefik.http.services.qrcodes.loadbalancer.server.port=5000"
 
 networks:
   iahome-network:

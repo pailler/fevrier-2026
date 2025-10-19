@@ -41,9 +41,10 @@ export async function GET(request: NextRequest) {
                     request.headers.get('x-real-ip') ||
                     'unknown';
     
-    if (tokenData.ip !== clientIP) {
-      // On peut choisir de bloquer ou juste logger
-    }
+    // Vérification IP désactivée car la propriété ip n'existe plus dans GradioToken
+    // if (tokenData.ip !== clientIP) {
+    //   // On peut choisir de bloquer ou juste logger
+    // }
     
     // Rediriger vers Gradio avec le token en paramètre
     const gradioUrl = new URL(RUINEDFOOOCUS_URL);

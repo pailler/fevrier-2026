@@ -100,11 +100,15 @@ export async function POST(request: NextRequest) {
     
     const gradioTokenData: GradioToken = {
       userId: user.id,
+      userEmail: user.email,
       moduleId: moduleId,
       moduleTitle: moduleTitle,
+      accessLevel: 'premium',
       expiresAt: expiresAt,
-      ip: clientIP,
-      issuedAt: now
+      permissions: ['read', 'write'],
+      issuedAt: now,
+      iat: now,
+      exp: expiresAt
     };
     
     // Signer le token

@@ -894,7 +894,7 @@ export default function EncoursPage() {
                               moduleTitle={moduleTitle}
                               onAccessGranted={(url) => {
                                 console.log(`🔗 ${moduleTitle}: Accès autorisé:`, url);
-                                window.open(url, '_blank');
+                                // L'ouverture de l'onglet est gérée par le composant lui-même
                               }}
                               onAccessDenied={(reason) => {
                                 console.log(`❌ ${moduleTitle}: Accès refusé:`, reason);
@@ -913,7 +913,7 @@ export default function EncoursPage() {
                               moduleTitle={moduleTitle}
                               onAccessGranted={(url) => {
                                 console.log(`🔗 ${moduleTitle}: Accès autorisé:`, url);
-                                window.open(url, '_blank');
+                                // L'ouverture de l'onglet est gérée par le composant lui-même
                               }}
                               onAccessDenied={(reason) => {
                                 console.log(`❌ ${moduleTitle}: Accès refusé:`, reason);
@@ -933,7 +933,7 @@ export default function EncoursPage() {
                             moduleCost={getModuleCost(module.module_id)}
                             onAccessGranted={(url) => {
                               console.log(`🔗 ${module.module_title}: Accès autorisé:`, url);
-                              window.open(url, '_blank');
+                              // L'ouverture de l'onglet est gérée par le composant lui-même
                             }}
                             onAccessDenied={(reason) => {
                               console.log(`❌ ${module.module_title}: Accès refusé:`, reason);

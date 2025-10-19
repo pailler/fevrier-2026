@@ -339,8 +339,10 @@ export default function RuinedFooocusPage() {
                 {(card?.category || 'AI GENERATION').toUpperCase()}
               </span>
               <p className="text-xl text-purple-100 mb-6">
-                RuinedFooocus vous permet de générer des images de haute qualité à partir de descriptions textuelles avec une précision et une créativité exceptionnelles.
+                RuinedFooocus combine les meilleurs aspects de Stable Diffusion et Midjourney en une expérience fluide et de pointe. 
+                Créez des images de haute qualité à partir de descriptions textuelles avec une précision et une créativité exceptionnelles.
               </p>
+              
               
               {/* Badges de fonctionnalités */}
               <div className="flex flex-wrap gap-3 mb-6">
@@ -353,6 +355,28 @@ export default function RuinedFooocusPage() {
                 <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
                   ⚡ Haute performance
                 </span>
+              </div>
+              
+              {/* Plateformes supportées */}
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-6">
+                <h3 className="text-white font-bold text-lg mb-4 text-center">Bénéficiez à distance des plateformes suivantes</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  <div className="bg-gray-100/30 text-white px-3 py-2 rounded-lg text-center text-sm font-medium backdrop-blur-sm">
+                    CPU
+                  </div>
+                  <div className="bg-green-500/80 text-white px-3 py-2 rounded-lg text-center text-sm font-medium backdrop-blur-sm">
+                    NVIDIA
+                  </div>
+                  <div className="bg-blue-500/80 text-white px-3 py-2 rounded-lg text-center text-sm font-medium backdrop-blur-sm">
+                    DirectML
+                  </div>
+                  <div className="bg-red-500/80 text-white px-3 py-2 rounded-lg text-center text-sm font-medium backdrop-blur-sm">
+                    ROCm
+                  </div>
+                  <div className="bg-white/90 text-gray-800 px-3 py-2 rounded-lg text-center text-sm font-medium backdrop-blur-sm">
+                    macOS
+                  </div>
+                </div>
               </div>
             </div>
             
@@ -574,8 +598,9 @@ export default function RuinedFooocusPage() {
                 {/* Description principale */}
                 <div className="text-center max-w-5xl mx-auto">
                   <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
-                    RuinedFooocus est un modèle d'intelligence artificielle révolutionnaire qui transforme vos descriptions textuelles en images de haute qualité. 
-                    Cette technologie de pointe vous permet de créer des visuels uniques et créatifs en quelques secondes.
+                    RuinedFooocus est un modèle d'intelligence artificielle révolutionnaire qui combine les meilleurs aspects de Stable Diffusion et Midjourney 
+                    en une expérience fluide et de pointe. Cette technologie de pointe vous permet de créer des visuels uniques et créatifs en quelques secondes, 
+                    en tirant parti des forces de ces deux géants de la génération d'images par IA.
                   </p>
                   {card.subtitle && (
                     <p className="text-base sm:text-lg text-gray-600 italic mb-8">
@@ -680,13 +705,91 @@ export default function RuinedFooocusPage() {
                     </div>
                   </div>
 
-                  {/* Chapitre 5: Sécurité et éthique */}
+                  {/* Chapitre 5: Plateformes supportées */}
                   <div className="bg-gradient-to-r from-teal-50 to-emerald-50 p-8 rounded-2xl border border-teal-200 shadow-lg">
                     <div className="flex items-center mb-6">
                       <div className="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                         <span className="text-white text-xl font-bold">5</span>
                       </div>
-                      <h4 className="text-2xl font-bold text-teal-900">Sécurité et éthique</h4>
+                      <h4 className="text-2xl font-bold text-teal-900">Bénéficiez à distance des plateformes suivantes</h4>
+                    </div>
+                    <div className="space-y-6 text-gray-700">
+                      <p className="text-lg leading-relaxed">
+                        RuinedFooocus vous permet de bénéficier à distance d'une large gamme de plateformes de calcul, garantissant une accessibilité maximale 
+                        et des performances optimales selon votre configuration matérielle, le tout depuis votre navigateur.
+                      </p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="bg-white/80 p-6 rounded-xl border border-gray-200 shadow-md">
+                          <div className="flex items-center mb-4">
+                            <div className="w-12 h-12 bg-gray-500 rounded-lg flex items-center justify-center mr-4">
+                              <span className="text-white font-bold text-lg">CPU</span>
+                            </div>
+                            <h5 className="text-lg font-bold text-gray-900">Processeur</h5>
+                          </div>
+                          <p className="text-gray-700 text-sm">
+                            Compatible avec tous les processeurs modernes, idéal pour les utilisateurs occasionnels.
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white/80 p-6 rounded-xl border border-gray-200 shadow-md">
+                          <div className="flex items-center mb-4">
+                            <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mr-4">
+                              <span className="text-white font-bold text-sm">NVIDIA</span>
+                            </div>
+                            <h5 className="text-lg font-bold text-gray-900">NVIDIA GPU</h5>
+                          </div>
+                          <p className="text-gray-700 text-sm">
+                            Optimisé pour les cartes graphiques NVIDIA avec accélération CUDA pour des performances maximales.
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white/80 p-6 rounded-xl border border-gray-200 shadow-md">
+                          <div className="flex items-center mb-4">
+                            <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mr-4">
+                              <span className="text-white font-bold text-xs">DirectML</span>
+                            </div>
+                            <h5 className="text-lg font-bold text-gray-900">DirectML</h5>
+                          </div>
+                          <p className="text-gray-700 text-sm">
+                            Support Microsoft DirectML pour les cartes graphiques AMD et Intel sur Windows.
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white/80 p-6 rounded-xl border border-gray-200 shadow-md">
+                          <div className="flex items-center mb-4">
+                            <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mr-4">
+                              <span className="text-white font-bold text-sm">ROCm</span>
+                            </div>
+                            <h5 className="text-lg font-bold text-gray-900">ROCm</h5>
+                          </div>
+                          <p className="text-gray-700 text-sm">
+                            Support AMD ROCm pour les cartes graphiques AMD sur Linux et Windows.
+                          </p>
+                        </div>
+                        
+                        <div className="bg-white/80 p-6 rounded-xl border border-gray-200 shadow-md">
+                          <div className="flex items-center mb-4">
+                            <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center mr-4">
+                              <span className="text-white font-bold text-sm">macOS</span>
+                            </div>
+                            <h5 className="text-lg font-bold text-gray-900">macOS</h5>
+                          </div>
+                          <p className="text-gray-700 text-sm">
+                            Support natif pour macOS avec optimisation Metal Performance Shaders.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Chapitre 6: Sécurité et éthique */}
+                  <div className="bg-gradient-to-r from-emerald-50 to-green-50 p-8 rounded-2xl border border-emerald-200 shadow-lg">
+                    <div className="flex items-center mb-6">
+                      <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                        <span className="text-white text-xl font-bold">6</span>
+                      </div>
+                      <h4 className="text-2xl font-bold text-emerald-900">Sécurité et éthique</h4>
                     </div>
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">

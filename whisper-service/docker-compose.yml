@@ -94,6 +94,7 @@ services:
       - ./whisper-webui:/usr/share/nginx/html:ro
     networks:
       - whisper-network
+      - iahome-network
 
   whisper-proxy:
     image: nginx:alpine
@@ -113,3 +114,5 @@ services:
 networks:
   whisper-network:
     driver: bridge
+  iahome-network:
+    external: true

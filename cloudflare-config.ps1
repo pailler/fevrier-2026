@@ -1,10 +1,10 @@
 # Configuration Cloudflare pour LibreSpeed
 # Remplacez ces valeurs par vos vraies clés Cloudflare
 
-# 🔑 VOS CLÉS CLOUDFLARE (à remplacer)
-$CloudflareApiToken = "VOTRE_TOKEN_API_CLOUDFLARE_ICI"
-$ZoneId = "VOTRE_ZONE_ID_ICI"
-$AccountId = "VOTRE_ACCOUNT_ID_ICI"
+# 🔑 VOS CLÉS CLOUDFLARE (configurées)
+$CloudflareApiToken = "wkhkSnnSNWU8uNAkP0M0bqVrNRWlfTxU_5WCCSsG"
+$ZoneId = "8e3782f7423cf8735c045eeabf8c6cf5"
+$AccountId = "9ba4294aa787e67c335c71876c10af21"
 
 # 📧 Configuration email et domaine
 $Email = "admin@iahome.fr"

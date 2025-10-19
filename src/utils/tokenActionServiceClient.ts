@@ -90,4 +90,52 @@ export class TokenActionServiceClient {
 
     return costs[moduleId] || null;
   }
+
+  // Méthode pour récupérer le solde de tokens d'un utilisateur
+  async getUserTokenBalance(userId: string): Promise<number> {
+    try {
+      const response = await fetch(`/api/user-tokens-simple?userId=${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        console.error('Erreur lors de la récupération du solde de tokens');
+        return 0;
+      }
+
+      const data = await response.json();
+      return data.tokensRemaining || 0;
+
+    } catch (error) {
+      console.error('Erreur getUserTokenBalance:', error);
+      return 0;
+    }
+  }
+
+  // Méthode pour récupérer l'historique des tokens d'un utilisateur
+  async getUserTokenHistory(userId: string, limit: number = 20): Promise<any[]> {
+    try {
+      const response = await fetch(`/api/user-tokens-simple/history?userId=${userId}&limit=${limit}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        console.error('Erreur lors de la récupération de l\'historique des tokens');
+        return [];
+      }
+
+      const data = await response.json();
+      return data.history || [];
+
+    } catch (error) {
+      console.error('Erreur getUserTokenHistory:', error);
+      return [];
+    }
+  }
 }

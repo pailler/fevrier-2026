@@ -34,6 +34,11 @@ export default function TokenBalance({ className = '', showIcon = true }: TokenB
           ⚠️
         </span>
       )}
+      {!loading && !error && tokens === 0 && (
+        <span className="text-yellow-500 text-xs" title="Aucun token disponible">
+          ⚠️
+        </span>
+      )}
     </div>
   );
 }

@@ -28,6 +28,34 @@ services:
     #   - "traefik.http.routers.librespeed.tls.certresolver=letsencrypt"
     #   - "traefik.http.services.librespeed.loadbalancer.server.port=80"
 
+  qrcodes:
+    build:
+      context: ./qrcodes
+      dockerfile: Dockerfile
+    container_name: qrcodes-iahome
+    restart: unless-stopped
+    ports:
+      - "7006:7006"
+    environment:
+      - FLASK_ENV=production
+      - PORT=7006
+      - IAHOME_JWT_SECRET=qr-code-secret-key-change-in-production
+      - IAHOME_API_URL=http://iahome-app:3000
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - ./qrcodes/data:/app/qr_codes
+      - ./qrcodes/logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7006/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - iahome-network
+
 networks:
   iahome-network:
     external: true
