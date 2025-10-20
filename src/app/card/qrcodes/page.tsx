@@ -184,18 +184,68 @@ export default function QRCodesPage() {
           .single();
 
         if (error) {
-          router.push('/');
+          console.log('❌ Erreur chargement carte QR codes depuis Supabase:', error);
+          // Créer des données de carte par défaut au lieu de rediriger
+          const defaultCardData = {
+            id: 'qrcodes',
+            title: 'QR Codes Dynamiques',
+            description: 'Créez des QR codes avec suivi en temps réel, personnalisation avancée et analytics détaillés pour optimiser vos campagnes marketing.',
+            subtitle: 'Générateur de QR codes professionnels avec analytics',
+            category: 'QR CODE GENERATOR',
+            price: 100,
+            features: [
+              'QR codes statiques et dynamiques',
+              'Personnalisation avancée (couleurs, logo)',
+              'Analytics en temps réel',
+              'Gestion centralisée',
+              'Export en haute qualité'
+            ],
+            requirements: [
+              'Connexion internet',
+              'Navigateur moderne',
+              '100 tokens par utilisation'
+            ],
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          setCard(defaultCardData);
+          console.log('✅ Utilisation des données par défaut pour QR codes');
           return;
         }
 
         if (data) {
-          // Configurer QR Codes comme module gratuit
-          const cardData = { ...data, price: 0 };
+          // Configurer QR Codes avec le bon prix
+          const cardData = { ...data, price: 100 };
           setCard(cardData);
           console.log('QR Codes card data:', cardData);
-          }
+        }
       } catch (error) {
-        router.push('/');
+        console.log('❌ Erreur lors du chargement de la carte QR codes:', error);
+        // Créer des données de carte par défaut
+        const defaultCardData = {
+          id: 'qrcodes',
+          title: 'QR Codes Dynamiques',
+          description: 'Créez des QR codes avec suivi en temps réel, personnalisation avancée et analytics détaillés pour optimiser vos campagnes marketing.',
+          subtitle: 'Générateur de QR codes professionnels avec analytics',
+          category: 'QR CODE GENERATOR',
+          price: 100,
+          features: [
+            'QR codes statiques et dynamiques',
+            'Personnalisation avancée (couleurs, logo)',
+            'Analytics en temps réel',
+            'Gestion centralisée',
+            'Export en haute qualité'
+          ],
+          requirements: [
+            'Connexion internet',
+            'Navigateur moderne',
+            '100 tokens par utilisation'
+          ],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        setCard(defaultCardData);
+        console.log('✅ Utilisation des données par défaut pour QR codes (catch)');
       } finally {
         setLoading(false);
       }
@@ -232,7 +282,7 @@ export default function QRCodesPage() {
     return selected;
   };
 
-  if (loading || authLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
