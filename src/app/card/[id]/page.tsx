@@ -804,6 +804,7 @@ export default function CardDetailPage() {
                   <div className="text-4xl font-bold mb-1">
                     {card.price === 0 || card.price === '0' ? 
                       (isFreeModule ? '10 tokens' : 'Free') : 
+                      card.id === 'qrcodes' ? '100 tokens' :
                       `${card.price} tokens`
                     }
                   </div>
@@ -1142,6 +1143,7 @@ export default function CardDetailPage() {
                   <div className="text-4xl font-bold mb-1">
                     {card.price === 0 || card.price === '0' ? 
                       (isFreeModule ? '10 tokens' : 'Free') : 
+                      card.id === 'qrcodes' ? '100 tokens' :
                       `${card.price} tokens`
                     }
                   </div>
@@ -1203,6 +1205,7 @@ export default function CardDetailPage() {
                   <div className="text-4xl font-bold mb-1">
                     {card.price === 0 || card.price === '0' ? 
                       (isFreeModule ? '10 tokens' : 'Free') : 
+                      card.id === 'qrcodes' ? '100 tokens' :
                       `${card.price} tokens`
                     }
                   </div>

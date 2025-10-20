@@ -176,17 +176,20 @@ export default function AdminApplications() {
             } else {
               description = `Test de vitesse de connexion internet. Coût: ${tokenCost} tokens par test.`;
             }
-          } else if (moduleId.includes('pdf') || moduleId.includes('qrcodes') || moduleId.includes('psitransfer')) {
+          } else if (moduleId.includes('pdf') || moduleId.includes('psitransfer')) {
             // Applications utilitaires : 10 tokens par utilisation
             tokenCost = 10;
             estimatedRevenue = stats.totalUsage * tokenCost * 0.01; // 0.01€ par token
             if (moduleId.includes('pdf')) {
               description = `Convertisseur de documents PDF. Coût: ${tokenCost} tokens par conversion.`;
-            } else if (moduleId.includes('qrcodes')) {
-              description = `Générateur de codes QR. Coût: ${tokenCost} tokens par génération.`;
             } else {
               description = `Service de transfert de fichiers sécurisé. Coût: ${tokenCost} tokens par transfert.`;
             }
+          } else if (moduleId.includes('qrcodes')) {
+            // Applications premium : 100 tokens par utilisation
+            tokenCost = 100;
+            estimatedRevenue = stats.totalUsage * tokenCost * 0.01; // 0.01€ par token
+            description = `Générateur de codes QR dynamiques. Coût: ${tokenCost} tokens par génération.`;
           } else {
             // Applications par défaut
             tokenCost = 10;

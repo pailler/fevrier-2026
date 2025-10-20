@@ -112,12 +112,15 @@ export default function AdminSettings() {
       const activeUsers = users.filter(u => u.updated_at && new Date(u.updated_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length;
       
       // Séparer applications et essentiels
-      const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes'];
-      const applications = userApps.filter(app => !essentialModules.includes(app.module_id));
+      const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed'];
+      const premiumModules = ['qrcodes'];
+      const applications = userApps.filter(app => !essentialModules.includes(app.module_id) && !premiumModules.includes(app.module_id));
       const essentiels = userApps.filter(app => essentialModules.includes(app.module_id));
+      const premium = userApps.filter(app => premiumModules.includes(app.module_id));
       
       const totalApplications = [...new Set(applications.map(app => app.module_id))].length;
       const totalEssentiels = [...new Set(essentiels.map(app => app.module_id))].length;
+      const totalPremium = [...new Set(premium.map(app => app.module_id))].length;
       
       const totalPayments = payments.length;
       const totalRevenue = payments

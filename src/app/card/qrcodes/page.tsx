@@ -289,7 +289,7 @@ export default function QRCodesPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Générez des QR codes
+                QR Codes Dynamiques
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
                 {(card?.category || 'QR CODE GENERATOR').toUpperCase()}
@@ -376,7 +376,7 @@ export default function QRCodesPage() {
             <div className="text-left mb-8">
               <div className="w-3/4 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
                 <div className="text-4xl font-bold mb-1">
-                  10 tokens
+                  100 tokens
                 </div>
                 <div className="text-sm opacity-90">
                   par utilisation

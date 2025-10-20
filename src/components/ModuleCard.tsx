@@ -822,7 +822,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               {/* Badge prix et nom du module en haut à droite */}
               <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
                 <span className="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                  QRCodes
+                  QR Codes Dynamiques
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
                   {formatPrice(module.price)}
@@ -1473,7 +1473,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
         <Link href={`/card/${module.id}`} className="block group">
           {/* Titre du module - affiché pour tous les modules */}
           <h3 className="text-3xl sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
-            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "Générez des QRcodes pros" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : module.title}
+            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : module.title}
           </h3>
           {/* Pour les modules spéciaux, afficher seulement la description si pas de sous-titre */}
           {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isQRCodes || isWhisper || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports ? (

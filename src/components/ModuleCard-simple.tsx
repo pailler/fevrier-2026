@@ -129,7 +129,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       'metube': { displayTitle: 'Téléchargez Youtube sans pub', appName: 'Metube' },
       'pdf': { displayTitle: 'Transformez vos PDF', appName: 'PDF+' },
       'psitransfer': { displayTitle: 'Transférez vos fichiers', appName: 'PSITransfer' },
-      'qrcodes': { displayTitle: 'Générez des QRcodes pros', appName: 'QRCodes' },
+      'qrcodes': { displayTitle: 'QR Codes Dynamiques', appName: 'QR Codes Dynamiques' },
       'stablediffusion': { displayTitle: 'Génération d\'images par IA pour créateurs', appName: 'Stable diffusion' },
       'comfyui': { displayTitle: 'Votre flux IA sur mesure', appName: 'ComfyUI', description: 'Un contrôle total sur chaque étape de la création d\'image' },
       'whisper': { displayTitle: 'l\'IA transcrit vos fichiers en texte', appName: 'Whisper IA' },
