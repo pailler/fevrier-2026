@@ -82,28 +82,9 @@ export default function MeTubeAccessButton({
         console.warn('⚠️ MeTube: Erreur incrémentation compteur:', incrementError);
       }
 
-      // Générer un token d'accès
-      const tokenResponse = await fetch('/api/generate-access-token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          userEmail: user.email,
-          moduleId: 'metube'
-        })
-      });
-
-      if (!tokenResponse.ok) {
-        throw new Error('Erreur génération token');
-      }
-
-      const tokenData = await tokenResponse.json();
-      
-      // Ouvrir MeTube avec le token
-      const accessUrl = `${tokenData.url}?token=${tokenData.token}`;
-      console.log('🔗 MeTube: Accès sécurisé à:', accessUrl);
+      // Rediriger directement vers MeTube via sous-domaine
+      const accessUrl = 'https://metube.iahome.fr';
+      console.log('🔗 MeTube: Accès direct à:', accessUrl);
       window.open(accessUrl, '_blank');
       
       // Appeler le callback pour notifier l'accès accordé

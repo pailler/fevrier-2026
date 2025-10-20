@@ -10,7 +10,7 @@ export const TOKEN_COSTS = {
   'metube': 10,
   'librespeed': 10,
   'psitransfer': 10,
-  'qrcodes': 10,
+  'qrcodes': 100,
   'pdf': 10,
   'meeting-reports': 10,
   'cogstudio': 10

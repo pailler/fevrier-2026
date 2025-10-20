@@ -7,9 +7,9 @@ interface TokenDisplayProps {
 }
 
 export default function TokenDisplay({ className = '', showIcon = true }: TokenDisplayProps) {
-  const { tokens, loading, error } = useTokenContext();
+  const { tokens, isLoading, error } = useTokenContext();
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className={`animate-pulse ${className}`}>
         <div className="h-6 w-16 bg-gray-200 rounded"></div>

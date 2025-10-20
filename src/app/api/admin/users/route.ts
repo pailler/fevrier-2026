@@ -93,3 +93,127 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 });
   }
 }
+
+export async function PUT(request: NextRequest) {
+  try {
+    const { userId, action, data } = await request.json();
+
+    if (!userId || !action) {
+      return NextResponse.json({ error: 'Paramètres manquants' }, { status: 400 });
+    }
+
+    let result;
+
+    switch (action) {
+      case 'update_profile':
+        const { fullName, role } = data;
+        const { data: updateResult, error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            full_name: fullName,
+            role: role,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId)
+          .select();
+
+        if (updateError) {
+          console.error('❌ Erreur mise à jour profil:', updateError);
+          return NextResponse.json({ error: 'Erreur lors de la mise à jour' }, { status: 500 });
+        }
+
+        result = updateResult;
+        break;
+
+      case 'suspend_user':
+        const { data: suspendResult, error: suspendError } = await supabase
+          .from('profiles')
+          .update({
+            is_active: false,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId)
+          .select();
+
+        if (suspendError) {
+          console.error('❌ Erreur suspension utilisateur:', suspendError);
+          return NextResponse.json({ error: 'Erreur lors de la suspension' }, { status: 500 });
+        }
+
+        result = suspendResult;
+        break;
+
+      case 'activate_user':
+        const { data: activateResult, error: activateError } = await supabase
+          .from('profiles')
+          .update({
+            is_active: true,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId)
+          .select();
+
+        if (activateError) {
+          console.error('❌ Erreur activation utilisateur:', activateError);
+          return NextResponse.json({ error: 'Erreur lors de l\'activation' }, { status: 500 });
+        }
+
+        result = activateResult;
+        break;
+
+      default:
+        return NextResponse.json({ error: 'Action non reconnue' }, { status: 400 });
+    }
+
+    console.log(`✅ Admin Users API: Action ${action} réussie pour l'utilisateur ${userId}`);
+
+    return NextResponse.json({
+      success: true,
+      message: `Action ${action} réussie`,
+      data: result
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur Admin Users API PUT:', error);
+    return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    if (!userId) {
+      return NextResponse.json({ error: 'ID utilisateur manquant' }, { status: 400 });
+    }
+
+    // Désactiver l'utilisateur au lieu de le supprimer (soft delete)
+    const { data: deleteResult, error: deleteError } = await supabase
+      .from('profiles')
+      .update({
+        is_active: false,
+        deleted_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+      .select();
+
+    if (deleteError) {
+      console.error('❌ Erreur suppression utilisateur:', deleteError);
+      return NextResponse.json({ error: 'Erreur lors de la suppression' }, { status: 500 });
+    }
+
+    console.log(`✅ Admin Users API: Utilisateur ${userId} désactivé`);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Utilisateur désactivé avec succès',
+      data: deleteResult
+    });
+
+  } catch (error) {
+    console.error('❌ Erreur Admin Users API DELETE:', error);
+    return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 });
+  }
+}

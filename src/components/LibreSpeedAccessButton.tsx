@@ -81,28 +81,9 @@ export default function LibreSpeedAccessButton({
         console.warn('⚠️ LibreSpeed: Erreur incrémentation compteur:', incrementError);
       }
 
-      // Générer un token d'accès
-      const tokenResponse = await fetch('/api/generate-access-token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          userEmail: user.email,
-          moduleId: 'librespeed'
-        })
-      });
-
-      if (!tokenResponse.ok) {
-        throw new Error('Erreur génération token');
-      }
-
-      const tokenData = await tokenResponse.json();
-      
-      // Ouvrir LibreSpeed avec le token
-      const accessUrl = `${tokenData.url}?token=${tokenData.token}`;
-      console.log('🔗 LibreSpeed: Accès sécurisé à:', accessUrl);
+      // Rediriger directement vers LibreSpeed via sous-domaine
+      const accessUrl = 'https://librespeed.iahome.fr';
+      console.log('🔗 LibreSpeed: Accès direct à:', accessUrl);
       window.open(accessUrl, '_blank');
       
       // Appeler le callback pour notifier l'accès accordé

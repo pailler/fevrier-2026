@@ -28,15 +28,15 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // Configuration des applications
+    // Configuration des applications via sous-domaines
     const APP_CONFIGS = {
       'ruinedfooocus': {
-        url: 'https://da4be546aab3e23055.gradio.live/',
+        url: 'https://ruinedfooocus.iahome.fr',
         name: 'RuinedFooocus',
         description: 'Application de génération d\'images IA'
       },
       'metube': {
-        url: 'http://192.168.1.150:8080',
+        url: 'https://metube.iahome.fr',
         name: 'MeTube',
         description: 'Téléchargeur de vidéos'
       },

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from '../../../utils/supabaseClient';
-import { TokenActionService } from '../../../utils/tokenActionService';
 
 const PDF_SERVICE_URL = process.env.PDF_SERVICE_URL || 'https://pdf.iahome.fr';
 
@@ -101,10 +100,19 @@ export async function GET(request: NextRequest) {
 
     // 🪙 NOUVELLE VÉRIFICATION : Vérifier les tokens disponibles
     console.log('PDF Proxy: Vérification des tokens pour:', session.user.email);
-    const tokenService = TokenActionService.getInstance();
     
     try {
-      const tokenBalance = await tokenService.getUserTokenBalance(session.user.id);
+      // Utiliser l'API pour obtenir le solde de tokens
+      const tokenResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/user-tokens-simple?userId=${session.user.id}`);
+      
+      if (!tokenResponse.ok) {
+        console.error('PDF Proxy: Erreur lors de la récupération des tokens');
+        return NextResponse.redirect('https://iahome.fr/encours?error=token_check_failed&module=pdf', 302);
+      }
+      
+      const tokenData = await tokenResponse.json();
+      const tokenBalance = tokenData.tokens || 0;
+      
       console.log('PDF Proxy: Solde de tokens:', tokenBalance);
       
       // Vérifier qu'il y a au moins 1 token pour une action PDF de base

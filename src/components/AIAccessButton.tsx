@@ -86,28 +86,21 @@ export default function AIAccessButton({
         console.warn(`⚠️ ${moduleTitle}: Erreur incrémentation compteur:`, incrementError);
       }
 
-      // Générer un token d'accès
-      const tokenResponse = await fetch('/api/generate-access-token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          userEmail: user.email,
-          moduleId: moduleId
-        })
-      });
+      // Rediriger directement vers l'application IA via sous-domaines
+      const applicationUrls: { [key: string]: string } = {
+        'stablediffusion': 'https://stablediffusion.iahome.fr',
+        'comfyui': 'https://comfyui.iahome.fr',
+        'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
+        'cogstudio': 'https://cogstudio.iahome.fr',
+      };
 
-      if (!tokenResponse.ok) {
-        throw new Error('Erreur génération token');
-      }
-
-      const tokenData = await tokenResponse.json();
+      const accessUrl = applicationUrls[moduleId];
       
-      // Ouvrir l'application avec le token
-      const accessUrl = `${tokenData.url}?token=${tokenData.token}`;
-      console.log(`🔗 ${moduleTitle}: Accès sécurisé à:`, accessUrl);
+      if (!accessUrl) {
+        throw new Error(`URL d'accès non configurée pour ${moduleId}`);
+      }
+      
+      console.log(`🔗 ${moduleTitle}: Accès direct à:`, accessUrl);
       window.open(accessUrl, '_blank');
       
       // Appeler le callback pour notifier l'accès accordé

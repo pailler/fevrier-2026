@@ -5,9 +5,8 @@ services:
     image: adolfintel/speedtest:latest
     container_name: librespeed-iahome
     restart: unless-stopped
-    # SUPPRIMER l'exposition de port - plus d'accès direct
-    # ports:
-    #   - "8085:80"
+    ports:
+      - "8085:80"
     environment:
       - PUID=1000
       - PGID=1000

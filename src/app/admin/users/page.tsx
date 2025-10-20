@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getSupabaseClient } from '../../../utils/supabaseService';
+import EditUserModal from '../../../components/admin/EditUserModal';
 
 interface UserApplication {
   moduleId: string;
@@ -30,6 +31,9 @@ export default function AdminUsers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -150,6 +154,119 @@ const supabase = getSupabaseClient();
     const matchesStatus = filterStatus === 'all' || user.status === filterStatus;
     return matchesSearch && matchesRole && matchesStatus;
   });
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveUser = async (userId: string, data: { fullName: string; role: string }) => {
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          action: 'update_profile',
+          data
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la mise à jour');
+      }
+
+      // Mettre à jour la liste des utilisateurs
+      setUsers(users.map(user => 
+        user.id === userId 
+          ? { ...user, fullName: data.fullName, role: data.role }
+          : user
+      ));
+
+      console.log('✅ Utilisateur mis à jour avec succès');
+    } catch (error) {
+      console.error('❌ Erreur lors de la mise à jour:', error);
+      throw error;
+    }
+  };
+
+  const handleSuspendUser = async (userId: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir suspendre cet utilisateur ?')) {
+      return;
+    }
+
+    setActionLoading(userId);
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          action: 'suspend_user'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la suspension');
+      }
+
+      // Mettre à jour la liste des utilisateurs
+      setUsers(users.map(user => 
+        user.id === userId 
+          ? { ...user, status: 'suspended' as const }
+          : user
+      ));
+
+      console.log('✅ Utilisateur suspendu avec succès');
+    } catch (error) {
+      console.error('❌ Erreur lors de la suspension:', error);
+      alert('Erreur lors de la suspension de l\'utilisateur');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleActivateUser = async (userId: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir activer cet utilisateur ?')) {
+      return;
+    }
+
+    setActionLoading(userId);
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          action: 'activate_user'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de l\'activation');
+      }
+
+      // Mettre à jour la liste des utilisateurs
+      setUsers(users.map(user => 
+        user.id === userId 
+          ? { ...user, status: 'active' as const }
+          : user
+      ));
+
+      console.log('✅ Utilisateur activé avec succès');
+    } catch (error) {
+      console.error('❌ Erreur lors de l\'activation:', error);
+      alert('Erreur lors de l\'activation de l\'utilisateur');
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -395,12 +512,30 @@ const supabase = getSupabaseClient();
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900">
+                      <button 
+                        onClick={() => handleEditUser(user)}
+                        className="text-blue-600 hover:text-blue-900 disabled:opacity-50"
+                        disabled={actionLoading === user.id}
+                      >
                         Modifier
                       </button>
-                      <button className="text-red-600 hover:text-red-900">
-                        Suspendre
-                      </button>
+                      {user.status === 'suspended' ? (
+                        <button 
+                          onClick={() => handleActivateUser(user.id)}
+                          className="text-green-600 hover:text-green-900 disabled:opacity-50"
+                          disabled={actionLoading === user.id}
+                        >
+                          {actionLoading === user.id ? 'Activation...' : 'Activer'}
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={() => handleSuspendUser(user.id)}
+                          className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                          disabled={actionLoading === user.id}
+                        >
+                          {actionLoading === user.id ? 'Suspension...' : 'Suspendre'}
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -429,6 +564,19 @@ const supabase = getSupabaseClient();
           </div>
         </div>
       </div>
+
+      {/* Modal de modification d'utilisateur */}
+      {editingUser && (
+        <EditUserModal
+          user={editingUser}
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setEditingUser(null);
+          }}
+          onSave={handleSaveUser}
+        />
+      )}
     </div>
   );
 }

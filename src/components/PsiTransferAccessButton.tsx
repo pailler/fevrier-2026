@@ -13,8 +13,8 @@ export default function PsiTransferAccessButton({ user }: PsiTransferAccessButto
       return;
     }
 
-    // Ouvrir directement PsiTransfer
-    const directUrl = 'http://localhost:8082';
+    // Ouvrir directement PsiTransfer via sous-domaine
+    const directUrl = 'https://psitransfer.iahome.fr';
     console.log('🔗 PsiTransfer: Accès direct à:', directUrl);
     window.open(directUrl, '_blank');
   };

@@ -1,0 +1,146 @@
+# Configuration Cloudflare Tunnel avec protection intelligente
+# Bloque l'accès direct mais permet l'accès avec tokens
+
+tunnel: iahome-secure
+credentials-file: /root/.cloudflared/iahome-secure.json
+
+# Configuration des origines avec protection intelligente
+ingress:
+  # LibreSpeed avec protection conditionnelle
+  - hostname: librespeed.iahome.fr
+    service: http://localhost:8085
+    originRequest:
+      httpHostHeader: librespeed.iahome.fr
+    # Middleware de protection
+    middleware:
+      - name: librespeed-protection
+        type: cloudflare_access
+        config:
+          # Autoriser seulement si token présent ou accès via iahome.fr
+          policy:
+            - condition: "http.request.uri.query contains 'token'"
+            - condition: "http.referer contains 'iahome.fr'"
+            - condition: "http.user_agent contains 'Mozilla'"
+          # Redirection si accès direct
+          redirect_url: "https://iahome.fr/encours"
+
+  # Meeting Reports avec protection conditionnelle
+  - hostname: meeting-reports.iahome.fr
+    service: http://localhost:3050
+    originRequest:
+      httpHostHeader: meeting-reports.iahome.fr
+    middleware:
+      - name: meeting-reports-protection
+        type: cloudflare_access
+        config:
+          policy:
+            - condition: "http.request.uri.query contains 'token'"
+            - condition: "http.referer contains 'iahome.fr'"
+          redirect_url: "https://iahome.fr/encours"
+
+  # Whisper avec protection conditionnelle
+  - hostname: whisper.iahome.fr
+    service: http://localhost:8093
+    originRequest:
+      httpHostHeader: whisper.iahome.fr
+    middleware:
+      - name: whisper-protection
+        type: cloudflare_access
+        config:
+          policy:
+            - condition: "http.request.uri.query contains 'token'"
+            - condition: "http.referer contains 'iahome.fr'"
+          redirect_url: "https://iahome.fr/encours"
+
+  # ComfyUI avec protection conditionnelle
+  - hostname: comfyui.iahome.fr
+    service: http://192.168.1.150:8188
+    originRequest:
+      httpHostHeader: comfyui.iahome.fr
+    middleware:
+      - name: comfyui-protection
+        type: cloudflare_access
+        config:
+          policy:
+            - condition: "http.request.uri.query contains 'token'"
+            - condition: "http.referer contains 'iahome.fr'"
+          redirect_url: "https://iahome.fr/encours"
+
+  # Stable Diffusion avec protection conditionnelle
+  - hostname: stablediffusion.iahome.fr
+    service: http://192.168.1.150:7880
+    originRequest:
+      httpHostHeader: stablediffusion.iahome.fr
+    middleware:
+      - name: stablediffusion-protection
+        type: cloudflare_access
+        config:
+          policy:
+            - condition: "http.request.uri.query contains 'token'"
+            - condition: "http.referer contains 'iahome.fr'"
+          redirect_url: "https://iahome.fr/encours"
+
+  # QR Codes avec protection conditionnelle
+  - hostname: qrcodes.iahome.fr
+    service: http://localhost:8080
+    originRequest:
+      httpHostHeader: qrcodes.iahome.fr
+    middleware:
+      - name: qrcodes-protection
+        type: cloudflare_access
+        config:
+          policy:
+            - condition: "http.request.uri.query contains 'token'"
+            - condition: "http.referer contains 'iahome.fr'"
+          redirect_url: "https://iahome.fr/encours"
+
+  # PsiTransfer avec protection conditionnelle
+  - hostname: psitransfer.iahome.fr
+    service: http://localhost:8081
+    originRequest:
+      httpHostHeader: psitransfer.iahome.fr
+    middleware:
+      - name: psitransfer-protection
+        type: cloudflare_access
+        config:
+          policy:
+            - condition: "http.request.uri.query contains 'token'"
+            - condition: "http.referer contains 'iahome.fr'"
+          redirect_url: "https://iahome.fr/encours"
+
+  # MeTube avec protection conditionnelle
+  - hostname: metube.iahome.fr
+    service: http://localhost:8082
+    originRequest:
+      httpHostHeader: metube.iahome.fr
+    middleware:
+      - name: metube-protection
+        type: cloudflare_access
+        config:
+          policy:
+            - condition: "http.request.uri.query contains 'token'"
+            - condition: "http.referer contains 'iahome.fr'"
+          redirect_url: "https://iahome.fr/encours"
+
+  # PDF avec protection conditionnelle
+  - hostname: pdf.iahome.fr
+    service: http://localhost:8083
+    originRequest:
+      httpHostHeader: pdf.iahome.fr
+    middleware:
+      - name: pdf-protection
+        type: cloudflare_access
+        config:
+          policy:
+            - condition: "http.request.uri.query contains 'token'"
+            - condition: "http.referer contains 'iahome.fr'"
+          redirect_url: "https://iahome.fr/encours"
+
+  # Accès normal à iahome.fr (sans protection)
+  - hostname: iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: iahome.fr
+
+  # Page de redirection par défaut
+  - service: http_status:404

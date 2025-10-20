@@ -13,8 +13,8 @@ export default function PDFAccessButton({ user }: PDFAccessButtonProps) {
       return;
     }
 
-    // Ouvrir directement PDF+
-    const directUrl = 'http://localhost:8080';
+    // Ouvrir directement PDF+ via sous-domaine
+    const directUrl = 'https://pdf.iahome.fr';
     console.log('🔗 PDF+: Accès direct à:', directUrl);
     window.open(directUrl, '_blank');
   };

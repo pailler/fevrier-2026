@@ -157,38 +157,30 @@ export default function CardDetailPage() {
       
       const expirationHours = moduleTitle.toLowerCase() === 'ruinedfooocus' ? 12 : undefined;
       
-      const response = await fetch('/api/generate-access-token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token || ''}`
-        },
-        body: JSON.stringify({
-          moduleId: moduleId,
-          moduleName: moduleTitle.toLowerCase().replace(/\s+/g, ''),
-          expirationHours: expirationHours
-        }),
-      });
+      // Rediriger directement vers l'application via sous-domaines
+      const applicationUrls = {
+        'librespeed': 'https://librespeed.iahome.fr',
+        'metube': 'https://metube.iahome.fr',
+        'whisper': 'https://whisper.iahome.fr',
+        'psitransfer': 'https://psitransfer.iahome.fr',
+        'qrcodes': 'https://qrcodes.iahome.fr',
+        'pdf': 'https://pdf.iahome.fr',
+        'stablediffusion': 'https://stablediffusion.iahome.fr',
+        'comfyui': 'https://comfyui.iahome.fr',
+        'meeting-reports': 'https://meeting-reports.iahome.fr',
+        'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
+        'cogstudio': 'https://cogstudio.iahome.fr',
+      };
+
+      const accessUrl = applicationUrls[moduleId];
       
-      if (!response.ok) {
-        let errorData;
-        try {
-          errorData = await response.json();
-        } catch {
-          errorData = { error: `Erreur HTTP ${response.status}` };
-        }
-        throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
+      if (!accessUrl) {
+        throw new Error(`URL d'accès non configurée pour ${moduleId}`);
       }
       
-      let responseData;
-      try {
-        responseData = await response.json();
-      } catch (error) {
-        throw new Error('Erreur lors du parsing de la réponse');
-      }
-      
-      const { accessToken, moduleName } = responseData;
-      console.log('✅ Token JWT généré avec succès');
+      console.log(`🔗 ${moduleTitle}: Accès direct à:`, accessUrl);
+      window.open(accessUrl, '_blank');
+      return;
       
       const moduleUrls: { [key: string]: string } = {
         'stablediffusion': '/api/gradio-proxy?service=stablediffusion',
@@ -210,7 +202,7 @@ export default function CardDetailPage() {
         'meeting-reports': 'https://meeting-reports.iahome.fr'
       };
 
-      const normalizedName = (moduleName || '').toLowerCase().replace(/\s+/g, '');
+      const normalizedName = (moduleTitle || '').toLowerCase().replace(/\s+/g, '');
       let baseUrl = moduleUrls[normalizedName];
       
       if (!baseUrl) {
@@ -218,7 +210,7 @@ export default function CardDetailPage() {
         baseUrl = moduleUrls[titleKey];
       }
       
-      if (!baseUrl && ((moduleName || '').toLowerCase().includes('librespeed') || (moduleTitle || '').toLowerCase().includes('librespeed'))) {
+      if (!baseUrl && ((moduleTitle || '').toLowerCase().includes('librespeed'))) {
         baseUrl = 'https://librespeed.iahome.fr';
       }
       
@@ -227,12 +219,12 @@ export default function CardDetailPage() {
       }
       
       const isProxyModule = baseUrl.startsWith('/api/');
-      const accessUrl = isProxyModule ? baseUrl : `${baseUrl}?token=${accessToken}`;
-      console.log('🔗 URL d\'accès:', accessUrl);
+      const finalAccessUrl = isProxyModule ? baseUrl : baseUrl;
+      console.log('🔗 URL d\'accès:', finalAccessUrl);
       
       setIframeModal({
         isOpen: true,
-        url: accessUrl,
+        url: finalAccessUrl,
         title: moduleTitle
       });
     } catch (error) {

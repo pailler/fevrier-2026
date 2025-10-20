@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS dynamic_qr_codes (
     name VARCHAR(255),
     url TEXT NOT NULL,
     qr_url TEXT NOT NULL,
+    management_token VARCHAR(64) UNIQUE,
+    user_email VARCHAR(255),
     size INTEGER DEFAULT 300,
     margin INTEGER DEFAULT 4,
     error_correction VARCHAR(1) DEFAULT 'M',
@@ -84,6 +86,16 @@ ON CONFLICT (qr_id) DO NOTHING;
 -- Migration pour ajouter les colonnes de personnalisation aux tables existantes
 DO $$ 
 BEGIN
+    -- Ajouter management_token si elle n'existe pas
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'dynamic_qr_codes' AND column_name = 'management_token') THEN
+        ALTER TABLE dynamic_qr_codes ADD COLUMN management_token VARCHAR(64) UNIQUE;
+    END IF;
+    
+    -- Ajouter user_email si elle n'existe pas
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'dynamic_qr_codes' AND column_name = 'user_email') THEN
+        ALTER TABLE dynamic_qr_codes ADD COLUMN user_email VARCHAR(255);
+    END IF;
+    
     -- Ajouter foreground_color si elle n'existe pas
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'dynamic_qr_codes' AND column_name = 'foreground_color') THEN
         ALTER TABLE dynamic_qr_codes ADD COLUMN foreground_color VARCHAR(7) DEFAULT '#000000';

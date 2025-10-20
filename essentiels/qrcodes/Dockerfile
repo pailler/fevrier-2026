@@ -13,13 +13,8 @@ WORKDIR /app
 # Copier le fichier requirements.txt s'il existe
 COPY requirements.txt* ./
 
-# Installer les dépendances Python (simplifié sans base de données)
-RUN pip install --no-cache-dir \
-    flask \
-    flask-cors \
-    qrcode[pil] \
-    pillow \
-    && rm -rf /root/.cache/pip
+# Installer les dépendances Python
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copier le code de l'application
 COPY . .

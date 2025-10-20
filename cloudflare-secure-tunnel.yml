@@ -1,0 +1,99 @@
+# Configuration Cloudflare Tunnel sécurisée
+# Cette configuration ajoute une protection contre l'accès direct aux sous-domaines
+
+tunnel: iahome-secure
+credentials-file: /root/.cloudflared/iahome-secure.json
+
+# Configuration des origines avec protection
+ingress:
+  # Page de redirection pour les accès directs aux sous-domaines
+  - hostname: librespeed.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: librespeed.iahome.fr
+    # Redirection vers iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  - hostname: meeting-reports.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: meeting-reports.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  - hostname: whisper.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: whisper.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  - hostname: comfyui.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: comfyui.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  - hostname: stablediffusion.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: stablediffusion.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  - hostname: qrcodes.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: qrcodes.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  - hostname: psitransfer.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: psitransfer.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  - hostname: metube.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: metube.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  - hostname: pdf.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: pdf.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  # Accès normal à iahome.fr
+  - hostname: iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: iahome.fr
+
+  # Page de redirection par défaut
+  - service: http_status:404

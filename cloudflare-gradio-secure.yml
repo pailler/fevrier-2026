@@ -100,3 +100,6 @@ ingress:
   # Redirection par défaut
   - service: http_status:404
 
+
+
+

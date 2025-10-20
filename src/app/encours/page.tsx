@@ -127,9 +127,17 @@ export default function EncoursPage() {
       const balance = await tokenService.getUserTokenBalance(user.id);
       setTokenBalance(balance);
       
-      // Charger l'historique d'utilisation
-      const history = await tokenService.getUserTokenHistory(user.id, 20);
-      setTokenHistory(history);
+      // Charger l'historique d'utilisation via la nouvelle API
+      const historyResponse = await fetch(`/api/usage-history?userId=${user.id}&limit=20`);
+      const historyData = await historyResponse.json();
+      
+      if (historyData.success) {
+        setTokenHistory(historyData.history || []);
+        console.log('📊 Historique chargé:', historyData.history.length, 'entrées');
+      } else {
+        console.error('Erreur chargement historique:', historyData.error);
+        setTokenHistory([]);
+      }
       
     } catch (error) {
       console.error('Erreur chargement tokens:', error);
@@ -333,19 +341,19 @@ export default function EncoursPage() {
       'qrcodes-statiques': 'qrcodes-statiques', // QR Codes Statiques
     };
 
-    // Mapping des slugs vers les URLs directes des applications
+    // Mapping des slugs vers les URLs directes des applications via sous-domaines
     const directUrls: { [key: string]: string } = {
-      'metube': 'http://localhost:8081',  // MeTube accès direct
-      'librespeed': 'http://localhost:8085',  // LibreSpeed accès direct
-      'pdf': 'http://localhost:8080',  // PDF accès direct
-      'psitransfer': 'http://localhost:8082',  // PsiTransfer accès direct
-      'qrcodes': 'http://localhost:8083',  // QR Codes accès direct
-      'qrcodes-statiques': 'http://localhost:7005',  // QR Codes Statiques local
-      'whisper': 'http://localhost:8084',  // Whisper accès direct
-      'stablediffusion': 'http://localhost:7860',  // StableDiffusion accès direct
-      'ruinedfooocus': 'http://localhost:7861',  // RuinedFooocus accès direct
-      'comfyui': 'http://localhost:8188',  // ComfyUI accès direct
-      'cogstudio': 'http://localhost:8086',  // CogStudio accès direct
+      'metube': 'https://metube.iahome.fr',  // MeTube accès direct
+      'librespeed': 'https://librespeed.iahome.fr',  // LibreSpeed accès direct
+      'pdf': 'https://pdf.iahome.fr',  // PDF accès direct
+      'psitransfer': 'https://psitransfer.iahome.fr',  // PsiTransfer accès direct
+      'qrcodes': 'https://qrcodes.iahome.fr',  // QR Codes accès direct
+      'qrcodes-statiques': 'https://qrcodes.iahome.fr',  // QR Codes Statiques
+      'whisper': 'https://whisper.iahome.fr',  // Whisper accès direct
+      'stablediffusion': 'https://stablediffusion.iahome.fr',  // StableDiffusion accès direct
+      'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',  // RuinedFooocus accès direct
+      'comfyui': 'https://comfyui.iahome.fr',  // ComfyUI accès direct
+      'cogstudio': 'https://cogstudio.iahome.fr',  // CogStudio accès direct
       'meeting-reports': 'https://meeting-reports.iahome.fr',  // Meeting Reports direct avec token
     };
     
@@ -370,7 +378,7 @@ export default function EncoursPage() {
       'librespeed': 10,
       'metube': 10,
       'psitransfer': 10,
-      'qrcodes': 10,
+      'qrcodes': 100,
       'pdf': 10,
       'meeting-reports': 10,
       'cogstudio': 10,
@@ -380,7 +388,7 @@ export default function EncoursPage() {
       '2': 10,      // MeTube -> 10 tokens
       '3': 10,      // LibreSpeed -> 10 tokens
       '4': 10,      // PsiTransfer -> 10 tokens
-      '5': 10,      // QR Codes -> 10 tokens (changé de 100 à 10)
+      '5': 100,     // QR Codes -> 100 tokens
       '7': 100,     // Stable Diffusion -> 100 tokens
       '8': 100,     // Ruined Fooocus -> 100 tokens
       '10': 100,    // ComfyUI -> 100 tokens
@@ -765,36 +773,6 @@ export default function EncoursPage() {
 
               </div>
 
-              {/* Historique d'utilisation */}
-              {tokenHistory.length > 0 && (
-                <div className="mt-6">
-                  <h3 className="text-sm font-medium text-gray-600 mb-3">📊 Dernières utilisations</h3>
-                  <div className="bg-gray-50 rounded-lg p-4 max-h-48 overflow-y-auto">
-                    <div className="space-y-2">
-                      {tokenHistory.slice(0, 10).map((usage, index) => (
-                        <div key={index} className="flex justify-between items-center text-sm">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-gray-500">
-                              {new Date(usage.usage_date).toLocaleDateString('fr-FR', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
-                            </span>
-                            <span className="text-gray-700">
-                              {usage.module_name} - {usage.action_type || 'action'}
-                            </span>
-                          </div>
-                          <span className="font-semibold text-red-600">
-                            -{usage.tokens_consumed} token{usage.tokens_consumed > 1 ? 's' : ''}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Grille des modules améliorée */}
@@ -947,6 +925,97 @@ export default function EncoursPage() {
                 );
               })}
             </div>
+
+            {/* Section Dernières utilisations améliorée */}
+            {tokenHistory.length > 0 && (
+              <div className="mt-12">
+                <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                      <span className="text-3xl mr-3">📊</span>
+                      Mes dernières utilisations
+                    </h2>
+                    <div className="text-sm text-gray-500">
+                      {tokenHistory.length} utilisation{tokenHistory.length > 1 ? 's' : ''} récente{tokenHistory.length > 1 ? 's' : ''}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {tokenHistory.slice(0, 20).map((usage, index) => {
+                      const usageDate = new Date(usage.usage_date);
+                      const isToday = usageDate.toDateString() === new Date().toDateString();
+                      const isYesterday = usageDate.toDateString() === new Date(Date.now() - 86400000).toDateString();
+                      
+                      let timeDisplay;
+                      if (isToday) {
+                        timeDisplay = `Aujourd'hui à ${usageDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+                      } else if (isYesterday) {
+                        timeDisplay = `Hier à ${usageDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+                      } else {
+                        timeDisplay = usageDate.toLocaleDateString('fr-FR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        });
+                      }
+
+                      const moduleIcons: { [key: string]: string } = {
+                        'librespeed': '🚀',
+                        'metube': '📺',
+                        'whisper': '🎤',
+                        'stablediffusion': '🎨',
+                        'comfyui': '🤖',
+                        'qrcodes': '📱',
+                        'pdf': '📄',
+                        'psitransfer': '📤',
+                        'meeting-reports': '📝',
+                        'ruinedfooocus': '🎭',
+                        'cogstudio': '⚙️'
+                      };
+
+                      const moduleIcon = moduleIcons[usage.module_name?.toLowerCase()] || '🔧';
+                      const actionType = usage.action_type || 'accès';
+
+                      return (
+                        <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                          <div className="flex items-center space-x-4">
+                            <div className="text-2xl">
+                              {moduleIcon}
+                            </div>
+                            <div>
+                              <div className="font-semibold text-gray-900">
+                                {usage.module_name || 'Module inconnu'}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {actionType} • {timeDisplay}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-bold text-red-600 text-lg">
+                              -{usage.tokens_consumed}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              token{usage.tokens_consumed > 1 ? 's' : ''}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  {tokenHistory.length > 20 && (
+                    <div className="mt-4 text-center">
+                      <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        Voir toutes les utilisations ({tokenHistory.length})
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

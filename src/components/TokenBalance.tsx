@@ -7,9 +7,9 @@ interface TokenBalanceProps {
 }
 
 export default function TokenBalance({ className = '', showIcon = true }: TokenBalanceProps) {
-  const { tokens, loading, error } = useTokenContext();
+  const { tokens, isLoading, error } = useTokenContext();
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className={`animate-pulse ${className}`}>
         <div className="h-6 w-16 bg-gray-200 rounded"></div>
@@ -34,7 +34,7 @@ export default function TokenBalance({ className = '', showIcon = true }: TokenB
           ⚠️
         </span>
       )}
-      {!loading && !error && tokens === 0 && (
+      {!isLoading && !error && tokens === 0 && (
         <span className="text-yellow-500 text-xs" title="Aucun token disponible">
           ⚠️
         </span>

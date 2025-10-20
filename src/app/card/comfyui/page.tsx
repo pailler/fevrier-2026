@@ -84,44 +84,10 @@ export default function ComfyUIPage() {
     }
 
     try {
-      const response = await fetch('/api/generate-access-token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token || ''}`
-        },
-        body: JSON.stringify({
-          moduleId: moduleId,
-          moduleName: moduleTitle.toLowerCase().replace(/\s+/g, ''),
-          expirationHours: 12
-        }),
-      });
-      
-      if (!response.ok) {
-        let errorData;
-        try {
-          errorData = await response.json();
-        } catch {
-          errorData = { error: `Erreur HTTP ${response.status}` };
-        }
-        throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
-      }
-      
-      let responseData;
-      try {
-        responseData = await response.json();
-      } catch (error) {
-        throw new Error('Erreur lors du parsing de la réponse');
-      }
-      
-      const { accessToken, moduleName } = responseData;
-      const baseUrl = 'https://comfyui.iahome.fr';
-      const accessUrl = `${baseUrl}?token=${accessToken}`;
-      setIframeModal({
-        isOpen: true,
-        url: accessUrl,
-        title: moduleTitle
-      });
+      // Rediriger directement vers comfyui via sous-domaine
+      const accessUrl = 'https://comfyui.iahome.fr';
+      console.log('🔗 comfyui: Accès direct à:', accessUrl);
+      window.open(accessUrl, '_blank');
     } catch (error) {
       alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }

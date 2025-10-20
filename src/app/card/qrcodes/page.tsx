@@ -84,43 +84,10 @@ export default function QRCodesPage() {
     }
 
     try {
-      const response = await fetch('/api/generate-access-token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          moduleId: moduleId,
-          moduleName: moduleTitle.toLowerCase().replace(/\s+/g, ''),
-          expirationHours: 12
-        }),
-      });
-      
-      if (!response.ok) {
-        let errorData;
-        try {
-          errorData = await response.json();
-        } catch {
-          errorData = { error: `Erreur HTTP ${response.status}` };
-        }
-        throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
-      }
-      
-      let responseData;
-      try {
-        responseData = await response.json();
-      } catch (error) {
-        throw new Error('Erreur lors du parsing de la réponse');
-      }
-      
-      const { accessToken, moduleName } = responseData;
-      const baseUrl = 'https://qrcodes.iahome.fr';
-      const accessUrl = `${baseUrl}?token=${accessToken}`;
-      setIframeModal({
-        isOpen: true,
-        url: accessUrl,
-        title: moduleTitle
-      });
+      // Rediriger directement vers qrcodes via sous-domaine
+      const accessUrl = 'https://qrcodes.iahome.fr';
+      console.log('🔗 qrcodes: Accès direct à:', accessUrl);
+      window.open(accessUrl, '_blank');
     } catch (error) {
       alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
@@ -464,7 +431,7 @@ export default function QRCodesPage() {
                       className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                     >
                       <span className="text-xl">🔑</span>
-                      <span>Activer QR Codes (10 tokens)</span>
+                      <span>Activer QR Codes (100 tokens)</span>
                     </button>
                   ) : (
                     // Module déjà activé : bouton d'accès
@@ -490,7 +457,7 @@ export default function QRCodesPage() {
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">🔒</span>
-                  <span>Connectez-vous pour activer QR Codes (10 tokens)</span>
+                  <span>Connectez-vous pour activer QR Codes (100 tokens)</span>
                 </button>
               )}
             </div>

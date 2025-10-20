@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   }
 
   const moduleId = 'qrcodes';
-  const tokensToConsume = 10;
+  const tokensToConsume = 100;
 
   try {
     // 1. Récupérer l'application utilisateur pour QR Codes
