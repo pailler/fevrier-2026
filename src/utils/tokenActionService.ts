@@ -10,10 +10,12 @@ export const TOKEN_COSTS = {
   'metube': 10,
   'librespeed': 10,
   'psitransfer': 10,
-  'qrcodes': 100,
   'pdf': 10,
   'meeting-reports': 10,
-  'cogstudio': 10
+  'cogstudio': 10,
+  
+  // Applications premium (100 tokens)
+  'qrcodes': 100
 } as const;
 
 export type ModuleId = keyof typeof TOKEN_COSTS;

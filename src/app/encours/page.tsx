@@ -378,10 +378,12 @@ export default function EncoursPage() {
       'librespeed': 10,
       'metube': 10,
       'psitransfer': 10,
-      'qrcodes': 100,
       'pdf': 10,
       'meeting-reports': 10,
       'cogstudio': 10,
+      
+      // Applications premium (100 tokens)
+      'qrcodes': 100,
       
       // Anciens IDs numériques (pour compatibilité)
       '1': 10,      // PDF+ -> 10 tokens

@@ -36,11 +36,14 @@ export async function GET(request: NextRequest) {
     
     // Obtenir les coûts par module
     const moduleCosts = {
+      // Applications essentielles (10 tokens)
       metube: 10,
       pdf: 10,
-      qrcodes: 100,
       librespeed: 10,
-      psitransfer: 10
+      psitransfer: 10,
+      
+      // Applications premium (100 tokens)
+      qrcodes: 100
     };
 
     return NextResponse.json({
