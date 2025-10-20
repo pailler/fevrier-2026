@@ -9,7 +9,7 @@ export default function MeTubePage() {
   const router = useRouter();
   const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
   const [card, setCard] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [iframeModal, setIframeModal] = useState<{isOpen: boolean, url: string, title: string}>({
     isOpen: false,
     url: '',
@@ -36,12 +36,7 @@ export default function MeTubePage() {
     setLoading(false);
   }, []);
 
-  // Mettre à jour le loading en fonction de l'état d'authentification
-  useEffect(() => {
-    if (!authLoading) {
-      setLoading(false);
-    }
-  }, [authLoading]);
+  // Le contenu s'affiche même sans authentification
 
   // Fonction pour accéder au module avec JWT
   const accessModuleWithJWT = useCallback(async () => {

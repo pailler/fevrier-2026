@@ -25,7 +25,7 @@ interface Card {
 export default function MeetingReportsPage() {
   const router = useRouter();
   const [card, setCard] = useState<Card | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [session, setSession] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
   const [selectedCards, setSelectedCards] = useState<any[]>([]);
@@ -225,7 +225,7 @@ export default function MeetingReportsPage() {
     };
 
     fetchCardDetails();
-  }, [router, session]);
+  }, [router]);
 
   // Gérer l'accès rapide pour les modules gratuits
   useEffect(() => {

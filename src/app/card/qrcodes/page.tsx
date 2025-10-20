@@ -32,7 +32,7 @@ export default function QRCodesPage() {
   const router = useRouter();
   const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
   const [card, setCard] = useState<Card | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedCards, setSelectedCards] = useState<any[]>([]);
   const [userSubscriptions, setUserSubscriptions] = useState<{[key: string]: any}>({});
   const [iframeModal, setIframeModal] = useState<{isOpen: boolean, url: string, title: string}>({

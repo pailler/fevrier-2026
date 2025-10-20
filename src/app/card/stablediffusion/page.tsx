@@ -30,7 +30,7 @@ interface Card {
 export default function StableDiffusionPage() {
   const router = useRouter();
   const [card, setCard] = useState<Card | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [session, setSession] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
   const [selectedCards, setSelectedCards] = useState<any[]>([]);
@@ -214,7 +214,7 @@ export default function StableDiffusionPage() {
     };
 
     fetchCardDetails();
-  }, [router, session]);
+  }, [router]);
 
   const handleSubscribe = (card: Card) => {
     if (!card?.id) {
