@@ -6,6 +6,7 @@ interface UnifiedModuleButtonProps {
   user?: any;
   moduleId: string;
   moduleTitle: string;
+  isAlreadyActivated?: boolean;
   onAccessGranted?: (url: string) => void;
   onAccessDenied?: (reason: string) => void;
 }
@@ -14,6 +15,7 @@ export default function UnifiedModuleButton({
   user,
   moduleId,
   moduleTitle,
+  isAlreadyActivated = false,
   onAccessGranted, 
   onAccessDenied 
 }: UnifiedModuleButtonProps) {
@@ -50,6 +52,11 @@ export default function UnifiedModuleButton({
       setIsLoading(false);
     }
   };
+
+  // Ne pas afficher le bouton si le module est déjà activé
+  if (isAlreadyActivated) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col items-center space-y-2">

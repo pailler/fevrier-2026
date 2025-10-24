@@ -10,6 +10,7 @@ interface ModuleAccessButtonProps {
   moduleName: string;
   moduleUrl: string;
   moduleCost: number;
+  isAlreadyActivated?: boolean;
   onAccessGranted?: (url: string) => void;
   onAccessDenied?: (reason: string) => void;
 }
@@ -20,6 +21,7 @@ export default function ModuleAccessButton({
   moduleName, 
   moduleUrl, 
   moduleCost,
+  isAlreadyActivated = false,
   onAccessGranted, 
   onAccessDenied 
 }: ModuleAccessButtonProps) {
@@ -124,6 +126,11 @@ export default function ModuleAccessButton({
       setIsLoading(false);
     }
   };
+
+  // Ne pas afficher le bouton si le module est déjà activé
+  if (isAlreadyActivated) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col items-center space-y-4">

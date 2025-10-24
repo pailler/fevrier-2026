@@ -170,33 +170,10 @@ export default function ModulesPage() {
                 </div>
               </div>
               
-              {module.status === 'active' ? (
-                <button
-                  onClick={() => {
-                    // Envoyer une notification d'accès à l'application
-                    try {
-                      const notificationService = NotificationServiceClient.getInstance();
-                      notificationService.notifyAppAccessed(user?.email || '', module.name, user?.email?.split('@')[0] || 'Utilisateur');
-                      ;
-                    } catch (notificationError) {
-                      console.error('❌ Erreur lors de l\'envoi de la notification:', notificationError);
-                    }
-                    
-                    // Redirection simple vers l'application
-                    window.open(module.url, '_blank');
-                  }}
-                  className={`w-full ${module.color} text-white font-medium py-3 px-4 rounded-lg transition-colors`}
-                >
-                  Accéder à l'appli
-                </button>
-              ) : (
-                <button
-                  className="w-full bg-gray-300 text-gray-500 font-medium py-3 px-4 rounded-lg cursor-not-allowed"
-                  disabled
-                >
-                  Bientôt disponible
-                </button>
-              )}
+              {/* Bouton d'accès supprimé - Les utilisateurs peuvent accéder via les sous-domaines */}
+              <div className="w-full bg-green-100 text-green-800 font-medium py-3 px-4 rounded-lg text-center">
+                ✅ Module activé - Accès via sous-domaine
+              </div>
             </div>
           ))}
         </div>

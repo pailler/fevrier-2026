@@ -980,19 +980,7 @@ export default function CardDetailPage() {
                       </button>
                     )}
 
-                    {/* Bouton d'accès pour LibreSpeed déjà activé */}
-                    {isLibrespeed && alreadyActivatedModules.includes(card.id) && (
-                      <button
-                        onClick={() => {
-                          console.log('✅ Accès LibreSpeed - Module déjà activé');
-                          window.open('https://librespeed.iahome.fr', '_blank');
-                        }}
-                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                      >
-                        <span className="text-xl">🔑</span>
-                        <span>Accéder à {card?.title || 'LibreSpeed'}</span>
-                      </button>
-                    )}
+                    {/* Bouton d'accès pour LibreSpeed déjà activé - SUPPRIMÉ */}
 
                     {/* Bouton d'accès spécial pour MeTube */}
                     {isMetube && (
@@ -1018,19 +1006,7 @@ export default function CardDetailPage() {
                     )}
 
                     {/* Bouton d'accès - visible seulement si l'utilisateur a accès au module (autres modules) */}
-                    {!isLibrespeed && !isMetube && isAuthenticated && user && userSubscriptions[`module_${card.id}`] && (
-                      <button
-                        onClick={() => {
-                          console.log('✅ Accès à l\'application accordé');
-                          // Redirection simple vers l'application
-                          window.open(`https://${card.id}.iahome.fr`, '_blank');
-                        }}
-                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                      >
-                        <span className="text-xl">🔑</span>
-                        <span>Accéder à {card.title}</span>
-                      </button>
-                    )}
+                    {/* Bouton d'accès pour les modules avec abonnement - SUPPRIMÉ */}
 
                     {/* Boutons d'activation pour les modules gratuits */}
                     {isFreeModule && !alreadyActivatedModules.includes(card.id) && !isLibrespeed && !isMetube && (
@@ -1244,19 +1220,7 @@ export default function CardDetailPage() {
                   </button>
                 )}
 
-                {/* Bouton d'accès pour PsiTransfer déjà activé */}
-                {alreadyActivatedModules.includes(card.id) && (
-                  <button
-                    onClick={() => {
-                      console.log('✅ Accès PsiTransfer - Module déjà activé');
-                      window.open('https://psitransfer.iahome.fr', '_blank');
-                    }}
-                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                  >
-                    <span className="text-xl">🔑</span>
-                    <span>Accéder à {card?.title || 'PsiTransfer'}</span>
-                  </button>
-                )}
+                {/* Bouton d'accès pour PsiTransfer déjà activé - SUPPRIMÉ */}
 
                 {/* Informations sur PsiTransfer */}
                 <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">

@@ -102,3 +102,4 @@ async function handleRequest(request) {
 - Lighthouse (Chrome DevTools)
 
 
+
