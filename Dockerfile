@@ -63,4 +63,4 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Commande de démarrage
-CMD ["npm", "start"] 
+CMD ["npm", "start"] # Force rebuild 10/24/2025 22:36:27
