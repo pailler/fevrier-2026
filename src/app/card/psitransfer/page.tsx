@@ -25,7 +25,7 @@ export default function PsiTransferPage() {
     category: 'WEB TOOLS',
     price: 'Gratuit',
     image: '/images/psitransfer-module.jpg',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+    videoUrl: 'https://www.youtube.com/embed/FlzQqgHFUOM'
   };
 
   // Utilisation du hook useCustomAuth pour la gestion de l'authentification
@@ -180,7 +180,7 @@ export default function PsiTransferPage() {
           <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
             <iframe
               className="w-full h-full rounded-2xl"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&modestbranding=1"
+              src="https://www.youtube.com/embed/FlzQqgHFUOM?autoplay=0&rel=0&modestbranding=1"
               title="Démonstration PsiTransfer"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
