@@ -83,7 +83,7 @@ export class TokenActionServiceClient {
       'librespeed': 10,
       'psitransfer': 10,
       'pdf': 10,
-      'meeting-reports': 10,
+      'meeting-reports': 100,
       'cogstudio': 10,
       
       // Applications premium (100 tokens)

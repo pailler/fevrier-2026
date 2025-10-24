@@ -1,0 +1,118 @@
+# Configuration Cloudflare Tunnel optimisée pour les performances
+tunnel: iahome-optimized
+credentials-file: C:\Users\AAA\.cloudflared\02a960c5-edd6-4b3f-844f-410b16247262.json
+
+# Configuration globale pour les performances
+originRequest:
+  # Optimisations de connexion
+  connectTimeout: 15s
+  tlsTimeout: 10s
+  tcpKeepAlive: 30s
+  keepAliveConnections: 20
+  keepAliveTimeout: 2m
+  disableChunkedEncoding: true
+  
+  # Optimisations de compression
+  compressionQuality: 6
+  noTLSVerify: true
+
+ingress:
+  # Application principale avec optimisations
+  - hostname: iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: iahome.fr
+      connectTimeout: 10s
+      tlsTimeout: 5s
+      keepAliveConnections: 15
+      keepAliveTimeout: 1m30s
+      disableChunkedEncoding: true
+
+  - hostname: www.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: www.iahome.fr
+      connectTimeout: 10s
+      tlsTimeout: 5s
+      keepAliveConnections: 15
+      keepAliveTimeout: 1m30s
+      disableChunkedEncoding: true
+
+  # Services avec optimisations spécifiques
+  - hostname: librespeed.iahome.fr
+    service: http://localhost:8085
+    originRequest:
+      httpHostHeader: librespeed.iahome.fr
+      connectTimeout: 20s  # Plus de temps pour les tests de vitesse
+      keepAliveConnections: 10
+      keepAliveTimeout: 2m
+
+  - hostname: whisper.iahome.fr
+    service: http://localhost:8093
+    originRequest:
+      httpHostHeader: whisper.iahome.fr
+      connectTimeout: 30s  # Plus de temps pour les uploads audio
+      keepAliveConnections: 5
+      keepAliveTimeout: 3m
+
+  - hostname: qrcodes.iahome.fr
+    service: http://localhost:7006
+    originRequest:
+      httpHostHeader: qrcodes.iahome.fr
+      connectTimeout: 15s
+      keepAliveConnections: 10
+      keepAliveTimeout: 1m
+
+  - hostname: psitransfer.iahome.fr
+    service: http://localhost:8087
+    originRequest:
+      httpHostHeader: psitransfer.iahome.fr
+      connectTimeout: 30s  # Plus de temps pour les transferts de fichiers
+      keepAliveConnections: 5
+      keepAliveTimeout: 5m
+
+  - hostname: metube.iahome.fr
+    service: http://localhost:8081
+    originRequest:
+      httpHostHeader: metube.iahome.fr
+      connectTimeout: 20s
+      keepAliveConnections: 8
+      keepAliveTimeout: 2m
+
+  - hostname: pdf.iahome.fr
+    service: http://localhost:8086
+    originRequest:
+      httpHostHeader: pdf.iahome.fr
+      connectTimeout: 15s
+      keepAliveConnections: 10
+      keepAliveTimeout: 1m30s
+
+  - hostname: meeting-reports.iahome.fr
+    service: http://127.0.0.1:3050
+    originRequest:
+      httpHostHeader: meeting-reports.iahome.fr
+      connectTimeout: 15s
+      keepAliveConnections: 8
+      keepAliveTimeout: 1m30s
+
+  # Services externes
+  - hostname: stablediffusion.iahome.fr
+    service: http://192.168.1.150:7880
+    originRequest:
+      httpHostHeader: stablediffusion.iahome.fr
+      connectTimeout: 30s
+      keepAliveConnections: 5
+      keepAliveTimeout: 3m
+
+  - hostname: comfyui.iahome.fr
+    service: http://192.168.1.150:8188
+    originRequest:
+      httpHostHeader: comfyui.iahome.fr
+      connectTimeout: 30s
+      keepAliveConnections: 5
+      keepAliveTimeout: 3m
+
+  # Catch-all pour les erreurs 404
+  - service: http_status:404
+
+

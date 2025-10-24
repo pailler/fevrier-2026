@@ -379,7 +379,7 @@ export default function EncoursPage() {
       'metube': 10,
       'psitransfer': 10,
       'pdf': 10,
-      'meeting-reports': 10,
+      'meeting-reports': 100,
       'cogstudio': 10,
       
       // Applications premium (100 tokens)
@@ -884,8 +884,25 @@ export default function EncoursPage() {
                           );
                         }
                         
+                        // QR Codes (100 tokens)
+                        if (moduleId === 'qrcodes') {
+                          return (
+                            <QRCodeAccessButton
+                              user={user}
+                              onAccessGranted={(url) => {
+                                console.log('🔗 QR Codes: Accès accordé, ouverture de:', url);
+                                window.open(url, '_blank');
+                              }}
+                              onAccessDenied={(reason) => {
+                                console.log('❌ QR Codes: Accès refusé:', reason);
+                                setError(`Accès QR Codes refusé: ${reason}`);
+                              }}
+                            />
+                          );
+                        }
+                        
                         // Applications essentielles (10 tokens)
-                        if (['librespeed', 'metube', 'psitransfer', 'qrcodes', 'pdf', 'meeting-reports', 'cogstudio'].includes(moduleId)) {
+                        if (['librespeed', 'metube', 'psitransfer', 'pdf'].includes(moduleId)) {
                           return (
                             <EssentialAccessButton
                               user={user}

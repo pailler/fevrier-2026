@@ -132,7 +132,7 @@ export default function EssentialAccessButton({
             : 'bg-blue-600 hover:bg-blue-700'
           }`}
       >
-        {isLoading ? '⏳ Ouverture...' : `🔧 Accéder à ${moduleTitle} (10 tokens)`}
+        {isLoading ? '⏳ Ouverture...' : `🔧 Accéder à ${moduleTitle} (${moduleId === 'qrcodes' ? '100' : '10'} tokens)`}
       </button>
 
       {error && <p className="text-red-500 text-sm">{error}</p>}

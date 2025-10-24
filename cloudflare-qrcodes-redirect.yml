@@ -1,0 +1,91 @@
+# Configuration Cloudflare pour rediriger qrcodes.iahome.fr vers l'application Next.js
+tunnel: iahome-new
+credentials-file: /root/.cloudflared/iahome-new.json
+
+ingress:
+  # Domaine principal
+  - hostname: iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: iahome.fr
+      disableChunkedEncoding: true
+      keepAliveConnections: 10
+      noTLSVerify: true
+
+  - hostname: www.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: www.iahome.fr
+      disableChunkedEncoding: true
+      keepAliveConnections: 10
+      noTLSVerify: true
+
+  # QR Codes - redirection vers l'application Next.js
+  - hostname: qrcodes.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: qrcodes.iahome.fr
+      noTLSVerify: true
+
+  # Autres sous-domaines
+  - hostname: librespeed.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: librespeed.iahome.fr
+      noTLSVerify: true
+
+  - hostname: whisper.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: whisper.iahome.fr
+      noTLSVerify: true
+
+  - hostname: psitransfer.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: psitransfer.iahome.fr
+      noTLSVerify: true
+
+  - hostname: metube.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: metube.iahome.fr
+      noTLSVerify: true
+
+  - hostname: pdf.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: pdf.iahome.fr
+      noTLSVerify: true
+
+  - hostname: stablediffusion.iahome.fr
+    service: http://192.168.1.150:7880
+    originRequest:
+      httpHostHeader: stablediffusion.iahome.fr
+      noTLSVerify: true
+
+  - hostname: ruinedfooocus.iahome.fr
+    service: http://192.168.1.150:7870
+    originRequest:
+      httpHostHeader: ruinedfooocus.iahome.fr
+      noTLSVerify: true
+
+  - hostname: comfyui.iahome.fr
+    service: http://192.168.1.150:8188
+    originRequest:
+      httpHostHeader: comfyui.iahome.fr
+      noTLSVerify: true
+
+  - hostname: meeting-reports.iahome.fr
+    service: http://localhost:3000
+    originRequest:
+      httpHostHeader: meeting-reports.iahome.fr
+      disableChunkedEncoding: true
+      noTLSVerify: true
+
+  # Page par défaut
+  - service: http_status:404
+
+
+
+

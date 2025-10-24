@@ -72,40 +72,6 @@ export default function MeTubePage() {
     }
   }, [user?.email]);
 
-  // Fonction pour gérer l'abonnement
-  const handleSubscribe = useCallback(async () => {
-    if (!user?.email) {
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/create-payment-intent', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          customerEmail: user.email,
-          moduleId: 'metube',
-          moduleName: 'MeTube'
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.clientSecret) {
-          // Rediriger vers Stripe ou ouvrir le modal de paiement
-          console.log('Client secret reçu:', data.clientSecret);
-        } else {
-          console.error('Aucun client secret reçu');
-        }
-      } else {
-        console.error('Erreur de réponse API:', response.status);
-      }
-    } catch (error) {
-      console.error('Erreur lors de l\'abonnement:', error);
-    }
-  }, [user?.email]);
 
   // Fonction pour ouvrir le modal iframe
   const openIframeModal = useCallback((url: string, title: string) => {

@@ -2,51 +2,23 @@ version: '3.8'
 
 services:
   qrcodes:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: qrcodes
-    restart: unless-stopped
+    build: .
+    container_name: qrcodes-service
     ports:
       - "7005:7005"
     environment:
-      - FLASK_ENV=production
-      - DATABASE_URL=postgresql://qrcode_user:qrcode_password@qrcodes-postgres:5432/qrcode_db
-      - IAHOME_JWT_SECRET=qr-code-secret-key-change-in-production
-      - IAHOME_API_URL=http://localhost:3000
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - IAHOME_JWT_SECRET=${IAHOME_JWT_SECRET}
     volumes:
-      - ./qr-codes:/app/qr_codes
       - ./logs:/app/logs
-    depends_on:
-      - qrcodes-postgres
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:7005/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
 
-  qrcodes-postgres:
-    image: postgres:15-alpine
-    container_name: qrcodes-postgres
-    restart: unless-stopped
-    environment:
-      - POSTGRES_DB=qrcode_db
-      - POSTGRES_USER=qrcode_user
-      - POSTGRES_PASSWORD=qrcode_password
-    volumes:
-      - qrcodes_postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - "5433:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U qrcode_user -d qrcode_db"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
 
-volumes:
-  qrcodes_postgres_data:
-  qrcodes_qr-codes:
-  qrcodes_logs:
+

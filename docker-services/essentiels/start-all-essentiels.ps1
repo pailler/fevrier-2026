@@ -80,7 +80,7 @@ if ($LASTEXITCODE -eq 0) {
 
 # Démarrer PsiTransfer
 Write-Host "`n7. Démarrage de PsiTransfer..." -ForegroundColor Yellow
-docker-compose -f psitransfer/docker-compose.yml up -d
+docker-compose -f ../../essentiels/psitransfer/docker-compose.yml up -d
 if ($LASTEXITCODE -eq 0) {
     Write-Host "   ✅ PsiTransfer démarré" -ForegroundColor Green
 } else {

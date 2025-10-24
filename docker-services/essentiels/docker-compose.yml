@@ -47,7 +47,7 @@ services:
       - ./qrcodes/data:/app/qr_codes
       - ./qrcodes/logs:/app/logs
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7006/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:7006/health')"]
       interval: 30s
       timeout: 10s
       retries: 3

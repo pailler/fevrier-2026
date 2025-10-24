@@ -231,15 +231,6 @@ export default function WhisperPage() {
     }
   }, [isFreeModule, card, quickAccessAttempted, session?.user?.id]);
 
-  const handleSubscribe = (card: Card) => {
-    if (isFreeModule) {
-      // Pour les modules gratuits, afficher le bouton d'activation
-      setShowActivateButton(true);
-    } else {
-      // Logique d'abonnement pour les modules payants - redirection vers Stripe
-      router.push(`/subscription/${card.id}`);
-    }
-  };
 
   const handleActivate = async (card: Card) => {
     if (!session?.user?.id) {
@@ -539,15 +530,6 @@ export default function WhisperPage() {
                   </div>
                 )}
 
-                {!alreadyActivatedModules.includes(card?.id || '') && !showActivateButton && (
-                  <button 
-                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-                    onClick={() => handleSubscribe(card!)}
-                  >
-                    <span className="text-xl">💳</span>
-                    <span>S'abonner</span>
-                  </button>
-                )}
 
                 {!alreadyActivatedModules.includes(card?.id || '') && showActivateButton && (
                   <div className="w-3/4 space-y-3">

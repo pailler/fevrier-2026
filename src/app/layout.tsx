@@ -1,174 +1,132 @@
-import type { Metadata } from "next";
-import FontAwesomeLocal from '@/components/FontAwesomeLocal';
-// import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import SimpleHeader from "../components/SimpleHeader";
-import Footer from "../components/Footer";
-import AdaptiveLayout from "../components/AdaptiveLayout";
-import ConditionalComponents from "../components/ConditionalComponents";
-import CSSOptimizer from "../components/CSSOptimizer";
-import PerformanceOptimizer from "../components/PerformanceOptimizer";
-import OptimizedWebVitals from "../components/OptimizedWebVitals";
-import ResourceOptimizer from "../components/ResourceOptimizer";
-import HTMLPreloadCleaner from "../components/HTMLPreloadCleaner";
-import CSSPreloadManager from "../components/CSSPreloadManager";
-import AggressivePreloadCleaner from "../components/AggressivePreloadCleaner";
-import MobileOptimizer from "../components/MobileOptimizer";
-import ClientTokenProvider from "../components/ClientTokenProvider";
-import { TokenProvider } from "../contexts/TokenContext";
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { TokenProvider } from '../contexts/TokenContext'
+import ClientHeader from '../components/ClientHeader'
+import Footer from '../components/Footer'
 
-// Supprimer les messages de développement React
-if (typeof window !== 'undefined') {
-  const originalConsoleLog = console.log;
-  console.log = function(...args) {
-    const message = args.join(' ');
-    if (message.includes('Download the React DevTools') || 
-        message.includes('react.dev/link/react-devtools')) {
-      return;
-    }
-    originalConsoleLog.apply(console, args);
-  };
-}
-
-// Utilisation de polices système pour éviter les preloads
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: {
-    default: "IA Home - Plateforme d'Intelligence Artificielle | Formation IA & Outils IA",
-    template: "%s | IA Home - Plateforme d'Intelligence Artificielle"
-  },
-  description: "Découvrez l'IA avec IA Home : formations interactives, outils Whisper, Stable Diffusion, ComfyUI. Apprenez l'intelligence artificielle à votre rythme avec nos modules pratiques et nos cours adaptés à tous les niveaux.",
+  title: 'IA Home - Plateforme d\'Intelligence Artificielle | Formation IA & Outils IA',
+  description: 'Découvrez l\'IA avec IA Home : formations interactives, outils Whisper, Stable Diffusion, ComfyUI. Apprenez l\'intelligence artificielle à votre rythme avec nos modules pratiques et nos cours adaptés à tous les niveaux.',
+  applicationName: 'IA Home',
+  authors: [{ name: 'IA Home', url: 'https://iahome.fr' }],
   keywords: [
-    "intelligence artificielle",
-    "IA",
-    "formation IA",
-    "Whisper",
-    "Stable Diffusion", 
-    "ComfyUI",
-    "apprentissage IA",
-    "tutoriel IA",
-    "outils IA",
-    "plateforme IA",
-    "cours IA",
-    "formation intelligence artificielle",
-    "développement IA",
-    "machine learning",
-    "deep learning",
-    "IA française"
+    'intelligence artificielle',
+    'IA',
+    'formation IA',
+    'Whisper',
+    'Stable Diffusion',
+    'ComfyUI',
+    'apprentissage IA',
+    'tutoriel IA',
+    'outils IA',
+    'plateforme IA',
+    'cours IA',
+    'formation intelligence artificielle',
+    'développement IA',
+    'machine learning',
+    'deep learning',
+    'IA française'
   ],
-  authors: [{ name: "IA Home", url: "https://iahome.fr" }],
-  creator: "IA Home",
-  publisher: "IA Home",
-  applicationName: "IA Home",
-  category: "Technology",
-  classification: "Intelligence Artificielle",
+  creator: 'IA Home',
+  publisher: 'IA Home',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  category: 'Technology',
+  classification: 'Intelligence Artificielle',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    viewportFit: 'cover',
+  },
   formatDetection: {
-    email: false,
-    address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://iahome.fr'),
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'IA Home',
+  },
+  themeColor: '#2563eb',
   alternates: {
-    canonical: '/',
+    canonical: 'https://iahome.fr',
     languages: {
       'fr-FR': 'https://iahome.fr',
     },
   },
   openGraph: {
-    title: "IA Home - Plateforme d'Intelligence Artificielle | Formation IA & Outils IA",
-    description: "Découvrez l'IA avec IA Home : formations interactives, outils Whisper, Stable Diffusion, ComfyUI. Apprenez l'intelligence artificielle à votre rythme.",
+    title: 'IA Home - Plateforme d\'Intelligence Artificielle | Formation IA & Outils IA',
+    description: 'Découvrez l\'IA avec IA Home : formations interactives, outils Whisper, Stable Diffusion, ComfyUI. Apprenez l\'intelligence artificielle à votre rythme.',
     url: 'https://iahome.fr',
     siteName: 'IA Home',
+    locale: 'fr_FR',
+    countryName: 'France',
     images: [
       {
-        url: '/images/og-image.jpg',
+        url: 'https://iahome.fr/images/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'IA Home - Plateforme d\'Intelligence Artificielle - Formation et Outils IA',
         type: 'image/jpeg',
       },
     ],
-    locale: 'fr_FR',
     type: 'website',
-    countryName: 'France',
   },
   twitter: {
     card: 'summary_large_image',
     site: '@iahome_fr',
     creator: '@iahome_fr',
-    title: "IA Home - Plateforme d'Intelligence Artificielle | Formation IA & Outils IA",
-    description: "Découvrez l'IA avec IA Home : formations interactives, outils Whisper, Stable Diffusion, ComfyUI. Apprenez l'intelligence artificielle à votre rythme.",
-    images: ['/images/og-image.jpg'],
+    title: 'IA Home - Plateforme d\'Intelligence Artificielle | Formation IA & Outils IA',
+    description: 'Découvrez l\'IA avec IA Home : formations interactives, outils Whisper, Stable Diffusion, ComfyUI. Apprenez l\'intelligence artificielle à votre rythme.',
+    images: ['https://iahome.fr/images/og-image.jpg'],
   },
-  robots: {
-    index: true,
-    follow: true,
-    nocache: false,
-    googleBot: {
-      index: true,
-      follow: true,
-      noimageindex: false,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
-  verification: {
-    google: 'your-google-verification-code',
-    yandex: 'your-yandex-verification-code',
-    yahoo: 'your-yahoo-verification-code',
-  },
-  other: {
-    'mobile-web-app-capable': 'yes',
-    'apple-mobile-web-app-capable': 'yes',
-    'apple-mobile-web-app-status-bar-style': 'default',
-    'apple-mobile-web-app-title': 'IA Home',
-    'application-name': 'IA Home',
-    'msapplication-TileColor': '#2563eb',
-    'theme-color': '#2563eb',
-    'format-detection': 'telephone=no',
-    'mobile-web-app-status-bar-style': 'black-translucent',
-  } as Record<string, string>,
-};
+}
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <html lang="fr" className="font-system">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
         <meta name="format-detection" content="telephone=no" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="IA Home" />
-        <FontAwesomeLocal />
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            // Redirection automatique pour qrcodes.iahome.fr
+            if (window.location.hostname === 'qrcodes.iahome.fr') {
+              window.location.href = '/qrcodes';
+            }
+          `
+        }} />
       </head>
       <body className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <CSSOptimizer />
-        <PerformanceOptimizer />
-        <OptimizedWebVitals />
-        <ResourceOptimizer />
-        <HTMLPreloadCleaner />
-        <CSSPreloadManager />
-        <AggressivePreloadCleaner />
-        <MobileOptimizer />
-        <AdaptiveLayout>
-          <ClientTokenProvider>
-            <TokenProvider>
-              <SimpleHeader />
-              <main className="flex-1">
-                {children}
-              </main>
-              <Footer />
-            </TokenProvider>
-          </ClientTokenProvider>
-        </AdaptiveLayout>
-        <ConditionalComponents />
+        <TokenProvider>
+          <ClientHeader />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </TokenProvider>
       </body>
     </html>
-  );
+  )
 }

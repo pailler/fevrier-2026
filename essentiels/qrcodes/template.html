@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' http://localhost:7005 https://qrcodes.iahome.fr;">
     <title>Générateur de QR Codes Dynamiques - IAHome</title>
     <style>
         * {
@@ -517,6 +518,22 @@
             background: #059669;
         }
 
+        .nav-btn.finalize {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 12px 24px;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+            border: 2px solid #f59e0b;
+        }
+
+        .nav-btn.finalize:hover {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+        }
+
         /* Error Messages */
         .error-message {
             background: #fef2f2;
@@ -624,6 +641,10 @@
                     <div class="step-circle">8</div>
                     <div class="step-label">QR Dynamique</div>
                     </div>
+                <div class="progress-step" data-step="9">
+                    <div class="step-circle">9</div>
+                    <div class="step-label">Final</div>
+                    </div>
                 </div>
 
             <!-- Step 1: Style Selection -->
@@ -639,7 +660,6 @@
                             <ul>
                                 <li>URL, texte, email</li>
                                 <li>Personnalisation visuelle</li>
-                                <li>Pas de statistiques</li>
                             </ul>
                     </div>
                         <div class="style-card" data-style="dynamic">
@@ -656,8 +676,8 @@
 
                 <!-- Navigation -->
                 <div class="navigation">
-                    <button id="prevBtn" class="nav-btn prev" onclick="prevStep()" style="display: none;">← Précédent</button>
-                    <button id="nextBtn" class="nav-btn next" onclick="nextStep()">Suivant →</button>
+                    <button id="prevBtn" class="nav-btn prev" style="display: none;">← Précédent</button>
+                    <button id="nextBtn" class="nav-btn next">Suivant →</button>
                 </div>
             </div>
 
@@ -687,8 +707,8 @@
 
                 <!-- Navigation -->
                 <div class="navigation">
-                    <button id="prevBtn" class="nav-btn prev" onclick="prevStep()">← Précédent</button>
-                    <button id="nextBtn" class="nav-btn next" onclick="nextStep()">Suivant →</button>
+                    <button id="prevBtn" class="nav-btn prev">← Précédent</button>
+                    <button id="nextBtn" class="nav-btn next">Suivant →</button>
                 </div>
             </div>
 
@@ -708,8 +728,8 @@
 
                 <!-- Navigation -->
                 <div class="navigation">
-                    <button id="prevBtn" class="nav-btn prev" onclick="prevStep()">← Précédent</button>
-                    <button id="nextBtn" class="nav-btn next" onclick="nextStep()">Suivant →</button>
+                    <button id="prevBtn" class="nav-btn prev">← Précédent</button>
+                    <button id="nextBtn" class="nav-btn next">Suivant →</button>
                 </div>
             </div>
 
@@ -733,8 +753,8 @@
 
                 <!-- Navigation -->
                 <div class="navigation">
-                    <button id="prevBtn" class="nav-btn prev" onclick="prevStep()">← Précédent</button>
-                    <button id="nextBtn" class="nav-btn next" onclick="nextStep()">Suivant →</button>
+                    <button id="prevBtn" class="nav-btn prev">← Précédent</button>
+                    <button id="nextBtn" class="nav-btn next">Suivant →</button>
                 </div>
             </div>
 
@@ -751,14 +771,14 @@
                     </div>
                     <div id="logo-preview" style="display: none;">
                         <img id="logo-preview-img" class="logo-preview" alt="Logo preview">
-                        <button onclick="removeLogo()" style="margin-top: 10px; padding: 8px 16px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer;">Supprimer le logo</button>
+                        <button id="removeLogoBtn" style="margin-top: 10px; padding: 8px 16px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer;">Supprimer le logo</button>
                     </div>
                     </div>
 
                 <!-- Navigation -->
                 <div class="navigation">
-                    <button id="prevBtn" class="nav-btn prev" onclick="prevStep()">← Précédent</button>
-                    <button id="nextBtn" class="nav-btn next" onclick="nextStep()">Suivant →</button>
+                    <button id="prevBtn" class="nav-btn prev">← Précédent</button>
+                    <button id="nextBtn" class="nav-btn next">Suivant →</button>
                 </div>
             </div>
 
@@ -785,8 +805,8 @@
 
                 <!-- Navigation -->
                 <div class="navigation">
-                    <button id="prevBtn" class="nav-btn prev" onclick="prevStep()">← Précédent</button>
-                    <button id="nextBtn" class="nav-btn next" onclick="nextStep()">Suivant →</button>
+                    <button id="prevBtn" class="nav-btn prev">← Précédent</button>
+                    <button id="nextBtn" class="nav-btn next">Suivant →</button>
                 </div>
             </div>
 
@@ -807,14 +827,13 @@
                         <li>Modifier le contenu à tout moment</li>
                         <li>Consulter les statistiques de scan</li>
                     <li>Gérer votre QR code avec un token unique</li>
-                    <li>Recevoir des notifications d'activité</li>
                 </ul>
                 </div>
 
                 <!-- Navigation -->
                 <div class="navigation">
-                    <button id="prevBtn" class="nav-btn prev" onclick="prevStep()">← Précédent</button>
-                    <button id="nextBtn" class="nav-btn next" onclick="nextStep()">Suivant →</button>
+                    <button id="prevBtn" class="nav-btn prev">← Précédent</button>
+                    <button id="nextBtn" class="nav-btn next">Suivant →</button>
                 </div>
             </div>
 
@@ -847,8 +866,8 @@
 
                 <!-- Navigation -->
                 <div class="navigation">
-                    <button id="prevBtn" class="nav-btn prev" onclick="prevStep()" style="display: none;">← Précédent</button>
-                    <button id="nextBtn" class="nav-btn next" onclick="nextStep()">Finaliser →</button>
+                    <button id="prevBtn" class="nav-btn prev">← Précédent</button>
+                    <button id="nextBtn" class="nav-btn next">Suivant →</button>
                 </div>
             </div>
 
@@ -858,25 +877,25 @@
                 <p class="step-description">Votre QR code est prêt. Que souhaitez-vous faire maintenant ?</p>
                 
                 <div class="final-actions">
-                    <div class="action-card" onclick="downloadCurrentQRCode()">
+                    <div class="action-card" id="downloadActionCard">
                         <div class="action-icon">📥</div>
                         <h3>Télécharger</h3>
                         <p>Téléchargez votre QR code en PNG</p>
                     </div>
                     
-                    <div class="action-card" onclick="shareQRCode()">
+                    <div class="action-card" id="shareActionCard">
                         <div class="action-icon">🔗</div>
                         <h3>Partager</h3>
                         <p>Copiez le lien de votre QR code</p>
                     </div>
                     
-                    <div class="action-card" onclick="manageQRCode()">
+                    <div class="action-card" id="manageActionCard">
                         <div class="action-icon">⚙️</div>
                         <h3>Gérer</h3>
                         <p>Modifiez votre QR code dynamique</p>
                     </div>
                     
-                    <div class="action-card" onclick="createNewQRCode()">
+                    <div class="action-card" id="newActionCard">
                         <div class="action-icon">➕</div>
                         <h3>Nouveau QR Code</h3>
                         <p>Créez un autre QR code</p>
@@ -899,8 +918,8 @@
 
                 <!-- Navigation -->
                 <div class="navigation">
-                    <button id="prevBtn" class="nav-btn prev" onclick="prevStep()">← Retour</button>
-                    <button id="finishBtn" class="nav-btn finish" onclick="finishWorkflow()">Terminer</button>
+                    <button id="prevBtn" class="nav-btn prev">← Retour</button>
+                    <button id="finishBtn" class="nav-btn finish">Terminer</button>
                 </div>
             </div>
 
@@ -927,6 +946,7 @@
             setupEventListeners();
             updateProgressIndicators();
             updateNavigation();
+            updateContentPlaceholder(); // Initialiser le placeholder
         });
 
         function initializeWorkflow() {
@@ -969,6 +989,7 @@
             // Content type
             document.getElementById('content-type').addEventListener('change', function() {
                 workflowState.contentType = this.value;
+                updateContentPlaceholder();
             });
 
             // Content input
@@ -996,7 +1017,7 @@
         }
 
         function setupEventListeners() {
-        // Logo upload
+            // Logo upload
             const logoUpload = document.getElementById('logo-upload');
             const logoInput = document.getElementById('logo-input');
 
@@ -1004,6 +1025,44 @@
             logoUpload.addEventListener('dragover', handleDragOver);
             logoUpload.addEventListener('drop', handleDrop);
             logoInput.addEventListener('change', handleLogoUpload);
+
+            // Navigation buttons
+            document.querySelectorAll('#prevBtn').forEach(btn => {
+                btn.addEventListener('click', prevStep);
+            });
+            document.querySelectorAll('#nextBtn').forEach(btn => {
+                btn.addEventListener('click', nextStep);
+            });
+            document.querySelectorAll('#finishBtn').forEach(btn => {
+                btn.addEventListener('click', finishWorkflow);
+            });
+
+            // Remove logo button
+            const removeLogoBtn = document.getElementById('removeLogoBtn');
+            if (removeLogoBtn) {
+                removeLogoBtn.addEventListener('click', removeLogo);
+            }
+
+            // Action cards
+            const downloadActionCard = document.getElementById('downloadActionCard');
+            if (downloadActionCard) {
+                downloadActionCard.addEventListener('click', downloadCurrentQRCode);
+            }
+
+            const shareActionCard = document.getElementById('shareActionCard');
+            if (shareActionCard) {
+                shareActionCard.addEventListener('click', shareQRCode);
+            }
+
+            const manageActionCard = document.getElementById('manageActionCard');
+            if (manageActionCard) {
+                manageActionCard.addEventListener('click', manageQRCode);
+            }
+
+            const newActionCard = document.getElementById('newActionCard');
+            if (newActionCard) {
+                newActionCard.addEventListener('click', createNewQRCode);
+            }
         }
 
         function handleDragOver(e) {
@@ -1058,16 +1117,59 @@
                     updateProgressIndicators();
                     updateNavigation();
                     
-                    // Si on arrive à l'étape 8, générer le QR code dynamique
-                    if (currentStep === 8 && workflowState.isDynamic) {
-                        generateDynamicQRCode();
-                    }
-                    // Si on arrive à l'étape 7 et que c'est un QR code statique, générer le QR code
-                    if (currentStep === 7 && !workflowState.isDynamic) {
-                        generateStaticQRCode();
+                    // Si on arrive à l'étape 8, générer le QR code automatiquement
+                    if (currentStep === 8) {
+                        console.log('Etape 8 atteinte, generation du QR code...');
+                        // Désactiver le bouton suivant pendant la génération
+                        const nextBtn = document.getElementById('nextBtn');
+                        if (nextBtn) {
+                            nextBtn.disabled = true;
+                            nextBtn.textContent = 'Génération en cours...';
+                        }
+                        
+                        if (workflowState.isDynamic) {
+                            console.log('Generation QR dynamique...');
+                            generateDynamicQRCode().then(() => {
+                                console.log('QR dynamique genere, passage a etape 9');
+                                // Passer automatiquement à l'étape 9 après génération
+                                currentStep = 9;
+                                showStep(currentStep);
+                                updateProgressIndicators();
+                                updateNavigation();
+                                showFinalSummary();
+                            }).catch((error) => {
+                                console.error('Erreur generation QR dynamique:', error);
+                                showError('Erreur lors de la génération du QR code dynamique');
+                                // Réactiver le bouton en cas d'erreur
+                                if (nextBtn) {
+                                    nextBtn.disabled = false;
+                                    nextBtn.textContent = 'Suivant →';
+                                }
+                            });
+                        } else {
+                            console.log('Generation QR statique...');
+                            generateStaticQRCode().then(() => {
+                                console.log('QR statique genere, passage a etape 9');
+                                // Passer automatiquement à l'étape 9 après génération
+                                currentStep = 9;
+                                showStep(currentStep);
+                                updateProgressIndicators();
+                                updateNavigation();
+                                showFinalSummary();
+                            }).catch((error) => {
+                                console.error('Erreur generation QR statique:', error);
+                                showError('Erreur lors de la génération du QR code statique');
+                                // Réactiver le bouton en cas d'erreur
+                                if (nextBtn) {
+                                    nextBtn.disabled = false;
+                                    nextBtn.textContent = 'Suivant →';
+                                }
+                            });
+                        }
                     }
                     // Si on arrive à l'étape 9, afficher le résumé final
                     if (currentStep === 9) {
+                        console.log('Etape 9 atteinte, affichage du resume final');
                         showFinalSummary();
                     }
                 }
@@ -1127,15 +1229,26 @@
                     nextBtn.style.display = 'none';
                 } else {
                     nextBtn.style.display = 'block';
-                    nextBtn.textContent = currentStep === 7 ? 'Générer →' : 
-                                        currentStep === 8 ? 'Finaliser →' : 'Suivant →';
+                    if (currentStep === 7) {
+                        nextBtn.textContent = 'Suivi du QR code →';
+                        nextBtn.className = 'nav-btn next finalize';
+                    } else {
+                        nextBtn.textContent = currentStep === 8 ? 'Suivant →' : 'Suivant →';
+                        nextBtn.className = 'nav-btn next';
+                    }
                 }
             } else {
                 if (currentStep >= 9) {
                     nextBtn.style.display = 'none';
                 } else {
                     nextBtn.style.display = 'block';
-                    nextBtn.textContent = currentStep === 7 ? 'Finaliser →' : 'Suivant →';
+                    if (currentStep === 7) {
+                        nextBtn.textContent = 'Suivi du QR code →';
+                        nextBtn.className = 'nav-btn next finalize';
+                    } else {
+                        nextBtn.textContent = 'Suivant →';
+                        nextBtn.className = 'nav-btn next';
+                    }
                 }
             }
         }
@@ -1213,16 +1326,19 @@
 
         async function generateStaticQRCode() {
             try {
-                const response = await fetch('/api/qr/static', {
+                // Formater le contenu selon le type choisi
+                const formattedContent = formatContentForQR(workflowState.content, workflowState.contentType);
+                
+                const response = await fetch('http://localhost:7005/api/qr/static', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        text: workflowState.content,
+                        content: formattedContent,
                         size: workflowState.size,
-                        foreground_color: workflowState.foregroundColor,
-                        background_color: workflowState.backgroundColor,
+                        qr_color: workflowState.foregroundColor,
+                        bg_color: workflowState.backgroundColor,
                         error_correction: workflowState.errorCorrection,
                         margin: workflowState.margin,
                         logo: workflowState.logo
@@ -1235,6 +1351,9 @@
                     // Stocker les données globalement
                     currentQRCodeData = result.qr_code;
                     currentQRCodeId = 'static-qr';
+                    currentManagementToken = null;
+                    currentManagementUrl = null;
+                    currentRedirectUrl = null;
                     
                     // Afficher le QR code
                     document.getElementById('qr-preview-placeholder').style.display = 'none';
@@ -1245,36 +1364,51 @@
                     addDownloadButton(result.qr_code, 'static-qr');
 
                     showSuccess('QR code statique créé avec succès !');
+                    return Promise.resolve();
                 } else {
                     showError('Erreur lors de la création du QR code : ' + result.error);
+                    return Promise.reject(new Error(result.error));
                 }
             } catch (error) {
                 console.error('Erreur:', error);
                 showError('Erreur lors de la création du QR code');
+                return Promise.reject(error);
             }
         }
 
         async function generateDynamicQRCode() {
             try {
-                const response = await fetch('/api/dynamic/qr', {
+                console.log('=== GENERATION QR DYNAMIQUE ===');
+                console.log('Workflow state:', workflowState);
+                
+                // Formater le contenu selon le type choisi
+                const formattedContent = formatContentForQR(workflowState.content, workflowState.contentType);
+                console.log('Contenu formate:', formattedContent);
+                
+                const requestData = {
+                    content: formattedContent,
+                    url: formattedContent,
+                    name: workflowState.name || 'Mon QR Code',
+                    size: workflowState.size,
+                    qr_color: workflowState.foregroundColor,
+                    bg_color: workflowState.backgroundColor,
+                    error_correction: workflowState.errorCorrection,
+                    margin: workflowState.margin,
+                    logo: workflowState.logo
+                };
+                console.log('Donnees envoyees:', requestData);
+                
+                const response = await fetch('http://localhost:7005/api/dynamic/qr', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        text: workflowState.content,
-                        url: workflowState.content,
-                        name: workflowState.name || 'Mon QR Code',
-                        size: workflowState.size,
-                        foreground_color: workflowState.foregroundColor,
-                        background_color: workflowState.backgroundColor,
-                        error_correction: workflowState.errorCorrection,
-                        margin: workflowState.margin,
-                        logo: workflowState.logo
-                    })
+                    body: JSON.stringify(requestData)
                 });
 
+                console.log('Reponse API dynamique:', response.status, response.statusText);
                 const result = await response.json();
+                console.log('Resultat API dynamique:', result);
 
                 if (result.success) {
                     console.log('QR code généré avec succès:', result);
@@ -1283,6 +1417,9 @@
                     // Stocker les données globalement
                     currentQRCodeData = result.qr_code;
                     currentQRCodeId = result.qr_id;
+                    currentManagementToken = result.management_token;
+                    currentManagementUrl = result.management_url;
+                    currentRedirectUrl = result.redirect_url;
                     
                     // Afficher le QR code
                     const placeholder = document.getElementById('qr-preview-placeholder');
@@ -1308,12 +1445,15 @@
                     addDownloadButton(result.qr_code, result.qr_id);
 
                     showSuccess('QR code dynamique créé avec succès !');
+                    return Promise.resolve();
                 } else {
                     showError('Erreur lors de la création du QR code : ' + result.error);
+                    return Promise.reject(new Error(result.error));
                 }
             } catch (error) {
                 console.error('Erreur:', error);
                 showError('Erreur lors de la création du QR code');
+                return Promise.reject(error);
             }
         }
 
@@ -1349,6 +1489,89 @@
         // Variables globales pour stocker les données du QR code généré
         let currentQRCodeData = null;
         let currentQRCodeId = null;
+        let currentManagementToken = null;
+        let currentManagementUrl = null;
+        let currentRedirectUrl = null;
+
+        function formatContentForQR(content, contentType) {
+            if (!content || !contentType) {
+                return content;
+            }
+
+            switch (contentType) {
+                case 'url':
+                    // S'assurer que l'URL commence par http:// ou https://
+                    if (!content.startsWith('http://') && !content.startsWith('https://')) {
+                        return 'https://' + content;
+                    }
+                    return content;
+                
+                case 'email':
+                    // Format email pour QR code
+                    return `mailto:${content}`;
+                
+                case 'phone':
+                    // Format téléphone pour QR code
+                    return `tel:${content}`;
+                
+                case 'sms':
+                    // Format SMS pour QR code
+                    return `sms:${content}`;
+                
+                case 'vcard':
+                    // Format vCard basique
+                    return `BEGIN:VCARD
+VERSION:3.0
+FN:${content}
+END:VCARD`;
+                
+                case 'wifi':
+                    // Format WiFi pour QR code (exemple basique)
+                    return `WIFI:T:WPA;S:${content};P:password;;`;
+                
+                case 'location':
+                    // Format géolocalisation (exemple)
+                    return `geo:0,0?q=${encodeURIComponent(content)}`;
+                
+                case 'text':
+                default:
+                    // Texte brut, pas de formatage
+                    return content;
+            }
+        }
+
+        function updateContentPlaceholder() {
+            const contentInput = document.getElementById('content-input');
+            const contentType = workflowState.contentType;
+            
+            switch (contentType) {
+                case 'url':
+                    contentInput.placeholder = 'Exemple: google.com ou https://example.com';
+                    break;
+                case 'email':
+                    contentInput.placeholder = 'Exemple: contact@example.com';
+                    break;
+                case 'phone':
+                    contentInput.placeholder = 'Exemple: +33123456789';
+                    break;
+                case 'sms':
+                    contentInput.placeholder = 'Exemple: +33123456789';
+                    break;
+                case 'vcard':
+                    contentInput.placeholder = 'Exemple: Jean Dupont';
+                    break;
+                case 'wifi':
+                    contentInput.placeholder = 'Exemple: MonWiFi';
+                    break;
+                case 'location':
+                    contentInput.placeholder = 'Exemple: Paris, France';
+                    break;
+                case 'text':
+                default:
+                    contentInput.placeholder = 'Entrez votre contenu ici...';
+                    break;
+            }
+        }
 
         function showFinalSummary() {
             // Afficher le résumé
@@ -1361,11 +1584,11 @@
             document.getElementById('summary-colors').textContent = `${workflowState.foregroundColor} sur ${workflowState.backgroundColor}`;
             
             // Afficher les informations de gestion pour les QR codes dynamiques
-            if (workflowState.isDynamic) {
+            if (workflowState.isDynamic && currentManagementUrl && currentRedirectUrl) {
                 const managementDiv = document.getElementById('summary-management');
                 managementDiv.style.display = 'block';
-                document.getElementById('summary-management-url').textContent = document.getElementById('management-url').textContent;
-                document.getElementById('summary-redirect-url').textContent = document.getElementById('redirect-url').textContent;
+                document.getElementById('summary-management-url').textContent = currentManagementUrl;
+                document.getElementById('summary-redirect-url').textContent = currentRedirectUrl;
             }
         }
 
@@ -1378,26 +1601,20 @@
         }
 
         function shareQRCode() {
-            if (workflowState.isDynamic) {
-                const redirectUrl = document.getElementById('redirect-url').textContent;
-                if (redirectUrl) {
-                    navigator.clipboard.writeText(redirectUrl).then(() => {
-                        showSuccess('Lien copié dans le presse-papiers !');
-                    }).catch(() => {
-                        showError('Impossible de copier le lien');
-                    });
-                }
+            if (workflowState.isDynamic && currentRedirectUrl) {
+                navigator.clipboard.writeText(currentRedirectUrl).then(() => {
+                    showSuccess('Lien copié dans le presse-papiers !');
+                }).catch(() => {
+                    showError('Impossible de copier le lien');
+                });
             } else {
                 showError('Le partage n\'est disponible que pour les QR codes dynamiques');
             }
         }
 
         function manageQRCode() {
-            if (workflowState.isDynamic) {
-                const managementUrl = document.getElementById('management-url').textContent;
-                if (managementUrl) {
-                    window.open(managementUrl, '_blank');
-                }
+            if (workflowState.isDynamic && currentManagementUrl) {
+                window.open(currentManagementUrl, '_blank');
             } else {
                 showError('La gestion n\'est disponible que pour les QR codes dynamiques');
             }
@@ -1440,6 +1657,9 @@
             // Réinitialiser les variables globales
             currentQRCodeData = null;
             currentQRCodeId = null;
+            currentManagementToken = null;
+            currentManagementUrl = null;
+            currentRedirectUrl = null;
 
             // Réinitialiser l'interface
             document.querySelectorAll('.style-card').forEach(card => card.classList.remove('selected'));

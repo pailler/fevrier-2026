@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { supabase } from '../utils/supabaseClient';
+import { useCustomAuth } from '../hooks/useCustomAuth';
 import DynamicNavigation from './DynamicNavigation';
 import TokenBalance from './TokenBalance';
 import { NotificationServiceClient } from '../utils/notificationServiceClient';
@@ -11,61 +11,19 @@ import { useIframeDetection } from '../utils/useIframeDetection';
 
 export default function Header() {
   const router = useRouter();
-  const [session, setSession] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
+  const { user, isAuthenticated, loading, signOut } = useCustomAuth();
   const [role, setRole] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isInIframe = useIframeDetection();
 
-  // Vérification de la configuration Supabase
-  useEffect(() => {
-    // Récupérer la session actuelle
-    const getSession = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      setSession(currentSession);
-      setUser(currentSession?.user || null);
-    };
-
-    getSession();
-
-    // Écouter les changements de session
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: any, session: any) => {
-        setSession(session);
-        setUser(session?.user || null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
-
   // Vérifier le rôle de l'utilisateur
   useEffect(() => {
-    const fetchUserRole = async () => {
-      if (!user?.id) {
-        setRole(null);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-
-        if (!error && data) {
-          setRole(data.role);
-        } else {
-          setRole('user');
-        }
-      } catch (error) {
-        setRole('user');
-      }
-    };
-
-    fetchUserRole();
-  }, [session, user]);
+    if (user?.role) {
+      setRole(user.role);
+    } else {
+      setRole('user');
+    }
+  }, [user]);
 
   // Fonction pour obtenir l'URL d'accès d'un module
   const getModuleAccessUrl = async (moduleName: string) => {
@@ -101,7 +59,12 @@ export default function Header() {
               <span className="hidden sm:inline">Bienvenue sur IAhome</span>
             </div>
             <div className="flex items-center space-x-3">
-              {!session ? (
+              {loading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-blue-200 border-t-white rounded-full animate-spin"></div>
+                  <span className="text-blue-100 text-sm">Chargement...</span>
+                </div>
+              ) : !isAuthenticated ? (
                 <div className="flex items-center space-x-3">
                   <button 
                     className="text-blue-100 hover:text-white transition-colors text-sm"
@@ -177,7 +140,7 @@ export default function Header() {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
-            {session && (
+            {isAuthenticated && (
               <>
                 <TokenBalance
                   className="text-blue-100 hover:text-white transition-colors"
@@ -196,26 +159,24 @@ export default function Header() {
                   onClick={async () => { 
                     // Envoyer une notification de déconnexion avant de se déconnecter
                     try {
-                      ;
                       console.log('🔍 DEBUG: Email:', user?.email);
-                      ;
                       
                       const notificationService = NotificationServiceClient.getInstance();
-                      ;
                       
                       const result = await notificationService.notifyUserLogout(user?.email || '', user?.email?.split('@')[0] || 'Utilisateur');
                       console.log('🔍 DEBUG: Résultat notification:', result);
                       
                       if (result) {
-                        ;
+                        console.log('✅ Notification de déconnexion envoyée');
                       } else {
-                        ;
+                        console.log('❌ Échec envoi notification de déconnexion');
                       }
                     } catch (notificationError) {
                       console.error('❌ Erreur lors de l\'envoi de la notification de déconnexion:', notificationError);
                     }
                     
-                    await supabase.auth.signOut(); 
+                    // Utiliser la fonction signOut de useCustomAuth
+                    signOut();
                     router.push('/login'); 
                   }}
                   className="text-white hover:text-blue-100 transition-colors font-medium px-3 py-1 rounded-lg hover:bg-blue-500 cursor-pointer"
@@ -225,7 +186,7 @@ export default function Header() {
               </>
             )}
             
-            {!session && (
+            {!isAuthenticated && (
               <Link 
                 href="/contact" 
                 className="text-white font-medium px-4 py-2 rounded-lg hover:bg-blue-500 transition-colors"
@@ -282,7 +243,7 @@ export default function Header() {
               </div>
 
               {/* Actions utilisateur */}
-              {session && (
+              {isAuthenticated && (
                 <>
                   <div className="px-4 py-2 border-b border-blue-500">
                     <div className="text-sm text-blue-100 mb-2">Compte</div>
@@ -300,7 +261,7 @@ export default function Header() {
                     </Link>
                     <button
                       onClick={async () => { 
-                        await supabase.auth.signOut(); 
+                        await signOut(); 
                         router.push('/login'); 
                       }}
                       className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors w-full text-left"

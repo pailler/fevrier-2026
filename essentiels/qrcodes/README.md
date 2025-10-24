@@ -1,6 +1,6 @@
-# 🎯 QR Code Generator - Dynamique avec Base de Données PostgreSQL
+# 🎯 QR Code Generator - Dynamique avec Supabase
 
-Un service complet de génération de QR codes dynamiques avec stockage en base de données PostgreSQL, statistiques avancées et interface web moderne.
+Un service complet de génération de QR codes dynamiques avec stockage Supabase, statistiques avancées et interface web moderne.
 
 ## 🚀 Fonctionnalités
 
@@ -8,7 +8,7 @@ Un service complet de génération de QR codes dynamiques avec stockage en base 
 - **Création** : Génération de QR codes avec ID unique
 - **Modification** : Changement de l'URL de destination sans régénérer le QR code
 - **Redirection** : Système de redirection automatique avec comptage des scans
-- **Persistance** : Stockage robuste en base de données PostgreSQL
+- **Persistance** : Stockage robuste avec Supabase
 
 ### Statistiques Avancées
 - **Compteur de scans** : Suivi du nombre de scans par QR code

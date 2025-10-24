@@ -504,31 +504,6 @@ export default function CardDetailPage() {
     }
   }, [card, isAuthenticated, user, quickAccessAttempted, accessModuleWithJWT]);
 
-  const handleSubscribe = (card: Card) => {
-    if (!card?.id) {
-      console.error('❌ Carte invalide:', card);
-      return;
-    }
-
-    const isSelected = selectedCards.some(c => c.id === card.id);
-    let newSelectedCards;
-    
-    if (isSelected) {
-      newSelectedCards = selectedCards.filter(c => c.id !== card.id);
-      console.log('Désabonnement de:', card.title);
-    } else {
-      newSelectedCards = [...selectedCards, card];
-      console.log('Abonnement à:', card.title);
-    }
-    
-    console.log('Nouveaux modules sélectionnés:', newSelectedCards);
-    setSelectedCards(newSelectedCards);
-    
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('selectedCards', JSON.stringify(newSelectedCards));
-      console.log('localStorage mis à jour');
-    }
-  };
 
   const isCardSelected = (cardId: string) => {
     if (!cardId) return false;
@@ -789,7 +764,7 @@ export default function CardDetailPage() {
             <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
               <iframe
                 className="w-full h-full rounded-2xl"
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&modestbranding=1"
+                src="https://www.youtube.com/embed/6z6Fh4buWrU?autoplay=0&rel=0&modestbranding=1"
                 title="Démonstration LibreSpeed"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1128,7 +1103,7 @@ export default function CardDetailPage() {
             <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
               <iframe
                 className="w-full h-full rounded-2xl"
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&modestbranding=1"
+                src="https://www.youtube.com/embed/IZoAzwgQ8YY?autoplay=0&rel=0&modestbranding=1"
                 title="Démonstration MeTube"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1187,15 +1162,16 @@ export default function CardDetailPage() {
       {isPsitransfer && (
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            {/* Colonne 1 - Interface PsiTransfer */}
-            <div className="w-full aspect-video bg-gradient-to-br from-blue-100 to-indigo-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600">
-                <div className="text-center text-white">
-                  <div className="text-6xl mb-4">📁</div>
-                  <h3 className="text-2xl font-bold mb-2">PsiTransfer</h3>
-                  <p className="text-blue-100">Transfert de fichiers sécurisé</p>
-                </div>
-              </div>
+            {/* Colonne 1 - Vidéo PsiTransfer */}
+            <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
+              <iframe
+                className="w-full h-full rounded-2xl"
+                src="https://www.youtube.com/embed/IZoAzwgQ8YY?autoplay=0&rel=0&modestbranding=1"
+                title="Démonstration PsiTransfer"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
             </div>
             
             {/* Colonne 2 - Système de boutons */}
@@ -1427,8 +1403,7 @@ export default function CardDetailPage() {
                         (ping) avec une précision au milliseconde près. Les tests sont optimisés pour différents types de connexions.
                       </p>
                       <p className="text-lg leading-relaxed">
-                        <strong>Statistiques détaillées :</strong> Visualisez vos résultats avec des graphiques interactifs, 
-                        suivez l'évolution de vos performances dans le temps, et exportez vos données pour analyse approfondie.
+                        <strong>Statistiques détaillées :</strong> Analysez vos performances réseau avec précision.
                       </p>
                       <p className="text-lg leading-relaxed">
                         <strong>Compatibilité universelle :</strong> Fonctionne sur tous les navigateurs modernes (Chrome, Firefox, 

@@ -16,6 +16,12 @@ export default function Home() {
 
   // Vérification de la configuration et redirection
   useEffect(() => {
+    // Redirection pour qrcodes.iahome.fr
+    if (typeof window !== 'undefined' && window.location.hostname === 'qrcodes.iahome.fr') {
+      router.replace('/qrcodes');
+      return;
+    }
+
     // Redirection pour librespeed.iahome.fr
     if (typeof window !== 'undefined' && window.location.hostname === 'librespeed.iahome.fr') {
       // Vérifier s'il y a un token dans l'URL

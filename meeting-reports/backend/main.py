@@ -29,7 +29,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # FastAPI app
-app = FastAPI(title="Meeting Reports Generator", version="1.0.0")
+app = FastAPI(title="Compte rendus IA", version="1.0.0")
 
 # CORS
 app.add_middleware(
@@ -79,7 +79,7 @@ async def startup_event():
 # Routes
 @app.get("/")
 async def root():
-    return {"message": "Meeting Reports Generator API", "status": "running"}
+    return {"message": "Compte rendus IA API", "status": "running"}
 
 @app.get("/health")
 async def health_check():

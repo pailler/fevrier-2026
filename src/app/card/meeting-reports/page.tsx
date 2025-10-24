@@ -399,7 +399,7 @@ export default function MeetingReportsPage() {
 
             </div>
             
-            {/* Logo Meeting Reports animé */}
+                {/* Logo Compte rendus IA animé */}
             <div className="flex-1 flex justify-center">
               <div className="relative w-80 h-64">
                 {/* Formes géométriques abstraites */}
@@ -408,7 +408,7 @@ export default function MeetingReportsPage() {
                 <div className="absolute bottom-0 left-16 w-20 h-20 bg-cyan-400 transform rotate-45 opacity-80 animate-pulse"></div>
                 <div className="absolute bottom-16 right-16 w-16 h-16 bg-white rounded-full opacity-80 animate-bounce"></div>
                 
-                {/* Logo Meeting Reports centré */}
+                {/* Logo Compte rendus IA centré */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="bg-white/95 backdrop-blur-sm rounded-full p-6 shadow-2xl border-2 border-emerald-500/20">
                     <svg className="w-20 h-20" viewBox="0 0 24 24" fill="none">
@@ -472,7 +472,7 @@ export default function MeetingReportsPage() {
             <iframe
               className="w-full h-full rounded-2xl"
               src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&modestbranding=1"
-              title="Démonstration Meeting Reports"
+              title="Démonstration Compte rendus IA"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -522,12 +522,12 @@ export default function MeetingReportsPage() {
                   <div className="w-3/4 mx-auto">
                     <ModuleActivationButton
                       moduleId={card?.id || 'meeting-reports'}
-                      moduleName={card?.title || 'Meeting Reports'}
+                      moduleName={card?.title || 'Compte rendus IA'}
                       moduleCost={100}
-                      moduleDescription={card?.description || 'Module Meeting Reports activé'}
+                      moduleDescription={card?.description || 'Module Compte rendus IA activé'}
                       onActivationSuccess={() => {
                         setAlreadyActivatedModules(prev => [...prev, card?.id || 'meeting-reports']);
-                        alert(`✅ Module ${card?.title || 'Meeting Reports'} activé avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
+                        alert(`✅ Module ${card?.title || 'Compte rendus IA'} activé avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
                       }}
                       onActivationError={(error) => {
                         console.error('Erreur activation:', error);
@@ -586,7 +586,7 @@ export default function MeetingReportsPage() {
             <div className="prose max-w-none">
               <div className="text-center mb-12">
                 <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-emerald-900 via-teal-900 to-cyan-900 bg-clip-text text-transparent mb-4">
-                  À propos de Meeting Reports
+                  À propos de Compte rendus IA
                 </h3>
                 <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-cyan-500 mx-auto rounded-full"></div>
               </div>
@@ -595,7 +595,7 @@ export default function MeetingReportsPage() {
                 {/* Description principale */}
                 <div className="text-center max-w-5xl mx-auto">
                   <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
-                    Meeting Reports est une solution d'intelligence artificielle qui transforme automatiquement vos réunions 
+                    Compte rendus IA est une solution d'intelligence artificielle qui transforme automatiquement vos réunions 
                     en rapports professionnels détaillés. Enregistrez, transcrivez et résumez vos réunions avec une précision exceptionnelle.
                   </p>
                   {card?.subtitle && (
@@ -618,7 +618,7 @@ export default function MeetingReportsPage() {
               Révolutionnez vos réunions avec l'IA
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Meeting Reports automatise la création de rapports de réunion professionnels, 
+              Compte rendus IA automatise la création de rapports de réunion professionnels, 
               vous faisant gagner du temps et améliorant la productivité de votre équipe.
             </p>
           </div>
@@ -631,11 +631,11 @@ export default function MeetingReportsPage() {
                 <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                   <span className="text-white text-xl font-bold">1</span>
                 </div>
-                <h4 className="text-2xl font-bold text-emerald-900">Qu'est-ce que Meeting Reports ?</h4>
+                <h4 className="text-2xl font-bold text-emerald-900">Qu'est-ce que Compte rendus IA ?</h4>
               </div>
               <div className="space-y-4 text-gray-700">
                 <p className="text-lg leading-relaxed">
-                  Meeting Reports est une plateforme d'intelligence artificielle qui transforme automatiquement 
+                  Compte rendus IA est une plateforme d'intelligence artificielle qui transforme automatiquement 
                   vos réunions en rapports professionnels détaillés. Enregistrez vos réunions, uploadez des fichiers audio, 
                   et obtenez instantanément des transcriptions précises et des résumés intelligents.
                 </p>
@@ -652,7 +652,7 @@ export default function MeetingReportsPage() {
                 <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
                   <span className="text-white text-xl font-bold">2</span>
                 </div>
-                <h4 className="text-2xl font-bold text-green-900">Pourquoi choisir Meeting Reports ?</h4>
+                <h4 className="text-2xl font-bold text-green-900">Pourquoi choisir Compte rendus IA ?</h4>
               </div>
               <div className="space-y-4 text-gray-700">
                 <p className="text-lg leading-relaxed">

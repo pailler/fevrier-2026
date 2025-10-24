@@ -216,26 +216,6 @@ export default function StableDiffusionPage() {
     fetchCardDetails();
   }, [router]);
 
-  const handleSubscribe = (card: Card) => {
-    if (!card?.id) {
-      return;
-    }
-
-    const isSelected = selectedCards.some(c => c.id === card.id);
-    let newSelectedCards;
-    
-    if (isSelected) {
-      newSelectedCards = selectedCards.filter(c => c.id !== card.id);
-      } else {
-      newSelectedCards = [...selectedCards, card];
-      }
-    
-    setSelectedCards(newSelectedCards);
-    
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('selectedCards', JSON.stringify(newSelectedCards));
-      }
-  };
 
   const isCardSelected = (cardId: string) => {
     if (!cardId) return false;

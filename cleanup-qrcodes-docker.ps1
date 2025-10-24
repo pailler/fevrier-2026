@@ -136,3 +136,12 @@ Write-Host "🎉 Nettoyage des containers QR codes terminé !" -ForegroundColor 
 Write-Host "💡 Vous pouvez maintenant démarrer le service QR codes principal avec:" -ForegroundColor Cyan
 Write-Host "   cd essentiels\qrcodes && docker-compose up -d" -ForegroundColor Gray
 
+
+
+
+
+
+
+
+
+

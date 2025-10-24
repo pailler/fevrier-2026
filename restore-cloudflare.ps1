@@ -183,3 +183,12 @@ Write-Host "📋 Configuration utilisée: cloudflare-restored-config.yml" -Foreg
 Write-Host "🔍 Vérifiez les logs du tunnel pour plus de détails" -ForegroundColor Cyan
 Write-Host "💡 Tous les sous-domaines pointent temporairement vers Next.js" -ForegroundColor Yellow
 
+
+
+
+
+
+
+
+
+

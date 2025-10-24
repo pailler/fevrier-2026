@@ -5,15 +5,14 @@ services:
     image: psitrax/psitransfer:latest
     container_name: psitransfer-iahome
     restart: unless-stopped
-    # SUPPRIMER l'exposition de port - plus d'accès direct
-    # ports:
-    #   - "8087:3000"
+    ports:
+      - "8087:3000"
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Paris
     volumes:
-      - ./data:/app/data
+      - ./psitransfer-data:/app/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 30s

@@ -7,7 +7,11 @@ $services = @("librespeed", "metube", "pdf", "psitransfer", "qrcodes")
 
 foreach ($service in $services) {
     Write-Host "`n🛑 Arrêt de $service..." -ForegroundColor Yellow
-    docker-compose -f $service/docker-compose.yml down
+    if ($service -eq "psitransfer") {
+        docker-compose -f ../../essentiels/psitransfer/docker-compose.yml down
+    } else {
+        docker-compose -f $service/docker-compose.yml down
+    }
     if ($LASTEXITCODE -eq 0) {
         Write-Host "   ✅ $service arrêté" -ForegroundColor Green
     } else {

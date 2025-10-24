@@ -3,27 +3,26 @@ FROM python:3.9-slim
 # Installer les dépendances système
 RUN apt-get update && apt-get install -y \
     gcc \
-    g++ \
-    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Copier le fichier requirements.txt s'il existe
-COPY requirements.txt* ./
+# Copier les fichiers de configuration
+COPY requirements.txt .
+COPY config.env .
 
 # Installer les dépendances Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copier le code de l'application
+# Copier le code source
 COPY . .
 
-# Créer le répertoire pour les QR codes
-RUN mkdir -p /app/qr_codes
+# Créer le dossier de logs
+RUN mkdir -p logs
 
 # Exposer le port
 EXPOSE 7005
 
-# Commande par défaut (service simplifié)
-CMD ["python", "qr_service.py"]
+# Commande de démarrage
+CMD ["python", "qr_server_simple.py"]

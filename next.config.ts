@@ -52,7 +52,7 @@ const nextConfig: NextConfig = {
     'localhost'
   ],
   
-  // Configuration pour le domaine
+  // Configuration pour le domaine avec optimisations de cache
   async headers() {
     return [
       {
@@ -88,15 +88,11 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Cache-Control',
-            value: 'public, max-age=0, must-revalidate, proxy-revalidate'
+            value: 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800'
           },
           {
-            key: 'Pragma',
-            value: 'no-cache'
-          },
-          {
-            key: 'Expires',
-            value: '0'
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
           }
         ]
       },

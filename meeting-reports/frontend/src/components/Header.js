@@ -12,7 +12,7 @@ const Header = () => {
             </div>
             <div>
               <h1 className="text-3xl font-bold">
-                Générateur de Rapports de Réunion
+                Compte rendus IA
                 <span className="text-xl font-normal text-blue-200 ml-2">
                   proposé par IAHome
                 </span>

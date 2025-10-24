@@ -16,11 +16,31 @@ export async function GET(request: NextRequest) {
 
     console.log('🪙 API user-tokens-simple GET: userId =', userId);
 
-    // Récupérer les tokens depuis la table user_tokens (sans vérifier profiles)
+    // Si userId est un email, récupérer l'UUID depuis profiles
+    let actualUserId = userId;
+    if (userId.includes('@')) {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', userId)
+        .single();
+      
+      if (profileError || !profile) {
+        console.error('❌ Utilisateur non trouvé:', profileError);
+        return NextResponse.json(
+          { error: 'Utilisateur non trouvé' },
+          { status: 404 }
+        );
+      }
+      actualUserId = profile.id;
+      console.log('🔄 UUID récupéré:', actualUserId, 'pour email:', userId);
+    }
+
+    // Récupérer les tokens depuis la table user_tokens
     const { data: userTokens, error: tokensError } = await supabase
       .from('user_tokens')
       .select('tokens, package_name, purchase_date, is_active')
-      .eq('user_id', userId)
+      .eq('user_id', actualUserId)
       .single();
 
     let tokens = 100; // Valeur par défaut
@@ -37,7 +57,7 @@ export async function GET(request: NextRequest) {
       const { error: insertError } = await supabase
         .from('user_tokens')
         .insert([{
-          user_id: userId,
+          user_id: actualUserId,
           tokens: 100,
           package_name: 'Welcome Package',
           purchase_date: new Date().toISOString(),
@@ -53,7 +73,7 @@ export async function GET(request: NextRequest) {
       }
     } else if (userTokens) {
       // Utiliser les vraies valeurs de la base de données
-      tokens = userTokens.tokens || 100;
+      tokens = userTokens.tokens !== null ? userTokens.tokens : 100;
       packageName = userTokens.package_name || 'Welcome Package';
       purchaseDate = userTokens.purchase_date || new Date().toISOString();
       isActive = userTokens.is_active !== false;
@@ -93,11 +113,31 @@ export async function POST(request: NextRequest) {
 
     console.log('🪙 API user-tokens-simple POST: userId =', userId, 'tokensToConsume =', tokensToConsume);
 
+    // Si userId est un email, récupérer l'UUID depuis profiles
+    let actualUserId = userId;
+    if (userId.includes('@')) {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', userId)
+        .single();
+      
+      if (profileError || !profile) {
+        console.error('❌ Utilisateur non trouvé pour consommation:', profileError);
+        return NextResponse.json(
+          { error: 'Utilisateur non trouvé' },
+          { status: 404 }
+        );
+      }
+      actualUserId = profile.id;
+      console.log('🔄 UUID récupéré pour consommation:', actualUserId, 'pour email:', userId);
+    }
+
     // Récupérer le solde actuel depuis la table user_tokens
     const { data: userTokens, error: tokensError } = await supabase
       .from('user_tokens')
       .select('tokens')
-      .eq('user_id', userId)
+      .eq('user_id', actualUserId)
       .single();
 
     let currentTokens = 100; // Valeur par défaut
@@ -111,7 +151,7 @@ export async function POST(request: NextRequest) {
       const { error: insertError } = await supabase
         .from('user_tokens')
         .insert([{
-          user_id: userId,
+          user_id: actualUserId,
           tokens: 100,
           package_name: 'Welcome Package',
           purchase_date: new Date().toISOString(),
@@ -156,7 +196,7 @@ export async function POST(request: NextRequest) {
         tokens: newTokenCount,
         updated_at: new Date().toISOString()
       })
-      .eq('user_id', userId);
+      .eq('user_id', actualUserId);
 
     if (updateError) {
       console.error('❌ Erreur lors de la mise à jour des tokens:', updateError);

@@ -143,21 +143,6 @@ export default function Home() {
     }
   }, []);
 
-  const handleSubscribe = (module: any) => {
-    const isSelected = selectedModules.some(m => m.id === module.id);
-    let newSelectedModules;
-    
-    if (isSelected) {
-      // Désabonner
-      newSelectedModules = selectedModules.filter(m => m.id !== module.id);
-      } else {
-      // S'abonner
-      newSelectedModules = [...selectedModules, module];
-      }
-    
-    setSelectedModules(newSelectedModules);
-    localStorage.setItem('selectedModules', JSON.stringify(newSelectedModules));
-    };
 
   const isModuleSelected = (moduleId: string) => {
     return selectedModules.some(module => module.id === moduleId);

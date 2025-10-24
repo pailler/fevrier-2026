@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  qrcodes:
+    build:
+      context: .
+      dockerfile: Dockerfile.clean
+    container_name: qrcodes-clean
+    ports:
+      - "7005:7005"
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+
+

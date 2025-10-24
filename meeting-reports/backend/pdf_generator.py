@@ -94,7 +94,7 @@ class PDFGenerator:
             story = []
             
             # En-tête avec titre et métadonnées
-            story.append(Paragraph("Rapport de Réunion", self.styles['CustomTitle']))
+            story.append(Paragraph("Compte rendu de Réunion", self.styles['CustomTitle']))
             story.append(Paragraph(f"Généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')}", self.styles['CustomMeta']))
             story.append(Paragraph(f"ID du rapport: {file_id}", self.styles['CustomMeta']))
             story.append(Spacer(1, 20))
@@ -146,7 +146,7 @@ class PDFGenerator:
             # Pied de page
             story.append(Spacer(1, 30))
             story.append(Paragraph("---", self.styles['CustomMeta']))
-            story.append(Paragraph("Généré par Meeting Reports Generator - proposé par IAHome", self.styles['CustomMeta']))
+            story.append(Paragraph("Généré par Compte rendus IA - proposé par IAHome", self.styles['CustomMeta']))
             story.append(Paragraph("Application de génération automatique de rapports de réunion", self.styles['CustomMeta']))
             
             # Construire le PDF
