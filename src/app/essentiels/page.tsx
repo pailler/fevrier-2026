@@ -25,7 +25,6 @@ export default function Essentiels() {
   const essentialModules = [
     'librespeed',
     'metube', 
-    'whisper',
     'psitransfer',
     'qrcodes',
     'pdf'
