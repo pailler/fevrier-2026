@@ -95,13 +95,13 @@ export default function Essentiels() {
           return;
         }
 
-        // Filtrer pour ne garder que les modules essentiels
+        // Filtrer pour ne garder que les modules essentiels (exclure whisper)
         const essentialModulesData = data?.filter(module => 
-          essentialModules.includes(module.id) ||
+          (essentialModules.includes(module.id) ||
           essentialModules.some(essentialId => 
             module.title.toLowerCase().includes(essentialId.toLowerCase()) ||
             module.title.toLowerCase().includes(essentialId.replace('-', ' '))
-          )
+          )) && module.id !== 'whisper'
         ) || [];
 
         setModules(essentialModulesData);
