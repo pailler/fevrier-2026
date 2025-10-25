@@ -133,36 +133,9 @@ export default function Essentiels() {
 
   // Fonction pour gérer l'accès aux modules
   const handleModuleAccess = async (moduleId: string, moduleTitle: string) => {
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-
-    try {
-      // Vérifier si l'utilisateur a accès au module
-      const { data: accessData, error: accessError } = await supabase
-        .from('user_applications')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('module_id', moduleId)
-        .single();
-
-      if (accessError && accessError.code !== 'PGRST116') {
-        console.error('Erreur lors de la vérification de l\'accès:', accessError);
-        return;
-      }
-
-      if (accessData) {
-        // L'utilisateur a déjà accès, rediriger vers le module
-        const moduleUrl = `/card/${moduleId}`;
-        router.push(moduleUrl);
-      } else {
-        // L'utilisateur n'a pas accès, rediriger vers la page de paiement
-        router.push(`/card/${moduleId}`);
-      }
-    } catch (error) {
-      console.error('Erreur lors de la vérification de l\'accès au module:', error);
-    }
+    // Rediriger directement vers la page détaillée du module, même en mode déconnecté
+    const moduleUrl = `/card/${moduleId}`;
+    router.push(moduleUrl);
   };
 
   // Filtrer les modules selon la recherche
