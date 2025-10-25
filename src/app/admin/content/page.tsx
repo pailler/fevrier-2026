@@ -31,60 +31,33 @@ export default function AdminContent() {
   useEffect(() => {
     const loadContent = async () => {
       try {
-        ;
+        console.log('🔄 Chargement du contenu...');
         
         const supabase = getSupabaseClient();
         const allContent: ContentItem[] = [];
 
-        // 1. Articles de blog
-        const { data: blogArticles, error: blogError } = await supabase
-          .from('blog_articles')
-          .select('id, title, status, published_at, created_at, updated_at, author, category')
-          .order('created_at', { ascending: false })
-          .limit(50);
+        // 1. Modules depuis la table modules
+        const { data: modules, error: modulesError } = await supabase
+          .from('modules')
+          .select('id, title, description, category, price, created_at, updated_at')
+          .order('created_at', { ascending: false });
 
-        if (!blogError && blogArticles) {
-          blogArticles.forEach(article => {
+        if (!modulesError && modules) {
+          modules.forEach(module => {
             allContent.push({
-              id: article.id,
-              title: article.title,
-              type: 'blog',
-              status: article.status as 'published' | 'draft' | 'archived',
-              published_at: article.published_at,
-              created_at: article.created_at,
-              updated_at: article.updated_at,
-              author: article.author,
-              category: article.category,
-              url: `/blog/${article.id}`
+              id: module.id,
+              title: module.title,
+              type: 'application',
+              status: 'published',
+              created_at: module.created_at,
+              updated_at: module.updated_at,
+              category: module.category,
+              url: `/card/${module.id}`
             });
           });
         }
 
-        // 2. Articles de formation
-        const { data: formationArticles, error: formationError } = await supabase
-          .from('formation_articles')
-          .select('id, title, is_published, published_at, created_at, updated_at, author, category')
-          .order('created_at', { ascending: false })
-          .limit(50);
-
-        if (!formationError && formationArticles) {
-          formationArticles.forEach(article => {
-            allContent.push({
-              id: article.id,
-              title: article.title,
-              type: 'formation',
-              status: article.is_published ? 'published' : 'draft',
-              published_at: article.published_at,
-              created_at: article.created_at,
-              updated_at: article.updated_at,
-              author: article.author,
-              category: article.category,
-              url: `/formation/${article.id}`
-            });
-          });
-        }
-
-        // 3. Applications (depuis user_applications)
+        // 2. Applications utilisateur depuis user_applications
         const { data: userApps, error: userAppsError } = await supabase
           .from('user_applications')
           .select(`
@@ -124,18 +97,13 @@ export default function AdminContent() {
             return acc;
           }, {} as Record<string, any>);
 
-          // Définir les modules essentiels et premium
-          const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed'];
-          const premiumModules = ['qrcodes'];
+          // Définir les modules essentiels
+          const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes'];
           
           Object.values(appGroups).forEach((app: any) => {
             const isEssential = essentialModules.some(essentialId => 
               app.id === essentialId || 
               app.title.toLowerCase().includes(essentialId.toLowerCase())
-            );
-            const isPremium = premiumModules.some(premiumId => 
-              app.id === premiumId || 
-              app.title.toLowerCase().includes(premiumId.toLowerCase())
             );
 
             allContent.push({
@@ -153,6 +121,46 @@ export default function AdminContent() {
           });
         }
 
+        // 3. Tokens utilisateur depuis user_tokens
+        const { data: tokens, error: tokensError } = await supabase
+          .from('user_tokens')
+          .select('user_id, tokens, package_name, created_at, updated_at')
+          .order('created_at', { ascending: false });
+
+        if (!tokensError && tokens) {
+          // Grouper par package pour éviter les doublons
+          const tokenGroups = tokens.reduce((acc, token) => {
+            const packageName = token.package_name || 'Standard Package';
+            if (!acc[packageName]) {
+              acc[packageName] = {
+                id: `tokens-${packageName}`,
+                title: `Package ${packageName}`,
+                users: 0,
+                total_tokens: 0,
+                created_at: token.created_at,
+                updated_at: token.updated_at
+              };
+            }
+            acc[packageName].users++;
+            acc[packageName].total_tokens += token.tokens || 0;
+            return acc;
+          }, {} as Record<string, any>);
+
+          Object.values(tokenGroups).forEach((tokenGroup: any) => {
+            allContent.push({
+              id: tokenGroup.id,
+              title: tokenGroup.title,
+              type: 'application',
+              status: 'published',
+              created_at: tokenGroup.created_at,
+              updated_at: tokenGroup.updated_at,
+              users: tokenGroup.users,
+              usage_count: tokenGroup.total_tokens,
+              url: '/tokens'
+            });
+          });
+        }
+
         // 4. Pages statiques (hardcodées)
         const staticPages: ContentItem[] = [
           {
@@ -164,20 +172,28 @@ export default function AdminContent() {
             url: '/applications'
           },
           {
-            id: 'formation',
-            title: 'Formations IA',
+            id: 'essentiels',
+            title: 'Applications Essentielles',
             type: 'page',
             status: 'published',
             created_at: new Date().toISOString(),
-            url: '/formation'
+            url: '/essentiels'
           },
           {
-            id: 'blog',
-            title: 'Blog IA',
+            id: 'modules',
+            title: 'Mes Applications',
             type: 'page',
             status: 'published',
             created_at: new Date().toISOString(),
-            url: '/blog'
+            url: '/modules'
+          },
+          {
+            id: 'encours',
+            title: 'Mes Applications Actives',
+            type: 'page',
+            status: 'published',
+            created_at: new Date().toISOString(),
+            url: '/encours'
           },
           {
             id: 'community',
@@ -232,8 +248,6 @@ export default function AdminContent() {
 
   const getTypeLabel = (type: string) => {
     const labels = {
-      'blog': 'Blog',
-      'formation': 'Formation',
       'application': 'Application',
       'essentiel': 'Essentiel',
       'page': 'Page'
@@ -265,8 +279,6 @@ export default function AdminContent() {
 
   const contentTypes = [
     { value: 'all', label: 'Tous', count: contentItems.length },
-    { value: 'blog', label: 'Blog', count: contentItems.filter(item => item.type === 'blog').length },
-    { value: 'formation', label: 'Formations', count: contentItems.filter(item => item.type === 'formation').length },
     { value: 'application', label: 'Applications', count: contentItems.filter(item => item.type === 'application').length },
     { value: 'essentiel', label: 'Essentiels', count: contentItems.filter(item => item.type === 'essentiel').length },
     { value: 'page', label: 'Pages', count: contentItems.filter(item => item.type === 'page').length },
