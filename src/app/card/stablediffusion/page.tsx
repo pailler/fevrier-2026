@@ -363,10 +363,26 @@ export default function StableDiffusionPage() {
         </div>
       </section>
 
-      {/* Vidéo StableDiffusion - Zone séparée après la bannière */}
+      {/* Vidéos StableDiffusion - Zone séparée après la bannière */}
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Première vidéo - Introduction */}
+        <div className="mb-8">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">Introduction à StableDiffusion</h3>
+          <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 max-w-4xl mx-auto">
+            <iframe
+              className="w-full h-full rounded-2xl"
+              src="https://www.youtube.com/embed/L-gOZrVjHKA?autoplay=0&rel=0&modestbranding=1"
+              title="Introduction StableDiffusion"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
+
+        {/* Deuxième vidéo - Démonstration */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-          {/* Colonne 1 - Vidéo */}
+          {/* Colonne 1 - Vidéo de démonstration */}
           <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
             <iframe
               className="w-full h-full rounded-2xl"
