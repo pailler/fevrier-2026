@@ -25,7 +25,7 @@ export default function MeTubePage() {
     category: 'MEDIA TOOLS',
     price: 'Gratuit',
     image: '/images/metube-module.jpg',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+    videoUrl: 'https://www.youtube.com/embed/IZoAzwgQ8YY'
   };
 
   // Utilisation du hook useCustomAuth pour la gestion de l'authentification
@@ -205,7 +205,7 @@ export default function MeTubePage() {
           <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
             <iframe
               className="w-full h-full rounded-2xl"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&modestbranding=1"
+              src="https://www.youtube.com/embed/IZoAzwgQ8YY?autoplay=0&rel=0&modestbranding=1"
               title="Démonstration MeTube"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
