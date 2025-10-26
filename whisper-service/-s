@@ -770,23 +770,27 @@
 
             const config = processingConfig[currentProcessingType];
             
-            // Upload direct uniquement - chunks désactivés
-            console.log(`📤 Upload direct: ${(selectedFile.size / 1024 / 1024).toFixed(1)}MB`);
-            await uploadDirectWithCompression(config);
+            // Essayer d'abord l'upload direct avec compression
+            try {
+                await uploadDirectWithCompression(config);
+            } catch (error) {
+                console.log('Upload direct échoué, tentative avec upload par chunks:', error);
+                // Si l'upload direct échoue, essayer l'upload par chunks
+                if (selectedFile.size > 10 * 1024 * 1024) {
+                    await uploadInChunks(config);
+                } else {
+                    throw error; // Re-lancer l'erreur si le fichier est petit
+                }
+            }
         }
 
         async function uploadDirectWithCompression(config) {
             const formData = new FormData();
             const fieldName = (currentProcessingType === 'image' || currentProcessingType === 'document') ? 'file' : 'audio_file';
             
-            // Vérifier la taille du fichier et proposer compression si nécessaire
+            // Utiliser le fichier original pour l'instant (compression désactivée temporairement)
             let fileToUpload = selectedFile;
             console.log(`📁 Fichier original: ${(fileToUpload.size / 1024 / 1024).toFixed(1)}MB`);
-            
-            // Si le fichier est trop gros (> 500MB), rejeter l'upload
-            if (fileToUpload.size > 500 * 1024 * 1024) {
-                throw new Error('Fichier trop volumineux. Taille maximum: 500MB. Veuillez compresser votre fichier.');
-            }
             
             // Vérifier que le fichier n'est pas vide
             if (!fileToUpload || fileToUpload.size === 0) {
@@ -798,7 +802,12 @@
             try {
                 const response = await fetch(config.endpoint, {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json, text/plain, */*',
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
                 });
 
                 // Vérifier si c'est une réponse asynchrone (202)
