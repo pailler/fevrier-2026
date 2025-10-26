@@ -1,0 +1,44 @@
+# Configuration Whisper pour Cloudflare SSL
+http:
+  routers:
+    # Route pour les challenges Let's Encrypt (si nécessaire)
+    whisper-acme:
+      rule: "Host(`whisper.iahome.fr`) && PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["web"]
+      service: whisper-direct
+      priority: 1000
+
+    # Route API pour whisper (audio, video, ocr, documents)
+    whisper-api:
+      rule: "Host(`whisper.iahome.fr`) && (PathPrefix(`/asr`) || PathPrefix(`/video-asr`) || PathPrefix(`/ocr`) || PathPrefix(`/documents`) || PathPrefix(`/extract-audio`))"
+      entryPoints: ["web"]
+      service: whisper-proxy-service
+      middlewares: ["security-headers@file", "whisper-buffer@file"]
+      priority: 20
+
+    # Route principale pour Whisper (WebUI)
+    whisper-main:
+      rule: "Host(`whisper.iahome.fr`)"
+      entryPoints: ["web"]
+      service: whisper-webui-service
+      middlewares: ["security-headers@file", "compress@file"]
+      priority: 5
+
+  services:
+    # Service pour les challenges Let's Encrypt
+    whisper-direct:
+      loadBalancer:
+        servers:
+          - url: "http://whisper-webui-prod:80"
+
+    # Service principal pour Whisper WebUI
+    whisper-webui-service:
+      loadBalancer:
+        servers:
+          - url: "http://whisper-webui-prod:80"
+
+    # Service proxy pour les APIs Whisper
+    whisper-proxy-service:
+      loadBalancer:
+        servers:
+          - url: "http://whisper-proxy:80"
