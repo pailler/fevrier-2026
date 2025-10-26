@@ -1,9 +1,0 @@
-tunnel: iahome-new
-credentials-file: C:\Users\AAA\.cloudflared\4cc75dfd-fd02-4496-97f9-23f40fc1943d.json
-
-ingress:
-  - hostname: meeting-reports.iahome.fr
-    service: http://localhost:3050
-    originRequest:
-      httpHostHeader: meeting-reports.iahome.fr
-  - service: http_status:404

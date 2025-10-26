@@ -105,8 +105,29 @@ export default function EssentialAccessButton({
 
       const tokenData = await tokenResponse.json();
       
-      // Rediriger vers la page de protection avec token pour validation
-      const accessUrl = `https://iahome.fr/subdomain-protection?token=${tokenData.token}`;
+      // URLs directes pour les modules essentiels
+      const moduleUrls: { [key: string]: string } = {
+        'qrcodes': 'https://qrcodes.iahome.fr',
+        'metube': 'https://metube.iahome.fr',
+        'librespeed': 'https://librespeed.iahome.fr',
+        'psitransfer': 'https://psitransfer.iahome.fr',
+        'pdf': 'https://pdf.iahome.fr',
+        'meeting-reports': 'https://meeting-reports.iahome.fr',
+        'cogstudio': 'https://cogstudio.iahome.fr'
+      };
+      
+      // Utiliser l'URL directe si disponible, sinon utiliser la protection avec token
+      const directUrl = moduleUrls[moduleId];
+      let accessUrl: string;
+      
+      if (directUrl) {
+        // Ajouter le token à l'URL directe
+        accessUrl = `${directUrl}?token=${tokenData.token}`;
+      } else {
+        // Fallback: utiliser la page de protection
+        accessUrl = `https://iahome.fr/subdomain-protection?token=${tokenData.token}`;
+      }
+      
       console.log(`🔗 ${moduleTitle}: Accès sécurisé à:`, accessUrl);
       window.open(accessUrl, '_blank');
       

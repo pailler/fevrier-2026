@@ -9,6 +9,7 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - HOST=0.0.0.0
       - PORT=8000
+      - CORS_ORIGIN=*
     volumes:
       - ./uploads:/app/uploads
       - ./reports:/app/reports
@@ -41,6 +42,8 @@ services:
       - backend
       - frontend
     restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
   uploads:

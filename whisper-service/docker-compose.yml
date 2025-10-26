@@ -110,6 +110,7 @@ services:
       - whisper-documents
     networks:
       - whisper-network
+      - iahome-network
 
 networks:
   whisper-network:

@@ -88,6 +88,7 @@ export default function AIAccessButton({
 
       // Rediriger directement vers l'application IA via sous-domaines
       const applicationUrls: { [key: string]: string } = {
+        'whisper': 'https://whisper.iahome.fr',
         'stablediffusion': 'https://stablediffusion.iahome.fr',
         'comfyui': 'https://comfyui.iahome.fr',
         'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',

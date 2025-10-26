@@ -9,7 +9,7 @@ const SpeakerInfo = ({ reportId }) => {
   const [error, setError] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8001';
+  const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
   const loadSpeakerInfo = React.useCallback(async () => {
     try {

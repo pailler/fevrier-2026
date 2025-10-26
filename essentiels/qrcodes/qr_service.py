@@ -38,6 +38,9 @@ logger = logging.getLogger(__name__)
 # Configuration de l'authentification centralisée
 IAHOME_JWT_SECRET = os.getenv('IAHOME_JWT_SECRET', 'your-super-secret-jwt-key-change-in-production')
 
+# Configuration du port
+PORT = int(os.getenv('PORT', 7005))
+
 def get_db_connection():
     """Créer une connexion à la base de données"""
     try:
@@ -989,8 +992,8 @@ def custom_qr():
 
 if __name__ == '__main__':
     print("🚀 Démarrage du service QR Code Generator - IAHome...")
-    print("🌐 Interface web: http://localhost:7005")
-    print("📡 API: http://localhost:7005/api/qr")
-    print("❤️  Health check: http://localhost:7005/health")
+    print(f"🌐 Interface web: http://localhost:{PORT}")
+    print(f"📡 API: http://localhost:{PORT}/api/qr")
+    print(f"❤️  Health check: http://localhost:{PORT}/health")
     
-    app.run(host='0.0.0.0', port=7005, debug=False)
+    app.run(host='0.0.0.0', port=PORT, debug=False)

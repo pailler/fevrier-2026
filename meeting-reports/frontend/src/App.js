@@ -6,8 +6,8 @@ import ReportList from './components/ReportList';
 import ReportViewer from './components/ReportViewer';
 import './App.css';
 
-// Utiliser l'API locale pour éviter les problèmes de routage
-const API_BASE_URL = 'http://localhost:8001';
+// Utiliser le domaine public pour les requêtes via Cloudflare
+const API_BASE_URL = '/api';
 
 function App() {
   const [reports, setReports] = useState([]);
@@ -71,7 +71,8 @@ function App() {
         },
       });
 
-      const fileId = uploadResponse.data.file_id;
+      console.log('Upload response:', uploadResponse.data);
+      const fileId = uploadResponse.data.id || uploadResponse.data.file_id;
       setProcessingStatus('Démarrage de la transcription...');
 
       // Démarrer le traitement

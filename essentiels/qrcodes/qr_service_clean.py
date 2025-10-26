@@ -35,6 +35,9 @@ load_dotenv('config.env')
 SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_KEY = os.getenv('SUPABASE_ANON_KEY')
 
+# Configuration du port
+PORT = int(os.getenv('PORT', 7006))
+
 def get_supabase_client():
     """Créer un client Supabase"""
     if not SUPABASE_URL or not SUPABASE_KEY:
@@ -522,8 +525,8 @@ def update_qr_url(qr_id):
 
 if __name__ == '__main__':
     logger.info("Démarrage du service QR Code Generator - IAHome...")
-    logger.info("Interface web: http://localhost:7005")
-    logger.info("API: http://localhost:7005/api/qr")
-    logger.info("Health check: http://localhost:7005/health")
+    logger.info(f"Interface web: http://localhost:{PORT}")
+    logger.info(f"API: http://localhost:{PORT}/api/qr")
+    logger.info(f"Health check: http://localhost:{PORT}/health")
     
-    app.run(host='0.0.0.0', port=7005, debug=False)
+    app.run(host='0.0.0.0', port=PORT, debug=False)

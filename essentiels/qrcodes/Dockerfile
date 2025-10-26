@@ -22,6 +22,8 @@ RUN pip install --no-cache-dir \
     pillow \
     psycopg2-binary \
     pyjwt \
+    supabase \
+    python-dotenv \
     && rm -rf /root/.cache/pip
 
 # Copier le code de l'application
@@ -34,4 +36,4 @@ RUN mkdir -p /app/qr_codes
 EXPOSE 7005
 
 # Commande par défaut (service complet avec base de données)
-CMD ["python", "qr_service.py"]
+CMD ["python", "qr_service_clean.py"]
