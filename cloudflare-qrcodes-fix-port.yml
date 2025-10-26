@@ -1,80 +1,106 @@
-tunnel: iahome-new
-credentials-file: C:\Users\AAA\.cloudflared\02a960c5-edd6-4b3f-844f-410b16247262.json
+﻿# Configuration Cloudflare Tunnel avec protection gratuite
+# Utilise un serveur HTTP local pour la redirection
 
+tunnel: iahome-new
+credentials-file: /root/.cloudflared/iahome-new.json
+
+# Configuration des origines avec protection gratuite
 ingress:
-  # Domaine principal
+  # LibreSpeed avec redirection directe
+  - hostname: librespeed.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: librespeed.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  # Meeting Reports avec redirection directe
+  - hostname: meeting-reports.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: meeting-reports.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  # Whisper avec redirection directe
+  - hostname: whisper.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: whisper.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  # ComfyUI avec redirection directe
+  - hostname: comfyui.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: comfyui.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  # Stable Diffusion avec redirection directe
+  - hostname: stablediffusion.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: stablediffusion.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  # QR Codes avec redirection directe
+  - hostname: qrcodes.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: qrcodes.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  # PsiTransfer avec redirection directe
+  - hostname: psitransfer.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: psitransfer.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  # MeTube avec redirection directe
+  - hostname: metube.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: metube.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  # PDF avec redirection directe
+  - hostname: pdf.iahome.fr
+    service: http_status:302
+    originRequest:
+      httpHostHeader: pdf.iahome.fr
+    response:
+      status_code: 302
+      headers:
+        Location: "https://iahome.fr/encours"
+
+  # Acces normal a iahome.fr (sans protection)
   - hostname: iahome.fr
     service: http://localhost:3000
     originRequest:
       httpHostHeader: iahome.fr
-      noTLSVerify: true
-      disableChunkedEncoding: true
-      connectTimeout: 30s
-      tlsTimeout: 10s
-      tcpKeepAlive: 30s
-      keepAliveConnections: 10
-      keepAliveTimeout: 1m30s
 
-  - hostname: www.iahome.fr
-    service: http://localhost:3000
-    originRequest:
-      httpHostHeader: www.iahome.fr
-      noTLSVerify: true
-      disableChunkedEncoding: true
-      connectTimeout: 30s
-      tlsTimeout: 10s
-      tcpKeepAlive: 30s
-      keepAliveConnections: 10
-      keepAliveTimeout: 1m30s
-
-  # QR Codes - REDIRECTION VERS NEXT.JS
-  - hostname: qrcodes.iahome.fr
-    service: http://localhost:3000
-    originRequest:
-      httpHostHeader: qrcodes.iahome.fr
-      noTLSVerify: true
-      disableChunkedEncoding: true
-      connectTimeout: 30s
-      tlsTimeout: 10s
-
-  # Autres sous-domaines
-  - hostname: librespeed.iahome.fr
-    service: http://localhost:8085
-    originRequest:
-      httpHostHeader: librespeed.iahome.fr
-      noTLSVerify: true
-
-  - hostname: whisper.iahome.fr
-    service: http://localhost:8093
-    originRequest:
-      httpHostHeader: whisper.iahome.fr
-      noTLSVerify: true
-
-  - hostname: psitransfer.iahome.fr
-    service: http://localhost:8087
-    originRequest:
-      httpHostHeader: psitransfer.iahome.fr
-      noTLSVerify: true
-
-  - hostname: metube.iahome.fr
-    service: http://localhost:8081
-    originRequest:
-      httpHostHeader: metube.iahome.fr
-      noTLSVerify: true
-
-  - hostname: pdf.iahome.fr
-    service: http://localhost:8086
-    originRequest:
-      httpHostHeader: pdf.iahome.fr
-      noTLSVerify: true
-
-  - hostname: meeting-reports.iahome.fr
-    service: http://127.0.0.1:3050
-    originRequest:
-      httpHostHeader: meeting-reports.iahome.fr
-      noTLSVerify: true
-      disableChunkedEncoding: true
-      connectTimeout: 30s
-      tlsTimeout: 10s
-
+  # Page de redirection par defaut
   - service: http_status:404

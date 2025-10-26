@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator - IAHome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        /* IAHome Banner Styles - QR Code Page */
+        .iahome-banner {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            padding: 60px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 2;
+        }
+
+        .banner-left {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .banner-right {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .banner-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .banner-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .banner-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .banner-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .banner-button.primary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #3b82f6;
+            font-weight: 600;
+        }
+
+        .banner-button.primary:hover {
+            background: white;
+            transform: translateY(-2px);
+        }
+
+        .banner-nav-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .qr-icon {
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .qr-icon-inner {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            gap: 2px;
+            padding: 8px;
+        }
+
+        .qr-icon-inner::before {
+            content: '';
+            grid-column: 2 / 4;
+            grid-row: 2 / 4;
+            background: #3b82f6;
+            border-radius: 2px;
+        }
+
+        .qr-icon-inner::after {
+            content: '';
+            grid-column: 6 / 8;
+            grid-row: 2 / 4;
+            background: #3b82f6;
+            border-radius: 2px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1, h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Workflow Progress Bar */
+        .workflow-progress {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 20px;
+            position: relative;
+        }
+
+        .progress-step::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 100%;
+            width: 40px;
+            height: 2px;
+            background: #e5e7eb;
+            z-index: 1;
+        }
+
+        .progress-step:last-child::after {
+            display: none;
+        }
+
+        .progress-step.active::after {
+            background: #3b82f6;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active .step-number {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .progress-step.active .step-label {
+            color: #3b82f6;
+            font-weight: 500;
+        }
+
+        /* Workflow Content */
+        .workflow-content {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .option-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+        }
+
+        .option-card.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .option-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .option-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .option-description {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .color-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .color-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .color-input input[type="color"] {
+            width: 50px;
+            height: 50px;
+            padding: 5px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Navigation Buttons */
+        .workflow-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .nav-button {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover {
+            background: #4b5563;
+            transform: translateY(-1px);
+        }
+
+        .nav-button.primary {
+            background: #3b82f6;
+        }
+
+        .nav-button.primary:hover {
+            background: #2563eb;
+        }
+
+        .nav-button:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* QR Code Display */
+        .qr-result {
+            text-align: center;
+            padding: 30px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .qr-code-image {
+            margin: 20px 0;
+        }
+
+        .qr-code-image img {
+            max-width: 300px;
+            height: auto;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.success {
+            background: #10b981;
+        }
+
+        .action-btn.success:hover {
+            background: #059669;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .banner-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .banner-title {
+                font-size: 2rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .color-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .workflow-navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- IAHome Banner -->
+    <div class="iahome-banner">
+        <div class="banner-container">
+            <div class="banner-left">
+                <h1 class="banner-title">Générez des QR codes dynamiques</h1>
+                <p class="banner-subtitle">
+                    Créez des QR codes dynamiques avec suivi en temps réel, personnalisation avancée et analytics détaillés pour optimiser vos campagnes marketing.
+                </p>
+                <div class="banner-nav-buttons">
+                    <button class="banner-button primary" onclick="resetWorkflow()">
+                        🎯 Nouveau QR Code
+                    </button>
+                </div>
+            </div>
+            <div class="banner-right">
+                <div class="qr-icon">
+                    <div class="qr-icon-inner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>🎯 QR Code Generator</h1>
+        
+        <!-- Workflow Progress -->
+        <div class="workflow-progress">
+            <div class="progress-step active" id="step1-indicator">
+                <div class="step-number">1</div>
+                <div class="step-label">Contenu</div>
+            </div>
+            <div class="progress-step" id="step2-indicator">
+                <div class="step-number">2</div>
+                <div class="step-label">Style</div>
+            </div>
+            <div class="progress-step" id="step3-indicator">
+                <div class="step-number">3</div>
+                <div class="step-label">Cible</div>
+            </div>
+            <div class="progress-step" id="step4-indicator">
+                <div class="step-number">4</div>
+                <div class="step-label">Qualité</div>
+            </div>
+        </div>
+
+        <!-- Step 1: Content Selection -->
+        <div id="step1" class="workflow-content">
+            <h2>Étape 1 : Choisir le type de contenu</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                Que voulez-vous encoder dans votre QR code ?
+            </p>
+            <div class="options-grid">
+                <div class="option-card" data-type="web" onclick="selectContent('web')">
+                    <div class="option-icon">🌐</div>
+                    <div class="option-title">Site Web</div>
+                    <div class="option-description">Rediriger vers une URL</div>
+                </div>
+                <div class="option-card" data-type="text" onclick="selectContent('text')">
+                    <div class="option-icon">📝</div>
+                    <div class="option-title">Texte</div>
+                    <div class="option-description">Afficher du texte simple</div>
+                </div>
+                <div class="option-card" data-type="email" onclick="selectContent('email')">
+                    <div class="option-icon">📧</div>
+                    <div class="option-title">Email</div>
+                    <div class="option-description">Ouvrir un client email</div>
+                </div>
+                <div class="option-card" data-type="phone" onclick="selectContent('phone')">
+                    <div class="option-icon">📞</div>
+                    <div class="option-title">Téléphone</div>
+                    <div class="option-description">Composer un numéro</div>
+                </div>
+            </div>
+            <div class="workflow-navigation">
+                <button class="nav-button" disabled>← Précédent</button>
+                <button class="nav-button primary" onclick="nextStep(1)">Suivant →</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Style Customization -->
+        <div id="step2" class="workflow-content" style="display: none;">
+            <h2>Étape 2 : Personnaliser le style</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                Choisissez les couleurs et la taille de votre QR code
+            </p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="size">Taille (pixels)</label>
+                    <input type="number" id="size" value="300" min="100" max="1000">
+                </div>
+                <div class="form-group">
+                    <label for="margin">Marge</label>
+                    <select id="margin">
+                        <option value="1">Minimale (1)</option>
+                        <option value="2">Petite (2)</option>
+                        <option value="4" selected>Normale (4)</option>
+                        <option value="6">Grande (6)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="color-inputs">
+                <div class="color-input">
+                    <label for="foregroundColor">Couleur du QR code</label>
+                    <input type="color" id="foregroundColor" value="#000000">
+                </div>
+                <div class="color-input">
+                    <label for="backgroundColor">Couleur de fond</label>
+                    <input type="color" id="backgroundColor" value="#FFFFFF">
+                </div>
+            </div>
+            <div class="workflow-navigation">
+                <button class="nav-button" onclick="prevStep(2)">← Précédent</button>
+                <button class="nav-button primary" onclick="nextStep(2)">Suivant →</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Target Selection -->
+        <div id="step3" class="workflow-content" style="display: none;">
+            <h2>Étape 3 : Définir la cible</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                Spécifiez le contenu de votre QR code
+            </p>
+            <div id="targetForm">
+                <!-- Dynamic form content will be inserted here -->
+            </div>
+            <div class="workflow-navigation">
+                <button class="nav-button" onclick="prevStep(3)">← Précédent</button>
+                <button class="nav-button primary" onclick="nextStep(3)">Suivant →</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Quality Settings -->
+        <div id="step4" class="workflow-content" style="display: none;">
+            <h2>Étape 4 : Paramètres de qualité</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                Ajustez la correction d'erreur pour optimiser la lisibilité
+            </p>
+            <div class="form-group">
+                <label for="errorCorrection">Niveau de correction d'erreur</label>
+                <select id="errorCorrection">
+                    <option value="L">Faible (L) - 7%</option>
+                    <option value="M" selected>Moyen (M) - 15%</option>
+                    <option value="Q">Élevé (Q) - 25%</option>
+                    <option value="H">Très élevé (H) - 30%</option>
+                </select>
+            </div>
+            <div class="workflow-navigation">
+                <button class="nav-button" onclick="prevStep(4)">← Précédent</button>
+                <button class="nav-button primary" onclick="generateQRCode()">Générer QR Code</button>
+            </div>
+        </div>
+
+        <!-- Result Display -->
+        <div id="result" class="workflow-content" style="display: none;">
+            <h2>✅ QR Code généré avec succès !</h2>
+            <div class="qr-result">
+                <div class="qr-code-image">
+                    <img id="qrCodeImage" src="" alt="QR Code généré">
+                </div>
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="downloadQR()">📥 Télécharger</button>
+                    <button class="action-btn success" onclick="shareQR()">📤 Partager</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Workflow state
+        let workflowState = {
+            contentType: null,
+            target: null,
+            style: {
+                size: 300,
+                margin: 4,
+                foregroundColor: '#000000',
+                backgroundColor: '#FFFFFF'
+            },
+            quality: {
+                errorCorrection: 'M'
+            }
+        };
+
+        function showStep(stepNumber) {
+            // Hide all steps
+            document.querySelectorAll('.workflow-content').forEach(step => {
+                step.style.display = 'none';
+            });
+            
+            // Remove active class from all indicators
+            document.querySelectorAll('.progress-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Show selected step
+            const stepElement = document.getElementById(`step${stepNumber}`);
+            if (stepElement) {
+                stepElement.style.display = 'block';
+                document.getElementById(`step${stepNumber}-indicator`).classList.add('active');
+            }
+        }
+
+        function nextStep(currentStep) {
+            if (currentStep === 1 && !workflowState.contentType) {
+                alert('Veuillez sélectionner un type de contenu');
+                return;
+            }
+            if (currentStep === 3 && !workflowState.target) {
+                alert('Veuillez remplir le champ requis');
+                return;
+            }
+            showStep(currentStep + 1);
+        }
+
+        function prevStep(currentStep) {
+            showStep(currentStep - 1);
+        }
+
+        function selectContent(type) {
+            // Remove selection from all cards
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked card
+            event.target.closest('.option-card').classList.add('selected');
+            
+            // Store selection
+            workflowState.contentType = type;
+            
+            // Update target form
+            updateTargetForm(type);
+        }
+
+        function updateTargetForm(type) {
+            const targetForm = document.getElementById('targetForm');
+            let html = '';
+            
+            switch (type) {
+                case 'web':
+                    html = `
+                        <div class="form-group">
+                            <label for="webUrl">URL du site web</label>
+                            <input type="url" id="webUrl" placeholder="https://example.com" required>
+                        </div>
+                    `;
+                    break;
+                case 'text':
+                    html = `
+                        <div class="form-group">
+                            <label for="textContent">Texte à encoder</label>
+                            <textarea id="textContent" placeholder="Votre texte ici..." rows="4" required></textarea>
+                        </div>
+                    `;
+                    break;
+                case 'email':
+                    html = `
+                        <div class="form-group">
+                            <label for="emailAddress">Adresse email</label>
+                            <input type="email" id="emailAddress" placeholder="contact@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="emailSubject">Sujet (optionnel)</label>
+                            <input type="text" id="emailSubject" placeholder="Sujet de l'email">
+                        </div>
+                        <div class="form-group">
+                            <label for="emailBody">Message (optionnel)</label>
+                            <textarea id="emailBody" placeholder="Message de l'email" rows="3"></textarea>
+                        </div>
+                    `;
+                    break;
+                case 'phone':
+                    html = `
+                        <div class="form-group">
+                            <label for="phoneNumber">Numéro de téléphone</label>
+                            <input type="tel" id="phoneNumber" placeholder="+33123456789" required>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            targetForm.innerHTML = html;
+        }
+
+        function generateQRCode() {
+            // Collect form data
+            const size = parseInt(document.getElementById('size').value);
+            const margin = parseInt(document.getElementById('margin').value);
+            const foregroundColor = document.getElementById('foregroundColor').value;
+            const backgroundColor = document.getElementById('backgroundColor').value;
+            const errorCorrection = document.getElementById('errorCorrection').value;
+            
+            let text = '';
+            
+            switch (workflowState.contentType) {
+                case 'web':
+                    text = document.getElementById('webUrl').value;
+                    break;
+                case 'text':
+                    text = document.getElementById('textContent').value;
+                    break;
+                case 'email':
+                    const email = document.getElementById('emailAddress').value;
+                    const subject = document.getElementById('emailSubject').value;
+                    const body = document.getElementById('emailBody').value;
+                    text = `mailto:${email}${subject ? '?subject=' + encodeURIComponent(subject) : ''}${body ? (subject ? '&' : '?') + 'body=' + encodeURIComponent(body) : ''}`;
+                    break;
+                case 'phone':
+                    text = `tel:${document.getElementById('phoneNumber').value}`;
+                    break;
+            }
+            
+            if (!text) {
+                alert('Veuillez remplir tous les champs requis');
+                return;
+            }
+            
+            // Generate QR code
+            const params = new URLSearchParams({
+                text: text,
+                size: size,
+                margin: margin,
+                foreground_color: foregroundColor,
+                background_color: backgroundColor,
+                errorCorrection: errorCorrection
+            });
+            
+            fetch(`/api/qr?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('qrCodeImage').src = `data:image/png;base64,${data.qr_code}`;
+                        showStep('result');
+                    } else {
+                        alert('Erreur lors de la génération du QR code: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Erreur lors de la génération du QR code');
+                });
+        }
+
+        function downloadQR() {
+            const img = document.getElementById('qrCodeImage');
+            const link = document.createElement('a');
+            link.download = 'qr-code.png';
+            link.href = img.src;
+            link.click();
+        }
+
+        function shareQR() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'QR Code généré',
+                    text: 'Voici mon QR code généré',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    alert('Lien copié dans le presse-papiers');
+                });
+            }
+        }
+
+        function resetWorkflow() {
+            workflowState = {
+                contentType: null,
+                target: null,
+                style: {
+                    size: 300,
+                    margin: 4,
+                    foregroundColor: '#000000',
+                    backgroundColor: '#FFFFFF'
+                },
+                quality: {
+                    errorCorrection: 'M'
+                }
+            };
+            
+            // Reset form
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Reset form values
+            document.getElementById('size').value = 300;
+            document.getElementById('margin').value = 4;
+            document.getElementById('foregroundColor').value = '#000000';
+            document.getElementById('backgroundColor').value = '#FFFFFF';
+            document.getElementById('errorCorrection').value = 'M';
+            
+            showStep(1);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            showStep(1);
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+

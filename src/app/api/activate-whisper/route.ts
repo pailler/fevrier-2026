@@ -35,8 +35,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Créer l'accès module dans user_applications
+    // Whisper est un module IA : 30 jours (1 mois)
     const expiresAt = new Date();
-    expiresAt.setFullYear(expiresAt.getFullYear() + 1); // Expire dans 1 an
+    expiresAt.setDate(expiresAt.getDate() + 30); // 1 mois
 
     const { data: accessData, error: accessError } = await supabase
       .from('user_applications')

@@ -94,8 +94,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Créer une entrée dans user_applications pour l'accès standard
+    // Déterminer la durée d'expiration selon le type de module
     const expiresAt = new Date();
-    expiresAt.setMonth(expiresAt.getMonth() + 3); // 3 mois
+    const aiModules = ['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui'];
+    const isAIModule = aiModules.some(id => module.title.toLowerCase().includes(id));
+    
+    // Modules IA : 30 jours (1 mois), Modules essentiels : 90 jours (3 mois)
+    if (isAIModule) {
+      expiresAt.setDate(expiresAt.getDate() + 30); // 1 mois
+    } else {
+      expiresAt.setDate(expiresAt.getDate() + 90); // 3 mois
+    }
     
     // Définir le quota d'utilisation à 20 pour tous les modules
     const maxUsage = 20;

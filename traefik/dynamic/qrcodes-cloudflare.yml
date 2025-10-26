@@ -21,10 +21,10 @@ http:
     qrcodes-direct:
       loadBalancer:
         servers:
-          - url: "http://qr-code-service:8080"
+          - url: "http://qrcodes:7005"
 
     # Service principal pour QR codes
     qrcodes-service:
       loadBalancer:
         servers:
-          - url: "http://qr-code-service:8080"
+          - url: "http://qrcodes:7005"

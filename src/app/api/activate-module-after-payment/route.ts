@@ -152,8 +152,18 @@ export async function POST(request: NextRequest) {
     ;
 
     // Activer le module pour l'utilisateur avec quota de 50 utilisations par mois
+    // Déterminer la durée d'expiration selon le type de module
     const now = new Date();
-    const expiresAt = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate()); // Expire dans 1 mois
+    const aiModules = ['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui'];
+    const isAIModule = aiModules.some(id => moduleId.toLowerCase().includes(id));
+    
+    // Modules IA : 30 jours (1 mois), Modules essentiels : 90 jours (3 mois)
+    const expiresAt = new Date(now);
+    if (isAIModule) {
+      expiresAt.setDate(expiresAt.getDate() + 30); // 1 mois
+    } else {
+      expiresAt.setDate(expiresAt.getDate() + 90); // 3 mois
+    }
     
     const { data: activationData, error: activationError } = await supabase
       .from('user_applications')

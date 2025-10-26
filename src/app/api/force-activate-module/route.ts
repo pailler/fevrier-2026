@@ -44,8 +44,17 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Créer l'accès module
+    // Déterminer la durée d'expiration selon le type de module
     const expiresAt = new Date();
-    expiresAt.setFullYear(expiresAt.getFullYear() + 1); // Expire dans 1 an
+    const aiModules = ['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui'];
+    const isAIModule = aiModules.some(id => moduleId.toLowerCase().includes(id));
+    
+    // Modules IA : 30 jours (1 mois), Modules essentiels : 90 jours (3 mois)
+    if (isAIModule) {
+      expiresAt.setDate(expiresAt.getDate() + 30); // 1 mois
+    } else {
+      expiresAt.setDate(expiresAt.getDate() + 90); // 3 mois
+    }
 
     const { data: accessData, error: accessError } = await supabase
       .from('user_applications')

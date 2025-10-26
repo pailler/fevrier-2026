@@ -25,8 +25,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: 'MeTube déjà activé pour cet utilisateur.' });
     }
 
+    // MeTube est un module essentiel : 90 jours (3 mois)
     const now = new Date();
-    const expiresAt = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+    const expiresAt = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000); // 90 jours (3 mois)
 
     const { data: accessData, error: createAccessError } = await supabase
       .from('user_applications')

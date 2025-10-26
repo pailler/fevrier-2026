@@ -16,30 +16,37 @@ export default function Home() {
 
   // Vérification de la configuration et redirection
   useEffect(() => {
-    // Redirection pour qrcodes.iahome.fr
-    if (typeof window !== 'undefined' && window.location.hostname === 'qrcodes.iahome.fr') {
-      router.replace('/qrcodes');
-      return;
-    }
-
-    // Redirection pour librespeed.iahome.fr
-    if (typeof window !== 'undefined' && window.location.hostname === 'librespeed.iahome.fr') {
-      // Vérifier s'il y a un token dans l'URL
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
       const urlParams = new URLSearchParams(window.location.search);
       const token = urlParams.get('token');
       
-      if (token) {
-        // Si un token est présent, rediriger vers la page de gestion LibreSpeed
-        router.replace(`/librespeed-host?token=${token}`);
-        return;
-      } else {
-        // Sinon, rediriger vers la page de login
-        router.replace('/login?redirect=/librespeed');
-        return;
+      // Liste des sous-domaines protégés
+      const protectedSubdomains = [
+        'librespeed.iahome.fr',
+        'meeting-reports.iahome.fr',
+        'whisper.iahome.fr',
+        'comfyui.iahome.fr',
+        'stablediffusion.iahome.fr',
+        'qrcodes.iahome.fr',
+        'psitransfer.iahome.fr',
+        'metube.iahome.fr',
+        'pdf.iahome.fr'
+      ];
+      
+      if (protectedSubdomains.includes(hostname)) {
+        if (token) {
+          // Si un token est présent, rediriger vers la page d'accès avec token
+          router.replace(`/access/${token}`);
+          return;
+        } else {
+          // Sinon, rediriger vers la page de protection
+          router.replace('/subdomain-protection');
+          return;
+        }
       }
     }
-
-  }, []); // Suppression des dépendances qui causaient la boucle
+  }, [router]);
 
   return (
     <>

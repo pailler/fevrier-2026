@@ -208,6 +208,36 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Tokens consommés:', tokensToConsume, 'Restants:', newTokenCount, 'pour userId:', userId);
 
+    // Enregistrer l'utilisation dans l'historique via user_applications
+    // Mettre à jour last_used_at pour l'historique
+    if (moduleId && moduleId !== 'test') {
+      // D'abord récupérer le usage_count actuel
+      const { data: currentApp, error: fetchError } = await supabase
+        .from('user_applications')
+        .select('usage_count')
+        .eq('user_id', userId)
+        .eq('module_id', moduleId)
+        .single();
+
+      if (!fetchError && currentApp) {
+        const { error: historyError } = await supabase
+          .from('user_applications')
+          .update({
+            last_used_at: new Date().toISOString(),
+            usage_count: (currentApp.usage_count || 0) + 1
+          })
+          .eq('user_id', userId)
+          .eq('module_id', moduleId);
+
+        if (historyError) {
+          console.error('❌ Erreur enregistrement historique:', historyError);
+          // Ne pas faire échouer la requête pour une erreur d'historique
+        } else {
+          console.log('✅ Utilisation enregistrée dans l\'historique');
+        }
+      }
+    }
+
     return NextResponse.json({
       success: true,
       tokensRemaining: newTokenCount,

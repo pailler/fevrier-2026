@@ -86,28 +86,28 @@ export default function EssentialAccessButton({
         console.warn(`⚠️ ${moduleTitle}: Erreur incrémentation compteur:`, incrementError);
       }
 
-      // Rediriger directement vers l'application via sous-domaines
-      const applicationUrls: { [key: string]: string } = {
-        'librespeed': 'https://librespeed.iahome.fr',
-        'metube': 'https://metube.iahome.fr',
-        'whisper': 'https://whisper.iahome.fr',
-        'psitransfer': 'https://psitransfer.iahome.fr',
-        'qrcodes': 'https://qrcodes.iahome.fr',
-        'pdf': 'https://pdf.iahome.fr',
-        'stablediffusion': 'https://stablediffusion.iahome.fr',
-        'comfyui': 'https://comfyui.iahome.fr',
-        'meeting-reports': 'https://meeting-reports.iahome.fr',
-        'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
-        'cogstudio': 'https://cogstudio.iahome.fr',
-      };
+      // Générer un token d'accès
+      const tokenResponse = await fetch('/api/generate-access-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          userEmail: user.email,
+          moduleId: moduleId
+        })
+      });
 
-      const accessUrl = applicationUrls[moduleId];
-      
-      if (!accessUrl) {
-        throw new Error(`URL d'accès non configurée pour ${moduleId}`);
+      if (!tokenResponse.ok) {
+        throw new Error('Erreur génération token');
       }
+
+      const tokenData = await tokenResponse.json();
       
-      console.log(`🔗 ${moduleTitle}: Accès direct à:`, accessUrl);
+      // Rediriger vers la page de protection avec token pour validation
+      const accessUrl = `https://iahome.fr/subdomain-protection?token=${tokenData.token}`;
+      console.log(`🔗 ${moduleTitle}: Accès sécurisé à:`, accessUrl);
       window.open(accessUrl, '_blank');
       
       // Appeler le callback pour notifier l'accès accordé
@@ -132,7 +132,7 @@ export default function EssentialAccessButton({
             : 'bg-blue-600 hover:bg-blue-700'
           }`}
       >
-        {isLoading ? '⏳ Ouverture...' : `🔧 Accéder à ${moduleTitle} (${moduleId === 'qrcodes' ? '100' : '10'} tokens)`}
+        {isLoading ? '⏳ Ouverture...' : `🔧 Accéder à ${moduleTitle} (10 tokens)`}
       </button>
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
