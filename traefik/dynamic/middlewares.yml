@@ -46,3 +46,12 @@ http:
         customResponseHeaders:
           X-Forwarded-Proto: "https"
 
+    # Middleware pour Whisper - Augmentation de la taille max des requêtes
+    whisper-buffer:
+      buffering:
+        maxRequestBodyBytes: 1073741824
+        maxResponseBodyBytes: 1073741824
+        memRequestBodyBytes: 26214400
+        memResponseBodyBytes: 26214400
+        retryExpression: "IsNetworkError() && Attempts() < 2"
+

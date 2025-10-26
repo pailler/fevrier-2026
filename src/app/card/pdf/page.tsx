@@ -205,39 +205,53 @@ export default function PDFPage() {
 
             <div className="space-y-6">
               {/* Boutons d'action */}
-              {isAuthenticated && user ? (
-                // Bouton d'accès pour les applis essentielles (uniquement si connecté)
-                <button 
-                  onClick={() => {
-                    if (isAuthenticated && user) {
-                      // Utilisateur connecté : aller à la page de transition puis /encours
-                      ;
-                      router.push(`/token-generated?module=${encodeURIComponent('PDF+')}&redirect=/encours`);
-                    } else {
-                      // Utilisateur non connecté : aller à la page de connexion puis retour à PDF+
-                      console.log('🔒 Accès PDF+ - Redirection vers connexion');
-                      router.push(`/login?redirect=${encodeURIComponent('/card/pdf')}`);
+              <button
+                onClick={async () => {
+                  if (isAuthenticated && user) {
+                    // Utilisateur connecté : activer PDF+ via API
+                    try {
+                      const response = await fetch('/api/activate-pdf', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          userId: user.id,
+                          email: user.email
+                        }),
+                      });
+
+                      if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                          console.log('✅ PDF+ activé avec succès');
+                          // Rediriger vers la page des modules actifs
+                          router.push('/encours');
+                        } else {
+                          console.error('❌ Erreur activation PDF+:', data.error);
+                          alert('Erreur lors de l\'activation de PDF+: ' + data.error);
+                        }
+                      } else {
+                        console.error('❌ Erreur réponse API:', response.status);
+                        alert('Erreur lors de l\'activation de PDF+');
+                      }
+                    } catch (error) {
+                      console.error('❌ Erreur lors de l\'activation de PDF+:', error);
+                      alert('Erreur lors de l\'activation de PDF+');
                     }
-                  }}
-                  className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                >
-                  <span className="text-xl">🆓</span>
-                  <span>Activer l'application PDF+</span>
-                </button>
-              ) : (
-                // Message pour les applis essentielles quand l'utilisateur n'est pas connecté
-                <button
-                  onClick={() => {
+                  } else {
                     // Utilisateur non connecté : aller à la page de connexion puis retour à PDF+
                     console.log('🔒 Accès PDF+ - Redirection vers connexion');
                     router.push(`/login?redirect=${encodeURIComponent('/card/pdf')}`);
-                  }}
-                  className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                >
-                  <span className="text-xl">🔒</span>
-                  <span>Connectez-vous pour activer PDF+</span>
-                </button>
-              )}
+                  }
+                }}
+                className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              >
+                <span className="text-xl">📄</span>
+                <span>
+                  {isAuthenticated && user ? 'Activez PDF+ (10 tokens)' : 'Connectez-vous pour activer PDF+ (10 tokens)'}
+                </span>
+              </button>
             </div>
           </div>
         </div>

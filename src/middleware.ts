@@ -31,6 +31,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // Bloquer complètement /token-generated AVANT toute autre chose
+  if (pathname === '/token-generated') {
+    // Retourner une 404 immédiatement, sans passer par le reste du middleware
+    return new NextResponse('Page non trouvée', { 
+      status: 404,
+      headers: {
+        'Content-Type': 'text/plain',
+      }
+    });
+  }
+
   // Réécritures simples pour Socket.IO
   if (pathname.startsWith('/socket.io')) {
     const url = new URL(request.url);

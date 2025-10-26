@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '../../utils/supabaseClient';
 import SimpleHeader from '../../components/SimpleHeader';
 import Footer from '../../components/Footer';
@@ -24,13 +24,93 @@ interface Page {
 export default function DynamicPage() {
   const params = useParams();
   const slug = params.slug as string;
+  const router = useRouter();
   
   const [page, setPage] = useState<Page | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Routes exclues - redirection immédiate
+  const excludedRoutes = [
+    'token-generated',
+    'encours',
+    'applications',
+    'essentiels',
+    'modules',
+    'login',
+    'signup',
+    'admin',
+    'auth',
+    'api',
+    'about',
+    'contact',
+    'privacy',
+    'terms',
+    'pricing',
+    'blog',
+    'formation',
+    'community',
+    'search',
+    'cookies',
+    'forgot-password',
+    'reset-password',
+    'verify-email',
+    'payment-success',
+    'payment-cancel',
+    'stablediffusion',
+    'comfyui',
+    'whisper',
+    'ruinedfooocus',
+    'librespeed',
+    'metube',
+    'psitransfer',
+    'qrcodes',
+    'pdf',
+    'tokens',
+    'my-tokens',
+    'modules-access',
+    'card',
+    'qr-code',
+    'qr-interface',
+    'qr-redirect',
+    'qrcodes-redirect',
+    'qrcodes-subdomain',
+    'qrcodes-direct',
+    'librespeed-direct',
+    'librespeed-access',
+    'librespeed-blocked',
+    'librespeed-redirect',
+    'metube-redirect',
+    'metube-security',
+    'protected-metube'
+  ];
+
+  // Redirection immédiate pour les routes exclues
   useEffect(() => {
+    if (excludedRoutes.includes(slug)) {
+      router.replace('/encours');
+    }
+  }, [slug, router]);
+
+  // Retourner null pour éviter tout rendu ou requête Supabase
+  if (excludedRoutes.includes(slug)) {
+    return null;
+  }
+
+  useEffect(() => {
+    // Ne rien faire si c'est une route exclue
+    if (excludedRoutes.includes(slug)) {
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     const fetchPage = async () => {
+      // Double vérification
+      if (excludedRoutes.includes(slug)) {
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
@@ -198,4 +278,4 @@ export default function DynamicPage() {
       <Footer />
     </div>
   );
-} 
+}

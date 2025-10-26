@@ -81,6 +81,21 @@ export async function POST(request: NextRequest) {
       })
       .eq('id', user.id);
 
+    // Envoyer la notification de login
+    try {
+      const { NotificationService } = await import('../../../../utils/notificationService');
+      const notificationService = NotificationService.getInstance();
+      
+      await notificationService.sendUserLoginNotification(
+        user.email,
+        user.full_name || user.email
+      );
+      console.log('✅ Notification de login envoyée à', user.email);
+    } catch (notificationError) {
+      console.error('❌ Erreur lors de l\'envoi de la notification de login:', notificationError);
+      // Ne pas faire échouer la connexion si la notification échoue
+    }
+
     return NextResponse.json({
       success: true,
       user: {

@@ -805,6 +805,39 @@ export default function CardDetailPage() {
                           return;
                         }
 
+                        // Pour les modules essentiels, utiliser les APIs d'activation spécifiques
+                        const moduleId = params.id as string;
+                        
+                        // Activation PDF
+                        if (moduleId === 'pdf') {
+                          try {
+                            const response = await fetch('/api/activate-pdf', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({
+                                userId: user.id,
+                                email: user.email
+                              }),
+                            });
+
+                            const result = await response.json();
+
+                            if (result.success) {
+                              alert('PDF+ activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications.');
+                              router.push('/encours');
+                              return;
+                            } else {
+                              alert(`Erreur lors de l'activation: ${result.error}`);
+                              return;
+                            }
+                          } catch (error) {
+                            alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                            return;
+                          }
+                        }
+
                         // Générer le token premium automatiquement pour les modules gratuits
                         if (user?.id && (card.price === 0 || card.price === '0')) {
                           try {
@@ -822,7 +855,7 @@ export default function CardDetailPage() {
                             if (response.ok) {
                               console.log('✅ Token premium généré pour', card.title);
                               // Rediriger vers la page de transition
-                              router.push(`/token-generated?module=${encodeURIComponent(card.title)}`);
+                              router.push(`/encours?module=${encodeURIComponent(card.title)}`);
                               return;
                             } else {
                               console.error('❌ Erreur génération token premium');
@@ -832,8 +865,8 @@ export default function CardDetailPage() {
                           }
                         }
 
-                        // En cas d'erreur, rediriger quand même vers la page de transition
-                        router.push(`/token-generated?module=${encodeURIComponent(card.title)}`);
+                        // En cas d'erreur, rediriger quand même vers /encours
+                        router.push(`/encours?module=${encodeURIComponent(card.title)}`);
                       }}
                     >
                       <span className="text-xl">🆓</span>
@@ -989,7 +1022,7 @@ export default function CardDetailPage() {
                           if (isAuthenticated && user) {
                             // Utilisateur connecté : aller à la page de transition puis /encours
                             console.log('✅ Accès MeTube - Utilisateur connecté');
-                            router.push(`/token-generated?module=${encodeURIComponent(card.title)}&redirect=/encours`);
+                            router.push(`/encours?module=${encodeURIComponent(card.title)}`);
                           } else {
                             // Utilisateur non connecté : aller à la page de connexion puis retour à MeTube
                             console.log('🔒 Accès MeTube - Redirection vers connexion');
@@ -1031,20 +1064,20 @@ export default function CardDetailPage() {
                                   if (response.ok) {
                                     console.log(`✅ Token premium généré pour ${card.title}`);
                                     // Rediriger vers la page de transition
-                                    router.push(`/token-generated?module=${encodeURIComponent(card.title)}`);
+                                    router.push(`/encours?module=${encodeURIComponent(card.title)}`);
                                   } else {
                                     console.error('❌ Erreur génération token premium');
                                     // En cas d'erreur, rediriger quand même vers la page de transition
-                                    router.push(`/token-generated?module=${encodeURIComponent(card.title)}`);
+                                    router.push(`/encours?module=${encodeURIComponent(card.title)}`);
                                   }
                                 } catch (error) {
                                   console.error('❌ Erreur lors de la génération du token:', error);
                                   // En cas d'erreur, rediriger quand même vers la page de transition
-                                  router.push(`/token-generated?module=${encodeURIComponent(card.title)}`);
+                                  router.push(`/encours?module=${encodeURIComponent(card.title)}`);
                                 }
                               } else {
                                 // Si pas connecté, rediriger vers la page de transition
-                                router.push(`/token-generated?module=${encodeURIComponent(card.title)}`);
+                                router.push(`/encours?module=${encodeURIComponent(card.title)}`);
                               }
                             }}
                             className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
@@ -1112,13 +1145,13 @@ export default function CardDetailPage() {
                 <button
                   onClick={() => {
                     if (isAuthenticated && user) {
-                      // Utilisateur connecté : aller à la page de transition puis /encours
+                      // Utilisateur connecté : redirection directe vers /encours
                       console.log('✅ Accès MeTube - Utilisateur connecté');
-                      router.push(`/token-generated?module=${encodeURIComponent(card.title)}&redirect=/encours`);
+                      router.push('/encours');
                     } else {
-                      // Utilisateur non connecté : aller à la page de transition (comme LibreSpeed)
-                      console.log('🔒 Accès MeTube - Redirection vers page de transition');
-                      router.push(`/token-generated?module=${encodeURIComponent(card.title)}`);
+                      // Utilisateur non connecté : redirection vers /encours
+                      console.log('🔒 Accès MeTube - Redirection vers /encours');
+                      router.push('/encours');
                     }
                   }}
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
