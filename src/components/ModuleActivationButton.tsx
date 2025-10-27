@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import { useTokenContext } from '../contexts/TokenContext';
 
@@ -159,9 +160,12 @@ export default function ModuleActivationButton({
       )}
       
       {!isAuthenticated && (
-        <div className="text-yellow-600 text-sm text-center max-w-xs">
+        <Link 
+          href="/login" 
+          className="text-blue-600 hover:text-blue-800 text-sm text-center max-w-xs underline"
+        >
           Connectez-vous pour activer ce module
-        </div>
+        </Link>
       )}
       
       {isAuthenticated && tokens !== null && tokens < moduleCost && (
