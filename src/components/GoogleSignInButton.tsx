@@ -20,10 +20,19 @@ export default function GoogleSignInButton({
     try {
       setLoading(true);
       
+      // Déterminer l'URL de base correcte
+      const redirectUrl = process.env.NEXT_PUBLIC_BASE_URL 
+        ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/google`
+        : `${window.location.origin}/api/auth/google`;
+      
+      console.log('🔍 DEBUG - Redirect URL:', redirectUrl);
+      console.log('🔍 DEBUG - Current origin:', window.location.origin);
+      console.log('🔍 DEBUG - Base URL:', process.env.NEXT_PUBLIC_BASE_URL);
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/api/auth/google`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
