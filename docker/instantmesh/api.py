@@ -28,6 +28,22 @@ def generate_output_name(input_filename):
     """Generate output filename from input"""
     return Path(input_filename).stem + ".obj"
 
+@app.route("/", methods=["GET"])
+def index():
+    """API home page"""
+    return jsonify({
+        "name": "InstantMesh API",
+        "version": "v1.0",
+        "description": "3D mesh generation from images",
+        "endpoints": {
+            "health": "GET /health - Check API status",
+            "generate": "POST /generate - Convert image to 3D mesh",
+            "list_outputs": "GET /list-outputs - List all generated files",
+            "download": "GET /download/:filename - Download generated file"
+        },
+        "usage": "Upload an image via POST to /generate to create a 3D mesh"
+    })
+
 @app.route("/health", methods=["GET"])
 def health():
     """Health check endpoint"""
