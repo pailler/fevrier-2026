@@ -13,74 +13,73 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        console.log('🔍 Processing OAuth callback...');
+        
         // Vérifier s'il y a des paramètres d'erreur dans l'URL
         const errorParam = searchParams.get('error');
         const errorDescription = searchParams.get('error_description');
         
         if (errorParam) {
+          console.error('❌ OAuth Error:', errorDescription || errorParam);
           setError(`Erreur d'authentification: ${errorDescription || errorParam}`);
           setTimeout(() => router.push('/login?error=oauth_error'), 3000);
           return;
         }
 
-        // Attendre que Supabase traite la session
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Récupérer la session directement
+        console.log('📋 Checking for session...');
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
-          // Essayer de récupérer l'utilisateur directement
-          const { data: userData, error: userError } = await supabase.auth.getUser();
-          
-          if (userError || !userData.user) {
-            setError('Aucune session trouvée. Veuillez réessayer.');
-            setTimeout(() => router.push('/login?error=no_session'), 3000);
-            return;
-          }
-          
-          // Traiter l'utilisateur trouvé
-          await processUser(userData.user);
+          console.error('❌ Session Error:', sessionError);
+          setError('Erreur lors de la récupération de la session.');
+          setTimeout(() => router.push('/login?error=session_error'), 3000);
           return;
         }
 
         if (sessionData.session?.user) {
-          await processUser(sessionData.session.user);
+          console.log('✅ Session found for:', sessionData.session.user.email);
+          
+          // Vérifier si l'utilisateur existe dans profiles
+          const profileResponse = await fetch('/api/check-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: sessionData.session.user.email }),
+          });
+
+          const profileData = await profileResponse.json();
+          
+          if (!profileData.exists) {
+            console.log('📝 Creating profile for new user...');
+            // Créer le profil si nécessaire
+            const createResponse = await fetch('/api/auth/signup', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: sessionData.session.user.email,
+                full_name: sessionData.session.user.user_metadata?.full_name || sessionData.session.user.email,
+              }),
+            });
+            
+            if (!createResponse.ok) {
+              console.error('Failed to create profile');
+            }
+          }
+
+          // Rediriger vers la page d'accueil
+          console.log('🚀 Redirecting to home...');
+          router.push('/');
         } else {
+          console.error('❌ No session found');
           setError('Aucune session trouvée. Veuillez réessayer.');
           setTimeout(() => router.push('/login?error=no_session'), 3000);
         }
       } catch (error) {
+        console.error('❌ Callback Error:', error);
         setError('Une erreur est survenue. Veuillez réessayer.');
         setTimeout(() => router.push('/login?error=callback_failed'), 3000);
       } finally {
         setLoading(false);
-      }
-    };
-
-    const processUser = async (user: any) => {
-      try {
-        // Utiliser l'API route pour créer l'utilisateur avec la clé de service
-        const response = await fetch('/api/auth/callback', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: user.email,
-            name: user.user_metadata?.full_name || user.email,
-          }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Erreur lors de la création de l\'utilisateur:', errorData);
-        }
-
-        // Rediriger vers la page d'accueil
-        router.push('/');
-      } catch (error) {
-        console.error('Erreur lors du traitement de l\'utilisateur:', error);
-        setError('Erreur lors du traitement de l\'utilisateur.');
-        setTimeout(() => router.push('/login?error=user_processing_failed'), 3000);
       }
     };
 
