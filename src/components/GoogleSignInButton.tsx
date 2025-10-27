@@ -17,6 +17,11 @@ export default function GoogleSignInButton({
   const [loading, setLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
+    // Temporairement désactivé en attendant la correction du problème Supabase 500
+    alert('La connexion Google est temporairement indisponible suite à une erreur côté Supabase.\n\nVeuillez utiliser la connexion par email/mot de passe.\n\nNous travaillons sur la résolution de ce problème.');
+    return;
+    
+    /* 
     try {
       setLoading(true);
       
@@ -53,6 +58,7 @@ export default function GoogleSignInButton({
     } finally {
       setLoading(false);
     }
+    */
   };
 
   return (
