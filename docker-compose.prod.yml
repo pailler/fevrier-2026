@@ -65,6 +65,42 @@ services:
   # dans le dossier ../essentiels/
   # Voir: ../essentiels/docker-compose.services.yml
 
+  instantmesh:
+    build:
+      context: ./docker/instantmesh
+      dockerfile: Dockerfile
+    container_name: iahome-instantmesh
+    restart: unless-stopped
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8003:7860"
+    volumes:
+      - ./data/instantmesh/inputs:/app/inputs
+      - ./data/instantmesh/outputs:/app/outputs
+    networks:
+      - iahome-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.instantmesh.rule=Host(`instantmesh.iahome.fr`)"
+      - "traefik.http.routers.instantmesh.entrypoints=websecure"
+      - "traefik.http.routers.instantmesh.tls=true"
+      - "traefik.http.routers.instantmesh.tls.certresolver=letsencrypt"
+      - "traefik.http.services.instantmesh.loadbalancer.server.port=7860"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   traefik:
     image: traefik:v2.10
     container_name: iahome-traefik
