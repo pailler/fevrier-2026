@@ -22,8 +22,8 @@ export default function GoogleSignInButton({
       
       // Déterminer l'URL de base correcte
       const redirectUrl = process.env.NEXT_PUBLIC_BASE_URL 
-        ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/google`
-        : `${window.location.origin}/api/auth/google`;
+        ? `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`
+        : `${window.location.origin}/auth/callback`;
       
       console.log('🔍 DEBUG - Redirect URL:', redirectUrl);
       console.log('🔍 DEBUG - Current origin:', window.location.origin);
