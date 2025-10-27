@@ -22,10 +22,11 @@ RUN git clone https://github.com/TencentARC/InstantMesh.git .
 RUN pip3 install --no-cache-dir --upgrade pip
 RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir flask flask-cors requests
 
-# Download model checkpoints
-RUN mkdir -p checkpoints && \
-    wget https://huggingface.co/IDEA-Research/InstantMesh/resolve/main/instant-mesh.pt -O checkpoints/instant-mesh.pt
+# Download model checkpoints (will download from correct repository)
+RUN mkdir -p checkpoints
+# Checkpoints will be downloaded at runtime from HuggingFace
 
 # Copy API script
 COPY api.py /app/api.py
