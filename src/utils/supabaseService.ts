@@ -20,9 +20,9 @@ export const getSupabaseClient = (): SupabaseClient => {
         autoRefreshToken: true,
         detectSessionInUrl: true,
         storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-        flowType: 'pkce',
+        flowType: 'implicit', // Utiliser le flux implicite au lieu de PKCE
         // Configuration pour éviter les instances multiples
-        debug: false
+        debug: true // Activer les logs pour debug
       },
       global: {
         headers: {
