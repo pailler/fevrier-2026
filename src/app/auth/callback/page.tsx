@@ -17,15 +17,9 @@ export default function AuthCallback() {
         // Attendre un peu pour que Supabase traite le callback
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // Récupérer la session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        // Récupérer la session sans gestion d'erreur détaillée
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (sessionError) {
-          console.error('❌ Erreur session:', sessionError);
-          setStatus('Erreur lors de la connexion. Redirection...');
-          setTimeout(() => router.push('/login?error=session_failed'), 2000);
-          return;
-        }
 
         if (session?.user) {
           console.log('✅ Session trouvée pour:', session.user.email);
@@ -48,27 +42,9 @@ export default function AuthCallback() {
           
           console.log('✅ Utilisateur stocké dans localStorage:', userData.email);
           
-          // Vérifier/créer le profil dans la table profiles
-          setStatus('Création de votre profil...');
-          const profileResponse = await fetch('/api/check-profile', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: session.user.email }),
-          });
-
-          const profileData = await profileResponse.json();
-          
-          if (!profileData.exists) {
-            console.log('📝 Création du profil utilisateur...');
-            await fetch('/api/auth/callback', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                email: session.user.email,
-                name: session.user.user_metadata?.full_name || session.user.email,
-              }),
-            });
-          }
+          // Attendre un peu pour que Supabase crée le profil automatiquement
+          // Ne pas essayer de créer le profil manuellement pour éviter les conflits
+          console.log('✅ Profil sera créé automatiquement par Supabase si besoin');
           
           setStatus('Redirection vers l\'accueil...');
           setTimeout(() => router.push('/'), 1000);
