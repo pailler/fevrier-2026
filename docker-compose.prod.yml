@@ -79,6 +79,7 @@ services:
     volumes:
       - ./data/instantmesh/inputs:/app/inputs
       - ./data/instantmesh/outputs:/app/outputs
+      - ./data/instantmesh/ckpts:/app/ckpts
     networks:
       - iahome-network
     deploy:

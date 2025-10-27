@@ -11,13 +11,19 @@ import uuid
 from pathlib import Path
 from datetime import datetime
 import traceback
+from huggingface_hub import hf_hub_download
+import torch
 
 app = Flask(__name__)
 CORS(app)
 
 INPUT_DIR = "/app/inputs"
 OUTPUT_DIR = "/app/outputs"
+CHECKPOINT_DIR = "/app/ckpts"
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp'}
+
+# Create checkpoint directory
+os.makedirs(CHECKPOINT_DIR, exist_ok=True)
 
 def allowed_file(filename):
     """Check if file extension is allowed"""
@@ -27,6 +33,46 @@ def allowed_file(filename):
 def generate_output_name(input_filename):
     """Generate output filename from input"""
     return Path(input_filename).stem + ".obj"
+
+def download_checkpoints():
+    """Download checkpoints from HuggingFace if not present"""
+    try:
+        # Check if models are already downloaded
+        unet_path = os.path.join(CHECKPOINT_DIR, "diffusion_pytorch_model.bin")
+        model_path = os.path.join(CHECKPOINT_DIR, "instant_mesh_large.ckpt")
+        
+        if os.path.exists(unet_path) and os.path.exists(model_path):
+            print("✅ Models already downloaded")
+            return True
+        
+        print("📥 Downloading InstantMesh models from HuggingFace...")
+        
+        # Download UNet
+        if not os.path.exists(unet_path):
+            print("📥 Downloading diffusion_pytorch_model.bin...")
+            hf_hub_download(
+                repo_id="TencentARC/InstantMesh",
+                filename="diffusion_pytorch_model.bin",
+                repo_type="model",
+                cache_dir=CHECKPOINT_DIR
+            )
+            print("✅ UNet downloaded")
+        
+        # Download reconstruction model
+        if not os.path.exists(model_path):
+            print("📥 Downloading instant_mesh_large.ckpt...")
+            hf_hub_download(
+                repo_id="TencentARC/InstantMesh",
+                filename="instant_mesh_large.ckpt",
+                repo_type="model",
+                cache_dir=CHECKPOINT_DIR
+            )
+            print("✅ Reconstruction model downloaded")
+        
+        return True
+    except Exception as e:
+        print(f"⚠️ Error downloading models: {e}")
+        return False
 
 @app.route("/", methods=["GET"])
 def index():
@@ -41,7 +87,9 @@ def index():
             "list_outputs": "GET /list-outputs - List all generated files",
             "download": "GET /download/:filename - Download generated file"
         },
-        "usage": "Upload an image via POST to /generate to create a 3D mesh"
+        "usage": "Upload an image via POST to /generate to create a 3D mesh",
+        "checkpoints_dir": CHECKPOINT_DIR,
+        "note": "Models will be downloaded automatically from HuggingFace on first use"
     })
 
 @app.route("/health", methods=["GET"])
@@ -171,6 +219,22 @@ def list_outputs():
             })
         
         return jsonify({"files": file_info})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/download-models", methods=["POST"])
+def download_models():
+    """Manually trigger model download from HuggingFace"""
+    try:
+        success = download_checkpoints()
+        if success:
+            return jsonify({
+                "success": True,
+                "message": "Models downloaded successfully",
+                "location": CHECKPOINT_DIR
+            })
+        else:
+            return jsonify({"error": "Failed to download models"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
