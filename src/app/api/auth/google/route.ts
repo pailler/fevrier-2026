@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/utils/supabaseService';
+import { createClient } from '@supabase/supabase-js';
+
+// Utiliser un client service role pour l'authentification OAuth
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function GET(request: NextRequest) {
   try {
+    console.log('🔍 Callback Google OAuth reçu');
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code');
     const error = searchParams.get('error');
+
+    console.log('📋 Paramètres reçus:', { code: code ? 'présent' : 'absent', error });
 
     if (error) {
       console.error('❌ Erreur OAuth:', error);
@@ -18,7 +27,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Échanger le code contre une session
-    const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error: exchangeError } = await supabaseAdmin.auth.exchangeCodeForSession(code);
 
     if (exchangeError) {
       console.error('❌ Erreur lors de l\'échange du code:', exchangeError);
@@ -29,7 +38,7 @@ export async function GET(request: NextRequest) {
       console.log('✅ Session créée pour:', data.session.user.email);
       
       // Vérifier si l'utilisateur existe dans la table profiles
-      const { data: userData, error: userError } = await supabase
+      const { data: userData, error: userError } = await supabaseAdmin
         .from('profiles')
         .select('*')
         .eq('email', data.session.user.email)
@@ -38,7 +47,7 @@ export async function GET(request: NextRequest) {
       // Si l'utilisateur n'existe pas, le créer
       if (!userData && userError?.code === 'PGRST116') {
         console.log('📝 Création de l\'utilisateur...');
-        const { error: insertError } = await supabase
+        const { error: insertError } = await supabaseAdmin
           .from('profiles')
           .insert({
             email: data.session.user.email,
