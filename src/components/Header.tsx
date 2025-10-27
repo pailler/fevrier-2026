@@ -74,7 +74,7 @@ export default function Header() {
                   </button>
                   <button 
                     className="bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors"
-                    onClick={() => router.push('/register')}
+                    onClick={() => router.push('/signup')}
                   >
                     Commencer
                   </button>
