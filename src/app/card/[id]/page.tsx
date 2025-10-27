@@ -875,13 +875,13 @@ export default function CardDetailPage() {
                   </>
                 ) : (card.price === 0 || card.price === '0') && (!isAuthenticated || !user) && !isLibrespeed ? (
                   // Message pour les modules gratuits quand l'utilisateur n'est pas connecté (sauf LibreSpeed)
-                  <a 
+                  <Link 
                     href="/login"
                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
                   >
                     <span className="text-xl">🔒</span>
                     <span>Connectez-vous pour activer {card?.title || 'Module'}</span>
-                  </a>
+                  </Link>
                 ) : (
                   // Boutons pour les modules payants
                   <div className="space-y-4">
@@ -1086,13 +1086,13 @@ export default function CardDetailPage() {
                             <span>Activer l'application {card.title}</span>
                           </button>
                         ) : (
-                          <a 
+                          <Link 
                             href="/login"
                             className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
                           >
                             <span className="text-xl">🔒</span>
                             <span>Connectez-vous pour activer {card?.title || 'Module'}</span>
-                          </a>
+                          </Link>
                         )}
                       </div>
                     )}
