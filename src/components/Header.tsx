@@ -136,6 +136,12 @@ export default function Header() {
               >
                 Applications IA
               </Link>
+              <Link 
+                href="/services" 
+                className="text-white hover:text-blue-100 font-medium transition-colors"
+              >
+                Services
+              </Link>
             </nav>
           </div>
 
@@ -216,11 +222,17 @@ export default function Header() {
               {/* Navigation principale */}
               <div className="px-4 py-2 border-b border-blue-500">
                 <div className="text-sm text-blue-100 mb-2">Navigation</div>
-                <Link
-                  href="/formation"
-                  className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors"
-                >
-                  Formation
+              <Link
+                href="/services"
+                className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors"
+              >
+                Services
+              </Link>
+              <Link
+                href="/formation"
+                className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors"
+              >
+                Formation
                 </Link>
                 <Link
                   href="/blog"

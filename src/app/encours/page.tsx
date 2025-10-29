@@ -346,7 +346,7 @@ export default function EncoursPage() {
       'pdf': 'http://localhost:8080',  // PDF accès direct
       'psitransfer': 'http://localhost:8082',  // PsiTransfer accès direct
       'qrcodes': 'https://qrcodes.iahome.fr',  // QR Codes accès direct via Cloudflare
-      'qrcodes-statiques': 'http://localhost:7005',  // QR Codes Statiques local
+      'qrcodes-statiques': 'http://localhost:7006',  // QR Codes Statiques local
       'whisper': 'http://localhost:8084',  // Whisper accès direct
       'stablediffusion': 'http://localhost:7860',  // StableDiffusion accès direct
       'ruinedfooocus': 'http://localhost:7861',  // RuinedFooocus accès direct
@@ -749,11 +749,11 @@ export default function EncoursPage() {
                       <p className="text-blue-100 text-sm">Gérez votre crédit token</p>
                     </div>
                   </div>
-                  <button
-                    onClick={fetchTokenData}
-                    disabled={loadingTokens}
+                <button
+                  onClick={fetchTokenData}
+                  disabled={loadingTokens}
                     className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium backdrop-blur-sm border border-white/30 transition-all disabled:opacity-50"
-                  >
+                >
                     {loadingTokens ? (
                       <span className="flex items-center">
                         <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
@@ -770,22 +770,22 @@ export default function EncoursPage() {
                         Actualiser
                       </span>
                     )}
-                  </button>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Solde de tokens - Mis en avant */}
                   <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
                     {/* Version mobile : en colonne */}
                     <div className="flex flex-col md:hidden">
                       <div className="flex items-center justify-between mb-4">
-                        <div>
+                    <div>
                           <h3 className="text-sm font-medium text-blue-100 uppercase tracking-wide mb-1">Solde disponible</h3>
                           <div className="flex items-baseline space-x-2">
                             <p className="text-5xl font-bold text-white">{tokenBalance}</p>
                             <p className="text-lg text-blue-200 font-medium">tokens</p>
-                          </div>
-                        </div>
+                    </div>
+                  </div>
                         <div className="text-6xl opacity-30">🪙</div>
                       </div>
                       
@@ -818,7 +818,7 @@ export default function EncoursPage() {
                             <span className="text-base">Rechargez vos tokens</span>
                           </div>
                         </div>
-                      </Link>
+                    </Link>
                     </div>
                     
                     {/* Version desktop : sur la même ligne */}
@@ -832,9 +832,9 @@ export default function EncoursPage() {
                             <p className="text-5xl font-bold text-white">{tokenBalance}</p>
                             <p className="text-lg text-blue-200 font-medium">tokens</p>
                           </div>
-                        </div>
-                      </div>
-                      
+                  </div>
+                </div>
+
                       {/* Bouton à droite */}
                       <Link href="/pricing" className="group shrink-0">
                         <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 hover:from-yellow-500 hover:via-yellow-600 hover:to-orange-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
@@ -846,8 +846,8 @@ export default function EncoursPage() {
                           </div>
                         </div>
                       </Link>
-                    </div>
-                    
+              </div>
+
                     {/* Barre de progression (desktop seulement, en dessous) */}
                     <div className="hidden md:block mt-4">
                       <div className="flex items-center justify-between mb-2">
@@ -948,15 +948,15 @@ export default function EncoursPage() {
                           <div className="flex justify-between items-center">
                             <span className="text-sm text-blue-700 font-medium">Date de début :</span>
                             <span className="text-sm font-semibold text-blue-900">{formatDate(module.created_at)}</span>
-                          </div>
-                          {module.expires_at && (
+                        </div>
+                        {module.expires_at && (
                             <div className="flex justify-between items-center">
                               <span className="text-sm text-blue-700 font-medium">Date de fin :</span>
                               <span className={`text-sm font-semibold ${getTimeRemainingColor(module.expires_at)}`}>
-                                {formatDate(module.expires_at)}
-                              </span>
-                            </div>
-                          )}
+                              {formatDate(module.expires_at)}
+                            </span>
+                          </div>
+                        )}
                           <div className="mt-2 pt-2 border-t border-blue-200">
                             <div className="flex justify-between items-center">
                               <span className="text-xs text-blue-600 font-medium">Durée restante :</span>
@@ -1136,12 +1136,12 @@ export default function EncoursPage() {
                               </div>
                               <p className="text-xs text-gray-400">
                                 à {usageDate.toLocaleTimeString('fr-FR', {
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </p>
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </p>
+                              </div>
                             </div>
-                          </div>
                         );
                       })}
                     </div>

@@ -1,8 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getSupabaseClient } from '../../../utils/supabaseService';
 import EditUserModal from '../../../components/admin/EditUserModal';
+
+// Intervalle de rafraîchissement automatique (en millisecondes)
+const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes
 
 interface UserApplication {
   moduleId: string;
@@ -34,118 +37,129 @@ export default function AdminUsers() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+
+  const loadUsers = useCallback(async () => {
+    try {
+      ;
+      
+      // Récupération directe des données depuis Supabase
+
+      const supabase = getSupabaseClient();
+
+      // Récupérer tous les profils utilisateurs
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (profilesError) {
+        console.error('❌ Erreur lors de la récupération des profils:', profilesError);
+        return;
+      }
+
+      console.log(`📊 ${profiles?.length || 0} profils trouvés dans la base de données`);
+
+      // Récupérer les applications utilisateurs pour chaque profil
+      const usersWithApplications = await Promise.all(
+        (profiles || []).map(async (profile) => {
+          // Récupérer les applications actives de l'utilisateur
+          const { data: applications, error: appsError } = await supabase
+            .from('user_applications')
+            .select('module_id, usage_count, max_usage, expires_at, is_active, created_at, last_used_at')
+            .eq('user_id', profile.id)
+            .eq('is_active', true);
+
+          if (appsError) {
+            console.error(`❌ Erreur applications pour ${profile.email}:`, appsError);
+          }
+
+          // Calculer la dernière connexion basée sur l'activité réelle
+          let lastLogin: Date | null = null;
+          
+          // 1. Vérifier la dernière utilisation d'un module
+          if (applications && applications.length > 0) {
+            const lastUsedDates = applications
+              .filter(app => app.last_used_at)
+              .map(app => new Date(app.last_used_at!))
+              .sort((a, b) => b.getTime() - a.getTime());
+            
+            if (lastUsedDates.length > 0) {
+              lastLogin = lastUsedDates[0];
+            }
+          }
+          
+          // 2. Si pas d'utilisation de module, utiliser la date de mise à jour du profil
+          if (!lastLogin && profile.updated_at) {
+            lastLogin = new Date(profile.updated_at);
+          }
+          
+          // 3. Si pas de mise à jour, utiliser la date de création
+          if (!lastLogin) {
+            lastLogin = new Date(profile.created_at);
+          }
+
+          // Calculer les modules actifs
+          const activeModules = applications?.map(app => app.module_id) || [];
+          
+          // Calculer le statut basé sur l'activité
+          const now = new Date();
+          const daysSinceLastLogin = lastLogin ? Math.floor((now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60 * 24)) : null;
+          
+          let status: 'active' | 'inactive' | 'suspended' = 'active';
+          if (!profile.is_active) {
+            status = 'suspended';
+          } else if (daysSinceLastLogin && daysSinceLastLogin > 30) {
+            status = 'inactive';
+          } else if (daysSinceLastLogin && daysSinceLastLogin > 7) {
+            status = 'inactive';
+          } else {
+            status = 'active';
+          }
+
+          return {
+            id: profile.id,
+            email: profile.email,
+            fullName: profile.full_name || profile.email,
+            role: profile.role || 'user',
+            createdAt: profile.created_at,
+            lastLogin: lastLogin?.toISOString() || null,
+            status,
+            modules: activeModules,
+            applications: applications?.map(app => ({
+              moduleId: app.module_id,
+              usageCount: app.usage_count || 0,
+              maxUsage: app.max_usage || 0,
+              expiresAt: app.expires_at,
+              lastUsedAt: app.last_used_at,
+              createdAt: app.created_at
+            })) || []
+          };
+        })
+      );
+
+      console.log(`✅ ${usersWithApplications.length} vrais utilisateurs chargés depuis Supabase`);
+      setUsers(usersWithApplications);
+      setLastUpdate(new Date());
+    } catch (error) {
+      console.error('❌ Erreur lors du chargement des utilisateurs:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const loadUsers = async () => {
-      try {
-        ;
-        
-        // Récupération directe des données depuis Supabase
-
-const supabase = getSupabaseClient();
-
-        // Récupérer tous les profils utilisateurs
-        const { data: profiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (profilesError) {
-          console.error('❌ Erreur lors de la récupération des profils:', profilesError);
-          return;
-        }
-
-        console.log(`📊 ${profiles?.length || 0} profils trouvés dans la base de données`);
-
-        // Récupérer les applications utilisateurs pour chaque profil
-        const usersWithApplications = await Promise.all(
-          (profiles || []).map(async (profile) => {
-            // Récupérer les applications actives de l'utilisateur
-            const { data: applications, error: appsError } = await supabase
-              .from('user_applications')
-              .select('module_id, usage_count, max_usage, expires_at, is_active, created_at, last_used_at')
-              .eq('user_id', profile.id)
-              .eq('is_active', true);
-
-            if (appsError) {
-              console.error(`❌ Erreur applications pour ${profile.email}:`, appsError);
-            }
-
-            // Calculer la dernière connexion basée sur l'activité réelle
-            let lastLogin: Date | null = null;
-            
-            // 1. Vérifier la dernière utilisation d'un module
-            if (applications && applications.length > 0) {
-              const lastUsedDates = applications
-                .filter(app => app.last_used_at)
-                .map(app => new Date(app.last_used_at!))
-                .sort((a, b) => b.getTime() - a.getTime());
-              
-              if (lastUsedDates.length > 0) {
-                lastLogin = lastUsedDates[0];
-              }
-            }
-            
-            // 2. Si pas d'utilisation de module, utiliser la date de mise à jour du profil
-            if (!lastLogin && profile.updated_at) {
-              lastLogin = new Date(profile.updated_at);
-            }
-            
-            // 3. Si pas de mise à jour, utiliser la date de création
-            if (!lastLogin) {
-              lastLogin = new Date(profile.created_at);
-            }
-
-            // Calculer les modules actifs
-            const activeModules = applications?.map(app => app.module_id) || [];
-            
-            // Calculer le statut basé sur l'activité
-            const now = new Date();
-            const daysSinceLastLogin = lastLogin ? Math.floor((now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60 * 24)) : null;
-            
-            let status: 'active' | 'inactive' | 'suspended' = 'active';
-            if (!profile.is_active) {
-              status = 'suspended';
-            } else if (daysSinceLastLogin && daysSinceLastLogin > 30) {
-              status = 'inactive';
-            } else if (daysSinceLastLogin && daysSinceLastLogin > 7) {
-              status = 'inactive';
-            } else {
-              status = 'active';
-            }
-
-            return {
-              id: profile.id,
-              email: profile.email,
-              fullName: profile.full_name || profile.email,
-              role: profile.role || 'user',
-              createdAt: profile.created_at,
-              lastLogin: lastLogin?.toISOString() || null,
-              status,
-              modules: activeModules,
-              applications: applications?.map(app => ({
-                moduleId: app.module_id,
-                usageCount: app.usage_count || 0,
-                maxUsage: app.max_usage || 0,
-                expiresAt: app.expires_at,
-                lastUsedAt: app.last_used_at,
-                createdAt: app.created_at
-              })) || []
-            };
-          })
-        );
-
-        console.log(`✅ ${usersWithApplications.length} vrais utilisateurs chargés depuis Supabase`);
-        setUsers(usersWithApplications);
-      } catch (error) {
-        console.error('❌ Erreur lors du chargement des utilisateurs:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadUsers();
-  }, []);
+    
+    // Rafraîchir les données automatiquement
+    const refreshInterval = setInterval(() => {
+      console.log('🔄 Mise à jour automatique des données...');
+      loadUsers();
+    }, REFRESH_INTERVAL);
+
+    // Nettoyer l'intervalle au démontage du composant
+    return () => clearInterval(refreshInterval);
+  }, [loadUsers]);
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -364,12 +378,34 @@ const supabase = getSupabaseClient();
     <div className="space-y-6">
       {/* En-tête */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Gestion administrateur IAHome
-        </h1>
-        <p className="text-gray-600">
-          Gérez les comptes utilisateurs, les rôles et les permissions
-        </p>
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Gestion administrateur IAHome
+            </h1>
+            <p className="text-gray-600">
+              Gérez les comptes utilisateurs, les rôles et les permissions
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-500">
+              Dernière mise à jour: {lastUpdate.toLocaleTimeString('fr-FR')}
+            </div>
+            <button
+              onClick={() => {
+                setLoading(true);
+                loadUsers();
+              }}
+              disabled={loading}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              {loading ? 'Rafraîchissement...' : 'Rafraîchir'}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Filtres et recherche */}

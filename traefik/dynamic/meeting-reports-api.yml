@@ -1,5 +1,4 @@
 # Configuration Traefik pour l'API Meeting Reports Generator
-# Placez ce fichier dans votre répertoire traefik/dynamic/
 
 http:
   routers:
@@ -12,18 +11,23 @@ http:
         - meeting-reports-stripprefix
         - meeting-reports-api-headers
         - meeting-reports-cors
+        - meeting-reports-buffer
 
   services:
     meeting-reports-api-service:
       loadBalancer:
         servers:
-          - url: "http://localhost:8001"
+          - url: "http://meeting-reports-backend-1:8000"
         healthCheck:
           path: "/health"
           interval: "30s"
           timeout: "5s"
 
   middlewares:
+    meeting-reports-buffer:
+      buffering:
+        maxRequestBodyBytes: 524288000  # 500 MB
+    
     meeting-reports-stripprefix:
       stripPrefix:
         prefixes:
@@ -56,4 +60,3 @@ http:
           - "http://localhost:3001"
         accessControlMaxAge: 100
         addVaryHeader: true
-

@@ -40,6 +40,9 @@ services:
       - PORT=7006
       - IAHOME_JWT_SECRET=qr-code-secret-key-change-in-production
       - IAHOME_API_URL=http://iahome-app:3000
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Paris
@@ -54,7 +57,10 @@ services:
       start_period: 40s
     networks:
       - iahome-network
+      - iahome_iahome-network
 
 networks:
   iahome-network:
+    external: true
+  iahome_iahome-network:
     external: true

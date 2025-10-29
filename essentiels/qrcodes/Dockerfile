@@ -33,7 +33,7 @@ COPY . .
 RUN mkdir -p /app/qr_codes
 
 # Exposer le port
-EXPOSE 7005
+EXPOSE 7006
 
 # Commande par défaut (service complet avec base de données)
 CMD ["python", "qr_service_clean.py"]

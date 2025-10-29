@@ -6,7 +6,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_API_KEY=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
       - HOST=0.0.0.0
       - PORT=8000
       - CORS_ORIGIN=*

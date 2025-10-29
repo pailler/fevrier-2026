@@ -26,12 +26,12 @@ http:
         replacement: "https://iahome.fr/api/redirect-psitransfer$1"
         permanent: false
     
-    # Middleware de redirection sécurisée pour QR Codes
-    qrcodes-secure-redirect:
-      redirectRegex:
-        regex: "^https://qrcodes\\.iahome\\.fr(.*)$"
-        replacement: "https://iahome.fr/api/redirect-qrcodes$1"
-        permanent: false
+    # Middleware de redirection sécurisée pour QR Codes (DÉSACTIVÉ - utilise qrcodes-cloudflare.yml)
+    # qrcodes-secure-redirect:
+    #   redirectRegex:
+    #     regex: "^https://qrcodes\\.iahome\\.fr(.*)$"
+    #     replacement: "https://iahome.fr/api/redirect-qrcodes$1"
+    #     permanent: false
     
     # Middleware de redirection sécurisée pour Stable Diffusion
     stablediffusion-secure-redirect:
@@ -84,14 +84,14 @@ http:
       tls: {}
       priority: 100
 
-    # QR Codes - Redirection sécurisée
-    qrcodes-secure:
-      rule: "Host(`qrcodes.iahome.fr`)"
-      entryPoints: ["websecure"]
-      service: qrcodes-redirect-service
-      middlewares: ["qrcodes-secure-redirect", "security-headers@file", "compress@file"]
-      tls: {}
-      priority: 100
+    # QR Codes - Redirection sécurisée (DÉSACTIVÉE - utilise qrcodes-cloudflare.yml)
+    # qrcodes-secure:
+    #   rule: "Host(`qrcodes.iahome.fr`)"
+    #   entryPoints: ["websecure"]
+    #   service: qrcodes-redirect-service
+    #   middlewares: ["qrcodes-secure-redirect", "security-headers@file", "compress@file"]
+    #   tls: {}
+    #   priority: 100
 
 
     # Stable Diffusion - Redirection sécurisée
@@ -146,11 +146,12 @@ http:
           - url: "http://iahome-app:3000"
         passHostHeader: true
 
-    qrcodes-redirect-service:
-      loadBalancer:
-        servers:
-          - url: "http://iahome-app:3000"
-        passHostHeader: true
+    # qrcodes-redirect-service (DÉSACTIVÉ - utilise qrcodes-cloudflare.yml directement)
+    # qrcodes-redirect-service:
+    #   loadBalancer:
+    #     servers:
+    #       - url: "http://iahome-app:3000"
+    #     passHostHeader: true
 
 
     stablediffusion-redirect-service:

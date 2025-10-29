@@ -1283,7 +1283,7 @@
                 // Formater le contenu selon le type choisi
                 const formattedContent = formatContentForQR(workflowState.content, workflowState.contentType);
                 
-                const response = await fetch('http://localhost:7005/api/qr/static', {
+                const response = await fetch('http://localhost:7006/api/qr/static', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1329,7 +1329,7 @@
                 // Formater le contenu selon le type choisi
                 const formattedContent = formatContentForQR(workflowState.content, workflowState.contentType);
                 
-                const response = await fetch('http://localhost:7005/api/dynamic/qr', {
+                const response = await fetch('http://localhost:7006/api/dynamic/qr', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

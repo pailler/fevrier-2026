@@ -21,10 +21,12 @@ http:
     qrcodes-direct:
       loadBalancer:
         servers:
-          - url: "http://qrcodes:7005"
+          - url: "http://qrcodes-iahome:7006"
+        passHostHeader: true
 
     # Service principal pour QR codes
     qrcodes-service:
       loadBalancer:
         servers:
-          - url: "http://qrcodes:7005"
+          - url: "http://qrcodes-iahome:7006"
+        passHostHeader: true

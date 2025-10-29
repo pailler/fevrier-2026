@@ -1,0 +1,225 @@
+# =====================================================
+# SYSTÈME DE PAGE RULES POUR SOUS-DOMAINES
+# Similaire aux Page Rules de Cloudflare
+# =====================================================
+# 
+# Comment ça fonctionne:
+# 1. Toute requête vers un sous-domaine est interceptée
+# 2. Si aucun token n'est présent dans l'URL, redirection vers iahome.fr
+# 3. Les ressources statiques sont exclues pour éviter les problèmes
+# 
+# Pour autoriser un accès depuis iahome.fr:
+# - L'application Next.js doit ajouter un token dans l'URL: ?token=xxx
+# - Les URLs avec token sont exclues de la redirection
+# =====================================================
+
+http:
+  middlewares:
+    
+    # ============================================
+    # RÈGLES DE REDIRECTION PAR SOUS-DOMaine
+    # Redirection vers iahome.fr si pas de token
+    # ============================================
+    
+    subdomain-redirect-librespeed:
+      # Redirection simple vers iahome.fr
+      redirectRegex:
+        regex: "^.*$"
+        replacement: "https://iahome.fr"
+        permanent: false
+    
+    subdomain-redirect-qrcodes:
+      redirectRegex:
+        regex: "^https?://qrcodes\\.iahome\\.fr(/.*)?$"
+        replacement: "https://iahome.fr"
+        permanent: false
+    
+    subdomain-redirect-pdf:
+      redirectRegex:
+        regex: "^https?://pdf\\.iahome\\.fr(/.*)?$"
+        replacement: "https://iahome.fr"
+        permanent: false
+    
+    subdomain-redirect-metube:
+      redirectRegex:
+        regex: "^https?://metube\\.iahome\\.fr(/.*)?$"
+        replacement: "https://iahome.fr"
+        permanent: false
+    
+    subdomain-redirect-whisper:
+      redirectRegex:
+        regex: "^https?://whisper\\.iahome\\.fr(/.*)?$"
+        replacement: "https://iahome.fr"
+        permanent: false
+    
+    subdomain-redirect-comfyui:
+      redirectRegex:
+        regex: "^https?://comfyui\\.iahome\\.fr(/.*)?$"
+        replacement: "https://iahome.fr"
+        permanent: false
+    
+    subdomain-redirect-meeting-reports:
+      redirectRegex:
+        regex: "^https?://meeting-reports\\.iahome\\.fr(/.*)?$"
+        replacement: "https://iahome.fr"
+        permanent: false
+    
+    subdomain-redirect-psitransfer:
+      redirectRegex:
+        regex: "^https?://psitransfer\\.iahome\\.fr(/.*)?$"
+        replacement: "https://iahome.fr"
+        permanent: false
+    
+    subdomain-redirect-stablediffusion:
+      redirectRegex:
+        regex: "^https?://stablediffusion\\.iahome\\.fr(/.*)?$"
+        replacement: "https://iahome.fr"
+        permanent: false
+    
+    subdomain-redirect-ruinedfooocus:
+      redirectRegex:
+        regex: "^https?://ruinedfooocus\\.iahome\\.fr(/.*)?$"
+        replacement: "https://iahome.fr"
+        permanent: false
+
+  routers:
+    # ============================================
+    # APPLICATION DES RÈGLES
+    # Priorité 200 = appliqué en premier (avant les autres routers)
+    # Les routes avec token sont gérées par les routers normaux (priorité 10-100)
+    # ============================================
+    
+    # Librespeed - HTTP (pour les requêtes non-HTTPS)
+    librespeed-redirect-rule-http:
+      rule: "Host(`librespeed.iahome.fr`) && !PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["web"]
+      service: librespeed-redirect-nextjs-service
+      priority: 200
+    
+    # Librespeed - HTTPS (pour les requêtes HTTPS via Cloudflare)
+    librespeed-redirect-rule-https:
+      rule: "Host(`librespeed.iahome.fr`) && !PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["websecure"]
+      service: librespeed-redirect-nextjs-service
+      tls:
+        certResolver: letsencrypt
+      priority: 200
+    
+    # QR Codes
+    qrcodes-redirect-rule:
+      rule: "Host(`qrcodes.iahome.fr`) && !PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["websecure"]
+      service: redirect-handler
+      middlewares: ["subdomain-redirect-qrcodes"]
+      tls:
+        certResolver: letsencrypt
+      priority: 200
+    
+    # PDF
+    pdf-redirect-rule:
+      rule: "Host(`pdf.iahome.fr`) && !PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["websecure"]
+      service: redirect-handler
+      middlewares: ["subdomain-redirect-pdf"]
+      tls:
+        certResolver: letsencrypt
+      priority: 200
+    
+    # MeTube
+    metube-redirect-rule:
+      rule: "Host(`metube.iahome.fr`) && !PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["websecure"]
+      service: redirect-handler
+      middlewares: ["subdomain-redirect-metube"]
+      tls:
+        certResolver: letsencrypt
+      priority: 200
+    
+    # Whisper
+    whisper-redirect-rule:
+      rule: "Host(`whisper.iahome.fr`) && !PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["websecure"]
+      service: redirect-handler
+      middlewares: ["subdomain-redirect-whisper"]
+      tls:
+        certResolver: letsencrypt
+      priority: 200
+    
+    # ComfyUI
+    comfyui-redirect-rule:
+      rule: "Host(`comfyui.iahome.fr`) && !PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["websecure"]
+      service: redirect-handler
+      middlewares: ["subdomain-redirect-comfyui"]
+      tls:
+        certResolver: letsencrypt
+      priority: 200
+    
+    # Meeting Reports
+    meeting-reports-redirect-rule:
+      rule: "Host(`meeting-reports.iahome.fr`) && !PathPrefix(`/.well-known/acme-challenge`) && !PathPrefix(`/api`)"
+      entryPoints: ["websecure"]
+      service: redirect-handler
+      middlewares: ["subdomain-redirect-meeting-reports"]
+      tls:
+        certResolver: letsencrypt
+      priority: 200
+    
+    # PsiTransfer
+    psitransfer-redirect-rule:
+      rule: "Host(`psitransfer.iahome.fr`) && !PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["websecure"]
+      service: redirect-handler
+      middlewares: ["subdomain-redirect-psitransfer"]
+      tls:
+        certResolver: letsencrypt
+      priority: 200
+    
+    # Stable Diffusion
+    stablediffusion-redirect-rule:
+      rule: "Host(`stablediffusion.iahome.fr`) && !PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["websecure"]
+      service: redirect-handler
+      middlewares: ["subdomain-redirect-stablediffusion"]
+      tls:
+        certResolver: letsencrypt
+      priority: 200
+    
+    # Ruined Fooocus
+    ruinedfooocus-redirect-rule:
+      rule: "Host(`ruinedfooocus.iahome.fr`) && !PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["websecure"]
+      service: redirect-handler
+      middlewares: ["subdomain-redirect-ruinedfooocus"]
+      tls:
+        certResolver: letsencrypt
+      priority: 200
+
+  services:
+    # Service de redirection vers iahome.fr
+    redirect-handler:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"  # Service réel pour gérer la redirection
+    
+    # Service de redirection simple (utilisé pour la redirection)
+    iahome-redirect-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        passHostHeader: true
+    
+    # Service API de redirection (route Next.js existante)
+    redirect-api-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000"
+        passHostHeader: true
+    
+    # Service de redirection pour librespeed via route Next.js
+    librespeed-redirect-nextjs-service:
+      loadBalancer:
+        servers:
+          - url: "http://iahome-app:3000/api/librespeed-redirect"
+        passHostHeader: true
+

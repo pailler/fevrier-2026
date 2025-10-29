@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const QR_CODE_SERVICE_URL = process.env.QR_CODE_SERVICE_URL || 'http://localhost:7005';
+const QR_CODE_SERVICE_URL = process.env.QR_CODE_SERVICE_URL || 'http://localhost:7006';
 
 export async function POST(request: NextRequest) {
   try {

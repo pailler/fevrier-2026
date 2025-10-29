@@ -9,12 +9,13 @@ http:
       priority: 1000
 
     # Route principale - Service d'authentification LibreSpeed
-    librespeed-main:
-      rule: "Host(`librespeed.iahome.fr`)"
-      entryPoints: ["web"]
-      service: librespeed-auth-service
-      middlewares: ["security-headers@file", "compress@file", "librespeed-proxy-headers@file"]
-      priority: 100
+    # DÉSACTIVÉE TEMPORAIREMENT - La redirection avec priorité 200 intercepte toutes les requêtes
+    # librespeed-main:
+    #   rule: "Host(`librespeed.iahome.fr`)"
+    #   entryPoints: ["web"]
+    #   service: librespeed-auth-service
+    #   middlewares: ["security-headers@file", "compress@file", "librespeed-proxy-headers@file"]
+    #   priority: 100
 
   services:
     # Service pour les challenges Let's Encrypt

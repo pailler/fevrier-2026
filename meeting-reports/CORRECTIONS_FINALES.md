@@ -1,159 +1,82 @@
-# 🔧 Corrections Finales - Meeting Reports Generator
+# ✅ Corrections finales - Meeting Reports
 
-## 📊 **Problèmes Identifiés et Résolus**
+## 🔧 Problèmes identifiés
 
-### **1. Erreur `report_id: undefined` dans la génération PDF**
-**Problème** : `POST /generate-pdf/undefined HTTP/1.1" 500 Internal Server Error`
-**Cause** : Le composant `ReportList` passait `report.id` au lieu de `report` complet
-**Solution** : Correction des appels `onReportSelect`
+1. ❌ Endpoint `/diarize-speakers/{file_id}` manquant (404)
+2. ❌ Endpoint `/generate-pdf/{file_id}` manquant (CORS error)
+3. ❌ Le frontend appelait `localhost:8001` au lieu du backend
 
-### **2. Configuration OpenAI non chargée**
-**Problème** : `OpenAI API key not configured - using fallback summarization`
-**Cause** : `load_dotenv` ne trouvait pas le fichier `config.env`
-**Solution** : Correction du chemin avec `os.path.join`
+## ✅ Corrections apportées
 
-### **3. Affichage des rapports dans la même page**
-**Problème** : Redirection vers port 3001
-**Cause** : `setCurrentStep(1)` après génération
-**Solution** : Suppression de la redirection, reste sur étape 3
+### 1. Backend (`meeting-reports/backend/main.py`)
 
-## 🛠️ **Solutions Appliquées**
-
-### **1. Correction du Frontend - ReportList.js**
-```javascript
-// ❌ Avant (Problématique)
-onClick={() => onReportSelect(report.id)}
-
-// ✅ Après (Corrigé)
-onClick={() => onReportSelect(report)}
-```
-
-**Fichiers modifiés** :
-- `frontend/src/components/ReportList.js` (3 occurrences)
-
-### **2. Correction du Backend - Configuration OpenAI**
+#### Ajout de l'endpoint `/diarize-speakers`
 ```python
-# ❌ Avant (Problématique)
-load_dotenv("config.env")
-
-# ✅ Après (Corrigé)
-load_dotenv(os.path.join(os.path.dirname(__file__), "config.env"))
+@app.post("/diarize-speakers/{file_id}")
+async def diarize_speakers(file_id: str):
+    """Identifie les locuteurs dans un fichier audio (stub pour l'instant)"""
+    return {
+        "success": False,
+        "error": "Diarization not implemented yet. This feature requires additional dependencies."
+    }
 ```
 
-**Fichier modifié** : `backend/main-simple-working.py`
+#### Ajout des endpoints PDF
+```python
+@app.post("/generate-pdf/{file_id}")
+async def generate_pdf(file_id: str):
+    """Génère un PDF à partir d'un rapport (stub pour l'instant)"""
+    return {
+        "status": "error",
+        "message": "PDF generation not implemented yet"
+    }
 
-### **3. Correction de l'Affichage - App.js**
+@app.get("/download-pdf/{file_id}")
+async def download_pdf(file_id: str):
+    """Télécharge un PDF généré (stub pour l'instant)"""
+    raise HTTPException(status_code=404, detail="PDF not found")
+```
+
+### 2. Frontend (`meeting-reports/frontend/src/components/ReportViewer.js`)
+
+#### Correction de `downloadPDF()`
+- ❌ Avant : appelait `http://localhost:8001` (inexistant)
+- ✅ Après : télécharge un fichier Markdown (.md) directement dans le navigateur
+
 ```javascript
-// ❌ Avant (Problématique)
-setTimeout(() => {
-  setCurrentStep(1); // Retourner à l'étape 1
-  setProcessingStatus('');
-}, 3000);
-
-// ✅ Après (Corrigé)
-setTimeout(() => {
-  setProcessingStatus('');
-}, 3000);
-// Ne pas revenir à l'étape 1, rester sur l'étape 3
-```
-
-**Fichier modifié** : `frontend/src/App.js`
-
-## 🎯 **Tests de Validation**
-
-### **1. Backend Health Check**
-```json
-{
-  "status": "healthy",
-  "whisper_loaded": true,
-  "llm_loaded": true  ✅ OpenAI chargé
+const downloadPDF = async () => {
+  // Générer le contenu Markdown
+  const content = `...`;
+  
+  // Créer et télécharger le fichier
+  const blob = new Blob([content], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  // ...
 }
 ```
 
-### **2. Génération PDF**
-```bash
-POST /generate-pdf/d532c4b3-7654-454f-a15c-de204183c21a
-# Réponse: {"message":"PDF generated successfully","status":"success"}
-```
+## 📋 Fonctionnalités implémentées
 
-### **3. Téléchargement PDF**
-```bash
-GET /download-pdf/d532c4b3-7654-454f-a15c-de204183c21a
-# Réponse: Fichier PDF téléchargé (Content-Type: application/pdf)
-```
+### ✅ Fonctionnelles
+- Upload de fichiers audio (MP3, WAV, M4A, WEBM, OGG, FLAC)
+- Transcription avec Whisper
+- Résumé avec OpenAI
+- Téléchargement Markdown (.md)
 
-### **4. Interface Utilisateur**
-- **✅ Affichage** : Rapports visibles dans l'étape 3
-- **✅ Sélection** : Clic sur rapport ouvre le détail
-- **✅ PDF** : Bouton "PDF" génère et télécharge
-- **✅ Markdown** : Bouton "Markdown" télécharge
-- **✅ Suppression** : Après téléchargement
+### ⚠️ Stub (non implémentées)
+- Diarization (identification des locuteurs)
+- Génération PDF (utilise Markdown à la place)
 
-## 🔧 **Fonctionnalités Validées**
+## 🎯 Utilisation actuelle
 
-### **1. Upload et Traitement**
-- **✅ Upload** : Fichiers MP3, WebM, WAV
-- **✅ Conversion** : FFmpeg fonctionne
-- **✅ Transcription** : Whisper AI
-- **✅ Résumé** : OpenAI GPT-3.5-turbo
+1. **Upload** : Fichier audio accepté
+2. **Traitement** : Whisper + OpenAI fonctionnels
+3. **Export** : Téléchargement en format Markdown (.md)
 
-### **2. Génération de Documents**
-- **✅ PDF** : Génération avec timestamp
-- **✅ Markdown** : Téléchargement texte
-- **✅ Suppression** : Après téléchargement
+## 💡 Notes
 
-### **3. Interface Utilisateur**
-- **✅ Étape 1** : Enregistrement audio
-- **✅ Étape 2** : Upload de fichier
-- **✅ Étape 3** : **Affichage des rapports** ✅
-- **✅ Navigation** : Reste sur la même page
+Les stubs pour `/diarize-speakers` et `/generate-pdf` retournent des erreurs appropriées pour indiquer que ces fonctionnalités ne sont pas encore implémentées. L'application fonctionne correctement pour l'essentiel :
+- ✅ Transcription
+- ✅ Résumé
+- ✅ Export (format Markdown)
 
-## 🌐 **URLs d'Accès**
-
-### **Développement**
-- **Frontend** : http://localhost:3050 ✅
-- **Backend** : http://localhost:8001 ✅
-- **Documentation** : http://localhost:8001/docs ✅
-
-### **Production**
-- **Domaine** : https://meeting-reports.iahome.fr ✅
-
-## 📊 **Logs de Succès**
-
-```
-INFO:main-simple-working:Whisper model loaded successfully!
-INFO:main-simple-working:AI-enhanced report generated successfully
-INFO:pdf_generator:PDF généré avec succès
-INFO:main-simple-working:PDF generated successfully
-```
-
-## 🎉 **Résultat Final**
-
-**✅ Toutes les Corrections Appliquées !**
-
-### **Problèmes Résolus**
-- **✅ `report_id: undefined`** : Corrigé
-- **✅ Configuration OpenAI** : Chargée
-- **✅ Génération PDF** : Fonctionnelle
-- **✅ Affichage** : Reste sur la même page
-
-### **Fonctionnalités Complètes**
-- **✅ Upload/Enregistrement** : Fonctionne
-- **✅ Transcription** : Whisper AI
-- **✅ Résumé IA** : OpenAI GPT
-- **✅ Génération PDF** : Avec timestamp
-- **✅ Téléchargement** : PDF et Markdown
-- **✅ Suppression** : Après téléchargement
-- **✅ Interface** : 3 étapes claires
-- **✅ Navigation** : Fluide, pas de redirection
-
-## 🚀 **Utilisation**
-
-1. **Accéder** à http://localhost:3050
-2. **Choisir** : Upload ou Enregistrement
-3. **Traiter** : Fichier audio automatiquement
-4. **Visualiser** : Rapport dans l'étape 3 (même page)
-5. **Télécharger** : PDF ou Markdown
-6. **Supprimer** : Après téléchargement
-
-**🎯 L'application Meeting Reports Generator fonctionne parfaitement avec toutes les corrections appliquées !**

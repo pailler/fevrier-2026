@@ -65,7 +65,7 @@ Un service complet de génération de QR codes dynamiques avec stockage Supabase
 
 ### Prérequis
 - Docker et Docker Compose
-- Ports disponibles : 7005 (service), 5432 (PostgreSQL)
+- Ports disponibles : 7006 (service), 5432 (PostgreSQL)
 
 ### Démarrage Rapide
 ```bash
@@ -80,8 +80,8 @@ docker-compose ps
 ```
 
 ### Accès
-- **Interface Web** : http://localhost:7005
-- **API REST** : http://localhost:7005/api
+- **Interface Web** : http://localhost:7006
+- **API REST** : http://localhost:7006/api
 - **Base de données** : localhost:5432 (qrcode_db)
 
 ## 📡 API REST
@@ -171,7 +171,7 @@ qr-code-service/
 ## 📊 Utilisation
 
 ### 1. Créer un QR Code Dynamique
-1. Accéder à http://localhost:7005
+1. Accéder à http://localhost:7006
 2. Aller dans l'onglet "QR Code Dynamique"
 3. Remplir le formulaire :
    - URL de destination
@@ -194,7 +194,7 @@ qr-code-service/
 
 ### Health Check
 ```bash
-curl http://localhost:7005/health
+curl http://localhost:7006/health
 ```
 
 ### Logs des Services

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
-const QR_CODE_SERVICE_URL = process.env.QR_CODE_SERVICE_URL || 'http://localhost:7005';
+const QR_CODE_SERVICE_URL = process.env.QR_CODE_SERVICE_URL || 'http://localhost:7006';
 const QR_CODE_JWT_SECRET = process.env.QR_CODE_JWT_SECRET || 'qr-code-secret-key-change-in-production';
 
 // Fonction pour générer un token d'accès

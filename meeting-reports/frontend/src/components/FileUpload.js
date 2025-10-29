@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileAudio, Mic, Shield, Zap, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, FileAudio, Mic } from 'lucide-react';
 
 const FileUpload = ({ onFileUpload, loading }) => {
   const [isDragActive, setIsDragActive] = useState(false);
@@ -17,7 +17,7 @@ const FileUpload = ({ onFileUpload, loading }) => {
       onDrop(files);
     },
     accept: {
-      'audio/*': ['.wav', '.mp3', '.m4a', '.webm', '.ogg']
+      'audio/*': ['.wav', '.mp3', '.m4a', '.webm', '.ogg', '.flac']
     },
     multiple: false,
     disabled: loading,
@@ -77,19 +77,11 @@ const FileUpload = ({ onFileUpload, loading }) => {
                 ou cliquez pour parcourir vos fichiers
               </p>
               <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-medium inline-block">
-                WAV, MP3, M4A, WEBM, OGG
+                WAV, MP3, M4A, WEBM, OGG, FLAC
               </div>
             </div>
             
             <div className="flex items-center space-x-8 text-sm text-gray-500">
-              <div className="flex items-center space-x-2">
-                <Shield className="h-5 w-5 text-green-500" />
-                <span className="font-medium">100% Privé</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Zap className="h-5 w-5 text-blue-500" />
-                <span className="font-medium">Alimenté par IA</span>
-              </div>
               <div className="flex items-center space-x-2">
                 <FileAudio className="h-5 w-5 text-purple-500" />
                 <span className="font-medium">Multi-format</span>
@@ -97,65 +89,6 @@ const FileUpload = ({ onFileUpload, loading }) => {
             </div>
           </div>
         )}
-      </div>
-      
-      {/* Informations détaillées */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-2xl border border-green-200">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
-              <CheckCircle className="h-5 w-5 text-white" />
-            </div>
-            <h3 className="font-semibold text-green-900">Taille maximale</h3>
-          </div>
-          <p className="text-green-700 text-sm">100MB par fichier</p>
-        </div>
-        
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
-              <Zap className="h-5 w-5 text-white" />
-            </div>
-            <h3 className="font-semibold text-blue-900">Temps de traitement</h3>
-          </div>
-          <p className="text-blue-700 text-sm">2-5 minutes selon la durée</p>
-        </div>
-        
-        <div className="bg-gradient-to-br from-purple-50 to-violet-50 p-6 rounded-2xl border border-purple-200">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center">
-              <Shield className="h-5 w-5 text-white" />
-            </div>
-            <h3 className="font-semibold text-purple-900">Confidentialité</h3>
-          </div>
-          <p className="text-purple-700 text-sm">Toutes les données restent locales</p>
-        </div>
-      </div>
-
-      {/* Conseils d'utilisation */}
-      <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-6 rounded-2xl border border-gray-200">
-        <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-          <AlertCircle className="h-5 w-5 text-blue-500 mr-2" />
-          Conseils pour une meilleure qualité
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-          <div className="flex items-start space-x-2">
-            <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-            <span>Utilisez un microphone de qualité pour de meilleurs résultats</span>
-          </div>
-          <div className="flex items-start space-x-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-            <span>Évitez les bruits de fond excessifs</span>
-          </div>
-          <div className="flex items-start space-x-2">
-            <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
-            <span>Parlez clairement et à un rythme normal</span>
-          </div>
-          <div className="flex items-start space-x-2">
-            <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
-            <span>Les fichiers plus courts se traitent plus rapidement</span>
-          </div>
-        </div>
       </div>
     </div>
   );

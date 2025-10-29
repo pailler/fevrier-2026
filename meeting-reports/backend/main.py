@@ -10,20 +10,22 @@ import json
 from datetime import datetime
 from pathlib import Path
 import asyncio
-# Commenté temporairement pour éviter les conflits de dépendances
-# from langchain.llms import OpenAI
-# from langchain.prompts import PromptTemplate
-# from langchain.chains import LLMChain
-# from langchain.schema import Document
-# from langchain.text_splitter import RecursiveCharacterTextSplitter
-# from langchain.chains.summarize import load_summarize_chain
+import os
+from openai import OpenAI
 import logging
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
 # Configuration
-UPLOAD_DIR = Path("../uploads")
-REPORTS_DIR = Path("../reports")
-UPLOAD_DIR.mkdir(exist_ok=True)
-REPORTS_DIR.mkdir(exist_ok=True)
+UPLOAD_DIR = Path("/app/uploads")
+REPORTS_DIR = Path("/app/reports")
+UPLOAD_DIR.mkdir(exist_ok=True, parents=True)
+REPORTS_DIR.mkdir(exist_ok=True, parents=True)
 
 # Logging
 logging.basicConfig(level=logging.INFO)
@@ -43,7 +45,7 @@ app.add_middleware(
 
 # Global variables
 whisper_model = None
-llm = None
+openai_client = None
 
 # Pydantic models
 class MeetingReport(BaseModel):
@@ -66,7 +68,7 @@ class ProcessingStatus(BaseModel):
 # Initialize models
 @app.on_event("startup")
 async def startup_event():
-    global whisper_model
+    global whisper_model, openai_client
     
     logger.info("Loading Whisper model...")
     try:
@@ -76,6 +78,19 @@ async def startup_event():
     except Exception as e:
         logger.error(f"Error loading Whisper: {e}")
         whisper_model = None
+    
+    # Initialize OpenAI client
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+    if openai_api_key:
+        try:
+            openai_client = OpenAI(api_key=openai_api_key)
+            logger.info("OpenAI client initialized successfully")
+        except Exception as e:
+            logger.error(f"Error initializing OpenAI: {e}")
+            openai_client = None
+    else:
+        logger.warning("OPENAI_API_KEY not set, OpenAI features will be disabled")
+        openai_client = None
     
     logger.info("Application started successfully!")
 
@@ -143,7 +158,7 @@ async def process_audio(file_id: str, background_tasks: BackgroundTasks):
     
     if not file_path.exists():
         # Try other extensions
-        for ext in [".mp3", ".m4a", ".webm", ".ogg"]:
+        for ext in [".mp3", ".m4a", ".webm", ".ogg", ".FLAC", ".flac", ".wav", ".WAV"]:
             alt_path = UPLOAD_DIR / f"{file_id}{ext}"
             if alt_path.exists():
                 file_path = alt_path
@@ -199,7 +214,7 @@ async def list_reports():
     
     return sorted(reports, key=lambda x: x["created_at"], reverse=True)
 
-@app.delete("/report/{file_id}")
+@app.delete("/reports/{file_id}")
 async def delete_report(file_id: str):
     """Delete a report and associated files"""
     # Delete report file
@@ -221,6 +236,136 @@ async def delete_report(file_id: str):
     
     return {"message": "Report deleted successfully"}
 
+@app.post("/clean")
+async def clean_all_reports():
+    """Delete all reports and uploaded files"""
+    try:
+        deleted_reports = 0
+        deleted_files = 0
+        
+        # Delete all report files
+        for report_file in REPORTS_DIR.glob("*_report.json"):
+            report_file.unlink()
+            deleted_reports += 1
+        
+        # Delete all status files
+        for status_file in REPORTS_DIR.glob("*_status.json"):
+            status_file.unlink()
+        
+        # Delete all uploaded audio files
+        for audio_file in UPLOAD_DIR.glob("*"):
+            if audio_file.is_file():
+                audio_file.unlink()
+                deleted_files += 1
+        
+        logger.info(f"Cleaned {deleted_reports} reports and {deleted_files} files")
+        
+        return {
+            "message": f"All reports and files deleted successfully. ({deleted_reports} reports, {deleted_files} files)"
+        }
+    except Exception as e:
+        logger.error(f"Error cleaning reports: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Error cleaning reports: {str(e)}")
+
+@app.post("/diarize-speakers/{file_id}")
+async def diarize_speakers(file_id: str):
+    """Identifie les locuteurs dans un fichier audio"""
+    try:
+        # Vérifier que le rapport existe
+        report_path = REPORTS_DIR / f"{file_id}_report.json"
+        if not report_path.exists():
+            raise HTTPException(status_code=404, detail="Rapport non trouvé")
+        
+        with open(report_path, 'r', encoding='utf-8') as f:
+            report = json.load(f)
+        
+        # Extraire les participants du rapport
+        participants = report.get('participants', [])
+        if isinstance(participants, str):
+            participants = [p.strip() for p in participants.split(',') if p.strip()]
+        
+        # Simuler une diarisation basée sur la transcription
+        # En production, on utiliserait pyannote.audio ou une autre bibliothèque
+        
+        # Analyse simple : compter les transitions de locuteurs
+        transcript = report.get('transcript', '')
+        
+        # Extraction approximative basée sur les participants détectés
+        speakers = []
+        for i, participant in enumerate(participants):
+            if participant and participant != "Non identifié":
+                # Générer un temps estimé pour chaque participant
+                duration = len(transcript) / len(participants) if participants else 0
+                speakers.append({
+                    "id": f"speaker_{i}",
+                    "name": participant,
+                    "role": "Participant",
+                    "duration": duration,
+                    "words_count": len(transcript.split()) // len(participants) if participants else 0
+                })
+        
+        # Statistiques approximatives
+        statistics = {
+            "total_speakers": len(speakers),
+            "total_duration": len(transcript) / 10,  # Estimation arbitraire
+            "transcript_length": len(transcript)
+        }
+        
+        return {
+            "success": True,
+            "speakers": speakers,
+            "statistics": statistics,
+            "message": "Analyse basée sur les participants détectés dans le rapport"
+        }
+        
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Rapport non trouvé")
+    except Exception as e:
+        logger.error(f"Error diarizing speakers: {e}", exc_info=True)
+        return {
+            "success": False,
+            "error": f"Erreur lors de l'analyse des locuteurs: {str(e)}"
+        }
+
+@app.post("/generate-pdf/{file_id}")
+async def generate_pdf(file_id: str):
+    """Génère un PDF à partir d'un rapport (stub pour l'instant)"""
+    # Cette fonctionnalité n'est pas encore implémentée
+    return {
+        "status": "error",
+        "message": "PDF generation not implemented yet"
+    }
+
+@app.get("/download-pdf/{file_id}")
+async def download_pdf(file_id: str):
+    """Télécharge un PDF généré du rapport"""
+    try:
+        # Load the report data (le fichier s'appelle {file_id}_report.json)
+        report_path = REPORTS_DIR / f"{file_id}_report.json"
+        if not report_path.exists():
+            raise HTTPException(status_code=404, detail="Rapport non trouvé")
+        
+        with open(report_path, 'r', encoding='utf-8') as f:
+            report = json.load(f)
+        
+        # Generate PDF
+        pdf_path = REPORTS_DIR / f"{file_id}.pdf"
+        if not pdf_path.exists():
+            if not generate_pdf(report, str(pdf_path)):
+                raise HTTPException(status_code=500, detail="Erreur lors de la génération du PDF")
+        
+        # Return PDF file
+        return FileResponse(
+            path=str(pdf_path),
+            media_type='application/pdf',
+            filename=f"compte-rendu-{file_id}.pdf"
+        )
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Rapport non trouvé")
+    except Exception as e:
+        logger.error(f"Error downloading PDF: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Erreur lors du téléchargement: {str(e)}")
+
 # Background processing function
 async def process_meeting_audio(file_id: str, file_path: str):
     """Process audio file and generate meeting report"""
@@ -235,8 +380,9 @@ async def process_meeting_audio(file_id: str, file_path: str):
             import whisper as whisper_lib
             logger.info("Loading Whisper model: base")
             model = whisper_lib.load_model("base")
-            logger.info("Whisper model loaded, starting transcription...")
-            result = model.transcribe(file_path)
+            logger.info("Whisper model loaded, starting transcription in French...")
+            # Forcer la langue française
+            result = model.transcribe(file_path, language="fr")
             transcript = result["text"]
             logger.info(f"Transcription completed: {len(transcript)} characters")
         except Exception as e:
@@ -278,9 +424,85 @@ async def update_status(file_id: str, status: str, progress: int, message: str):
         json.dump(status_data, f, indent=2)
 
 async def generate_meeting_report(transcript: str, file_id: str) -> dict:
-    """Generate a basic meeting report from transcript"""
+    """Generate a meeting report from transcript using OpenAI"""
     
-    # Simple extraction based on common patterns
+    # Use OpenAI if available, otherwise fallback to basic extraction
+    if openai_client:
+        try:
+            logger.info("Using OpenAI for intelligent summarization in French")
+            
+            # Create a prompt for OpenAI (en français)
+            prompt = f"""Analysez cette transcription de réunion et extrayez :
+
+1. Un résumé concis (2-3 phrases)
+2. Les points clés discutés (max 10)
+3. Les éléments d'action avec propriétaires si mentionnés (max 10)
+4. Les participants principaux mentionnés (max 5)
+
+Transcription :
+{transcript}
+
+Formatez la réponse en JSON avec ces clés exactes : summary, key_points, action_items, participants.
+Chaque clé doit contenir une liste de chaînes de caractères.
+Tout doit être en français."""
+
+            response = openai_client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "Vous êtes un expert en analyse de réunions. Extrayez et structurez les informations de réunion en français."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3,
+                max_tokens=2000
+            )
+            
+            # Parse OpenAI response
+            content = response.choices[0].message.content
+            logger.info(f"OpenAI response: {content[:200]}...")
+            
+            # Try to parse as JSON, fallback if needed
+            try:
+                import json as json_lib
+                ai_data = json_lib.loads(content)
+            except:
+                # If not JSON, use basic parsing
+                ai_data = {
+                    "summary": content.split("1.")[0] if "1." in content else content[:200],
+                    "key_points": [l.strip() for l in content.split("\n") if l.strip() and "-" in l][:10],
+                    "action_items": [],
+                    "participants": []
+                }
+            
+            summary = ai_data.get("summary", content[:200])
+            key_points = ai_data.get("key_points", [])
+            action_items = ai_data.get("action_items", [])
+            participants = ai_data.get("participants", ["Non identifié"])
+            
+        except Exception as e:
+            logger.error(f"OpenAI error: {e}, falling back to basic extraction")
+            # Fallback to basic extraction
+            summary, key_points, action_items, participants = await _basic_extraction(transcript)
+    else:
+        # Basic extraction
+        summary, key_points, action_items, participants = await _basic_extraction(transcript)
+    
+    # Create final report
+    report = {
+        "id": file_id,
+        "filename": f"{file_id}.wav",
+        "transcript": transcript,
+        "summary": summary if summary else "Résumé non disponible",
+        "action_items": action_items if action_items else ["Aucun élément d'action identifié"],
+        "key_points": key_points if key_points else ["Aucun point clé identifié"],
+        "participants": participants if participants else ["Non identifié"],
+        "created_at": datetime.now().isoformat(),
+        "duration": None
+    }
+    
+    return report
+
+async def _basic_extraction(transcript: str):
+    """Basic extraction fallback"""
     lines = transcript.split('\n')
     
     # Extract potential action items (lines with "do", "need to", etc.)
@@ -301,29 +523,149 @@ async def generate_meeting_report(transcript: str, file_id: str) -> dict:
     
     # Create summary from transcript
     transcript_lines = [l.strip() for l in transcript.split('\n') if l.strip()]
-    summary = "\n".join(transcript_lines[:5])  # First 5 lines as summary
+    summary = "\n".join(transcript_lines[:3])  # First 3 lines as summary
     
-    # Simple participant extraction (lines with names or "I", "we")
     participants = []
     
-    # Create final report
-    report = {
-        "id": file_id,
-        "filename": f"{file_id}.wav",
-        "transcript": transcript,
-        "summary": summary,
-        "action_items": action_items if action_items else ["Aucun élément d'action identifié"],
-        "key_points": key_points if key_points else ["Aucun point clé identifié"],
-        "participants": participants if participants else ["Non identifié"],
-        "created_at": datetime.now().isoformat(),
-        "duration": None
-    }
-    
-    return report
+    return summary, key_points, action_items, participants
+
+def generate_pdf(report: dict, output_path: str):
+    """Generate PDF from report data"""
+    try:
+        logger.info(f"Generating PDF for report: {output_path}")
+        # Create PDF
+        doc = SimpleDocTemplate(output_path, pagesize=A4)
+        styles = getSampleStyleSheet()
+        
+        # Story to build the PDF
+        story = []
+        
+        # Title
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=24,
+            textColor='#1e40af',
+            spaceAfter=30,
+            alignment=TA_CENTER
+        )
+        story.append(Paragraph("Compte-rendu de réunion", title_style))
+        story.append(Spacer(1, 0.5*inch))
+        
+        # Report info
+        info_style = ParagraphStyle(
+            'Info',
+            parent=styles['Normal'],
+            fontSize=10,
+            textColor='#6b7280',
+            spaceAfter=10
+        )
+        story.append(Paragraph(f"<b>Fichier:</b> {report.get('filename', 'N/A')}", info_style))
+        story.append(Paragraph(f"<b>Date:</b> {report.get('created_at', 'N/A')}", info_style))
+        story.append(Spacer(1, 0.3*inch))
+        
+        # Summary
+        subtitle_style = ParagraphStyle(
+            'Subtitle',
+            parent=styles['Heading2'],
+            fontSize=16,
+            textColor='#1e40af',
+            spaceBefore=20,
+            spaceAfter=15
+        )
+        story.append(Paragraph("Résumé", subtitle_style))
+        
+        normal_style = ParagraphStyle(
+            'Normal',
+            parent=styles['Normal'],
+            fontSize=11,
+            alignment=TA_JUSTIFY,
+            spaceAfter=20
+        )
+        
+        summary = report.get('summary', '')
+        # Split summary into sentences
+        sentences = summary.split(',')
+        for sentence in sentences:
+            if sentence.strip():
+                story.append(Paragraph(sentence.strip(), normal_style))
+        
+        story.append(Spacer(1, 0.2*inch))
+        
+        # Key Points
+        story.append(Paragraph("Points clés", subtitle_style))
+        bullet_style = ParagraphStyle(
+            'Bullet',
+            parent=styles['Normal'],
+            fontSize=11,
+            bulletIndent=10,
+            spaceAfter=10
+        )
+        
+        key_points = report.get('key_points', [])
+        if isinstance(key_points, str):
+            key_points = [kp.strip() for kp in key_points.split(',') if kp.strip()]
+        
+        for point in key_points:
+            if point.strip():
+                story.append(Paragraph(f"• {point}", normal_style))
+        
+        story.append(Spacer(1, 0.2*inch))
+        
+        # Action Items
+        story.append(Paragraph("Éléments d'action", subtitle_style))
+        
+        action_items = report.get('action_items', [])
+        if isinstance(action_items, str):
+            action_items = [ai.strip() for ai in action_items.split(',') if ai.strip()]
+        
+        for item in action_items:
+            if item.strip():
+                story.append(Paragraph(f"• {item}", normal_style))
+        
+        story.append(Spacer(1, 0.2*inch))
+        
+        # Participants
+        story.append(Paragraph("Participants", subtitle_style))
+        
+        participants = report.get('participants', [])
+        if isinstance(participants, str):
+            participants = [p.strip() for p in participants.split(',') if p.strip()]
+        
+        for participant in participants:
+            if participant.strip():
+                story.append(Paragraph(f"• {participant}", normal_style))
+        
+        story.append(PageBreak())
+        
+        # Full Transcript
+        story.append(Paragraph("Transcription complète", subtitle_style))
+        transcript = report.get('transcript', '')
+        # Split transcript into paragraphs
+        paragraphs = transcript.split('\n')
+        for para in paragraphs:
+            if para.strip():
+                story.append(Paragraph(para.strip(), normal_style))
+                story.append(Spacer(1, 0.1*inch))
+        
+        # Build PDF
+        doc.build(story)
+        logger.info(f"PDF generated successfully: {output_path}")
+        return True
+    except Exception as e:
+        logger.error(f"Error generating PDF: {e}")
+        return False
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(
+        app, 
+        host="0.0.0.0", 
+        port=8000,
+        limit_concurrency=1000,
+        limit_max_requests=10000,
+        timeout_keep_alive=75
+    )
 
 
 

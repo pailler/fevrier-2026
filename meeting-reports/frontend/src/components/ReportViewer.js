@@ -59,32 +59,16 @@ ${report.transcript}
   const downloadPDF = async () => {
     setIsGeneratingPDF(true);
     try {
-      // Générer le PDF
-      const generateResponse = await fetch(`http://localhost:8001/generate-pdf/${report.id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
       
-      if (!generateResponse.ok) {
+      // Télécharger le PDF depuis le backend
+      const response = await fetch(`${API_BASE_URL}/download-pdf/${report.id}`);
+      
+      if (!response.ok) {
         throw new Error('Erreur lors de la génération du PDF');
       }
       
-      const generateResult = await generateResponse.json();
-      
-      if (generateResult.status !== 'success') {
-        throw new Error(generateResult.message || 'Erreur lors de la génération du PDF');
-      }
-      
-      // Télécharger le PDF
-      const downloadResponse = await fetch(`http://localhost:8001/download-pdf/${report.id}`);
-      
-      if (!downloadResponse.ok) {
-        throw new Error('Erreur lors du téléchargement du PDF');
-      }
-      
-      const blob = await downloadResponse.blob();
+      const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

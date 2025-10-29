@@ -84,7 +84,7 @@ Ajouté les boutons de navigation à toutes les étapes :
 - Interface de test intégrée
 
 #### **Tests Effectués**
-- ✅ Application accessible localement : http://localhost:7005
+- ✅ Application accessible localement : http://localhost:7006
 - ✅ Application accessible via Cloudflare : https://qrcodes.iahome.fr
 - ✅ Boutons de navigation présents dans toutes les étapes
 - ✅ Fonctions JavaScript `nextStep()` et `prevStep()` fonctionnelles

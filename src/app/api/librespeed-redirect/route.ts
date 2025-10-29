@@ -12,12 +12,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect('http://192.168.1.150:8083', 302);
     }
     
-    // Aucun token ou token invalide - rediriger vers la page de connexion
-    return NextResponse.redirect('https://iahome.fr/login', 302);
+    // Aucun token - rediriger vers la page d'accueil (protection)
+    console.log('🛡️ LibreSpeed: Accès direct bloqué, redirection vers iahome.fr');
+    return NextResponse.redirect('https://iahome.fr', 302);
 
   } catch (error) {
     console.error('❌ LibreSpeed Redirect Error:', error);
-    return NextResponse.redirect('https://iahome.fr/login', 302);
+    return NextResponse.redirect('https://iahome.fr', 302);
   }
 }
 

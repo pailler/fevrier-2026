@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     // Rediriger vers le service Python
     const pythonServiceUrl = process.env.NODE_ENV === 'production' 
       ? 'https://qrcodes.iahome.fr' 
-      : 'http://localhost:7005';
+      : 'http://localhost:7006';
     
     const response = await fetch(`${pythonServiceUrl}/api/dynamic/qr`, {
       method: 'POST',
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     
     // Adapter l'URL de redirection pour utiliser le domaine correct
     if (result.redirect_url) {
-      result.redirect_url = result.redirect_url.replace('http://localhost:7005', 'https://qrcodes.iahome.fr');
+      result.redirect_url = result.redirect_url.replace('http://localhost:7006', 'https://qrcodes.iahome.fr');
       result.redirect_url = result.redirect_url.replace('/redirect/', '/r/');
     }
     

@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 IAHOME_JWT_SECRET = os.getenv('IAHOME_JWT_SECRET', 'your-super-secret-jwt-key-change-in-production')
 
 # Configuration du port
-PORT = int(os.getenv('PORT', 7005))
+PORT = int(os.getenv('PORT', 7006))
 
 def get_db_connection():
     """Créer une connexion à la base de données"""
@@ -333,7 +333,7 @@ def create_dynamic_qr():
         # Créer le QR code en base de données
         user_id = get_user_from_token()
         qr_id = str(uuid.uuid4())[:8]
-        qr_url = f"http://localhost:7005/r/{qr_id}"
+        qr_url = f"https://qrcodes.iahome.fr/r/{qr_id}"
         
         # Récupérer les couleurs depuis les paramètres
         foreground_color = data.get('foreground_color', '#000000')
@@ -526,7 +526,7 @@ def update_dynamic_qr(qr_id):
                 logo = None
         
         # Régénérer le QR code avec les nouveaux paramètres
-        qr_url = f"http://localhost:7005/r/{qr_id}"
+        qr_url = f"https://qrcodes.iahome.fr/r/{qr_id}"
         if logo:
             qr_code = generate_custom_qr_code(
                 text=qr_url,

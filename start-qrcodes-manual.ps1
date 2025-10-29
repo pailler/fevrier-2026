@@ -50,8 +50,8 @@ Write-Host "   Port: $env:DB_PORT" -ForegroundColor Gray
 
 # Démarrer le service
 Write-Host "🚀 Démarrage du service sur le port 7005..." -ForegroundColor Cyan
-Write-Host "📱 Interface web: http://localhost:7005" -ForegroundColor Green
-Write-Host "🔗 API: http://localhost:7005/api/qr/dynamic" -ForegroundColor Green
+Write-Host "📱 Interface web: http://localhost:7006" -ForegroundColor Green
+Write-Host "🔗 API: http://localhost:7006/api/qr/dynamic" -ForegroundColor Green
 Write-Host "⏹️ Appuyez sur Ctrl+C pour arrêter le service" -ForegroundColor Yellow
 
 try {
@@ -60,6 +60,9 @@ try {
     Write-Host "❌ Erreur lors du démarrage du service: $($_.Exception.Message)" -ForegroundColor Red
     exit 1
 }
+
+
+
 
 
 

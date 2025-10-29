@@ -16,7 +16,7 @@ const SpeakerInfo = ({ reportId }) => {
       setIsLoading(true);
       setError(null);
       
-      const response = await axios.post(`${API_BASE_URL}/api/diarize-speakers/${reportId}`);
+      const response = await axios.post(`${API_BASE_URL}/diarize-speakers/${reportId}`);
       
       if (response.data.success) {
         setSpeakers(response.data.speakers || []);

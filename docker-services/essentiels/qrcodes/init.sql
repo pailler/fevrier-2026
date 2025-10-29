@@ -80,7 +80,7 @@ CREATE TRIGGER update_dynamic_qr_codes_updated_at
 -- Insérer quelques données de test (optionnel)
 INSERT INTO dynamic_qr_codes (qr_id, name, url, qr_url, size, margin, error_correction) 
 VALUES 
-    ('test1234', 'QR Code de test', 'https://www.google.com', 'http://localhost:7005/r/test1234', 300, 4, 'M')
+    ('test1234', 'QR Code de test', 'https://www.google.com', 'https://qrcodes.iahome.fr/r/test1234', 300, 4, 'M')
 ON CONFLICT (qr_id) DO NOTHING;
 
 -- Migration pour ajouter les colonnes de personnalisation aux tables existantes

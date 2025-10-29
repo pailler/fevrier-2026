@@ -216,7 +216,7 @@ class QRCodeHandler(http.server.BaseHTTPRequestHandler):
         pass
 
 if __name__ == '__main__':
-    PORT = 7005
+    PORT = 7006
     
     print("Demarrage du serveur QR Code simple...")
     print(f"Interface web: http://localhost:{PORT}")

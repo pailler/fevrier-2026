@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'IA Home - Plateforme d\'Intelligence Artificielle | Formation IA & Outils IA',
-  description: 'Découvrez l\'IA avec IA Home : formations interactives, outils Whisper, Stable Diffusion, ComfyUI. Apprenez l\'intelligence artificielle à votre rythme avec nos modules pratiques et nos cours adaptés à tous les niveaux.',
+  description: 'Découvrez l\'IA avec IA Home : formations interactives, outils Whisper, Stable Diffusion, ComfyUI. Accédez à nos services via whisper.iahome.fr, librespeed.iahome.fr, qrcodes.iahome.fr et tous nos sous-domaines. Apprenez l\'intelligence artificielle à votre rythme avec nos modules pratiques et nos cours adaptés à tous les niveaux.',
   applicationName: 'IA Home',
   authors: [{ name: 'IA Home', url: 'https://iahome.fr' }],
   keywords: [
@@ -28,7 +28,18 @@ export const metadata: Metadata = {
     'développement IA',
     'machine learning',
     'deep learning',
-    'IA française'
+    'IA française',
+    'whisper.iahome.fr',
+    'librespeed.iahome.fr',
+    'qrcodes.iahome.fr',
+    'metube.iahome.fr',
+    'pdf.iahome.fr',
+    'psitransfer.iahome.fr',
+    'meeting-reports.iahome.fr',
+    'stablediffusion.iahome.fr',
+    'comfyui.iahome.fr',
+    'sous-domaines iahome',
+    'services iahome'
   ],
   creator: 'IA Home',
   publisher: 'IA Home',

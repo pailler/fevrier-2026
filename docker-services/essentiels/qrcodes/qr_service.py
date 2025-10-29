@@ -1288,10 +1288,10 @@ def custom_qr():
 
 if __name__ == '__main__':
     print("Demarrage du service QR Code Generator - IAHome...")
-    print("Interface web: http://localhost:7005")
-    print("API: http://localhost:7005/api/qr")
-    print("Health check: http://localhost:7005/health")
+    print("Interface web: http://localhost:7006")
+    print("API: http://localhost:7006/api/qr")
+    print("Health check: http://localhost:7006/health")
     
     # Utiliser un serveur HTTP différent pour éviter la détection d'URLs de Werkzeug
     from werkzeug.serving import run_simple
-    run_simple('0.0.0.0', 7005, app, use_reloader=False, use_debugger=False, threaded=True)
+    run_simple('0.0.0.0', PORT, app, use_reloader=False, use_debugger=False, threaded=True)

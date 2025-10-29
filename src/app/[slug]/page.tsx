@@ -30,7 +30,7 @@ export default function DynamicPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Routes exclues - redirection immédiate
+  // Routes exclues - certaines nécessitent une redirection, d'autres non
   const excludedRoutes = [
     'token-generated',
     'encours',
@@ -85,15 +85,29 @@ export default function DynamicPage() {
     'protected-metube'
   ];
 
-  // Redirection immédiate pour les routes exclues
+  // Routes qui nécessitent une redirection vers /encours
+  const redirectRoutes = [
+    'token-generated',
+    'encours',
+    'applications',
+    'essentiels',
+    'modules'
+  ];
+
+  // Redirection immédiate pour certaines routes exclues uniquement
   useEffect(() => {
-    if (excludedRoutes.includes(slug)) {
+    if (redirectRoutes.includes(slug)) {
       router.replace('/encours');
     }
   }, [slug, router]);
 
-  // Retourner null pour éviter tout rendu ou requête Supabase
-  if (excludedRoutes.includes(slug)) {
+  // Pour les routes de redirection, retourner null aussi pour éviter le flash
+  if (redirectRoutes.includes(slug)) {
+    return null;
+  }
+
+  // Retourner null pour les routes exclues (laisse Next.js gérer les routes statiques)
+  if (excludedRoutes.includes(slug) && !redirectRoutes.includes(slug)) {
     return null;
   }
 

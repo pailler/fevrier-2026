@@ -12,18 +12,38 @@ http:
         - meeting-reports-stripprefix
         - meeting-reports-api-headers
         - meeting-reports-cors
+        - meeting-reports-no-buffer
+    
+    meeting-reports-upload:
+      rule: "Host(`meeting-reports.iahome.fr`) && PathPrefix(`/api/upload`)"
+      service: meeting-reports-api-service
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - meeting-reports-upload-nobuffer
+        - meeting-reports-stripprefix
+        - meeting-reports-api-headers
+        - meeting-reports-cors
 
   services:
     meeting-reports-api-service:
       loadBalancer:
         servers:
-          - url: "http://localhost:8001"
+          - url: "http://localhost:8000"
         healthCheck:
           path: "/health"
           interval: "30s"
           timeout: "5s"
 
   middlewares:
+    meeting-reports-no-buffer:
+      buffering:
+        maxRequestBodyBytes: 524288000  # 500 MB
+    
+    meeting-reports-upload-nobuffer:
+      buffering:
+        maxRequestBodyBytes: 524288000  # 500 MB
+    
     meeting-reports-stripprefix:
       stripPrefix:
         prefixes:

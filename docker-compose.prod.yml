@@ -67,7 +67,7 @@ services:
 
   instantmesh:
     build:
-      context: ./docker/instantmesh
+      context: ./instantmesh/docker
       dockerfile: Dockerfile
     container_name: iahome-instantmesh
     restart: unless-stopped
@@ -77,9 +77,9 @@ services:
     ports:
       - "8003:7860"
     volumes:
-      - ./data/instantmesh/inputs:/app/inputs
-      - ./data/instantmesh/outputs:/app/outputs
-      - ./data/instantmesh/ckpts:/app/ckpts
+      - ./instantmesh/inputs:/app/inputs
+      - ./instantmesh/outputs:/app/outputs
+      - ./instantmesh/ckpts:/app/ckpts
     networks:
       - iahome-network
     deploy:
@@ -96,6 +96,9 @@ services:
       - "traefik.http.routers.instantmesh.tls=true"
       - "traefik.http.routers.instantmesh.tls.certresolver=letsencrypt"
       - "traefik.http.services.instantmesh.loadbalancer.server.port=7860"
+      # Cloudflare Real IP
+      - "traefik.http.middlewares.instantmesh-cloudflare.headers.customrequestheaders.X-Forwarded-For=CF-Connecting-IP"
+      - "traefik.http.routers.instantmesh.middlewares=instantmesh-cloudflare"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7860/health"]
       interval: 30s

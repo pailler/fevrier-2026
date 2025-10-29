@@ -23,7 +23,7 @@ COPY template.html .
 RUN mkdir -p logs
 
 # Exposer le port
-EXPOSE 7005
+EXPOSE 7006
 
 # Commande de démarrage
 CMD ["python", "qr_service_clean.py"]
