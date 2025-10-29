@@ -68,3 +68,8 @@ Thumbs.db
 *.backup
 *.bakdocker-services/essentiels/pdf/temp/
 ffmpeg.zip
+
+# Fichiers LFS volumineux (> 100 Mo) - exclus du dépôt GitHub
+essentiels/metube-downloads/
+essentiels/polr-db-data/
+*.mp4

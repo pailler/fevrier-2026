@@ -1,3 +1,4 @@
-*.mp4 filter=lfs diff=lfs merge=lfs -text
-essentiels/polr-db-data/* filter=lfs diff=lfs merge=lfs -text
-essentiels/metube-downloads/* filter=lfs diff=lfs merge=lfs -text
+# Fichiers LFS désactivés - fichiers > 100 Mo exclus du dépôt
+# *.mp4 filter=lfs diff=lfs merge=lfs -text
+# essentiels/polr-db-data/* filter=lfs diff=lfs merge=lfs -text
+# essentiels/metube-downloads/* filter=lfs diff=lfs merge=lfs -text
