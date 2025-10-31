@@ -351,45 +351,575 @@ def redirect_qr(qr_id):
         logger.error(f"Erreur redirection: {e}")
         return jsonify({'error': 'Erreur interne du serveur'}), 500
 
+@app.route('/update', methods=['GET'])
+def update_qr_page():
+    """Page simple avec formulaire pour modifier un QR code (ID, token, nouvelle URL)"""
+    html = """
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Modifier un QR Code</title>
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 40px 20px; }
+            .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+            h1 { color: #333; margin-bottom: 10px; font-size: 28px; font-weight: 700; text-align: center; }
+            .subtitle { color: #666; margin-bottom: 30px; text-align: center; font-size: 14px; }
+            .form-group { margin-bottom: 25px; }
+            label { display: block; margin-bottom: 10px; font-weight: 600; color: #333; font-size: 15px; }
+            input[type="text"], input[type="url"] { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; transition: border-color 0.3s; }
+            input[type="text"]:focus, input[type="url"]:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+            small { color: #64748b; display: block; margin-top: 5px; font-size: 13px; }
+            .submit-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s; }
+            .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+            .submit-btn:disabled { background: #6c757d; cursor: not-allowed; transform: none; }
+            .message { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; font-size: 14px; }
+            .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; font-weight: 500; }
+            .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+            .example-section { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea; }
+            .example-section h4 { color: #333; margin-bottom: 12px; font-size: 14px; font-weight: 600; }
+            .example-link { font-family: 'Courier New', monospace; font-size: 13px; word-break: break-all; padding: 12px; background: white; border-radius: 6px; border: 1px solid #e0e0e0; line-height: 1.8; }
+            .example-link .base-url { color: #666; }
+            .example-link .qr-id { background: #e3f2fd; color: #1976d2; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+            .example-link .token-part { background: #f1f8e9; color: #558b2f; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+            .back-link { text-align: center; margin-top: 20px; }
+            .back-link a { color: #667eea; text-decoration: none; font-weight: 600; }
+            .back-link a:hover { text-decoration: underline; }
+            .success-url { background: #e8f5e9; color: #2e7d32; padding: 8px 12px; border-radius: 6px; margin-top: 10px; font-family: 'Courier New', monospace; font-weight: 600; display: inline-block; word-break: break-all; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🔧 Modifier l'URL d'un QR Code</h1>
+            <p class="subtitle">Entrez les informations de votre QR code dynamique</p>
+            
+            <form id="updateForm">
+                <div class="form-group">
+                    <label for="qrId">ID du QR Code :</label>
+                    <input type="text" id="qrId" placeholder="Ex: f69bd041" required>
+                    <small>L'ID du QR code (8 caractères)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="token">Token de gestion :</label>
+                    <input type="text" id="token" placeholder="Votre token de gestion" required>
+                    <small>Le token fourni lors de la création</small>
+                </div>
+                
+                <!-- Exemple de lien avec codes couleurs -->
+                <div class="example-section">
+                    <h4>💡 Où trouver l'ID et le token ?</h4>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 10px;">Exemple de lien de gestion QR code dynamique :</p>
+                    <div class="example-link">
+                        <span class="base-url">https://qrcodes.iahome.fr/manage/</span><span class="qr-id">f69bd041</span><span class="base-url">?token=</span><span class="token-part">4ec97cec-7c56-4825-95ec-4f9f8e7b9242</span>
+                    </div>
+                    <div style="margin-top: 12px; font-size: 12px; color: #666;">
+                        <p style="margin: 6px 0;">🔵 <strong>En bleu</strong> : ID du QR Code (8 caractères) → Copiez dans le champ "ID du QR Code"</p>
+                        <p style="margin: 6px 0;">🟢 <strong>En vert</strong> : Token de gestion → Copiez dans le champ "Token de gestion"</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="newUrl">Nouvelle URL de destination :</label>
+                    <input type="url" id="newUrl" placeholder="https://example.com" required>
+                    <small>La nouvelle URL de redirection</small>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">🔄 Mettre à jour l'URL</button>
+            </form>
+            
+            <div id="message" class="message"></div>
+            
+            <div class="back-link">
+                <a href="/">← Retour à l'accueil</a>
+            </div>
+        </div>
+        
+        <script>
+            const form = document.getElementById('updateForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const messageDiv = document.getElementById('message');
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const qrId = document.getElementById('qrId').value.trim();
+                const token = document.getElementById('token').value.trim();
+                const newUrl = document.getElementById('newUrl').value.trim();
+                
+                if (!qrId || !token || !newUrl) {
+                    showMessage('Veuillez remplir tous les champs', 'error');
+                    return;
+                }
+                
+                // Validation URL
+                try {
+                    const urlObj = new URL(newUrl);
+                    if (!urlObj.protocol || (!urlObj.protocol.startsWith('http'))) {
+                        showMessage('URL invalide. Utilisez le format: https://example.com', 'error');
+                        return;
+                    }
+                } catch (urlError) {
+                    showMessage('URL invalide. Utilisez le format: https://example.com', 'error');
+                    return;
+                }
+                
+                // Désactiver le bouton
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Mise à jour...';
+                hideMessage();
+                
+                try {
+                    const response = await fetch('/api/qr/update-url/' + qrId, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: newUrl, token: token })
+                    });
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        try {
+                            const errorJson = JSON.parse(errorText);
+                            showMessage('❌ Erreur: ' + (errorJson.error || 'Mise à jour échouée'), 'error');
+                        } catch {
+                            showMessage('❌ Erreur HTTP ' + response.status + ': ' + errorText, 'error');
+                        }
+                        return;
+                    }
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showMessage('✅ URL mise à jour avec succès dans Supabase!\\n\\n<span class="success-url">Nouvelle URL validée: ' + newUrl + '</span>', 'success');
+                        // Réinitialiser le formulaire sauf l'ID et le token
+                        document.getElementById('newUrl').value = '';
+                    } else {
+                        showMessage('❌ Erreur: ' + (result.error || 'Mise à jour échouée'), 'error');
+                    }
+                } catch (error) {
+                    showMessage('❌ Erreur: ' + error.message, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '🔄 Mettre à jour l\\'URL';
+                }
+            });
+            
+            function showMessage(text, type) {
+                // Remplacer les \\n par <br> et permettre le HTML
+                let htmlText = text.replace(/\\\\n/g, '<br>').replace(/\\n/g, '<br>');
+                messageDiv.innerHTML = htmlText;
+                messageDiv.className = 'message ' + type;
+                messageDiv.style.display = 'block';
+                
+                // Faire défiler vers le message si succès
+                if (type === 'success') {
+                    messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+            
+            function hideMessage() {
+                messageDiv.style.display = 'none';
+            }
+        </script>
+    </body>
+    </html>
+    """
+    
+    headers = {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0, private',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+    }
+    return html, 200, headers
+
 @app.route('/manage/<qr_id>')
 def manage_qr(qr_id):
-    """Redirige vers l'étape 8 du workflow avec le token en paramètre (page de gestion intégrée)"""
-    token = request.args.get('token', '').strip()
-    
-    # Vérifier que le token est présent
-    if not token:
-        error_html = f"""
+    """Page de gestion du QR code"""
+    try:
+        # Récupérer le token depuis l'URL et le nettoyer
+        token = request.args.get('token', '').strip()
+        
+        logger.info(f"🔍 Tentative d'accès à la page de gestion pour QR {qr_id}")
+        logger.info(f"🔑 Token reçu dans l'URL: {token[:30] + '...' if len(token) > 30 else (token if token else 'AUCUN')}")
+        
+        # Connexion à Supabase
+        supabase = get_supabase_client()
+        if not supabase:
+            logger.error("❌ Impossible de se connecter à Supabase")
+            return jsonify({'error': 'Erreur de connexion à Supabase'}), 500
+        
+        # Récupérer les informations du QR code
+        result = supabase.table('dynamic_qr_codes').select('*').eq('qr_id', qr_id).eq('is_active', True).execute()
+        
+        if not result.data:
+            logger.warning(f"⚠️ QR Code {qr_id} non trouvé ou inactif")
+            return jsonify({'error': 'QR Code non trouvé'}), 404
+        
+        qr_data = result.data[0]
+        stored_token = qr_data.get('management_token', '').strip()
+        
+        logger.info(f"🔑 Token stocké dans la DB: {stored_token[:30] + '...' if len(stored_token) > 30 else (stored_token if stored_token else 'AUCUN')}")
+        
+        # Comparaison stricte des tokens (nettoyés des espaces)
+        token_match = token and stored_token and token == stored_token
+        
+        logger.info(f"✅ Tokens identiques: {token_match}")
+        
+        # Vérifier le token de gestion
+        if not token_match:
+            # Retourner une page HTML informative (200) au lieu d'un statut 403
+            error_html = f"""
+            <!DOCTYPE html>
+            <html lang="fr">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Validation requise</title>
+                <style>
+                    body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; text-align: center; }}
+                    .container {{ max-width: 650px; margin: 50px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+                    h1 {{ color: #d97706; }}
+                    p {{ color: #444; }}
+                    code {{ background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }}
+                    .hint {{ margin-top: 16px; color: #6b7280; font-size: 0.95rem; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>⚠️ Validation du lien requise</h1>
+                    <p><strong>Le token de gestion est manquant ou invalide pour ce QR code.</strong></p>
+                    
+                    <div style="background: #fef3c7; padding: 15px; border-radius: 5px; margin: 20px 0; text-align: left;">
+                        <p style="margin: 0 0 10px 0;"><strong>💡 Pour accéder à cette page :</strong></p>
+                        <ul style="margin: 0; padding-left: 20px;">
+                            <li>Utilisez le lien complet fourni lors de la création du QR code</li>
+                            <li>Le lien doit contenir le paramètre <code>?token=</code> avec votre token unique</li>
+                            <li>Format attendu : <code>https://qrcodes.iahome.fr/manage/{qr_id}?token=VOTRE_TOKEN</code></li>
+                        </ul>
+                    </div>
+                    
+                    <p class="hint">🔗 <strong>Lien de création :</strong><br>
+                    <code style="background: #f1f5f9; padding: 8px 12px; border-radius: 4px; display: inline-block; margin-top: 8px;">https://qrcodes.iahome.fr/manage/{qr_id}?token=&lt;votre_token&gt;</code></p>
+                    
+                    <div style="background: #dbeafe; padding: 15px; border-radius: 5px; margin: 20px 0; text-align: left;">
+                        <p style="margin: 0;"><strong>ℹ️ Note :</strong> Si vous venez de mettre à jour l'URL, aucun rechargement n'est nécessaire. Restez sur la page et le message de succès s'affiche en dessous du bouton vert.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+            # Headers anti-cache
+            headers = {
+                'Content-Type': 'text/html; charset=utf-8',
+                'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0, private',
+                'Pragma': 'no-cache',
+                'Expires': '0',
+                'X-Content-Type-Options': 'nosniff',
+                'Last-Modified': datetime.now().isoformat(),
+                'ETag': f'"{datetime.now().timestamp()}"'
+            }
+            return error_html, 200, headers
+        
+        # URL de gestion complète
+        management_url = f"https://qrcodes.iahome.fr/manage/{qr_id}?token={stored_token}"
+        
+        # Page de gestion HTML simplifiée et fonctionnelle
+        html = f"""
         <!DOCTYPE html>
         <html lang="fr">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Validation requise</title>
+            <title>Gestion QR Code</title>
             <style>
-                body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; text-align: center; }}
-                .container {{ max-width: 650px; margin: 50px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-                h1 {{ color: #d97706; }}
-                p {{ color: #444; }}
+                * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 40px 20px; }}
+                .container {{ max-width: 650px; margin: 0 auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }}
+                h1 {{ color: #333; margin-bottom: 30px; font-size: 28px; font-weight: 700; text-align: center; }}
+                .info-section {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 12px; margin-bottom: 30px; color: white; }}
+                .info-section h2 {{ color: white; font-size: 20px; margin-bottom: 15px; font-weight: 600; }}
+                .info-section p {{ color: rgba(255,255,255,0.95); font-size: 14px; line-height: 1.7; margin-bottom: 15px; }}
+                .url-container {{ display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }}
+                .url-display {{ background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px; word-break: break-all; color: white; border: 1px solid rgba(255,255,255,0.3); }}
+                .copy-btn {{ background: white; color: #667eea; padding: 12px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s; }}
+                .copy-btn:hover {{ background: #f0f0f0; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }}
+                .copy-btn.copied {{ background: #28a745; color: white; }}
+                .warning {{ margin-top: 15px; padding: 12px; background: rgba(255,193,7,0.2); border-left: 4px solid #ffc107; border-radius: 6px; font-size: 13px; color: rgba(255,255,255,0.95); }}
+                .form-section {{ margin-top: 30px; }}
+                .form-group {{ margin-bottom: 25px; }}
+                label {{ display: block; margin-bottom: 10px; font-weight: 600; color: #333; font-size: 15px; }}
+                input[type="url"] {{ width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; transition: border-color 0.3s; }}
+                input[type="url"]:focus {{ outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }}
+                .submit-btn {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s; }}
+                .submit-btn:hover {{ transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }}
+                .submit-btn:disabled {{ background: #6c757d; cursor: not-allowed; transform: none; }}
+                .message {{ margin-top: 20px; padding: 15px; border-radius: 8px; display: none; font-size: 14px; }}
+                .message.success {{ background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }}
+                .message.error {{ background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }}
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>⚠️ Token manquant</h1>
-                <p><strong>Le token de gestion est requis dans l'URL.</strong></p>
-                <p style="margin-top: 20px;"><a href="/">Retour à l'accueil</a></p>
+                <h1>🔧 Modifier l'URL de destination</h1>
+                
+                <div class="info-section">
+                    <h2>🔑 Lien de gestion</h2>
+                    <p>Conservez ce lien pour modifier l'URL de destination de votre QR code à tout moment. Ce lien contient votre token de gestion unique et confidentiel.</p>
+                    <div class="url-container">
+                        <div class="url-display" id="managementUrl">{management_url}</div>
+                        <button class="copy-btn" id="copyBtn" onclick="copyManagementUrl()">📋 Copier le lien</button>
+                    </div>
+                    <div class="warning">⚠️ Ne partagez pas ce lien - il donne accès à la gestion de votre QR code.</div>
+                </div>
+                
+                <div class="form-section">
+                    <div class="current-url-section" style="margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">URL actuelle dans Supabase:</label>
+                        <div id="currentUrlDisplay" style="font-family: 'Courier New', monospace; font-size: 14px; color: #667eea; word-break: break-all; padding: 10px; background: white; border-radius: 6px; border: 1px solid #e0e0e0;">{qr_data['url']}</div>
+                    </div>
+                    
+                    <form id="updateForm">
+                        <div class="form-group">
+                            <label for="newUrl">Nouvelle URL de destination:</label>
+                            <input type="url" id="newUrl" value="{qr_data['url']}" placeholder="https://example.com" required>
+                        </div>
+                        <button type="submit" class="submit-btn" id="submitBtn">Mettre à jour l'URL</button>
+                    </form>
+                </div>
+                
+                <div id="message" class="message"></div>
             </div>
+            
+            <script>
+                (function() {{
+                    const qrId = '{qr_id}';
+                    const STORAGE_KEY = 'qr_management_token_' + qrId;
+                    
+                    // Récupérer le token depuis l'URL OU depuis localStorage
+                    const urlParams = new URLSearchParams(window.location.search);
+                    let token = urlParams.get('token');
+                    
+                    // Si le token est dans l'URL, le sauvegarder dans localStorage
+                    if (token) {{
+                        localStorage.setItem(STORAGE_KEY, token);
+                        console.log('✅ Token sauvegardé dans localStorage');
+                    }} else {{
+                        // Sinon, essayer de le récupérer depuis localStorage
+                        token = localStorage.getItem(STORAGE_KEY);
+                        if (token) {{
+                            console.log('✅ Token récupéré depuis localStorage');
+                            // Restaurer le token dans l'URL sans recharger la page
+                            const newUrl = new URL(window.location);
+                            newUrl.searchParams.set('token', token);
+                            window.history.replaceState({{}}, '', newUrl);
+                        }}
+                    }}
+                    
+                    if (!token) {{
+                        document.body.innerHTML = '<div style="max-width: 600px; margin: 50px auto; padding: 30px; background: white; border-radius: 12px; text-align: center;"><h1 style="color: #dc3545;">❌ Token manquant</h1><p>Le token de gestion est requis dans l\'URL.</p></div>';
+                        return;
+                    }}
+                    
+                    console.log('🔑 Token disponible:', token ? token.substring(0, 10) + '...' : 'MANQUANT');
+                    
+                    const form = document.getElementById('updateForm');
+                    const input = document.getElementById('newUrl');
+                    const submitBtn = document.getElementById('submitBtn');
+                    const messageDiv = document.getElementById('message');
+                    
+                    if (!form || !input || !submitBtn) {{
+                        console.error('❌ Éléments du formulaire non trouvés:', {{
+                            form: !!form,
+                            input: !!input,
+                            submitBtn: !!submitBtn
+                        }});
+                        return;
+                    }}
+                    
+                    console.log('✅ Formulaire trouvé, ajout de l\'écouteur submit...');
+                    
+                    form.addEventListener('submit', async function(e) {{
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        console.log('🔄🔄🔄 FORM SUBMIT INTERCEPTÉ!');
+                        
+                        const newUrl = input.value.trim();
+                        console.log('📝 URL saisie:', newUrl);
+                        
+                        if (!newUrl) {{
+                            showMessage('Veuillez saisir une URL', 'error');
+                            return;
+                        }}
+                        
+                        // Validation URL
+                        try {{
+                            new URL(newUrl);
+                        }} catch {{
+                            showMessage('URL invalide. Utilisez le format: https://example.com', 'error');
+                            return;
+                        }}
+                        
+                        // Désactiver le bouton
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Mise à jour...';
+                        hideMessage();
+                        
+                        console.log('📤 Envoi requête POST vers /api/qr/update-url/' + qrId);
+                        console.log('📦 Données envoyées:', {{ url: newUrl, token: token ? token.substring(0, 10) + '...' : 'MANQUANT' }});
+                        
+                        try {{
+                            const apiUrl = '/api/qr/update-url/' + qrId;
+                            console.log('🌐 URL API:', apiUrl);
+                            console.log('📤 Token envoyé:', token ? token.substring(0, 20) + '...' : 'MANQUANT');
+                            console.log('📤 Body:', JSON.stringify({{ url: newUrl, token: token ? token.substring(0, 10) + '...' : 'MANQUANT' }}));
+                            
+                            const response = await fetch(apiUrl, {{
+                                method: 'POST',
+                                headers: {{ 'Content-Type': 'application/json' }},
+                                body: JSON.stringify({{ url: newUrl, token: token }})
+                            }}).catch(function(fetchError) {{
+                                console.error('❌❌❌ ERREUR FETCH:', fetchError);
+                                throw fetchError;
+                            }});
+                            
+                            console.log('📥 Réponse reçue - Status:', response.status, response.statusText);
+                            console.log('📥 Headers:', Array.from(response.headers.entries()));
+                            
+                            if (!response.ok) {{
+                                console.error('❌ Réponse non OK:', response.status, response.statusText);
+                                const errorText = await response.text();
+                                console.error('❌ Corps de l\'erreur:', errorText);
+                                try {{
+                                    const errorJson = JSON.parse(errorText);
+                                    showMessage('❌ Erreur: ' + (errorJson.error || 'Mise à jour échouée'), 'error');
+                                }} catch {{
+                                    showMessage('❌ Erreur HTTP ' + response.status + ': ' + errorText, 'error');
+                                }}
+                                return;
+                            }}
+                            
+                            const result = await response.json();
+                            console.log('📦 Résultat JSON:', result);
+                            
+                            if (response.ok && result.success) {{
+                                // Mettre à jour l'affichage de l'URL actuelle dans Supabase
+                                const currentUrlDisplay = document.getElementById('currentUrlDisplay');
+                                if (currentUrlDisplay) {{
+                                    currentUrlDisplay.textContent = newUrl;
+                                    currentUrlDisplay.style.color = '#28a745';
+                                    currentUrlDisplay.style.borderColor = '#28a745';
+                                    // Animation de succès
+                                    currentUrlDisplay.style.transition = 'all 0.3s';
+                                    setTimeout(() => {{
+                                        currentUrlDisplay.style.color = '#667eea';
+                                        currentUrlDisplay.style.borderColor = '#e0e0e0';
+                                    }}, 2000);
+                                }}
+                                
+                                // Mettre à jour l'input pour refléter la nouvelle URL
+                                input.value = newUrl;
+                                
+                                // Afficher un message de succès avec la nouvelle URL
+                                showMessage('✅ URL mise à jour avec succès dans Supabase!\\n\\nNouvelle URL: ' + newUrl, 'success');
+                                
+                                // S'assurer que le token reste dans l'URL et localStorage
+                                if (token) {{
+                                    localStorage.setItem(STORAGE_KEY, token);
+                                    const currentUrl = new URL(window.location);
+                                    if (!currentUrl.searchParams.get('token')) {{
+                                        currentUrl.searchParams.set('token', token);
+                                        window.history.replaceState({{}}, '', currentUrl);
+                                    }}
+                                }}
+                            }} else {{
+                                showMessage('❌ Erreur: ' + (result.error || 'Mise à jour échouée'), 'error');
+                            }}
+                        }} catch (error) {{
+                            showMessage('❌ Erreur: ' + error.message, 'error');
+                        }} finally {{
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Mettre à jour l\'URL';
+                        }}
+                    }});
+                    
+                    function showMessage(text, type) {{
+                        messageDiv.innerHTML = text.replace(/\\n/g, '<br>');
+                        messageDiv.className = 'message ' + type;
+                        messageDiv.style.display = 'block';
+                        
+                        // Faire défiler vers le message si succès
+                        if (type === 'success') {{
+                            messageDiv.scrollIntoView({{ behavior: 'smooth', block: 'nearest' }});
+                        }}
+                    }}
+                    
+                    function hideMessage() {{
+                        messageDiv.style.display = 'none';
+                    }}
+                }})();
+                
+                function copyManagementUrl() {{
+                    const urlElement = document.getElementById('managementUrl');
+                    const copyBtn = document.getElementById('copyBtn');
+                    const url = urlElement.textContent;
+                    
+                    navigator.clipboard.writeText(url).then(function() {{
+                        copyBtn.textContent = '✓ Copié!';
+                        copyBtn.classList.add('copied');
+                        
+                        setTimeout(function() {{
+                            copyBtn.textContent = '📋 Copier le lien';
+                            copyBtn.classList.remove('copied');
+                        }}, 2000);
+                    }}).catch(function(err) {{
+                        // Fallback pour navigateurs anciens
+                        const textArea = document.createElement('textarea');
+                        textArea.value = url;
+                        textArea.style.position = 'fixed';
+                        textArea.style.opacity = '0';
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        try {{
+                            document.execCommand('copy');
+                            copyBtn.textContent = '✓ Copié!';
+                            copyBtn.classList.add('copied');
+                            setTimeout(function() {{
+                                copyBtn.textContent = '📋 Copier le lien';
+                                copyBtn.classList.remove('copied');
+                            }}, 2000);
+                        }} catch (err) {{
+                            console.error('Erreur lors de la copie:', err);
+                        }}
+                        document.body.removeChild(textArea);
+                    }});
+                }}
+            </script>
         </body>
         </html>
         """
+        
+        # Headers anti-cache
         headers = {
             'Content-Type': 'text/html; charset=utf-8',
             'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0, private',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'X-Content-Type-Options': 'nosniff',
+            'Last-Modified': datetime.now().isoformat(),
+            'ETag': f'"{datetime.now().timestamp()}"'
         }
-        return error_html, 200, headers
-    
-    # Rediriger vers la page principale avec les paramètres pour ouvrir directement l'étape 8 en mode modification
-    redirect_url = f"/?qr_id={qr_id}&token={token}&action=manage"
-    return redirect(redirect_url, code=302)
+        return html, 200, headers
+        
+    except Exception as e:
+        logger.error(f"Erreur page de gestion: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({'error': 'Erreur interne du serveur'}), 500
 
 @app.route('/manage-old/<qr_id>', methods=['GET'])
 def manage_qr_old(qr_id):
