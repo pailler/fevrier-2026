@@ -105,13 +105,14 @@ export default function AdminUsers() {
           // Calculer le statut basé sur l'activité
           const now = new Date();
           const daysSinceLastLogin = lastLogin ? Math.floor((now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60 * 24)) : null;
+          const isAdmin = profile.role === 'admin';
           
           let status: 'active' | 'inactive' | 'suspended' = 'active';
           if (!profile.is_active) {
             status = 'suspended';
-          } else if (daysSinceLastLogin && daysSinceLastLogin > 30) {
-            status = 'inactive';
-          } else if (daysSinceLastLogin && daysSinceLastLogin > 7) {
+          } else if (!isAdmin && daysSinceLastLogin && daysSinceLastLogin > 60) {
+            // Les admins sont toujours considérés comme actifs s'ils ont is_active: true
+            // Seuls les utilisateurs normaux sont marqués inactifs après 60 jours
             status = 'inactive';
           } else {
             status = 'active';

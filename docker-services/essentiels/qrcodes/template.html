@@ -606,7 +606,65 @@
             <p>Créez des QR codes personnalisés avec IAHome</p>
         </div>
 
-        <div class="workflow-container">
+        <!-- Page d'accueil avec 3 boutons -->
+        <div class="workflow-container" id="home-page">
+            <div class="workflow-content active" style="padding: 60px 40px; text-align: center;">
+                <h2 class="step-title" style="font-size: 2.5rem; margin-bottom: 40px;">Que souhaitez-vous faire ?</h2>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; max-width: 1000px; margin: 0 auto;">
+                    <!-- Bouton 1: QR Code Statique -->
+                    <div class="action-card" id="action-static" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; border-radius: 16px; cursor: pointer; transition: all 0.3s; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3); color: white;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">📄</div>
+                        <h3 style="font-size: 1.8rem; margin-bottom: 15px; color: white;">QR Code Statique</h3>
+                        <p style="color: rgba(255,255,255,0.9); margin-bottom: 25px; line-height: 1.6;">
+                            Créez un QR code simple avec un contenu fixe. Parfait pour les URLs, textes, emails et autres informations permanentes.
+                        </p>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; margin-top: 20px;">
+                            <ul style="text-align: left; list-style: none; padding: 0; margin: 0;">
+                                <li style="margin: 8px 0;">✓ Contenu fixe</li>
+                                <li style="margin: 8px 0;">✓ Personnalisation visuelle</li>
+                                <li style="margin: 8px 0;">✓ Génération rapide</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Bouton 2: QR Code Dynamique -->
+                    <div class="action-card" id="action-dynamic" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 40px 30px; border-radius: 16px; cursor: pointer; transition: all 0.3s; box-shadow: 0 10px 30px rgba(245, 87, 108, 0.3); color: white;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">🔄</div>
+                        <h3 style="font-size: 1.8rem; margin-bottom: 15px; color: white;">QR Code Dynamique</h3>
+                        <p style="color: rgba(255,255,255,0.9); margin-bottom: 25px; line-height: 1.6;">
+                            Créez un QR code avec gestion avancée. Modifiez l'URL à tout moment et consultez les statistiques de scan.
+                        </p>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; margin-top: 20px;">
+                            <ul style="text-align: left; list-style: none; padding: 0; margin: 0;">
+                                <li style="margin: 8px 0;">✓ Modification du contenu</li>
+                                <li style="margin: 8px 0;">✓ Statistiques de scan</li>
+                                <li style="margin: 8px 0;">✓ Token de gestion</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Bouton 3: Modifier QR Code Dynamique -->
+                    <div class="action-card" id="action-update" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 40px 30px; border-radius: 16px; cursor: pointer; transition: all 0.3s; box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3); color: white;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">✏️</div>
+                        <h3 style="font-size: 1.8rem; margin-bottom: 15px; color: white;">Modifier un QR Code</h3>
+                        <p style="color: rgba(255,255,255,0.9); margin-bottom: 25px; line-height: 1.6;">
+                            Modifiez l'URL de destination d'un QR code dynamique existant. Utilisez votre ID et token de gestion.
+                        </p>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; margin-top: 20px;">
+                            <ul style="text-align: left; list-style: none; padding: 0; margin: 0;">
+                                <li style="margin: 8px 0;">✓ Mise à jour rapide</li>
+                                <li style="margin: 8px 0;">✓ Sans aller sur Supabase</li>
+                                <li style="margin: 8px 0;">✓ Modifications instantanées</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section de Création (cachée par défaut) -->
+        <div class="workflow-container" id="creation-workflow" style="display: none;">
             <!-- Progress Indicators -->
             <div class="progress-indicators">
                 <div class="progress-step" data-step="1">
@@ -837,38 +895,104 @@
                 </div>
             </div>
 
-            <!-- Step 8: Dynamic QR Code -->
-            <!-- Note: Le QR code ne sera PAS affiché ici, mais uniquement à l'étape 9 -->
+            <!-- Step 8: Dynamic QR Code / Modification -->
             <div class="workflow-content" id="step-8">
-                <h2 class="step-title">8. Génération du QR Code Dynamique</h2>
-                <p class="step-description">Créez votre QR code dynamique avec gestion avancée</p>
-                
-                <div class="form-group">
-                    <div class="qr-preview" style="text-align: center; padding: 40px;">
-                        <div class="qr-preview-placeholder" id="qr-preview-placeholder">
-                            <p style="color: #64748b; font-size: 16px;">⏳ Génération du QR code en cours...</p>
-                            <p style="color: #94a3b8; font-size: 14px; margin-top: 10px;">Votre QR code apparaîtra à l'étape suivante</p>
+                <!-- Mode Création (affiché par défaut pour les QR codes dynamiques en création) -->
+                <div id="step-8-create-mode">
+                    <h2 class="step-title">8. Génération du QR Code Dynamique</h2>
+                    <p class="step-description">Créez votre QR code dynamique avec gestion avancée</p>
+                    
+                    <div class="form-group">
+                        <div class="qr-preview" style="text-align: center; padding: 40px;">
+                            <div class="qr-preview-placeholder" id="qr-preview-placeholder">
+                                <p style="color: #64748b; font-size: 16px;">⏳ Génération du QR code en cours...</p>
+                            </div>
+                            <img id="qr-preview-img" style="display: none; max-width: 400px; margin: 20px auto;" alt="QR Code Preview">
                         </div>
-                        <!-- L'image QR code ne sera plus affichée ici, elle sera uniquement à l'étape 9 -->
-                        <img id="qr-preview-img" style="display: none;" alt="QR Code Preview">
+                    </div>
+
+                    <div id="management-info" class="management-info" style="display: none; margin-top: 30px;">
+                        <!-- Section Lien de gestion -->
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 12px; margin-bottom: 30px; color: white;">
+                            <h2 style="color: white; font-size: 20px; margin-bottom: 15px; font-weight: 600;">🔑 Lien de gestion</h2>
+                            <p style="color: rgba(255,255,255,0.95); font-size: 14px; line-height: 1.7; margin-bottom: 15px;">
+                                Conservez ce lien pour modifier l'URL de destination de votre QR code à tout moment. Ce lien contient votre token de gestion unique et confidentiel.
+                            </p>
+                            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+                                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px; word-break: break-all; color: white; border: 1px solid rgba(255,255,255,0.3);" id="management-url-display"></div>
+                                <button id="copy-management-url-btn-step8" style="background: white; color: #667eea; padding: 12px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s;">
+                                    📋 Copier le lien
+                                </button>
+                            </div>
+                            <div style="margin-top: 15px; padding: 12px; background: rgba(255,193,7,0.2); border-left: 4px solid #ffc107; border-radius: 6px; font-size: 13px; color: rgba(255,255,255,0.95);">
+                                ⚠️ Ne partagez pas ce lien - il donne accès à la gestion de votre QR code.
+                            </div>
+                        </div>
+                        
+                        <!-- Section URL actuelle dans Supabase -->
+                        <div style="margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">URL actuelle dans Supabase:</label>
+                            <div id="current-url-display-step8" style="font-family: 'Courier New', monospace; font-size: 14px; color: #667eea; word-break: break-all; padding: 10px; background: white; border-radius: 6px; border: 1px solid #e0e0e0;"></div>
+                        </div>
+                        
+                        <!-- Informations supplémentaires -->
+                        <div style="margin-top: 20px; padding: 15px; background: #f8fafc; border-radius: 8px;">
+                            <p style="margin: 5px 0;"><strong>Token de gestion :</strong></p>
+                            <div class="token" id="management-token" style="font-family: 'Courier New', monospace; color: #667eea;"></div>
+                            <p style="margin: 15px 0 5px 0;"><strong>URL de redirection :</strong></p>
+                            <div class="url" id="redirect-url" style="font-family: 'Courier New', monospace; color: #667eea; word-break: break-all;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="navigation">
+                        <button id="prevBtn" class="nav-btn prev">← Précédent</button>
+                        <button id="nextBtn" class="nav-btn next">Suivant →</button>
                     </div>
                 </div>
 
-                <div id="management-info" class="management-info" style="display: none;">
-                    <h3>🔑 Informations de gestion</h3>
-                    <p><strong>Token de gestion :</strong></p>
-                    <div class="token" id="management-token"></div>
-                    <p><strong>URL de gestion :</strong></p>
-                    <div class="url" id="management-url"></div>
-                    <p><strong>URL de redirection :</strong></p>
-                    <div class="url" id="redirect-url"></div>
+                <!-- Mode Modification (affiché quand on veut modifier un QR code existant) -->
+                <div id="step-8-update-mode" style="display: none;">
+                    <h2 class="step-title">8. Informations de Gestion du QR Code</h2>
+                    <p class="step-description">Consultez les informations de gestion de votre QR code dynamique</p>
+                    
+                    <!-- Section Lien de gestion -->
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 12px; margin-bottom: 30px; color: white;">
+                        <h2 style="color: white; font-size: 20px; margin-bottom: 15px; font-weight: 600;">🔑 Lien de gestion</h2>
+                        <p style="color: rgba(255,255,255,0.95); font-size: 14px; line-height: 1.7; margin-bottom: 15px;">
+                            Conservez ce lien pour accéder aux informations de gestion de votre QR code à tout moment. Ce lien contient votre token de gestion unique et confidentiel.
+                        </p>
+                        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+                            <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px; word-break: break-all; color: white; border: 1px solid rgba(255,255,255,0.3);" id="management-url-display-update"></div>
+                            <button id="copy-management-url-btn-step8-update" style="background: white; color: #667eea; padding: 12px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s;">
+                                📋 Copier le lien
+                            </button>
+                        </div>
+                        <div style="margin-top: 15px; padding: 12px; background: rgba(255,193,7,0.2); border-left: 4px solid #ffc107; border-radius: 6px; font-size: 13px; color: rgba(255,255,255,0.95);">
+                            ⚠️ Ne partagez pas ce lien - il donne accès à la gestion de votre QR code.
+                        </div>
                     </div>
-                </div>
+                    
+                    <!-- Section URL actuelle dans Supabase -->
+                    <div style="margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">URL actuelle dans Supabase:</label>
+                        <div id="current-url-display-step8-update" style="font-family: 'Courier New', monospace; font-size: 14px; color: #667eea; word-break: break-all; padding: 10px; background: white; border-radius: 6px; border: 1px solid #e0e0e0;"></div>
+                    </div>
+                    
+                    <!-- Informations supplémentaires -->
+                    <div style="margin-top: 20px; padding: 15px; background: #f8fafc; border-radius: 8px;">
+                        <p style="margin: 5px 0;"><strong>Token de gestion :</strong></p>
+                        <div id="management-token-update" style="font-family: 'Courier New', monospace; color: #667eea;"></div>
+                        <p style="margin: 15px 0 5px 0;"><strong>URL de redirection :</strong></p>
+                        <div id="redirect-url-update" style="font-family: 'Courier New', monospace; color: #667eea; word-break: break-all;"></div>
+                    </div>
 
-                <!-- Navigation -->
-                <div class="navigation">
-                    <button id="prevBtn" class="nav-btn prev">← Précédent</button>
-                    <button id="nextBtn" class="nav-btn next">Suivant →</button>
+                    <!-- Navigation -->
+                    <div class="navigation" style="margin-top: 30px;">
+                        <button id="backToHomeFromStep8" class="nav-btn prev" style="background: #64748b; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                            ← Retour à l'accueil
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -968,6 +1092,8 @@
                     <button id="finishBtn" class="nav-btn finish">Terminer</button>
                 </div>
             </div>
+        </div>
+        </div>
 
     <script>
         // État du workflow
@@ -988,6 +1114,215 @@
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
+            // ========== GESTION DE L'ARRIVÉE DEPUIS /manage ==========
+            const urlParams = new URLSearchParams(window.location.search);
+            const qrIdFromUrl = urlParams.get('qr_id');
+            const tokenFromUrl = urlParams.get('token');
+            const action = urlParams.get('action');
+            
+            // Si on arrive depuis la page de gestion avec qr_id et token, ouvrir directement l'étape 8 en mode modification
+            if (qrIdFromUrl && tokenFromUrl && action === 'manage') {
+                // Cacher la page d'accueil
+                const homePage = document.getElementById('home-page');
+                if (homePage) homePage.style.display = 'none';
+                
+                // Afficher le workflow de création
+                const creationWorkflow = document.getElementById('creation-workflow');
+                if (creationWorkflow) {
+                    creationWorkflow.style.display = 'block';
+                    // Afficher step-8 en mode modification
+                    const step8CreateMode = document.getElementById('step-8-create-mode');
+                    const step8UpdateMode = document.getElementById('step-8-update-mode');
+                    if (step8CreateMode) step8CreateMode.style.display = 'none';
+                    if (step8UpdateMode) step8UpdateMode.style.display = 'block';
+                    
+                    // Pas besoin de pré-remplir les champs - affichage en lecture seule uniquement
+                    
+                    // Récupérer les informations du QR code depuis Supabase pour les afficher
+                    fetch(`/api/qr/get-url/${qrIdFromUrl}?token=${encodeURIComponent(tokenFromUrl)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.encoded_url) {
+                                // Afficher l'URL actuelle
+                                const currentUrlDisplay = document.getElementById('current-url-display-step8-update');
+                                if (currentUrlDisplay) {
+                                    currentUrlDisplay.textContent = data.encoded_url;
+                                }
+                                
+                                // Afficher l'URL de redirection
+                                const redirectUrlUpdate = document.getElementById('redirect-url-update');
+                                if (redirectUrlUpdate) {
+                                    redirectUrlUpdate.textContent = data.encoded_url;
+                                }
+                            }
+                            
+                            // Afficher le lien de gestion
+                            const managementUrlDisplay = document.getElementById('management-url-display-update');
+                            if (managementUrlDisplay) {
+                                const managementUrl = `https://qrcodes.iahome.fr/manage/${qrIdFromUrl}?token=${tokenFromUrl}`;
+                                managementUrlDisplay.textContent = managementUrl;
+                                
+                                // Configurer le bouton copier
+                                const copyBtn = document.getElementById('copy-management-url-btn-step8-update');
+                                if (copyBtn) {
+                                    copyBtn.onclick = function() {
+                                        navigator.clipboard.writeText(managementUrl).then(() => {
+                                            copyBtn.textContent = '✅ Copié !';
+                                            copyBtn.style.background = '#28a745';
+                                            copyBtn.style.color = 'white';
+                                            setTimeout(() => {
+                                                copyBtn.textContent = '📋 Copier le lien';
+                                                copyBtn.style.background = 'white';
+                                                copyBtn.style.color = '#667eea';
+                                            }, 2000);
+                                        }).catch(err => {
+                                            console.error('Erreur copie:', err);
+                                            alert('Erreur lors de la copie. Veuillez copier manuellement: ' + managementUrl);
+                                        });
+                                    };
+                                }
+                            }
+                            
+                            // Afficher le token de gestion
+                            const tokenDisplay = document.getElementById('management-token-update');
+                            if (tokenDisplay) {
+                                tokenDisplay.textContent = tokenFromUrl;
+                            }
+                        })
+                        .catch(err => console.error('Erreur récupération URL:', err));
+                    
+                    // Aller directement à l'étape 8
+                    currentStep = 8;
+                    showStep(8);
+                    updateProgressIndicators();
+                    updateNavigation();
+                    // Scroll vers le workflow
+                    creationWorkflow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+            
+            // ========== FIN GESTION DE L'ARRIVÉE DEPUIS /manage ==========
+            
+            // ========== GESTION DES BOUTONS D'ACCUEIL ==========
+            const homePage = document.getElementById('home-page');
+            const creationWorkflow = document.getElementById('creation-workflow');
+            const actionStatic = document.getElementById('action-static');
+            const actionDynamic = document.getElementById('action-dynamic');
+            const actionUpdate = document.getElementById('action-update');
+            
+            // Effet hover sur les cartes d'action
+            [actionStatic, actionDynamic, actionUpdate].forEach(card => {
+                if (card) {
+                    card.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-5px)';
+                        this.style.boxShadow = this.style.boxShadow.replace(/rgba\([^\)]+\)/, (match) => {
+                            return match.replace(/0\.3\)/, '0.5)');
+                        });
+                    });
+                    card.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                        this.style.boxShadow = this.style.boxShadow.replace(/rgba\([^\)]+\)/, (match) => {
+                            return match.replace(/0\.5\)/, '0.3)');
+                        });
+                    });
+                }
+            });
+            
+            // Bouton 1: Créer QR Code Statique
+            if (actionStatic) {
+                actionStatic.addEventListener('click', function() {
+                    // Cacher la page d'accueil
+                    if (homePage) homePage.style.display = 'none';
+                    // Afficher le workflow de création
+                    if (creationWorkflow) {
+                        creationWorkflow.style.display = 'block';
+                        // Définir le style comme statique
+                        workflowState.style = 'static';
+                        workflowState.isDynamic = false;
+                        // S'assurer que step-8 est en mode création
+                        const step8CreateMode = document.getElementById('step-8-create-mode');
+                        const step8UpdateMode = document.getElementById('step-8-update-mode');
+                        if (step8CreateMode) step8CreateMode.style.display = 'block';
+                        if (step8UpdateMode) step8UpdateMode.style.display = 'none';
+                        // Aller à l'étape 1
+                        currentStep = 1;
+                        showStep(1);
+                        updateProgressIndicators();
+                        updateNavigation();
+                        // Scroll vers le workflow
+                        creationWorkflow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            }
+            
+            // Bouton 2: Créer QR Code Dynamique
+            if (actionDynamic) {
+                actionDynamic.addEventListener('click', function() {
+                    // Cacher la page d'accueil
+                    if (homePage) homePage.style.display = 'none';
+                    // Afficher le workflow de création
+                    if (creationWorkflow) {
+                        creationWorkflow.style.display = 'block';
+                        // Définir le style comme dynamique
+                        workflowState.style = 'dynamic';
+                        workflowState.isDynamic = true;
+                        // S'assurer que step-8 est en mode création
+                        const step8CreateMode = document.getElementById('step-8-create-mode');
+                        const step8UpdateMode = document.getElementById('step-8-update-mode');
+                        if (step8CreateMode) step8CreateMode.style.display = 'block';
+                        if (step8UpdateMode) step8UpdateMode.style.display = 'none';
+                        // Aller à l'étape 1
+                        currentStep = 1;
+                        showStep(1);
+                        updateProgressIndicators();
+                        updateNavigation();
+                        // Scroll vers le workflow
+                        creationWorkflow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            }
+            
+            // Bouton 3: Modifier QR Code Dynamique
+            if (actionUpdate) {
+                actionUpdate.addEventListener('click', function() {
+                    // Cacher la page d'accueil
+                    if (homePage) homePage.style.display = 'none';
+                    // Afficher le workflow de création
+                    if (creationWorkflow) {
+                        creationWorkflow.style.display = 'block';
+                        // Afficher step-8 en mode modification
+                        const step8CreateMode = document.getElementById('step-8-create-mode');
+                        const step8UpdateMode = document.getElementById('step-8-update-mode');
+                        if (step8CreateMode) step8CreateMode.style.display = 'none';
+                        if (step8UpdateMode) step8UpdateMode.style.display = 'block';
+                        // Aller directement à l'étape 8
+                        currentStep = 8;
+                        showStep(8);
+                        updateProgressIndicators();
+                        updateNavigation();
+                        // Scroll vers le workflow
+                        creationWorkflow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            }
+            
+            // Bouton Retour depuis step-8 (mode modification)
+            const backToHomeFromStep8 = document.getElementById('backToHomeFromStep8');
+            if (backToHomeFromStep8) {
+                backToHomeFromStep8.addEventListener('click', function() {
+                    // Cacher le workflow de création
+                    if (creationWorkflow) creationWorkflow.style.display = 'none';
+                    // Afficher la page d'accueil
+                    if (homePage) {
+                        homePage.style.display = 'block';
+                        homePage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            }
+            
+            // ========== FIN GESTION DES BOUTONS D'ACCUEIL ==========
+            
+            // Le formulaire de mise à jour d'URL a été supprimé - affichage en lecture seule uniquement
             // Cacher toutes les navigations sauf celle du step 1
             document.querySelectorAll('.navigation').forEach(nav => {
                 nav.style.display = 'none'; // Cacher toutes par défaut
@@ -1290,20 +1625,85 @@
                 }
                 
                 generateDynamicQRCode().then(() => {
-                    console.log('QR dynamique genere, verification avant passage a etape 9');
+                    console.log('QR dynamique genere, affichage direct a etape 8');
                     console.log('currentQRCodeData existe:', !!currentQRCodeData);
                     console.log('currentQRCodeData longueur:', currentQRCodeData ? currentQRCodeData.length : 0);
                     
                     // Attendre un peu pour s'assurer que les données sont bien stockées
                     setTimeout(() => {
-                        // S'assurer que le QR code est bien généré avant de passer à l'étape 9
+                        // S'assurer que le QR code est bien généré et afficher directement à l'étape 8
                         if (currentQRCodeData && currentQRCodeData.length > 0) {
-                            console.log('Passage à l\'étape 9...');
-                                currentStep = 9;
-                                showStep(currentStep);
-                                updateProgressIndicators();
-                                updateNavigation();
-                                showFinalSummary();
+                            console.log('Affichage des informations à l\'étape 8...');
+                            
+                            // Afficher le QR code directement à l'étape 8
+                            const placeholder = document.getElementById('qr-preview-placeholder');
+                            const qrImg = document.getElementById('qr-preview-img');
+                            
+                            if (placeholder) {
+                                placeholder.style.display = 'none';
+                            }
+                            if (qrImg) {
+                                qrImg.src = 'data:image/png;base64,' + currentQRCodeData;
+                                qrImg.style.display = 'block';
+                            }
+                            
+                            // Afficher les informations de gestion dans l'étape 8
+                            const managementInfo = document.getElementById('management-info');
+                            if (managementInfo && currentManagementUrl && currentRedirectUrl) {
+                                managementInfo.style.display = 'block';
+                                
+                                // Remplir les nouvelles sections intégrées dans step-8
+                                const managementUrlDisplay = document.getElementById('management-url-display');
+                                const currentUrlDisplay = document.getElementById('current-url-display-step8');
+                                const tokenDiv = document.getElementById('management-token');
+                                const redirectDiv = document.getElementById('redirect-url');
+                                
+                                if (managementUrlDisplay) managementUrlDisplay.textContent = currentManagementUrl;
+                                if (currentUrlDisplay) currentUrlDisplay.textContent = currentRedirectUrl;
+                                if (tokenDiv && currentManagementToken) tokenDiv.textContent = currentManagementToken;
+                                if (redirectDiv) redirectDiv.textContent = currentRedirectUrl;
+                                
+                                // Configurer le bouton "Copier le lien" pour step-8
+                                const copyBtnStep8 = document.getElementById('copy-management-url-btn-step8');
+                                if (copyBtnStep8 && currentManagementUrl) {
+                                    copyBtnStep8.onclick = function() {
+                                        navigator.clipboard.writeText(currentManagementUrl).then(() => {
+                                            copyBtnStep8.textContent = '✅ Copié !';
+                                            copyBtnStep8.style.background = '#28a745';
+                                            copyBtnStep8.style.color = 'white';
+                                            setTimeout(() => {
+                                                copyBtnStep8.textContent = '📋 Copier le lien';
+                                                copyBtnStep8.style.background = 'white';
+                                                copyBtnStep8.style.color = '#667eea';
+                                            }, 2000);
+                                        }).catch(err => {
+                                            console.error('Erreur copie:', err);
+                                            alert('Erreur lors de la copie. Veuillez copier manuellement: ' + currentManagementUrl);
+                                        });
+                                    };
+                                }
+                            }
+                            
+                            // Mettre à jour la navigation pour afficher "Gérer le QR Code"
+                            updateProgressIndicators();
+                            updateNavigation();
+                            
+                            // Réactiver le bouton "Suivant" pour rediriger vers la gestion
+                            setTimeout(() => {
+                                const nextBtn = document.querySelector('#nextBtn');
+                                if (nextBtn && currentManagementUrl) {
+                                    nextBtn.disabled = false;
+                                    nextBtn.textContent = 'Gérer le QR Code →';
+                                    // Configurer l'action du bouton pour rediriger vers la gestion
+                                    nextBtn.onclick = function(e) {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        manageQRCode();
+                                    };
+                                }
+                            }, 100);
+                            
+                            showSuccess('QR code dynamique créé avec succès ! Cliquez sur "Gérer le QR Code →" pour modifier son URL.');
                         } else {
                             console.error('currentQRCodeData est vide ou invalide');
                             showError('Le QR code n\'a pas pu être généré. Veuillez réessayer.');
@@ -1329,14 +1729,23 @@
                     }
             
             // Navigation normale pour les autres étapes
+            // À l'étape 8 avec QR dynamique, le bouton "Suivant" redirige vers la page de gestion
+            // Ne pas permettre de passer à l'étape 9 si on est à l'étape 8 avec QR dynamique
+            if (currentStep === 8 && workflowState.isDynamic && currentQRCodeData && currentQRCodeData.length > 0) {
+                // Le bouton "Suivant" est déjà configuré pour rediriger vers la gestion dans updateNavigation()
+                // Ne pas faire de navigation normale, mais permettre la redirection via manageQRCode()
+                console.log('Étape 8 terminée - QR dynamique généré, le bouton "Suivant" redirige vers la gestion');
+                return;
+            }
+            
             if (currentStep < 9) {
                 currentStep++;
                 showStep(currentStep);
                 updateProgressIndicators();
                 updateNavigation();
                 
-                    // Si on arrive à l'étape 9, afficher le résumé final
-                    if (currentStep === 9) {
+                    // Si on arrive à l'étape 9 (pour QR statiques uniquement), afficher le résumé final
+                    if (currentStep === 9 && !workflowState.isDynamic) {
                         console.log('Etape 9 atteinte, affichage du resume final');
                         showFinalSummary();
                 }
@@ -1407,7 +1816,7 @@
             
             prevBtn.style.display = currentStep > 1 ? 'block' : 'none';
             
-            // Cacher le bouton suivant à l'étape 9 (dernière étape)
+            // Ne plus afficher l'étape 9 - on reste à l'étape 8 pour les QR dynamiques
                 if (currentStep >= 9) {
                     nextBtn.style.display = 'none';
                 return;
@@ -1420,7 +1829,20 @@
                     nextBtn.textContent = 'Générer le QR Code →';
                         nextBtn.className = 'nav-btn next finalize';
                 } else if (currentStep === 8) {
-                    nextBtn.style.display = 'none'; // Pas de bouton, génération automatique
+                    // À l'étape 8, afficher "Suivant" pour rediriger vers la page de gestion
+                    if (currentQRCodeData && currentQRCodeData.length > 0 && currentManagementUrl) {
+                        nextBtn.textContent = 'Gérer le QR Code →';
+                        nextBtn.className = 'nav-btn next finalize';
+                        nextBtn.disabled = false; // Activer le bouton pour rediriger vers la gestion
+                        // Remplacer l'action du bouton pour rediriger vers la page de gestion
+                        nextBtn.onclick = function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            manageQRCode();
+                        };
+                    } else {
+                        nextBtn.style.display = 'none'; // Pas de bouton pendant la génération
+                    }
                     } else {
                     nextBtn.textContent = 'Suivant →';
                         nextBtn.className = 'nav-btn next';
@@ -1611,14 +2033,61 @@
                     currentRedirectUrl = result.redirect_url;
                     
                     console.log('QR code généré et stocké. Longueur:', currentQRCodeData ? currentQRCodeData.length : 0);
-                    console.log('Passage automatique à l\'étape 9...');
+                    console.log('QR code dynamique généré et prêt - affichage à l\'étape 8');
                     
-                    // Ne pas afficher ici, on va passer à l'étape 9 qui l'affichera
-
-                    // Ne pas afficher ici, tout sera fait à l'étape 9
-                    // Les informations de gestion seront affichées dans showFinalSummary()
+                    // Remplir automatiquement les informations de gestion dans l'étape 8
+                    setTimeout(() => {
+                        const managementInfo = document.getElementById('management-info');
+                        if (managementInfo && currentManagementUrl && currentRedirectUrl) {
+                            // Afficher la section de gestion
+                            managementInfo.style.display = 'block';
+                            
+                            // Remplir le lien de gestion
+                            const managementUrlDisplay = document.getElementById('management-url-display');
+                            if (managementUrlDisplay && currentManagementUrl) {
+                                managementUrlDisplay.textContent = currentManagementUrl;
+                            }
+                            
+                            // Remplir l'URL actuelle dans Supabase
+                            const currentUrlDisplay = document.getElementById('current-url-display-step8');
+                            if (currentUrlDisplay && currentRedirectUrl) {
+                                currentUrlDisplay.textContent = currentRedirectUrl;
+                            }
+                            
+                            // Remplir le token de gestion
+                            const tokenDiv = document.getElementById('management-token');
+                            if (tokenDiv && currentManagementToken) {
+                                tokenDiv.textContent = currentManagementToken;
+                            }
+                            
+                            // Remplir l'URL de redirection
+                            const redirectDiv = document.getElementById('redirect-url');
+                            if (redirectDiv && currentRedirectUrl) {
+                                redirectDiv.textContent = currentRedirectUrl;
+                            }
+                            
+                            // Configurer le bouton "Copier le lien"
+                            const copyBtnStep8 = document.getElementById('copy-management-url-btn-step8');
+                            if (copyBtnStep8 && currentManagementUrl) {
+                                copyBtnStep8.onclick = function() {
+                                    navigator.clipboard.writeText(currentManagementUrl).then(() => {
+                                        copyBtnStep8.textContent = '✅ Copié !';
+                                        copyBtnStep8.style.background = '#28a745';
+                                        copyBtnStep8.style.color = 'white';
+                                        setTimeout(() => {
+                                            copyBtnStep8.textContent = '📋 Copier le lien';
+                                            copyBtnStep8.style.background = 'white';
+                                            copyBtnStep8.style.color = '#667eea';
+                                        }, 2000);
+                                    }).catch(err => {
+                                        console.error('Erreur copie:', err);
+                                        alert('Erreur lors de la copie. Veuillez copier manuellement: ' + currentManagementUrl);
+                                    });
+                                };
+                            }
+                        }
+                    }, 500);
                     
-                    console.log('QR code dynamique généré et prêt pour l\'étape 9');
                     return Promise.resolve();
                 } else {
                     showError('Erreur lors de la création du QR code : ' + result.error);
@@ -1852,7 +2321,8 @@ END:VCARD`;
 
         function manageQRCode() {
             if (workflowState.isDynamic && currentManagementUrl) {
-                window.open(currentManagementUrl, '_blank');
+                // Rediriger vers la page de gestion dans la même fenêtre (pas de nouvelle page)
+                window.location.href = currentManagementUrl;
             } else {
                 showError('La gestion n\'est disponible que pour les QR codes dynamiques');
             }

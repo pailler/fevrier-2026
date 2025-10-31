@@ -51,11 +51,14 @@ export async function GET(request: NextRequest) {
         const now = new Date();
         const lastLogin = lastAccess?.created_at ? new Date(lastAccess.created_at) : null;
         const daysSinceLastLogin = lastLogin ? Math.floor((now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60 * 24)) : null;
+        const isAdmin = profile.role === 'admin';
         
         let status: 'active' | 'inactive' | 'suspended' = 'active';
         if (!profile.is_active) {
           status = 'suspended';
-        } else if (daysSinceLastLogin && daysSinceLastLogin > 30) {
+        } else if (!isAdmin && daysSinceLastLogin && daysSinceLastLogin > 60) {
+          // Les admins sont toujours considérés comme actifs s'ils ont is_active: true
+          // Seuls les utilisateurs normaux sont marqués inactifs après 60 jours
           status = 'inactive';
         }
 

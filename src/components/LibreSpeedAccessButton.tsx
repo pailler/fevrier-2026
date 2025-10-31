@@ -100,13 +100,15 @@ export default function LibreSpeedAccessButton({
 
       const tokenData = await tokenResponse.json();
       
-      // Ouvrir LibreSpeed via le proxy sécurisé
-      const accessUrl = tokenData.url;
-      console.log('🔗 LibreSpeed: Accès sécurisé à:', accessUrl);
-      window.open(accessUrl, '_blank');
+      // Utiliser le proxy avec Service Token Cloudflare Access
+      // Le proxy fait la requête depuis le serveur avec le Service Token pour contourner l'auth interactive
+      const proxyUrl = `https://iahome.fr/api/librespeed-access?token=${tokenData.token}`;
+      
+      console.log('🔗 LibreSpeed: Accès via proxy avec Service Token à:', proxyUrl);
+      window.open(proxyUrl, '_blank');
       
       // Appeler le callback pour notifier l'accès accordé
-      onAccessGranted?.(accessUrl);
+      onAccessGranted?.(proxyUrl);
     } catch (err) {
       console.error('❌ LibreSpeed: Erreur inattendue:', err);
       setError('Une erreur inattendue est survenue.');

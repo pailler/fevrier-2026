@@ -84,7 +84,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; connect-src 'self' http://localhost:8003 https://instantmesh.iahome.fr https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; frame-src 'self' https:;"
+            value: "default-src 'self'; connect-src 'self' http://localhost:8003 https://instantmesh.iahome.fr https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io https://*.cloudflareaccess.com https://*.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://iahome.fr/cdn-cgi/ https://*.cloudflareaccess.com https://*.cloudflare.com; style-src 'self' 'unsafe-inline' https://*.cloudflareaccess.com https://*.cloudflare.com; img-src 'self' data: https:; font-src 'self' data: https://*.cloudflareaccess.com https://*.cloudflare.com; frame-src 'self' https: https://*.cloudflareaccess.com;"
           },
           {
             key: 'Cache-Control',

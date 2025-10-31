@@ -198,3 +198,8 @@ Write-Host "   - Vérifier l'état: docker ps" -ForegroundColor Gray
 Write-Host "   - Voir les logs: docker logs <container>" -ForegroundColor Gray
 Write-Host "   - Voir l'info système: docker info" -ForegroundColor Gray
 
+
+
+
+
+

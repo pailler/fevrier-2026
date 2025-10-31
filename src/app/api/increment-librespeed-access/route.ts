@@ -66,12 +66,14 @@ export async function POST(request: NextRequest) {
     // Les tokens sont déjà consommés par le service de tokens principal
     // Cette API ne fait que incrémenter le compteur d'usage
 
-    // Incrémenter le compteur dans user_applications
+    // Incrémenter le compteur dans user_applications et mettre à jour last_used_at
     const newUsageCount = currentUsage + 1;
+    const now = new Date().toISOString();
     const { data: updatedApp, error: updateAppError } = await supabase
       .from('user_applications')
       .update({
-        usage_count: newUsageCount
+        usage_count: newUsageCount,
+        last_used_at: now  // Mettre à jour la date de dernière utilisation
       })
       .eq('id', userApp.id)
       .select()

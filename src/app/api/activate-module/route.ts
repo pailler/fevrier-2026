@@ -117,6 +117,10 @@ export async function POST(request: NextRequest) {
     }
 
     // 6. Activer le module dans user_applications
+    // Définir une expiration de 1 mois (30 jours) pour tous les modules
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 30); // 1 mois
+    
     const { error: activationError } = await supabase
       .from('user_applications')
       .insert([{
@@ -125,7 +129,7 @@ export async function POST(request: NextRequest) {
         module_title: moduleName,
         access_level: 'premium',
         is_active: true,
-        expires_at: null, // Pas d'expiration pour les modules activés
+        expires_at: expiresAt.toISOString(), // Expiration dans 1 mois
         usage_count: 0,
         max_usage: null, // Pas de limite d'usage
         created_at: new Date().toISOString(),

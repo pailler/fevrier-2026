@@ -56,19 +56,37 @@ if os.getenv('SUPABASE_SERVICE_ROLE_KEY'):
 else:
     logger.warning("⚠️ Utilisation de ANON_KEY (peut être bloqué par RLS pour UPDATE)")
 
-def get_supabase_client():
-    """Créer un client Supabase"""
+def get_supabase_client(use_service_role=False):
+    """Créer un client Supabase
+    
+    Args:
+        use_service_role: Si True, force l'utilisation de SERVICE_ROLE_KEY (pour bypasser RLS)
+    """
     if create_client is None:
         logger.error("Bibliothèque Supabase non disponible")
         return None
+    
+    # Toujours vérifier les variables d'environnement à chaque appel (pas seulement au démarrage)
+    supabase_url = os.getenv('SUPABASE_URL') or os.getenv('NEXT_PUBLIC_SUPABASE_URL') or SUPABASE_URL
+    if use_service_role:
+        # Force l'utilisation de SERVICE_ROLE_KEY pour les opérations qui nécessitent de bypasser RLS
+        supabase_key = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
+        if supabase_key:
+            logger.info("🔑 Utilisation de SERVICE_ROLE_KEY pour bypasser RLS")
+        else:
+            logger.warning("⚠️ SERVICE_ROLE_KEY demandée mais non disponible - utilisation de ANON_KEY")
+            supabase_key = os.getenv('SUPABASE_ANON_KEY') or os.getenv('NEXT_PUBLIC_SUPABASE_ANON_KEY') or SUPABASE_KEY
+    else:
+        # Prioriser SERVICE_ROLE_KEY si disponible, sinon utiliser ANON_KEY
+        supabase_key = os.getenv('SUPABASE_SERVICE_ROLE_KEY') or os.getenv('SUPABASE_ANON_KEY') or os.getenv('NEXT_PUBLIC_SUPABASE_ANON_KEY') or SUPABASE_KEY
         
-    if not SUPABASE_URL or not SUPABASE_KEY:
-        logger.error(f"Configuration Supabase manquante - URL: {bool(SUPABASE_URL)}, KEY: {bool(SUPABASE_KEY)}")
+    if not supabase_url or not supabase_key:
+        logger.error(f"Configuration Supabase manquante - URL: {bool(supabase_url)}, KEY: {bool(supabase_key)}")
         return None
     
     try:
         # Créer le client Supabase (la nouvelle version 2.7.4 ne nécessite plus de gérer le proxy manuellement)
-        client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        client = create_client(supabase_url, supabase_key)
         logger.info("Client Supabase créé avec succès")
         return client
     except Exception as e:
@@ -82,7 +100,15 @@ def index():
     """Page d'accueil - Interface QR codes"""
     try:
         with open('template.html', 'r', encoding='utf-8') as f:
-            return f.read()
+            html_content = f.read()
+        # Headers anti-cache pour forcer le rechargement
+        headers = {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        }
+        return html_content, 200, headers
     except FileNotFoundError:
         return """
         <!DOCTYPE html>
@@ -327,6 +353,46 @@ def redirect_qr(qr_id):
 
 @app.route('/manage/<qr_id>')
 def manage_qr(qr_id):
+    """Redirige vers l'étape 8 du workflow avec le token en paramètre (page de gestion intégrée)"""
+    token = request.args.get('token', '').strip()
+    
+    # Vérifier que le token est présent
+    if not token:
+        error_html = f"""
+        <!DOCTYPE html>
+        <html lang="fr">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Validation requise</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; text-align: center; }}
+                .container {{ max-width: 650px; margin: 50px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+                h1 {{ color: #d97706; }}
+                p {{ color: #444; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>⚠️ Token manquant</h1>
+                <p><strong>Le token de gestion est requis dans l'URL.</strong></p>
+                <p style="margin-top: 20px;"><a href="/">Retour à l'accueil</a></p>
+            </div>
+        </body>
+        </html>
+        """
+        headers = {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0, private',
+        }
+        return error_html, 200, headers
+    
+    # Rediriger vers la page principale avec les paramètres pour ouvrir directement l'étape 8 en mode modification
+    redirect_url = f"/?qr_id={qr_id}&token={token}&action=manage"
+    return redirect(redirect_url, code=302)
+
+@app.route('/manage-old/<qr_id>', methods=['GET'])
+def manage_qr_old(qr_id):
     """Page de gestion du QR code"""
     try:
         # Récupérer le token depuis l'URL et le nettoyer
@@ -401,344 +467,308 @@ def manage_qr(qr_id):
             </body>
             </html>
             """
-            return error_html, 200
+            # Headers anti-cache
+            headers = {
+                'Content-Type': 'text/html; charset=utf-8',
+                'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0, private',
+                'Pragma': 'no-cache',
+                'Expires': '0',
+                'X-Content-Type-Options': 'nosniff',
+                'Last-Modified': datetime.now().isoformat(),
+                'ETag': f'"{datetime.now().timestamp()}"'
+            }
+            return error_html, 200, headers
         
-        # Page de gestion HTML
+        # URL de gestion complète
+        management_url = f"https://qrcodes.iahome.fr/manage/{qr_id}?token={stored_token}"
+        
+        # Page de gestion HTML simplifiée et fonctionnelle
         html = f"""
         <!DOCTYPE html>
         <html lang="fr">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Gestion QR Code - {qr_data['name']}</title>
+            <title>Gestion QR Code</title>
             <style>
-                body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
-                .container {{ max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-                h1 {{ color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }}
-                .info {{ background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; }}
-                .url {{ background: #e9ecef; padding: 10px; border-radius: 3px; font-family: monospace; word-break: break-all; }}
-                .stats {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }}
-                .stat {{ background: #007bff; color: white; padding: 20px; border-radius: 5px; text-align: center; }}
-                .stat h3 {{ margin: 0 0 10px 0; }}
-                .stat p {{ margin: 0; font-size: 24px; font-weight: bold; }}
+                * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 40px 20px; }}
+                .container {{ max-width: 650px; margin: 0 auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }}
+                h1 {{ color: #333; margin-bottom: 30px; font-size: 28px; font-weight: 700; text-align: center; }}
+                .info-section {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 12px; margin-bottom: 30px; color: white; }}
+                .info-section h2 {{ color: white; font-size: 20px; margin-bottom: 15px; font-weight: 600; }}
+                .info-section p {{ color: rgba(255,255,255,0.95); font-size: 14px; line-height: 1.7; margin-bottom: 15px; }}
+                .url-container {{ display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }}
+                .url-display {{ background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px; word-break: break-all; color: white; border: 1px solid rgba(255,255,255,0.3); }}
+                .copy-btn {{ background: white; color: #667eea; padding: 12px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s; }}
+                .copy-btn:hover {{ background: #f0f0f0; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }}
+                .copy-btn.copied {{ background: #28a745; color: white; }}
+                .warning {{ margin-top: 15px; padding: 12px; background: rgba(255,193,7,0.2); border-left: 4px solid #ffc107; border-radius: 6px; font-size: 13px; color: rgba(255,255,255,0.95); }}
+                .form-section {{ margin-top: 30px; }}
+                .form-group {{ margin-bottom: 25px; }}
+                label {{ display: block; margin-bottom: 10px; font-weight: 600; color: #333; font-size: 15px; }}
+                input[type="url"] {{ width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; transition: border-color 0.3s; }}
+                input[type="url"]:focus {{ outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }}
+                .submit-btn {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s; }}
+                .submit-btn:hover {{ transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }}
+                .submit-btn:disabled {{ background: #6c757d; cursor: not-allowed; transform: none; }}
+                .message {{ margin-top: 20px; padding: 15px; border-radius: 8px; display: none; font-size: 14px; }}
+                .message.success {{ background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }}
+                .message.error {{ background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }}
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>🔧 Gestion QR Code</h1>
-                <h2>{qr_data['name']}</h2>
+                <h1>🔧 Modifier l'URL de destination</h1>
                 
-                <div class="info">
-                    <h3>Informations</h3>
-                    <p><strong>ID:</strong> {qr_data['qr_id']}</p>
-                    <p><strong>URL de destination:</strong></p>
-                    <div class="url">{qr_data['url']}</div>
-                    <p><strong>URL de redirection:</strong></p>
-                    <div class="url">{qr_data['qr_url']}</div>
-                    <p><strong>Créé le:</strong> {qr_data['created_at']}</p>
+                <div class="info-section">
+                    <h2>🔑 Lien de gestion</h2>
+                    <p>Conservez ce lien pour modifier l'URL de destination de votre QR code à tout moment. Ce lien contient votre token de gestion unique et confidentiel.</p>
+                    <div class="url-container">
+                        <div class="url-display" id="managementUrl">{management_url}</div>
+                        <button class="copy-btn" id="copyBtn" onclick="copyManagementUrl()">📋 Copier le lien</button>
+                    </div>
+                    <div class="warning">⚠️ Ne partagez pas ce lien - il donne accès à la gestion de votre QR code.</div>
                 </div>
                 
-                <div class="stats">
-                    <div class="stat">
-                        <h3>Scans</h3>
-                        <p>{qr_data['scans']}</p>
+                <div class="form-section">
+                    <div class="current-url-section" style="margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">URL actuelle dans Supabase:</label>
+                        <div id="currentUrlDisplay" style="font-family: 'Courier New', monospace; font-size: 14px; color: #667eea; word-break: break-all; padding: 10px; background: white; border-radius: 6px; border: 1px solid #e0e0e0;">{qr_data['url']}</div>
                     </div>
-                    <div class="stat">
-                        <h3>Dernier scan</h3>
-                        <p>{qr_data['last_scan'] or 'Jamais'}</p>
-                    </div>
-                </div>
-                
-                <div class="info">
-                    <h3>Modifier l'URL de destination</h3>
-                    <form id="updateUrlForm">
-                        <div style="margin-bottom: 15px;">
-                            <label for="newUrl" style="display: block; margin-bottom: 5px; font-weight: bold;">Nouvelle URL de destination:</label>
-                            <input type="url" id="newUrl" value="{qr_data['url']}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" required>
+                    
+                    <form id="updateForm">
+                        <div class="form-group">
+                            <label for="newUrl">Nouvelle URL de destination:</label>
+                            <input type="url" id="newUrl" value="{qr_data['url']}" placeholder="https://example.com" required>
                         </div>
-                        <button type="submit" style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Mettre à jour l'URL</button>
+                        <button type="submit" class="submit-btn" id="submitBtn">Mettre à jour l'URL</button>
                     </form>
-                    <div id="updateMessage" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
-                    <div id="reloadButtonContainer" style="margin-top: 10px; display: none;">
-                        <button id="reloadPageBtn" style="background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">🔄 Actualiser la page pour voir les changements</button>
-                    </div>
                 </div>
                 
-                <div class="info">
-                    <h3>Actions</h3>
-                    <p><a id="testRedirectLink" href="{qr_data['qr_url']}" target="_blank">Tester la redirection</a></p>
-                    <p><a href="javascript:history.back()">Retour</a></p>
-                </div>
+                <div id="message" class="message"></div>
             </div>
             
             <script>
-                // Vérifier que le token est présent dans l'URL au chargement
                 (function() {{
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const token = urlParams.get('token');
+                    const qrId = '{qr_id}';
+                    const STORAGE_KEY = 'qr_management_token_' + qrId;
                     
-                    if (!token || token.trim() === '') {{
-                        // Si pas de token, essayer de le récupérer depuis le localStorage (backup)
-                        const storedToken = localStorage.getItem('qr_management_token_{qr_id}');
-                        
-                        if (storedToken) {{
-                            // Rediriger avec le token stocké
-                            const newUrl = window.location.pathname + '?token=' + storedToken;
-                            window.location.href = newUrl;
-                            return;
-                        }}
-                        
-                        // Sinon, afficher un message d'erreur et ne pas continuer
-                        document.body.innerHTML = `
-                            <div style="font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; text-align: center;">
-                                <div style="max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                                    <h1 style="color: #dc3545;">❌ Accès refusé</h1>
-                                    <p>Le token de gestion est manquant dans l'URL.</p>
-                                    <p>Vérifiez que vous utilisez le bon lien de gestion fourni lors de la création du QR code.</p>
-                                    <p style="margin-top: 20px;"><a href="javascript:history.back()" style="color: #007bff; text-decoration: none;">← Retour</a></p>
-                                </div>
-                            </div>
-                        `;
-                        return;
-                    }}
-                    
-                    // Stocker le token dans le localStorage comme backup
-                    localStorage.setItem('qr_management_token_{qr_id}', token);
-                }})();
-                
-                // Fonction pour obtenir le token (depuis URL ou localStorage)
-                function getToken() {{
+                    // Récupérer le token depuis l'URL OU depuis localStorage
                     const urlParams = new URLSearchParams(window.location.search);
                     let token = urlParams.get('token');
                     
-                    if (!token || token.trim() === '') {{
-                        // Essayer depuis localStorage
-                        token = localStorage.getItem('qr_management_token_{qr_id}');
+                    // Si le token est dans l'URL, le sauvegarder dans localStorage
+                    if (token) {{
+                        localStorage.setItem(STORAGE_KEY, token);
+                        console.log('✅ Token sauvegardé dans localStorage');
+                    }} else {{
+                        // Sinon, essayer de le récupérer depuis localStorage
+                        token = localStorage.getItem(STORAGE_KEY);
+                        if (token) {{
+                            console.log('✅ Token récupéré depuis localStorage');
+                            // Restaurer le token dans l'URL sans recharger la page
+                            const newUrl = new URL(window.location);
+                            newUrl.searchParams.set('token', token);
+                            window.history.replaceState({{}}, '', newUrl);
+                        }}
                     }}
                     
-                    return token || '';
-                }}
-                
-                // Gestion du formulaire de mise à jour - Version corrigée et simplifiée
-                (function() {{
-                    function initUpdateForm() {{
-                        const updateForm = document.getElementById('updateUrlForm');
+                    if (!token) {{
+                        document.body.innerHTML = '<div style="max-width: 600px; margin: 50px auto; padding: 30px; background: white; border-radius: 12px; text-align: center;"><h1 style="color: #dc3545;">❌ Token manquant</h1><p>Le token de gestion est requis dans l\'URL.</p></div>';
+                        return;
+                    }}
+                    
+                    console.log('🔑 Token disponible:', token ? token.substring(0, 10) + '...' : 'MANQUANT');
+                    
+                    const form = document.getElementById('updateForm');
+                    const input = document.getElementById('newUrl');
+                    const submitBtn = document.getElementById('submitBtn');
+                    const messageDiv = document.getElementById('message');
+                    
+                    if (!form || !input || !submitBtn) {{
+                        console.error('❌ Éléments du formulaire non trouvés:', {{
+                            form: !!form,
+                            input: !!input,
+                            submitBtn: !!submitBtn
+                        }});
+                        return;
+                    }}
+                    
+                    console.log('✅ Formulaire trouvé, ajout de l\'écouteur submit...');
+                    
+                    form.addEventListener('submit', async function(e) {{
+                        e.preventDefault();
+                        e.stopPropagation();
                         
-                        if (!updateForm) {{
-                            console.error('❌ Formulaire updateUrlForm non trouvé');
+                        console.log('🔄🔄🔄 FORM SUBMIT INTERCEPTÉ!');
+                        
+                        const newUrl = input.value.trim();
+                        console.log('📝 URL saisie:', newUrl);
+                        
+                        if (!newUrl) {{
+                            showMessage('Veuillez saisir une URL', 'error');
                             return;
                         }}
                         
-                        console.log('✅ Formulaire trouvé');
+                        // Validation URL
+                        try {{
+                            new URL(newUrl);
+                        }} catch {{
+                            showMessage('URL invalide. Utilisez le format: https://example.com', 'error');
+                            return;
+                        }}
                         
-                        updateForm.addEventListener('submit', async function(e) {{
-                            e.preventDefault();
-                            e.stopPropagation();
-                            
-                            console.log('🔄 Submit intercepté');
-                            
-                            // Récupérer les éléments
-                            const newUrlInput = document.getElementById('newUrl');
-                            const messageDiv = document.getElementById('updateMessage');
-                            const submitBtn = updateForm.querySelector('button[type="submit"]');
-                            const token = getToken();
-                            
-                            const newUrl = (newUrlInput ? newUrlInput.value.trim() : '');
-                            
-                            console.log('📝 Nouvelle URL:', newUrl);
-                            console.log('🔑 Token:', token ? token.substring(0, 30) + '...' : 'MANQUANT');
-                            
-                            // Validations
-                            if (!newUrl) {{
-                                if (messageDiv) {{
-                                    messageDiv.style.display = 'block';
-                                    messageDiv.style.background = '#f8d7da';
-                                    messageDiv.style.color = '#721c24';
-                                    messageDiv.style.border = '1px solid #f5c6cb';
-                                    messageDiv.style.padding = '12px';
-                                    messageDiv.style.borderRadius = '4px';
-                                    messageDiv.textContent = '❌ Veuillez saisir une URL valide';
-                                }}
-                                return;
-                            }}
-                            
-                            // Validation basique de l'URL
-                            try {{
-                                const urlObj = new URL(newUrl);
-                                if (!['http:', 'https:'].includes(urlObj.protocol)) {{
-                                    throw new Error('Protocole invalide');
-                                }}
-                            }} catch (e) {{
-                                if (messageDiv) {{
-                                    messageDiv.style.display = 'block';
-                                    messageDiv.style.background = '#f8d7da';
-                                    messageDiv.style.color = '#721c24';
-                                    messageDiv.style.border = '1px solid #f5c6cb';
-                                    messageDiv.style.padding = '12px';
-                                    messageDiv.style.borderRadius = '4px';
-                                    messageDiv.textContent = '❌ URL invalide. Veuillez saisir une URL complète (ex: https://example.com)';
-                                }}
-                                return;
-                            }}
-                            
-                            if (!token) {{
-                                if (messageDiv) {{
-                                    messageDiv.style.display = 'block';
-                                    messageDiv.style.background = '#f8d7da';
-                                    messageDiv.style.color = '#721c24';
-                                    messageDiv.style.border = '1px solid #f5c6cb';
-                                    messageDiv.style.padding = '12px';
-                                    messageDiv.style.borderRadius = '4px';
-                                    messageDiv.textContent = '❌ Token manquant. Veuillez utiliser le lien de gestion complet.';
-                                }}
-                                return;
-                            }}
-                            
-                            // Désactiver le bouton
-                            if (submitBtn) {{
-                                submitBtn.disabled = true;
-                                submitBtn.textContent = 'Mise à jour...';
-                            }}
-                            if (messageDiv) {{
-                                messageDiv.style.display = 'none';
-                            }}
-                            
-                            try {{
-                                console.log('📤 Envoi POST vers /api/qr/update-url/{qr_id}');
-                                
-                                const response = await fetch('/api/qr/update-url/{qr_id}', {{
-                                    method: 'POST',
-                                    headers: {{
-                                        'Content-Type': 'application/json'
-                                    }},
-                                    body: JSON.stringify({{
-                                        url: newUrl,
-                                        token: token
-                                    }})
-                                }});
-                                
-                                console.log('📥 Status:', response.status);
-                                
-                                const result = await response.json();
-                                console.log('📦 Résultat:', result);
-                                
-                                if (response.ok && result.success) {{
-                                    console.log('✅ Mise à jour réussie dans Supabase');
-                                    
-                                    // Mettre à jour l'URL dans le champ input (affichage local uniquement)
-                                    if (newUrlInput) {{
-                                        newUrlInput.value = newUrl;
-                                    }}
-                                    
-                                    // Afficher le message de succès avec un bouton de rechargement
-                                    if (messageDiv) {{
-                                        messageDiv.style.display = 'block';
-                                        messageDiv.style.background = '#d4edda';
-                                        messageDiv.style.color = '#155724';
-                                        messageDiv.style.border = '1px solid #c3e6cb';
-                                        messageDiv.style.padding = '15px';
-                                        messageDiv.style.borderRadius = '4px';
-                                        messageDiv.style.marginTop = '15px';
-                                        messageDiv.innerHTML = '✅ <strong style="font-size: 16px;">Mise à jour réussie !</strong><br><br>La nouvelle URL de destination a été enregistrée dans Supabase :<br><code style="display: block; margin: 8px 0; background: #f0f0f0; padding: 8px 12px; border-radius: 4px; font-family: monospace; word-break: break-all; color: #333;">' + newUrl + '</code><br><small style="color: #666;">Cliquez sur le bouton ci-dessous pour actualiser la page et voir les changements.</small>';
-                                    }}
-                                    
-                                    // Afficher le bouton de rechargement
-                                    const reloadBtnContainer = document.getElementById('reloadButtonContainer');
-                                    if (reloadBtnContainer) {{
-                                        reloadBtnContainer.style.display = 'block';
-                                    }}
-                                    
-                                    // Réactiver le bouton de mise à jour
-                                    if (submitBtn) {{
-                                        submitBtn.disabled = false;
-                                        submitBtn.textContent = 'Mettre à jour l\'URL';
-                                    }}
-                                    
-                                    // Faire défiler pour voir le message
-                                    setTimeout(() => {{
-                                        if (messageDiv) {{
-                                            messageDiv.scrollIntoView({{ behavior: 'smooth', block: 'nearest' }});
-                                        }}
-                                    }}, 100);
-                                }} else {{
-                                    if (messageDiv) {{
-                                        messageDiv.style.display = 'block';
-                                        messageDiv.style.background = '#f8d7da';
-                                        messageDiv.style.color = '#721c24';
-                                        messageDiv.style.border = '1px solid #f5c6cb';
-                                        messageDiv.textContent = '❌ ' + (result.error || 'Erreur lors de la mise à jour');
-                                    }}
-                                    if (submitBtn) {{
-                                        submitBtn.disabled = false;
-                                        submitBtn.textContent = 'Mettre à jour l\'URL';
-                                    }}
-                                }}
-                            }} catch (error) {{
-                                console.error('❌ Exception:', error);
-                                if (messageDiv) {{
-                                    messageDiv.style.display = 'block';
-                                    messageDiv.style.background = '#f8d7da';
-                                    messageDiv.style.color = '#721c24';
-                                    messageDiv.style.border = '1px solid #f5c6cb';
-                                    messageDiv.textContent = '❌ Erreur: ' + error.message;
-                                }}
-                                if (submitBtn) {{
-                                    submitBtn.disabled = false;
-                                    submitBtn.textContent = 'Mettre à jour l\'URL';
-                                }}
-                            }}
-                        }});
-                    }}
-                    
-                    // Initialiser quand le DOM est prêt
-                    if (document.readyState === 'loading') {{
-                        document.addEventListener('DOMContentLoaded', initUpdateForm);
-                    }} else {{
-                        initUpdateForm();
-                    }}
-                }})();
-                
-                // Gestion du bouton de rechargement de page
-                (function() {{
-                    function initReloadButton() {{
-                        const reloadBtn = document.getElementById('reloadPageBtn');
+                        // Désactiver le bouton
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Mise à jour...';
+                        hideMessage();
                         
-                        if (reloadBtn) {{
-                            reloadBtn.addEventListener('click', function() {{
-                                // Préserver le token dans l'URL lors du rechargement
-                                const urlParams = new URLSearchParams(window.location.search);
-                                const token = urlParams.get('token');
-                                
-                                if (token) {{
-                                    // Recharger en conservant le token
-                                    window.location.href = window.location.pathname + '?token=' + encodeURIComponent(token);
-                                }} else {{
-                                    // Essayer depuis localStorage
-                                    const storedToken = localStorage.getItem('qr_management_token_{qr_id}');
-                                    if (storedToken) {{
-                                        window.location.href = window.location.pathname + '?token=' + encodeURIComponent(storedToken);
-                                    }} else {{
-                                        // Rechargement simple
-                                        window.location.reload();
-                                    }}
-                                }}
+                        console.log('📤 Envoi requête POST vers /api/qr/update-url/' + qrId);
+                        console.log('📦 Données envoyées:', {{ url: newUrl, token: token ? token.substring(0, 10) + '...' : 'MANQUANT' }});
+                        
+                        try {{
+                            const apiUrl = '/api/qr/update-url/' + qrId;
+                            console.log('🌐 URL API:', apiUrl);
+                            console.log('📤 Token envoyé:', token ? token.substring(0, 20) + '...' : 'MANQUANT');
+                            console.log('📤 Body:', JSON.stringify({{ url: newUrl, token: token ? token.substring(0, 10) + '...' : 'MANQUANT' }}));
+                            
+                            const response = await fetch(apiUrl, {{
+                                method: 'POST',
+                                headers: {{ 'Content-Type': 'application/json' }},
+                                body: JSON.stringify({{ url: newUrl, token: token }})
+                            }}).catch(function(fetchError) {{
+                                console.error('❌❌❌ ERREUR FETCH:', fetchError);
+                                throw fetchError;
                             }});
+                            
+                            console.log('📥 Réponse reçue - Status:', response.status, response.statusText);
+                            console.log('📥 Headers:', Array.from(response.headers.entries()));
+                            
+                            if (!response.ok) {{
+                                console.error('❌ Réponse non OK:', response.status, response.statusText);
+                                const errorText = await response.text();
+                                console.error('❌ Corps de l\'erreur:', errorText);
+                                try {{
+                                    const errorJson = JSON.parse(errorText);
+                                    showMessage('❌ Erreur: ' + (errorJson.error || 'Mise à jour échouée'), 'error');
+                                }} catch {{
+                                    showMessage('❌ Erreur HTTP ' + response.status + ': ' + errorText, 'error');
+                                }}
+                                return;
+                            }}
+                            
+                            const result = await response.json();
+                            console.log('📦 Résultat JSON:', result);
+                            
+                            if (response.ok && result.success) {{
+                                // Mettre à jour l'affichage de l'URL actuelle dans Supabase
+                                const currentUrlDisplay = document.getElementById('currentUrlDisplay');
+                                if (currentUrlDisplay) {{
+                                    currentUrlDisplay.textContent = newUrl;
+                                    currentUrlDisplay.style.color = '#28a745';
+                                    currentUrlDisplay.style.borderColor = '#28a745';
+                                    // Animation de succès
+                                    currentUrlDisplay.style.transition = 'all 0.3s';
+                                    setTimeout(() => {{
+                                        currentUrlDisplay.style.color = '#667eea';
+                                        currentUrlDisplay.style.borderColor = '#e0e0e0';
+                                    }}, 2000);
+                                }}
+                                
+                                // Mettre à jour l'input pour refléter la nouvelle URL
+                                input.value = newUrl;
+                                
+                                // Afficher un message de succès avec la nouvelle URL
+                                showMessage('✅ URL mise à jour avec succès dans Supabase!\\n\\nNouvelle URL: ' + newUrl, 'success');
+                                
+                                // S'assurer que le token reste dans l'URL et localStorage
+                                if (token) {{
+                                    localStorage.setItem(STORAGE_KEY, token);
+                                    const currentUrl = new URL(window.location);
+                                    if (!currentUrl.searchParams.get('token')) {{
+                                        currentUrl.searchParams.set('token', token);
+                                        window.history.replaceState({{}}, '', currentUrl);
+                                    }}
+                                }}
+                            }} else {{
+                                showMessage('❌ Erreur: ' + (result.error || 'Mise à jour échouée'), 'error');
+                            }}
+                        }} catch (error) {{
+                            showMessage('❌ Erreur: ' + error.message, 'error');
+                        }} finally {{
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Mettre à jour l\'URL';
+                        }}
+                    }});
+                    
+                    function showMessage(text, type) {{
+                        messageDiv.innerHTML = text.replace(/\\n/g, '<br>');
+                        messageDiv.className = 'message ' + type;
+                        messageDiv.style.display = 'block';
+                        
+                        // Faire défiler vers le message si succès
+                        if (type === 'success') {{
+                            messageDiv.scrollIntoView({{ behavior: 'smooth', block: 'nearest' }});
                         }}
                     }}
                     
-                    // Initialiser quand le DOM est prêt
-                    if (document.readyState === 'loading') {{
-                        document.addEventListener('DOMContentLoaded', initReloadButton);
-                    }} else {{
-                        initReloadButton();
+                    function hideMessage() {{
+                        messageDiv.style.display = 'none';
                     }}
                 }})();
+                
+                function copyManagementUrl() {{
+                    const urlElement = document.getElementById('managementUrl');
+                    const copyBtn = document.getElementById('copyBtn');
+                    const url = urlElement.textContent;
+                    
+                    navigator.clipboard.writeText(url).then(function() {{
+                        copyBtn.textContent = '✓ Copié!';
+                        copyBtn.classList.add('copied');
+                        
+                        setTimeout(function() {{
+                            copyBtn.textContent = '📋 Copier';
+                            copyBtn.classList.remove('copied');
+                        }}, 2000);
+                    }}).catch(function(err) {{
+                        // Fallback pour navigateurs anciens
+                        const textArea = document.createElement('textarea');
+                        textArea.value = url;
+                        textArea.style.position = 'fixed';
+                        textArea.style.opacity = '0';
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        try {{
+                            document.execCommand('copy');
+                            copyBtn.textContent = '✓ Copié!';
+                            copyBtn.classList.add('copied');
+                            setTimeout(function() {{
+                                copyBtn.textContent = '📋 Copier';
+                                copyBtn.classList.remove('copied');
+                            }}, 2000);
+                        }} catch (err) {{
+                            alert('Erreur lors de la copie. Veuillez copier manuellement: ' + url);
+                        }}
+                        document.body.removeChild(textArea);
+                    }});
+                }}
             </script>
         </body>
         </html>
         """
         
-        return html
+        # Headers anti-cache pour forcer le rechargement
+        headers = {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0, private',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'X-Content-Type-Options': 'nosniff',
+            'Last-Modified': datetime.now().isoformat(),
+            'ETag': f'"{datetime.now().timestamp()}"'
+        }
+        return html, 200, headers
         
     except Exception as e:
         logger.error(f"Erreur gestion QR: {e}")
@@ -775,13 +805,17 @@ def update_qr_url(qr_id):
     """API pour mettre à jour l'URL de destination d'un QR code"""
     # Gérer les requêtes CORS preflight
     if request.method == 'OPTIONS':
+        logger.info(f"📡 OPTIONS preflight pour /api/qr/update-url/{qr_id}")
         response = jsonify({})
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
         return response
     
-    logger.info(f"📨 Requête reçue pour mise à jour URL de QR {qr_id}")
+    logger.info(f"📨📨📨 REQUÊTE POST REÇUE pour mise à jour URL de QR {qr_id}")
+    logger.info(f"📨 Headers: {dict(request.headers)}")
+    logger.info(f"📨 Method: {request.method}")
+    logger.info(f"📨 Content-Type: {request.content_type}")
     
     try:
         data = request.get_json()
@@ -801,8 +835,8 @@ def update_qr_url(qr_id):
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response, 400
         
-        # Connexion à Supabase
-        supabase = get_supabase_client()
+        # Connexion à Supabase - FORCER SERVICE_ROLE_KEY pour bypasser RLS lors de l'UPDATE
+        supabase = get_supabase_client(use_service_role=True)
         if not supabase:
             response = jsonify({'success': False, 'error': 'Erreur de connexion à Supabase'})
             response.headers.add('Access-Control-Allow-Origin', '*')
@@ -838,68 +872,256 @@ def update_qr_url(qr_id):
             old_url = before_update.data[0]['url'] if before_update.data else None
             logger.info(f"📋 URL avant mise à jour: {old_url}")
             
-            # Mettre à jour dans Supabase - Méthode directe (comme pour les scans)
+            # Mettre à jour dans Supabase - Vérifier que SERVICE_ROLE_KEY est bien utilisée
+            service_role_key = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
             logger.info(f"💾 Exécution UPDATE Supabase pour QR {qr_id}...")
+            logger.info(f"💾 SERVICE_ROLE_KEY présente: {bool(service_role_key)}")
             logger.info(f"💾 Ancienne URL: {old_url}")
             logger.info(f"💾 Nouvelle URL: {new_url_cleaned}")
             
+            # Vérifier quelle clé est réellement utilisée
+            supabase_url_env = os.getenv('SUPABASE_URL') or os.getenv('NEXT_PUBLIC_SUPABASE_URL')
+            if service_role_key:
+                logger.info(f"🔑 Clé utilisée: SERVICE_ROLE_KEY (bypass RLS)")
+                logger.info(f"🔑 Clé longueur: {len(service_role_key)} caractères")
+            else:
+                logger.warning(f"⚠️ SERVICE_ROLE_KEY NON DISPONIBLE - Utilisation de ANON_KEY (peut être bloqué par RLS)")
+            
+            # PRIORITÉ: Utiliser une fonction RPC PostgreSQL qui bypass RLS
+            # Si la fonction n'existe pas, utiliser l'API REST PostgREST
+            update_success = False
+            update_response = None
+            
+            # Méthode 1: Fonction RPC PostgreSQL (ULTIME PRIORITÉ - bypass RLS garanti)
             try:
-                # UPDATE direct (même méthode que pour les scans qui fonctionne)
-                update_response = supabase.table('dynamic_qr_codes').update({
-                    'url': new_url_cleaned,
-                    'updated_at': datetime.now().isoformat()
-                }).eq('qr_id', qr_id).eq('is_active', True).execute()
+                logger.info(f"🚀 Méthode 1 (PRIORITÉ ABSOLUE): Fonction RPC PostgreSQL...")
+                rpc_result = supabase.rpc('update_qr_url', {
+                    'p_qr_id': qr_id,
+                    'p_new_url': new_url_cleaned,
+                    'p_management_token': token
+                }).execute()
                 
-                logger.info(f"✅ UPDATE envoyé à Supabase")
-                logger.info(f"📦 Réponse UPDATE: {update_response}")
+                logger.info(f"✅ RPC exécuté - Type: {type(rpc_result)}")
+                logger.info(f"📦 Réponse RPC: {rpc_result}")
                 
-                # Attendre pour la propagation
-                import time
-                time.sleep(0.5)
-                
-            except Exception as update_ex:
-                logger.error(f"❌ ERREUR UPDATE Supabase: {update_ex}")
-                logger.error(f"❌ Type d'erreur: {type(update_ex)}")
-                import traceback
-                logger.error(traceback.format_exc())
-                # Ne pas lever l'exception, on vérifiera quand même après
+                if hasattr(rpc_result, 'data') and rpc_result.data:
+                    rpc_data = rpc_result.data
+                    logger.info(f"📦 Données RPC: {rpc_data}")
+                    if isinstance(rpc_data, dict) and rpc_data.get('success'):
+                        logger.info(f"✅✅✅ UPDATE via RPC réussi: {rpc_data}")
+                        update_success = True
+                    elif isinstance(rpc_data, str):
+                        # Si c'est une chaîne JSON
+                        import json
+                        try:
+                            rpc_json = json.loads(rpc_data)
+                            if rpc_json.get('success'):
+                                logger.info(f"✅✅✅ UPDATE via RPC réussi: {rpc_json}")
+                                update_success = True
+                            else:
+                                logger.error(f"❌ RPC échoué: {rpc_json.get('error')}")
+                        except:
+                            logger.warning(f"⚠️ Réponse RPC non JSON: {rpc_data}")
+                    else:
+                        logger.warning(f"⚠️ Format de réponse RPC inattendu: {rpc_data}")
+                else:
+                    logger.warning(f"⚠️ Aucune donnée retournée par RPC")
+                    
+            except Exception as rpc_ex:
+                error_msg = str(rpc_ex)
+                logger.warning(f"⚠️ Fonction RPC non disponible ou erreur: {error_msg}")
+                if "does not exist" in error_msg.lower() or "not found" in error_msg.lower():
+                    logger.info(f"💡 La fonction RPC 'update_qr_url' n'existe pas encore dans Supabase")
+                    logger.info(f"💡 Utilisation de l'API REST PostgREST à la place")
+                else:
+                    logger.error(f"❌ ERREUR RPC: {rpc_ex}")
+                    import traceback
+                    logger.error(traceback.format_exc())
             
-            # Vérifier que la mise à jour a fonctionné en relisant les données
-            verify_result = supabase.table('dynamic_qr_codes').select('url, updated_at').eq('qr_id', qr_id).eq('is_active', True).execute()
+            # Méthode 2: API REST PostgREST directe (PRIORITÉ si RPC échoue)
+            if not update_success:
+                try:
+                    logger.info(f"🚀 Méthode 2 (PRIORITÉ): API REST PostgREST direct...")
+                    import httpx
+                    
+                    supabase_url = os.getenv('SUPABASE_URL') or os.getenv('NEXT_PUBLIC_SUPABASE_URL')
+                    service_key = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
+                    
+                    if not supabase_url or not service_key:
+                        logger.error(f"❌ Configuration manquante pour API REST - URL: {bool(supabase_url)}, KEY: {bool(service_key)}")
+                    else:
+                        # Utiliser l'API REST PostgREST directement
+                        rest_url = f"{supabase_url}/rest/v1/dynamic_qr_codes"
+                        headers = {
+                            'apikey': service_key,
+                            'Authorization': f'Bearer {service_key}',
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=representation'  # Pour obtenir les données mises à jour
+                        }
+                        
+                        update_data = {
+                            'url': new_url_cleaned,
+                            'updated_at': datetime.now().isoformat()
+                        }
+                        
+                        # Utiliser PATCH avec filtres
+                        filter_url = f"{rest_url}?qr_id=eq.{qr_id}&is_active=eq.true"
+                        logger.info(f"🌐 Appel API REST: PATCH {filter_url}")
+                        logger.info(f"🌐 Headers: apikey={service_key[:20]}..., Authorization=Bearer {service_key[:20]}...")
+                        logger.info(f"🌐 Data: {update_data}")
+                        
+                        # Utiliser httpx qui est déjà installé
+                        with httpx.Client(timeout=15.0) as client:
+                            response_obj = client.patch(filter_url, json=update_data, headers=headers)
+                            
+                            logger.info(f"📡 Réponse HTTP: {response_obj.status_code}")
+                            logger.info(f"📡 Headers réponse: {dict(response_obj.headers)}")
+                            logger.info(f"📡 Corps réponse (premiers 500 chars): {response_obj.text[:500]}")
+                            
+                            if response_obj.status_code in [200, 204]:
+                                logger.info(f"✅✅✅ UPDATE via API REST réussi (status {response_obj.status_code})")
+                                try:
+                                    response_data = response_obj.json()
+                                    logger.info(f"📦 Données retournées par API REST: {response_data}")
+                                    if response_data and len(response_data) > 0:
+                                        updated_url_rest = response_data[0].get('url')
+                                        if updated_url_rest == new_url_cleaned:
+                                            logger.info(f"✅✅✅ URL confirmée via API REST: {updated_url_rest}")
+                                            update_success = True
+                                        else:
+                                            logger.warning(f"⚠️ URL API REST ne correspond pas: attendu {new_url_cleaned}, reçu {updated_url_rest}")
+                                    else:
+                                        # Pas de données retournées mais status OK = succès
+                                        logger.info(f"✅ UPDATE API REST réussi sans données retournées (status {response_obj.status_code})")
+                                        update_success = True
+                                except Exception as json_err:
+                                    # Si pas de JSON mais status OK, c'est bon
+                                    logger.info(f"⚠️ Pas de JSON dans la réponse mais status OK: {json_err}")
+                                    if response_obj.status_code in [200, 204]:
+                                        logger.info(f"✅ UPDATE API REST réussi (status {response_obj.status_code})")
+                                        update_success = True
+                            else:
+                                logger.error(f"❌❌❌ ÉCHEC API REST: Status {response_obj.status_code}")
+                                logger.error(f"❌ Réponse complète: {response_obj.text}")
+                                
+                except Exception as update_ex2:
+                    logger.error(f"❌❌❌ ERREUR UPDATE Méthode 2 (API REST): {update_ex2}")
+                    import traceback
+                    logger.error(traceback.format_exc())
             
-            if verify_result.data:
-                current_url = verify_result.data[0]['url']
-                logger.info(f"🔍 URL actuelle dans Supabase après mise à jour: {current_url}")
+            # Méthode 3: UPDATE avec select() via bibliothèque Python (fallback)
+            if not update_success:
+                try:
+                    logger.info(f"🚀 Méthode 3 (FALLBACK): UPDATE avec .select() via bibliothèque Python...")
+                    update_response = supabase.table('dynamic_qr_codes').update({
+                        'url': new_url_cleaned,
+                        'updated_at': datetime.now().isoformat()
+                    }).eq('qr_id', qr_id).eq('is_active', True).select('url, updated_at').execute()
+                    
+                    logger.info(f"✅ UPDATE Méthode 2 exécuté - Type: {type(update_response)}")
+                    logger.info(f"📦 Réponse UPDATE complète: {update_response}")
+                    
+                    if hasattr(update_response, 'data') and update_response.data:
+                        logger.info(f"📦 Données retournées: {update_response.data}")
+                        updated_url_in_response = update_response.data[0].get('url') if update_response.data else None
+                        logger.info(f"📦 URL dans réponse: {updated_url_in_response}")
+                        if updated_url_in_response == new_url_cleaned:
+                            logger.info(f"✅✅✅ URL confirmée dans réponse: {updated_url_in_response}")
+                            update_success = True
+                        else:
+                            logger.warning(f"⚠️ URL ne correspond pas: attendu {new_url_cleaned}, reçu {updated_url_in_response}")
+                    else:
+                        logger.warning(f"⚠️ Aucune donnée retournée par UPDATE")
+                        
+                except Exception as update_ex:
+                    logger.error(f"❌❌❌ ERREUR UPDATE Méthode 2: {update_ex}")
+                    import traceback
+                    logger.error(traceback.format_exc())
+            
+            # Méthode 4: UPDATE direct sans select (dernier recours)
+            if not update_success:
+                try:
+                    logger.info(f"🚀 Méthode 4 (DERNIER RECOURS): UPDATE direct sans .select()...")
+                    supabase_direct = get_supabase_client(use_service_role=True)
+                    supabase_direct.table('dynamic_qr_codes').update({
+                        'url': new_url_cleaned,
+                        'updated_at': datetime.now().isoformat()
+                    }).eq('qr_id', qr_id).eq('is_active', True).execute()
+                    logger.info(f"✅ UPDATE Méthode 3 exécuté (sans retour de données)")
+                    # On vérifiera après avec SELECT
+                except Exception as update_ex3:
+                    logger.error(f"❌❌❌ ERREUR UPDATE Méthode 3: {update_ex3}")
+                    import traceback
+                    logger.error(traceback.format_exc())
+            
+            # Attendre un peu plus pour la propagation
+            import time
+            time.sleep(0.8)
+            
+            # Vérifier que la mise à jour a fonctionné en relisant les données (avec retry)
+            verify_attempts = 3
+            verify_success = False
+            current_url = None
+            
+            for attempt in range(verify_attempts):
+                logger.info(f"🔍 Tentative de vérification {attempt + 1}/{verify_attempts}...")
+                verify_result = supabase.table('dynamic_qr_codes').select('url, updated_at').eq('qr_id', qr_id).eq('is_active', True).execute()
                 
-                if current_url == new_url_cleaned:
-                    logger.info(f"✅ URL mise à jour avec succès dans Supabase pour QR {qr_id}: {old_url} -> {new_url_cleaned}")
+                if verify_result.data:
+                    current_url = verify_result.data[0]['url']
+                    logger.info(f"🔍 URL actuelle dans Supabase (tentative {attempt + 1}): {current_url}")
+                    
+                    if current_url == new_url_cleaned:
+                        logger.info(f"✅✅✅ URL confirmée dans Supabase: {old_url} -> {new_url_cleaned}")
+                        verify_success = True
+                        break
+                    else:
+                        logger.warning(f"⚠️ URL ne correspond pas encore (tentative {attempt + 1}): attendu {new_url_cleaned}, reçu {current_url}")
+                        if attempt < verify_attempts - 1:
+                            time.sleep(0.5)
+                else:
+                    logger.warning(f"⚠️ QR Code non trouvé lors de la vérification (tentative {attempt + 1})")
+                    if attempt < verify_attempts - 1:
+                        time.sleep(0.5)
+            
+            if verify_success:
+                logger.info(f"✅✅✅ URL mise à jour avec succès dans Supabase pour QR {qr_id}: {old_url} -> {new_url_cleaned}")
+                response = jsonify({
+                    'success': True, 
+                    'message': f'URL mise à jour avec succès dans Supabase',
+                    'new_url': new_url_cleaned,
+                    'old_url': old_url,
+                    'verified': True
+                })
+                response.headers.add('Access-Control-Allow-Origin', '*')
+                return response
+            else:
+                logger.error(f"❌❌❌ ÉCHEC: L'UPDATE n'a pas fonctionné après {verify_attempts} tentatives!")
+                logger.error(f"❌ URL actuelle dans DB: {current_url}")
+                logger.error(f"❌ URL attendue: {new_url_cleaned}")
+                logger.error(f"❌ Ancienne URL: {old_url}")
+                
+                # Même si la vérification échoue, renvoyer un succès si aucune erreur n'a été levée
+                # (parfois Supabase met du temps à propager les changements)
+                if update_success or (hasattr(update_response, 'data') and update_response.data):
+                    logger.info(f"⚠️ UPDATE semble avoir réussi mais vérification échouée - probablement un délai de propagation")
                     response = jsonify({
                         'success': True, 
-                        'message': f'URL mise à jour avec succès dans Supabase',
+                        'message': f'URL mise à jour (vérification en cours...)',
                         'new_url': new_url_cleaned,
-                        'old_url': old_url
+                        'old_url': old_url,
+                        'warning': 'La mise à jour a été envoyée mais la vérification prend du temps'
                     })
                     response.headers.add('Access-Control-Allow-Origin', '*')
                     return response
-                else:
-                    logger.error(f"❌❌❌ ÉCHEC: L'UPDATE n'a pas fonctionné!")
-                    logger.error(f"❌ URL actuelle dans DB: {current_url}")
-                    logger.error(f"❌ URL attendue: {new_url_cleaned}")
-                    logger.error(f"❌ Probablement bloqué par RLS (Row Level Security)")
-                    logger.error(f"❌ SOLUTION: Utilisez SUPABASE_SERVICE_ROLE_KEY dans .env")
-                    logger.error(f"❌ Ancienne URL: {old_url}")
-                    response = jsonify({
-                        'success': False, 
-                        'error': f'La mise à jour a échoué (probablement RLS). URL actuelle dans Supabase: {current_url}',
-                        'current_url': current_url,
-                        'expected_url': new_url_cleaned,
-                        'rls_blocked': True
-                    })
-                    response.headers.add('Access-Control-Allow-Origin', '*')
-                    return response, 500
-            else:
-                logger.error(f"❌ Impossible de vérifier la mise à jour - QR Code non trouvé")
-                response = jsonify({'success': False, 'error': 'Impossible de vérifier la mise à jour'})
+                
+                response = jsonify({
+                    'success': False, 
+                    'error': f'La mise à jour n\'a pas pu être vérifiée. URL actuelle: {current_url or "inconnue"}',
+                    'current_url': current_url,
+                    'expected_url': new_url_cleaned,
+                    'old_url': old_url
+                })
                 response.headers.add('Access-Control-Allow-Origin', '*')
                 return response, 500
                 

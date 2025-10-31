@@ -180,3 +180,8 @@ Write-Host "   - Nouvelle version installée: $cloudflaredExe" -ForegroundColor 
 Write-Host "   - Pour restaurer l'ancienne version: Copiez $cloudflaredOld vers $cloudflaredExe" -ForegroundColor Gray
 
 
+
+
+
+
+

@@ -28,7 +28,8 @@ export async function POST(request: Request) {
 
     // 2. Créer l'accès sans consommation de tokens (activation gratuite)
     const now = new Date();
-    const expiresAt = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate()); // Accès pour 1 an
+    const expiresAt = new Date(now);
+    expiresAt.setDate(expiresAt.getDate() + 30); // 1 mois (30 jours)
 
     const { data: accessData, error: createAccessError } = await supabase
       .from('user_applications')

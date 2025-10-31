@@ -51,12 +51,14 @@ export async function POST(request: NextRequest) {
     // Plus de vérification de quota - le système de tokens gère les limites
     ;
 
-    // Incrémenter le compteur dans user_applications
+    // Incrémenter le compteur dans user_applications et mettre à jour last_used_at
     const newUsageCount = currentUsage + 1;
+    const now = new Date().toISOString();
     const { data: updatedApp, error: updateAppError } = await supabase
       .from('user_applications')
       .update({
-        usage_count: newUsageCount
+        usage_count: newUsageCount,
+        last_used_at: now  // Mettre à jour la date de dernière utilisation
       })
       .eq('id', userApp.id)
       .select()

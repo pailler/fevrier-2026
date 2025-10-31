@@ -85,12 +85,15 @@ export async function POST(request: Request) {
       });
     }
 
+    // Incrémenter le compteur dans user_applications et mettre à jour last_used_at
     const newUsageCount = currentUsage + 1;
+    const now = new Date().toISOString();
     const { data: updatedApp, error: updateAppError } = await supabase
       .from('user_applications')
       .update({
         usage_count: newUsageCount,
-        last_accessed_at: new Date().toISOString()
+        last_used_at: now,  // Mettre à jour la date de dernière utilisation
+        last_accessed_at: now  // Compatibilité (si les deux champs existent)
       })
       .eq('id', userAppId)
       .select()

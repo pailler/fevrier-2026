@@ -119,3 +119,8 @@ if ($offlineServices) {
 Write-Host "`n✅ Diagnostic terminé!" -ForegroundColor Green
 
 
+
+
+
+
+

@@ -232,3 +232,8 @@ Write-Host "   - Voir toutes les images: docker images" -ForegroundColor Gray
 Write-Host "   - Info système: docker info" -ForegroundColor Gray
 Write-Host "   - Arrêter Docker: Get-Process '*docker*' | Stop-Process -Force" -ForegroundColor Gray
 
+
+
+
+
+
