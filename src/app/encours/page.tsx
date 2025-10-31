@@ -941,7 +941,7 @@ export default function EncoursPage() {
                     <div className={`p-6 text-white bg-gradient-to-r ${getModuleTypeColor(module)}`}>
                       {/* Titre du module en haut, entièrement visible */}
                       <h3 className="text-xl font-bold mb-4 break-words leading-tight">
-                        {module.module_title}
+                        {(module.module_id === 'qrcodes' || module.module_id === '5') ? 'QR Codes dynamiques' : module.module_title}
                       </h3>
                       
                       {/* Badges et informations */}
@@ -1013,7 +1013,7 @@ export default function EncoursPage() {
                                   {formatTimeRemaining(module.expires_at)}
                                 </span>
                               ) : (
-                                <span className="text-xs font-bold text-green-600">Illimitée</span>
+                                <span className="text-xs font-bold text-green-600">Expire dans un mois</span>
                               )}
                             </div>
                           </div>
