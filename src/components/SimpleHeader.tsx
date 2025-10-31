@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import TokenBalance from './TokenBalance';
 import TokenBalanceLink from './TokenBalanceLink';
@@ -19,12 +20,33 @@ export default function SimpleHeader() {
         {/* Section unique - Navigation et utilisateur */}
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-6">
-            <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                <span className="text-blue-600 font-bold text-lg">I</span>
+            <Link href="/" className="flex items-center space-x-2 hover:opacity-90 transition-opacity" aria-label="Accueil IAhome">
+              <div className="relative h-8 w-auto md:h-9 lg:h-10">
+                <Image
+                  src="/iahome-logo.svg"
+                  alt="IAhome"
+                  width={40}
+                  height={40}
+                  priority
+                  className="h-8 md:h-9 lg:h-10 w-auto"
+                />
               </div>
-              <span className="text-xl font-bold text-white">IAhome</span>
+              <span className="text-xl font-bold text-white hidden sm:inline">IAhome</span>
             </Link>
+            
+            {/* Bouton Mes applis avec tokens pour mobile UNIQUEMENT - à droite du logo */}
+            {isAuthenticated && user && (
+              <div className="flex md:hidden items-center space-x-2">
+                <Link
+                  href="/encours"
+                  className="bg-white text-blue-600 font-semibold px-2 py-1.5 rounded text-xs hover:bg-blue-50 transition-colors flex items-center space-x-1"
+                >
+                  <span>📱</span>
+                  <span>Mes applis</span>
+                </Link>
+                <TokenBalance className="text-yellow-400 font-bold text-xs" showIcon={true} />
+              </div>
+            )}
 
             {/* Navigation principale - TOUJOURS VISIBLE */}
             <nav className="hidden md:flex items-center space-x-6">
@@ -61,10 +83,10 @@ export default function SimpleHeader() {
                 <TokenBalanceLink />
                 <Link
                   href="/encours"
-                  className="bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors flex items-center space-x-1"
+                  className="hidden md:flex bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors items-center space-x-1"
                 >
                   <span>📱</span>
-                  <span className="hidden sm:inline">Mes applis</span>
+                  <span>Mes applis</span>
                 </Link>
                 <div className="flex items-center space-x-2">
                   <div className={`w-2 h-2 rounded-full animate-pulse ${
@@ -194,13 +216,6 @@ export default function SimpleHeader() {
                     <TokenBalance className="text-white" />
                   </div>
                   
-                  <Link
-                    href="/encours"
-                    className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    📱 Mes applis
-                  </Link>
                   <button
                     onClick={() => {
                       signOut();

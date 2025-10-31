@@ -84,7 +84,7 @@ export default function MeetingReportsAccessButton({
         ) : (
           <div className="flex items-center space-x-2">
             <span>📊</span>
-            <span>Accéder à Meeting Reports (100 tokens)</span>
+            <span>Accéder au Compte rendu automatique (100 tokens)</span>
           </div>
         )}
       </button>

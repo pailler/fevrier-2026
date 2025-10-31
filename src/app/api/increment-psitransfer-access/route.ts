@@ -45,10 +45,10 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Vérifier la date d'expiration
-    const now = new Date();
+    const currentDate = new Date();
     const expiresAt = new Date(userApp.expires_at);
     
-    if (expiresAt <= now) {
+    if (expiresAt <= currentDate) {
       console.log('❌ PsiTransfer Access: Module expiré');
       return new NextResponse(JSON.stringify({
         success: false,
@@ -124,13 +124,15 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 6. Incrémenter le compteur dans user_applications
+    // 6. Incrémenter le compteur dans user_applications et mettre à jour last_used_at
     const newUsageCount = currentUsage + 1;
+    const nowISO = new Date().toISOString();
     const { data: updatedApp, error: updateAppError } = await supabase
       .from('user_applications')
       .update({
         usage_count: newUsageCount,
-        last_accessed_at: new Date().toISOString()
+        last_used_at: nowISO,  // Mettre à jour la date de dernière utilisation
+        last_accessed_at: nowISO  // Compatibilité (si les deux champs existent)
       })
       .eq('id', userApp.id)
       .select()

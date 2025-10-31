@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
@@ -116,7 +116,7 @@ export default function EncoursPage() {
   }, [user]);
 
   // Charger les données de tokens
-  const fetchTokenData = async () => {
+  const fetchTokenData = useCallback(async () => {
     if (!user?.id) {
       console.log('🔄 fetchTokenData: Pas d\'utilisateur, arrêt');
       return;
@@ -142,7 +142,53 @@ export default function EncoursPage() {
     } finally {
       setLoadingTokens(false);
     }
-  };
+  }, [user?.id]);
+
+  // Mise à jour en temps réel de l'historique des utilisations
+  useEffect(() => {
+    if (!user?.id) return;
+
+    console.log('🔔 Configuration de l\'écoute en temps réel pour l\'historique des tokens');
+
+    // S'abonner aux changements de la table token_usage (table réelle utilisée)
+    const channel = supabase
+      .channel(`token_usage:${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'token_usage',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('🔔 Nouvelle utilisation détectée en temps réel:', payload.new);
+          // Rafraîchir immédiatement l'historique
+          fetchTokenData();
+        }
+      )
+      .subscribe((status) => {
+        console.log('🔔 Statut de l\'abonnement Realtime:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Abonnement Realtime actif');
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('❌ Erreur d\'abonnement Realtime, utilisation du polling de secours');
+        }
+      });
+
+    // Polling de secours toutes les 5 secondes si Realtime ne fonctionne pas
+    const pollingInterval = setInterval(() => {
+      console.log('🔄 Polling de secours - Vérification des nouvelles utilisations');
+      fetchTokenData();
+    }, 5000);
+
+    // Nettoyer l'abonnement et le polling au démontage
+    return () => {
+      console.log('🔔 Nettoyage de l\'abonnement en temps réel');
+      clearInterval(pollingInterval);
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, fetchTokenData]);
 
   // Charger les modules souscrits par l'utilisateur et les tokens d'accès
   useEffect(() => {
@@ -376,17 +422,19 @@ export default function EncoursPage() {
       'librespeed': 10,
       'metube': 10,
       'psitransfer': 10,
-      'qrcodes': 10,
       'pdf': 10,
       'meeting-reports': 10,
       'cogstudio': 10,
+      
+      // Applications premium (100 tokens)
+      'qrcodes': 100,
       
       // Anciens IDs numériques (pour compatibilité)
       '1': 10,      // PDF+ -> 10 tokens
       '2': 10,      // MeTube -> 10 tokens
       '3': 10,      // LibreSpeed -> 10 tokens
       '4': 10,      // PsiTransfer -> 10 tokens
-      '5': 10,      // QR Codes -> 10 tokens (changé de 100 à 10)
+      '5': 100,     // QR Codes -> 100 tokens
       '7': 100,     // Stable Diffusion -> 100 tokens
       '8': 100,     // Ruined Fooocus -> 100 tokens
       '10': 100,    // ComfyUI -> 100 tokens
@@ -548,7 +596,7 @@ export default function EncoursPage() {
     }
     
     // Pour les modules essentiels, afficher "Module essentiel"
-    const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'qrcodes-statiques'];
+    const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes-statiques'];
     const isEssential = essentialModules.some(essentialId => 
       module.module_id === essentialId || 
       module.module_title.toLowerCase().includes(essentialId.toLowerCase()) ||
@@ -1003,8 +1051,52 @@ export default function EncoursPage() {
                           );
                         }
                         
+                        // QR Codes (100 tokens) - application premium
+                        if (moduleId === 'qrcodes') {
+                          return (
+                            <QRCodeAccessButton
+                              user={user}
+                              onAccessGranted={(url) => {
+                                console.log(`🔗 ${moduleTitle}: Accès autorisé:`, url);
+                                console.log('🔄 onAccessGranted: Rafraîchissement immédiat des tokens');
+                                fetchTokenData();
+                                setTimeout(() => {
+                                  console.log('🔄 onAccessGranted: Rafraîchissement différé des tokens');
+                                  fetchTokenData();
+                                }, 2000);
+                              }}
+                              onAccessDenied={(reason) => {
+                                console.log(`❌ ${moduleTitle}: Accès refusé:`, reason);
+                                alert(`Accès refusé: ${reason}`);
+                              }}
+                            />
+                          );
+                        }
+                        
+                        // Meeting Reports (100 tokens) - compte rendu automatique
+                        if (moduleId === 'meeting-reports') {
+                          return (
+                            <MeetingReportsAccessButton
+                              user={user}
+                              onAccessGranted={(url) => {
+                                console.log(`🔗 ${moduleTitle}: Accès autorisé:`, url);
+                                console.log('🔄 onAccessGranted: Rafraîchissement immédiat des tokens');
+                                fetchTokenData();
+                                setTimeout(() => {
+                                  console.log('🔄 onAccessGranted: Rafraîchissement différé des tokens');
+                                  fetchTokenData();
+                                }, 2000);
+                              }}
+                              onAccessDenied={(reason) => {
+                                console.log(`❌ ${moduleTitle}: Accès refusé:`, reason);
+                                alert(`Accès refusé: ${reason}`);
+                              }}
+                            />
+                          );
+                        }
+                        
                         // Applications essentielles (10 tokens)
-                        if (['librespeed', 'metube', 'psitransfer', 'qrcodes', 'pdf', 'meeting-reports', 'cogstudio'].includes(moduleId)) {
+                        if (['librespeed', 'metube', 'psitransfer', 'pdf', 'cogstudio'].includes(moduleId)) {
                           return (
                             <EssentialAccessButton
                               user={user}
