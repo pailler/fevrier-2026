@@ -141,12 +141,19 @@ export default function QRCodesPage() {
         // Vérifier si le module actuel est déjà activé dans user_applications
         if (card?.id) {
           setCheckingActivation(true);
+          console.log('🔍 Vérification activation QR Codes pour card.id:', card.id);
           const isActivated = await checkModuleActivation(card.id);
+          console.log('🔍 Résultat vérification activation:', isActivated);
           if (isActivated) {
-            setAlreadyActivatedModules(prev => [...prev, card.id]);
-            console.log('✅ QR Codes détecté comme déjà activé');
+            setAlreadyActivatedModules(prev => {
+              const updated = [...prev];
+              if (!updated.includes(card.id)) updated.push(card.id);
+              if (!updated.includes('qrcodes')) updated.push('qrcodes');
+              console.log('✅ QR Codes détecté comme déjà activé, alreadyActivatedModules:', updated);
+              return updated;
+            });
           } else {
-            console.log('❌ QR Codes pas encore activé');
+            console.log('❌ QR Codes pas encore activé, alreadyActivatedModules:', alreadyActivatedModules);
           }
           setCheckingActivation(false);
         }
@@ -393,7 +400,7 @@ export default function QRCodesPage() {
           <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
             <iframe
               className="w-full h-full rounded-2xl"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0&rel=0&modestbranding=1"
+              src="https://www.youtube.com/embed/SOtL5XeKvyY?autoplay=0&rel=0&modestbranding=1"
               title="Démonstration QR Codes"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -415,81 +422,81 @@ export default function QRCodesPage() {
             </div>
 
             <div className="space-y-6">
-              {/* Boutons d'action */}
-              {isAuthenticated && user ? (
-                // Utilisateur connecté
-                <>
-                  {!alreadyActivatedModules.includes('qrcodes') ? (
-                    // Module pas encore activé : bouton d'activation
-                    <button
-                      onClick={async () => {
-                        if (!isAuthenticated || !user) {
-                          console.log('❌ Accès QR Codes - Utilisateur non connecté');
-                          router.push(`/login?redirect=${encodeURIComponent('/card/qrcodes')}`);
-                          return;
-                        }
-
-                        try {
-                          console.log('🔄 Activation QR Codes pour:', user.email);
-                          
-                          const response = await fetch('/api/activate-qrcodes', {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                              userId: user.id,
-                              email: user.email
-                            }),
-                          });
-
-                          const result = await response.json();
-
-                          if (result.success) {
-                            console.log('✅ QR Codes activé avec succès');
-                            alert('QR Codes activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
-                            router.push('/encours');
-                          } else {
-                            console.error('❌ Erreur activation QR Codes:', result.error);
-                            alert(`Erreur lors de l'activation: ${result.error}`);
-                          }
-                        } catch (error) {
-                          console.error('❌ Erreur activation QR Codes:', error);
-                          alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
-                        }
-                      }}
-                      className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                    >
-                      <span className="text-xl">🔑</span>
-                      <span>Activer QR Codes (100 tokens)</span>
-                    </button>
-                  ) : (
-                    // Module déjà activé : bouton d'accès
-                    <button
-                      onClick={() => {
-                        console.log('✅ Accès QR Codes - Module déjà activé');
-                        window.open('https://qrcodes.iahome.fr', '_blank');
-                      }}
-                      className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                    >
-                      <span className="text-xl">🚀</span>
-                      <span>Accéder à QR Codes</span>
-                    </button>
-                  )}
-                </>
-              ) : (
-                // Utilisateur non connecté : aller à la page de connexion puis retour à QR Codes
+              {/* Bouton d'activation spécial pour QR Codes - Modèle LibreSpeed */}
+              {checkingActivation ? (
+                <div className="w-3/4 flex items-center justify-center py-4 px-6 text-gray-600">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
+                  <span>Vérification de l'activation...</span>
+                </div>
+              ) : card && !alreadyActivatedModules.includes(card.id) && !alreadyActivatedModules.includes('qrcodes') ? (
                 <button
-                  onClick={() => {
-                    console.log('🔒 Accès QR Codes - Redirection vers connexion');
-                    router.push(`/login?redirect=${encodeURIComponent('/card/qrcodes')}`);
+                  onClick={async () => {
+                    if (!isAuthenticated || !user) {
+                      console.log('❌ Accès QR Codes - Utilisateur non connecté');
+                      router.push(`/login?redirect=${encodeURIComponent('/card/qrcodes')}`);
+                      return;
+                    }
+
+                    try {
+                      console.log('🔄 Activation QR Codes pour:', user.email);
+                      
+                      const response = await fetch('/api/activate-qrcodes', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          userId: user.id,
+                          email: user.email
+                        }),
+                      });
+
+                      const result = await response.json();
+
+                      if (result.success) {
+                        console.log('✅ QR Codes activé avec succès');
+                        setAlreadyActivatedModules(prev => {
+                          const updated = [...prev];
+                          if (!updated.includes('qrcodes')) updated.push('qrcodes');
+                          if (card?.id && !updated.includes(card.id)) updated.push(card.id);
+                          return updated;
+                        });
+                        alert('QR Codes activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
+                        router.push('/encours');
+                      } else {
+                        console.error('❌ Erreur activation QR Codes:', result.error);
+                        alert(`Erreur lors de l'activation: ${result.error}`);
+                      }
+                    } catch (error) {
+                      console.error('❌ Erreur activation QR Codes:', error);
+                      alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                    }
                   }}
-                  className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
-                  <span className="text-xl">🔒</span>
-                  <span>Connectez-vous pour activer QR Codes (100 tokens)</span>
+                  <span className="text-xl">⚡</span>
+                  <span>
+                    {isAuthenticated && user ? `Activer QR Codes (100 tokens)` : `Connectez-vous pour activer QR Codes (100 tokens)`}
+                  </span>
                 </button>
+              ) : (
+                <div className="w-3/4 text-center py-4 px-6 text-gray-600">
+                  <p>QR Codes déjà activé</p>
+                </div>
               )}
+
+              {/* Message de debug temporaire */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="text-xs text-gray-500 mt-2 p-2 bg-gray-100 rounded">
+                  <p>Debug Info:</p>
+                  <p>card.id: {card?.id || 'null'}</p>
+                  <p>alreadyActivatedModules: {JSON.stringify(alreadyActivatedModules)}</p>
+                  <p>checkingActivation: {checkingActivation.toString()}</p>
+                  <p>isAuthenticated: {isAuthenticated ? 'true' : 'false'}</p>
+                </div>
+              )}
+
+              {/* Bouton d'accès pour QR Codes déjà activé - SUPPRIMÉ (comme LibreSpeed) */}
             </div>
           </div>
         </div>

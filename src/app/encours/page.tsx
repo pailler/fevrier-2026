@@ -54,19 +54,27 @@ export default function EncoursPage() {
   const [tokenHistory, setTokenHistory] = useState<any[]>([]);
   const [loadingTokens, setLoadingTokens] = useState(false);
 
-  // Vérification de l'authentification
+  // Vérification de l'authentification avec timeout de sécurité
   useEffect(() => {
-    if (authLoading) return; // Attendre que l'authentification soit vérifiée
+    if (authLoading) {
+      // Timeout de sécurité pour éviter un chargement infini
+      const timeout = setTimeout(() => {
+        console.warn('⚠️ Authentification prend trop de temps, arrêt du chargement');
+        setLoading(false);
+      }, 10000); // 10 secondes max
+      
+      return () => clearTimeout(timeout);
+    }
     
     // Ajouter un petit délai pour s'assurer que l'authentification est bien chargée
     const timer = setTimeout(() => {
       if (!isAuthenticated || !user) {
-        ;
+        console.log('❌ Utilisateur non authentifié, redirection vers /login');
         router.push('/login');
         return;
       }
       
-      console.log('Utilisateur authentifié:', user.email);
+      console.log('✅ Utilisateur authentifié:', user.email);
     }, 100); // 100ms de délai
     
     return () => clearTimeout(timer);
@@ -119,6 +127,9 @@ export default function EncoursPage() {
   const fetchTokenData = useCallback(async () => {
     if (!user?.id) {
       console.log('🔄 fetchTokenData: Pas d\'utilisateur, arrêt');
+      // ✅ Mettre à jour les valeurs par défaut même si pas d'utilisateur
+      setTokenBalance(0);
+      setTokenHistory([]);
       return;
     }
     
@@ -129,18 +140,21 @@ export default function EncoursPage() {
       // Charger le solde de tokens
       const tokenService = TokenActionServiceClient.getInstance();
       const balance = await tokenService.getUserTokenBalance(user.id);
-      setTokenBalance(balance);
+      setTokenBalance(balance || 0); // ✅ Valeur par défaut si null
       console.log('🔄 fetchTokenData: Solde mis à jour:', balance);
       
       // Charger l'historique d'utilisation
       const history = await tokenService.getUserTokenHistory(user.id, 20);
-      setTokenHistory(history);
-      console.log('🔄 fetchTokenData: Historique mis à jour:', history.length, 'entrées');
+      setTokenHistory(history || []); // ✅ Tableau vide par défaut si null
+      console.log('🔄 fetchTokenData: Historique mis à jour:', history?.length || 0, 'entrées');
       
     } catch (error) {
       console.error('❌ fetchTokenData: Erreur chargement tokens:', error);
+      // ✅ Mettre à jour avec des valeurs par défaut en cas d'erreur
+      setTokenBalance(0);
+      setTokenHistory([]);
     } finally {
-      setLoadingTokens(false);
+      setLoadingTokens(false); // ✅ Toujours arrêter le chargement
     }
   }, [user?.id]);
 
@@ -163,8 +177,9 @@ export default function EncoursPage() {
         },
         (payload) => {
           console.log('🔔 Nouvelle utilisation détectée en temps réel:', payload.new);
-          // Rafraîchir immédiatement l'historique
-          fetchTokenData();
+          // Rafraîchir immédiatement l'historique (sans dépendance pour éviter les boucles)
+          // eslint-disable-next-line react-hooks/exhaustive-deps
+          fetchTokenData().catch(err => console.error('Erreur fetchTokenData depuis Realtime:', err));
         }
       )
       .subscribe((status) => {
@@ -179,7 +194,8 @@ export default function EncoursPage() {
     // Polling de secours toutes les 5 secondes si Realtime ne fonctionne pas
     const pollingInterval = setInterval(() => {
       console.log('🔄 Polling de secours - Vérification des nouvelles utilisations');
-      fetchTokenData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      fetchTokenData().catch(err => console.error('Erreur fetchTokenData depuis polling:', err));
     }, 5000);
 
     // Nettoyer l'abonnement et le polling au démontage
@@ -188,7 +204,8 @@ export default function EncoursPage() {
       clearInterval(pollingInterval);
       supabase.removeChannel(channel);
     };
-  }, [user?.id, fetchTokenData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]); // ✅ Retiré fetchTokenData pour éviter les dépendances circulaires
 
   // Charger les modules souscrits par l'utilisateur et les tokens d'accès
   useEffect(() => {
@@ -355,18 +372,33 @@ export default function EncoursPage() {
         setError(null);
         
       } catch (error) {
+        console.error('❌ fetchUserModules: Erreur:', error);
         setError(`Erreur lors du chargement des modules: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
         setUserModules([]);
       } finally {
-        setLoading(false);
+        setLoading(false); // ✅ Toujours arrêter le chargement, même en cas d'erreur
       }
     };
 
-    if (user) {
-      fetchUserModules();
-      fetchTokenData(); // Charger aussi les données de tokens
+    if (user?.id) {
+      fetchUserModules().catch(err => {
+        console.error('❌ Erreur non gérée dans fetchUserModules:', err);
+        setError('Erreur lors du chargement. Veuillez réessayer.');
+        setLoading(false);
+      });
+      
+      // Charger les tokens séparément pour ne pas bloquer le rendu
+      fetchTokenData().catch(err => {
+        console.error('❌ Erreur non gérée dans fetchTokenData:', err);
+        // Ne pas bloquer le rendu si les tokens échouent
+        setTokenBalance(0);
+        setTokenHistory([]);
+      });
+    } else {
+      // Si pas d'utilisateur, arrêter le chargement immédiatement
+      setLoading(false);
     }
-  }, [user]);
+  }, [user?.id]); // ✅ Utiliser user?.id au lieu de user pour éviter les re-renders inutiles
 
   // Mapping des modules vers leurs URLs directes (sécurisées via tokens)
   const getModuleUrl = (moduleId: string): string => {
