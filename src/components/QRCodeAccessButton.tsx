@@ -44,9 +44,10 @@ export default function QRCodeAccessButton({
       console.log('🪙 QR Codes: Tokens consommés avec succès:', consumeResult.tokensConsumed);
       console.log('🪙 QR Codes: Tokens restants:', consumeResult.tokensRemaining);
 
-      // Notifier l'accès accordé (l'ouverture sera gérée par le callback)
+      // Accès direct au sous-domaine
       const qrcodesUrl = 'https://qrcodes.iahome.fr';
-      console.log('🔗 QR Codes: Accès accordé pour:', qrcodesUrl);
+      console.log('🔗 QR Codes: Accès direct à:', qrcodesUrl);
+      window.open(qrcodesUrl, '_blank');
       
       onAccessGranted?.(qrcodesUrl);
 

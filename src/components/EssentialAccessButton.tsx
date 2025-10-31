@@ -105,34 +105,36 @@ export default function EssentialAccessButton({
 
       const tokenData = await tokenResponse.json();
       
-      // URLs directes pour les modules essentiels
-      const moduleUrls: { [key: string]: string } = {
-        'qrcodes': 'https://qrcodes.iahome.fr',
-        'metube': 'https://metube.iahome.fr',
+      // Mapping des modules vers leurs sous-domaines publics
+      const moduleSubdomains: Record<string, string> = {
         'librespeed': 'https://librespeed.iahome.fr',
-        'psitransfer': 'https://psitransfer.iahome.fr',
+        'metube': 'https://metube.iahome.fr',
         'pdf': 'https://pdf.iahome.fr',
+        'psitransfer': 'https://psitransfer.iahome.fr',
+        'qrcodes': 'https://qrcodes.iahome.fr',
+        'whisper': 'https://whisper.iahome.fr',
+        'stablediffusion': 'https://stablediffusion.iahome.fr',
+        'comfyui': 'https://comfyui.iahome.fr',
         'meeting-reports': 'https://meeting-reports.iahome.fr',
-        'cogstudio': 'https://cogstudio.iahome.fr'
+        'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
+        'cogstudio': 'https://cogstudio.iahome.fr',
       };
       
-      // Utiliser l'URL directe si disponible, sinon utiliser la protection avec token
-      const directUrl = moduleUrls[moduleId];
-      let accessUrl: string;
+      // Obtenir l'URL du sous-domaine pour ce module
+      const moduleUrl = moduleSubdomains[moduleId];
       
-      if (directUrl) {
-        // Ajouter le token à l'URL directe
-        accessUrl = `${directUrl}?token=${tokenData.token}`;
-      } else {
-        // Fallback: utiliser la page de protection
-        accessUrl = `https://iahome.fr/subdomain-protection?token=${tokenData.token}`;
+      if (!moduleUrl) {
+        throw new Error(`Module ${moduleId} non trouvé`);
       }
       
-      console.log(`🔗 ${moduleTitle}: Accès sécurisé à:`, accessUrl);
-      window.open(accessUrl, '_blank');
+      // Ouvrir directement le sous-domaine avec le token en paramètre
+      const directUrl = `${moduleUrl}?token=${encodeURIComponent(tokenData.token)}`;
+      
+      console.log(`🔗 ${moduleTitle}: Accès direct au sous-domaine:`, directUrl);
+      window.open(directUrl, '_blank');
       
       // Appeler le callback pour notifier l'accès accordé
-      onAccessGranted?.(accessUrl);
+      onAccessGranted?.(directUrl);
     } catch (err) {
       console.error(`❌ ${moduleTitle}: Erreur inattendue:`, err);
       setError('Une erreur inattendue est survenue.');

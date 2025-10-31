@@ -180,9 +180,6 @@ export default function Header() {
                   <span>📱</span>
                   <span>Mes applis</span>
                 </Link>
-                <span className="text-white font-medium px-3 py-1 rounded-lg">
-                  {user?.email}
-                </span>
                 <button
                   onClick={async () => { 
                     // Envoyer une notification de déconnexion avant de se déconnecter

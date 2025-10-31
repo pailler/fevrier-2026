@@ -88,14 +88,6 @@ export default function SimpleHeader() {
                   <span>📱</span>
                   <span>Mes applis</span>
                 </Link>
-                <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full animate-pulse ${
-                    user.role === 'admin' ? 'bg-red-400' : 'bg-green-400'
-                  }`}></div>
-                  <span className="text-white font-medium px-3 py-1 rounded-lg">
-                    {user.full_name || user.email}
-                  </span>
-                </div>
                 <button
                   onClick={() => {
                     signOut();

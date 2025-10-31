@@ -47,9 +47,10 @@ export default function MeetingReportsAccessButton({
       console.log('🪙 Meeting Reports: Tokens consommés avec succès:', consumeResult.tokensConsumed);
       console.log('🪙 Meeting Reports: Tokens restants:', consumeResult.tokensRemaining);
 
-      // Notifier l'accès accordé (l'ouverture sera gérée par le callback)
+      // Accès direct au sous-domaine
       const meetingReportsUrl = 'https://meeting-reports.iahome.fr';
-      console.log('🔗 Meeting Reports: Accès accordé pour:', meetingReportsUrl);
+      console.log('🔗 Meeting Reports: Accès direct à:', meetingReportsUrl);
+      window.open(meetingReportsUrl, '_blank');
       
       onAccessGranted?.(meetingReportsUrl);
 
