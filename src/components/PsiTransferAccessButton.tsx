@@ -1,37 +1,40 @@
 'use client';
 
 import React from 'react';
+import { useModuleAccess } from '../hooks/useModuleAccess';
 
 interface PsiTransferAccessButtonProps {
   user?: any;
+  onAccessGranted?: (url: string) => void;
+  onAccessDenied?: (reason: string) => void;
 }
 
-export default function PsiTransferAccessButton({ user }: PsiTransferAccessButtonProps) {
-  const handleDirectAccess = () => {
-    if (!user) {
-      alert('Vous devez être connecté');
-      return;
-    }
-
-    // Ouvrir directement PsiTransfer via sous-domaine
-    const directUrl = 'https://psitransfer.iahome.fr';
-    console.log('🔗 PsiTransfer: Accès direct à:', directUrl);
-    window.open(directUrl, '_blank');
-  };
+export default function PsiTransferAccessButton({ 
+  user,
+  onAccessGranted,
+  onAccessDenied
+}: PsiTransferAccessButtonProps) {
+  const { handleAccess, isLoading, error } = useModuleAccess({
+    user: user!,
+    moduleId: 'psitransfer',
+    moduleTitle: 'PsiTransfer',
+    tokenCost: 10
+  });
 
   return (
     <div className="flex flex-col items-center space-y-4">
       <button
-        onClick={handleDirectAccess}
-        disabled={!user}
+        onClick={() => handleAccess(onAccessGranted, onAccessDenied)}
+        disabled={isLoading || !user}
         className={`px-6 py-3 rounded-lg text-white font-semibold transition-colors duration-300
-          ${!user
+          ${isLoading || !user
             ? 'bg-gray-400 cursor-not-allowed'
             : 'bg-blue-600 hover:bg-blue-700'
           }`}
       >
-        📤 Accéder à PsiTransfer
+        {isLoading ? '⏳ Ouverture...' : '📤 Accéder à PsiTransfer (10 tokens)'}
       </button>
+      {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 }

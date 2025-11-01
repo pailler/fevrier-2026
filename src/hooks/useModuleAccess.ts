@@ -1,44 +1,20 @@
-'use client';
-
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { TokenActionServiceClient } from '../utils/tokenActionServiceClient';
 import { useTokenContext } from '../contexts/TokenContext';
 
-interface EssentialAccessButtonProps {
-  user?: any;
+interface UseModuleAccessOptions {
+  user: any;
   moduleId: string;
   moduleTitle: string;
-  onAccessGranted?: (url: string) => void;
-  onAccessDenied?: (reason: string) => void;
+  tokenCost?: number;
 }
 
-export default function EssentialAccessButton({ 
-  user,
-  moduleId,
-  moduleTitle,
-  onAccessGranted, 
-  onAccessDenied 
-}: EssentialAccessButtonProps) {
+export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }: UseModuleAccessOptions) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { refreshTokens } = useTokenContext();
 
-  // Mapping des modules vers leurs sous-domaines publics
-  const moduleSubdomains: Record<string, string> = {
-    'librespeed': 'https://librespeed.iahome.fr',
-    'metube': 'https://metube.iahome.fr',
-    'pdf': 'https://pdf.iahome.fr',
-    'psitransfer': 'https://psitransfer.iahome.fr',
-    'qrcodes': 'https://qrcodes.iahome.fr',
-    'whisper': 'https://whisper.iahome.fr',
-    'stablediffusion': 'https://stablediffusion.iahome.fr',
-    'comfyui': 'https://comfyui.iahome.fr',
-    'meeting-reports': 'https://meeting-reports.iahome.fr',
-    'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
-    'cogstudio': 'https://cogstudio.iahome.fr',
-  };
-
-  const handleAccess = async () => {
+  const handleAccess = async (onAccessGranted?: (url: string) => void, onAccessDenied?: (reason: string) => void) => {
     if (!user) {
       setError('Vous devez être connecté');
       onAccessDenied?.('Non connecté');
@@ -120,6 +96,21 @@ export default function EssentialAccessButton({
 
       const tokenData = await tokenResponse.json();
       
+      // Mapping des modules vers leurs sous-domaines publics
+      const moduleSubdomains: Record<string, string> = {
+        'librespeed': 'https://librespeed.iahome.fr',
+        'metube': 'https://metube.iahome.fr',
+        'pdf': 'https://pdf.iahome.fr',
+        'psitransfer': 'https://psitransfer.iahome.fr',
+        'qrcodes': 'https://qrcodes.iahome.fr',
+        'whisper': 'https://whisper.iahome.fr',
+        'stablediffusion': 'https://stablediffusion.iahome.fr',
+        'comfyui': 'https://comfyui.iahome.fr',
+        'meeting-reports': 'https://meeting-reports.iahome.fr',
+        'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
+        'cogstudio': 'https://cogstudio.iahome.fr',
+      };
+      
       // Obtenir l'URL du sous-domaine pour ce module
       const moduleUrl = moduleSubdomains[moduleId];
       
@@ -144,21 +135,11 @@ export default function EssentialAccessButton({
     }
   };
 
-  return (
-    <div className="flex flex-col items-center space-y-4">
-      <button
-        onClick={handleAccess}
-        disabled={isLoading || !user}
-        className={`px-6 py-3 rounded-lg text-white font-semibold transition-colors duration-300
-          ${isLoading || !user
-            ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-blue-600 hover:bg-blue-700'
-          }`}
-      >
-        {isLoading ? '⏳ Ouverture...' : `🔧 Accéder à ${moduleTitle} (10 tokens)`}
-      </button>
-
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-    </div>
-  );
+  return {
+    handleAccess,
+    isLoading,
+    error
+  };
 }
+
+
