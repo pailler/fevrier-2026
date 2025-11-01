@@ -17,6 +17,40 @@ const protectedRoutes = [
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const hostname = request.headers.get('host') || '';
+  const xForwardedHost = request.headers.get('x-forwarded-host') || '';
+  
+  // Log pour debug
+  console.log('🔍 Middleware appelé - Hostname:', hostname, 'X-Forwarded-Host:', xForwardedHost, 'Pathname:', pathname);
+
+  // Protection LibreSpeed : Si accès via librespeed.iahome.fr
+  // Avec Redirect Rules Cloudflare, cette protection est déjà gérée par Redirect Rules
+  // Le middleware ne fait que vérifier le token et laisser passer si valide
+  const isLibreSpeed = hostname === 'librespeed.iahome.fr' || 
+                       hostname.includes('librespeed.iahome.fr') ||
+                       xForwardedHost === 'librespeed.iahome.fr' ||
+                       xForwardedHost.includes('librespeed.iahome.fr');
+  
+  if (isLibreSpeed) {
+    const token = request.nextUrl.searchParams.get('token');
+    
+    console.log('🔒 LibreSpeed détecté - Token:', token ? 'présent' : 'absent');
+    
+    if (token) {
+      // Token présent - laisser passer vers LibreSpeed
+      // Rewrite vers le service LibreSpeed local via Cloudflare Tunnel
+      console.log('✅ LibreSpeed: Token présent, laisser passer vers LibreSpeed');
+      // Ne pas rediriger, laisser Cloudflare Tunnel gérer le routage
+      // Le service localhost:8085 sera accessible via Cloudflare Tunnel
+      return NextResponse.next();
+    } else {
+      // Aucun token - Redirect Rules devrait avoir déjà intercepté
+      // Si on arrive ici, c'est que Redirect Rules n'a pas fonctionné
+      // Rediriger vers la route de protection
+      console.log('🛡️ LibreSpeed: Accès direct bloqué (pas de token), redirection vers iahome.fr');
+      return NextResponse.redirect('https://iahome.fr/api/librespeed-redirect', 302);
+    }
+  }
 
   // Middleware simplifié pour éviter les boucles infinies
   // Ne fait que les redirections essentielles

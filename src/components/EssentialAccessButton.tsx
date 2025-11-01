@@ -38,6 +38,7 @@ export default function EssentialAccessButton({
     setError(null);
 
     try {
+      // Processus d'accès direct sans demande de mot de passe
       console.log(`🪙 ${moduleTitle}: Vérification et consommation des tokens pour:`, user.email);
       
       // Utiliser le service pour la consommation côté serveur

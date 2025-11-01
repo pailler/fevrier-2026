@@ -727,19 +727,29 @@ export default function EncoursPage() {
 
         {/* Affichage des erreurs de token */}
         {tokenError && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="mb-6 bg-pink-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
               </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">
-                  Erreur d'accès à LibreSpeed
+              <div className="ml-3 flex-1">
+                <h3 className="text-sm font-medium text-red-800 mb-2">
+                  Accès à l'application non autorisé
                 </h3>
                 <div className="mt-2 text-sm text-red-700">
-                  <p>{tokenError}</p>
+                  <p className="mb-2">
+                    Pour accéder gratuitement aux applications IAHome, veuillez vous connecter avec votre compte.
+                  </p>
+                  {!user && (
+                    <Link 
+                      href="/login"
+                      className="inline-block mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                    >
+                      Se connecter
+                    </Link>
+                  )}
                 </div>
                 <div className="mt-4">
                   <button
@@ -1170,8 +1180,32 @@ export default function EncoursPage() {
                           );
                         }
                         
-                        // Applications essentielles (10 tokens)
-                        if (['librespeed', 'metube', 'psitransfer', 'pdf', 'cogstudio'].includes(moduleId)) {
+                        // LibreSpeed - Utiliser le bouton spécial sans demande de mot de passe
+                        if (moduleId === 'librespeed') {
+                          return (
+                            <LibreSpeedAccessButton
+                              user={user}
+                              onAccessGranted={(url) => {
+                                console.log(`🔗 ${moduleTitle}: Accès autorisé:`, url);
+                                console.log('🔄 onAccessGranted: Rafraîchissement immédiat des tokens');
+                                // Rafraîchir l'historique des tokens après utilisation
+                                fetchTokenData();
+                                // Rafraîchir aussi après un délai pour s'assurer que les données sont mises à jour
+                                setTimeout(() => {
+                                  console.log('🔄 onAccessGranted: Rafraîchissement différé des tokens');
+                                  fetchTokenData();
+                                }, 2000);
+                              }}
+                              onAccessDenied={(reason) => {
+                                console.log(`❌ ${moduleTitle}: Accès refusé:`, reason);
+                                alert(`Accès refusé: ${reason}`);
+                              }}
+                            />
+                          );
+                        }
+                        
+                        // Applications essentielles (10 tokens) - sans LibreSpeed (qui a son propre bouton)
+                        if (['metube', 'psitransfer', 'pdf', 'cogstudio'].includes(moduleId)) {
                           return (
                             <EssentialAccessButton
                               user={user}
