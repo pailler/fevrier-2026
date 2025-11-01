@@ -114,3 +114,4 @@ La seule limitation est la transcription Whisper sur Windows, mais l'application
 
 
 
+

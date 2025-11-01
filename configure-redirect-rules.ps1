@@ -113,3 +113,4 @@ Write-Host ""
 Write-Host "✅ Configuration terminée !" -ForegroundColor Green
 Write-Host "   Testez avec: .\test-redirect-rules.ps1" -ForegroundColor Gray
 Write-Host ""
+

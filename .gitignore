@@ -73,3 +73,6 @@ ffmpeg.zip
 essentiels/metube-downloads/
 essentiels/polr-db-data/
 *.mp4
+*.ckpt
+*.bin
+instantmesh/ckpts/

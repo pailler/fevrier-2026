@@ -54,3 +54,4 @@ if ($tunnelInfo -match "CONNECTOR ID") {
 Write-Host "`n✅ Redémarrage terminé!" -ForegroundColor Green
 Write-Host "🌐 Le Worker Cloudflare est maintenant actif pour librespeed.iahome.fr" -ForegroundColor Cyan
 
+

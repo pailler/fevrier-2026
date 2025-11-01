@@ -98,12 +98,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Créer automatiquement 100 tokens pour le nouvel utilisateur
+    // Créer automatiquement 200 tokens pour le nouvel utilisateur
     const { error: tokenError } = await supabase
       .from('user_tokens')
       .insert([{
         user_id: profileData.id,
-        tokens: 100, // 100 tokens par défaut
+        tokens: 200, // 200 tokens par défaut pour les nouveaux utilisateurs
         package_name: 'Welcome Package',
         purchase_date: new Date().toISOString(),
         is_active: true
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       console.error('Erreur lors de la création des tokens:', tokenError);
       // Ne pas faire échouer la création du compte pour les tokens
     } else {
-      console.log(`✅ 100 tokens créés pour le nouvel utilisateur ${email}`);
+      console.log(`✅ 200 tokens créés pour le nouvel utilisateur ${email}`);
     }
 
     // Envoyer une notification d'inscription à l'utilisateur

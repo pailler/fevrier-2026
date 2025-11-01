@@ -71,3 +71,4 @@ Le code 530 Cloudflare indique généralement :
 
 La configuration est **correcte** et l'API fonctionne **localement**. Une fois la propagation Cloudflare terminée, cela devrait fonctionner.
 
+

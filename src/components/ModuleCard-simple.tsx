@@ -109,7 +109,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     
     
     // Image par défaut
-    return imageUrl || '/images/default-module.jpg';
+    return imageUrl || '/images/module-visuals/generic-module.svg';
   };
 
   const imageUrl = getModuleImage(module.title, module.image_url);

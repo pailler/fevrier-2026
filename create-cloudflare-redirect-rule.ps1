@@ -225,3 +225,4 @@ Write-Host "🧪 Test de la configuration:" -ForegroundColor Cyan
 Write-Host "   .\test-redirect-rules.ps1" -ForegroundColor Gray
 Write-Host ""
 
+

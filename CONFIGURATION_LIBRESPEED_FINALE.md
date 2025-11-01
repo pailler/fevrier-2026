@@ -140,3 +140,4 @@ La Solution 1 est **entièrement mise en place** pour LibreSpeed :
 - [SECURITE_CLOUDFLARE_LOCALHOST.md](./SECURITE_CLOUDFLARE_LOCALHOST.md) - Guide complet de sécurité
 - [traefik/dynamic/PAGE-RULES-README.md](./traefik/dynamic/PAGE-RULES-README.md) - Documentation Page Rules
 
+

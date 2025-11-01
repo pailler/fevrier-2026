@@ -91,3 +91,4 @@ docker-compose -f docker-compose.prod.yml restart iahome-app
 - ⏳ Attendre 30-60 secondes pour la propagation Cloudflare
 - 🧪 Tester ensuite : `https://librespeed.iahome.fr`
 
+

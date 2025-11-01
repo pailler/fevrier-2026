@@ -171,3 +171,4 @@ Une fois tous les tests réussis :
 - [traefik/dynamic/PAGE-RULES-README.md](./traefik/dynamic/PAGE-RULES-README.md) - Documentation Page Rules
 - [src/app/api/librespeed-redirect/route.ts](./src/app/api/librespeed-redirect/route.ts) - Route de redirection
 
+

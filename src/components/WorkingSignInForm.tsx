@@ -8,12 +8,14 @@ interface WorkingSignInFormProps {
   onSuccess?: (user: any) => void;
   onError?: (error: any) => void;
   className?: string;
+  redirectUrl?: string;
 }
 
 export default function WorkingSignInForm({
   onSuccess,
   onError,
-  className = ""
+  className = "",
+  redirectUrl
 }: WorkingSignInFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -54,8 +56,9 @@ export default function WorkingSignInForm({
         // Utiliser notre hook personnalisé pour gérer l'état d'authentification
         signIn(result.user, result.token);
         
-        // Rediriger vers la page d'accueil
-        router.push('/');
+        // Rediriger vers la page d'origine ou la page d'accueil par défaut
+        const redirectTo = redirectUrl ? decodeURIComponent(redirectUrl) : '/';
+        router.push(redirectTo);
       }
 
       console.log('Connexion réussie:', result.user);

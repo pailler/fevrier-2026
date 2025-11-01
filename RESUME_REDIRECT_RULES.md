@@ -138,3 +138,4 @@ curl -I "https://librespeed.iahome.fr?token=test123"
 curl -I https://iahome.fr/api/librespeed-redirect
 ```
 
+

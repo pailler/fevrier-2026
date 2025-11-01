@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/utils/supabaseClient';
 
 export default function AuthCallback() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [status, setStatus] = useState<string>('Vérification de votre connexion...');
 
   useEffect(() => {
@@ -46,8 +47,12 @@ export default function AuthCallback() {
           // Ne pas essayer de créer le profil manuellement pour éviter les conflits
           console.log('✅ Profil sera créé automatiquement par Supabase si besoin');
           
+          // Récupérer le paramètre redirect de l'URL (peut être dans l'URL ou dans le state OAuth)
+          const redirectParam = searchParams.get('redirect');
+          const redirectUrl = redirectParam ? decodeURIComponent(redirectParam) : '/';
+          
           setStatus('Redirection vers l\'accueil...');
-          setTimeout(() => router.push('/'), 1000);
+          setTimeout(() => router.push(redirectUrl), 1000);
         } else {
           console.log('❌ Aucune session trouvée');
           setStatus('Session non trouvée. Redirection...');
@@ -61,7 +66,7 @@ export default function AuthCallback() {
     };
 
     handleAuth();
-  }, [router]);
+  }, [router, searchParams]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

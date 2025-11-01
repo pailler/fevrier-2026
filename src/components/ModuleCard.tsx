@@ -107,7 +107,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     }
     
     // Image par défaut pour tous les autres modules
-    return '/images/default-module.jpg';
+    return '/images/module-visuals/generic-module.svg';
   };
 
   // Forcer l'utilisation des images JPG simples - éliminer les zones noires

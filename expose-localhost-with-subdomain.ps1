@@ -148,3 +148,4 @@ Write-Host ""
 Write-Host "🎉 Configuration terminée!" -ForegroundColor Green
 Write-Host "🌐 Accès sécurisé: https://$Subdomain.iahome.fr" -ForegroundColor Cyan
 
+

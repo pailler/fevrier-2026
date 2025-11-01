@@ -47,7 +47,7 @@ export default function SignUpSuccessPage() {
           setIsRedirecting(true);
           // Utiliser setTimeout pour éviter l'erreur de rendu
           setTimeout(() => {
-            router.push('/?message=Compte créé avec succès ! Bienvenue sur IAhome.');
+            router.push('/encours?message=Compte créé avec succès ! Bienvenue sur IAhome.');
           }, 100);
           return 0;
         }
@@ -139,13 +139,13 @@ export default function SignUpSuccessPage() {
                   onClick={() => {
                     setIsRedirecting(true);
                     setTimeout(() => {
-                      router.push('/?message=Compte créé avec succès ! Bienvenue sur IAhome.');
+                      router.push('/encours?message=Compte créé avec succès ! Bienvenue sur IAhome.');
                     }, 100);
                   }}
                   disabled={isRedirecting}
                   className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isRedirecting ? 'Redirection...' : 'Aller à l\'accueil maintenant'}
+                  {isRedirecting ? 'Redirection...' : 'Accéder à mes applications'}
                 </button>
                 
                 <button

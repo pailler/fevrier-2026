@@ -31,7 +31,11 @@ function LoginContent() {
 
   const handleAuthSuccess = (user: any) => {
     if (user) {
-      router.push('/');
+      // Récupérer le paramètre redirect de l'URL
+      const redirectParam = searchParams.get('redirect');
+      // Rediriger vers la page d'origine ou la page d'accueil par défaut
+      const redirectUrl = redirectParam ? decodeURIComponent(redirectParam) : '/';
+      router.push(redirectUrl);
     }
   };
 
@@ -86,6 +90,7 @@ function LoginContent() {
               onSuccess={handleAuthSuccess}
               onError={handleAuthError}
               className="mb-6"
+              redirectUrl={searchParams.get('redirect') || undefined}
             />
             
             <div className="relative my-6">
@@ -100,6 +105,7 @@ function LoginContent() {
             <WorkingSignInForm
               onSuccess={handleAuthSuccess}
               onError={handleAuthError}
+              redirectUrl={searchParams.get('redirect') || undefined}
             />
 
             <div className="mt-6 text-center">

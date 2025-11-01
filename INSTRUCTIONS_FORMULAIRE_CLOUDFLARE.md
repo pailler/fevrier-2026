@@ -113,3 +113,4 @@ Si vous ne pouvez pas utiliser "Expression de filtre personnalisé", utilisez "M
 
 Dans ce cas, **toutes** les requêtes vers `librespeed.iahome.fr` seront redirigées, même avec token. La vérification du token sera faite uniquement par Next.js dans `/api/librespeed-redirect`.
 
+

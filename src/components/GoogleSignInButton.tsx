@@ -7,12 +7,14 @@ interface GoogleSignInButtonProps {
   onSuccess?: (user: any) => void;
   onError?: (error: any) => void;
   className?: string;
+  redirectUrl?: string;
 }
 
 export default function GoogleSignInButton({ 
   onSuccess, 
   onError, 
-  className = "" 
+  className = "",
+  redirectUrl
 }: GoogleSignInButtonProps) {
   const [loading, setLoading] = useState(false);
 

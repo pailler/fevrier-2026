@@ -155,3 +155,4 @@ Une fois la Redirect Rule configurée :
 
 Si les fonctionnalités sont bloquées, voir `GUIDE_CLOUDFLARE_REDIRECT_RULES.md` section "Alternative : Proxy Next.js pour Token"
 
+

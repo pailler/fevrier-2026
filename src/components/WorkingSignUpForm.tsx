@@ -90,11 +90,12 @@ export default function WorkingSignUpForm({
         // Connecter l'utilisateur automatiquement
         signIn(result.user, autoToken);
         
+        // Attendre un peu pour que l'authentification soit bien initialisée
         // Rediriger vers la page de succès avec les données utilisateur
         setTimeout(() => {
           const userData = encodeURIComponent(JSON.stringify(result.user));
           router.push(`/signup-success?user=${userData}`);
-        }, 2000);
+        }, 1500);
       }
 
       console.log('Inscription réussie:', result.user);

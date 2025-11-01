@@ -24,6 +24,12 @@ export const getSupabaseClient = (): SupabaseClient => {
         // Configuration pour éviter les instances multiples
         debug: true // Activer les logs pour debug
       },
+      realtime: {
+        // Configuration pour gérer l'absence de WebSocket
+        params: {
+          eventsPerSecond: 10
+        },
+      },
       global: {
         headers: {
           'X-Client-Info': 'iahome-app'

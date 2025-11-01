@@ -49,7 +49,14 @@ export default function EncoursPage() {
     title: ''
   });
   const [tokenError, setTokenError] = useState<string | null>(null);
-  const [cacheBuster] = useState(() => Date.now() + Math.random() * 1000);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [cacheBuster] = useState(() => {
+    try {
+      return Date.now() + Math.random() * 1000;
+    } catch (e) {
+      return Date.now();
+    }
+  });
   const [tokenBalance, setTokenBalance] = useState<number>(0);
   const [tokenHistory, setTokenHistory] = useState<any[]>([]);
   const [loadingTokens, setLoadingTokens] = useState(false);
@@ -66,61 +73,109 @@ export default function EncoursPage() {
       return () => clearTimeout(timeout);
     }
     
-    // Ajouter un petit délai pour s'assurer que l'authentification est bien chargée
+    // Ajouter un délai pour s'assurer que l'authentification est bien chargée
+    // Attendre que authLoading soit terminé avant de vérifier l'authentification
     const timer = setTimeout(() => {
-      if (!isAuthenticated || !user) {
-        console.log('❌ Utilisateur non authentifié, redirection vers /login');
-        router.push('/login');
+      // Si l'authentification est encore en cours de chargement, ne rien faire
+      if (authLoading) {
+        console.log('⏳ Authentification en cours de chargement...');
         return;
       }
       
-      console.log('✅ Utilisateur authentifié:', user.email);
-    }, 100); // 100ms de délai
+      if (!isAuthenticated || !user) {
+        console.log('❌ Utilisateur non authentifié, redirection vers /login');
+        // Préserver la page actuelle pour y revenir après connexion
+        try {
+          router.push('/login?redirect=' + encodeURIComponent('/encours'));
+        } catch (routerError) {
+          console.error('❌ Erreur lors de la redirection:', routerError);
+          // Fallback: redirection directe
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login?redirect=' + encodeURIComponent('/encours');
+          }
+        }
+        return;
+      }
+      
+      console.log('✅ Utilisateur authentifié:', user?.email || 'email non disponible');
+    }, 500); // 500ms de délai pour laisser le temps à l'authentification de se charger
     
     return () => clearTimeout(timer);
   }, [isAuthenticated, user, authLoading, router]);
 
-  // Vérifier s'il y a des erreurs de token dans l'URL
+  // Vérifier s'il y a des erreurs de token ou des messages de succès dans l'URL
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const errorParam = urlParams.get('error');
-    const balanceParam = urlParams.get('balance');
-    const moduleParam = urlParams.get('module');
+    // Vérifier que nous sommes côté client
+    if (typeof window === 'undefined') return;
     
-    if (errorParam) {
-      switch (errorParam) {
-        case 'invalid_token':
-          setTokenError('Token d\'accès invalide. Veuillez cliquer à nouveau sur "Accéder à l\'application".');
-          break;
-        case 'token_expired':
-          setTokenError('Token d\'accès expiré. Veuillez cliquer à nouveau sur "Accéder à l\'application".');
-          break;
-        case 'token_verification_failed':
-          setTokenError('Erreur de vérification du token. Veuillez réessayer.');
-          break;
-        case 'insufficient_tokens':
-          const moduleName = moduleParam || 'cette application';
-          const balance = balanceParam || '0';
-          setTokenError(`🪙 Tokens insuffisants pour accéder à ${moduleName}. Solde actuel: ${balance} token(s). Veuillez acheter des tokens pour continuer.`);
-          break;
-        case 'token_check_failed':
-          setTokenError('Erreur lors de la vérification des tokens. Veuillez réessayer ou contacter le support.');
-          break;
-        default:
-          setTokenError('Erreur d\'accès à l\'application. Veuillez réessayer.');
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const errorParam = urlParams.get('error');
+      const messageParam = urlParams.get('message');
+      const balanceParam = urlParams.get('balance');
+      const moduleParam = urlParams.get('module');
+      
+      // Gérer les messages de succès
+      if (messageParam) {
+        setSuccessMessage(decodeURIComponent(messageParam));
+        // Nettoyer l'URL après avoir récupéré le message
+        try {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } catch (e) {
+          console.warn('Erreur lors du nettoyage de l\'URL:', e);
+        }
+        // Effacer le message après 5 secondes
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 5000);
       }
       
-      // Nettoyer l'URL
-      window.history.replaceState({}, document.title, window.location.pathname);
+      if (errorParam) {
+        switch (errorParam) {
+          case 'invalid_token':
+            setTokenError('Token d\'accès invalide. Veuillez cliquer à nouveau sur "Accéder à l\'application".');
+            break;
+          case 'token_expired':
+            setTokenError('Token d\'accès expiré. Veuillez cliquer à nouveau sur "Accéder à l\'application".');
+            break;
+          case 'token_verification_failed':
+            setTokenError('Erreur de vérification du token. Veuillez réessayer.');
+            break;
+          case 'insufficient_tokens':
+            const moduleName = moduleParam || 'cette application';
+            const balance = balanceParam || '0';
+            setTokenError(`🪙 Tokens insuffisants pour accéder à ${moduleName}. Solde actuel: ${balance} token(s). Veuillez acheter des tokens pour continuer.`);
+            break;
+          case 'token_check_failed':
+            setTokenError('Erreur lors de la vérification des tokens. Veuillez réessayer ou contacter le support.');
+            break;
+          default:
+            setTokenError('Erreur d\'accès à l\'application. Veuillez réessayer.');
+        }
+        
+        // Nettoyer l'URL
+        try {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } catch (e) {
+          console.warn('Erreur lors du nettoyage de l\'URL:', e);
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors de la lecture des paramètres URL:', error);
     }
   }, []);
 
   // Récupérer le rôle de l'utilisateur
   useEffect(() => {
-    if (!user) return;
-    
-    // Le rôle est déjà disponible dans l'objet user de notre système d'authentification
-    setRole(user.role || 'user');
+    try {
+      if (!user) return;
+      
+      // Le rôle est déjà disponible dans l'objet user de notre système d'authentification
+      setRole(user.role || 'user');
+    } catch (error) {
+      console.error('❌ Erreur lors de la récupération du rôle:', error);
+      setRole('user');
+    }
   }, [user]);
 
   // Charger les données de tokens
@@ -162,36 +217,56 @@ export default function EncoursPage() {
   useEffect(() => {
     if (!user?.id) return;
 
-    console.log('🔔 Configuration de l\'écoute en temps réel pour l\'historique des tokens');
+    // Vérifier si WebSocket est disponible
+    const isWebSocketAvailable = typeof window !== 'undefined' && typeof WebSocket !== 'undefined';
+    
+    if (!isWebSocketAvailable) {
+      console.warn('⚠️ WebSocket non disponible, utilisation du polling uniquement');
+    } else {
+      console.log('🔔 Configuration de l\'écoute en temps réel pour l\'historique des tokens');
+    }
 
-    // S'abonner aux changements de la table token_usage (table réelle utilisée)
-    const channel = supabase
-      .channel(`token_usage:${user.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'token_usage',
-          filter: `user_id=eq.${user.id}`
-        },
-        (payload) => {
-          console.log('🔔 Nouvelle utilisation détectée en temps réel:', payload.new);
-          // Rafraîchir immédiatement l'historique (sans dépendance pour éviter les boucles)
-          // eslint-disable-next-line react-hooks/exhaustive-deps
-          fetchTokenData().catch(err => console.error('Erreur fetchTokenData depuis Realtime:', err));
-        }
-      )
-      .subscribe((status) => {
-        console.log('🔔 Statut de l\'abonnement Realtime:', status);
-        if (status === 'SUBSCRIBED') {
-          console.log('✅ Abonnement Realtime actif');
-        } else if (status === 'CHANNEL_ERROR') {
-          console.error('❌ Erreur d\'abonnement Realtime, utilisation du polling de secours');
-        }
-      });
+    let channel: any = null;
 
-    // Polling de secours toutes les 5 secondes si Realtime ne fonctionne pas
+    // Essayer de créer l'abonnement Realtime seulement si WebSocket est disponible
+    if (isWebSocketAvailable) {
+      try {
+        // S'abonner aux changements de la table token_usage (table réelle utilisée)
+        channel = supabase
+          .channel(`token_usage:${user.id}`)
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'token_usage',
+              filter: `user_id=eq.${user.id}`
+            },
+            (payload) => {
+              console.log('🔔 Nouvelle utilisation détectée en temps réel:', payload.new);
+              // Rafraîchir immédiatement l'historique (sans dépendance pour éviter les boucles)
+              // eslint-disable-next-line react-hooks/exhaustive-deps
+              fetchTokenData().catch(err => console.error('Erreur fetchTokenData depuis Realtime:', err));
+            }
+          )
+          .subscribe((status) => {
+            console.log('🔔 Statut de l\'abonnement Realtime:', status);
+            if (status === 'SUBSCRIBED') {
+              console.log('✅ Abonnement Realtime actif');
+            } else if (status === 'CHANNEL_ERROR') {
+              console.warn('⚠️ Erreur d\'abonnement Realtime, utilisation du polling de secours');
+            }
+          });
+      } catch (error: any) {
+        console.error('❌ Erreur lors de la configuration Realtime:', error);
+        if (error?.message?.includes('WebSocket') || error?.message?.includes('websocket')) {
+          console.warn('⚠️ WebSocket non disponible, utilisation du polling uniquement');
+        }
+        channel = null;
+      }
+    }
+
+    // Polling de secours toutes les 5 secondes (toujours actif même si Realtime fonctionne)
     const pollingInterval = setInterval(() => {
       console.log('🔄 Polling de secours - Vérification des nouvelles utilisations');
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -202,7 +277,13 @@ export default function EncoursPage() {
     return () => {
       console.log('🔔 Nettoyage de l\'abonnement en temps réel');
       clearInterval(pollingInterval);
-      supabase.removeChannel(channel);
+      if (channel) {
+        try {
+          supabase.removeChannel(channel);
+        } catch (error) {
+          console.warn('⚠️ Erreur lors du nettoyage du channel Realtime:', error);
+        }
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]); // ✅ Retiré fetchTokenData pour éviter les dépendances circulaires
@@ -283,9 +364,11 @@ export default function EncoursPage() {
         }
 
         if (modulesError) {
-          }
+          // Log l'erreur mais continuer avec les données disponibles
+          console.warn('⚠️ Erreur récupération modules:', modulesError);
+        }
 
-// Vérifier que les données sont valides
+        // Vérifier que les données sont valides
         if (!moduleAccessData) {
           moduleAccessData = []; // Initialiser avec un tableau vide
         }
@@ -319,19 +402,50 @@ export default function EncoursPage() {
           }
           
           // Vérifier que le module est visible dans /encours via l'API de sécurité
+          // Ajout d'un timeout pour éviter que cela bloque le chargement
           try {
-            const securityResponse = await fetch(`/api/check-module-security?module=${access.module_id}&userId=${user.id}`);
-            const securityResult = await securityResponse.json();
+            // Vérifier si AbortController est disponible
+            let controller: AbortController | null = null;
+            let timeoutId: NodeJS.Timeout | null = null;
             
-            if (!securityResult.success || !securityResult.isVisible || !securityResult.hasAccess) {
-              console.log('🔒 Module non visible dans /encours:', access.module_title, securityResult.reason);
-              continue;
+            if (typeof AbortController !== 'undefined') {
+              controller = new AbortController();
+              timeoutId = setTimeout(() => {
+                if (controller) controller.abort();
+              }, 3000); // Timeout de 3 secondes
             }
             
-            console.log('✅ Module visible dans /encours:', access.module_title);
-          } catch (securityError) {
-            console.error('Erreur vérification sécurité module:', securityError);
-            // En cas d'erreur, on garde le module par sécurité
+            const fetchOptions: RequestInit = controller ? { signal: controller.signal } : {};
+            
+            const securityResponse = await fetch(
+              `/api/check-module-security?module=${access.module_id}&userId=${user.id}`,
+              fetchOptions
+            );
+            
+            if (timeoutId) {
+              clearTimeout(timeoutId);
+            }
+            
+            if (!securityResponse.ok) {
+              console.warn('⚠️ Réponse non-OK de check-module-security:', securityResponse.status);
+              // En cas d'erreur HTTP, on garde le module par sécurité
+            } else {
+              const securityResult = await securityResponse.json();
+              
+              if (!securityResult.success || !securityResult.isVisible || !securityResult.hasAccess) {
+                console.log('🔒 Module non visible dans /encours:', access.module_title, securityResult.reason);
+                continue;
+              }
+              
+              console.log('✅ Module visible dans /encours:', access.module_title);
+            }
+          } catch (securityError: any) {
+            if (securityError && securityError.name === 'AbortError') {
+              console.warn('⏱️ Timeout vérification sécurité module:', access.module_title);
+            } else {
+              console.error('Erreur vérification sécurité module:', securityError);
+            }
+            // En cas d'erreur (timeout ou autre), on garde le module par sécurité
           }
           
           // Créer l'objet module
@@ -381,11 +495,21 @@ export default function EncoursPage() {
     };
 
     if (user?.id) {
-      fetchUserModules().catch(err => {
-        console.error('❌ Erreur non gérée dans fetchUserModules:', err);
-        setError('Erreur lors du chargement. Veuillez réessayer.');
+      // Ajouter un timeout de sécurité pour éviter un chargement infini
+      const timeoutId = setTimeout(() => {
+        console.warn('⏱️ Timeout de sécurité: arrêt du chargement après 15 secondes');
         setLoading(false);
-      });
+      }, 15000); // 15 secondes max
+      
+      fetchUserModules()
+        .catch(err => {
+          console.error('❌ Erreur non gérée dans fetchUserModules:', err);
+          setError('Erreur lors du chargement. Veuillez réessayer.');
+          setLoading(false);
+        })
+        .finally(() => {
+          clearTimeout(timeoutId);
+        });
       
       // Charger les tokens séparément pour ne pas bloquer le rendu
       fetchTokenData().catch(err => {
@@ -692,6 +816,21 @@ export default function EncoursPage() {
     );
   }
 
+  // Protection finale : si user est null après toutes les vérifications, ne pas rendre
+  if (!user) {
+    console.error('❌ user is null in render, redirecting...');
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Chargement...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       
@@ -724,6 +863,34 @@ export default function EncoursPage() {
             </button>
           </div>
         </div>
+
+        {/* Affichage des messages de succès */}
+        {successMessage && (
+          <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3 flex-1">
+                <p className="text-sm font-medium text-green-800">
+                  {successMessage}
+                </p>
+              </div>
+              <div className="ml-4 flex-shrink-0">
+                <button
+                  onClick={() => setSuccessMessage(null)}
+                  className="text-green-400 hover:text-green-500"
+                >
+                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Affichage des erreurs de token */}
         {tokenError && (
@@ -1106,6 +1273,10 @@ export default function EncoursPage() {
                         
                         // Applications IA (100 tokens)
                         if (['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui'].includes(moduleId)) {
+                          if (!user) {
+                            console.error('❌ user is null in AIAccessButton');
+                            return null;
+                          }
                           return (
                             <AIAccessButton
                               user={user}
@@ -1132,6 +1303,10 @@ export default function EncoursPage() {
                         
                         // QR Codes (100 tokens) - application premium
                         if (moduleId === 'qrcodes') {
+                          if (!user) {
+                            console.error('❌ user is null in QRCodeAccessButton');
+                            return null;
+                          }
                           return (
                             <QRCodeAccessButton
                               user={user}
@@ -1157,6 +1332,10 @@ export default function EncoursPage() {
                         
                         // Meeting Reports (100 tokens) - compte rendu automatique
                         if (moduleId === 'meeting-reports') {
+                          if (!user) {
+                            console.error('❌ user is null in MeetingReportsAccessButton');
+                            return null;
+                          }
                           return (
                             <MeetingReportsAccessButton
                               user={user}
@@ -1182,6 +1361,10 @@ export default function EncoursPage() {
                         
                         // LibreSpeed - Utiliser le bouton spécial sans demande de mot de passe
                         if (moduleId === 'librespeed') {
+                          if (!user) {
+                            console.error('❌ user is null in LibreSpeedAccessButton');
+                            return null;
+                          }
                           return (
                             <LibreSpeedAccessButton
                               user={user}
@@ -1206,6 +1389,10 @@ export default function EncoursPage() {
                         
                         // Applications essentielles (10 tokens) - sans LibreSpeed (qui a son propre bouton)
                         if (['metube', 'psitransfer', 'pdf', 'cogstudio'].includes(moduleId)) {
+                          if (!user) {
+                            console.error('❌ user is null in EssentialAccessButton');
+                            return null;
+                          }
                           return (
                             <EssentialAccessButton
                               user={user}
@@ -1231,6 +1418,10 @@ export default function EncoursPage() {
                         }
                         
                         // Fallback pour les autres modules
+                        if (!user) {
+                          console.error('❌ user is null in ModuleAccessButton');
+                          return null;
+                        }
                         return (
                           <ModuleAccessButton
                             user={user}
