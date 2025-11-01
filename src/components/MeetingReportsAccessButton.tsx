@@ -47,6 +47,30 @@ export default function MeetingReportsAccessButton({
       console.log('🪙 Meeting Reports: Tokens consommés avec succès:', consumeResult.tokensConsumed);
       console.log('🪙 Meeting Reports: Tokens restants:', consumeResult.tokensRemaining);
 
+      // Incrémenter le compteur d'accès dans user_applications
+      try {
+        const incrementResponse = await fetch('/api/increment-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            userEmail: user.email,
+            moduleId: 'meeting-reports'
+          })
+        });
+
+        if (incrementResponse.ok) {
+          const incrementData = await incrementResponse.json();
+          console.log('✅ Meeting Reports: Compteur incrémenté:', incrementData.usage_count);
+        } else {
+          console.warn('⚠️ Meeting Reports: Erreur incrémentation compteur, continuons...');
+        }
+      } catch (incrementError) {
+        console.warn('⚠️ Meeting Reports: Erreur incrémentation compteur:', incrementError);
+      }
+
       // Accès direct au sous-domaine
       const meetingReportsUrl = 'https://meeting-reports.iahome.fr';
       console.log('🔗 Meeting Reports: Accès direct à:', meetingReportsUrl);

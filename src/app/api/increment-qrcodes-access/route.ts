@@ -124,6 +124,26 @@ export async function POST(request: Request) {
     console.log('✅ QR Codes Access: Compteur incrémenté:', newUsageCount, '/', maxUsage);
     console.log(`✅ QR Codes Access: ${tokensToConsume} tokens consommés. Restants:`, userTokens.tokens - tokensToConsume);
 
+    // Enregistrer l'utilisation dans token_usage pour l'historique "Mes dernières utilisations"
+    const { error: tokenUsageError } = await supabase
+      .from('token_usage')
+      .insert({
+        user_id: userId,
+        module_id: 'qrcodes',
+        module_name: 'QR Codes',
+        action_type: 'access',
+        tokens_consumed: tokensToConsume,
+        usage_date: now,
+        created_at: now
+      });
+
+    if (tokenUsageError) {
+      console.error('❌ QR Codes Access: Erreur enregistrement token_usage:', tokenUsageError);
+      // Ne pas faire échouer la requête pour une erreur d'historique
+    } else {
+      console.log('✅ QR Codes Access: Utilisation enregistrée dans token_usage pour l\'historique');
+    }
+
     return new NextResponse(JSON.stringify({
       success: true,
       usage_count: updatedApp.usage_count,

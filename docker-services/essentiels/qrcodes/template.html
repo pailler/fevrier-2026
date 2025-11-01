@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' http://localhost:7006 https://qrcodes.iahome.fr;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' http://localhost:7006 http://localhost:3000 https://qrcodes.iahome.fr https://iahome.fr;">
     <title>Générateur de QR Codes Dynamiques - IAHome</title>
     <style>
         * {
@@ -2135,12 +2135,18 @@
                 };
                 console.log('Donnees envoyees:', requestData);
                 
-                // Utiliser toujours l'URL relative (fonctionne en production et développement)
-                const response = await fetch('/api/dynamic/qr', {
+                // Appeler l'API Next.js pour l'authentification et l'enregistrement dans token_usage
+                // Utiliser l'URL absolue vers Next.js pour garantir l'authentification
+                const apiUrl = window.location.origin === 'https://qrcodes.iahome.fr' 
+                    ? 'https://iahome.fr/api/dynamic/qr'  // Production : appeler Next.js
+                    : 'http://localhost:3000/api/dynamic/qr';  // Dev : appeler Next.js local
+                
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
+                    credentials: 'include',  // Inclure les cookies pour l'authentification
                     body: JSON.stringify(requestData)
                 });
 

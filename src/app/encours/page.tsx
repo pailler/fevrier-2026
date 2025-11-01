@@ -595,6 +595,14 @@ export default function EncoursPage() {
     return 'text-green-600';
   };
 
+  // Calculer une date d'expiration virtuelle (1 mois après la création) si expires_at est null
+  const getVirtualExpirationDate = (createdAt: string): string => {
+    const created = new Date(createdAt);
+    const virtualExpiration = new Date(created);
+    virtualExpiration.setMonth(virtualExpiration.getMonth() + 1); // Ajouter 1 mois
+    return virtualExpiration.toISOString();
+  };
+
   const getUsageColor = (current: number, max: number) => {
     const percentage = max ? (current / max) * 100 : 0;
     if (percentage >= 90) return 'text-red-600';
@@ -955,9 +963,10 @@ export default function EncoursPage() {
             {/* Grille des modules améliorée */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {userModules.map((module) => {
-                const isExpired = !!(module.expires_at && new Date(module.expires_at) <= new Date());
-                const isExpiringSoon = module.expires_at && getDaysRemaining(module.expires_at) <= 7;
-                                 const maxUsage = module.max_usage || 20;
+                const expirationDate = module.expires_at || getVirtualExpirationDate(module.created_at);
+                const isExpired = new Date(expirationDate) <= new Date();
+                const isExpiringSoon = getDaysRemaining(expirationDate) <= 7;
+                const maxUsage = module.max_usage || 20;
                 const isQuotaExceeded = (module.current_usage || 0) >= maxUsage;
                 
                 return (
@@ -983,17 +992,33 @@ export default function EncoursPage() {
                           <span className="px-2 py-1 rounded-full text-xs font-bold bg-white/20 text-white">
                             {getModuleTypeIcon(module)} {getModuleTypeLabel(module)}
                           </span>
-                          {module.expires_at && (
-                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                              isExpired 
-                                ? 'bg-red-500 text-white' 
-                                : isExpiringSoon
-                                  ? 'bg-yellow-500 text-white'
-                                  : 'bg-white/20 text-white'
-                            }`}>
-                              {formatTimeRemaining(module.expires_at)}
-                            </span>
-                          )}
+                          {(() => {
+                            const expirationDate = module.expires_at || getVirtualExpirationDate(module.created_at);
+                            const isVirtualExpiration = !module.expires_at;
+                            const days = getDaysRemaining(expirationDate);
+                            const isExpired = days < 0;
+                            const isExpiringSoon = days <= 7;
+                            
+                            return (
+                              <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                isExpired 
+                                  ? 'bg-red-500 text-white' 
+                                  : isExpiringSoon
+                                    ? 'bg-yellow-500 text-white'
+                                    : isVirtualExpiration
+                                      ? 'bg-green-500 text-white'
+                                      : 'bg-white/20 text-white'
+                              }`}>
+                                {(() => {
+                                  const days = getDaysRemaining(expirationDate);
+                                  if (days < 0) return 'Expiré';
+                                  if (days === 0) return 'Aujourd\'hui';
+                                  if (days === 1) return 'Demain';
+                                  return `${days} jours`;
+                                })()}
+                              </span>
+                            );
+                          })()}
                         </div>
                       </div>
                       
@@ -1029,26 +1054,38 @@ export default function EncoursPage() {
                             <span className="text-sm text-blue-700 font-medium">Date de début :</span>
                             <span className="text-sm font-semibold text-blue-900">{formatDate(module.created_at)}</span>
                         </div>
-                        {module.expires_at && (
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-blue-700 font-medium">Date de fin :</span>
-                              <span className={`text-sm font-semibold ${getTimeRemainingColor(module.expires_at)}`}>
-                              {formatDate(module.expires_at)}
-                            </span>
-                          </div>
-                        )}
-                          <div className="mt-2 pt-2 border-t border-blue-200">
-                            <div className="flex justify-between items-center">
-                              <span className="text-xs text-blue-600 font-medium">Durée restante :</span>
-                              {module.expires_at ? (
-                                <span className={`text-xs font-bold ${getTimeRemainingColor(module.expires_at)}`}>
-                                  {formatTimeRemaining(module.expires_at)}
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-blue-700 font-medium">Date de fin :</span>
+                          {(() => {
+                            const expirationDate = module.expires_at || getVirtualExpirationDate(module.created_at);
+                            return (
+                              <span className={`text-sm font-semibold ${getTimeRemainingColor(expirationDate)}`}>
+                                {formatDate(expirationDate)}
+                              </span>
+                            );
+                          })()}
+                        </div>
+                        <div className="mt-2 pt-2 border-t border-blue-200">
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs text-blue-600 font-medium">Durée restante :</span>
+                            {(() => {
+                              const expirationDate = module.expires_at || getVirtualExpirationDate(module.created_at);
+                              const days = getDaysRemaining(expirationDate);
+                              const displayText = days < 0 
+                                ? 'Expiré' 
+                                : days === 0 
+                                  ? 'Expire aujourd\'hui'
+                                  : days === 1
+                                    ? 'Expire demain'
+                                    : `${days} jours`;
+                              return (
+                                <span className={`text-xs font-bold ${getTimeRemainingColor(expirationDate)}`}>
+                                  {displayText}
                                 </span>
-                              ) : (
-                                <span className="text-xs font-bold text-green-600">Expire dans un mois</span>
-                              )}
-                            </div>
+                              );
+                            })()}
                           </div>
+                        </div>
                         </div>
                       </div>
 
@@ -1090,11 +1127,14 @@ export default function EncoursPage() {
                               user={user}
                               onAccessGranted={(url) => {
                                 console.log(`🔗 ${moduleTitle}: Accès autorisé:`, url);
-                                console.log('🔄 onAccessGranted: Rafraîchissement immédiat des tokens');
+                                console.log('🔄 onAccessGranted: Rafraîchissement immédiat des tokens et modules');
                                 fetchTokenData();
+                                // Rafraîchir aussi les modules pour mettre à jour usage_count
+                                refreshData();
                                 setTimeout(() => {
-                                  console.log('🔄 onAccessGranted: Rafraîchissement différé des tokens');
+                                  console.log('🔄 onAccessGranted: Rafraîchissement différé des tokens et modules');
                                   fetchTokenData();
+                                  refreshData();
                                 }, 2000);
                               }}
                               onAccessDenied={(reason) => {
@@ -1112,11 +1152,14 @@ export default function EncoursPage() {
                               user={user}
                               onAccessGranted={(url) => {
                                 console.log(`🔗 ${moduleTitle}: Accès autorisé:`, url);
-                                console.log('🔄 onAccessGranted: Rafraîchissement immédiat des tokens');
+                                console.log('🔄 onAccessGranted: Rafraîchissement immédiat des tokens et modules');
                                 fetchTokenData();
+                                // Rafraîchir aussi les modules pour mettre à jour usage_count
+                                refreshData();
                                 setTimeout(() => {
-                                  console.log('🔄 onAccessGranted: Rafraîchissement différé des tokens');
+                                  console.log('🔄 onAccessGranted: Rafraîchissement différé des tokens et modules');
                                   fetchTokenData();
+                                  refreshData();
                                 }, 2000);
                               }}
                               onAccessDenied={(reason) => {

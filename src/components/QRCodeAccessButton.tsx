@@ -44,6 +44,30 @@ export default function QRCodeAccessButton({
       console.log('🪙 QR Codes: Tokens consommés avec succès:', consumeResult.tokensConsumed);
       console.log('🪙 QR Codes: Tokens restants:', consumeResult.tokensRemaining);
 
+      // Incrémenter le compteur d'accès dans user_applications
+      try {
+        const incrementResponse = await fetch('/api/increment-module-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            userEmail: user.email,
+            moduleId: 'qrcodes'
+          })
+        });
+
+        if (incrementResponse.ok) {
+          const incrementData = await incrementResponse.json();
+          console.log('✅ QR Codes: Compteur incrémenté:', incrementData.usage_count);
+        } else {
+          console.warn('⚠️ QR Codes: Erreur incrémentation compteur, continuons...');
+        }
+      } catch (incrementError) {
+        console.warn('⚠️ QR Codes: Erreur incrémentation compteur:', incrementError);
+      }
+
       // Accès direct au sous-domaine
       const qrcodesUrl = 'https://qrcodes.iahome.fr';
       console.log('🔗 QR Codes: Accès direct à:', qrcodesUrl);

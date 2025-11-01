@@ -208,14 +208,37 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Tokens consommés:', tokensToConsume, 'Restants:', newTokenCount, 'pour userId:', userId);
 
-    // Enregistrer l'utilisation dans l'historique via user_applications
-    // Mettre à jour last_used_at pour l'historique
+    // Enregistrer l'utilisation dans token_usage pour l'historique "Mes dernières utilisations"
     if (moduleId && moduleId !== 'test') {
+      const now = new Date().toISOString();
+      
+      // Créer une entrée dans token_usage pour l'historique
+      const { error: tokenUsageError } = await supabase
+        .from('token_usage')
+        .insert({
+          user_id: actualUserId,
+          module_id: moduleId,
+          module_name: moduleName || moduleId,
+          action_type: 'access',
+          tokens_consumed: tokensToConsume,
+          usage_date: now,
+          created_at: now
+        });
+
+      if (tokenUsageError) {
+        console.error('❌ Erreur enregistrement token_usage:', tokenUsageError);
+        // Ne pas faire échouer la requête pour une erreur d'historique
+      } else {
+        console.log('✅ Utilisation enregistrée dans token_usage pour l\'historique');
+      }
+
+      // Enregistrer l'utilisation dans l'historique via user_applications
+      // Mettre à jour last_used_at pour l'historique
       // D'abord récupérer le usage_count actuel
       const { data: currentApp, error: fetchError } = await supabase
         .from('user_applications')
         .select('usage_count')
-        .eq('user_id', userId)
+        .eq('user_id', actualUserId)
         .eq('module_id', moduleId)
         .single();
 
@@ -223,17 +246,17 @@ export async function POST(request: NextRequest) {
         const { error: historyError } = await supabase
           .from('user_applications')
           .update({
-            last_used_at: new Date().toISOString(),
+            last_used_at: now,
             usage_count: (currentApp.usage_count || 0) + 1
           })
-          .eq('user_id', userId)
+          .eq('user_id', actualUserId)
           .eq('module_id', moduleId);
 
         if (historyError) {
-          console.error('❌ Erreur enregistrement historique:', historyError);
+          console.error('❌ Erreur enregistrement historique user_applications:', historyError);
           // Ne pas faire échouer la requête pour une erreur d'historique
         } else {
-          console.log('✅ Utilisation enregistrée dans l\'historique');
+          console.log('✅ Utilisation enregistrée dans user_applications');
         }
       }
     }
