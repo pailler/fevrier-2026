@@ -23,7 +23,9 @@ RUN mkdir -p uploads reports
 EXPOSE 8000
 
 # Run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Utiliser hypercorn au lieu de uvicorn pour supporter les gros fichiers (500MB)
+# Hypercorn permet de configurer max_incomplete_size pour les uploads volumineux
+CMD ["hypercorn", "main:app", "--bind", "0.0.0.0:8000", "--max-incomplete-size", "524288000", "--reload"]
 
 
 

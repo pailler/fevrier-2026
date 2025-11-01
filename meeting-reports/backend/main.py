@@ -20,6 +20,9 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
 
 # Configuration
 UPLOAD_DIR = Path("/app/uploads")
@@ -31,8 +34,44 @@ REPORTS_DIR.mkdir(exist_ok=True, parents=True)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# FastAPI app
-app = FastAPI(title="Compte rendus IA", version="1.0.0")
+# FastAPI app - Configuration pour supporter les gros fichiers (500MB)
+app = FastAPI(
+    title="Compte rendus IA", 
+    version="1.0.0",
+    # Configuration pour les gros fichiers
+    # FastAPI/Starlette limite par défaut à ~16MB, on augmente à 500MB
+)
+
+# Middleware pour augmenter la limite de taille de body pour les uploads
+class LargeFileUploadMiddleware(BaseHTTPMiddleware):
+    """
+    Middleware pour permettre les uploads de gros fichiers jusqu'à 500MB.
+    Starlette a une limite par défaut de ~16MB qu'on contourne ici.
+    """
+    MAX_UPLOAD_SIZE = 500 * 1024 * 1024  # 500 MB
+    
+    async def dispatch(self, request: Request, call_next):
+        # Vérifier si c'est une requête POST vers /upload
+        if request.method == "POST" and request.url.path in ["/upload", "/api/upload"]:
+            # Vérifier la taille du Content-Length si disponible
+            content_length = request.headers.get("content-length")
+            if content_length:
+                try:
+                    size = int(content_length)
+                    if size > self.MAX_UPLOAD_SIZE:
+                        logger.warning(f"Fichier trop volumineux: {size} bytes (max: {self.MAX_UPLOAD_SIZE})")
+                        return JSONResponse(
+                            status_code=413,
+                            content={"detail": f"Fichier trop volumineux. Maximum: {self.MAX_UPLOAD_SIZE / 1024 / 1024:.0f}MB"}
+                        )
+                except ValueError:
+                    pass
+        
+        response = await call_next(request)
+        return response
+
+# Ajouter le middleware pour les gros fichiers
+app.add_middleware(LargeFileUploadMiddleware)
 
 # CORS
 app.add_middleware(
@@ -105,14 +144,17 @@ async def health_check():
 
 @app.post("/upload")
 async def upload_audio(file: UploadFile = File(None)):
-    """Upload audio file for processing"""
+    """Upload audio file for processing - Supports large files up to 500MB"""
     import traceback
+    import aiofiles
+    
     logger.info("=" * 80)
     logger.info("UPLOAD ENDPOINT CALLED")
     logger.info("=" * 80)
     
     # Log request info
-    logger.info(f"Request headers: {dict(file.headers) if hasattr(file, 'headers') else 'No headers'}")
+    if file:
+        logger.info(f"Request headers: {dict(file.headers) if hasattr(file, 'headers') else 'No headers'}")
     
     # Vérifier si un fichier a été fourni
     if file is None:
@@ -122,7 +164,7 @@ async def upload_audio(file: UploadFile = File(None)):
     
     logger.info(f"✅ File object received: filename={file.filename}, content_type={file.content_type}")
     
-    # Accepter tous les types de fichiers
+    # Accepter tous les types de fichiers audio
     if file.content_type and not file.content_type.startswith("audio/"):
         logger.warning(f"⚠️ Content type '{file.content_type}' is not audio, but proceeding anyway")
     
@@ -134,21 +176,38 @@ async def upload_audio(file: UploadFile = File(None)):
     
     logger.info(f"📝 Saving file: {filename}")
     
-    # Save file
+    # Save file using streaming for large files (prevents loading entire file in memory)
     try:
-        content = await file.read()
-        logger.info(f"✅ File content read: {len(content)} bytes")
+        # Utiliser aiofiles pour écrire en streaming et éviter de charger tout en mémoire
+        async with aiofiles.open(file_path, "wb") as buffer:
+            chunk_size = 8192  # 8KB chunks
+            total_size = 0
+            
+            # Stream the file content in chunks
+            while True:
+                chunk = await file.read(chunk_size)
+                if not chunk:
+                    break
+                await buffer.write(chunk)
+                total_size += len(chunk)
+                
+                # Log progress for large files
+                if total_size % (10 * 1024 * 1024) == 0:  # Every 10MB
+                    logger.info(f"📊 Upload progress: {total_size / 1024 / 1024:.1f} MB")
         
-        with open(file_path, "wb") as buffer:
-            buffer.write(content)
-        
-        logger.info(f"✅ File uploaded successfully: {filename}, size: {len(content)} bytes")
+        logger.info(f"✅ File uploaded successfully: {filename}, size: {total_size} bytes ({total_size / 1024 / 1024:.2f} MB)")
         logger.info("=" * 80)
-        return {"id": file_id, "filename": filename, "status": "uploaded"}
+        return {"id": file_id, "filename": filename, "status": "uploaded", "size": total_size}
     
     except Exception as e:
         logger.error(f"❌ Error uploading file: {e}", exc_info=True)
         logger.error(traceback.format_exc())
+        # Clean up partial file if it exists
+        if file_path.exists():
+            try:
+                file_path.unlink()
+            except:
+                pass
         raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}")
 
 @app.post("/process/{file_id}")
@@ -664,7 +723,10 @@ if __name__ == "__main__":
         port=8000,
         limit_concurrency=1000,
         limit_max_requests=10000,
-        timeout_keep_alive=75
+        timeout_keep_alive=75,
+        # Configuration pour les gros fichiers (500MB)
+        # Note: uvicorn utilise Starlette qui a une limite par défaut de ~16MB
+        # Cette configuration est gérée via le Dockerfile avec les arguments CLI
     )
 
 

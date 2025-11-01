@@ -70,6 +70,16 @@ function App() {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        // Configuration pour les gros fichiers
+        maxContentLength: 524288000, // 500MB
+        maxBodyLength: 524288000, // 500MB
+        timeout: 600000, // 10 minutes timeout pour les gros fichiers
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setProcessingStatus(`Upload en cours: ${percentCompleted}% (${(progressEvent.loaded / 1024 / 1024).toFixed(1)} MB / ${(progressEvent.total / 1024 / 1024).toFixed(1)} MB)`);
+          }
+        },
       });
 
       console.log('Upload response:', uploadResponse.data);
