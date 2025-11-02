@@ -21,23 +21,19 @@ export async function POST(request: NextRequest) {
         .eq('user_id', userId)
         .single();
 
-      let currentTokens = 10; // Valeur par défaut
-      
-      if (!tokensError && userTokens) {
-        currentTokens = userTokens.tokens;
-      } else {
-        // Créer une entrée par défaut si elle n'existe pas
-        const { error: insertError } = await supabase
-          .from('user_tokens')
-          .insert([{
-            user_id: userId,
-            tokens: 10
-          }]);
-
-        if (insertError) {
-          console.log('⚠️ LibreSpeed: Table user_tokens non disponible, autorisation par défaut');
-        }
+      if (tokensError || !userTokens) {
+        // L'utilisateur n'a pas de tokens, pas d'accès
+        console.log('❌ LibreSpeed Access: Utilisateur sans tokens pour userId:', userId);
+        return NextResponse.json({
+          hasAccess: false,
+          error: 'Tokens insuffisants',
+          currentTokens: 0,
+          requiredTokens: 10,
+          message: 'Vous devez acheter des tokens pour utiliser ce service'
+        });
       }
+
+      const currentTokens = userTokens.tokens || 0;
 
       // Vérifier si l'utilisateur a assez de tokens (10 tokens requis)
       if (currentTokens < 10) {

@@ -38,7 +38,25 @@ export default function AIAccessButton({
       >
         {isLoading ? '⏳ Ouverture...' : `🤖 Accéder à ${moduleTitle} (100 tokens)`}
       </button>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && (
+        <p className="text-red-500 text-sm">
+          {error.includes('Rechargez') || error.includes('tokens') ? (
+            <>
+              Plus de tokens ?{' '}
+              <a 
+                href="https://iahome.fr/pricing" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="underline font-semibold hover:text-red-700"
+              >
+                rechargez
+              </a>
+            </>
+          ) : (
+            error
+          )}
+        </p>
+      )}
     </div>
   );
 }

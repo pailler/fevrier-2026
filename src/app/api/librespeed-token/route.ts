@@ -24,9 +24,6 @@ export async function POST(request: NextRequest) {
 
     console.log('🔑 LibreSpeed: Génération token pour:', { userId, userEmail });
     
-    // Variable pour stocker le nombre de tokens restants
-    let currentTokens = 0;
-    
     // 🪙 GESTION DES TOKENS : Vérifier et consommer 10 tokens
     try {
       // Récupérer le solde actuel
@@ -36,43 +33,25 @@ export async function POST(request: NextRequest) {
         .eq('user_id', userId)
         .single();
 
-      let currentTokens = 10; // Valeur par défaut
-      
-      if (!tokensError && userTokens) {
-        currentTokens = userTokens.tokens;
-      } else {
-        // Créer une entrée par défaut si elle n'existe pas
-        const { error: insertError } = await supabase
-          .from('user_tokens')
-          .insert([{
-            user_id: userId,
-            tokens: 10
-          }]);
-
-        if (insertError) {
-          console.log('⚠️ LibreSpeed: Table user_tokens non disponible, simulation de la consommation');
-          // Simuler la consommation
-          const newTokenCount = Math.max(0, currentTokens - 10);
-          console.log('🪙 LibreSpeed: Simulation consommation: 10 tokens pour:', userEmail);
-          console.log('🪙 LibreSpeed: Tokens restants:', newTokenCount);
-
-          const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-          
-          return new NextResponse(JSON.stringify({
-            success: true,
-            token: token,
-            expiresIn: 300, // 5 minutes
-            tokensConsumed: 10,
-            tokensRemaining: newTokenCount
-          }), { 
-            status: 200,
-            headers: {
-              ...corsHeaders,
-              'Content-Type': 'application/json'
-            }
-          });
-        }
+      if (tokensError || !userTokens) {
+        // L'utilisateur n'a pas de tokens, il doit passer par les achats
+        console.log('❌ LibreSpeed: Utilisateur sans tokens:', userEmail);
+        return new NextResponse(JSON.stringify({
+          success: false,
+          error: 'Tokens insuffisants',
+          currentTokens: 0,
+          requiredTokens: 10,
+          message: 'Vous devez acheter des tokens pour utiliser ce service'
+        }), { 
+          status: 400,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json'
+          }
+        });
       }
+
+      let currentTokens = userTokens.tokens || 0;
 
       // Vérifier si l'utilisateur a assez de tokens
       if (currentTokens < 10) {
@@ -102,7 +81,9 @@ export async function POST(request: NextRequest) {
         console.error('Erreur lors de la mise à jour des tokens:', updateError);
         return new NextResponse(JSON.stringify({
           success: false,
-          error: 'Erreur lors de la consommation des tokens'
+          error: 'Plus de tokens ? Rechargez',
+          message: 'Plus de tokens ? Rechargez',
+          pricingUrl: 'https://iahome.fr/pricing'
         }), { 
           status: 500,
           headers: {
@@ -113,35 +94,37 @@ export async function POST(request: NextRequest) {
       }
 
       console.log('🪙 LibreSpeed: Token consommé: 10, Restants:', newTokenCount, 'pour:', userEmail);
-      currentTokens = newTokenCount; // Mettre à jour currentTokens pour la réponse
+      
+      // Générer un token aléatoire simple
+      const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      
+      return new NextResponse(JSON.stringify({
+        success: true,
+        token: token,
+        expiresIn: 300, // 5 minutes
+        tokensConsumed: 10,
+        tokensRemaining: newTokenCount
+      }), { 
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      });
 
     } catch (error) {
-      console.log('⚠️ LibreSpeed: Table user_tokens non disponible, simulation de la consommation');
-      // Simuler la consommation
-      const initialTokens = 10;
-      const newTokenCount = Math.max(0, initialTokens - 10);
-      console.log('🪙 LibreSpeed: Simulation consommation: 10 tokens pour:', userEmail);
-      console.log('🪙 LibreSpeed: Tokens restants:', newTokenCount);
-      currentTokens = newTokenCount; // Mettre à jour currentTokens pour la réponse
+      console.error('❌ LibreSpeed: Erreur lors de la gestion des tokens:', error);
+      return new NextResponse(JSON.stringify({
+        success: false,
+        error: 'Erreur lors de la vérification des tokens'
+      }), { 
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      });
     }
-    
-    // Générer un token aléatoire simple
-    const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    
-    ;
-    return new NextResponse(JSON.stringify({
-      success: true,
-      token: token,
-      expiresIn: 300, // 5 minutes
-      tokensConsumed: 10,
-      tokensRemaining: currentTokens
-    }), { 
-      status: 200,
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'application/json'
-      }
-    });
 
   } catch (error) {
     console.error('❌ LibreSpeed Token Error:', error);

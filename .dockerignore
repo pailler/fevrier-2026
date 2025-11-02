@@ -68,3 +68,20 @@ test-*
 tmp/
 temp/
 uploads/
+
+# Gros fichiers et binaires
+cloudflared.exe*
+*.exe.backup
+*.exe.old
+ffmpeg/
+instantmesh/ckpts/
+instantmesh/inputs/
+instantmesh/outputs/
+essentiels/polr-db-data/
+essentiels/uploads/
+meeting-reports/uploads/
+meeting-reports/frontend/node_modules/.cache/
+meeting-reports/backend/uploads/
+
+# Cache de build Next.js (sera régénéré)
+.next/cache/

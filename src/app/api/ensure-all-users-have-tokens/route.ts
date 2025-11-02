@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '../../../utils/supabaseClient';
 
 /**
- * Route API pour s'assurer que tous les utilisateurs dans profiles ont des tokens
- * Crée automatiquement 200 tokens pour les utilisateurs qui n'en ont pas
+ * Route API pour vérifier l'état des tokens de tous les utilisateurs
+ * NE CRÉE PAS de tokens automatiquement
+ * Les tokens sont créés UNIQUEMENT lors de l'inscription
+ * Les utilisateurs sans tokens doivent passer par les achats
  */
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 Vérification et création automatique des tokens pour tous les utilisateurs...');
+    console.log('🔍 Vérification de l\'état des tokens pour tous les utilisateurs...');
 
     // 1. Récupérer tous les utilisateurs depuis profiles
     const { data: profiles, error: profilesError } = await supabase
@@ -28,19 +30,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Aucun utilisateur trouvé',
-        created: 0,
-        updated: 0,
         total: 0
       });
     }
 
     console.log(`📊 ${profiles.length} utilisateurs trouvés`);
 
-    let createdCount = 0;
-    let updatedCount = 0;
     const results = [];
 
-    // 2. Pour chaque utilisateur, vérifier et créer/mettre à jour les tokens
+    // 2. Pour chaque utilisateur, vérifier l'état des tokens (SANS CRÉER)
     for (const profile of profiles) {
       try {
         // Vérifier si l'utilisateur a déjà des tokens
@@ -51,81 +49,22 @@ export async function POST(request: NextRequest) {
           .single();
 
         if (tokensError && tokensError.code === 'PGRST116') {
-          // PGRST116 = no rows returned - créer les tokens
-          console.log(`🪙 Création de 200 tokens pour ${profile.email}...`);
-          
-          const { error: insertError } = await supabase
-            .from('user_tokens')
-            .insert([{
-              user_id: profile.id,
-              tokens: 200,
-              package_name: 'Welcome Package',
-              purchase_date: new Date().toISOString(),
-              is_active: true
-            }]);
-
-          if (insertError) {
-            console.error(`❌ Erreur création tokens pour ${profile.email}:`, insertError);
-            results.push({
-              email: profile.email,
-              userId: profile.id,
-              status: 'error',
-              action: 'create',
-              error: insertError.message
-            });
-          } else {
-            console.log(`✅ 200 tokens créés pour ${profile.email}`);
-            createdCount++;
-            results.push({
-              email: profile.email,
-              userId: profile.id,
-              status: 'created',
-              tokens: 200
-            });
-          }
+          // PGRST116 = no rows returned - utilisateur sans tokens
+          results.push({
+            email: profile.email,
+            userId: profile.id,
+            status: 'no_tokens',
+            tokens: 0,
+            message: 'Utilisateur sans tokens - doit passer par les achats'
+          });
         } else if (userTokens) {
           // L'utilisateur a déjà des tokens
-          if (userTokens.tokens < 200) {
-            // Mettre à jour à 200 tokens si moins de 200
-            console.log(`🔄 Mise à jour de ${userTokens.tokens} à 200 tokens pour ${profile.email}...`);
-            
-            const { error: updateError } = await supabase
-              .from('user_tokens')
-              .update({
-                tokens: 200,
-                updated_at: new Date().toISOString()
-              })
-              .eq('user_id', profile.id);
-
-            if (updateError) {
-              console.error(`❌ Erreur mise à jour tokens pour ${profile.email}:`, updateError);
-              results.push({
-                email: profile.email,
-                userId: profile.id,
-                status: 'error',
-                action: 'update',
-                error: updateError.message
-              });
-            } else {
-              console.log(`✅ Tokens mis à jour à 200 pour ${profile.email}`);
-              updatedCount++;
-              results.push({
-                email: profile.email,
-                userId: profile.id,
-                status: 'updated',
-                oldTokens: userTokens.tokens,
-                newTokens: 200
-              });
-            }
-          } else {
-            // L'utilisateur a déjà 200 tokens ou plus
-            results.push({
-              email: profile.email,
-              userId: profile.id,
-              status: 'ok',
-              tokens: userTokens.tokens
-            });
-          }
+          results.push({
+            email: profile.email,
+            userId: profile.id,
+            status: 'has_tokens',
+            tokens: userTokens.tokens
+          });
         } else {
           // Erreur inattendue
           console.error(`❌ Erreur inattendue pour ${profile.email}:`, tokensError);
@@ -148,16 +87,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    console.log(`✅ Traitement terminé: ${createdCount} créés, ${updatedCount} mis à jour`);
+    const usersWithoutTokens = results.filter(r => r.status === 'no_tokens').length;
+    const usersWithTokens = results.filter(r => r.status === 'has_tokens').length;
+
+    console.log(`✅ Vérification terminée: ${usersWithTokens} avec tokens, ${usersWithoutTokens} sans tokens`);
 
     return NextResponse.json({
       success: true,
-      message: 'Vérification et création des tokens terminées',
+      message: 'Vérification des tokens terminée (aucune création automatique)',
       summary: {
         total: profiles.length,
-        created: createdCount,
-        updated: updatedCount,
-        ok: profiles.length - createdCount - updatedCount
+        withTokens: usersWithTokens,
+        withoutTokens: usersWithoutTokens
       },
       results: results
     });
@@ -210,11 +151,11 @@ export async function GET(request: NextRequest) {
         .eq('user_id', profile.id)
         .single();
 
-      if (!userTokens || userTokens.tokens === null || userTokens.tokens < 200) {
+      if (!userTokens || userTokens.tokens === null) {
         usersWithoutTokens.push({
           email: profile.email,
           userId: profile.id,
-          tokens: userTokens?.tokens || 0
+          tokens: 0
         });
       } else {
         usersWithTokens.push({

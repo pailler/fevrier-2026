@@ -42,8 +42,9 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
       
       if (!consumeResult.success) {
         console.log(`🪙 ${moduleTitle}: Échec consommation tokens:`, consumeResult.reason);
-        setError(consumeResult.reason || 'Erreur lors de la consommation des tokens');
-        onAccessDenied?.(consumeResult.reason || 'Erreur tokens');
+        const errorMessage = consumeResult.reason || 'Plus de tokens ? Rechargez';
+        setError(errorMessage);
+        onAccessDenied?.(errorMessage);
         return;
       }
       

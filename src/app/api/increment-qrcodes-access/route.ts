@@ -81,7 +81,9 @@ export async function POST(request: Request) {
       console.error('❌ QR Codes Access: Erreur consommation tokens:', updateTokensError);
       return new NextResponse(JSON.stringify({
         success: false,
-        error: 'Erreur lors de la consommation des tokens'
+        error: 'Plus de tokens ? Rechargez',
+        message: 'Plus de tokens ? Rechargez',
+        pricingUrl: 'https://iahome.fr/pricing'
       }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }

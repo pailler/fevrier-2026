@@ -54,15 +54,11 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">10 utilisations MeTube</span>
+                    <span className="text-gray-600">2 utilisations IA (200 tokens)</span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">10 utilisations PDF+</span>
-                  </li>
-                  <li className="flex items-center">
-                    <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">1 utilisation IA</span>
+                    <span className="text-gray-600">10 utilisations Applis essentielles</span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
@@ -110,15 +106,11 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">100 utilisations MeTube</span>
-                  </li>
-                  <li className="flex items-center">
-                    <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">100 utilisations PDF+</span>
-                  </li>
-                  <li className="flex items-center">
-                    <span className="text-green-500 mr-2">✓</span>
                     <span className="text-gray-600">10 utilisations IA</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-gray-600">100 utilisations Applis essentielles</span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
@@ -161,15 +153,11 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">300 utilisations MeTube</span>
-                  </li>
-                  <li className="flex items-center">
-                    <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">300 utilisations PDF+</span>
-                  </li>
-                  <li className="flex items-center">
-                    <span className="text-green-500 mr-2">✓</span>
                     <span className="text-gray-600">30 utilisations IA</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-gray-600">300 utilisations Applis essentielles</span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
@@ -212,15 +200,11 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">2000 utilisations MeTube</span>
-                  </li>
-                  <li className="flex items-center">
-                    <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">2000 utilisations PDF+</span>
-                  </li>
-                  <li className="flex items-center">
-                    <span className="text-green-500 mr-2">✓</span>
                     <span className="text-gray-600">200 utilisations IA</span>
+                  </li>
+                  <li className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <span className="text-gray-600">2000 utilisations Applis essentielles</span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
@@ -241,22 +225,21 @@ export default function PricingPage() {
               <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">
                 💰 Coûts par application
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                <div className="bg-white rounded-lg p-4 text-center">
-                  <div className="text-lg font-bold text-blue-600 mb-1">10 tokens</div>
-                  <div className="text-gray-600">MeTube</div>
-                  <div className="text-gray-600">LibreSpeed</div>
-                </div>
-                <div className="bg-white rounded-lg p-4 text-center">
-                  <div className="text-lg font-bold text-blue-600 mb-1">10 tokens</div>
-                  <div className="text-gray-600">PDF+</div>
-                  <div className="text-gray-600">QR Codes</div>
-                  <div className="text-gray-600">PsiTransfer</div>
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                 <div className="bg-white rounded-lg p-4 text-center">
                   <div className="text-lg font-bold text-blue-600 mb-1">100 tokens</div>
                   <div className="text-gray-600">Applications IA</div>
                   <div className="text-gray-600">(StableDiffusion, ComfyUI, etc.)</div>
+                </div>
+                <div className="bg-white rounded-lg p-4 text-center">
+                  <div className="text-lg font-bold text-blue-600 mb-1">10 tokens</div>
+                  <div className="text-gray-600">Applis essentielles</div>
+                  <div className="text-gray-600">(MeTube, PDF+, LibreSpeed, etc.)</div>
+                </div>
+                <div className="bg-white rounded-lg p-4 text-center">
+                  <div className="text-lg font-bold text-blue-600 mb-1">10 tokens</div>
+                  <div className="text-gray-600">QR Codes</div>
+                  <div className="text-gray-600">PsiTransfer</div>
                 </div>
               </div>
             </div>

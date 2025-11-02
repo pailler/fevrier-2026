@@ -141,7 +141,11 @@ export async function POST(request: NextRequest) {
     if (updateError) {
       console.error('Erreur lors de la mise à jour des tokens:', updateError);
       return NextResponse.json(
-        { error: 'Erreur lors de la consommation des tokens' },
+        { 
+          error: 'Plus de tokens ? Rechargez',
+          message: 'Plus de tokens ? Rechargez',
+          pricingUrl: 'https://iahome.fr/pricing'
+        },
         { status: 500 }
       );
     }

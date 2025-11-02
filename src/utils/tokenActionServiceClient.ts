@@ -47,7 +47,8 @@ export class TokenActionServiceClient {
           success: false,
           tokensConsumed: 0,
           tokensRemaining: 0,
-          reason: errorData.message || 'Erreur lors de la consommation des tokens'
+          reason: errorData.message || 'Plus de tokens ? Rechargez',
+          pricingUrl: errorData.pricingUrl || 'https://iahome.fr/pricing'
         };
       }
 

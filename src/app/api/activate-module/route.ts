@@ -37,36 +37,22 @@ export async function POST(request: NextRequest) {
       .eq('user_id', userId)
       .single();
 
-    let currentTokens = 10; // Valeur par défaut
-    
-    if (!tokensError && userTokens) {
-      currentTokens = userTokens.tokens;
-    } else {
-      // Créer une entrée par défaut si elle n'existe pas
-      const { error: insertError } = await supabase
-        .from('user_tokens')
-        .insert([{
-          user_id: userId,
-          tokens: 10
-        }]);
-
-      if (insertError) {
-        console.log('⚠️ Table user_tokens non disponible, simulation de la consommation');
-        // Simuler la consommation
-        const newTokenCount = Math.max(0, currentTokens - moduleCost);
-        console.log(`🪙 Simulation consommation: ${moduleCost} tokens pour:`, userEmail);
-        console.log('🪙 Tokens restants:', newTokenCount);
-
-        return NextResponse.json({
-          success: true,
-          message: `Module ${moduleName} activé avec succès`,
-          tokensConsumed: moduleCost,
-          tokensRemaining: newTokenCount,
-          moduleId,
-          moduleName
-        });
-      }
+    if (tokensError || !userTokens) {
+      // L'utilisateur n'a pas de tokens, il doit passer par les achats
+      console.log('❌ Activation module: Utilisateur sans tokens:', userEmail);
+      return NextResponse.json(
+        { 
+          error: 'Tokens insuffisants',
+          currentTokens: 0,
+          requiredTokens: moduleCost,
+          insufficient: true,
+          message: 'Vous devez acheter des tokens pour activer ce module'
+        },
+        { status: 400 }
+      );
     }
+
+    const currentTokens = userTokens.tokens || 0;
 
     // 3. Vérifier si l'utilisateur a assez de tokens
     if (currentTokens < moduleCost) {
@@ -111,7 +97,11 @@ export async function POST(request: NextRequest) {
     if (updateError) {
       console.error('Erreur lors de la mise à jour des tokens:', updateError);
       return NextResponse.json(
-        { error: 'Erreur lors de la consommation des tokens' },
+        { 
+          error: 'Plus de tokens ? Rechargez',
+          message: 'Plus de tokens ? Rechargez',
+          pricingUrl: 'https://iahome.fr/pricing'
+        },
         { status: 500 }
       );
     }

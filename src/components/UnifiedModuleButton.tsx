@@ -45,7 +45,25 @@ export default function UnifiedModuleButton({
       >
         {isLoading ? '⏳ Ouverture...' : `🚀 Accéder à ${moduleTitle}`}
       </button>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && (
+        <p className="text-red-500 text-sm">
+          {error.includes('Rechargez') || error.includes('tokens') ? (
+            <>
+              Plus de tokens ?{' '}
+              <a 
+                href="https://iahome.fr/pricing" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="underline font-semibold hover:text-red-700"
+              >
+                rechargez
+              </a>
+            </>
+          ) : (
+            error
+          )}
+        </p>
+      )}
     </div>
   );
 }

@@ -25,6 +25,7 @@ export interface TokenConsumptionResult {
   tokensConsumed: number;
   tokensRemaining: number;
   reason?: string;
+  pricingUrl?: string;
 }
 
 export class TokenActionService {
@@ -74,7 +75,8 @@ export class TokenActionService {
           success: false,
           tokensConsumed: 0,
           tokensRemaining: 0,
-          reason: errorData.message || 'Erreur lors de la consommation des tokens'
+          reason: errorData.message || 'Plus de tokens ? Rechargez',
+          pricingUrl: errorData.pricingUrl || 'https://iahome.fr/pricing'
         };
       }
 
