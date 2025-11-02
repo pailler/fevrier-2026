@@ -158,6 +158,10 @@ export default function CardDetailPage() {
       const expirationHours = moduleTitle.toLowerCase() === 'ruinedfooocus' ? 12 : undefined;
       
       // Rediriger directement vers l'application via sous-domaines
+      // En développement : utiliser localhost si disponible
+      // En production : utiliser les sous-domaines publics
+      const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+      
       const applicationUrls = {
         'librespeed': 'https://librespeed.iahome.fr',
         'metube': 'https://metube.iahome.fr',
@@ -167,7 +171,8 @@ export default function CardDetailPage() {
         'pdf': 'https://pdf.iahome.fr',
         'stablediffusion': 'https://stablediffusion.iahome.fr',
         'comfyui': 'https://comfyui.iahome.fr',
-        'meeting-reports': 'https://meeting-reports.iahome.fr',
+        // Meeting Reports : localhost:3050 en dev, meeting-reports.iahome.fr en prod
+        'meeting-reports': isDevelopment ? 'http://localhost:3050' : 'https://meeting-reports.iahome.fr',
         'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
         'cogstudio': 'https://cogstudio.iahome.fr',
       };

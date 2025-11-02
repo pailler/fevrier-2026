@@ -283,7 +283,9 @@ export default function MeetingReportsPage() {
 
   const handleQuickAccess = () => {
     // URL par défaut pour Meeting Reports
-    const meetingReportsUrl = 'https://meeting-reports.iahome.fr';
+    // Meeting Reports : localhost:3050 en dev, meeting-reports.iahome.fr en prod
+    const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const meetingReportsUrl = isDevelopment ? 'http://localhost:3050' : 'https://meeting-reports.iahome.fr';
     const moduleUrl = card?.url || meetingReportsUrl;
     
     if (isFreeModule) {

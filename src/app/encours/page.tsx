@@ -554,7 +554,10 @@ export default function EncoursPage() {
       'ruinedfooocus': 'http://localhost:7861',  // RuinedFooocus accès direct
       'comfyui': 'http://localhost:8188',  // ComfyUI accès direct
       'cogstudio': 'http://localhost:8086',  // CogStudio accès direct
-      'meeting-reports': 'https://meeting-reports.iahome.fr',  // Meeting Reports direct avec token
+      // Meeting Reports : localhost:3050 en dev, meeting-reports.iahome.fr en prod
+      'meeting-reports': (typeof window !== 'undefined' && window.location.hostname === 'localhost') 
+        ? 'http://localhost:3050' 
+        : 'https://meeting-reports.iahome.fr',
     };
     
     // Convertir module_id numérique en slug si nécessaire

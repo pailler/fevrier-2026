@@ -156,14 +156,15 @@ http:
       priority: 200
     
     # Meeting Reports
-    meeting-reports-redirect-rule:
-      rule: "Host(`meeting-reports.iahome.fr`) && !PathPrefix(`/.well-known/acme-challenge`) && !PathPrefix(`/api`)"
-      entryPoints: ["websecure"]
-      service: redirect-handler
-      middlewares: ["subdomain-redirect-meeting-reports"]
-      tls:
-        certResolver: letsencrypt
-      priority: 200
+    # Meeting Reports : Route désactivée car gérée par traefik-meeting-reports.yml
+    # meeting-reports-redirect-rule:
+    #   rule: "Host(`meeting-reports.iahome.fr`) && !PathPrefix(`/.well-known/acme-challenge`) && !PathPrefix(`/api`)"
+    #   entryPoints: ["websecure"]
+    #   service: redirect-handler
+    #   middlewares: ["subdomain-redirect-meeting-reports"]
+    #   tls:
+    #     certResolver: letsencrypt
+    #   priority: 1  # Priorité basse pour ne pas interférer avec /api
     
     # PsiTransfer
     psitransfer-redirect-rule:

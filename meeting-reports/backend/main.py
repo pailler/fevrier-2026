@@ -175,25 +175,38 @@ async def upload_audio(file: UploadFile = File(None)):
     file_path = UPLOAD_DIR / filename
     
     logger.info(f"📝 Saving file: {filename}")
+    logger.info(f"📦 Expected file size from headers: {file.headers.get('content-length', 'unknown') if hasattr(file, 'headers') else 'unknown'} bytes")
     
     # Save file using streaming for large files (prevents loading entire file in memory)
     try:
         # Utiliser aiofiles pour écrire en streaming et éviter de charger tout en mémoire
+        # Augmenter la taille des chunks pour améliorer les performances (64KB au lieu de 8KB)
         async with aiofiles.open(file_path, "wb") as buffer:
-            chunk_size = 8192  # 8KB chunks
+            chunk_size = 65536  # 64KB chunks pour meilleures performances
             total_size = 0
+            last_logged = 0
             
-            # Stream the file content in chunks
+            logger.info(f"🚀 Starting file stream...")
+            
+            # Stream the file content in chunks avec timeout
             while True:
-                chunk = await file.read(chunk_size)
-                if not chunk:
-                    break
-                await buffer.write(chunk)
-                total_size += len(chunk)
-                
-                # Log progress for large files
-                if total_size % (10 * 1024 * 1024) == 0:  # Every 10MB
-                    logger.info(f"📊 Upload progress: {total_size / 1024 / 1024:.1f} MB")
+                try:
+                    # Lire le chunk avec timeout pour éviter les blocages
+                    chunk = await asyncio.wait_for(file.read(chunk_size), timeout=300.0)  # 5 minutes timeout par chunk
+                    if not chunk:
+                        break
+                    
+                    await buffer.write(chunk)
+                    total_size += len(chunk)
+                    
+                    # Log progress plus fréquent pour les gros fichiers (toutes les 5MB)
+                    if total_size - last_logged >= (5 * 1024 * 1024):  # Every 5MB
+                        logger.info(f"📊 Upload progress: {total_size / 1024 / 1024:.1f} MB")
+                        last_logged = total_size
+                        
+                except asyncio.TimeoutError:
+                    logger.error(f"❌ Timeout while reading chunk at {total_size} bytes")
+                    raise HTTPException(status_code=408, detail=f"Upload timeout after {total_size / 1024 / 1024:.1f} MB")
         
         logger.info(f"✅ File uploaded successfully: {filename}, size: {total_size} bytes ({total_size / 1024 / 1024:.2f} MB)")
         logger.info("=" * 80)
@@ -599,113 +612,223 @@ def generate_pdf(report: dict, output_path: str):
         # Story to build the PDF
         story = []
         
-        # Title
+        # Title - Style amélioré
         title_style = ParagraphStyle(
             'CustomTitle',
             parent=styles['Heading1'],
-            fontSize=24,
+            fontSize=28,
             textColor='#1e40af',
-            spaceAfter=30,
-            alignment=TA_CENTER
+            spaceAfter=20,
+            spaceBefore=10,
+            alignment=TA_CENTER,
+            fontName='Helvetica-Bold'
         )
-        story.append(Paragraph("Compte-rendu de réunion", title_style))
-        story.append(Spacer(1, 0.5*inch))
+        story.append(Paragraph("Compte-rendu de Réunion", title_style))
+        story.append(Spacer(1, 0.3*inch))
         
-        # Report info
+        # Report info - Style amélioré avec fond
         info_style = ParagraphStyle(
             'Info',
             parent=styles['Normal'],
             fontSize=10,
-            textColor='#6b7280',
-            spaceAfter=10
+            textColor='#4b5563',
+            spaceAfter=8,
+            backColor='#f3f4f6',
+            borderPadding=8
         )
-        story.append(Paragraph(f"<b>Fichier:</b> {report.get('filename', 'N/A')}", info_style))
-        story.append(Paragraph(f"<b>Date:</b> {report.get('created_at', 'N/A')}", info_style))
-        story.append(Spacer(1, 0.3*inch))
+        info_box_style = ParagraphStyle(
+            'InfoBox',
+            parent=styles['Normal'],
+            fontSize=10,
+            textColor='#6b7280',
+            spaceAfter=5
+        )
+        story.append(Paragraph(f"<b>Fichier:</b> {report.get('filename', 'N/A')}", info_box_style))
+        story.append(Paragraph(f"<b>Date de création:</b> {report.get('created_at', 'N/A')}", info_box_style))
+        if report.get('duration'):
+            story.append(Paragraph(f"<b>Durée:</b> {report.get('duration', 'N/A')}", info_box_style))
+        story.append(Spacer(1, 0.4*inch))
         
-        # Summary
+        # Summary - Style amélioré
         subtitle_style = ParagraphStyle(
             'Subtitle',
             parent=styles['Heading2'],
-            fontSize=16,
+            fontSize=18,
             textColor='#1e40af',
-            spaceBefore=20,
-            spaceAfter=15
+            spaceBefore=25,
+            spaceAfter=12,
+            fontName='Helvetica-Bold',
+            borderWidth=1,
+            borderColor='#1e40af',
+            borderPadding=8,
+            backColor='#eff6ff'
         )
-        story.append(Paragraph("Résumé", subtitle_style))
+        story.append(Paragraph("📋 Résumé", subtitle_style))
         
         normal_style = ParagraphStyle(
             'Normal',
             parent=styles['Normal'],
-            fontSize=11,
+            fontSize=12,
             alignment=TA_JUSTIFY,
-            spaceAfter=20
+            spaceAfter=12,
+            leading=14,
+            leftIndent=0,
+            rightIndent=0
         )
         
         summary = report.get('summary', '')
-        # Split summary into sentences
-        sentences = summary.split(',')
-        for sentence in sentences:
-            if sentence.strip():
-                story.append(Paragraph(sentence.strip(), normal_style))
+        # Handle summary - can be string or list
+        if isinstance(summary, list):
+            summary = ' '.join(str(s) for s in summary if s)
+        elif not isinstance(summary, str):
+            summary = str(summary) if summary else ''
+        
+        # Format summary as paragraphs
+        if summary:
+            # Split by periods or newlines for better paragraph breaks
+            paragraphs = summary.replace('. ', '.\n').split('\n')
+            for para in paragraphs:
+                para = para.strip()
+                if para:
+                    # Remove trailing period if followed by new paragraph
+                    if para.endswith('.') and len(para) > 1:
+                        para = para[:-1]
+                    story.append(Paragraph(para, normal_style))
         
         story.append(Spacer(1, 0.2*inch))
         
-        # Key Points
-        story.append(Paragraph("Points clés", subtitle_style))
+        # Key Points - Style amélioré
+        story.append(Paragraph("🔑 Points clés", subtitle_style))
         bullet_style = ParagraphStyle(
             'Bullet',
             parent=styles['Normal'],
             fontSize=11,
+            leftIndent=20,
             bulletIndent=10,
-            spaceAfter=10
+            spaceAfter=8,
+            leading=14
         )
         
         key_points = report.get('key_points', [])
         if isinstance(key_points, str):
             key_points = [kp.strip() for kp in key_points.split(',') if kp.strip()]
+        elif not isinstance(key_points, list):
+            key_points = [str(key_points)] if key_points else []
         
+        # Handle list items that might be nested lists
+        key_points_flat = []
         for point in key_points:
-            if point.strip():
+            if isinstance(point, list):
+                key_points_flat.extend([str(p) for p in point if p])
+            else:
+                key_points_flat.append(str(point))
+        
+        for point in key_points_flat:
+            point = point.strip()
+            if point:
                 story.append(Paragraph(f"• {point}", normal_style))
         
         story.append(Spacer(1, 0.2*inch))
         
-        # Action Items
-        story.append(Paragraph("Éléments d'action", subtitle_style))
+        # Action Items - Style amélioré
+        story.append(Paragraph("✅ Éléments d'action", subtitle_style))
         
         action_items = report.get('action_items', [])
         if isinstance(action_items, str):
             action_items = [ai.strip() for ai in action_items.split(',') if ai.strip()]
+        elif not isinstance(action_items, list):
+            action_items = [str(action_items)] if action_items else []
         
+        # Handle list items that might be nested lists
+        action_items_flat = []
         for item in action_items:
-            if item.strip():
+            if isinstance(item, list):
+                action_items_flat.extend([str(i) for i in item if i])
+            else:
+                action_items_flat.append(str(item))
+        
+        for item in action_items_flat:
+            item = item.strip()
+            if item:
                 story.append(Paragraph(f"• {item}", normal_style))
         
         story.append(Spacer(1, 0.2*inch))
         
-        # Participants
-        story.append(Paragraph("Participants", subtitle_style))
+        # Participants - Style amélioré
+        story.append(Paragraph("👥 Participants", subtitle_style))
         
         participants = report.get('participants', [])
         if isinstance(participants, str):
             participants = [p.strip() for p in participants.split(',') if p.strip()]
+        elif not isinstance(participants, list):
+            participants = [str(participants)] if participants else []
         
+        # Handle list items that might be nested lists
+        participants_flat = []
         for participant in participants:
-            if participant.strip():
+            if isinstance(participant, list):
+                participants_flat.extend([str(p) for p in participant if p])
+            else:
+                participants_flat.append(str(participant))
+        
+        for participant in participants_flat:
+            participant = participant.strip()
+            if participant:
                 story.append(Paragraph(f"• {participant}", normal_style))
         
         story.append(PageBreak())
         
-        # Full Transcript
-        story.append(Paragraph("Transcription complète", subtitle_style))
+        # Full Transcript - Style amélioré
+        transcript_title_style = ParagraphStyle(
+            'TranscriptTitle',
+            parent=styles['Heading2'],
+            fontSize=18,
+            textColor='#1e40af',
+            spaceBefore=25,
+            spaceAfter=15,
+            fontName='Helvetica-Bold'
+        )
+        story.append(Paragraph("📝 Transcription complète", transcript_title_style))
+        
+        transcript_style = ParagraphStyle(
+            'Transcript',
+            parent=styles['Normal'],
+            fontSize=10,
+            alignment=TA_JUSTIFY,
+            spaceAfter=8,
+            leading=12,
+            leftIndent=10,
+            rightIndent=10
+        )
         transcript = report.get('transcript', '')
+        # Handle transcript - can be string or list
+        if isinstance(transcript, list):
+            transcript = ' '.join(str(t) for t in transcript if t)
+        elif not isinstance(transcript, str):
+            transcript = str(transcript) if transcript else ''
+        
         # Split transcript into paragraphs
-        paragraphs = transcript.split('\n')
-        for para in paragraphs:
-            if para.strip():
-                story.append(Paragraph(para.strip(), normal_style))
-                story.append(Spacer(1, 0.1*inch))
+        if transcript:
+            paragraphs = transcript.split('\n')
+            for para in paragraphs:
+                para = para.strip()
+                if para:
+                    story.append(Paragraph(para, transcript_style))
+                    story.append(Spacer(1, 0.08*inch))
+        
+        # Footer
+        story.append(Spacer(1, 0.3*inch))
+        footer_style = ParagraphStyle(
+            'Footer',
+            parent=styles['Normal'],
+            fontSize=9,
+            textColor='#9ca3af',
+            alignment=TA_CENTER,
+            spaceBefore=20
+        )
+        story.append(Paragraph("─" * 50, footer_style))
+        story.append(Paragraph("Généré par Compte rendus IA - IAHome", footer_style))
+        story.append(Paragraph(f"Document généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')}", footer_style))
         
         # Build PDF
         doc.build(story)

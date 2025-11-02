@@ -47,6 +47,9 @@ export default function AuthCallback() {
           // Ne pas essayer de créer le profil manuellement pour éviter les conflits
           console.log('✅ Profil sera créé automatiquement par Supabase si besoin');
           
+          // Les tokens sont créés uniquement lors de l'inscription (dans /api/auth/callback)
+          // Pas de création automatique lors de la connexion
+          
           // Récupérer le paramètre redirect de l'URL (peut être dans l'URL ou dans le state OAuth)
           const redirectParam = searchParams.get('redirect');
           const redirectUrl = redirectParam ? decodeURIComponent(redirectParam) : '/';

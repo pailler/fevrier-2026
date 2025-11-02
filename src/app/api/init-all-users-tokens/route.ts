@@ -21,7 +21,6 @@ export async function POST(request: NextRequest) {
     console.log(`📊 ${profiles?.length || 0} utilisateurs trouvés`);
 
     let totalCreated = 0;
-    let totalUpdated = 0;
 
     // 2. Pour chaque utilisateur, s'assurer qu'il a des tokens
     for (const profile of profiles || []) {
@@ -39,12 +38,12 @@ export async function POST(request: NextRequest) {
         }
 
         if (!existingTokens) {
-          // Créer les tokens par défaut
+          // Créer les tokens par défaut (200 tokens pour les nouveaux utilisateurs)
           const { error: insertError } = await supabase
             .from('user_tokens')
             .insert([{
               user_id: profile.id,
-              tokens: 100, // 100 tokens par défaut
+              tokens: 200, // 200 tokens par défaut pour les nouveaux utilisateurs
               package_name: 'Welcome Package',
               purchase_date: new Date().toISOString(),
               is_active: true
@@ -53,26 +52,13 @@ export async function POST(request: NextRequest) {
           if (insertError) {
             console.error(`❌ Erreur création tokens pour ${profile.email}:`, insertError);
           } else {
-            console.log(`✅ 100 tokens créés pour ${profile.email}`);
+            console.log(`✅ 200 tokens créés pour ${profile.email}`);
             totalCreated++;
           }
         } else {
-          // Vérifier si l'utilisateur a moins de 100 tokens et les compléter
-          if (existingTokens.tokens < 100) {
-            const { error: updateError } = await supabase
-              .from('user_tokens')
-              .update({ tokens: 100 })
-              .eq('user_id', profile.id);
-
-            if (updateError) {
-              console.error(`❌ Erreur mise à jour tokens pour ${profile.email}:`, updateError);
-            } else {
-              console.log(`✅ Tokens complétés à 100 pour ${profile.email}`);
-              totalUpdated++;
-            }
-          } else {
-            console.log(`✅ ${profile.email} a déjà ${existingTokens.tokens} tokens`);
-          }
+          // Ne pas mettre à jour automatiquement les tokens existants
+          // Les tokens sont gérés uniquement par l'achat et la consommation
+          console.log(`✅ ${profile.email} a déjà ${existingTokens.tokens} tokens`);
         }
       } catch (error) {
         console.error(`❌ Erreur traitement ${profile.email}:`, error);
@@ -89,15 +75,13 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('🎯 Initialisation terminée!');
-    console.log(`📊 ${totalCreated} enregistrements créés`);
-    console.log(`📊 ${totalUpdated} enregistrements mis à jour`);
+    console.log(`📊 ${totalCreated} enregistrements créés pour les nouveaux utilisateurs`);
     console.log(`📊 ${finalTokens?.length || 0} utilisateurs avec tokens au total`);
 
     return NextResponse.json({
       success: true,
-      message: 'Tokens utilisateur initialisés avec succès',
+      message: 'Tokens utilisateur initialisés avec succès (uniquement pour les utilisateurs sans tokens)',
       totalCreated,
-      totalUpdated,
       totalUsers: finalTokens?.length || 0,
       tokens: finalTokens || []
     });

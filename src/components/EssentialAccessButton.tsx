@@ -33,7 +33,10 @@ export default function EssentialAccessButton({
     'whisper': 'https://whisper.iahome.fr',
     'stablediffusion': 'https://stablediffusion.iahome.fr',
     'comfyui': 'https://comfyui.iahome.fr',
-    'meeting-reports': 'https://meeting-reports.iahome.fr',
+    // Meeting Reports : localhost:3050 en dev, meeting-reports.iahome.fr en prod
+    'meeting-reports': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+      ? 'http://localhost:3050'
+      : 'https://meeting-reports.iahome.fr',
     'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
     'cogstudio': 'https://cogstudio.iahome.fr',
   };

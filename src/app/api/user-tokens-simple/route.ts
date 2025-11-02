@@ -43,65 +43,26 @@ export async function GET(request: NextRequest) {
       .eq('user_id', actualUserId)
       .single();
 
-    let tokens = 200; // Valeur par défaut pour les nouveaux utilisateurs
-    let packageName = 'Welcome Package';
-    let purchaseDate = new Date().toISOString();
-    let isActive = true;
-
     if (tokensError) {
-      console.error('❌ Erreur récupération tokens:', tokensError);
-      
-      // Si l'utilisateur n'a pas d'entrée dans user_tokens, créer une entrée par défaut
-      console.log('🔄 Création d\'une entrée par défaut pour userId:', userId);
-      
-      const { error: insertError } = await supabase
-        .from('user_tokens')
-        .insert([{
-          user_id: actualUserId,
-          tokens: 200, // 200 tokens pour les nouveaux utilisateurs
-          package_name: 'Welcome Package',
-          purchase_date: new Date().toISOString(),
-          is_active: true
-        }]);
-
-      if (insertError) {
-        console.error('❌ Erreur création entrée par défaut:', insertError);
-        // Utiliser les valeurs par défaut
-      } else {
-        console.log('✅ Entrée par défaut créée avec 200 tokens pour userId:', userId);
-        tokens = 200;
-      }
-    } else if (userTokens) {
-      // Utiliser les vraies valeurs de la base de données
-      tokens = userTokens.tokens !== null ? userTokens.tokens : 200;
-      packageName = userTokens.package_name || 'Welcome Package';
-      purchaseDate = userTokens.purchase_date || new Date().toISOString();
-      isActive = userTokens.is_active !== false;
-      
-      // Si l'utilisateur a 0 tokens ou moins, mettre à jour à 200 tokens (nouveaux utilisateurs)
-      if (tokens <= 0) {
-        console.log('🔄 Utilisateur avec 0 tokens détecté, mise à jour à 200 tokens pour userId:', userId);
-        const { error: updateError } = await supabase
-          .from('user_tokens')
-          .update({
-            tokens: 200,
-            package_name: 'Welcome Package',
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', actualUserId);
-        
-        if (!updateError) {
-          tokens = 200;
-          console.log('✅ Tokens mis à jour à 200 pour userId:', userId);
-        } else {
-          console.error('❌ Erreur mise à jour tokens:', updateError);
-        }
-      }
-      
-      console.log('✅ Tokens récupérés depuis la DB:', tokens, 'pour userId:', userId);
+      // Si l'utilisateur n'a pas de tokens, retourner 0
+      // Les tokens ne sont créés QUE lors de l'inscription, pas automatiquement ici
+      console.log('⚠️ Utilisateur sans tokens (doit passer par les achats):', userId);
+      return NextResponse.json({
+        tokens: 0,
+        tokensRemaining: 0,
+        packageName: null,
+        purchaseDate: null,
+        isActive: false
+      });
     }
 
-    console.log('🪙 Retour de', tokens, 'tokens pour userId:', userId);
+    // Utiliser les vraies valeurs de la base de données
+    const tokens = userTokens.tokens !== null ? userTokens.tokens : 0;
+    const packageName = userTokens.package_name || null;
+    const purchaseDate = userTokens.purchase_date || null;
+    const isActive = userTokens.is_active !== false;
+    
+    console.log('✅ Tokens récupérés depuis la DB:', tokens, 'pour userId:', userId);
 
     return NextResponse.json({
       tokens: tokens,
@@ -160,38 +121,23 @@ export async function POST(request: NextRequest) {
       .eq('user_id', actualUserId)
       .single();
 
-    let currentTokens = 200; // Valeur par défaut pour les nouveaux utilisateurs
-    
     if (tokensError) {
-      console.error('❌ Erreur récupération tokens pour consommation:', tokensError);
-      
-      // Créer une entrée par défaut si elle n'existe pas
-      console.log('🔄 Création d\'une entrée par défaut pour consommation userId:', userId);
-      
-      const { error: insertError } = await supabase
-        .from('user_tokens')
-        .insert([{
-          user_id: actualUserId,
-          tokens: 200, // 200 tokens pour les nouveaux utilisateurs
-          package_name: 'Welcome Package',
-          purchase_date: new Date().toISOString(),
-          is_active: true
-        }]);
-
-      if (insertError) {
-        console.error('❌ Erreur création entrée par défaut pour consommation:', insertError);
-        return NextResponse.json(
-          { error: 'Impossible de créer l\'entrée de tokens' },
-          { status: 500 }
-        );
-      } else {
-        console.log('✅ Entrée par défaut créée avec 200 tokens pour consommation userId:', userId);
-        currentTokens = 200;
-      }
-    } else if (userTokens) {
-      currentTokens = userTokens.tokens || 200;
-      console.log('✅ Solde actuel récupéré:', currentTokens, 'tokens pour userId:', userId);
+      // Si l'utilisateur n'a pas de tokens, il doit passer par les achats
+      console.error('❌ Utilisateur sans tokens pour consommation:', userId);
+      return NextResponse.json(
+        { 
+          error: 'Tokens insuffisants',
+          currentTokens: 0,
+          requiredTokens: tokensToConsume,
+          insufficient: true,
+          message: 'Vous devez acheter des tokens pour utiliser ce service'
+        },
+        { status: 400 }
+      );
     }
+
+    const currentTokens = userTokens.tokens || 0;
+    console.log('✅ Solde actuel récupéré:', currentTokens, 'tokens pour userId:', userId);
 
     // Vérifier si l'utilisateur a assez de tokens
     if (currentTokens < tokensToConsume) {

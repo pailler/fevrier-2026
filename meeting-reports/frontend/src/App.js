@@ -8,7 +8,16 @@ import ReportViewer from './components/ReportViewer';
 import './App.css';
 
 // Utiliser le domaine public pour les requêtes via Cloudflare
+// TEMPORAIRE : Pour tester sans Cloudflare, décommentez la ligne suivante :
+// const API_BASE_URL = 'http://localhost:8000';  // Direct backend, bypass Cloudflare/Traefik
 const API_BASE_URL = '/api';
+
+// URL pour les uploads : utiliser le sous-domaine dédié (bypass limite Cloudflare 1MB)
+// En développement : localhost, en production : upload-meeting-reports.iahome.fr
+const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+const UPLOAD_API_URL = isDevelopment 
+  ? 'http://localhost:8000/upload'  // Direct backend en dev
+  : 'https://upload-meeting-reports.iahome.fr/api/upload';  // Sous-domaine dédié en prod
 
 function App() {
   const [reports, setReports] = useState([]);
@@ -66,19 +75,31 @@ function App() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const uploadResponse = await axios.post(`${API_BASE_URL}/upload`, formData, {
+      // Utiliser le sous-domaine dédié pour les uploads (bypass limite Cloudflare 1MB)
+      const uploadResponse = await axios.post(UPLOAD_API_URL, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
         // Configuration pour les gros fichiers
         maxContentLength: 524288000, // 500MB
         maxBodyLength: 524288000, // 500MB
-        timeout: 600000, // 10 minutes timeout pour les gros fichiers
+        timeout: 1800000, // 30 minutes timeout pour les très gros fichiers (244MB)
+        // Configuration pour éviter les timeouts sur les connexions lentes
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
             setProcessingStatus(`Upload en cours: ${percentCompleted}% (${(progressEvent.loaded / 1024 / 1024).toFixed(1)} MB / ${(progressEvent.total / 1024 / 1024).toFixed(1)} MB)`);
+            
+            // Log pour debugging
+            if (percentCompleted % 10 === 0) {
+              console.log(`Upload progress: ${percentCompleted}%`);
+            }
           }
+        },
+        // Configuration axios pour les gros fichiers
+        maxRedirects: 5,
+        validateStatus: function (status) {
+          return status >= 200 && status < 500; // Ne pas considérer 413 comme une erreur fatale
         },
       });
 

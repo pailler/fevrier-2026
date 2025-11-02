@@ -1,0 +1,94 @@
+# Configuration Traefik pour upload-meeting-reports.iahome.fr
+# Sous-domaine dédié pour les uploads (bypass Cloudflare Proxy 1MB limit)
+
+http:
+  routers:
+    # Route pour /api/upload avec priorité élevée
+    upload-meeting-reports-upload:
+      rule: "Host(`upload-meeting-reports.iahome.fr`) && PathPrefix(`/api/upload`)"
+      service: upload-meeting-reports-api-service
+      priority: 100  # Priorité très élevée
+      entryPoints:
+        - websecure
+        - web
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - upload-meeting-reports-upload-nobuffer
+        - upload-meeting-reports-stripprefix
+        - upload-meeting-reports-headers
+        - upload-meeting-reports-cors
+    
+    # Route générale pour /api (hors upload)
+    upload-meeting-reports-api:
+      rule: "Host(`upload-meeting-reports.iahome.fr`) && PathPrefix(`/api`) && !PathPrefix(`/api/upload`)"
+      service: upload-meeting-reports-api-service
+      priority: 1  # Priorité plus basse
+      entryPoints:
+        - websecure
+        - web
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - upload-meeting-reports-stripprefix
+        - upload-meeting-reports-headers
+        - upload-meeting-reports-cors
+        - upload-meeting-reports-buffer
+
+  services:
+    upload-meeting-reports-api-service:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:8000"  # Backend direct
+        healthCheck:
+          path: "/health"
+          interval: "30s"
+          timeout: "5s"
+
+  middlewares:
+    # Buffer pour les autres routes API
+    upload-meeting-reports-buffer:
+      buffering:
+        maxRequestBodyBytes: 524288000  # 500 MB maximum
+        memRequestBodyBytes: 524288000  # 500 MB en mémoire
+        memResponseBodyBytes: 10485760  # 10 MB pour les réponses
+    
+    # Pas de buffer pour les uploads (streaming)
+    upload-meeting-reports-upload-nobuffer:
+      buffering:
+        maxRequestBodyBytes: 524288000  # 500 MB maximum
+        memRequestBodyBytes: 524288000  # 500 MB en mémoire - streaming pur
+        memResponseBodyBytes: 10485760  # 10 MB pour les réponses
+    
+    # Strip prefix pour enlever /api
+    upload-meeting-reports-stripprefix:
+      stripPrefix:
+        prefixes:
+          - "/api"
+    
+    # Headers pour l'API
+    upload-meeting-reports-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-For: ""
+          X-Real-IP: ""
+        customResponseHeaders:
+          X-Content-Type-Options: "nosniff"
+    
+    # CORS pour l'API
+    upload-meeting-reports-cors:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        accessControlAllowOriginList:
+          - "https://meeting-reports.iahome.fr"
+          - "https://upload-meeting-reports.iahome.fr"
+          - "http://localhost:3050"
+        accessControlMaxAge: 86400
+        addVaryHeader: true
+

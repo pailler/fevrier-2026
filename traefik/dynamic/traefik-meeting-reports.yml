@@ -4,22 +4,26 @@
 http:
   routers:
     meeting-reports:
-      rule: "Host(`meeting-reports.iahome.fr`)"
+      rule: "Host(`meeting-reports.iahome.fr`) && !PathPrefix(`/api`) && !PathPrefix(`/.well-known/acme-challenge`)"
       service: meeting-reports-service
+      entryPoints:
+        - websecure
+        - web
       tls:
         certResolver: letsencrypt
       middlewares:
         - meeting-reports-headers
+      priority: 200  # Priorité élevée pour passer avant la route de redirection
 
   services:
     meeting-reports-service:
       loadBalancer:
         servers:
-          - url: "http://localhost:3001"
+          - url: "http://host.docker.internal:3050"  # Utiliser Nginx qui fait déjà le reverse proxy
         healthCheck:
           path: "/"
           interval: "30s"
-          timeout: "5s"
+          timeout: "10s"
         passHostHeader: true
 
   middlewares:

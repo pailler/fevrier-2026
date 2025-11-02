@@ -30,36 +30,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Si l'utilisateur n'a pas de tokens, créer un enregistrement avec 10 tokens par défaut
+    // Si l'utilisateur n'a pas de tokens, retourner 0
+    // Les tokens ne sont créés QUE lors de l'inscription, pas automatiquement ici
     if (!userTokens) {
-      console.log('🪙 Création automatique de 10 tokens pour le nouvel utilisateur:', userId);
-      
-      const { error: createError } = await supabase
-        .from('user_tokens')
-        .upsert([{
-          user_id: userId,
-          tokens: 100, // 100 tokens par défaut pour les nouveaux utilisateurs
-          package_name: 'Welcome Package',
-          purchase_date: new Date().toISOString(),
-          is_active: true
-        }], {
-          onConflict: 'user_id'
-        });
-
-      if (createError) {
-        console.error('Erreur lors de la création des tokens par défaut:', createError);
-        return NextResponse.json(
-          { error: 'Erreur lors de la création des tokens par défaut' },
-          { status: 500 }
-        );
-      }
-
-      // Retourner les tokens créés
+      console.log('⚠️ Utilisateur sans tokens (doit passer par les achats):', userId);
       return NextResponse.json({
-        tokens: 10,
-        packageName: 'Welcome Package',
-        purchaseDate: new Date().toISOString(),
-        isActive: true
+        tokens: 0,
+        packageName: null,
+        purchaseDate: null,
+        isActive: false
       });
     }
 
@@ -113,82 +92,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Si l'utilisateur n'a pas de tokens, créer un enregistrement avec 10 tokens par défaut
+    // Si l'utilisateur n'a pas de tokens, il doit passer par les achats
     if (!userTokens) {
-      console.log('🪙 Création automatique de 100 tokens pour la consommation:', userId);
-      
-      const { error: createError } = await supabase
-        .from('user_tokens')
-        .upsert([{
-          user_id: userId,
-          tokens: 100, // 100 tokens par défaut pour les nouveaux utilisateurs
-          package_name: 'Welcome Package',
-          purchase_date: new Date().toISOString(),
-          is_active: true
-        }], {
-          onConflict: 'user_id'
-        });
-
-      if (createError) {
-        console.error('Erreur lors de la création des tokens par défaut:', createError);
-        return NextResponse.json(
-          { error: 'Erreur lors de la création des tokens par défaut' },
-          { status: 500 }
-        );
-      }
-
-      // Maintenant vérifier si l'utilisateur a assez de tokens après création
-      if (100 < tokensToConsume) {
-        return NextResponse.json(
-          { 
-            error: 'Tokens insuffisants',
-            currentTokens: 100,
-            requiredTokens: tokensToConsume,
-            insufficient: true
-          },
-          { status: 400 }
-        );
-      }
-
-      // Consommer les tokens
-      const newTokenCount = 100 - tokensToConsume;
-      
-      const { error: updateError } = await supabase
-        .from('user_tokens')
-        .update({
-          tokens: newTokenCount
-        })
-        .eq('user_id', userId);
-
-      if (updateError) {
-        console.error('Erreur lors de la mise à jour des tokens:', updateError);
-        return NextResponse.json(
-          { error: 'Erreur lors de la consommation des tokens' },
-          { status: 500 }
-        );
-      }
-
-      // Enregistrer l'utilisation des tokens
-      const { error: usageError } = await supabase
-        .from('token_usage')
-        .insert([{
-          user_id: userId,
-          module_id: moduleId,
-          module_name: moduleName || 'Unknown Module',
-          tokens_consumed: tokensToConsume,
-          usage_date: new Date().toISOString()
-        }]);
-
-      if (usageError) {
-        console.error('Erreur lors de l\'enregistrement de l\'utilisation:', usageError);
-        // Ne pas faire échouer la transaction pour cette erreur
-      }
-
-      return NextResponse.json({
-        success: true,
-        tokensRemaining: newTokenCount,
-        tokensConsumed: tokensToConsume
-      });
+      console.log('❌ Utilisateur sans tokens pour consommation:', userId);
+      return NextResponse.json(
+        { 
+          error: 'Tokens insuffisants',
+          currentTokens: 0,
+          requiredTokens: tokensToConsume,
+          insufficient: true,
+          message: 'Vous devez acheter des tokens pour utiliser ce service'
+        },
+        { status: 400 }
+      );
     }
 
     const currentTokens = userTokens.tokens;

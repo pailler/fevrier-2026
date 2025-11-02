@@ -24,8 +24,9 @@ EXPOSE 8000
 
 # Run the application
 # Utiliser hypercorn au lieu de uvicorn pour supporter les gros fichiers (500MB)
-# Hypercorn permet de configurer max_incomplete_size pour les uploads volumineux
-CMD ["hypercorn", "main:app", "--bind", "0.0.0.0:8000", "--max-incomplete-size", "524288000", "--reload"]
+# Note: La limite de taille est gérée par le middleware dans main.py
+# Timeouts étendus pour les gros uploads
+CMD ["hypercorn", "main:app", "--bind", "0.0.0.0:8000", "--keep-alive", "75", "--read-timeout", "1800"]
 
 
 

@@ -3,20 +3,11 @@
 
 http:
   routers:
-    meeting-reports-api:
-      rule: "Host(`meeting-reports.iahome.fr`) && PathPrefix(`/api`)"
-      service: meeting-reports-api-service
-      tls:
-        certResolver: letsencrypt
-      middlewares:
-        - meeting-reports-stripprefix
-        - meeting-reports-api-headers
-        - meeting-reports-cors
-        - meeting-reports-no-buffer
-    
+    # Route spécifique pour upload - DOIT être en premier pour avoir la priorité
     meeting-reports-upload:
       rule: "Host(`meeting-reports.iahome.fr`) && PathPrefix(`/api/upload`)"
       service: meeting-reports-api-service
+      priority: 10  # Priorité élevée pour être évaluée en premier
       tls:
         certResolver: letsencrypt
       middlewares:
@@ -24,12 +15,25 @@ http:
         - meeting-reports-stripprefix
         - meeting-reports-api-headers
         - meeting-reports-cors
+    
+    # Route générale pour /api - doit exclure /api/upload
+    meeting-reports-api:
+      rule: "Host(`meeting-reports.iahome.fr`) && PathPrefix(`/api`) && !PathPrefix(`/api/upload`)"
+      service: meeting-reports-api-service
+      priority: 1  # Priorité plus basse
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - meeting-reports-stripprefix
+        - meeting-reports-api-headers
+        - meeting-reports-cors
+        - meeting-reports-no-buffer
 
   services:
     meeting-reports-api-service:
       loadBalancer:
         servers:
-          - url: "http://localhost:8000"
+          - url: "http://host.docker.internal:8000"  # Accès depuis le conteneur Docker
         healthCheck:
           path: "/health"
           interval: "30s"
@@ -38,11 +42,19 @@ http:
   middlewares:
     meeting-reports-no-buffer:
       buffering:
-        maxRequestBodyBytes: 524288000  # 500 MB
+        maxRequestBodyBytes: 524288000  # 500 MB maximum
+        memRequestBodyBytes: 524288000  # 500 MB en mémoire - désactive le streaming sur disque
+        memResponseBodyBytes: 10485760  # 10 MB pour les réponses
     
     meeting-reports-upload-nobuffer:
+      # Configuration pour streaming des gros fichiers
+      # Désactiver complètement le buffering pour permettre le streaming pur
+      # memRequestBodyBytes par défaut à 2MB, on l'augmente considérablement
       buffering:
-        maxRequestBodyBytes: 524288000  # 500 MB
+        maxRequestBodyBytes: 524288000  # 500 MB maximum
+        memRequestBodyBytes: 524288000  # 500 MB en mémoire - désactive le streaming sur disque
+        memResponseBodyBytes: 10485760  # 10 MB pour les réponses
+        retryExpression: "IsNetworkError() && Attempts() < 3"
     
     meeting-reports-stripprefix:
       stripPrefix:
