@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { LibreSpeedAccessService } from '../../../utils/librespeedAccess';
+import { checkSessionDuration } from '../../../utils/sessionDurationCheck';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -47,6 +48,19 @@ export async function GET(request: NextRequest) {
     if (error || !session) {
       ;
       return new NextResponse('Unauthorized - Invalid session', { 
+        status: 401,
+        headers: {
+          'X-Access-Granted': 'false'
+        }
+      });
+    }
+
+    // Vérifier la durée de session (60 minutes sauf admin)
+    const durationCheck = await checkSessionDuration(session);
+    
+    if (!durationCheck.isValid) {
+      console.log('❌ Session expirée:', durationCheck.reason);
+      return new NextResponse(`Unauthorized - ${durationCheck.reason || 'Session expirée'}`, { 
         status: 401,
         headers: {
           'X-Access-Granted': 'false'

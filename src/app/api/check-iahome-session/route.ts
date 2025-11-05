@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { checkSessionDuration } from '../../../utils/sessionDurationCheck';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,29 +17,41 @@ export async function GET(request: NextRequest) {
 
     let session = null;
 
-    // Méthode 1: Vérifier via token Bearer
-    if (authHeader && authHeader.startsWith('Bearer ')) {
+    // Méthode 1: Vérifier via cookies de session (priorité - plus fiable car contient toute la session)
+    if (cookieHeader) {
+      const supabaseWithCookies = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+          },
+          global: {
+            headers: {
+              cookie: cookieHeader,
+            },
+          },
+        }
+      );
+      
+      const { data: { session: cookieSession }, error } = await supabaseWithCookies.auth.getSession();
+      
+      if (!error && cookieSession?.user) {
+        session = cookieSession;
+      }
+    }
+    
+    // Méthode 2: Vérifier via token Bearer
+    if (!session && authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
       const { data: { user }, error } = await supabase.auth.getUser(token);
       
       if (!error && user) {
-        session = { user };
-        }
-    }
-    
-    // Méthode 2: Vérifier via cookies de session
-    if (!session && cookieHeader) {
-      // Extraire les cookies de session Supabase
-      const sessionCookie = cookieHeader
-        .split(';')
-        .find(cookie => cookie.trim().startsWith('sb-'));
-      
-      if (sessionCookie) {
-        const { data: { session: cookieSession }, error } = await supabase.auth.getSession();
-        
-        if (!error && cookieSession?.user) {
-          session = cookieSession;
-          }
+        session = { 
+          user,
+          access_token: token
+        };
       }
     }
 
@@ -86,6 +99,17 @@ export async function GET(request: NextRequest) {
     }
 
     if (session?.user) {
+      // Vérifier la durée de session (60 minutes sauf admin)
+      const durationCheck = await checkSessionDuration(session);
+      
+      if (!durationCheck.isValid) {
+        return NextResponse.json({
+          success: false,
+          authenticated: false,
+          message: durationCheck.reason || 'Session expirée'
+        }, { status: 401 });
+      }
+
       return NextResponse.json({
         success: true,
         authenticated: true,
@@ -94,7 +118,8 @@ export async function GET(request: NextRequest) {
           email: session.user.email,
           role: session.user.user_metadata?.role || 'user'
         },
-        message: 'Accès autorisé'
+        message: 'Accès autorisé',
+        remainingMinutes: durationCheck.remainingMinutes
       });
     } else {
       return NextResponse.json({

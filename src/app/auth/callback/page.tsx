@@ -26,6 +26,21 @@ export default function AuthCallback() {
           console.log('✅ Session trouvée pour:', session.user.email);
           setStatus('Finalisation de votre connexion...');
           
+          // Initialiser la session dans user_sessions pour le suivi de durée
+          // Faire cela de manière asynchrone sans bloquer la connexion
+          fetch('/api/initialize-session', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: session.user.id,
+              userEmail: session.user.email
+            })
+          }).catch(initError => {
+            console.warn('⚠️ Erreur lors de l\'initialisation de la session (non bloquant):', initError);
+          });
+          
           // Créer les données utilisateur pour localStorage
           const userData = {
             id: session.user.id,

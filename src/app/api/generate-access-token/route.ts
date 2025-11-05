@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isAdminUser } from '../../../utils/sessionDurationCheck';
+
+const DEFAULT_TOKEN_DURATION_MS = 24 * 60 * 60 * 1000; // 24h pour admin
+const LIMITED_TOKEN_DURATION_MS = 60 * 60 * 1000; // 60 minutes pour utilisateurs normaux
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,6 +17,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Déterminer la durée du token selon si l'utilisateur est admin
+    const tokenDuration = isAdminUser(userEmail) ? DEFAULT_TOKEN_DURATION_MS : LIMITED_TOKEN_DURATION_MS;
+    const tokenDurationSeconds = Math.floor(tokenDuration / 1000);
+
     // Créer un token simple (Base64)
     const tokenPayload = {
       userId,
@@ -20,11 +28,11 @@ export async function POST(request: NextRequest) {
       moduleId,
       moduleTitle: moduleId.charAt(0).toUpperCase() + moduleId.slice(1),
       accessLevel: 'premium',
-      expiresAt: Date.now() + (24 * 60 * 60 * 1000), // 24 heures
+      expiresAt: Date.now() + tokenDuration,
       permissions: ['read', 'access', 'write', 'advanced_features'],
       issuedAt: Date.now(),
       iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 heures en secondes
+      exp: Math.floor(Date.now() / 1000) + tokenDurationSeconds
     };
 
     const token = btoa(JSON.stringify(tokenPayload));
