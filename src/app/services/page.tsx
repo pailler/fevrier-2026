@@ -3,6 +3,10 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { subdomainsConfig, getSubdomainsByCategory } from '../../utils/subdomainsConfig';
 
+// Désactiver le cache pour cette page
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const categoryLabels: Record<string, string> = {
   ai: 'Intelligence Artificielle',
   productivity: 'Productivité',
