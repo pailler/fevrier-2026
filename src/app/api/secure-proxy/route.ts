@@ -16,6 +16,7 @@ const APPLICATION_PORTS: { [key: string]: number } = {
   'meeting-reports': 3050,
   'ruinedfooocus': 7870,
   'cogstudio': 8080,
+  'hunyuan3d': 8888,
 };
 
 // Mapping des modules vers leurs hôtes locaux (si différent de localhost)
