@@ -231,15 +231,15 @@ export default function EncoursPage() {
     // Essayer de créer l'abonnement Realtime seulement si WebSocket est disponible
     if (isWebSocketAvailable) {
       try {
-        // S'abonner aux changements de la table token_usage (table réelle utilisée)
+        // S'abonner aux changements de la table user_applications (nouveau système)
         channel = supabase
-          .channel(`token_usage:${user.id}`)
+          .channel(`user_applications:${user.id}`)
           .on(
             'postgres_changes',
             {
-              event: 'INSERT',
+              event: 'UPDATE',
               schema: 'public',
-              table: 'token_usage',
+              table: 'user_applications',
               filter: `user_id=eq.${user.id}`
             },
             (payload) => {
@@ -960,10 +960,10 @@ export default function EncoursPage() {
               Vous n'avez pas encore souscrit à des applications. Découvrez notre collection de nos modules essentiels et applis IA et commencez à explorer !
             </p>
             <Link 
-              href="/modules" 
+              href="/services" 
               className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             >
-              🚀 Découvrir nos modules
+              Activez vos applications IAHome gratuitement
             </Link>
           </div>
         ) : (

@@ -156,8 +156,12 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('❌ Erreur activation module:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Erreur interne du serveur';
     return NextResponse.json(
-      { error: 'Erreur interne du serveur' },
+      { 
+        error: 'Erreur interne du serveur',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
       { status: 500 }
     );
   }

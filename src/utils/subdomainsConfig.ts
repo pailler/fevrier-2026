@@ -59,21 +59,24 @@ export const subdomainsConfig: SubdomainInfo[] = [
     subdomain: 'qrcodes.iahome.fr',
     url: 'https://qrcodes.iahome.fr',
     title: 'Gestionnaire de QR Codes | Création et Statistiques - IA Home',
-    description: 'Créez et gérez vos QR codes avec suivi des statistiques. Générez des QR codes pour URLs, textes, emails et plus. Analysez les scans et visualisez les performances de vos codes.',
-    keywords: ['qr code', 'générateur qr code', 'créer qr code', 'statistiques qr code', 'qr code tracker', 'qr code analytics'],
+    description: 'Créez et gérez vos QR codes dynamiques avec suivi des statistiques. Modifiez l\'URL de destination sans recréer le QR code. Générez des QR codes pour URLs, textes, emails et plus. Analysez les scans et visualisez les performances de vos codes.',
+    keywords: ['qr code', 'générateur qr code', 'créer qr code', 'statistiques qr code', 'qr code tracker', 'qr code analytics', 'qr code dynamique', 'modifier qr code'],
     category: 'tools',
     icon: '📱',
     features: [
+      'QR codes dynamiques : modifiez l\'URL sans recréer le code',
       'Génération de QR codes personnalisés',
       'Suivi des scans en temps réel',
       'Statistiques détaillées',
       'Gestion de liens courts',
-      'Codes QR dynamiques'
+      'Codes QR statiques et dynamiques'
     ],
     useCases: [
       'Créer des QR codes pour vos campagnes marketing',
+      'Modifier les liens de destination sans changer le QR code imprimé',
       'Suivre les performances de vos codes',
-      'Partager des liens facilement'
+      'Partager des liens facilement',
+      'Adapter vos campagnes en temps réel'
     ]
   },
   {
@@ -248,24 +251,25 @@ export const subdomainsConfig: SubdomainInfo[] = [
     ]
   },
   {
-    subdomain: 'instantmesh.iahome.fr',
-    url: 'https://instantmesh.iahome.fr',
-    title: 'InstantMesh - Génération 3D par IA | IA Home',
-    description: 'Générez des modèles 3D à partir d\'images avec InstantMesh. Transformez vos photos en modèles 3D utilisables pour l\'impression 3D, l\'animation et la visualisation.',
-    keywords: ['instantmesh', 'génération 3d', 'modèle 3d', 'image to 3d', 'reconstruction 3d', 'ia 3d', 'mesh generation'],
+    subdomain: 'hunyuan3d.iahome.fr',
+    url: 'https://hunyuan3d.iahome.fr',
+    title: 'Hunyuan 3D - Génération 3D par IA | IA Home',
+    description: 'Générez des modèles 3D à partir de texte ou d\'images avec l\'intelligence artificielle. Créez des objets 3D réalistes et détaillés pour vos projets.',
+    keywords: ['hunyuan 3d', 'génération 3d', 'ia 3d', 'modèle 3d', 'création 3d', 'text to 3d', 'image to 3d'],
     category: 'ai',
     icon: '🎲',
     features: [
+      'Génération 3D à partir de texte',
       'Génération 3D à partir d\'images',
-      'Modèles optimisés',
-      'Export multiples formats',
-      'Reconstruction précise',
-      'Traitement rapide'
+      'Modèles 3D haute qualité',
+      'Export en formats standards',
+      'Interface intuitive'
     ],
     useCases: [
-      'Créer des modèles 3D pour l\'impression',
-      'Reconstruire des objets en 3D',
-      'Prototyper rapidement en 3D'
+      'Créer des modèles 3D pour vos projets',
+      'Prototyper des objets rapidement',
+      'Générer du contenu 3D pour le design',
+      'Explorer la création 3D avec l\'IA'
     ]
   }
 ];

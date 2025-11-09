@@ -55,52 +55,85 @@ export default function ModuleActivationButton({
       console.log(`🔄 Activation du module ${moduleName} (${moduleId}) pour ${user.email}`);
 
       // Vérifier d'abord si le module est déjà activé
-      const checkResponse = await fetch('/api/check-module-activation', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          moduleId: moduleId,
-          userId: user.id
-        }),
-      });
+      let checkResponse;
+      try {
+        checkResponse = await fetch('/api/check-module-activation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId: moduleId,
+            userId: user.id
+          }),
+        });
 
-      if (checkResponse.ok) {
-        const checkData = await checkResponse.json();
-        if (checkData.isActivated) {
-          setError('Module déjà activé');
-          onActivationError?.('Module déjà activé');
-          return;
+        if (checkResponse.ok) {
+          const checkData = await checkResponse.json();
+          if (checkData.isActivated) {
+            setError('Module déjà activé');
+            onActivationError?.('Module déjà activé');
+            setIsLoading(false);
+            return;
+          }
         }
+      } catch (checkErr) {
+        console.warn('⚠️ Erreur lors de la vérification d\'activation (continuons):', checkErr);
+        // On continue même si la vérification échoue
       }
 
       // Appeler l'API d'activation du module
-      const response = await fetch('/api/activate-module', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          moduleId,
-          moduleName,
-          userId: user.id,
-          userEmail: user.email,
-          moduleCost,
-          moduleDescription
-        }),
-      });
+      let response;
+      try {
+        response = await fetch('/api/activate-module', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId,
+            moduleName,
+            userId: user.id,
+            userEmail: user.email,
+            moduleCost,
+            moduleDescription
+          }),
+        });
+      } catch (fetchErr) {
+        // Erreur réseau lors du fetch
+        const networkError = fetchErr instanceof TypeError && fetchErr.message.includes('fetch')
+          ? 'Erreur de connexion réseau. Vérifiez votre connexion internet.'
+          : fetchErr instanceof Error ? fetchErr.message : 'Erreur réseau inconnue';
+        
+        console.error(`❌ Erreur réseau lors de l'activation du module ${moduleName}:`, fetchErr);
+        setError(networkError);
+        onActivationError?.(networkError);
+        setIsLoading(false);
+        return;
+      }
+
+      // Vérifier si la réponse est OK avant de parser le JSON
+      if (!response.ok) {
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (parseErr) {
+          // Si on ne peut pas parser le JSON, utiliser le statut HTTP
+          throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
+        }
+        throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
+      }
 
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Erreur lors de l\'activation du module');
-      }
 
       console.log(`✅ Module ${moduleName} activé avec succès`);
       
       // Mettre à jour les tokens côté client
-      await refreshTokens();
+      try {
+        await refreshTokens();
+      } catch (tokenErr) {
+        console.warn('⚠️ Erreur lors de la mise à jour des tokens (non bloquant):', tokenErr);
+      }
       
       // Notifier le succès
       onActivationSuccess?.();
@@ -112,7 +145,7 @@ export default function ModuleActivationButton({
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
-      console.error(`❌ Erreur activation module ${moduleName}:`, errorMessage);
+      console.error(`❌ Erreur activation module ${moduleName}:`, errorMessage, err);
       setError(errorMessage);
       onActivationError?.(errorMessage);
     } finally {

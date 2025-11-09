@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Breadcrumb from '../../../components/Breadcrumb';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
+import { TOKEN_COSTS } from '../../../utils/tokenActionService';
 // import { NotificationServiceClient } from '../../../utils/notificationServiceClient';
 // import AuthorizedAccessButton from '../../../components/AuthorizedAccessButton';
 
@@ -73,6 +74,25 @@ export default function CardDetailPage() {
     card?.title?.toLowerCase().includes('pdf') ||
     card?.title?.toLowerCase().includes('psitransfer')
   );
+
+  // Fonction helper pour obtenir le texte du prix en tokens
+  const getPriceText = (moduleId: string | undefined, modulePrice: number | string | null | undefined): string => {
+    if (!moduleId) return 'Gratuit';
+    
+    // Si le prix est 0 ou null, c'est gratuit
+    if (modulePrice === 0 || modulePrice === '0' || modulePrice === null) {
+      return 'Gratuit';
+    }
+    
+    // Vérifier si le module a un coût en tokens défini
+    const tokenCost = TOKEN_COSTS[moduleId as keyof typeof TOKEN_COSTS];
+    if (tokenCost) {
+      return `${tokenCost} tokens par utilisation`;
+    }
+    
+    // Fallback: utiliser le prix tel quel (pour compatibilité avec les anciens modules)
+    return `€${modulePrice} par mois`;
+  };
 
   // Fonction pour vérifier si un module est déjà activé
   const checkModuleActivation = useCallback(async (moduleId: string) => {
@@ -327,7 +347,7 @@ export default function CardDetailPage() {
       console.log('🔧 Chargement carte pour:', params.id);
 
       // Liste des modules qui ont des pages spécifiques
-      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'cogstudio', 'ruinedfooocus', 'whisper', 'meeting-reports', 'psitransfer'];
+      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'cogstudio', 'ruinedfooocus', 'whisper', 'meeting-reports', 'psitransfer', 'hunyuan3d'];
       
       // Si c'est un module avec une page spécifique, charger la page spécifique
       if (specificPages.includes(params.id as string)) {
@@ -439,18 +459,8 @@ export default function CardDetailPage() {
 
         if (error) {
           console.error('Erreur lors du chargement de la carte:', error);
-          // Au lieu de rediriger, afficher une carte par défaut
-          const defaultCard = {
-            id: params.id as string,
-            title: params.id as string,
-            description: 'Module en cours de configuration',
-            category: 'AUTRE',
-            price: 0,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-          setCard(defaultCard);
-          setLoading(false);
+          // Rediriger immédiatement vers l'accueil si le module n'existe pas
+          router.replace('/');
           return;
         }
 
@@ -460,18 +470,8 @@ export default function CardDetailPage() {
         }
       } catch (error) {
         console.error('Erreur:', error);
-        setError('Erreur lors du chargement du module');
-        // Au lieu de rediriger, afficher une carte par défaut
-        const defaultCard = {
-          id: params.id as string,
-          title: params.id as string,
-          description: 'Module en cours de configuration',
-          category: 'AUTRE',
-          price: 0,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-        setCard(defaultCard);
+        // Rediriger immédiatement vers l'accueil si erreur
+        router.push('/');
       } finally {
         setLoading(false);
       }
@@ -1517,7 +1517,7 @@ export default function CardDetailPage() {
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          {card.price === 0 || card.price === '0' ? 'Gratuit' : `€${card.price} par mois`}
+                          {getPriceText(card?.id, card?.price)}
                         </p>
                       </div>
                     </div>

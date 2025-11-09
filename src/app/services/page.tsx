@@ -29,7 +29,7 @@ const getCardPageUrl = (subdomain: string): string | null => {
     'pdf': '/card/pdf',
     'psitransfer': '/card/psitransfer',
     'librespeed': '/card/librespeed',
-    'instantmesh': '/card/instantmesh'
+    'hunyuan3d': '/card/hunyuan3d'
   };
   
   return serviceToCardMapping[serviceName] || null;
@@ -43,11 +43,11 @@ export default function ServicesPage() {
     document.title = 'Services IA Home - Tous nos Outils et Applications IA';
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', 'Découvrez tous nos services et sous-domaines IA Home : Whisper pour la transcription, Stable Diffusion pour les images, outils de productivité, gestion de QR codes et bien plus.');
+      metaDescription.setAttribute('content', 'Découvrez tous nos services et sous-domaines IA Home : Whisper pour la transcription, Stable Diffusion pour les images, outils de productivité, QR codes dynamiques modifiables et bien plus.');
     } else {
       const newMetaDescription = document.createElement('meta');
       newMetaDescription.name = 'description';
-      newMetaDescription.content = 'Découvrez tous nos services et sous-domaines IA Home : Whisper pour la transcription, Stable Diffusion pour les images, outils de productivité, gestion de QR codes et bien plus.';
+      newMetaDescription.content = 'Découvrez tous nos services et sous-domaines IA Home : Whisper pour la transcription, Stable Diffusion pour les images, outils de productivité, QR codes dynamiques modifiables et bien plus.';
       document.head.appendChild(newMetaDescription);
     }
   }, []);
