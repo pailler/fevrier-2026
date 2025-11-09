@@ -56,13 +56,6 @@ export const metadata: Metadata = {
   },
   category: 'Technology',
   classification: 'Intelligence Artificielle',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: 'cover',
-  },
   formatDetection: {
     telephone: false,
   },
@@ -71,7 +64,6 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
     title: 'IA Home',
   },
-  themeColor: '#2563eb',
   alternates: {
     canonical: 'https://iahome.fr',
     languages: {

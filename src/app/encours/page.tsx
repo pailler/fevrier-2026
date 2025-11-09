@@ -412,7 +412,7 @@ export default function EncoursPage() {
               controller = new AbortController();
               timeoutId = setTimeout(() => {
                 if (controller) controller.abort();
-              }, 3000); // Timeout de 3 secondes
+              }, 10000); // Timeout de 10 secondes (augmenté pour éviter les timeouts)
             }
             
             const fetchOptions: RequestInit = controller ? { signal: controller.signal } : {};
@@ -539,6 +539,7 @@ export default function EncoursPage() {
       '11': 'cogstudio', // Cog Studio -> cogstudio
       'meeting-reports': 'meeting-reports', // Meeting Reports -> meeting-reports
       'qrcodes-statiques': 'qrcodes-statiques', // QR Codes Statiques
+      'hunyuan3d': 'hunyuan3d', // Hunyuan 3D -> hunyuan3d
     };
 
     // Mapping des slugs vers les URLs directes des applications
@@ -558,6 +559,10 @@ export default function EncoursPage() {
       'meeting-reports': (typeof window !== 'undefined' && window.location.hostname === 'localhost') 
         ? 'http://localhost:3050' 
         : 'https://meeting-reports.iahome.fr',
+      // Hunyuan 3D : localhost:8888 en dev, hunyuan3d.iahome.fr en prod
+      'hunyuan3d': (typeof window !== 'undefined' && window.location.hostname === 'localhost') 
+        ? 'http://localhost:8888' 
+        : 'https://hunyuan3d.iahome.fr',
     };
     
     // Convertir module_id numérique en slug si nécessaire
@@ -576,6 +581,7 @@ export default function EncoursPage() {
       'stablediffusion': 100,
       'ruinedfooocus': 100,
       'comfyui': 100,
+      'hunyuan3d': 100,
       
       // Applications essentielles (10 tokens)
       'librespeed': 10,
