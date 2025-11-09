@@ -112,6 +112,7 @@ export default function AdminDashboard() {
             { module: 'qrcodes', usage: 8, users: 2 },
             { module: 'metube', usage: 5, users: 2 },
             { module: 'whisper', usage: 3, users: 1 },
+            { module: 'hunyuan3d', usage: 0, users: 0 },
             { module: 'psitransfer', usage: 2, users: 1 }
           ]
         };

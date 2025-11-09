@@ -5,6 +5,7 @@ export const TOKEN_COSTS = {
   'stablediffusion': 100,
   'ruinedfooocus': 100,
   'comfyui': 100,
+  'hunyuan3d': 100,
   
   // Applications essentielles (10 tokens)
   'metube': 10,
@@ -64,6 +65,8 @@ export class TokenActionService {
         body: JSON.stringify({
           userId,
           tokensToConsume: cost,
+          moduleId: moduleId,
+          moduleName: moduleTitle,
           action: `${moduleId}.${action}`,
           description: `Accès à ${moduleTitle}`
         })
