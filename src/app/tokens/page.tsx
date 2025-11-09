@@ -6,7 +6,7 @@ export default function TokensRedirectPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Rediriger automatiquement vers la page des tarifs
+    // Rediriger automatiquement vers la page des offres
     router.replace('/pricing');
   }, [router]);
 
@@ -14,7 +14,7 @@ export default function TokensRedirectPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Redirection vers les tarifs...</p>
+        <p className="text-gray-600">Redirection vers les offres...</p>
       </div>
     </div>
   );

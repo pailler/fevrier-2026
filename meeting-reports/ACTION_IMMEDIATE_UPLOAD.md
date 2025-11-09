@@ -66,3 +66,7 @@ Pour que les uploads > 1 MB fonctionnent, vous **DEVEZ** créer le sous-domaine 
 2. Après création du sous-domaine, tester avec fichiers > 1 MB
 
 
+
+
+
+

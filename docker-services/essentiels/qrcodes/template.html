@@ -654,7 +654,7 @@
                         <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px; margin-top: 20px;">
                             <ul style="text-align: left; list-style: none; padding: 0; margin: 0;">
                                 <li style="margin: 8px 0;">✓ Mise à jour rapide</li>
-                                <li style="margin: 8px 0;">✓ Sans aller sur Supabase</li>
+                                <li style="margin: 8px 0;">✓ Obtenir le nombre de scan</li>
                                 <li style="margin: 8px 0;">✓ Modifications instantanées</li>
                             </ul>
                         </div>
@@ -951,71 +951,6 @@
                     </div>
                 </div>
 
-                <!-- Mode Modification (affiché quand on veut modifier un QR code existant) -->
-                <div id="step-8-update-mode" style="display: none;">
-                    <h2 class="step-title">8. Informations de Gestion du QR Code</h2>
-                    <p class="step-description">Consultez les informations de gestion de votre QR code dynamique</p>
-                    
-                    <!-- Section Lien de gestion -->
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 12px; margin-bottom: 30px; color: white;">
-                        <h2 style="color: white; font-size: 20px; margin-bottom: 15px; font-weight: 600;">🔑 Lien de gestion</h2>
-                        <p style="color: rgba(255,255,255,0.95); font-size: 14px; line-height: 1.7; margin-bottom: 15px;">
-                            Conservez ce lien pour accéder aux informations de gestion de votre QR code à tout moment. Ce lien contient votre token de gestion unique et confidentiel.
-                        </p>
-                        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
-                            <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px; word-break: break-all; color: white; border: 1px solid rgba(255,255,255,0.3);" id="management-url-display-update"></div>
-                            <button id="copy-management-url-btn-step8-update" style="background: white; color: #667eea; padding: 12px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s;">
-                                📋 Copier le lien
-                            </button>
-                        </div>
-                        <div style="margin-top: 15px; padding: 12px; background: rgba(255,193,7,0.2); border-left: 4px solid #ffc107; border-radius: 6px; font-size: 13px; color: rgba(255,255,255,0.95);">
-                            ⚠️ Ne partagez pas ce lien - il donne accès à la gestion de votre QR code.
-                        </div>
-                    </div>
-                    
-                    <!-- Section URL actuelle dans Supabase -->
-                    <div style="margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">URL actuelle dans Supabase:</label>
-                        <div id="current-url-display-step8-update" style="font-family: 'Courier New', monospace; font-size: 14px; color: #667eea; word-break: break-all; padding: 10px; background: white; border-radius: 6px; border: 1px solid #e0e0e0;"></div>
-                    </div>
-                    
-                    <!-- Formulaire de modification d'URL -->
-                    <div style="margin-top: 30px; padding: 25px; background: white; border-radius: 12px; border: 2px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        <h3 style="margin-top: 0; margin-bottom: 20px; color: #333; font-size: 20px; font-weight: 600;">🔧 Modifier l'URL de destination</h3>
-                        
-                        <form id="updateUrlFormStep8">
-                            <div style="margin-bottom: 20px;">
-                                <label for="update-new-url-step8" style="display: block; margin-bottom: 10px; font-weight: 600; color: #333; font-size: 15px;">Nouvelle URL de destination:</label>
-                                <input type="url" id="update-new-url-step8" placeholder="https://example.com" required
-                                       style="width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; transition: border-color 0.3s;">
-                                <small style="color: #64748b; display: block; margin-top: 5px; font-size: 13px;">Entrez la nouvelle URL vers laquelle votre QR code redirigera</small>
-                            </div>
-                            
-                            <button type="submit" id="updateUrlBtnStep8" 
-                                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s;">
-                                🔄 Mettre à jour l'URL
-                            </button>
-                        </form>
-                        
-                        <!-- Message de résultat -->
-                        <div id="update-url-message-step8" style="margin-top: 20px; padding: 15px; border-radius: 8px; display: none; font-size: 14px;"></div>
-                    </div>
-                    
-                    <!-- Informations supplémentaires -->
-                    <div style="margin-top: 20px; padding: 15px; background: #f8fafc; border-radius: 8px;">
-                        <p style="margin: 5px 0;"><strong>Token de gestion :</strong></p>
-                        <div id="management-token-update" style="font-family: 'Courier New', monospace; color: #667eea;"></div>
-                        <p style="margin: 15px 0 5px 0;"><strong>URL de redirection :</strong></p>
-                        <div id="redirect-url-update" style="font-family: 'Courier New', monospace; color: #667eea; word-break: break-all;"></div>
-                    </div>
-
-                    <!-- Navigation -->
-                    <div class="navigation" style="margin-top: 30px;">
-                        <button id="backToHomeFromStep8" class="nav-btn prev" style="background: #64748b; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s;">
-                            ← Retour à l'accueil
-                        </button>
-                    </div>
-                </div>
             </div>
 
             <!-- Step 9: Final Step -->
@@ -1152,80 +1087,6 @@
                 const creationWorkflow = document.getElementById('creation-workflow');
                 if (creationWorkflow) {
                     creationWorkflow.style.display = 'block';
-                    // Afficher step-8 en mode modification
-                    const step8CreateMode = document.getElementById('step-8-create-mode');
-                    const step8UpdateMode = document.getElementById('step-8-update-mode');
-                    if (step8CreateMode) step8CreateMode.style.display = 'none';
-                    if (step8UpdateMode) step8UpdateMode.style.display = 'block';
-                    
-                    // Pas besoin de pré-remplir les champs - affichage en lecture seule uniquement
-                    
-                    // Récupérer les informations du QR code depuis Supabase pour les afficher
-                    fetch(`/api/qr/get-url/${qrIdFromUrl}?token=${encodeURIComponent(tokenFromUrl)}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.encoded_url) {
-                                // Afficher l'URL actuelle
-                                const currentUrlDisplay = document.getElementById('current-url-display-step8-update');
-                                if (currentUrlDisplay) {
-                                    currentUrlDisplay.textContent = data.encoded_url;
-                                }
-                                
-                                // Pré-remplir le champ input du formulaire
-                                const updateUrlInput = document.getElementById('update-new-url-step8');
-                                if (updateUrlInput) {
-                                    updateUrlInput.value = data.encoded_url;
-                                }
-                                
-                                // Afficher l'URL de redirection
-                                const redirectUrlUpdate = document.getElementById('redirect-url-update');
-                                if (redirectUrlUpdate) {
-                                    redirectUrlUpdate.textContent = data.encoded_url;
-                                }
-                            }
-                            
-                            // Afficher le lien de gestion
-                            const managementUrlDisplay = document.getElementById('management-url-display-update');
-                            if (managementUrlDisplay) {
-                                const managementUrl = `https://qrcodes.iahome.fr/manage/${qrIdFromUrl}?token=${tokenFromUrl}`;
-                                managementUrlDisplay.textContent = managementUrl;
-                                
-                                // Configurer le bouton copier
-                                const copyBtn = document.getElementById('copy-management-url-btn-step8-update');
-                                if (copyBtn) {
-                                    copyBtn.onclick = function() {
-                                        navigator.clipboard.writeText(managementUrl).then(() => {
-                                            copyBtn.textContent = '✅ Copié !';
-                                            copyBtn.style.background = '#28a745';
-                                            copyBtn.style.color = 'white';
-                                            setTimeout(() => {
-                                                copyBtn.textContent = '📋 Copier le lien';
-                                                copyBtn.style.background = 'white';
-                                                copyBtn.style.color = '#667eea';
-                                            }, 2000);
-                                        }).catch(err => {
-                                            console.error('Erreur copie:', err);
-                                            alert('Erreur lors de la copie. Veuillez copier manuellement: ' + managementUrl);
-                                        });
-                                    };
-                                }
-                            }
-                            
-                            // Afficher le token de gestion
-                            const tokenDisplay = document.getElementById('management-token-update');
-                            if (tokenDisplay) {
-                                tokenDisplay.textContent = tokenFromUrl;
-                            }
-                        })
-                        .catch(err => console.error('Erreur récupération URL:', err));
-                    
-                    // Aller directement à l'étape 8
-                    currentStep = 8;
-                    showStep(8);
-                    updateProgressIndicators();
-                    updateNavigation();
-                    // Scroll vers le workflow
-                    creationWorkflow.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             }
             
@@ -1269,9 +1130,7 @@
                         workflowState.isDynamic = false;
                         // S'assurer que step-8 est en mode création
                         const step8CreateMode = document.getElementById('step-8-create-mode');
-                        const step8UpdateMode = document.getElementById('step-8-update-mode');
                         if (step8CreateMode) step8CreateMode.style.display = 'block';
-                        if (step8UpdateMode) step8UpdateMode.style.display = 'none';
                         // Aller à l'étape 1
                         currentStep = 1;
                         showStep(1);
@@ -1296,9 +1155,7 @@
                         workflowState.isDynamic = true;
                         // S'assurer que step-8 est en mode création
                         const step8CreateMode = document.getElementById('step-8-create-mode');
-                        const step8UpdateMode = document.getElementById('step-8-update-mode');
                         if (step8CreateMode) step8CreateMode.style.display = 'block';
-                        if (step8UpdateMode) step8UpdateMode.style.display = 'none';
                         // Aller à l'étape 1
                         currentStep = 1;
                         showStep(1);
@@ -1318,137 +1175,7 @@
                 });
             }
             
-            // Bouton Retour depuis step-8 (mode modification)
-            const backToHomeFromStep8 = document.getElementById('backToHomeFromStep8');
-            if (backToHomeFromStep8) {
-                backToHomeFromStep8.addEventListener('click', function() {
-                    // Cacher le workflow de création
-                    if (creationWorkflow) creationWorkflow.style.display = 'none';
-                    // Afficher la page d'accueil
-                    if (homePage) {
-                        homePage.style.display = 'block';
-                        homePage.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                });
-            }
-            
             // ========== FIN GESTION DES BOUTONS D'ACCUEIL ==========
-            
-            // ========== GESTION DU FORMULAIRE DE MISE À JOUR D'URL (STEP-8-UPDATE-MODE) ==========
-            const updateUrlFormStep8 = document.getElementById('updateUrlFormStep8');
-            if (updateUrlFormStep8) {
-                updateUrlFormStep8.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    const newUrl = document.getElementById('update-new-url-step8').value.trim();
-                    const qrId = qrIdFromUrl || new URLSearchParams(window.location.search).get('qr_id');
-                    const token = tokenFromUrl || new URLSearchParams(window.location.search).get('token');
-                    
-                    if (!newUrl) {
-                        showMessageStep8('Veuillez saisir une URL', 'error');
-                        return;
-                    }
-                    
-                    // Validation URL
-                    try {
-                        new URL(newUrl);
-                    } catch {
-                        showMessageStep8('URL invalide. Utilisez le format: https://example.com', 'error');
-                        return;
-                    }
-                    
-                    if (!qrId || !token) {
-                        showMessageStep8('QR ID ou token manquant', 'error');
-                        return;
-                    }
-                    
-                    const submitBtn = document.getElementById('updateUrlBtnStep8');
-                    const messageDiv = document.getElementById('update-url-message-step8');
-                    
-                    // Désactiver le bouton
-                    submitBtn.disabled = true;
-                    submitBtn.textContent = 'Mise à jour...';
-                    hideMessageStep8();
-                    
-                    try {
-                        const response = await fetch(`/api/qr/update-url/${qrId}`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ url: newUrl, token: token })
-                        });
-                        
-                        if (!response.ok) {
-                            const errorText = await response.text();
-                            try {
-                                const errorJson = JSON.parse(errorText);
-                                showMessageStep8('❌ Erreur: ' + (errorJson.error || 'Mise à jour échouée'), 'error');
-                            } catch {
-                                showMessageStep8('❌ Erreur HTTP ' + response.status + ': ' + errorText, 'error');
-                            }
-                            return;
-                        }
-                        
-                        const result = await response.json();
-                        
-                        if (result.success) {
-                            // Mettre à jour l'affichage de l'URL actuelle
-                            const currentUrlDisplay = document.getElementById('current-url-display-step8-update');
-                            if (currentUrlDisplay) {
-                                currentUrlDisplay.textContent = newUrl;
-                                currentUrlDisplay.style.color = '#28a745';
-                                currentUrlDisplay.style.borderColor = '#28a745';
-                                setTimeout(() => {
-                                    currentUrlDisplay.style.color = '#667eea';
-                                    currentUrlDisplay.style.borderColor = '#e0e0e0';
-                                }, 2000);
-                            }
-                            
-                            // Mettre à jour l'URL de redirection
-                            const redirectUrlUpdate = document.getElementById('redirect-url-update');
-                            if (redirectUrlUpdate) {
-                                redirectUrlUpdate.textContent = newUrl;
-                            }
-                            
-                            showMessageStep8('✅ URL mise à jour avec succès dans Supabase!\\n\\nNouvelle URL: ' + newUrl, 'success');
-                        } else {
-                            showMessageStep8('❌ Erreur: ' + (result.error || 'Mise à jour échouée'), 'error');
-                        }
-                    } catch (error) {
-                        showMessageStep8('❌ Erreur: ' + error.message, 'error');
-                    } finally {
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = '🔄 Mettre à jour l\'URL';
-                    }
-                });
-            }
-            
-            function showMessageStep8(text, type) {
-                const messageDiv = document.getElementById('update-url-message-step8');
-                if (messageDiv) {
-                    messageDiv.innerHTML = text.replace(/\\n/g, '<br>');
-                    messageDiv.className = 'message ' + type;
-                    messageDiv.style.display = 'block';
-                    messageDiv.style.background = type === 'success' ? '#d4edda' : '#f8d7da';
-                    messageDiv.style.color = type === 'success' ? '#155724' : '#721c24';
-                    messageDiv.style.border = type === 'success' ? '1px solid #c3e6cb' : '1px solid #f5c6cb';
-                    messageDiv.style.padding = '15px';
-                    messageDiv.style.borderRadius = '8px';
-                    messageDiv.style.marginTop = '20px';
-                    
-                    if (type === 'success') {
-                        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }
-                }
-            }
-            
-            function hideMessageStep8() {
-                const messageDiv = document.getElementById('update-url-message-step8');
-                if (messageDiv) {
-                    messageDiv.style.display = 'none';
-                }
-            }
-            // ========== FIN GESTION DU FORMULAIRE DE MISE À JOUR D'URL ==========
             
             // Cacher toutes les navigations sauf celle du step 1
             document.querySelectorAll('.navigation').forEach(nav => {

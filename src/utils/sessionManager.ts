@@ -1,8 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import { isAdminUser } from './sessionDurationCheck';
 
-const DEFAULT_TOKEN_DURATION_MS = 24 * 60 * 60 * 1000; // 24h pour admin
-const LIMITED_TOKEN_DURATION_MS = 60 * 60 * 1000; // 60 minutes pour utilisateurs normaux
+// Durée maximale de session : 1 heure pour tous les utilisateurs (même admin)
+const TOKEN_DURATION_MS = 60 * 60 * 1000; // 60 minutes (1 heure)
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,23 +19,8 @@ export interface SessionToken {
 export class SessionManager {
   // Générer automatiquement un token d'accès pour un utilisateur connecté
   static async generateAutoToken(userId: string, moduleName: string, userEmail?: string): Promise<string> {
-    // Déterminer la durée du token selon si l'utilisateur est admin
-    let tokenDuration = LIMITED_TOKEN_DURATION_MS; // 60 minutes par défaut
-    
-    // Si on a l'email, vérifier si c'est l'admin
-    if (userEmail && isAdminUser(userEmail)) {
-      tokenDuration = DEFAULT_TOKEN_DURATION_MS; // 24h pour admin
-    } else if (!userEmail) {
-      // Si on n'a pas l'email, essayer de le récupérer depuis la base de données
-      try {
-        const { data: userData } = await supabase.auth.admin.getUserById(userId);
-        if (userData?.user?.email && isAdminUser(userData.user.email)) {
-          tokenDuration = DEFAULT_TOKEN_DURATION_MS;
-        }
-      } catch (error) {
-        console.warn('Impossible de récupérer l\'email de l\'utilisateur, utilisation durée limitée');
-      }
-    }
+    // Durée du token : 1 heure pour tous les utilisateurs
+    const tokenDuration = TOKEN_DURATION_MS;
     
     const token = crypto.randomUUID();
     const expiresAt = new Date(Date.now() + tokenDuration);

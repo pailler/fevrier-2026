@@ -92,3 +92,7 @@ docker-compose up -d
 3. Vérifier les logs backend pour la progression
 4. Vérifier que l'upload se termine sans erreur
 
+
+
+
+

@@ -1,4 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialiser Supabase avec la clé de service pour bypasser RLS
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function GET(
   request: NextRequest,
@@ -7,30 +14,46 @@ export async function GET(
   try {
     const { qrId } = await params;
     
-    console.log(`🔍 QR Redirect: ${qrId}`);
+    console.log(`🔍 QR Redirect Next.js: ${qrId}`);
     
-    // Récupérer les données du QR code depuis le stockage temporaire
-    if (!global.qrCodes) {
+    // Récupérer les données du QR code depuis Supabase
+    const { data: qrData, error } = await supabase
+      .from('dynamic_qr_codes')
+      .select('*')
+      .eq('qr_id', qrId)
+      .eq('is_active', true)
+      .single();
+    
+    if (error || !qrData) {
+      console.error('❌ QR Code non trouvé:', error);
       return NextResponse.json({ error: 'QR Code non trouvé' }, { status: 404 });
     }
     
-    const qrData = global.qrCodes.get(qrId);
+    // Incrémenter le compteur de scans dans Supabase
+    const { error: updateError } = await supabase
+      .from('dynamic_qr_codes')
+      .update({
+        scans: (qrData.scans || 0) + 1,
+        last_scan: new Date().toISOString()
+      })
+      .eq('qr_id', qrId)
+      .eq('is_active', true);
     
-    if (!qrData) {
-      return NextResponse.json({ error: 'QR Code non trouvé' }, { status: 404 });
+    if (updateError) {
+      console.error('❌ Erreur mise à jour scans:', updateError);
+      // Continuer quand même la redirection même si l'incrémentation échoue
     }
     
-    // Incrémenter le compteur de scans
-    qrData.scans = (qrData.scans || 0) + 1;
-    qrData.last_scan = new Date();
-    
-    console.log(`✅ QR Redirect: ${qrData.url} (scans: ${qrData.scans})`);
+    console.log(`✅ QR Redirect: ${qrData.url} (scans: ${(qrData.scans || 0) + 1})`);
     
     // Rediriger vers l'URL de destination
     return NextResponse.redirect(qrData.url, 302);
     
   } catch (error) {
     console.error('❌ Erreur QR Redirect:', error);
-    return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Erreur interne du serveur',
+      details: error instanceof Error ? error.message : String(error)
+    }, { status: 500 });
   }
 }

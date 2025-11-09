@@ -1,0 +1,636 @@
+From 8d5f3dee99ac640ad0b27c54b1358864e027d989 Mon Sep 17 00:00:00 2001
+From: pailler <formateur_tic@hotmail.com>
+Date: Sun, 2 Nov 2025 03:29:00 +0100
+Subject: [PATCH] Fix: nettoyage fichiers mal places
+
+---
+ .../app/api/check-librespeed-access/route.ts  |  76 -------
+ .../api/ensure-all-users-have-tokens/route.ts | 187 ------------------
+ .../app/api/increment-metube-access/route.ts  | 148 --------------
+ .../api/increment-psitransfer-access/route.ts | 181 -----------------
+ 4 files changed, 592 deletions(-)
+ delete mode 100644 src/app/api/activate-module/src/app/api/check-librespeed-access/route.ts
+ delete mode 100644 src/app/api/activate-module/src/app/api/check-librespeed-access/src/app/api/ensure-all-users-have-tokens/route.ts
+ delete mode 100644 src/app/api/activate-module/src/app/api/check-librespeed-access/src/app/api/ensure-all-users-have-tokens/src/app/api/increment-metube-access/route.ts
+ delete mode 100644 src/app/api/activate-module/src/app/api/check-librespeed-access/src/app/api/ensure-all-users-have-tokens/src/app/api/increment-metube-access/src/app/api/increment-psitransfer-access/route.ts
+
+diff --git a/src/app/api/activate-module/src/app/api/check-librespeed-access/route.ts b/src/app/api/activate-module/src/app/api/check-librespeed-access/route.ts
+deleted file mode 100644
+index c8c549f..0000000
+--- a/src/app/api/activate-module/src/app/api/check-librespeed-access/route.ts
++++ /dev/null
+@@ -1,76 +0,0 @@
+-import { NextRequest, NextResponse } from 'next/server';
+-import { supabase } from '../../../utils/supabaseClient';
+-
+-export async function POST(request: NextRequest) {
+-  try {
+-    ;
+-    
+-    const body = await request.json();
+-    const { userId } = body;
+-    
+-    if (!userId) {
+-      return new NextResponse('Missing userId', { status: 400 });
+-    }
+-
+-    // 🪙 NOUVELLE VÉRIFICATION DES TOKENS : Vérifier que l'utilisateur a au moins 1 token
+-    try {
+-      // Récupérer le solde actuel
+-      const { data: userTokens, error: tokensError } = await supabase
+-        .from('user_tokens')
+-        .select('tokens')
+-        .eq('user_id', userId)
+-        .single();
+-
+-      if (tokensError || !userTokens) {
+-        // L'utilisateur n'a pas de tokens, pas d'accès
+-        console.log('❌ LibreSpeed Access: Utilisateur sans tokens pour userId:', userId);
+-        return NextResponse.json({
+-          hasAccess: false,
+-          error: 'Tokens insuffisants',
+-          currentTokens: 0,
+-          requiredTokens: 10,
+-          message: 'Vous devez acheter des tokens pour utiliser ce service'
+-        });
+-      }
+-
+-      const currentTokens = userTokens.tokens || 0;
+-
+-      // Vérifier si l'utilisateur a assez de tokens (10 tokens requis)
+-      if (currentTokens < 10) {
+-        console.log('❌ LibreSpeed Access: Tokens insuffisants pour userId:', userId);
+-        return NextResponse.json({
+-          hasAccess: false,
+-          error: 'Tokens insuffisants',
+-          currentTokens: currentTokens,
+-          requiredTokens: 10
+-        });
+-      }
+-
+-      ;
+-
+-    } catch (error) {
+-      console.log('⚠️ LibreSpeed: Table user_tokens non disponible, autorisation par défaut');
+-    }
+-
+-    return NextResponse.json({
+-      hasAccess: true,
+-      tokens: [], // Pas de tokens d'accès pour l'instant
+-      count: 1
+-    });
+-
+-  } catch (error) {
+-    console.error('❌ Check LibreSpeed Access Error:', error);
+-    return new NextResponse('Internal Server Error', { status: 500 });
+-  }
+-}
+-
+-export async function OPTIONS() {
+-  return new NextResponse(null, {
+-    status: 200,
+-    headers: {
+-      'Access-Control-Allow-Origin': '*',
+-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+-      'Access-Control-Allow-Headers': 'Content-Type',
+-    },
+-  });
+-}
+\ No newline at end of file
+diff --git a/src/app/api/activate-module/src/app/api/check-librespeed-access/src/app/api/ensure-all-users-have-tokens/route.ts b/src/app/api/activate-module/src/app/api/check-librespeed-access/src/app/api/ensure-all-users-have-tokens/route.ts
+deleted file mode 100644
+index 9da0cab..0000000
+--- a/src/app/api/activate-module/src/app/api/check-librespeed-access/src/app/api/ensure-all-users-have-tokens/route.ts
++++ /dev/null
+@@ -1,187 +0,0 @@
+-import { NextRequest, NextResponse } from 'next/server';
+-import { supabase } from '../../../utils/supabaseClient';
+-
+-/**
+- * Route API pour vérifier l'état des tokens de tous les utilisateurs
+- * NE CRÉE PAS de tokens automatiquement
+- * Les tokens sont créés UNIQUEMENT lors de l'inscription
+- * Les utilisateurs sans tokens doivent passer par les achats
+- */
+-export async function POST(request: NextRequest) {
+-  try {
+-    console.log('🔍 Vérification de l\'état des tokens pour tous les utilisateurs...');
+-
+-    // 1. Récupérer tous les utilisateurs depuis profiles
+-    const { data: profiles, error: profilesError } = await supabase
+-      .from('profiles')
+-      .select('id, email, full_name')
+-      .eq('is_active', true);
+-
+-    if (profilesError) {
+-      console.error('❌ Erreur récupération profiles:', profilesError);
+-      return NextResponse.json({
+-        success: false,
+-        error: 'Erreur lors de la récupération des utilisateurs',
+-        details: profilesError.message
+-      }, { status: 500 });
+-    }
+-
+-    if (!profiles || profiles.length === 0) {
+-      return NextResponse.json({
+-        success: true,
+-        message: 'Aucun utilisateur trouvé',
+-        total: 0
+-      });
+-    }
+-
+-    console.log(`📊 ${profiles.length} utilisateurs trouvés`);
+-
+-    const results = [];
+-
+-    // 2. Pour chaque utilisateur, vérifier l'état des tokens (SANS CRÉER)
+-    for (const profile of profiles) {
+-      try {
+-        // Vérifier si l'utilisateur a déjà des tokens
+-        const { data: userTokens, error: tokensError } = await supabase
+-          .from('user_tokens')
+-          .select('id, tokens')
+-          .eq('user_id', profile.id)
+-          .single();
+-
+-        if (tokensError && tokensError.code === 'PGRST116') {
+-          // PGRST116 = no rows returned - utilisateur sans tokens
+-          results.push({
+-            email: profile.email,
+-            userId: profile.id,
+-            status: 'no_tokens',
+-            tokens: 0,
+-            message: 'Utilisateur sans tokens - doit passer par les achats'
+-          });
+-        } else if (userTokens) {
+-          // L'utilisateur a déjà des tokens
+-          results.push({
+-            email: profile.email,
+-            userId: profile.id,
+-            status: 'has_tokens',
+-            tokens: userTokens.tokens
+-          });
+-        } else {
+-          // Erreur inattendue
+-          console.error(`❌ Erreur inattendue pour ${profile.email}:`, tokensError);
+-          results.push({
+-            email: profile.email,
+-            userId: profile.id,
+-            status: 'error',
+-            action: 'check',
+-            error: tokensError?.message || 'Erreur inconnue'
+-          });
+-        }
+-      } catch (error) {
+-        console.error(`❌ Erreur traitement ${profile.email}:`, error);
+-        results.push({
+-          email: profile.email,
+-          userId: profile.id,
+-          status: 'error',
+-          error: error instanceof Error ? error.message : 'Erreur inconnue'
+-        });
+-      }
+-    }
+-
+-    const usersWithoutTokens = results.filter(r => r.status === 'no_tokens').length;
+-    const usersWithTokens = results.filter(r => r.status === 'has_tokens').length;
+-
+-    console.log(`✅ Vérification terminée: ${usersWithTokens} avec tokens, ${usersWithoutTokens} sans tokens`);
+-
+-    return NextResponse.json({
+-      success: true,
+-      message: 'Vérification des tokens terminée (aucune création automatique)',
+-      summary: {
+-        total: profiles.length,
+-        withTokens: usersWithTokens,
+-        withoutTokens: usersWithoutTokens
+-      },
+-      results: results
+-    });
+-
+-  } catch (error) {
+-    console.error('❌ Erreur API ensure-all-users-have-tokens:', error);
+-    return NextResponse.json({
+-      success: false,
+-      error: 'Erreur interne du serveur',
+-      details: error instanceof Error ? error.message : 'Unknown error'
+-    }, { status: 500 });
+-  }
+-}
+-
+-/**
+- * Route GET pour vérifier l'état des tokens de tous les utilisateurs
+- */
+-export async function GET(request: NextRequest) {
+-  try {
+-    // Récupérer tous les utilisateurs depuis profiles
+-    const { data: profiles, error: profilesError } = await supabase
+-      .from('profiles')
+-      .select('id, email, full_name')
+-      .eq('is_active', true);
+-
+-    if (profilesError) {
+-      return NextResponse.json({
+-        success: false,
+-        error: 'Erreur lors de la récupération des utilisateurs',
+-        details: profilesError.message
+-      }, { status: 500 });
+-    }
+-
+-    if (!profiles || profiles.length === 0) {
+-      return NextResponse.json({
+-        success: true,
+-        total: 0,
+-        usersWithoutTokens: [],
+-        usersWithTokens: []
+-      });
+-    }
+-
+-    const usersWithoutTokens = [];
+-    const usersWithTokens = [];
+-
+-    for (const profile of profiles) {
+-      const { data: userTokens } = await supabase
+-        .from('user_tokens')
+-        .select('tokens')
+-        .eq('user_id', profile.id)
+-        .single();
+-
+-      if (!userTokens || userTokens.tokens === null) {
+-        usersWithoutTokens.push({
+-          email: profile.email,
+-          userId: profile.id,
+-          tokens: 0
+-        });
+-      } else {
+-        usersWithTokens.push({
+-          email: profile.email,
+-          userId: profile.id,
+-          tokens: userTokens.tokens
+-        });
+-      }
+-    }
+-
+-    return NextResponse.json({
+-      success: true,
+-      total: profiles.length,
+-      usersWithoutTokens: usersWithoutTokens,
+-      usersWithTokens: usersWithTokens,
+-      countWithoutTokens: usersWithoutTokens.length,
+-      countWithTokens: usersWithTokens.length
+-    });
+-
+-  } catch (error) {
+-    console.error('❌ Erreur API ensure-all-users-have-tokens GET:', error);
+-    return NextResponse.json({
+-      success: false,
+-      error: 'Erreur interne du serveur',
+-      details: error instanceof Error ? error.message : 'Unknown error'
+-    }, { status: 500 });
+-  }
+-}
+-
+diff --git a/src/app/api/activate-module/src/app/api/check-librespeed-access/src/app/api/ensure-all-users-have-tokens/src/app/api/increment-metube-access/route.ts b/src/app/api/activate-module/src/app/api/check-librespeed-access/src/app/api/ensure-all-users-have-tokens/src/app/api/increment-metube-access/route.ts
+deleted file mode 100644
+index 4a55717..0000000
+--- a/src/app/api/activate-module/src/app/api/check-librespeed-access/src/app/api/ensure-all-users-have-tokens/src/app/api/increment-metube-access/route.ts
++++ /dev/null
+@@ -1,148 +0,0 @@
+-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+-import { cookies } from 'next/headers';
+-import { NextResponse } from 'next/server';
+-
+-export async function POST(request: Request) {
+-  const { userId } = await request.json();
+-  const supabase = createRouteHandlerClient({ cookies });
+-
+-  if (!userId) {
+-    return new NextResponse(JSON.stringify({ success: false, error: 'User ID is required' }), {
+-      status: 400,
+-      headers: { 'Content-Type': 'application/json' }
+-    });
+-  }
+-
+-  const moduleId = 'metube';
+-  const tokensToConsume = 10;
+-
+-  try {
+-    const { data: userApp, error: appError } = await supabase
+-      .from('user_applications')
+-      .select('id, usage_count, max_usage, expires_at')
+-      .eq('user_id', userId)
+-      .eq('module_id', moduleId)
+-      .single();
+-
+-    if (appError || !userApp) {
+-      console.error('❌ MeTube Access: Erreur récupération application utilisateur:', appError);
+-      return new NextResponse(JSON.stringify({
+-        success: false,
+-        error: 'Accès MeTube non trouvé pour cet utilisateur'
+-      }), {
+-        status: 404,
+-        headers: { 'Content-Type': 'application/json' }
+-      });
+-    }
+-
+-    const { id: userAppId, usage_count: currentUsage, max_usage: maxUsage } = userApp;
+-
+-    const { data: userTokens, error: tokensError } = await supabase
+-      .from('user_tokens')
+-      .select('tokens')
+-      .eq('user_id', userId)
+-      .single();
+-
+-    if (tokensError || !userTokens) {
+-      console.error('❌ MeTube Access: Erreur récupération tokens:', tokensError);
+-      return new NextResponse(JSON.stringify({
+-        success: false,
+-        error: 'Profil utilisateur non trouvé'
+-      }), {
+-        status: 404,
+-        headers: { 'Content-Type': 'application/json' }
+-      });
+-    }
+-
+-    if (userTokens.tokens < tokensToConsume) {
+-      console.log('❌ MeTube Access: Tokens insuffisants:', userTokens.tokens);
+-      return new NextResponse(JSON.stringify({
+-        success: false,
+-        error: 'Tokens insuffisants',
+-        message: `${tokensToConsume} tokens requis pour utiliser MeTube. Tokens disponibles: ${userTokens.tokens}`
+-      }), {
+-        status: 400,
+-        headers: { 'Content-Type': 'application/json' }
+-      });
+-    }
+-
+-    const { error: updateTokensError } = await supabase
+-      .from('user_tokens')
+-      .update({ 
+-        tokens: userTokens.tokens - tokensToConsume,
+-        updated_at: new Date().toISOString()
+-      })
+-      .eq('user_id', userId);
+-
+-    if (updateTokensError) {
+-      console.error('❌ MeTube Access: Erreur consommation tokens:', updateTokensError);
+-      return new NextResponse(JSON.stringify({
+-        success: false,
+-        error: 'Plus de tokens ? Rechargez',
+-        message: 'Plus de tokens ? Rechargez',
+-        pricingUrl: 'https://iahome.fr/pricing'
+-      }), {
+-        status: 500,
+-        headers: { 'Content-Type': 'application/json' }
+-      });
+-    }
+-
+-    // Incrémenter le compteur dans user_applications et mettre à jour last_used_at
+-    const newUsageCount = currentUsage + 1;
+-    const now = new Date().toISOString();
+-    const { data: updatedApp, error: updateAppError } = await supabase
+-      .from('user_applications')
+-      .update({
+-        usage_count: newUsageCount,
+-        last_used_at: now,  // Mettre à jour la date de dernière utilisation
+-        last_accessed_at: now  // Compatibilité (si les deux champs existent)
+-      })
+-      .eq('id', userAppId)
+-      .select()
+-      .single();
+-
+-    if (updateAppError) {
+-      console.error('❌ MeTube Access: Erreur mise à jour user_applications:', updateAppError);
+-      await supabase
+-        .from('user_tokens')
+-        .update({ 
+-          tokens: userTokens.tokens,
+-          updated_at: new Date().toISOString()
+-        })
+-        .eq('user_id', userId);
+-      return new NextResponse(JSON.stringify({
+-        success: false,
+-        error: 'Erreur lors de la mise à jour du compteur d\'utilisation'
+-      }), {
+-        status: 500,
+-        headers: { 'Content-Type': 'application/json' }
+-      });
+-    }
+-
+-    console.log('✅ MeTube Access: Compteur incrémenté:', newUsageCount, '/', maxUsage);
+-    console.log(`✅ MeTube Access: ${tokensToConsume} tokens consommés. Restants:`, userTokens.tokens - tokensToConsume);
+-
+-    return new NextResponse(JSON.stringify({
+-      success: true,
+-      usage_count: updatedApp.usage_count,
+-      max_usage: updatedApp.max_usage,
+-      last_accessed_at: updatedApp.last_accessed_at,
+-      tokens_consumed: tokensToConsume,
+-      tokens_remaining: userTokens.tokens - tokensToConsume
+-    }), {
+-      status: 200,
+-      headers: { 'Content-Type': 'application/json' }
+-    });
+-
+-  } catch (error) {
+-    console.error('❌ Erreur inattendue lors de l\'accès à MeTube:', error);
+-    return new NextResponse(JSON.stringify({
+-      success: false,
+-      error: `Erreur serveur: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
+-    }), {
+-      status: 500,
+-      headers: { 'Content-Type': 'application/json' }
+-    });
+-  }
+-}
+-
+diff --git a/src/app/api/activate-module/src/app/api/check-librespeed-access/src/app/api/ensure-all-users-have-tokens/src/app/api/increment-metube-access/src/app/api/increment-psitransfer-access/route.ts b/src/app/api/activate-module/src/app/api/check-librespeed-access/src/app/api/ensure-all-users-have-tokens/src/app/api/increment-metube-access/src/app/api/increment-psitransfer-access/route.ts
+deleted file mode 100644
+index 6a80efe..0000000
+--- a/src/app/api/activate-module/src/app/api/check-librespeed-access/src/app/api/ensure-all-users-have-tokens/src/app/api/increment-metube-access/src/app/api/increment-psitransfer-access/route.ts
++++ /dev/null
+@@ -1,181 +0,0 @@
+-import { NextRequest, NextResponse } from 'next/server';
+-import { createClient } from '@supabase/supabase-js';
+-
+-const supabase = createClient(
+-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+-);
+-
+-export async function POST(request: NextRequest) {
+-  try {
+-    const { userId } = await request.json();
+-
+-    if (!userId) {
+-      return new NextResponse(JSON.stringify({
+-        success: false,
+-        error: 'userId requis'
+-      }), {
+-        status: 400,
+-        headers: { 'Content-Type': 'application/json' }
+-      });
+-    }
+-
+-    console.log('🔍 PsiTransfer Access: Recherche dans user_applications pour userId:', userId);
+-
+-    // 1. Rechercher l'accès PsiTransfer de l'utilisateur
+-    const { data: userApp, error: appError } = await supabase
+-      .from('user_applications')
+-      .select('id, usage_count, max_usage, expires_at, module_id')
+-      .eq('user_id', userId)
+-      .eq('module_id', 'psitransfer')
+-      .eq('is_active', true)
+-      .single();
+-
+-    console.log('🔍 PsiTransfer Access: Résultat recherche:', { userApp, appError });
+-
+-    if (appError || !userApp) {
+-      console.error('❌ PsiTransfer Access: Module non trouvé ou inactif:', appError);
+-      return new NextResponse(JSON.stringify({
+-        success: false,
+-        error: 'Module PsiTransfer non activé'
+-      }), {
+-        status: 404,
+-        headers: { 'Content-Type': 'application/json' }
+-      });
+-    }
+-
+-    // 2. Vérifier la date d'expiration
+-    const currentDate = new Date();
+-    const expiresAt = new Date(userApp.expires_at);
+-    
+-    if (expiresAt <= currentDate) {
+-      console.log('❌ PsiTransfer Access: Module expiré');
+-      return new NextResponse(JSON.stringify({
+-        success: false,
+-        error: 'Module PsiTransfer expiré'
+-      }), {
+-        status: 403,
+-        headers: { 'Content-Type': 'application/json' }
+-      });
+-    }
+-
+-    // 3. Vérifier la limite d'usage
+-    const currentUsage = userApp.usage_count || 0;
+-    const maxUsage = userApp.max_usage;
+-
+-    if (maxUsage && currentUsage >= maxUsage) {
+-      console.log('❌ PsiTransfer Access: Limite d\'usage atteinte:', currentUsage, '/', maxUsage);
+-      return new NextResponse(JSON.stringify({
+-        success: false,
+-        error: 'Limite d\'usage atteinte'
+-      }), {
+-        status: 403,
+-        headers: { 'Content-Type': 'application/json' }
+-      });
+-    }
+-
+-    // 4. Vérifier et consommer 10 tokens
+-    const { data: userTokens, error: tokensError } = await supabase
+-      .from('user_tokens')
+-      .select('tokens')
+-      .eq('user_id', userId)
+-      .single();
+-
+-    if (tokensError || !userTokens) {
+-      console.error('❌ PsiTransfer Access: Erreur récupération tokens:', tokensError);
+-      return new NextResponse(JSON.stringify({
+-        success: false,
+-        error: 'Profil utilisateur non trouvé'
+-      }), {
+-        status: 404,
+-        headers: { 'Content-Type': 'application/json' }
+-      });
+-    }
+-
+-    if (userTokens.tokens < 10) {
+-      console.log('❌ PsiTransfer Access: Tokens insuffisants:', userTokens.tokens);
+-      return new NextResponse(JSON.stringify({
+-        success: false,
+-        error: 'Tokens insuffisants',
+-        message: '10 tokens requis pour utiliser PsiTransfer. Tokens disponibles: ' + userTokens.tokens
+-      }), {
+-        status: 400,
+-        headers: { 'Content-Type': 'application/json' }
+-      });
+-    }
+-
+-    // 5. Consommer 10 tokens
+-    const { error: updateTokensError } = await supabase
+-      .from('user_tokens')
+-      .update({ 
+-        tokens: userTokens.tokens - 10,
+-        updated_at: new Date().toISOString()
+-      })
+-      .eq('user_id', userId);
+-
+-    if (updateTokensError) {
+-      console.error('❌ PsiTransfer Access: Erreur consommation tokens:', updateTokensError);
+-      return new NextResponse(JSON.stringify({
+-        success: false,
+-        error: 'Plus de tokens ? Rechargez',
+-        message: 'Plus de tokens ? Rechargez',
+-        pricingUrl: 'https://iahome.fr/pricing'
+-      }), {
+-        status: 500,
+-        headers: { 'Content-Type': 'application/json' }
+-      });
+-    }
+-
+-    // 6. Incrémenter le compteur dans user_applications et mettre à jour last_used_at
+-    const newUsageCount = currentUsage + 1;
+-    const nowISO = new Date().toISOString();
+-    const { data: updatedApp, error: updateAppError } = await supabase
+-      .from('user_applications')
+-      .update({
+-        usage_count: newUsageCount,
+-        last_used_at: nowISO,  // Mettre à jour la date de dernière utilisation
+-        last_accessed_at: nowISO  // Compatibilité (si les deux champs existent)
+-      })
+-      .eq('id', userApp.id)
+-      .select()
+-      .single();
+-
+-    if (updateAppError) {
+-      console.error('❌ PsiTransfer Access: Erreur mise à jour user_applications:', updateAppError);
+-      // Rollback: remettre les tokens
+-      await supabase
+-        .from('user_tokens')
+-        .update({ 
+-          tokens: userTokens.tokens,
+-          updated_at: new Date().toISOString()
+-        })
+-        .eq('user_id', userId);
+-      return new NextResponse('Error updating usage count', { status: 500 });
+-    }
+-
+-    console.log('✅ PsiTransfer Access: Compteur incrémenté:', newUsageCount, '/', maxUsage);
+-    console.log('✅ PsiTransfer Access: 10 tokens consommés. Restants:', userTokens.tokens - 10);
+-
+-    return new NextResponse(JSON.stringify({
+-      success: true,
+-      usage_count: updatedApp.usage_count,
+-      max_usage: updatedApp.max_usage,
+-      last_accessed_at: updatedApp.last_accessed_at,
+-      tokens_consumed: 10,
+-      tokens_remaining: userTokens.tokens - 10
+-    }), {
+-      status: 200,
+-      headers: { 'Content-Type': 'application/json' }
+-    });
+-
+-  } catch (error) {
+-    console.error('❌ PsiTransfer Access: Erreur:', error);
+-    return new NextResponse(JSON.stringify({
+-      success: false,
+-      error: 'Erreur interne du serveur'
+-    }), {
+-      status: 500,
+-      headers: { 'Content-Type': 'application/json' }
+-    });
+-  }
+-}
+-- 
+2.50.0.windows.1
+

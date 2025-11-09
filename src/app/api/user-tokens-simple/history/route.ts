@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '../../../../utils/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+import { TOKEN_COSTS } from '../../../../utils/tokenActionService';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,87 +28,64 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (profileError) {
+      // Si le profil n'existe pas (PGRST116), retourner un historique vide
+      if (profileError.code === 'PGRST116') {
+        console.log('⚠️ Profil non trouvé pour userId:', userId, '- retour d\'un historique vide');
+        return NextResponse.json({
+          success: true,
+          history: [],
+          total: 0
+        });
+      }
+      
       console.error('Erreur lors de la récupération du profil:', profileError);
       return NextResponse.json(
-        { error: 'Utilisateur non trouvé' },
-        { status: 404 }
+        { error: 'Erreur lors de la récupération du profil', details: profileError.message },
+        { status: 500 }
       );
     }
 
-    // Récupérer l'historique réel depuis token_usage
-    const { data: tokenUsageHistory, error: tokenUsageError } = await supabase
-      .from('token_usage')
+    // Récupérer l'historique depuis user_applications (nouveau système)
+    const { data: usageHistory, error: historyError } = await supabase
+      .from('user_applications')
       .select(`
         id,
         module_id,
-        module_name,
-        action_type,
-        tokens_consumed,
-        usage_date
+        module_title,
+        usage_count,
+        last_used_at,
+        created_at
       `)
       .eq('user_id', userId)
-      .order('usage_date', { ascending: false })
+      .not('last_used_at', 'is', null)
+      .order('last_used_at', { ascending: false })
       .limit(limit);
 
-    if (tokenUsageError) {
-      console.error('Erreur lors de la récupération de l\'historique token_usage:', tokenUsageError);
+    if (historyError) {
+      console.error('Erreur lors de la récupération de l\'historique user_applications:', historyError);
+      return NextResponse.json(
+        { error: 'Erreur lors de la récupération de l\'historique' },
+        { status: 500 }
+      );
+    }
+
+    // Transformer les données avec les coûts depuis TOKEN_COSTS
+    const history = (usageHistory || []).map(usage => {
+      const moduleId = usage.module_id as keyof typeof TOKEN_COSTS;
+      const tokensConsumed = TOKEN_COSTS[moduleId] || 10; // Coût par défaut si module non trouvé
       
-      // Fallback : essayer avec user_applications
-      const { data: usageHistory, error: historyError } = await supabase
-        .from('user_applications')
-        .select(`
-          id,
-          module_id,
-          module_title,
-          usage_count,
-          last_used_at,
-          created_at
-        `)
-        .eq('user_id', userId)
-        .not('last_used_at', 'is', null)
-        .order('last_used_at', { ascending: false })
-        .limit(limit);
-
-      if (historyError) {
-        console.error('Erreur lors de la récupération de l\'historique user_applications:', historyError);
-        return NextResponse.json(
-          { error: 'Erreur lors de la récupération de l\'historique' },
-          { status: 500 }
-        );
-      }
-
-      // Transformer les données pour correspondre au format attendu
-      const history = (usageHistory || []).map(usage => ({
+      return {
         id: usage.id,
         module_id: usage.module_id,
         module_name: usage.module_title || usage.module_id,
         action_type: 'access',
-        tokens_consumed: 10, // Coût par défaut
+        tokens_consumed: tokensConsumed,
         usage_date: usage.last_used_at || usage.created_at,
         description: `Accès à ${usage.module_title || usage.module_id}`
-      }));
+      };
+    });
 
-      console.log('📊 Historique récupéré depuis user_applications pour:', userProfile.email, '-', history.length, 'entrées');
-
-      return NextResponse.json({
-        success: true,
-        history: history,
-        total: history.length
-      });
-    }
-
-    // Utiliser les données réelles de token_usage
-    const history = (tokenUsageHistory || []).map(usage => ({
-      id: usage.id,
-      module_id: usage.module_id,
-      module_name: usage.module_name,
-      action_type: usage.action_type || 'access',
-      tokens_consumed: usage.tokens_consumed || 10,
-      usage_date: usage.usage_date,
-      description: `${usage.action_type || 'accès'} - ${usage.module_name}`
-    }));
-
-    console.log('📊 Historique récupéré pour:', userProfile.email, '-', history.length, 'entrées');
+    console.log('📊 Historique récupéré depuis user_applications pour:', userProfile.email, '-', history.length, 'entrées');
 
     return NextResponse.json({
       success: true,

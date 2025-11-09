@@ -70,3 +70,7 @@ Si vous avez accès à un autre réseau (mobile, VPN) :
 3. **Vérifier les logs Traefik** pour voir si les requêtes arrivent
 4. **Tester depuis un autre réseau** pour isoler le problème
 
+
+
+
+

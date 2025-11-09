@@ -196,11 +196,12 @@ export default function QRCodesPage() {
           const defaultCardData = {
             id: 'qrcodes',
             title: 'QR Codes Dynamiques',
-            description: 'Créez des QR codes avec suivi en temps réel, personnalisation avancée et analytics détaillés pour optimiser vos campagnes marketing.',
+            description: 'Créez des QR codes dynamiques avec suivi en temps réel, personnalisation avancée et analytics détaillés. Modifiez l\'URL de destination sans recréer le QR code pour optimiser vos campagnes marketing.',
             subtitle: 'Générateur de QR codes professionnels avec analytics',
             category: 'QR CODE GENERATOR',
             price: 100,
             features: [
+              'QR codes dynamiques : modifiez l\'URL sans recréer le code',
               'QR codes statiques et dynamiques',
               'Personnalisation avancée (couleurs, logo)',
               'Analytics en temps réel',

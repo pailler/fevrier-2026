@@ -210,51 +210,9 @@ export default function AdminEvents() {
           });
         }
 
-        // 5. Événements consommation de tokens (réels et simulés)
-        const { data: tokenUsage, error: tokenUsageError } = await supabase
-          .from('token_usage')
-          .select(`
-            id, user_id, module_id, tokens_consumed, action_type, created_at
-          `)
-          .order('created_at', { ascending: false })
-          .limit(50);
-
-        if (!tokenUsageError && tokenUsage) {
-          const tokenUserIds = [...new Set(tokenUsage.map(t => t.user_id))];
-          const { data: tokenProfiles, error: tokenProfilesError } = await supabase
-            .from('profiles')
-            .select('id, email, full_name')
-            .in('id', tokenUserIds);
-
-          const tokenProfilesMap = {};
-          (tokenProfiles || []).forEach(profile => {
-            tokenProfilesMap[profile.id] = profile;
-          });
-
-          tokenUsage.forEach(usage => {
-            const profile = tokenProfilesMap[usage.user_id];
-            const module = modulesMap[usage.module_id];
-            
-            if (profile && module) {
-              allEvents.push({
-                id: `token_consumed_${usage.id}`,
-                type: 'token_consumed',
-                title: 'Tokens consommés',
-                description: `${profile.full_name || profile.email} a consommé ${usage.tokens_consumed} tokens pour ${module.name}`,
-                timestamp: usage.created_at,
-                user: profile,
-                metadata: { 
-                  module: module.name, 
-                  tokens_consumed: usage.tokens_consumed,
-                  action_type: usage.action_type
-                },
-                icon: '🔥',
-                color: 'bg-red-100 text-red-800'
-              });
-            }
-          });
-        }
-
+        // 5. Événements consommation de tokens depuis user_applications (nouveau système)
+        // Note: token_usage est l'ancien système et est vide, on utilise user_applications maintenant
+        
         // 5.1. Événements consommation de tokens simulés basés sur les logs réels
         if (!userAppsError && userApps) {
           // Simuler des événements de consommation de tokens basés sur les utilisations récentes

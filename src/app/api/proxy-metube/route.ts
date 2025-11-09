@@ -5,8 +5,8 @@ import { validateAccessToken, hasPermission } from '../../../utils/accessToken';
 
 // Configuration du module Metube
 const METUBE_CONFIG = {
-  url: 'http://iahome-metube:8081', // URL interne du module Metube (nom du service Docker)
-  externalUrl: 'http://192.168.1.150:8082', // URL externe accessible depuis le navigateur
+  url: process.env.METUBE_URL || 'http://localhost:8081', // Port exposé sur localhost
+  externalUrl: process.env.METUBE_EXTERNAL_URL || 'http://localhost:8081', // URL externe accessible depuis le navigateur
   credentials: {
     username: process.env.METUBE_USERNAME || 'admin',
     password: process.env.METUBE_PASSWORD || 'password'

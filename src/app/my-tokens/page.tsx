@@ -81,20 +81,16 @@ export default function MyTokensPage() {
 
   const fetchTokenUsage = async (userId: string) => {
     try {
-      // Récupérer l'historique d'utilisation des tokens
-      const { data: usageData, error: usageError } = await supabase
-        .from('token_usage')
-        .select('*')
-        .eq('user_id', userId)
-        .order('usage_date', { ascending: false })
-        .limit(20);
-
-      if (usageError) {
-        console.error('Erreur lors du chargement de l\'historique:', usageError);
+      // Récupérer l'historique d'utilisation des tokens via l'API
+      const response = await fetch(`/api/user-tokens-simple/history?userId=${userId}&limit=20`);
+      
+      if (!response.ok) {
+        console.error('Erreur lors du chargement de l\'historique:', response.statusText);
         return;
       }
 
-      setTokenUsage(usageData || []);
+      const data = await response.json();
+      setTokenUsage(data.history || []);
     } catch (error) {
       console.error('Erreur lors du chargement de l\'historique:', error);
     }

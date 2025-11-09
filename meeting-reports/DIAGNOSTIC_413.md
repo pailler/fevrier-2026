@@ -129,3 +129,7 @@ Vérifier le middleware dans `meeting-reports/backend/main.py` :
 2. **Si > 100 MB** : C'est Cloudflare, passer en DNS only ou utiliser un autre endpoint
 3. **Si < 100 MB** : Vérifier que Traefik a bien rechargé avec la nouvelle config
 
+
+
+
+

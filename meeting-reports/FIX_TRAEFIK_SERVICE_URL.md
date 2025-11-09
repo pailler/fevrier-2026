@@ -64,3 +64,7 @@ Après le redémarrage :
 - Le port 3050 est celui exposé par Nginx dans `docker-compose.yml`
 - Nginx fait déjà le reverse proxy vers frontend (port 3000) et backend (port 8000)
 
+
+
+
+

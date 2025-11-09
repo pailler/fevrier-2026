@@ -41,3 +41,7 @@ Write-Host "   Get-Process | Where-Object ProcessName -like '*traefik*'" -Foregr
 
 Write-Host "`n✅ Configuration vérifiée!" -ForegroundColor Green
 
+
+
+
+

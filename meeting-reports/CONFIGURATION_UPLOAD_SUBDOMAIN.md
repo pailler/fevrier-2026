@@ -81,3 +81,7 @@ Dans Cloudflare Dashboard → DNS → Records :
 - Le domaine principal `meeting-reports.iahome.fr` peut rester en proxy Cloudflare
 - Les autres endpoints API (`/api/reports`, `/api/status`, etc.) continuent d'utiliser le domaine principal
 
+
+
+
+

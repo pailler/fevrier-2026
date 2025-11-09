@@ -49,3 +49,7 @@ Si vous voulez garder le proxy pour la page principale :
 
 Le Worker Cloudflare **ne peut pas** contourner la limite de 1 MB du proxy Cloudflare. Cette limite est appliquée **avant** que le Worker ne s'exécute.
 
+
+
+
+

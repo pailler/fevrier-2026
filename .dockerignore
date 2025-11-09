@@ -74,9 +74,6 @@ cloudflared.exe*
 *.exe.backup
 *.exe.old
 ffmpeg/
-instantmesh/ckpts/
-instantmesh/inputs/
-instantmesh/outputs/
 essentiels/polr-db-data/
 essentiels/uploads/
 meeting-reports/uploads/

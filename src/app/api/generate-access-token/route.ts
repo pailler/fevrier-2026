@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdminUser } from '../../../utils/sessionDurationCheck';
 
-const DEFAULT_TOKEN_DURATION_MS = 24 * 60 * 60 * 1000; // 24h pour admin
-const LIMITED_TOKEN_DURATION_MS = 60 * 60 * 1000; // 60 minutes pour utilisateurs normaux
+// Durée maximale de session : 1 heure pour tous les utilisateurs (même admin)
+const TOKEN_DURATION_MS = 60 * 60 * 1000; // 60 minutes (1 heure)
+const TOKEN_DURATION_SECONDS = Math.floor(TOKEN_DURATION_MS / 1000);
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,9 +17,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Déterminer la durée du token selon si l'utilisateur est admin
-    const tokenDuration = isAdminUser(userEmail) ? DEFAULT_TOKEN_DURATION_MS : LIMITED_TOKEN_DURATION_MS;
-    const tokenDurationSeconds = Math.floor(tokenDuration / 1000);
+    // Durée du token : 1 heure pour tous les utilisateurs
+    const tokenDuration = TOKEN_DURATION_MS;
+    const tokenDurationSeconds = TOKEN_DURATION_SECONDS;
 
     // Créer un token simple (Base64)
     const tokenPayload = {

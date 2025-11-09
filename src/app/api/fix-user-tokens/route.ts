@@ -54,13 +54,13 @@ export async function POST(request: NextRequest) {
 
     // 3. Si l'utilisateur n'a pas de tokens, les créer
     if (!userTokens) {
-      console.log(`🪙 Création de 200 tokens pour ${email}...`);
+      console.log(`🪙 Création de 400 tokens pour ${email}...`);
       
       const { data: newTokens, error: createError } = await supabase
         .from('user_tokens')
         .insert([{
           user_id: profile.id,
-          tokens: 200, // 200 tokens par défaut pour les nouveaux utilisateurs
+          tokens: 400, // 400 tokens par défaut pour les nouveaux utilisateurs
           package_name: 'Welcome Package',
           purchase_date: new Date().toISOString(),
           is_active: true
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
         }, { status: 500 });
       }
 
-      console.log(`✅ 200 tokens créés avec succès pour ${email}`);
+      console.log(`✅ 400 tokens créés avec succès pour ${email}`);
       
       return NextResponse.json({
         success: true,

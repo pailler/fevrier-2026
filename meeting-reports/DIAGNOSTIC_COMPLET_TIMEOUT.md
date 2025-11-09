@@ -78,3 +78,7 @@ Le problème semble être une **combinaison** de :
 3. **Tester sans Worker** : Désactiver temporairement le Worker Cloudflare
 4. **Vérifier DNS** : S'assurer que le domaine pointe vers le bon serveur
 
+
+
+
+

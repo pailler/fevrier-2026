@@ -107,3 +107,7 @@ docker exec iahome-traefik cat /etc/traefik/dynamic/meeting-reports-api.yml
 
 Si l'erreur persiste après modification du Worker, c'est qu'il y a un autre point de blocage à identifier.
 
+
+
+
+

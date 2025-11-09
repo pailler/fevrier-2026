@@ -77,3 +77,7 @@ Si aucun test ne fonctionne :
 - ❌ Le problème vient de Traefik/Nginx/Backend
 - ❌ Vérifiez les logs : `docker logs meeting-reports-nginx-1 --tail=50`
 
+
+
+
+

@@ -59,6 +59,28 @@ services:
       - iahome-network
       - iahome_iahome-network
 
+  metube:
+    image: alexta69/metube:latest
+    container_name: metube-iahome
+    restart: unless-stopped
+    ports:
+      - "0.0.0.0:8081:8081"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - ./metube/downloads:/downloads
+      - ./metube/cleanup-metube-auto.sh:/usr/local/bin/cleanup-metube.sh:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - iahome-network
+
 networks:
   iahome-network:
     external: true

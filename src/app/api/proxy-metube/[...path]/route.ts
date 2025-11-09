@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Configuration du module Metube
+// Utiliser localhost:8081 car le port est exposé, ou le nom du conteneur si sur le même réseau
 const METUBE_CONFIG = {
-  url: 'http://iahome-metube:8081',
+  url: process.env.METUBE_URL || 'http://localhost:8081', // Port exposé sur localhost
 };
 
 function buildUpstreamUrl(pathSegments: string[], request: NextRequest): string {

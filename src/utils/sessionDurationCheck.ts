@@ -1,12 +1,11 @@
 /**
  * Utilitaire pour vérifier la durée de session
- * Limite les sessions à 60 minutes sauf pour l'utilisateur admin formateur_tic@hotmail.com
+ * Limite les sessions à 60 minutes (1 heure) pour tous les utilisateurs, y compris l'admin
  */
 
 import { createClient } from '@supabase/supabase-js';
 
-const ADMIN_EMAIL = 'formateur_tic@hotmail.com';
-const SESSION_DURATION_MS = 60 * 60 * 1000; // 60 minutes en millisecondes
+const SESSION_DURATION_MS = 60 * 60 * 1000; // 60 minutes (1 heure) en millisecondes
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -146,13 +145,7 @@ export async function checkSessionDuration(session: any): Promise<SessionDuratio
     const userEmail = session.user.email;
     const userId = session.user.id;
 
-    // L'admin n'a pas de limite de durée de session
-    if (userEmail === ADMIN_EMAIL) {
-      return {
-        isValid: true
-      };
-    }
-
+    // Tous les utilisateurs, y compris l'admin, ont une limite de 1 heure
     let sessionCreatedAt: Date | null = null;
 
     // Méthode 1: Essayer d'extraire depuis le JWT token (iat) - la plus fiable
@@ -250,8 +243,15 @@ export async function checkSessionDuration(session: any): Promise<SessionDuratio
 
 /**
  * Vérifie si un utilisateur est l'admin (formateur_tic@hotmail.com)
+ * Note: Même l'admin a maintenant une limite de session de 1 heure
  */
+const ADMIN_EMAIL = 'formateur_tic@hotmail.com';
+
 export function isAdminUser(email: string | undefined | null): boolean {
   return email === ADMIN_EMAIL;
 }
+
+
+
+
 

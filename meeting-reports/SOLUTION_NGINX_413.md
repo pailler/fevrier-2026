@@ -49,3 +49,7 @@ Les services ont été redémarrés. **Testez maintenant** l'upload d'un fichier
 
 Si l'erreur persiste, vérifiez dans Cloudflare Dashboard que le Worker a bien été modifié pour exclure `/api/upload`.
 
+
+
+
+

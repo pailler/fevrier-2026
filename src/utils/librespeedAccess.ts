@@ -85,7 +85,7 @@ export class LibreSpeedAccessService {
 
       // Générer un token aléatoire
       const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 heure (60 minutes)
 
       // Enregistrer le token dans la table librespeed_tokens
       const { error: insertError } = await supabase

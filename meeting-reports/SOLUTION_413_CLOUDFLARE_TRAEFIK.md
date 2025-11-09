@@ -117,3 +117,7 @@ docker-compose -f docker-compose.prod.yml restart traefik
 - Si le problème persiste, vérifier les logs Traefik : `docker logs iahome-traefik`
 - Vérifier que le backend est accessible : `curl http://localhost:8000/health`
 
+
+
+
+

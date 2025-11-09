@@ -26,3 +26,7 @@ Si le test direct fonctionne, vous pouvez temporairement utiliser le backend dir
 2. Ou créer un tunnel direct vers le backend
 3. Ou configurer Traefik pour désactiver complètement le buffering pour cette route
 
+
+
+
+

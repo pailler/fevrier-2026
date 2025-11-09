@@ -10,9 +10,20 @@ import qrcode
 import logging
 from io import BytesIO
 from datetime import datetime
-from flask import Flask, request, jsonify, redirect
+from flask import Flask, request, jsonify, redirect, send_file
 from flask_cors import CORS
 from dotenv import load_dotenv
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import mm
+from reportlab.pdfgen import canvas
+from reportlab.lib.colors import HexColor
+
+# Import Resend
+try:
+    import resend
+except ImportError:
+    logger.warning("Resend non disponible, l'envoi d'email ne fonctionnera pas")
+    resend = None
 
 # Import Supabase
 try:
@@ -29,8 +40,28 @@ logger = logging.getLogger(__name__)
 PORT = int(os.getenv('PORT', 7006))
 
 app = Flask(__name__)
-# Configuration CORS permissive pour développement et production
-CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"], "allow_headers": ["Content-Type", "Authorization"]}})
+# Configuration CORS avec origines spécifiques (pas de * pour éviter les problèmes avec credentials)
+allowed_origins = [
+    "https://qrcodes.iahome.fr",
+    "https://www.qrcodes.iahome.fr",
+    "https://iahome.fr",
+    "https://www.iahome.fr",
+    "http://localhost:7006",
+    "http://localhost:3000",
+]
+
+def get_allowed_origin(request_origin=None):
+    """Retourne l'origine autorisée ou la première par défaut"""
+    if request_origin and request_origin in allowed_origins:
+        return request_origin
+    return allowed_origins[0]  # Par défaut, qrcodes.iahome.fr
+
+CORS(app, resources={r"/*": {
+    "origins": allowed_origins,
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "allow_headers": ["Content-Type", "Authorization"],
+    "supports_credentials": False  # Pas de credentials pour éviter les problèmes avec *
+}})
 
 # Configuration pour forcer le parsing JSON
 app.config['JSON_AS_ASCII'] = False
@@ -321,36 +352,6 @@ def create_dynamic_qr():
         logger.error(f"Erreur création QR dynamique: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/r/<qr_id>')
-def redirect_qr(qr_id):
-    """Rediriger vers l'URL de destination"""
-    try:
-        # Connexion à Supabase
-        supabase = get_supabase_client()
-        if not supabase:
-            return jsonify({'error': 'Erreur de connexion à Supabase'}), 500
-        
-        # Récupérer les informations du QR code
-        result = supabase.table('dynamic_qr_codes').select('*').eq('qr_id', qr_id).eq('is_active', True).execute()
-        
-        if not result.data:
-            return jsonify({'error': 'QR Code non trouvé'}), 404
-        
-        qr_data = result.data[0]
-        
-        # Incrémenter le compteur de scans
-        supabase.table('dynamic_qr_codes').update({
-            'scans': qr_data['scans'] + 1,
-            'last_scan': datetime.now().isoformat()
-        }).eq('qr_id', qr_id).execute()
-        
-        # Redirection directe
-        return redirect(qr_data['url'], code=302)
-        
-    except Exception as e:
-        logger.error(f"Erreur redirection: {e}")
-        return jsonify({'error': 'Erreur interne du serveur'}), 500
-
 @app.route('/update', methods=['GET'])
 def update_qr_page():
     """Page simple avec formulaire pour modifier un QR code (ID, token, nouvelle URL)"""
@@ -388,18 +389,29 @@ def update_qr_page():
             .back-link a { color: #667eea; text-decoration: none; font-weight: 600; }
             .back-link a:hover { text-decoration: underline; }
             .success-url { background: #e8f5e9; color: #2e7d32; padding: 8px 12px; border-radius: 6px; margin-top: 10px; font-family: 'Courier New', monospace; font-weight: 600; display: inline-block; word-break: break-all; }
+            .extract-btn { transition: all 0.3s; }
+            .extract-btn:hover { background: #5568d3 !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); }
+            .extract-btn:active { transform: translateY(0); }
         </style>
     </head>
     <body>
         <div class="container">
-            <h1>🔧 Modifier l'URL d'un QR Code</h1>
+            <h1>🔧 Modifiez votre QR code dynamique et/ou obtenez le nombre de scan</h1>
             <p class="subtitle">Entrez les informations de votre QR code dynamique</p>
             
             <form id="updateForm">
+                <!-- Champ pour coller le lien complet -->
+                <div class="form-group">
+                    <label for="fullLink">🔗 Lien complet de gestion (optionnel) :</label>
+                    <input type="text" id="fullLink" placeholder="https://qrcodes.iahome.fr/manage/f69bd041?token=4ec97cec-7c56-4825-95ec-4f9f8e7b9242">
+                    <small>Collez le lien complet pour remplir automatiquement l'ID et le token</small>
+                    <button type="button" id="extractBtn" class="extract-btn" style="margin-top: 8px; padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">✨ Extraire automatiquement</button>
+                </div>
+                
                 <div class="form-group">
                     <label for="qrId">ID du QR Code :</label>
                     <input type="text" id="qrId" placeholder="Ex: f69bd041" required>
-                    <small>L'ID du QR code (8 caractères)</small>
+                    <small>L'ID du QR code (8 caractères) fourni lors de la création</small>
                 </div>
                 
                 <div class="form-group">
@@ -416,8 +428,9 @@ def update_qr_page():
                         <span class="base-url">https://qrcodes.iahome.fr/manage/</span><span class="qr-id">f69bd041</span><span class="base-url">?token=</span><span class="token-part">4ec97cec-7c56-4825-95ec-4f9f8e7b9242</span>
                     </div>
                     <div style="margin-top: 12px; font-size: 12px; color: #666;">
-                        <p style="margin: 6px 0;">🔵 <strong>En bleu</strong> : ID du QR Code (8 caractères) → Copiez dans le champ "ID du QR Code"</p>
-                        <p style="margin: 6px 0;">🟢 <strong>En vert</strong> : Token de gestion → Copiez dans le champ "Token de gestion"</p>
+                        <p style="margin: 6px 0;">🔵 <strong>En bleu</strong> : ID du QR Code (8 caractères)</p>
+                        <p style="margin: 6px 0;">🟢 <strong>En vert</strong> : Token de gestion</p>
+                        <p style="margin: 8px 0; padding-top: 8px; border-top: 1px solid #e0e0e0; font-weight: 600; color: #667eea;">✨ Nouveau : Collez le lien complet dans le champ du haut et cliquez sur "Extraire automatiquement"</p>
                     </div>
                 </div>
                 
@@ -432,6 +445,38 @@ def update_qr_page():
             
             <div id="message" class="message"></div>
             
+            <div class="check-stats-section" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 20px; border-radius: 12px; margin-top: 30px; color: white;">
+                <h3 style="color: white; font-size: 18px; margin-bottom: 12px; font-weight: 600;">🔍 Vérifier les statistiques</h3>
+                <p style="color: rgba(255,255,255,0.95); font-size: 13px; margin-bottom: 15px;">Collez le token et l'ID d'un QR code pour afficher ses statistiques de scans.</p>
+                <form id="checkStatsForm" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div>
+                        <label for="checkQrId" style="display: block; margin-bottom: 6px; font-weight: 600; color: white; font-size: 14px;">ID du QR Code:</label>
+                        <input type="text" id="checkQrId" placeholder="Ex: 9daebebd" style="width: 100%; padding: 12px; border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; font-size: 14px; font-family: 'Courier New', monospace; background: rgba(255,255,255,0.95);" required>
+                    </div>
+                    <div>
+                        <label for="checkToken" style="display: block; margin-bottom: 6px; font-weight: 600; color: white; font-size: 14px;">Token de gestion:</label>
+                        <input type="text" id="checkToken" placeholder="Collez votre token ici" style="width: 100%; padding: 12px; border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; font-size: 14px; font-family: 'Courier New', monospace; background: rgba(255,255,255,0.95);" required>
+                    </div>
+                    <button type="submit" class="check-stats-btn" style="background: white; color: #d97706; padding: 12px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s;">
+                        <span>📊 Afficher les statistiques</span>
+                    </button>
+                </form>
+                <div id="checkStatsMessage" class="message" style="margin-top: 15px;"></div>
+                <div id="checkStatsResult" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.15); border-radius: 8px; border: 1px solid rgba(255,255,255,0.3);">
+                    <h4 style="color: white; font-size: 16px; margin-bottom: 12px; font-weight: 600;">📊 Statistiques du QR Code</h4>
+                    <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                        <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px; text-align: center;">
+                            <h4 style="color: white; font-size: 12px; margin-bottom: 6px; font-weight: 600;">Scans</h4>
+                            <p id="resultScans" style="color: white; font-size: 18px; font-weight: 700; margin: 0;">-</p>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 12px; border-radius: 8px; text-align: center;">
+                            <h4 style="color: white; font-size: 12px; margin-bottom: 6px; font-weight: 600;">Dernier scan</h4>
+                            <p id="resultLastScan" style="color: white; font-size: 12px; font-weight: 600; margin: 0;">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="back-link">
                 <a href="/">← Retour à l'accueil</a>
             </div>
@@ -441,6 +486,67 @@ def update_qr_page():
             const form = document.getElementById('updateForm');
             const submitBtn = document.getElementById('submitBtn');
             const messageDiv = document.getElementById('message');
+            const fullLinkInput = document.getElementById('fullLink');
+            const qrIdInput = document.getElementById('qrId');
+            const tokenInput = document.getElementById('token');
+            const extractBtn = document.getElementById('extractBtn');
+            
+            // Fonction pour extraire l'ID et le token du lien complet
+            function extractFromLink() {
+                const fullLink = fullLinkInput.value.trim();
+                
+                if (!fullLink) {
+                    showMessage('Veuillez coller le lien complet de gestion', 'error');
+                    return;
+                }
+                
+                try {
+                    // Pattern pour extraire l'ID et le token
+                    // Format attendu: https://qrcodes.iahome.fr/manage/XXXXXXXX?token=TOKEN
+                    const match = fullLink.match(/\/manage\/([a-f0-9]{8})\\?token=([a-f0-9-]+)/i);
+                    
+                    if (match && match.length === 3) {
+                        const qrId = match[1];
+                        const token = match[2];
+                        
+                        // Remplir les champs
+                        qrIdInput.value = qrId;
+                        tokenInput.value = token;
+                        
+                        showMessage('✅ ID et token extraits avec succès !', 'success');
+                        
+                        // Focus sur le champ URL
+                        document.getElementById('newUrl').focus();
+                    } else {
+                        // Essayer un autre format (sans le domaine complet)
+                        const match2 = fullLink.match(/manage\/([a-f0-9]{8})\\?token=([a-f0-9-]+)/i);
+                        if (match2 && match2.length === 3) {
+                            const qrId = match2[1];
+                            const token = match2[2];
+                            
+                            qrIdInput.value = qrId;
+                            tokenInput.value = token;
+                            
+                            showMessage('✅ ID et token extraits avec succès !', 'success');
+                            document.getElementById('newUrl').focus();
+                        } else {
+                            showMessage('❌ Format de lien invalide. Utilisez le format: https://qrcodes.iahome.fr/manage/XXXXXXXX?token=TOKEN', 'error');
+                        }
+                    }
+                } catch (error) {
+                    showMessage("❌ Erreur lors de l'extraction: " + error.message, "error");
+                }
+            }
+            
+            // Bouton d'extraction
+            extractBtn.addEventListener('click', extractFromLink);
+            
+            // Auto-extraction lors du collage (Ctrl+V ou Cmd+V)
+            fullLinkInput.addEventListener('paste', function(e) {
+                setTimeout(() => {
+                    extractFromLink();
+                }, 100);
+            });
             
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -503,7 +609,7 @@ def update_qr_page():
                     showMessage('❌ Erreur: ' + error.message, 'error');
                 } finally {
                     submitBtn.disabled = false;
-                    submitBtn.textContent = '🔄 Mettre à jour l\\'URL';
+                    submitBtn.textContent = "🔄 Mettre à jour l'URL";
                 }
             });
             
@@ -523,6 +629,112 @@ def update_qr_page():
             function hideMessage() {
                 messageDiv.style.display = 'none';
             }
+            
+            // Fonction pour vérifier les statistiques d'un QR code
+            async function checkStats(qrId, token) {
+                const checkStatsForm = document.getElementById('checkStatsForm');
+                const checkStatsMessage = document.getElementById('checkStatsMessage');
+                const checkStatsResult = document.getElementById('checkStatsResult');
+                const resultScans = document.getElementById('resultScans');
+                const resultLastScan = document.getElementById('resultLastScan');
+                const submitBtn = checkStatsForm.querySelector('button[type="submit"]');
+                
+                // Désactiver le formulaire
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span>⏳ Vérification...</span>';
+                hideCheckStatsMessage();
+                checkStatsResult.style.display = 'none';
+                
+                try {
+                    console.log('🔍 Vérification des statistiques pour QR:', qrId);
+                    
+                    const response = await fetch('/api/qr/stats/' + qrId, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token: token })
+                    });
+                    
+                    console.log('📥 Réponse reçue:', response.status, response.statusText);
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('❌ Erreur HTTP:', errorText);
+                        try {
+                            const errorJson = JSON.parse(errorText);
+                            showCheckStatsMessage('❌ Erreur: ' + (errorJson.error || 'Échec de la vérification'), 'error');
+                        } catch {
+                            showCheckStatsMessage('❌ Erreur HTTP ' + response.status + ': ' + errorText, 'error');
+                        }
+                        return;
+                    }
+                    
+                    const result = await response.json();
+                    console.log('📦 Résultat:', result);
+                    
+                    if (result.success) {
+                        resultScans.textContent = result.scans || 0;
+                        resultLastScan.textContent = result.last_scan || 'Jamais';
+                        checkStatsResult.style.display = 'block';
+                        showCheckStatsMessage('✅ Statistiques récupérées avec succès!', 'success');
+                    } else {
+                        showCheckStatsMessage('❌ Erreur: ' + (result.error || 'Échec de la vérification'), 'error');
+                    }
+                } catch (error) {
+                    console.error('❌ Erreur catch:', error);
+                    showCheckStatsMessage('❌ Erreur: ' + error.message, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span>📊 Afficher les statistiques</span>';
+                }
+            }
+            
+            function showCheckStatsMessage(text, type) {
+                const checkStatsMessage = document.getElementById('checkStatsMessage');
+                checkStatsMessage.innerHTML = text.replace(/\\n/g, '<br>');
+                checkStatsMessage.className = 'message ' + type;
+                checkStatsMessage.style.display = 'block';
+            }
+            
+            function hideCheckStatsMessage() {
+                const checkStatsMessage = document.getElementById('checkStatsMessage');
+                checkStatsMessage.style.display = 'none';
+            }
+            
+            // Ajouter le gestionnaire d'événements pour le formulaire de vérification des statistiques
+            const checkStatsForm = document.getElementById('checkStatsForm');
+            if (checkStatsForm) {
+                checkStatsForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const checkQrId = document.getElementById('checkQrId').value.trim();
+                    const checkToken = document.getElementById('checkToken').value.trim();
+                    
+                    if (!checkQrId || !checkToken) {
+                        showCheckStatsMessage('❌ Veuillez remplir tous les champs', 'error');
+                        return;
+                    }
+                    
+                    checkStats(checkQrId, checkToken);
+                });
+                
+                // Auto-remplir les champs depuis le formulaire principal si disponibles
+                const qrIdInput = document.getElementById('qrId');
+                const tokenInput = document.getElementById('token');
+                const checkQrIdInput = document.getElementById('checkQrId');
+                const checkTokenInput = document.getElementById('checkToken');
+                
+                // Synchroniser les champs quand l'utilisateur remplit le formulaire principal
+                qrIdInput.addEventListener('input', function() {
+                    if (qrIdInput.value.trim()) {
+                        checkQrIdInput.value = qrIdInput.value.trim();
+                    }
+                });
+                
+                tokenInput.addEventListener('input', function() {
+                    if (tokenInput.value.trim()) {
+                        checkTokenInput.value = tokenInput.value.trim();
+                    }
+                });
+            }
         </script>
     </body>
     </html>
@@ -536,15 +748,348 @@ def update_qr_page():
     }
     return html, 200, headers
 
+@app.route('/r/<qr_id>')
+def redirect_qr(qr_id):
+    """Rediriger vers l'URL de destination"""
+    try:
+        logger.info(f"🔍 Redirection QR: {qr_id}")
+        
+        # Connexion à Supabase - FORCER SERVICE_ROLE_KEY pour bypasser RLS
+        supabase = get_supabase_client(use_service_role=True)
+        if not supabase:
+            logger.error("❌ Impossible de se connecter à Supabase")
+            return jsonify({'error': 'Erreur de connexion à Supabase'}), 500
+        
+        # Récupérer les informations du QR code
+        result = supabase.table('dynamic_qr_codes').select('*').eq('qr_id', qr_id).eq('is_active', True).execute()
+        
+        if not result.data:
+            logger.warning(f"❌ QR Code {qr_id} non trouvé")
+            return jsonify({'error': 'QR Code non trouvé'}), 404
+        
+        qr_data = result.data[0]
+        destination_url = qr_data.get('url', '')
+        
+        if not destination_url:
+            logger.error(f"❌ URL de destination vide pour QR {qr_id}")
+            return jsonify({'error': 'URL de destination non définie'}), 500
+        
+        logger.info(f"✅ QR Code {qr_id} trouvé, redirection vers: {destination_url}")
+        
+        # Incrémenter le compteur de scans (en arrière-plan, ne pas bloquer la redirection)
+        try:
+            supabase.table('dynamic_qr_codes').update({
+                'scans': (qr_data.get('scans', 0) or 0) + 1,
+                'last_scan': datetime.now().isoformat()
+            }).eq('qr_id', qr_id).eq('is_active', True).execute()
+            logger.info(f"📊 Scan incrémenté pour QR {qr_id}")
+        except Exception as scan_error:
+            logger.warning(f"⚠️ Erreur incrémentation scan (redirection continue): {scan_error}")
+        
+        # Redirection directe
+        return redirect(destination_url, code=302)
+        
+    except Exception as e:
+        logger.error(f"❌ Erreur redirection: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({'error': 'Erreur interne du serveur', 'details': str(e)}), 500
+
+
+@app.route('/manage/<qr_id>/pdf')
+def download_qr_pdf(qr_id):
+    """Générer et télécharger un PDF avec les informations de gestion du QR code"""
+    try:
+        token = request.args.get('token', '').strip()
+        
+        # Connexion à Supabase
+        supabase = get_supabase_client(use_service_role=True)
+        if not supabase:
+            return jsonify({'error': 'Erreur de connexion à Supabase'}), 500
+        
+        # Récupérer les informations du QR code
+        result = supabase.table('dynamic_qr_codes').select('*').eq('qr_id', qr_id).eq('is_active', True).execute()
+        
+        if not result.data:
+            return jsonify({'error': 'QR Code non trouvé'}), 404
+        
+        qr_data = result.data[0]
+        stored_token = qr_data.get('management_token', '').strip()
+        
+        # Vérifier le token
+        if not token or token != stored_token:
+            return jsonify({'error': 'Token invalide'}), 403
+        
+        # Créer le PDF en mémoire
+        buffer = BytesIO()
+        pdf = canvas.Canvas(buffer, pagesize=A4)
+        width, height = A4
+        
+        # Couleurs
+        primary_color = HexColor('#667eea')
+        secondary_color = HexColor('#764ba2')
+        text_color = HexColor('#333333')
+        light_gray = HexColor('#f5f5f5')
+        
+        # En-tête avec gradient
+        pdf.setFillColor(primary_color)
+        pdf.rect(0, height - 80, width, 80, fill=1)
+        
+        pdf.setFillColor('white')
+        pdf.setFont("Helvetica-Bold", 24)
+        pdf.drawString(50, height - 50, "QR Code Dynamique - Informations de Gestion")
+        
+        # Informations principales
+        y_position = height - 120
+        pdf.setFillColor(text_color)
+        pdf.setFont("Helvetica-Bold", 14)
+        pdf.drawString(50, y_position, "Informations de votre QR Code")
+        
+        y_position -= 30
+        pdf.setFont("Helvetica", 11)
+        
+        # ID du QR Code
+        pdf.setFont("Helvetica-Bold", 11)
+        pdf.drawString(50, y_position, "ID du QR Code:")
+        pdf.setFont("Courier", 10)
+        pdf.drawString(200, y_position, qr_id)
+        y_position -= 25
+        
+        # URL de destination
+        pdf.setFont("Helvetica-Bold", 11)
+        pdf.drawString(50, y_position, "URL de destination:")
+        pdf.setFont("Courier", 9)
+        url_text = qr_data.get('url', 'N/A')
+        # Découper l'URL si trop longue
+        if len(url_text) > 60:
+            url_lines = [url_text[i:i+60] for i in range(0, len(url_text), 60)]
+            for line in url_lines:
+                pdf.drawString(200, y_position, line)
+                y_position -= 15
+        else:
+            pdf.drawString(200, y_position, url_text)
+            y_position -= 25
+        
+        # Lien vers la page de gestion /update (cliquable)
+        y_position -= 10
+        pdf.setFillColor(primary_color)
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(50, y_position, "Page de gestion (cliquable):")
+        y_position -= 20
+        
+        update_page_url = "https://qrcodes.iahome.fr/update"
+        pdf.setFont("Courier", 9)
+        
+        # Calculer la hauteur nécessaire pour le lien (une seule ligne)
+        link_rect_height = 20
+        link_start_y = y_position
+        
+        # Dessiner le rectangle de fond avec la bonne hauteur
+        link_bottom = link_start_y - link_rect_height + 5
+        link_top = link_start_y + 5
+        pdf.setFillColor(light_gray)
+        pdf.rect(50, link_bottom, width - 100, link_rect_height, fill=1)
+        
+        # Afficher le texte du lien
+        pdf.setFillColor(HexColor('#0066cc'))  # Couleur bleue pour le lien
+        current_y = y_position
+        pdf.drawString(55, current_y, update_page_url)
+        current_y -= 20
+        
+        # Créer UN SEUL lien cliquable qui couvre toute la zone du rectangle
+        pdf.linkURL(update_page_url, (50, link_bottom, width - 50, link_top), relative=0)
+        
+        # Note pour utiliser la page de gestion
+        y_position = current_y - 5
+        pdf.setFillColor(HexColor('#666666'))
+        pdf.setFont("Helvetica-Oblique", 8)
+        pdf.drawString(55, y_position, "💡 Utilisez cette page pour modifier votre QR code dynamique")
+        y_position -= 20
+        
+        # Lien de gestion complet (cliquable)
+        y_position -= 10
+        pdf.setFillColor(primary_color)
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(50, y_position, "Lien de gestion complet (cliquable):")
+        y_position -= 20
+        
+        management_url = f"https://qrcodes.iahome.fr/manage/{qr_id}?token={stored_token}"
+        pdf.setFont("Courier", 9)
+        
+        # Calculer d'abord le nombre de lignes nécessaires
+        if len(management_url) > 70:
+            management_url_lines = [management_url[i:i+70] for i in range(0, len(management_url), 70)]
+            num_lines = len(management_url_lines)
+            link_rect_height = num_lines * 15 + 10
+        else:
+            num_lines = 1
+            link_rect_height = 20
+        
+        # Dessiner le rectangle avec la bonne hauteur
+        link_start_y = y_position
+        link_bottom = link_start_y - link_rect_height + 5
+        link_top = link_start_y + 5
+        pdf.setFillColor(light_gray)
+        pdf.rect(50, link_bottom, width - 100, link_rect_height, fill=1)
+        
+        # Dessiner le texte
+        pdf.setFillColor(HexColor('#0066cc'))
+        current_y = y_position
+        if num_lines > 1:
+            for line in management_url_lines:
+                pdf.drawString(55, current_y, line)
+                current_y -= 15
+        else:
+            pdf.drawString(55, current_y, management_url)
+            current_y -= 20
+        
+        # Créer la zone cliquable qui couvre tout le rectangle
+        pdf.linkURL(management_url, (50, link_bottom, width - 50, link_top), relative=0)
+        y_position = current_y - 5
+        pdf.setFillColor(HexColor('#666666'))
+        pdf.setFont("Helvetica-Oblique", 8)
+        pdf.drawString(55, y_position, "💡 Cliquez sur le lien ci-dessus ou copiez-le pour gérer votre QR code")
+        y_position -= 20
+        
+        # Instructions
+        y_position -= 10
+        pdf.setFillColor(secondary_color)
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(50, y_position, "Instructions:")
+        y_position -= 25
+        
+        pdf.setFillColor(text_color)
+        pdf.setFont("Helvetica", 10)
+        instructions = [
+            "1. Conservez ce document en lieu sûr",
+            "2. Utilisez le lien de gestion complet pour modifier l'URL de destination",
+            "3. Ne partagez jamais votre lien de gestion",
+            "4. Vous pouvez modifier l'URL autant de fois que nécessaire",
+            "5. Le QR code reste le même, seule l'URL de destination change"
+        ]
+        
+        for instruction in instructions:
+            pdf.drawString(70, y_position, instruction)
+            y_position -= 20
+        
+        # Statistiques
+        y_position -= 20
+        pdf.setFillColor(primary_color)
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(50, y_position, "Statistiques:")
+        y_position -= 25
+        
+        pdf.setFillColor(text_color)
+        pdf.setFont("Helvetica", 10)
+        scans = qr_data.get('scans', 0) or 0
+        pdf.drawString(70, y_position, f"Nombre de scans: {scans}")
+        y_position -= 20
+        
+        created_at = qr_data.get('created_at', 'N/A')
+        if created_at != 'N/A':
+            try:
+                created_date = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                pdf.drawString(70, y_position, f"Créé le: {created_date.strftime('%d/%m/%Y à %H:%M')}")
+            except:
+                pdf.drawString(70, y_position, f"Créé le: {created_at}")
+        else:
+            pdf.drawString(70, y_position, f"Créé le: {created_at}")
+        
+        # Pied de page
+        pdf.setFillColor(HexColor('#999999'))
+        pdf.setFont("Helvetica", 8)
+        pdf.drawString(50, 30, f"Document généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')}")
+        pdf.drawString(50, 20, "IAHome - QR Codes Dynamiques - https://qrcodes.iahome.fr")
+        
+        # Finaliser le PDF
+        pdf.save()
+        buffer.seek(0)
+        
+        return send_file(
+            buffer,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name=f'QR_Code_{qr_id}_Informations.pdf'
+        )
+        
+    except Exception as e:
+        logger.error(f"Erreur génération PDF: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({'error': 'Erreur lors de la génération du PDF'}), 500
+
+@app.route('/api/qr/stats/<qr_id>', methods=['POST', 'OPTIONS'])
+def get_qr_stats(qr_id):
+    """Récupérer les statistiques d'un QR code avec vérification du token"""
+    try:
+        # Gérer les requêtes OPTIONS (CORS preflight)
+        if request.method == 'OPTIONS':
+            origin = request.headers.get('Origin')
+            allowed_origin = get_allowed_origin(origin)
+            response = jsonify({'success': True})
+            response.headers['Access-Control-Allow-Origin'] = allowed_origin
+            response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
+            return response
+        
+        # Récupérer le token depuis le body
+        data = request.get_json()
+        token = data.get('token', '').strip() if data else ''
+        
+        if not token:
+            return jsonify({'error': 'Token manquant'}), 400
+        
+        # Connexion à Supabase
+        supabase = get_supabase_client(use_service_role=True)
+        if not supabase:
+            return jsonify({'error': 'Erreur de connexion à Supabase'}), 500
+        
+        # Récupérer les informations du QR code
+        result = supabase.table('dynamic_qr_codes').select('*').eq('qr_id', qr_id).eq('is_active', True).execute()
+        
+        if not result.data:
+            return jsonify({'error': 'QR Code non trouvé'}), 404
+        
+        qr_data = result.data[0]
+        stored_token = qr_data.get('management_token', '').strip()
+        
+        # Vérifier le token
+        if not token or token != stored_token:
+            return jsonify({'error': 'Token invalide'}), 403
+        
+        # Retourner les statistiques
+        response = jsonify({
+            'success': True,
+            'scans': qr_data.get('scans', 0) or 0,
+            'last_scan': qr_data.get('last_scan', 'Jamais') or 'Jamais'
+        })
+        origin = request.headers.get('Origin')
+        allowed_origin = get_allowed_origin(origin)
+        response.headers['Access-Control-Allow-Origin'] = allowed_origin
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        return response
+        
+    except Exception as e:
+        logger.error(f"❌ Erreur get_qr_stats: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        response = jsonify({'error': 'Erreur interne du serveur'})
+        origin = request.headers.get('Origin')
+        allowed_origin = get_allowed_origin(origin)
+        response.headers['Access-Control-Allow-Origin'] = allowed_origin
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        return response, 500
+
 @app.route('/manage/<qr_id>')
 def manage_qr(qr_id):
-    """Page de gestion du QR code"""
+    """Page de gestion du QR code avec vérification du token dans l'URL"""
     try:
         # Récupérer le token depuis l'URL et le nettoyer
         token = request.args.get('token', '').strip()
         
         logger.info(f"🔍 Tentative d'accès à la page de gestion pour QR {qr_id}")
-        logger.info(f"🔑 Token reçu dans l'URL: {token[:30] + '...' if len(token) > 30 else (token if token else 'AUCUN')}")
+        logger.info(f"🔑 Token reçu: {token[:20] if token else 'AUCUN'}...")
         
         # Connexion à Supabase
         supabase = get_supabase_client()
@@ -562,7 +1107,7 @@ def manage_qr(qr_id):
         qr_data = result.data[0]
         stored_token = qr_data.get('management_token', '').strip()
         
-        logger.info(f"🔑 Token stocké dans la DB: {stored_token[:30] + '...' if len(stored_token) > 30 else (stored_token if stored_token else 'AUCUN')}")
+        logger.info(f"🔑 Token stocké dans la DB: {stored_token[:20] if stored_token else 'AUCUN'}...")
         
         # Comparaison stricte des tokens (nettoyés des espaces)
         token_match = token and stored_token and token == stored_token
@@ -580,12 +1125,17 @@ def manage_qr(qr_id):
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Validation requise</title>
                 <style>
-                    body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; text-align: center; }}
-                    .container {{ max-width: 650px; margin: 50px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-                    h1 {{ color: #d97706; }}
-                    p {{ color: #444; }}
-                    code {{ background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }}
-                    .hint {{ margin-top: 16px; color: #6b7280; font-size: 0.95rem; }}
+                    * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                    body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 40px 20px; display: flex; align-items: center; justify-content: center; }}
+                    .container {{ max-width: 650px; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }}
+                    h1 {{ color: #d97706; margin-bottom: 20px; font-size: 28px; text-align: center; }}
+                    p {{ color: #444; margin-bottom: 15px; line-height: 1.6; }}
+                    code {{ background: #f1f5f9; padding: 4px 8px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 13px; }}
+                    .info-box {{ background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b; }}
+                    .info-box ul {{ margin: 10px 0 0 20px; }}
+                    .info-box li {{ margin: 8px 0; }}
+                    .link-display {{ background: #f1f5f9; padding: 12px; border-radius: 6px; margin: 15px 0; font-family: 'Courier New', monospace; font-size: 12px; word-break: break-all; }}
+                    .note-box {{ background: #dbeafe; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3b82f6; }}
                 </style>
             </head>
             <body>
@@ -593,19 +1143,19 @@ def manage_qr(qr_id):
                     <h1>⚠️ Validation du lien requise</h1>
                     <p><strong>Le token de gestion est manquant ou invalide pour ce QR code.</strong></p>
                     
-                    <div style="background: #fef3c7; padding: 15px; border-radius: 5px; margin: 20px 0; text-align: left;">
-                        <p style="margin: 0 0 10px 0;"><strong>💡 Pour accéder à cette page :</strong></p>
-                        <ul style="margin: 0; padding-left: 20px;">
+                    <div class="info-box">
+                        <p style="margin: 0 0 10px 0; font-weight: 600;">💡 Pour accéder à cette page :</p>
+                        <ul>
                             <li>Utilisez le lien complet fourni lors de la création du QR code</li>
                             <li>Le lien doit contenir le paramètre <code>?token=</code> avec votre token unique</li>
                             <li>Format attendu : <code>https://qrcodes.iahome.fr/manage/{qr_id}?token=VOTRE_TOKEN</code></li>
                         </ul>
                     </div>
                     
-                    <p class="hint">🔗 <strong>Lien de création :</strong><br>
-                    <code style="background: #f1f5f9; padding: 8px 12px; border-radius: 4px; display: inline-block; margin-top: 8px;">https://qrcodes.iahome.fr/manage/{qr_id}?token=&lt;votre_token&gt;</code></p>
+                    <p style="font-weight: 600; margin-top: 20px;">🔗 <strong>Lien de gestion :</strong></p>
+                    <div class="link-display">https://qrcodes.iahome.fr/manage/{qr_id}?token=&lt;votre_token&gt;</div>
                     
-                    <div style="background: #dbeafe; padding: 15px; border-radius: 5px; margin: 20px 0; text-align: left;">
+                    <div class="note-box">
                         <p style="margin: 0;"><strong>ℹ️ Note :</strong> Si vous venez de mettre à jour l'URL, aucun rechargement n'est nécessaire. Restez sur la page et le message de succès s'affiche en dessous du bouton vert.</p>
                     </div>
                 </div>
@@ -626,8 +1176,10 @@ def manage_qr(qr_id):
         
         # URL de gestion complète
         management_url = f"https://qrcodes.iahome.fr/manage/{qr_id}?token={stored_token}"
+        qr_url = qr_data.get('qr_url', f"https://qrcodes.iahome.fr/r/{qr_id}")
+        pdf_url = f"https://qrcodes.iahome.fr/manage/{qr_id}/pdf?token={stored_token}"
         
-        # Page de gestion HTML simplifiée et fonctionnelle
+        # Page de gestion HTML stylée et fonctionnelle
         html = f"""
         <!DOCTYPE html>
         <html lang="fr">
@@ -638,28 +1190,30 @@ def manage_qr(qr_id):
             <style>
                 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
                 body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 40px 20px; }}
-                .container {{ max-width: 650px; margin: 0 auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }}
-                h1 {{ color: #333; margin-bottom: 30px; font-size: 28px; font-weight: 700; text-align: center; }}
+                .container {{ max-width: 700px; margin: 0 auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }}
+                h1 {{ color: #333; margin-bottom: 30px; font-size: 32px; font-weight: 700; text-align: center; }}
                 .info-section {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 12px; margin-bottom: 30px; color: white; }}
                 .info-section h2 {{ color: white; font-size: 20px; margin-bottom: 15px; font-weight: 600; }}
                 .info-section p {{ color: rgba(255,255,255,0.95); font-size: 14px; line-height: 1.7; margin-bottom: 15px; }}
                 .url-container {{ display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }}
-                .url-display {{ background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px; word-break: break-all; color: white; border: 1px solid rgba(255,255,255,0.3); }}
+                .url-display {{ background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 20px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 15px; word-break: break-all; color: white; border: 1px solid rgba(255,255,255,0.3); min-height: 80px; line-height: 1.8; }}
                 .copy-btn {{ background: white; color: #667eea; padding: 12px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s; }}
                 .copy-btn:hover {{ background: #f0f0f0; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }}
                 .copy-btn.copied {{ background: #28a745; color: white; }}
                 .warning {{ margin-top: 15px; padding: 12px; background: rgba(255,193,7,0.2); border-left: 4px solid #ffc107; border-radius: 6px; font-size: 13px; color: rgba(255,255,255,0.95); }}
-                .form-section {{ margin-top: 30px; }}
-                .form-group {{ margin-bottom: 25px; }}
-                label {{ display: block; margin-bottom: 10px; font-weight: 600; color: #333; font-size: 15px; }}
-                input[type="url"] {{ width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; transition: border-color 0.3s; }}
-                input[type="url"]:focus {{ outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }}
-                .submit-btn {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s; }}
-                .submit-btn:hover {{ transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }}
-                .submit-btn:disabled {{ background: #6c757d; cursor: not-allowed; transform: none; }}
+                .pdf-section {{ background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 20px; border-radius: 12px; margin-bottom: 30px; color: white; text-align: center; }}
+                .pdf-section h3 {{ color: white; font-size: 18px; margin-bottom: 12px; font-weight: 600; }}
+                .pdf-section p {{ color: rgba(255,255,255,0.95); font-size: 13px; margin-bottom: 15px; }}
+                .pdf-btn {{ background: white; color: #10b981; padding: 12px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }}
+                .pdf-btn:hover {{ background: #f0f0f0; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }}
                 .message {{ margin-top: 20px; padding: 15px; border-radius: 8px; display: none; font-size: 14px; }}
                 .message.success {{ background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }}
                 .message.error {{ background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }}
+                .stats-section {{ background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #667eea; }}
+                .stats-grid {{ display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }}
+                .stat-card {{ background: white; padding: 15px; border-radius: 8px; text-align: center; }}
+                .stat-card h4 {{ color: #667eea; font-size: 14px; margin-bottom: 8px; font-weight: 600; }}
+                .stat-card p {{ color: #333; font-size: 20px; font-weight: 700; }}
             </style>
         </head>
         <body>
@@ -676,25 +1230,114 @@ def manage_qr(qr_id):
                     <div class="warning">⚠️ Ne partagez pas ce lien - il donne accès à la gestion de votre QR code.</div>
                 </div>
                 
-                <div class="form-section">
-                    <div class="current-url-section" style="margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">URL actuelle dans Supabase:</label>
-                        <div id="currentUrlDisplay" style="font-family: 'Courier New', monospace; font-size: 14px; color: #667eea; word-break: break-all; padding: 10px; background: white; border-radius: 6px; border: 1px solid #e0e0e0;">{qr_data['url']}</div>
+                <div class="pdf-section">
+                    <h3>📄 Télécharger les informations</h3>
+                    <p>Téléchargez un document PDF contenant toutes les informations nécessaires pour gérer et mettre à jour votre QR code.</p>
+                    <div style="display: flex; gap: 10px; flex-direction: column;">
+                        <a href="{pdf_url}" class="pdf-btn" download>
+                            <span>📥 Télécharger le PDF</span>
+                        </a>
                     </div>
-                    
-                    <form id="updateForm">
-                        <div class="form-group">
-                            <label for="newUrl">Nouvelle URL de destination:</label>
-                            <input type="url" id="newUrl" value="{qr_data['url']}" placeholder="https://example.com" required>
-                        </div>
-                        <button type="submit" class="submit-btn" id="submitBtn">Mettre à jour l'URL</button>
-                    </form>
                 </div>
                 
-                <div id="message" class="message"></div>
+                <div class="pdf-section" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+                    <h3>🔧 Page de gestion</h3>
+                    <p>Accédez à la page de gestion pour modifier votre QR code dynamique et consulter les statistiques.</p>
+                    <div style="display: flex; gap: 10px; flex-direction: column;">
+                        <a href="https://qrcodes.iahome.fr/update" class="pdf-btn" style="background: white; color: #3b82f6;">
+                            <span>🔗 Accéder à la page de gestion</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="stats-section">
+                    <h3 style="color: #333; font-size: 16px; margin-bottom: 10px; font-weight: 600;">📊 Statistiques</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h4>Scans</h4>
+                            <p id="scansCount">{qr_data.get('scans', 0) or 0}</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Dernier scan</h4>
+                            <p id="lastScan" style="font-size: 12px;">{qr_data.get('last_scan', 'Jamais') or 'Jamais'}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <script>
+                
+                // Fonction pour vérifier les statistiques d'un QR code
+                async function checkStats(qrId, token) {{
+                    const checkStatsForm = document.getElementById('checkStatsForm');
+                    const checkStatsMessage = document.getElementById('checkStatsMessage');
+                    const checkStatsResult = document.getElementById('checkStatsResult');
+                    const resultScans = document.getElementById('resultScans');
+                    const resultLastScan = document.getElementById('resultLastScan');
+                    const submitBtn = checkStatsForm.querySelector('button[type="submit"]');
+                    
+                    // Désactiver le formulaire
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span>⏳ Vérification...</span>';
+                    hideCheckStatsMessage();
+                    checkStatsResult.style.display = 'none';
+                    
+                    try {{
+                        console.log('🔍 Vérification des statistiques pour QR:', qrId);
+                        
+                        const response = await fetch('/api/qr/stats/' + qrId, {{
+                            method: 'POST',
+                            headers: {{ "Content-Type": "application/json" }},
+                            body: JSON.stringify({{ token: token }})
+                        }});
+                        
+                        console.log('📥 Réponse reçue:', response.status, response.statusText);
+                        
+                        if (!response.ok) {{
+                            const errorText = await response.text();
+                            console.error('❌ Erreur HTTP:', errorText);
+                            try {{
+                                const errorJson = JSON.parse(errorText);
+                                showCheckStatsMessage('❌ Erreur: ' + (errorJson.error || 'Échec de la vérification'), 'error');
+                            }} catch {{
+                                showCheckStatsMessage('❌ Erreur HTTP ' + response.status + ': ' + errorText, 'error');
+                            }}
+                            return;
+                        }}
+                        
+                        const result = await response.json();
+                        console.log('📦 Résultat:', result);
+                        
+                        if (result.success) {{
+                            resultScans.textContent = result.scans || 0;
+                            resultLastScan.textContent = result.last_scan || 'Jamais';
+                            checkStatsResult.style.display = 'block';
+                            showCheckStatsMessage('✅ Statistiques récupérées avec succès!', 'success');
+                        }} else {{
+                            showCheckStatsMessage('❌ Erreur: ' + (result.error || 'Échec de la vérification'), 'error');
+                        }}
+                    }} catch (error) {{
+                        console.error('❌ Erreur catch:', error);
+                        showCheckStatsMessage('❌ Erreur: ' + error.message, 'error');
+                    }} finally {{
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<span>📊 Afficher les statistiques</span>';
+                    }}
+                }}
+                
+                function showCheckStatsMessage(text, type) {{
+                    const checkStatsMessage = document.getElementById('checkStatsMessage');
+                    checkStatsMessage.innerHTML = text.replace(/\\n/g, '<br>');
+                    checkStatsMessage.className = 'message ' + type;
+                    checkStatsMessage.style.display = 'block';
+                }}
+                
+                function hideCheckStatsMessage() {{
+                    const checkStatsMessage = document.getElementById('checkStatsMessage');
+                    checkStatsMessage.style.display = 'none';
+                }}
+                
+                // IIFE pour initialiser le token et ajouter les gestionnaires d'événements
                 (function() {{
                     const qrId = '{qr_id}';
                     const STORAGE_KEY = 'qr_management_token_' + qrId;
@@ -720,146 +1363,28 @@ def manage_qr(qr_id):
                     }}
                     
                     if (!token) {{
-                        document.body.innerHTML = '<div style="max-width: 600px; margin: 50px auto; padding: 30px; background: white; border-radius: 12px; text-align: center;"><h1 style="color: #dc3545;">❌ Token manquant</h1><p>Le token de gestion est requis dans l\'URL.</p></div>';
+                        document.body.innerHTML = '<div style="max-width: 600px; margin: 50px auto; padding: 30px; background: white; border-radius: 12px; text-align: center;"><h1 style="color: #dc3545;">❌ Token manquant</h1><p>Le token de gestion est requis dans l'URL.</p></div>';
                         return;
                     }}
                     
                     console.log('🔑 Token disponible:', token ? token.substring(0, 10) + '...' : 'MANQUANT');
                     
-                    const form = document.getElementById('updateForm');
-                    const input = document.getElementById('newUrl');
-                    const submitBtn = document.getElementById('submitBtn');
-                    const messageDiv = document.getElementById('message');
-                    
-                    if (!form || !input || !submitBtn) {{
-                        console.error('❌ Éléments du formulaire non trouvés:', {{
-                            form: !!form,
-                            input: !!input,
-                            submitBtn: !!submitBtn
-                        }});
-                        return;
-                    }}
-                    
-                    console.log('✅ Formulaire trouvé, ajout de l\'écouteur submit...');
-                    
-                    form.addEventListener('submit', async function(e) {{
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
-                        console.log('🔄🔄🔄 FORM SUBMIT INTERCEPTÉ!');
-                        
-                        const newUrl = input.value.trim();
-                        console.log('📝 URL saisie:', newUrl);
-                        
-                        if (!newUrl) {{
-                            showMessage('Veuillez saisir une URL', 'error');
-                            return;
-                        }}
-                        
-                        // Validation URL
-                        try {{
-                            new URL(newUrl);
-                        }} catch {{
-                            showMessage('URL invalide. Utilisez le format: https://example.com', 'error');
-                            return;
-                        }}
-                        
-                        // Désactiver le bouton
-                        submitBtn.disabled = true;
-                        submitBtn.textContent = 'Mise à jour...';
-                        hideMessage();
-                        
-                        console.log('📤 Envoi requête POST vers /api/qr/update-url/' + qrId);
-                        console.log('📦 Données envoyées:', {{ url: newUrl, token: token ? token.substring(0, 10) + '...' : 'MANQUANT' }});
-                        
-                        try {{
-                            const apiUrl = '/api/qr/update-url/' + qrId;
-                            console.log('🌐 URL API:', apiUrl);
-                            console.log('📤 Token envoyé:', token ? token.substring(0, 20) + '...' : 'MANQUANT');
-                            console.log('📤 Body:', JSON.stringify({{ url: newUrl, token: token ? token.substring(0, 10) + '...' : 'MANQUANT' }}));
+                    // Ajouter le gestionnaire d'événements pour le formulaire de vérification des statistiques
+                    const checkStatsForm = document.getElementById('checkStatsForm');
+                    if (checkStatsForm) {{
+                        checkStatsForm.addEventListener('submit', function(e) {{
+                            e.preventDefault();
+                            const checkQrId = document.getElementById('checkQrId').value.trim();
+                            const checkToken = document.getElementById('checkToken').value.trim();
                             
-                            const response = await fetch(apiUrl, {{
-                                method: 'POST',
-                                headers: {{ 'Content-Type': 'application/json' }},
-                                body: JSON.stringify({{ url: newUrl, token: token }})
-                            }}).catch(function(fetchError) {{
-                                console.error('❌❌❌ ERREUR FETCH:', fetchError);
-                                throw fetchError;
-                            }});
-                            
-                            console.log('📥 Réponse reçue - Status:', response.status, response.statusText);
-                            console.log('📥 Headers:', Array.from(response.headers.entries()));
-                            
-                            if (!response.ok) {{
-                                console.error('❌ Réponse non OK:', response.status, response.statusText);
-                                const errorText = await response.text();
-                                console.error('❌ Corps de l\'erreur:', errorText);
-                                try {{
-                                    const errorJson = JSON.parse(errorText);
-                                    showMessage('❌ Erreur: ' + (errorJson.error || 'Mise à jour échouée'), 'error');
-                                }} catch {{
-                                    showMessage('❌ Erreur HTTP ' + response.status + ': ' + errorText, 'error');
-                                }}
+                            if (!checkQrId || !checkToken) {{
+                                showCheckStatsMessage('❌ Veuillez remplir tous les champs', 'error');
                                 return;
                             }}
                             
-                            const result = await response.json();
-                            console.log('📦 Résultat JSON:', result);
-                            
-                            if (response.ok && result.success) {{
-                                // Mettre à jour l'affichage de l'URL actuelle dans Supabase
-                                const currentUrlDisplay = document.getElementById('currentUrlDisplay');
-                                if (currentUrlDisplay) {{
-                                    currentUrlDisplay.textContent = newUrl;
-                                    currentUrlDisplay.style.color = '#28a745';
-                                    currentUrlDisplay.style.borderColor = '#28a745';
-                                    // Animation de succès
-                                    currentUrlDisplay.style.transition = 'all 0.3s';
-                                    setTimeout(() => {{
-                                        currentUrlDisplay.style.color = '#667eea';
-                                        currentUrlDisplay.style.borderColor = '#e0e0e0';
-                                    }}, 2000);
-                                }}
-                                
-                                // Mettre à jour l'input pour refléter la nouvelle URL
-                                input.value = newUrl;
-                                
-                                // Afficher un message de succès avec la nouvelle URL
-                                showMessage('✅ URL mise à jour avec succès dans Supabase!\\n\\nNouvelle URL: ' + newUrl, 'success');
-                                
-                                // S'assurer que le token reste dans l'URL et localStorage
-                                if (token) {{
-                                    localStorage.setItem(STORAGE_KEY, token);
-                                    const currentUrl = new URL(window.location);
-                                    if (!currentUrl.searchParams.get('token')) {{
-                                        currentUrl.searchParams.set('token', token);
-                                        window.history.replaceState({{}}, '', currentUrl);
-                                    }}
-                                }}
-                            }} else {{
-                                showMessage('❌ Erreur: ' + (result.error || 'Mise à jour échouée'), 'error');
-                            }}
-                        }} catch (error) {{
-                            showMessage('❌ Erreur: ' + error.message, 'error');
-                        }} finally {{
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = 'Mettre à jour l\'URL';
-                        }}
-                    }});
-                    
-                    function showMessage(text, type) {{
-                        messageDiv.innerHTML = text.replace(/\\n/g, '<br>');
-                        messageDiv.className = 'message ' + type;
-                        messageDiv.style.display = 'block';
-                        
-                        // Faire défiler vers le message si succès
-                        if (type === 'success') {{
-                            messageDiv.scrollIntoView({{ behavior: 'smooth', block: 'nearest' }});
-                        }}
-                    }}
-                    
-                    function hideMessage() {{
-                        messageDiv.style.display = 'none';
+                            checkStats(checkQrId, checkToken);
+                        }});
+                        console.log("✅ Gestionnaire d'événements ajouté au formulaire de vérification des statistiques");
                     }}
                 }})();
                 
@@ -893,7 +1418,7 @@ def manage_qr(qr_id):
                                 copyBtn.classList.remove('copied');
                             }}, 2000);
                         }} catch (err) {{
-                            console.error('Erreur lors de la copie:', err);
+                            alert('Erreur lors de la copie. Veuillez copier manuellement: ' + url);
                         }}
                         document.body.removeChild(textArea);
                     }});
@@ -1029,7 +1554,7 @@ def manage_qr_old(qr_id):
                 .info-section h2 {{ color: white; font-size: 20px; margin-bottom: 15px; font-weight: 600; }}
                 .info-section p {{ color: rgba(255,255,255,0.95); font-size: 14px; line-height: 1.7; margin-bottom: 15px; }}
                 .url-container {{ display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }}
-                .url-display {{ background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px; word-break: break-all; color: white; border: 1px solid rgba(255,255,255,0.3); }}
+                .url-display {{ background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 20px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 15px; word-break: break-all; color: white; border: 1px solid rgba(255,255,255,0.3); min-height: 80px; line-height: 1.8; }}
                 .copy-btn {{ background: white; color: #667eea; padding: 12px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s; }}
                 .copy-btn:hover {{ background: #f0f0f0; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }}
                 .copy-btn.copied {{ background: #28a745; color: white; }}
@@ -1105,7 +1630,7 @@ def manage_qr_old(qr_id):
                     }}
                     
                     if (!token) {{
-                        document.body.innerHTML = '<div style="max-width: 600px; margin: 50px auto; padding: 30px; background: white; border-radius: 12px; text-align: center;"><h1 style="color: #dc3545;">❌ Token manquant</h1><p>Le token de gestion est requis dans l\'URL.</p></div>';
+                        document.body.innerHTML = '<div style="max-width: 600px; margin: 50px auto; padding: 30px; background: white; border-radius: 12px; text-align: center;"><h1 style="color: #dc3545;">❌ Token manquant</h1><p>Le token de gestion est requis dans l'URL.</p></div>';
                         return;
                     }}
                     
@@ -1125,7 +1650,7 @@ def manage_qr_old(qr_id):
                         return;
                     }}
                     
-                    console.log('✅ Formulaire trouvé, ajout de l\'écouteur submit...');
+                    console.log("✅ Formulaire trouvé, ajout de l'écouteur submit...");
                     
                     form.addEventListener('submit', async function(e) {{
                         e.preventDefault();
@@ -1164,8 +1689,8 @@ def manage_qr_old(qr_id):
                             console.log('📤 Body:', JSON.stringify({{ url: newUrl, token: token ? token.substring(0, 10) + '...' : 'MANQUANT' }}));
                             
                             const response = await fetch(apiUrl, {{
-                                method: 'POST',
-                                headers: {{ 'Content-Type': 'application/json' }},
+                                method: "POST",
+                                headers: {{ "Content-Type": "application/json" }},
                                 body: JSON.stringify({{ url: newUrl, token: token }})
                             }}).catch(function(fetchError) {{
                                 console.error('❌❌❌ ERREUR FETCH:', fetchError);
@@ -1178,7 +1703,7 @@ def manage_qr_old(qr_id):
                             if (!response.ok) {{
                                 console.error('❌ Réponse non OK:', response.status, response.statusText);
                                 const errorText = await response.text();
-                                console.error('❌ Corps de l\'erreur:', errorText);
+                                console.error("❌ Corps de l'erreur:", errorText);
                                 try {{
                                     const errorJson = JSON.parse(errorText);
                                     showMessage('❌ Erreur: ' + (errorJson.error || 'Mise à jour échouée'), 'error');
@@ -1228,7 +1753,7 @@ def manage_qr_old(qr_id):
                             showMessage('❌ Erreur: ' + error.message, 'error');
                         }} finally {{
                             submitBtn.disabled = false;
-                            submitBtn.textContent = 'Mettre à jour l\'URL';
+                            submitBtn.textContent = "Mettre à jour l'URL";
                         }}
                     }});
                     
@@ -1337,7 +1862,7 @@ def update_qr_url(qr_id):
     if request.method == 'OPTIONS':
         logger.info(f"📡 OPTIONS preflight pour /api/qr/update-url/{qr_id}")
         response = jsonify({})
-        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Origin', get_allowed_origin(request.headers.get('Origin')))
         response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
         return response
@@ -1352,7 +1877,7 @@ def update_qr_url(qr_id):
         if not data:
             logger.error("❌ Aucune donnée JSON reçue")
             response = jsonify({'success': False, 'error': 'Données JSON requises'})
-            response.headers.add('Access-Control-Allow-Origin', '*')
+            response.headers.add('Access-Control-Allow-Origin', get_allowed_origin(request.headers.get('Origin')))
             return response, 400
         
         new_url = data.get('url', '').strip()
@@ -1362,14 +1887,14 @@ def update_qr_url(qr_id):
         
         if not new_url or not token:
             response = jsonify({'success': False, 'error': 'URL et token requis'})
-            response.headers.add('Access-Control-Allow-Origin', '*')
+            response.headers.add('Access-Control-Allow-Origin', get_allowed_origin(request.headers.get('Origin')))
             return response, 400
         
         # Connexion à Supabase - FORCER SERVICE_ROLE_KEY pour bypasser RLS lors de l'UPDATE
         supabase = get_supabase_client(use_service_role=True)
         if not supabase:
             response = jsonify({'success': False, 'error': 'Erreur de connexion à Supabase'})
-            response.headers.add('Access-Control-Allow-Origin', '*')
+            response.headers.add('Access-Control-Allow-Origin', get_allowed_origin(request.headers.get('Origin')))
             return response, 500
         
         # Vérifier le token de gestion
@@ -1377,7 +1902,7 @@ def update_qr_url(qr_id):
         
         if not result.data:
             response = jsonify({'success': False, 'error': 'QR Code non trouvé'})
-            response.headers.add('Access-Control-Allow-Origin', '*')
+            response.headers.add('Access-Control-Allow-Origin', get_allowed_origin(request.headers.get('Origin')))
             return response, 404
         
         stored_token = result.data[0]['management_token']
@@ -1387,7 +1912,7 @@ def update_qr_url(qr_id):
         
         if stored_token != token:
             response = jsonify({'success': False, 'error': 'Token de gestion invalide'})
-            response.headers.add('Access-Control-Allow-Origin', '*')
+            response.headers.add('Access-Control-Allow-Origin', get_allowed_origin(request.headers.get('Origin')))
             return response, 403
         
         # Mettre à jour l'URL dans Supabase
@@ -1623,7 +2148,7 @@ def update_qr_url(qr_id):
                     'old_url': old_url,
                     'verified': True
                 })
-                response.headers.add('Access-Control-Allow-Origin', '*')
+                response.headers.add('Access-Control-Allow-Origin', get_allowed_origin(request.headers.get('Origin')))
                 return response
             else:
                 logger.error(f"❌❌❌ ÉCHEC: L'UPDATE n'a pas fonctionné après {verify_attempts} tentatives!")
@@ -1642,7 +2167,7 @@ def update_qr_url(qr_id):
                         'old_url': old_url,
                         'warning': 'La mise à jour a été envoyée mais la vérification prend du temps'
                     })
-                    response.headers.add('Access-Control-Allow-Origin', '*')
+                    response.headers.add('Access-Control-Allow-Origin', get_allowed_origin(request.headers.get('Origin')))
                     return response
                 
                 response = jsonify({
@@ -1652,7 +2177,7 @@ def update_qr_url(qr_id):
                     'expected_url': new_url_cleaned,
                     'old_url': old_url
                 })
-                response.headers.add('Access-Control-Allow-Origin', '*')
+                response.headers.add('Access-Control-Allow-Origin', get_allowed_origin(request.headers.get('Origin')))
                 return response, 500
                 
         except Exception as update_error:
@@ -1660,7 +2185,7 @@ def update_qr_url(qr_id):
             import traceback
             logger.error(traceback.format_exc())
             response = jsonify({'success': False, 'error': f'Erreur Supabase: {str(update_error)}'})
-            response.headers.add('Access-Control-Allow-Origin', '*')
+            response.headers.add('Access-Control-Allow-Origin', get_allowed_origin(request.headers.get('Origin')))
             return response, 500
         
     except Exception as e:
@@ -1668,7 +2193,7 @@ def update_qr_url(qr_id):
         import traceback
         logger.error(traceback.format_exc())
         response = jsonify({'success': False, 'error': 'Erreur interne du serveur'})
-        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Origin', get_allowed_origin(request.headers.get('Origin')))
         return response, 500
 
 if __name__ == '__main__':

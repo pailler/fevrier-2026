@@ -51,6 +51,12 @@ export default function SimpleHeader() {
             {/* Navigation principale - TOUJOURS VISIBLE */}
             <nav className="hidden md:flex items-center space-x-6">
               <Link 
+                href="/marketing" 
+                className="text-white hover:text-blue-100 font-medium transition-colors"
+              >
+                Découvrir
+              </Link>
+              <Link 
                 href="/formation" 
                 className="text-white hover:text-blue-100 font-medium transition-colors"
               >
@@ -73,6 +79,12 @@ export default function SimpleHeader() {
                 className="text-white hover:text-blue-100 font-medium transition-colors"
               >
                 Applications IA
+              </Link>
+              <Link 
+                href="/pricing" 
+                className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-4 py-2 rounded-lg font-semibold transition-colors"
+              >
+                Offres
               </Link>
             </nav>
           </div>

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   metube:
     image: alexta69/metube:latest
@@ -14,6 +12,8 @@ services:
       - TZ=Europe/Paris
     volumes:
       - ./downloads:/downloads
+      # Script de nettoyage automatique
+      - ./cleanup-metube-auto.sh:/usr/local/bin/cleanup-metube.sh:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081"]
       interval: 30s

@@ -83,6 +83,36 @@ export async function middleware(request: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
+  // Réécriture pour MeTube : router les requêtes vers /add vers le proxy MeTube
+  const isMetube = hostname === 'metube.iahome.fr' || 
+                   hostname.includes('metube.iahome.fr') ||
+                   xForwardedHost === 'metube.iahome.fr' ||
+                   xForwardedHost.includes('metube.iahome.fr');
+  
+  if (isMetube) {
+    // Router les requêtes API MeTube vers le proxy
+    if (pathname.startsWith('/api/') || pathname === '/add') {
+      const url = new URL(request.url);
+      // Si c'est /add (POST), router vers /api/proxy-metube/add (pas /api/add car MeTube utilise /add directement)
+      if (pathname === '/add') {
+        url.pathname = '/api/proxy-metube/add';
+      } else if (pathname.startsWith('/api/')) {
+        // Router /api/* vers /api/proxy-metube/api/*
+        url.pathname = `/api/proxy-metube${pathname}`;
+      }
+      console.log(`🔄 [MeTube Middleware] Rewrite ${pathname} -> ${url.pathname}`);
+      return NextResponse.rewrite(url);
+    }
+    
+    // Router la page principale vers le proxy MeTube
+    if (pathname === '/' || pathname === '') {
+      const url = new URL(request.url);
+      url.pathname = '/api/proxy-metube/';
+      console.log(`🔄 [MeTube Middleware] Rewrite / -> /api/proxy-metube/`);
+      return NextResponse.rewrite(url);
+    }
+  }
+
   return NextResponse.next();
 }
 

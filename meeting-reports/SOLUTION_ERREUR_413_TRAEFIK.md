@@ -96,3 +96,7 @@ Pour tester si la correction fonctionne :
 
 L'erreur 413 ne devrait plus apparaître pour les fichiers jusqu'à 500 MB, et les uploads devraient progresser normalement.
 
+
+
+
+

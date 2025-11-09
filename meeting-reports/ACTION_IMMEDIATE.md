@@ -68,3 +68,7 @@ Après modification du Worker, vérifiez dans Cloudflare Dashboard → Analytics
 - Les erreurs 4xx devraient diminuer
 - Les requêtes vers `/api/upload` devraient passer
 
+
+
+
+

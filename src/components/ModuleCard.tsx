@@ -170,13 +170,16 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   
   // Vérifier si c'est le module Meeting Reports pour appliquer un style spécial
   const isMeetingReports = module.title.toLowerCase().includes('meeting reports') || module.title.toLowerCase().includes('meeting') || module.id === 'meeting-reports';
+  
+  // Vérifier si c'est le module Hunyuan 3D pour appliquer un style spécial
+  const isHunyuan3D = module.title.toLowerCase().includes('hunyuan') || module.title.toLowerCase().includes('hunyuan3d') || module.title.toLowerCase().includes('3d') || module.id === 'hunyuan3d';
 
   return (
-    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isIAPhoto ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isIATube ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isStirlingPDF ? 'ring-2 ring-gray-500 ring-opacity-50' : ''} ${isMeetingReports ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''}`}>
+    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isIAPhoto ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isIATube ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isStirlingPDF ? 'ring-2 ring-gray-500 ring-opacity-50' : ''} ${isMeetingReports ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isHunyuan3D ? 'ring-2 ring-purple-500 ring-opacity-50' : ''}`}>
       
       {/* Image du module - Cliquable */}
       <Link href={`/card/${module.id}`} className="block">
-        <div className={`relative h-48 cursor-pointer group overflow-hidden ${isMeetingReports ? 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700' : 'bg-gradient-to-br from-blue-50 to-indigo-100'}`}>
+        <div className={`relative h-48 cursor-pointer group overflow-hidden ${isMeetingReports ? 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700' : isHunyuan3D ? 'bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-700' : 'bg-gradient-to-br from-blue-50 to-indigo-100'}`}>
           {/* Particules animées pour Meeting Reports */}
           {isMeetingReports && (
             <>
@@ -203,16 +206,18 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             </div>
           )}
           
-          {/* Image simple sans gestion d'erreur - forcer l'affichage */}
-          <img 
-            src={imageUrl} 
-            alt={module.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-          />
+          {/* Image simple sans gestion d'erreur - forcer l'affichage (masquée pour les modules spéciaux) */}
+          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && !isHunyuan3D && (
+            <img 
+              src={imageUrl} 
+              alt={module.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
+          )}
           
           {/* Overlay au survol - seulement pour les modules non-spéciaux */}
-          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && (
+          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && !isHunyuan3D && (
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
               <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white bg-opacity-90 rounded-full p-3">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1450,6 +1455,106 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                 </div>
               </div>
             </>
+          ) : isHunyuan3D ? (
+            <>
+              {/* Style spécial pour Hunyuan 3D - informations visibles en permanence */}
+              {/* Graphiques d'arrière-plan 3D */}
+              <div className="absolute inset-0 overflow-hidden">
+                {/* Grille 3D en arrière-plan */}
+                <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 200 200" preserveAspectRatio="none">
+                  <defs>
+                    <pattern id="grid3d" width="20" height="20" patternUnits="userSpaceOnUse">
+                      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" strokeWidth="0.5"/>
+                    </pattern>
+                  </defs>
+                  <rect width="100%" height="100%" fill="url(#grid3d)"/>
+                </svg>
+                
+                {/* Formes 3D abstraites */}
+                <div className="absolute top-4 left-4 w-16 h-16 border-2 border-white/30 transform rotate-45 opacity-30"></div>
+                <div className="absolute bottom-4 right-4 w-12 h-12 border-2 border-white/30 transform -rotate-45 opacity-30"></div>
+                <div className="absolute top-1/2 right-8 w-8 h-8 border-2 border-white/30 transform rotate-12 opacity-20"></div>
+                
+                {/* Particules animées pour Hunyuan 3D */}
+                <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+                <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
+                <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
+                <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
+                <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
+                <div className="absolute top-1/4 right-1/4 w-1.5 h-1.5 bg-white/20 rounded-full animate-pulse"></div>
+                <div className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-white/25 rounded-full animate-bounce"></div>
+              </div>
+              {/* Effet de vague en bas */}
+              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
+              
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Logo Hunyuan 3D au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-purple-500/20">
+                  {/* Logo Hunyuan 3D avec icône de cube 3D */}
+                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
+                    {/* Cercle de fond */}
+                    <circle cx="12" cy="12" r="10" fill="#9333EA" stroke="#7C3AED" strokeWidth="1"/>
+                    
+                    {/* Cube 3D stylisé */}
+                    {/* Face avant */}
+                    <path d="M8 10 L12 7 L16 10 L16 14 L12 17 L8 14 Z" fill="white" opacity="0.9"/>
+                    {/* Face arrière */}
+                    <path d="M12 7 L16 10 L16 14 L12 17 Z" fill="white" opacity="0.6"/>
+                    {/* Face droite */}
+                    <path d="M16 10 L20 7 L20 11 L16 14 Z" fill="white" opacity="0.7"/>
+                    {/* Lignes de perspective */}
+                    <path d="M8 10 L12 7" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M16 10 L20 7" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M16 14 L20 11" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M12 17 L20 11" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                    
+                    {/* Indicateurs 3D */}
+                    <circle cx="10" cy="12" r="1" fill="white" opacity="0.8"/>
+                    <circle cx="14" cy="12" r="1" fill="white" opacity="0.8"/>
+                    <circle cx="12" cy="10" r="1" fill="white" opacity="0.8"/>
+                    <circle cx="12" cy="14" r="1" fill="white" opacity="0.8"/>
+                    
+                    {/* Particules 3D */}
+                    <circle cx="6" cy="6" r="0.8" fill="white" opacity="0.6"/>
+                    <circle cx="18" cy="6" r="0.8" fill="white" opacity="0.6"/>
+                    <circle cx="6" cy="18" r="0.8" fill="white" opacity="0.6"/>
+                    <circle cx="18" cy="18" r="0.8" fill="white" opacity="0.6"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Badge prix et nom du module en haut à droite */}
+              <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                <span className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  Hunyuan 3D
+                </span>
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "AI POWERED" pour Hunyuan 3D */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-purple-400 to-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    🎨 AI POWERED
+                  </span>
+                </div>
+              </div>
+            </>
           ) : (
             <>
               {/* Style normal pour les autres modules */}
@@ -1473,13 +1578,13 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
         <Link href={`/card/${module.id}`} className="block group">
           {/* Titre du module - affiché pour tous les modules */}
           <h3 className="text-3xl sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
-            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : module.title}
+            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : isHunyuan3D ? "Hunyuan 3D - Génération 3D par IA" : module.title}
           </h3>
           {/* Pour les modules spéciaux, afficher seulement la description si pas de sous-titre */}
-          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isQRCodes || isWhisper || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports ? (
+          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isQRCodes || isWhisper || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports || isHunyuan3D ? (
             !module.subtitle && (
               <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
-                {isComfyUI ? "ComfyUI : contrôle total sur chaque étape de la création d'image" : isMeetingReports ? "Transformez automatiquement vos réunions en rapports professionnels avec l'IA" : module.description}
+                {isComfyUI ? "ComfyUI : contrôle total sur chaque étape de la création d'image" : isMeetingReports ? "Transformez automatiquement vos réunions en rapports professionnels avec l'IA" : isHunyuan3D ? "Hunyuan 3D : Générez des modèles 3D à partir de texte ou d'images avec l'intelligence artificielle" : module.description}
               </p>
             )
           ) : (

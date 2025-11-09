@@ -65,7 +65,7 @@ export default function PaymentSuccessPage() {
               </Link>
               <div className="text-sm text-gray-500">
                 <Link href="/pricing" className="text-blue-600 hover:underline">
-                  Retour aux tarifs
+                  Retour aux offres
                 </Link>
               </div>
             </div>

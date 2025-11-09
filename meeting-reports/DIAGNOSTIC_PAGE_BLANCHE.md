@@ -81,3 +81,7 @@ Ouvrez F12 → Console et Network :
 3. **Vérifiez le cache** : Videz le cache du navigateur (Ctrl+Shift+Delete)
 4. **Testez en navigation privée** : Pour éviter les problèmes de cache/cookies
 
+
+
+
+

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const METUBE_CONFIG = {
-  url: process.env.METUBE_INTERNAL_URL || 'http://iahome-metube:8081',
+  url: process.env.METUBE_URL || process.env.METUBE_INTERNAL_URL || 'http://localhost:8081',
 };
 
 function rewriteMetubeHtml(html: string): string {

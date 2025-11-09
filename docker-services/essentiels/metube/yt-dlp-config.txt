@@ -1,0 +1,29 @@
+# Configuration yt-dlp pour contourner les restrictions YouTube
+# Options pour éviter l'erreur 403 Forbidden
+
+# Utiliser le client Android/Web pour contourner les restrictions
+--extractor-args "youtube:player_client=android,web"
+
+# User-Agent moderne pour simuler un navigateur
+--user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+
+# Referer pour simuler une navigation depuis YouTube
+--referer "https://www.youtube.com/"
+
+# Headers supplémentaires
+--add-header "Accept-Language:en-US,en;q=0.9"
+--add-header "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+--add-header "Accept-Encoding:gzip, deflate, br"
+
+# Options de format et qualité
+--format "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
+
+# Retry en cas d'erreur
+--retries 3
+--fragment-retries 3
+
+# Ignorer les erreurs de certificat SSL (si nécessaire)
+# --no-check-certificate
+
+# Utiliser les cookies si disponibles (décommenter si vous avez un fichier cookies.txt)
+# --cookies /config/cookies/cookies.txt

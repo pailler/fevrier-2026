@@ -150,23 +150,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Enregistrer l'utilisation des tokens
-    const { error: usageError } = await supabase
-      .from('token_usage')
-      .insert([
-        {
-          user_id: userId,
-          module_id: moduleId,
-          module_name: moduleName || 'Unknown Module',
-          tokens_consumed: tokensToConsume,
-          usage_date: new Date().toISOString()
-        }
-      ]);
-
-    if (usageError) {
-      console.error('Erreur lors de l\'enregistrement de l\'utilisation:', usageError);
-      // Ne pas faire échouer la transaction pour cette erreur
-    }
+    // L'historique est maintenant géré via user_applications dans le système de tokens
 
     return NextResponse.json({
       success: true,

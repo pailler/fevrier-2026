@@ -67,3 +67,7 @@
 - Le streaming est utilisé pour éviter la saturation mémoire
 
 
+
+
+
+

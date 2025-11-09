@@ -52,7 +52,56 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier le mot de passe
+    // Si le profil n'a pas de password_hash (compte créé via OAuth), vérifier dans Supabase Auth
+    if (!user.password_hash) {
+      console.log('📋 Compte OAuth détecté (pas de password_hash), vérification dans Supabase Auth...');
+      
+      // Vérifier si l'utilisateur existe dans Supabase Auth
+      const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+      
+      if (!authError && authUsers && authUsers.users) {
+        const authUser = authUsers.users.find((u: any) => u.email === email);
+        
+        if (authUser) {
+          // L'utilisateur existe dans Supabase Auth (compte OAuth)
+          // Essayer de se connecter via Supabase Auth avec le mot de passe
+          // Si ça échoue, c'est que le compte n'a pas de mot de passe défini
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+          
+          if (signInError) {
+            // Le compte OAuth n'a pas de mot de passe défini
+            return NextResponse.json(
+              { 
+                error: 'Ce compte a été créé avec Google. Veuillez vous connecter avec Google.',
+                oauth_account: true,
+                needs_password: true,
+                set_password_url: '/api/auth/set-password-oauth'
+              },
+              { status: 401 }
+            );
+          }
+          
+          // Connexion réussie via Supabase Auth
+          console.log('✅ Connexion réussie via Supabase Auth pour compte OAuth');
+          // Continuer avec le flux normal (générer le token JWT)
+        }
+      }
+      
+      // Si on arrive ici, le compte OAuth n'a pas de mot de passe
+      return NextResponse.json(
+        { 
+          error: 'Ce compte a été créé avec Google. Veuillez vous connecter avec Google.',
+          oauth_account: true,
+          needs_password: true
+        },
+        { status: 401 }
+      );
+    }
+
+    // Vérifier le mot de passe pour les comptes classiques
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
     if (!isPasswordValid) {
       return NextResponse.json(

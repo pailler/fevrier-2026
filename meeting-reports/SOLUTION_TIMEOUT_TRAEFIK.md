@@ -66,3 +66,7 @@ Après le redémarrage de Traefik :
 - Le frontend est servi par `traefik-meeting-reports.yml` avec priorité 200
 - La protection par token est gérée par le Worker Cloudflare
 
+
+
+
+

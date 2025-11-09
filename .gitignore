@@ -73,6 +73,15 @@ ffmpeg.zip
 essentiels/metube-downloads/
 essentiels/polr-db-data/
 *.mp4
+*.mkv
+*.webm
+*.mp3
+*.FLAC
 *.ckpt
 *.bin
 instantmesh/ckpts/
+v16_hunyuan2-stableprojectorz/
+docker-services/essentiels/metube/downloads/*.mkv
+docker-services/essentiels/metube/downloads/*.webm
+meeting-reports/uploads/*.mp3
+meeting-reports/uploads/*.FLAC

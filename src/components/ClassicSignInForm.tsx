@@ -40,8 +40,13 @@ export default function ClassicSignInForm({
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error || 'Erreur lors de la connexion');
-        onError?.(new Error(result.error));
+        // Si c'est un compte OAuth qui n'a pas de mot de passe
+        if (result.oauth_account && result.needs_password) {
+          setError('Ce compte a été créé avec Google. Veuillez vous connecter avec le bouton "Se connecter avec Google" ci-dessus.');
+        } else {
+          setError(result.error || 'Erreur lors de la connexion');
+        }
+        onError?.(new Error(result.error || 'Erreur lors de la connexion'));
         return;
       }
 

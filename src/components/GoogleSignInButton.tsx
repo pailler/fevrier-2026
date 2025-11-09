@@ -19,27 +19,22 @@ export default function GoogleSignInButton({
   const [loading, setLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
-    // Temporairement désactivé en attendant la correction du problème Supabase 500
-    alert('La connexion Google est temporairement indisponible suite à une erreur côté Supabase.\n\nVeuillez utiliser la connexion par email/mot de passe.\n\nNous travaillons sur la résolution de ce problème.');
-    return;
-    
-    /* 
     try {
       setLoading(true);
       
       // Déterminer l'URL de base correcte
-      const redirectUrl = process.env.NEXT_PUBLIC_BASE_URL 
-        ? `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`
-        : `${window.location.origin}/auth/callback`;
+      const baseRedirectUrl = redirectUrl || (
+        process.env.NEXT_PUBLIC_BASE_URL 
+          ? `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`
+          : `${window.location.origin}/auth/callback`
+      );
       
-      console.log('🔍 DEBUG - Redirect URL:', redirectUrl);
-      console.log('🔍 DEBUG - Current origin:', window.location.origin);
-      console.log('🔍 DEBUG - Base URL:', process.env.NEXT_PUBLIC_BASE_URL);
+      console.log('🔍 Connexion Google - Redirect URL:', baseRedirectUrl);
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectUrl,
+          redirectTo: baseRedirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -48,19 +43,19 @@ export default function GoogleSignInButton({
       });
 
       if (error) {
-        console.error('Erreur de connexion Google:', error);
+        console.error('❌ Erreur de connexion Google:', error);
         onError?.(error);
+        setLoading(false);
       } else {
-        // La redirection se fait automatiquement
-        console.log('Redirection vers Google OAuth...');
+        // La redirection se fait automatiquement vers Google
+        console.log('✅ Redirection vers Google OAuth...');
+        // Ne pas mettre setLoading(false) ici car on va être redirigé
       }
     } catch (error) {
-      console.error('Erreur lors de la connexion Google:', error);
+      console.error('❌ Erreur lors de la connexion Google:', error);
       onError?.(error);
-    } finally {
       setLoading(false);
     }
-    */
   };
 
   return (

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Configuration du module Metube
 const METUBE_CONFIG = {
-  url: 'http://iahome-metube:8081', // URL interne du module Metube
+  url: process.env.METUBE_URL || 'http://localhost:8081', // Port exposé sur localhost
 };
 
 // Fonction pour déterminer le MIME type basé sur l'extension

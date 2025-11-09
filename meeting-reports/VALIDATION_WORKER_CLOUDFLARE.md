@@ -54,3 +54,7 @@ Le Worker est correctement modifié si :
 3. **Redéployez** : Parfois il faut redéployer plusieurs fois
 4. **Videz le cache** : Cloudflare peut mettre en cache les réponses, ajoutez un cache-control dans le Worker
 
+
+
+
+

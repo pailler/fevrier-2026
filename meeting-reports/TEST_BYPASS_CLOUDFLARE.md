@@ -56,3 +56,7 @@ La propagation peut prendre jusqu'à 5 minutes. Pour vérifier :
 - **Si Test 3 fonctionne** (Worker désactivé) → C'est le Worker qui bloque
 - **Si aucun test ne fonctionne** → Le problème vient de Traefik/Nginx/Backend
 
+
+
+
+

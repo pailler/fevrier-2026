@@ -61,6 +61,22 @@ export async function POST(request: NextRequest) {
     // 3. Exécuter l'action MeTube
     const actionResult = await executeMeTubeAction(actionType, videoUrl);
     
+    // 3.5. Nettoyer les sessions MeTube après l'action (pour utilisateurs externes)
+    try {
+      const cleanupResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/metube-cleanup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullCleanup: false }) // Nettoyer seulement les sessions, pas les fichiers
+      });
+      
+      if (cleanupResponse.ok) {
+        console.log('✅ Sessions MeTube nettoyées après l\'action');
+      }
+    } catch (cleanupError) {
+      console.log('⚠️ Erreur lors du nettoyage des sessions (non bloquant):', cleanupError);
+      // Ne pas bloquer l'action si le nettoyage échoue
+    }
+    
     // 4. Consommer les tokens seulement si l'action réussit
     let tokensConsumed = 0;
     let tokensRemaining = currentTokens;

@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '../../../utils/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 // Version simplifiée qui ne vérifie pas la table profiles
 export async function GET(request: NextRequest) {
@@ -44,16 +49,32 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (tokensError) {
-      // Si l'utilisateur n'a pas de tokens, retourner 0
-      // Les tokens ne sont créés QUE lors de l'inscription, pas automatiquement ici
-      console.log('⚠️ Utilisateur sans tokens (doit passer par les achats):', userId);
-      return NextResponse.json({
-        tokens: 0,
-        tokensRemaining: 0,
-        packageName: null,
-        purchaseDate: null,
-        isActive: false
-      });
+      // PGRST116 = "No rows returned" - c'est normal si l'utilisateur n'a pas de tokens
+      if (tokensError.code === 'PGRST116') {
+        console.log('⚠️ Utilisateur sans tokens (doit passer par les achats):', actualUserId);
+        console.log('⚠️ Email:', userId.includes('@') ? userId : 'N/A');
+        return NextResponse.json({
+          tokens: 0,
+          tokensRemaining: 0,
+          packageName: null,
+          purchaseDate: null,
+          isActive: false
+        });
+      } else {
+        // Autre erreur (permissions, etc.)
+        console.error('❌ Erreur lors de la récupération des tokens:', tokensError);
+        console.error('❌ Code:', tokensError.code);
+        console.error('❌ Message:', tokensError.message);
+        console.error('❌ User ID:', actualUserId);
+        return NextResponse.json({
+          tokens: 0,
+          tokensRemaining: 0,
+          packageName: null,
+          purchaseDate: null,
+          isActive: false,
+          error: tokensError.message
+        });
+      }
     }
 
     // Utiliser les vraies valeurs de la base de données
@@ -62,7 +83,9 @@ export async function GET(request: NextRequest) {
     const purchaseDate = userTokens.purchase_date || null;
     const isActive = userTokens.is_active !== false;
     
-    console.log('✅ Tokens récupérés depuis la DB:', tokens, 'pour userId:', userId);
+    console.log('✅ Tokens récupérés depuis la DB:', tokens, 'pour userId:', actualUserId);
+    console.log('✅ Package:', packageName);
+    console.log('✅ Is Active:', isActive);
 
     return NextResponse.json({
       tokens: tokens,
@@ -178,31 +201,10 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Tokens consommés:', tokensToConsume, 'Restants:', newTokenCount, 'pour userId:', userId);
 
-    // Enregistrer l'utilisation dans token_usage pour l'historique "Mes dernières utilisations"
+    // Enregistrer l'utilisation dans l'historique via user_applications
     if (moduleId && moduleId !== 'test') {
       const now = new Date().toISOString();
       
-      // Créer une entrée dans token_usage pour l'historique
-      const { error: tokenUsageError } = await supabase
-        .from('token_usage')
-        .insert({
-          user_id: actualUserId,
-          module_id: moduleId,
-          module_name: moduleName || moduleId,
-          action_type: 'access',
-          tokens_consumed: tokensToConsume,
-          usage_date: now,
-          created_at: now
-        });
-
-      if (tokenUsageError) {
-        console.error('❌ Erreur enregistrement token_usage:', tokenUsageError);
-        // Ne pas faire échouer la requête pour une erreur d'historique
-      } else {
-        console.log('✅ Utilisation enregistrée dans token_usage pour l\'historique');
-      }
-
-      // Enregistrer l'utilisation dans l'historique via user_applications
       // Mettre à jour last_used_at pour l'historique
       // D'abord récupérer le usage_count actuel
       const { data: currentApp, error: fetchError } = await supabase
