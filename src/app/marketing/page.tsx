@@ -5,7 +5,6 @@ import { subdomainsConfig } from '../../utils/subdomainsConfig';
 
 // Désactiver le cache pour cette page
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
 export default function MarketingPage() {
   useEffect(() => {

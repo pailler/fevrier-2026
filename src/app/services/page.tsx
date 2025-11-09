@@ -5,7 +5,6 @@ import { subdomainsConfig, getSubdomainsByCategory } from '../../utils/subdomain
 
 // Désactiver le cache pour cette page
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
 const categoryLabels: Record<string, string> = {
   ai: 'Intelligence Artificielle',

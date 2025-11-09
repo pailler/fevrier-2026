@@ -36,6 +36,8 @@ export class TokenActionServiceClient {
         body: JSON.stringify({
           userId,
           tokensToConsume: cost,
+          moduleId: moduleId,
+          moduleName: moduleTitle,
           action: `${moduleId}.${action}`,
           description: `Accès à ${moduleTitle}`
         })
@@ -78,6 +80,7 @@ export class TokenActionServiceClient {
       'stablediffusion': 100,
       'ruinedfooocus': 100,
       'comfyui': 100,
+      'hunyuan3d': 100,
       
       // Applications essentielles (10 tokens)
       'metube': 10,
