@@ -1281,7 +1281,7 @@ export default function EncoursPage() {
                         const moduleTitle = module.module_title;
                         
                         // Applications IA (100 tokens)
-                        if (['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui'].includes(moduleId)) {
+                        if (['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui', 'hunyuan3d'].includes(moduleId)) {
                           if (!user) {
                             console.error('❌ user is null in AIAccessButton');
                             return null;
