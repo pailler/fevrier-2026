@@ -115,6 +115,8 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'meeting-reports': isDevelopment ? 'http://localhost:3050' : 'https://meeting-reports.iahome.fr',
         'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
         'cogstudio': 'https://cogstudio.iahome.fr',
+        // Hunyuan 3D : localhost:8888 en dev, hunyuan3d.iahome.fr en prod
+        'hunyuan3d': isDevelopment ? 'http://localhost:8888' : 'https://hunyuan3d.iahome.fr',
       };
       
       // Obtenir l'URL du sous-domaine pour ce module

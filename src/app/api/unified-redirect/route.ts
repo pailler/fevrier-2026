@@ -20,6 +20,7 @@ const MODULE_URLS: { [key: string]: string } = {
   'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
   'comfyui': 'https://comfyui.iahome.fr',
   'cogstudio': 'https://cogstudio.iahome.fr',
+  'hunyuan3d': 'https://hunyuan3d.iahome.fr',
 };
 
 export async function GET(request: NextRequest) {
