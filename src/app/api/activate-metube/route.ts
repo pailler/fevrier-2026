@@ -1,10 +1,13 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-export async function POST(request: Request) {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+export async function POST(request: NextRequest) {
   const { userId, email } = await request.json();
-  const supabase = createRouteHandlerClient({ cookies });
 
   if (!userId || !email) {
     return NextResponse.json({ success: false, error: 'User ID and email are required' }, { status: 400 });

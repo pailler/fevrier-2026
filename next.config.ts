@@ -66,25 +66,10 @@ const nextConfig: NextConfig = {
             key: 'X-Content-Type-Options',
             value: 'nosniff'
           },
-          {
-            key: 'Access-Control-Allow-Origin',
-            value: '*'
-          },
-          {
-            key: 'Access-Control-Allow-Methods',
-            value: 'GET, POST, PUT, DELETE, OPTIONS'
-          },
-          {
-            key: 'Access-Control-Allow-Headers',
-            value: 'Content-Type, Authorization, Cookie, X-Requested-With'
-          },
-          {
-            key: 'Access-Control-Allow-Credentials',
-            value: 'true'
-          },
+          // CORS headers retirés - gérés par les routes API individuelles
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; connect-src 'self' http://localhost:8003 https://instantmesh.iahome.fr https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io https://*.cloudflareaccess.com https://*.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://iahome.fr/cdn-cgi/ https://*.cloudflareaccess.com https://*.cloudflare.com; style-src 'self' 'unsafe-inline' https://*.cloudflareaccess.com https://*.cloudflare.com; img-src 'self' data: https:; font-src 'self' data: https://*.cloudflareaccess.com https://*.cloudflare.com; frame-src 'self' https: https://*.cloudflareaccess.com;"
+            value: "default-src 'self'; connect-src 'self' http://localhost:8003 https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io wss://*.supabase.co wss://*.supabase.io https://*.cloudflareaccess.com https://*.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://iahome.fr/cdn-cgi/ https://*.cloudflareaccess.com https://*.cloudflare.com; style-src 'self' 'unsafe-inline' https://*.cloudflareaccess.com https://*.cloudflare.com; img-src 'self' data: https:; font-src 'self' data: https://*.cloudflareaccess.com https://*.cloudflare.com; frame-src 'self' https: https://*.cloudflareaccess.com;"
           },
           {
             key: 'Cache-Control',
@@ -93,19 +78,6 @@ const nextConfig: NextConfig = {
           {
             key: 'X-DNS-Prefetch-Control',
             value: 'on'
-          }
-        ]
-      },
-      {
-        source: '/_next/static/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable'
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
           }
         ]
       },
@@ -119,6 +91,10 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Type',
             value: 'text/css'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
           }
         ]
       },
@@ -132,6 +108,40 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Type',
             value: 'application/javascript'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          }
+        ]
+      },
+      {
+        source: '/_next/static/chunks/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          },
+          {
+            key: 'Content-Type',
+            value: 'application/javascript'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          }
+        ]
+      },
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
           }
         ]
       },
@@ -150,6 +160,7 @@ const nextConfig: NextConfig = {
             key: 'Expires',
             value: '0'
           }
+          // Pas d'en-têtes CORS ici - gérés par chaque route API individuellement
         ]
       },
       {
@@ -196,6 +207,17 @@ const nextConfig: NextConfig = {
             key: 'Access-Control-Max-Age',
             value: '86400'
           }
+        ]
+      },
+      {
+        // Exception pour /api/dynamic/qr - CORS géré par la route elle-même
+        source: '/api/dynamic/qr',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate'
+          }
+          // Pas d'en-têtes CORS ici - gérés par la route API
         ]
       }
     ];
