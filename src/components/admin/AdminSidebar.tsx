@@ -72,7 +72,7 @@ export default function AdminSidebar() {
           <div className="space-y-3">
             {/* Tokens */}
             <div className="flex items-center justify-between">
-              <TokenBalance className="text-sm" />
+              <TokenBalance className="text-base" />
             </div>
 
             {/* Bouton Mes applis */}
@@ -97,7 +97,7 @@ export default function AdminSidebar() {
         {/* Version collapsed */}
         {isCollapsed && user && (
           <div className="flex flex-col items-center space-y-2">
-            <TokenBalance className="text-xs" />
+            <TokenBalance className="text-sm" />
             <Link
               href="/encours"
               className="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center hover:bg-blue-700 transition-colors"
