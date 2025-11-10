@@ -64,7 +64,7 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
             <div className="flex md:hidden items-center space-x-3">
               <Link
                 href="/encours"
-                className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 font-bold px-4 py-2.5 rounded-lg text-base hover:from-yellow-500 hover:to-yellow-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2"
+                className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 font-bold px-4 py-2.5 rounded-lg text-lg hover:from-yellow-500 hover:to-yellow-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2"
               >
                 <span className="text-xl">📱</span>
                 <span>Mes applis</span>
