@@ -136,28 +136,39 @@ export default function Hunyuan3DPage() {
       }
 
       try {
-        // Vérifier si la table user_subscriptions existe avant de faire la requête
-        const { data: subscriptions, error } = await supabase
-          .from('user_subscriptions')
+        // Utiliser user_applications au lieu de user_subscriptions
+        const { data: accessData, error: accessError } = await supabase
+          .from('user_applications')
           .select('*')
-          .eq('user_id', session.user.id);
+          .eq('user_id', session.user.id)
+          .eq('is_active', true);
 
-        if (error) {
-          // Si la table n'existe pas, on continue sans erreur
-          if (error.code === '42P01') {
-            console.log('Table user_subscriptions n\'existe pas, continuons sans abonnements');
-            setUserSubscriptions({});
-            return;
-          }
-          console.error('Erreur lors du chargement des abonnements:', error);
+        if (accessError) {
+          console.log('⚠️ Table user_applications non trouvée, pas d\'abonnements actifs');
           setUserSubscriptions({});
           return;
         }
 
         const subscriptionsMap: {[key: string]: any} = {};
-        subscriptions?.forEach(sub => {
-          subscriptionsMap[sub.module_id] = sub;
-        });
+        
+        for (const access of accessData || []) {
+          try {
+            subscriptionsMap[access.module_id] = {
+              module_id: access.module_id,
+              status: access.is_active ? 'active' : 'inactive',
+              access: {
+                id: access.id,
+                created_at: access.created_at,
+                access_level: access.access_level,
+                expires_at: access.expires_at,
+                is_active: access.is_active
+              }
+            };
+          } catch (error) {
+            console.error(`❌ Exception traitement module ${access.module_id}:`, error);
+            continue;
+          }
+        }
 
         setUserSubscriptions(subscriptionsMap);
 
@@ -197,6 +208,7 @@ export default function Hunyuan3DPage() {
   // Charger les détails de la carte
   useEffect(() => {
     const fetchCardDetails = async () => {
+      setLoading(true);
       try {
         const { data, error } = await supabase
           .from('modules')
@@ -210,6 +222,10 @@ export default function Hunyuan3DPage() {
         }
 
         if (data) {
+          // Forcer l'URL YouTube si elle est vide
+          if (!data.youtube_url || data.youtube_url.trim() === '') {
+            data.youtube_url = 'https://www.youtube.com/embed/CP2cDFgbs8s?autoplay=0&rel=0&modestbranding=1';
+          }
           setCard(data);
         }
       } catch (error) {
@@ -276,6 +292,56 @@ export default function Hunyuan3DPage() {
     }
   };
 
+  const handleAccessClick = async (card: Card) => {
+    if (!session?.user?.id) {
+      router.push('/login');
+      return;
+    }
+
+    if (card?.url) {
+      try {
+        // Générer un JWT pour l'accès au module
+        const response = await fetch('/api/generate-module-jwt', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            moduleId: card.id,
+            userId: session.user.id,
+            moduleUrl: card.url
+          }),
+        });
+
+        if (response.ok) {
+          const { token } = await response.json();
+          const urlWithToken = `${card.url}?token=${token}`;
+          window.open(urlWithToken, '_blank');
+        } else {
+          console.error('Erreur lors de la génération du JWT');
+          alert('Erreur lors de la génération du token d\'accès.');
+        }
+      } catch (error) {
+        console.error('Erreur inattendue lors de l\'accès au module:', error);
+        alert('Une erreur inattendue est survenue lors de l\'accès au module.');
+      }
+    } else {
+      alert('URL du module non disponible.');
+    }
+  };
+
+  const handleDemoClick = (card: Card) => {
+    if (card?.demo_url) {
+      setIframeModal({
+        isOpen: true,
+        url: card.demo_url,
+        title: `Démo - ${card.title}`
+      });
+    } else {
+      alert('URL de démo non disponible.');
+    }
+  };
+
   const handleQuickAccess = () => {
     if (card?.url) {
       if (isFreeModule) {
@@ -339,7 +405,7 @@ export default function Hunyuan3DPage() {
           <Breadcrumb 
             items={[
               { label: 'Accueil', href: '/' },
-              { label: card?.title || 'Chargement...' }
+              { label: card?.title || 'Hunyuan 3D' }
             ]}
           />
         </div>
@@ -370,16 +436,13 @@ export default function Hunyuan3DPage() {
                 {(card?.category || 'IA').toUpperCase()}
               </span>
               <p className="text-xl text-purple-100 mb-6">
-                Transformez vos idées en modèles 3D détaillés. Générez des objets 3D à partir de texte ou d'images avec une précision exceptionnelle.
+                Transformez vos idées en modèles 3D détaillés. Générez des objets 3D à partir d'images avec une précision exceptionnelle.
               </p>
               
               {/* Badges de fonctionnalités */}
               <div className="flex flex-wrap gap-3 mb-6">
                 <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
                   🎲 Génération 3D
-                </span>
-                <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
-                  📝 Texte vers 3D
                 </span>
                 <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
                   🖼️ Image vers 3D
@@ -446,29 +509,20 @@ export default function Hunyuan3DPage() {
         </div>
       </section>
 
-      {/* Zone de vidéo et boutons */}
+      {/* Vidéo Hunyuan 3D - Zone séparée après la bannière */}
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Vidéo de démonstration */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-          {/* Colonne 1 - Vidéo (si disponible) */}
+          {/* Colonne 1 - Vidéo de démonstration */}
           <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
-            {card.youtube_url ? (
-              <iframe
-                className="w-full h-full rounded-2xl"
-                src={card.youtube_url}
-                title="Démonstration Hunyuan 3D"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="text-center text-gray-500">
-                  <div className="text-6xl mb-4">🎲</div>
-                  <p className="text-xl">Vidéo de démonstration</p>
-                  <p className="text-sm mt-2">Bientôt disponible</p>
-                </div>
-              </div>
-            )}
+            <iframe
+              className="w-full h-full rounded-2xl"
+              src="https://www.youtube.com/embed/CP2cDFgbs8s?autoplay=0&rel=0&modestbranding=1"
+              title="Démonstration Hunyuan 3D"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
           </div>
           
           {/* Colonne 2 - Système de boutons */}
@@ -528,31 +582,28 @@ export default function Hunyuan3DPage() {
                   </div>
                 )}
 
-
-                {!alreadyActivatedModules.includes(card?.id || '') && showActivateButton && (
-                  <div className="w-3/4 space-y-3">
-                    <button 
-                      className="w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => handleActivate(card!)}
-                      disabled={isActivating}
+                {/* Bouton d'accès direct si déjà activé */}
+                {alreadyActivatedModules.includes(card?.id || '') && (
+                  <div className="w-3/4 mx-auto">
+                    <button
+                      onClick={() => handleAccessClick(card!)}
+                      className="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300 shadow-lg"
                     >
-                      {isActivating ? (
-                        <>
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                          <span>Activation...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="text-xl">⚡</span>
-                          <span>Activer {card?.title}</span>
-                        </>
-                      )}
+                      <span className="mr-2">🚀</span>
+                      Accéder à {card?.title || 'Hunyuan 3D'}
                     </button>
-                    <button 
-                      className="w-full text-sm text-gray-500 hover:text-gray-700 transition-colors"
-                      onClick={() => setShowActivateButton(false)}
+                  </div>
+                )}
+
+                {/* Bouton de démo */}
+                {card?.demo_url && (
+                  <div className="w-3/4 mx-auto">
+                    <button
+                      onClick={() => handleDemoClick(card)}
+                      className="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-blue-700 bg-blue-100 hover:bg-blue-200 transition-colors duration-300 shadow-md"
                     >
-                      Annuler
+                      <span className="mr-2">▶️</span>
+                      Voir la démo
                     </button>
                   </div>
                 )}
@@ -588,7 +639,7 @@ export default function Hunyuan3DPage() {
                 <div className="text-center max-w-5xl mx-auto">
                   <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
                     Hunyuan 3D est une plateforme d'intelligence artificielle révolutionnaire qui transforme vos idées en modèles 3D détaillés. 
-                    Cette technologie de pointe vous permet de créer des objets 3D réalistes à partir de texte ou d'images en quelques secondes.
+                    Cette technologie de pointe vous permet de créer des objets 3D réalistes à partir d'images en quelques secondes.
                   </p>
                   {card?.subtitle && (
                     <p className="text-base sm:text-lg text-gray-600 italic mb-8">
@@ -628,7 +679,7 @@ export default function Hunyuan3DPage() {
               <div className="space-y-4 text-gray-700">
                 <p className="text-lg leading-relaxed">
                   Hunyuan 3D est une plateforme d'intelligence artificielle de nouvelle génération qui transforme 
-                  vos descriptions textuelles ou vos images en modèles 3D détaillés et réalistes. 
+                  vos images en modèles 3D détaillés et réalistes. 
                   Basée sur les technologies d'IA les plus avancées, elle offre une solution complète pour tous vos besoins de création 3D.
                 </p>
                 <p className="text-base leading-relaxed">
@@ -649,7 +700,7 @@ export default function Hunyuan3DPage() {
               </div>
               <div className="space-y-4 text-gray-700">
                 <p className="text-lg leading-relaxed">
-                  <strong>Génération rapide :</strong> Créez des modèles 3D en quelques secondes à partir de simples descriptions textuelles ou d'images. 
+                  <strong>Génération rapide :</strong> Créez des modèles 3D en quelques secondes à partir d'images. 
                   Plus besoin de compétences en modélisation 3D complexes.
                 </p>
                 <p className="text-lg leading-relaxed">
@@ -672,10 +723,6 @@ export default function Hunyuan3DPage() {
                 <h4 className="text-2xl font-bold text-blue-900">Fonctionnalités avancées</h4>
               </div>
               <div className="space-y-4 text-gray-700">
-                <p className="text-lg leading-relaxed">
-                  <strong>Texte vers 3D :</strong> Décrivez simplement votre objet en texte et l'IA génère un modèle 3D correspondant. 
-                  Support de descriptions détaillées pour des résultats précis.
-                </p>
                 <p className="text-lg leading-relaxed">
                   <strong>Image vers 3D :</strong> Transformez vos images 2D en modèles 3D avec une reconstruction précise de la géométrie et des textures.
                 </p>
@@ -736,17 +783,7 @@ export default function Hunyuan3DPage() {
           </div>
           
           {/* Fonctionnalités principales */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 my-12">
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 sm:p-8 rounded-2xl border border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <span className="text-2xl">📝</span>
-                </div>
-                <h4 className="font-bold text-purple-900 mb-3 text-lg">Texte vers 3D</h4>
-                <p className="text-gray-700 text-sm">Génération 3D à partir de descriptions textuelles détaillées.</p>
-              </div>
-            </div>
-            
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 my-12">
             <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 sm:p-8 rounded-2xl border border-indigo-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
               <div className="text-center">
                 <div className="w-16 h-16 bg-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
