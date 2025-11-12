@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 import { supabase } from '../../../utils/supabaseClient';
 
 const PSITRANSFER_SERVICE_URL = process.env.PSITRANSFER_SERVICE_URL || 'http://localhost:8084';
@@ -147,8 +148,8 @@ export async function POST(request: NextRequest) {
       const cookieHeader = request.headers.get('cookie');
       if (cookieHeader) {
         const supabaseWithCookies = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          getSupabaseUrl(),
+          getSupabaseAnonKey(),
           {
             auth: {
               persistSession: false,
@@ -215,8 +216,8 @@ export async function POST(request: NextRequest) {
       
       if (cookieHeader) {
         const supabaseWithCookies = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          getSupabaseUrl(),
+          getSupabaseAnonKey(),
           {
             auth: {
               persistSession: false,

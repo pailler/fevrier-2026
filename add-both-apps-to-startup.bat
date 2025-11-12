@@ -77,3 +77,8 @@ echo   3. Supprimez les raccourcis correspondants
 echo.
 pause
 
+
+
+
+
+

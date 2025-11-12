@@ -17,6 +17,15 @@ RUN npm ci
 COPY env.production.local ./.env.production
 COPY env.production.local ./.env.local
 
+# Définir les variables d'environnement comme ARG pour qu'elles soient disponibles au build time
+# Next.js remplace process.env.NEXT_PUBLIC_* au moment du build, donc elles doivent être disponibles
+ARG NEXT_PUBLIC_SUPABASE_URL=https://xemtoyzcihmncbrlsmhr.supabase.co
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlbXRveXpjaGhtbmNicmxzbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0MDUzMDUsImV4cCI6MjA2NTk4MTMwNX0.afcRGhlB5Jj-7kgCV6IzUDRdGUQkHkm1Fdl1kzDdj6M
+
+# Convertir les ARG en ENV pour qu'elles soient disponibles pendant le build
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+
 # Copier le code source
 COPY . .
 

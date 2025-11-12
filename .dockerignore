@@ -74,11 +74,29 @@ cloudflared.exe*
 *.exe.backup
 *.exe.old
 ffmpeg/
+hunyuan2-spz/
+essentiels/
+meeting-reports/
+whisper-service/
+docker-services/
+deploy/
+librespeed-official/
+stirling-pdf/
+*.pdf
+DOCUMENTATION_*.pdf
+
+# Dossiers avec données volumineuses
 essentiels/polr-db-data/
 essentiels/uploads/
+essentiels/metube-downloads/
+essentiels/pdf-data/
+essentiels/pdf-temp/
+essentiels/psitransfer/
+essentiels/qr-link-manager/
 meeting-reports/uploads/
 meeting-reports/frontend/node_modules/.cache/
 meeting-reports/backend/uploads/
+metube-downloads/
 
 # Cache de build Next.js (sera régénéré)
 .next/cache/

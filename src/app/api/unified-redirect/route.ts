@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 import { LibreSpeedAccessService } from '../../../utils/librespeedAccess';
 import ModuleSecurityService from '../../../utils/moduleSecurityService';
 import { checkSessionDuration } from '../../../utils/sessionDurationCheck';
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  getSupabaseUrl(),
+  getSupabaseAnonKey()
 );
 
 // Mapping des modules vers leurs URLs de destination
@@ -108,8 +109,8 @@ export async function GET(request: NextRequest) {
 
     // Créer un client Supabase avec les cookies
     const supabaseWithCookies = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      getSupabaseUrl(),
+      getSupabaseAnonKey(),
       {
         auth: {
           persistSession: false,
@@ -131,12 +132,20 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect('https://iahome.fr/login?redirect=/encours', 302);
     }
 
-    // Vérifier la durée de session (60 minutes sauf admin)
+    // Vérifier la durée de session (60 minutes)
     const durationCheck = await checkSessionDuration(session);
     
     if (!durationCheck.isValid) {
       console.log('❌ Session expirée:', durationCheck.reason);
-      return NextResponse.redirect(`https://iahome.fr/login?redirect=/encours&error=session_expired&reason=${encodeURIComponent(durationCheck.reason || 'Session expirée')}`, 302);
+      
+      // Déconnecter Supabase Auth si la session a expiré
+      try {
+        await supabaseWithCookies.auth.signOut();
+      } catch (error) {
+        console.warn('⚠️ Erreur lors de la déconnexion Supabase:', error);
+      }
+      
+      return NextResponse.redirect(`https://iahome.fr/login?redirect=/encours&error=session_expired&message=${encodeURIComponent('Votre session a expiré après 1 heure. Veuillez vous reconnecter.')}`, 302);
     }
 
     console.log('👤 Utilisateur authentifié:', session.user.email);

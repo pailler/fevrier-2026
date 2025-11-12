@@ -1,9 +1,27 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Valeurs par défaut pour éviter les erreurs si les variables d'environnement ne sont pas disponibles
+const DEFAULT_SUPABASE_URL = 'https://xemtoyzcihmncbrlsmhr.supabase.co';
+const DEFAULT_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlbXRveXpjaGhtbmNicmxzbWhyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDQwNTMwNSwiZXhwIjoyMDY1OTgxMzA1fQ.CwVYrasKI78pAXnEfLMiamBIV_QtPQtwFJSmUJ68GQM';
+
+// Fonction helper pour obtenir une variable d'environnement avec fallback
+function getEnvVar(key: string, defaultValue: string): string {
+  try {
+    const value = typeof process !== 'undefined' && process.env ? process.env[key] : undefined;
+    if (!value || value === 'undefined' || value === 'null' || (typeof value === 'string' && value.trim() === '')) {
+      return defaultValue;
+    }
+    return value as string;
+  } catch (error) {
+    return defaultValue;
+  }
+}
+
+// Créer le client Supabase avec valeurs par défaut garanties
+const supabaseUrl = getEnvVar('NEXT_PUBLIC_SUPABASE_URL', DEFAULT_SUPABASE_URL);
+const supabaseKey = getEnvVar('SUPABASE_SERVICE_ROLE_KEY', DEFAULT_SERVICE_ROLE_KEY);
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export interface LibreSpeedAccessResult {
   hasAccess: boolean;

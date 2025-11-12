@@ -10,6 +10,10 @@ export default function HTMLPreloadCleaner() {
       const geistFonts = document.querySelectorAll('link[rel="preload"][as="font"][href*="geist"]');
       geistFonts.forEach(link => link.remove());
 
+      // Supprimer les preloads de polices Inter (e4af272ccee01ff0-s.p.woff2)
+      const interFonts = document.querySelectorAll('link[rel="preload"][as="font"][href*="e4af272ccee01ff0"]');
+      interFonts.forEach(link => link.remove());
+
       // Supprimer les preloads d'images og-image
       const ogImages = document.querySelectorAll('link[rel="preload"][as="image"][href*="og-image"]');
       ogImages.forEach(link => link.remove());
@@ -18,7 +22,7 @@ export default function HTMLPreloadCleaner() {
       const allFonts = document.querySelectorAll('link[rel="preload"][as="font"]');
       allFonts.forEach(link => {
         const href = link.getAttribute('href');
-        if (href && (href.includes('geist') || href.includes('woff2'))) {
+        if (href && (href.includes('geist') || href.includes('woff2') || href.includes('e4af272ccee01ff0'))) {
           link.remove();
         }
       });
@@ -55,7 +59,7 @@ export default function HTMLPreloadCleaner() {
                   const href = link.getAttribute('href');
                   const as = link.getAttribute('as');
                   
-                  if ((as === 'font' && href && (href.includes('geist') || href.includes('woff2'))) ||
+                  if ((as === 'font' && href && (href.includes('geist') || href.includes('woff2') || href.includes('e4af272ccee01ff0'))) ||
                       (as === 'image' && href && (href.includes('og-image') || href.includes('.jpg') || href.includes('.png')))) {
                     link.remove();
                     shouldRemove = true;

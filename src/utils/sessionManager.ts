@@ -1,11 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
+import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 
 // Durée maximale de session : 1 heure pour tous les utilisateurs (même admin)
 const TOKEN_DURATION_MS = 60 * 60 * 1000; // 60 minutes (1 heure)
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  getSupabaseUrl(),
+  getSupabaseServiceRoleKey()
 );
 
 export interface SessionToken {

@@ -53,3 +53,8 @@ Si l'erreur persiste, v√©rifiez dans Cloudflare Dashboard que le Worker a bien √
 
 
 
+
+
+
+
+

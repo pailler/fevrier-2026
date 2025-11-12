@@ -32,7 +32,8 @@ export async function GET(request: NextRequest) {
       pdf: { access: 10, generate: 1, batch_generate: 3, custom_design: 2, analytics: 1 },
       librespeed: { access: 10 },
       qrcodes: { access: 100, generate: 1, batch_generate: 3, custom_design: 2, analytics: 1 },
-      psitransfer: { access: 10, download: 10, convert: 20, batch_download: 50 }
+      psitransfer: { access: 10, download: 10, convert: 20, batch_download: 50 },
+      'code-learning': { access: 10 }
     };
 
     return NextResponse.json({

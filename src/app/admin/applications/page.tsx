@@ -185,6 +185,11 @@ export default function AdminApplications() {
             } else {
               description = `Service de transfert de fichiers sécurisé. Coût: ${tokenCost} tokens par transfert.`;
             }
+          } else if (moduleId.includes('code-learning')) {
+            // Application éducative : 10 tokens par utilisation
+            tokenCost = 10;
+            estimatedRevenue = stats.totalUsage * tokenCost * 0.01; // 0.01€ par token
+            description = `Application d'apprentissage du code pour enfants. Coût: ${tokenCost} tokens par accès.`;
           } else if (moduleId.includes('qrcodes')) {
             // Applications premium : 100 tokens par utilisation
             tokenCost = 100;

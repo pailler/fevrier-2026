@@ -27,7 +27,8 @@ export default function Essentiels() {
     'metube', 
     'psitransfer',
     'qrcodes',
-    'pdf'
+    'pdf',
+    'code-learning'
   ];
 
   // Vérification de l'authentification (optionnelle pour cette page)
@@ -130,10 +131,94 @@ export default function Essentiels() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Fonction pour mapper les IDs de modules vers les slugs corrects pour les routes
+  const getModuleSlug = (moduleId: string, moduleTitle: string): string => {
+    // Mapping des IDs numériques et textuels vers les slugs corrects
+    const moduleIdMapping: { [key: string]: string } = {
+      // IDs numériques
+      '1': 'pdf',
+      '2': 'metube',
+      '3': 'librespeed',
+      '4': 'psitransfer',
+      '5': 'qrcodes',
+      '7': 'stablediffusion',
+      '8': 'ruinedfooocus',
+      '10': 'comfyui',
+      '11': 'cogstudio',
+      // IDs textuels (garder tels quels s'ils sont déjà corrects)
+      'librespeed': 'librespeed',
+      'metube': 'metube',
+      'psitransfer': 'psitransfer',
+      'qrcodes': 'qrcodes',
+      'pdf': 'pdf',
+      'pdf+': 'pdf',
+      'stablediffusion': 'stablediffusion',
+      'ruinedfooocus': 'ruinedfooocus',
+      'comfyui': 'comfyui',
+      'cogstudio': 'cogstudio',
+      'code-learning': 'code-learning',
+      'meeting-reports': 'meeting-reports',
+      'hunyuan3d': 'hunyuan3d',
+      'whisper': 'whisper',
+    };
+
+    // Vérifier d'abord le mapping direct
+    if (moduleIdMapping[moduleId]) {
+      return moduleIdMapping[moduleId];
+    }
+
+    // Si pas de mapping, essayer de trouver par titre
+    const titleLower = moduleTitle.toLowerCase();
+    if (titleLower.includes('librespeed') || titleLower.includes('speed')) {
+      return 'librespeed';
+    }
+    if (titleLower.includes('metube') || titleLower.includes('me tube')) {
+      return 'metube';
+    }
+    if (titleLower.includes('psitransfer') || titleLower.includes('psi transfer')) {
+      return 'psitransfer';
+    }
+    if (titleLower.includes('qrcode') || titleLower.includes('qr code')) {
+      return 'qrcodes';
+    }
+    if (titleLower.includes('pdf')) {
+      return 'pdf';
+    }
+    if (titleLower.includes('code learning') || titleLower.includes('code-learning')) {
+      return 'code-learning';
+    }
+    if (titleLower.includes('stable diffusion')) {
+      return 'stablediffusion';
+    }
+    if (titleLower.includes('ruinedfooocus') || titleLower.includes('ruined fooocus')) {
+      return 'ruinedfooocus';
+    }
+    if (titleLower.includes('comfyui') || titleLower.includes('comfy ui')) {
+      return 'comfyui';
+    }
+    if (titleLower.includes('cogstudio') || titleLower.includes('cog studio')) {
+      return 'cogstudio';
+    }
+    if (titleLower.includes('meeting reports') || titleLower.includes('meeting-reports')) {
+      return 'meeting-reports';
+    }
+    if (titleLower.includes('hunyuan') || titleLower.includes('hunyuan3d')) {
+      return 'hunyuan3d';
+    }
+    if (titleLower.includes('whisper')) {
+      return 'whisper';
+    }
+
+    // Fallback: utiliser l'ID tel quel (peut-être déjà un slug valide)
+    return moduleId;
+  };
+
   // Fonction pour gérer l'accès aux modules
   const handleModuleAccess = async (moduleId: string, moduleTitle: string) => {
+    // Obtenir le slug correct pour le lien
+    const moduleSlug = getModuleSlug(moduleId, moduleTitle);
     // Rediriger directement vers la page détaillée du module, même en mode déconnecté
-    const moduleUrl = `/card/${moduleId}`;
+    const moduleUrl = `/card/${moduleSlug}`;
     router.push(moduleUrl);
   };
 

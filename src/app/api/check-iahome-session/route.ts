@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 import { checkSessionDuration } from '../../../utils/sessionDurationCheck';
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  getSupabaseUrl(),
+  getSupabaseServiceRoleKey()
 );
 
 export async function GET(request: NextRequest) {
@@ -16,12 +17,13 @@ export async function GET(request: NextRequest) {
     const originalUri = request.headers.get('x-original-uri');
 
     let session = null;
+    let supabaseWithCookies: any = null;
 
     // Méthode 1: Vérifier via cookies de session (priorité - plus fiable car contient toute la session)
     if (cookieHeader) {
-      const supabaseWithCookies = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      supabaseWithCookies = createClient(
+        getSupabaseUrl(),
+        getSupabaseAnonKey(),
         {
           auth: {
             persistSession: false,
@@ -99,14 +101,24 @@ export async function GET(request: NextRequest) {
     }
 
     if (session?.user) {
-      // Vérifier la durée de session (60 minutes sauf admin)
+      // Vérifier la durée de session (60 minutes)
       const durationCheck = await checkSessionDuration(session);
       
       if (!durationCheck.isValid) {
+        // Déconnecter Supabase Auth si la session a expiré
+        try {
+          if (supabaseWithCookies) {
+            await supabaseWithCookies.auth.signOut();
+          }
+        } catch (error) {
+          console.warn('⚠️ Erreur lors de la déconnexion Supabase:', error);
+        }
+        
         return NextResponse.json({
           success: false,
           authenticated: false,
-          message: durationCheck.reason || 'Session expirée'
+          message: durationCheck.reason || 'Session expirée',
+          expired: true
         }, { status: 401 });
       }
 

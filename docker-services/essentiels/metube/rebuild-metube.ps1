@@ -61,3 +61,8 @@ Write-Host "`n💡 Pour voir les logs du conteneur, utilisez:" -ForegroundColor 
 Write-Host "   docker logs -f metube-iahome" -ForegroundColor Gray
 
 
+
+
+
+
+

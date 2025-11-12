@@ -19,6 +19,88 @@ interface ModuleCardProps {
 }
 
 export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
+  // Fonction pour mapper les IDs de modules vers les slugs corrects pour les routes
+  const getModuleSlug = (moduleId: string, moduleTitle: string): string => {
+    // Mapping des IDs numériques et textuels vers les slugs corrects
+    const moduleIdMapping: { [key: string]: string } = {
+      // IDs numériques
+      '1': 'pdf',
+      '2': 'metube',
+      '3': 'librespeed',
+      '4': 'psitransfer',
+      '5': 'qrcodes',
+      '7': 'stablediffusion',
+      '8': 'ruinedfooocus',
+      '10': 'comfyui',
+      '11': 'cogstudio',
+      // IDs textuels (garder tels quels s'ils sont déjà corrects)
+      'librespeed': 'librespeed',
+      'metube': 'metube',
+      'psitransfer': 'psitransfer',
+      'qrcodes': 'qrcodes',
+      'pdf': 'pdf',
+      'pdf+': 'pdf',
+      'stablediffusion': 'stablediffusion',
+      'ruinedfooocus': 'ruinedfooocus',
+      'comfyui': 'comfyui',
+      'cogstudio': 'cogstudio',
+      'code-learning': 'code-learning',
+      'meeting-reports': 'meeting-reports',
+      'hunyuan3d': 'hunyuan3d',
+      'whisper': 'whisper',
+    };
+
+    // Vérifier d'abord le mapping direct
+    if (moduleIdMapping[moduleId]) {
+      return moduleIdMapping[moduleId];
+    }
+
+    // Si pas de mapping, essayer de trouver par titre
+    const titleLower = moduleTitle.toLowerCase();
+    if (titleLower.includes('librespeed') || titleLower.includes('speed')) {
+      return 'librespeed';
+    }
+    if (titleLower.includes('metube') || titleLower.includes('me tube')) {
+      return 'metube';
+    }
+    if (titleLower.includes('psitransfer') || titleLower.includes('psi transfer')) {
+      return 'psitransfer';
+    }
+    if (titleLower.includes('qrcode') || titleLower.includes('qr code')) {
+      return 'qrcodes';
+    }
+    if (titleLower.includes('pdf')) {
+      return 'pdf';
+    }
+    if (titleLower.includes('code learning') || titleLower.includes('code-learning')) {
+      return 'code-learning';
+    }
+    if (titleLower.includes('stable diffusion')) {
+      return 'stablediffusion';
+    }
+    if (titleLower.includes('ruinedfooocus') || titleLower.includes('ruined fooocus')) {
+      return 'ruinedfooocus';
+    }
+    if (titleLower.includes('comfyui') || titleLower.includes('comfy ui')) {
+      return 'comfyui';
+    }
+    if (titleLower.includes('cogstudio') || titleLower.includes('cog studio')) {
+      return 'cogstudio';
+    }
+    if (titleLower.includes('meeting reports') || titleLower.includes('meeting-reports')) {
+      return 'meeting-reports';
+    }
+    if (titleLower.includes('hunyuan') || titleLower.includes('hunyuan3d')) {
+      return 'hunyuan3d';
+    }
+    if (titleLower.includes('whisper')) {
+      return 'whisper';
+    }
+
+    // Fallback: utiliser l'ID tel quel (peut-être déjà un slug valide)
+    return moduleId;
+  };
+
   // Si les données sont vides, afficher un message
   if (!module) {
     return (
@@ -40,6 +122,9 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       </div>
     );
   }
+
+  // Obtenir le slug correct pour le lien
+  const moduleSlug = getModuleSlug(module.id, module.title);
   
   // Supprimé la gestion d'erreur d'image qui empêchait l'affichage
   // const [imageError, setImageError] = useState(false);
@@ -178,7 +263,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isIAPhoto ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isIATube ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isStirlingPDF ? 'ring-2 ring-gray-500 ring-opacity-50' : ''} ${isMeetingReports ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isHunyuan3D ? 'ring-2 ring-purple-500 ring-opacity-50' : ''}`}>
       
       {/* Image du module - Cliquable */}
-      <Link href={`/card/${module.id}`} className="block">
+      <Link href={`/card/${moduleSlug}`} className="block">
         <div className={`relative h-48 cursor-pointer group overflow-hidden ${isMeetingReports ? 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700' : isHunyuan3D ? 'bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-700' : 'bg-gradient-to-br from-blue-50 to-indigo-100'}`}>
           {/* Particules animées pour Meeting Reports */}
           {isMeetingReports && (
@@ -1575,7 +1660,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
 
       {/* Contenu du module */}
       <div className="p-6">
-        <Link href={`/card/${module.id}`} className="block group">
+        <Link href={`/card/${moduleSlug}`} className="block group">
           {/* Titre du module - affiché pour tous les modules */}
           <h3 className="text-3xl sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
             {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : isHunyuan3D ? "Hunyuan 3D - Génération 3D par IA" : module.title}
@@ -1584,7 +1669,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
           {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isQRCodes || isWhisper || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports || isHunyuan3D ? (
             !module.subtitle && (
               <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
-                {isComfyUI ? "ComfyUI : contrôle total sur chaque étape de la création d'image" : isMeetingReports ? "Transformez automatiquement vos réunions en rapports professionnels avec l'IA" : isHunyuan3D ? "Hunyuan 3D : Générez des modèles 3D à partir de texte ou d'images avec l'intelligence artificielle" : module.description}
+                {isComfyUI ? "ComfyUI : contrôle total sur chaque étape de la création d'image" : isMeetingReports ? "Transformez automatiquement vos réunions en rapports professionnels avec l'IA" : isHunyuan3D ? "Hunyuan 3D : Générez des modèles 3D à partir d'images avec l'intelligence artificielle" : module.description}
               </p>
             )
           ) : (
@@ -1598,7 +1683,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
         <div className="flex gap-2">
           {/* Bouton voir les détails */}
           <Link
-            href={`/card/${module.id}`}
+            href={`/card/${moduleSlug}`}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 text-sm"
           >
             <span>Voir les détails</span>

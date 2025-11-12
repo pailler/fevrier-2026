@@ -1,11 +1,21 @@
 import type { NextConfig } from "next";
 
+// Valeurs par défaut pour Supabase (utilisées si les variables d'environnement ne sont pas définies)
+const DEFAULT_SUPABASE_URL = 'https://xemtoyzcihmncbrlsmhr.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlbXRveXpjaWhtbmNicmxzbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0MDUzMDUsImV4cCI6MjA2NTk4MTMwNX0.afcRGhlB5Jj-7kgCV6IzUDRdGUQkHkm1Fdl1kzDdj6M';
+
 const nextConfig: NextConfig = {
   // Configuration pour la production
   // output: 'standalone', // Désactivé pour résoudre les problèmes de fichiers statiques
   experimental: {
     // outputFileTracingRoot: undefined,
     optimizePackageImports: ['@supabase/supabase-js'],
+  },
+  
+  // Définir explicitement les variables d'environnement avec des valeurs par défaut
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY,
   },
   
   // Configuration pour les gros uploads
@@ -43,6 +53,22 @@ const nextConfig: NextConfig = {
   },
   
   transpilePackages: ['@supabase/supabase-js'],
+  
+  // Exclure les dossiers problématiques du build
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve = config.resolve || {};
+      config.resolve.alias = {
+        ...config.resolve.alias,
+      };
+    }
+    // Exclure hunyuan2-spz du traitement webpack
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: ['**/node_modules/**', '**/hunyuan2-spz/**', '**/.git/**'],
+    };
+    return config;
+  },
   
   // Configuration pour résoudre l'avertissement cross-origin
   allowedDevOrigins: [
@@ -103,7 +129,7 @@ const nextConfig: NextConfig = {
           // CORS headers retirés - gérés par les routes API individuelles
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; connect-src 'self' http://localhost:8003 https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io wss://*.supabase.co wss://*.supabase.io https://*.cloudflareaccess.com https://*.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://iahome.fr/cdn-cgi/ https://*.cloudflareaccess.com https://*.cloudflare.com; style-src 'self' 'unsafe-inline' https://*.cloudflareaccess.com https://*.cloudflare.com; img-src 'self' data: https:; font-src 'self' data: https://*.cloudflareaccess.com https://*.cloudflare.com; frame-src 'self' https: https://*.cloudflareaccess.com;"
+            value: "default-src 'self'; connect-src 'self' http://localhost:8003 http://localhost:7960 https://hunyuan3d.iahome.fr https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io wss://*.supabase.co wss://*.supabase.io https://*.cloudflareaccess.com https://cloudflare.com https://*.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://iahome.fr/cdn-cgi/ https://*.cloudflareaccess.com https://*.cloudflare.com; style-src 'self' 'unsafe-inline' https://*.cloudflareaccess.com https://*.cloudflare.com; img-src 'self' data: https:; font-src 'self' data: https://*.cloudflareaccess.com https://*.cloudflare.com; frame-src 'self' https: https://*.cloudflareaccess.com https://hunyuan3d.iahome.fr; frame-ancestors 'self'; report-uri /api/csp-report;"
           },
           {
             key: 'Cache-Control',

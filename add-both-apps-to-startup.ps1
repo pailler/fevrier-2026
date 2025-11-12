@@ -48,33 +48,32 @@ if (-not $stabilityMatrixPath) {
 Write-Host ""
 
 # ============================================================
-# Ajouter Hunyuan3D-2
+# Ajouter Hunyuan3D-2 (port 8888)
 # ============================================================
-Write-Host "[2/2] Ajout de Hunyuan3D-2..." -ForegroundColor Yellow
+Write-Host "[2/2] Ajout de Hunyuan3D-2 (port 8888)..." -ForegroundColor Yellow
 
-$hunyuanScriptPath = Join-Path $env:USERPROFILE "Documents\iahome\v16_hunyuan2-stableprojectorz\run-browser_(slower)\run-gradio-turbo-multiview-RECOMMENDED.bat"
+# Vérifier si le script de démarrage Hunyuan3D existe
+$hunyuanScriptPath = Join-Path $PSScriptRoot "start-hunyuan3d.ps1"
 $hunyuanScriptPath = Resolve-Path $hunyuanScriptPath -ErrorAction SilentlyContinue
 
 if (-not $hunyuanScriptPath) {
-    Write-Host "   ❌ Erreur: Impossible de trouver le fichier .bat" -ForegroundColor Red
-    Write-Host "      Chemin recherché: $env:USERPROFILE\Documents\iahome\v16_hunyuan2-stableprojectorz\run-browser_(slower)\run-gradio-turbo-multiview-RECOMMENDED.bat" -ForegroundColor Yellow
+    Write-Host "   ❌ Erreur: Impossible de trouver start-hunyuan3d.ps1" -ForegroundColor Red
+    Write-Host "      Chemin recherché: $PSScriptRoot\start-hunyuan3d.ps1" -ForegroundColor Yellow
     $errorCount++
 } else {
-    $shortcutName = "Hunyuan3D-2 - Auto Start.lnk"
-    $shortcutPath = Join-Path $startupFolder $shortcutName
+    $batchFileName = "Hunyuan3D-2 - Auto Start.bat"
+    $batchFilePath = Join-Path $startupFolder $batchFileName
     
     try {
-        $WshShell = New-Object -ComObject WScript.Shell
-        $Shortcut = $WshShell.CreateShortcut($shortcutPath)
-        $Shortcut.TargetPath = $hunyuanScriptPath
-        $Shortcut.WorkingDirectory = Split-Path $hunyuanScriptPath
-        $Shortcut.Description = "Démarrage automatique de Hunyuan3D-2"
-        $Shortcut.Save()
+        # Créer le fichier batch qui lance le script PowerShell
+        $batchContent = "@echo off`r`ncd /d `"$PSScriptRoot`"`r`npowershell.exe -ExecutionPolicy Bypass -File `"start-hunyuan3d.ps1`"`r`n"
         
-        Write-Host "   ✅ OK - Hunyuan3D-2 ajouté avec succès" -ForegroundColor Green
+        Set-Content -Path $batchFilePath -Value $batchContent -Encoding ASCII
+        
+        Write-Host "   ✅ OK - Hunyuan3D-2 (port 8888) ajouté avec succès" -ForegroundColor Green
         $successCount++
     } catch {
-        Write-Host "   ❌ Erreur lors de la création du raccourci: $_" -ForegroundColor Red
+        Write-Host "   ❌ Erreur lors de la création du fichier batch: $_" -ForegroundColor Red
         $errorCount++
     }
 }
@@ -96,7 +95,13 @@ Write-Host "   1. Appuyez sur Win+R" -ForegroundColor Gray
 Write-Host "   2. Tapez: shell:startup" -ForegroundColor Gray
 Write-Host "   3. Supprimez les raccourcis correspondants" -ForegroundColor Gray
 Write-Host ""
+Write-Host "📌 Notes importantes:" -ForegroundColor Yellow
+Write-Host "   - Hunyuan3D-2 démarre automatiquement sur le port 8888" -ForegroundColor Yellow
+Write-Host "     et sera accessible via https://hunyuan3d.iahome.fr" -ForegroundColor Yellow
+Write-Host ""
 
 Write-Host "Appuyez sur une touche pour continuer..."
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+
+
 

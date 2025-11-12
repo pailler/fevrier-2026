@@ -137,28 +137,39 @@ export default function WhisperPage() {
       }
 
       try {
-        // Vérifier si la table user_subscriptions existe avant de faire la requête
-        const { data: subscriptions, error } = await supabase
-          .from('user_subscriptions')
+        // Utiliser user_applications au lieu de user_subscriptions
+        const { data: accessData, error: accessError } = await supabase
+          .from('user_applications')
           .select('*')
-          .eq('user_id', session.user.id);
+          .eq('user_id', session.user.id)
+          .eq('is_active', true);
 
-        if (error) {
-          // Si la table n'existe pas, on continue sans erreur
-          if (error.code === '42P01') {
-            console.log('Table user_subscriptions n\'existe pas, continuons sans abonnements');
-            setUserSubscriptions({});
-            return;
-          }
-          console.error('Erreur lors du chargement des abonnements:', error);
+        if (accessError) {
+          console.log('⚠️ Table user_applications non trouvée, pas d\'abonnements actifs');
           setUserSubscriptions({});
           return;
         }
 
         const subscriptionsMap: {[key: string]: any} = {};
-        subscriptions?.forEach(sub => {
-          subscriptionsMap[sub.module_id] = sub;
-        });
+        
+        for (const access of accessData || []) {
+          try {
+            subscriptionsMap[access.module_id] = {
+              module_id: access.module_id,
+              status: access.is_active ? 'active' : 'inactive',
+              access: {
+                id: access.id,
+                created_at: access.created_at,
+                access_level: access.access_level,
+                expires_at: access.expires_at,
+                is_active: access.is_active
+              }
+            };
+          } catch (error) {
+            console.error(`❌ Exception traitement module ${access.module_id}:`, error);
+            continue;
+          }
+        }
 
         setUserSubscriptions(subscriptionsMap);
 

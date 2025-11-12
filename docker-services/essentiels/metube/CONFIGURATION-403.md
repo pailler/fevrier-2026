@@ -96,3 +96,8 @@ Si l'erreur 403 persiste après avoir ajouté les cookies :
 4. Essayez de télécharger une autre vidéo YouTube pour vérifier si le problème est spécifique à une vidéo
 
 
+
+
+
+
+

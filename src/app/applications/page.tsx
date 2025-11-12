@@ -159,7 +159,7 @@ export default function Home() {
 
 
   // Modules essentiels à exclure de la page applications
-  const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes'];
+  const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'code-learning'];
   
   // Filtrer les modules
   const filteredModules = modules

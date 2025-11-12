@@ -50,12 +50,17 @@ export default function CardDetailPage() {
 
   // Vérifier si c'est le module librespeed pour appliquer un style spécial
   const isLibrespeed = Boolean(card?.title?.toLowerCase().includes('librespeed') || card?.id === 'librespeed');
+  // Vérifier si c'est le module code-learning
+  const isCodeLearning = Boolean(card?.title?.toLowerCase().includes('code') || card?.id === 'code-learning');
   
   // Vérifier si c'est le module metube pour appliquer un style spécial
   const isMetube = Boolean(card?.title?.toLowerCase().includes('metube') || card?.id === 'metube');
   
   // Vérifier si c'est le module psitransfer pour appliquer un style spécial
   const isPsitransfer = Boolean(card?.title?.toLowerCase().includes('psitransfer') || card?.id === 'psitransfer');
+  
+  // Vérifier si c'est le module hunyuan3d pour appliquer un style spécial
+  const isHunyuan3d = Boolean(card?.title?.toLowerCase().includes('hunyuan') || card?.id === 'hunyuan3d');
   
   // Debug MeTube
   console.log('🔍 DEBUG METUBE:', {
@@ -191,6 +196,7 @@ export default function CardDetailPage() {
         'pdf': 'https://pdf.iahome.fr',
         'stablediffusion': 'https://stablediffusion.iahome.fr',
         'comfyui': 'https://comfyui.iahome.fr',
+        'code-learning': '/code-learning',
         // Meeting Reports : localhost:3050 en dev, meeting-reports.iahome.fr en prod
         'meeting-reports': isDevelopment ? 'http://localhost:3050' : 'https://meeting-reports.iahome.fr',
         'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
@@ -204,7 +210,13 @@ export default function CardDetailPage() {
       }
       
       console.log(`🔗 ${moduleTitle}: Accès direct à:`, accessUrl);
-      window.open(accessUrl, '_blank');
+      
+      // Pour les routes internes (commençant par /), rediriger dans le même onglet
+      if (accessUrl.startsWith('/')) {
+        window.location.href = accessUrl;
+      } else {
+        window.open(accessUrl, '_blank');
+      }
       return;
       
       const moduleUrls: { [key: string]: string } = {
@@ -969,6 +981,55 @@ export default function CardDetailPage() {
                     )}
 
 
+                    {/* Bouton d'accès spécial pour Code Learning */}
+                    {isCodeLearning && !alreadyActivatedModules.includes(card.id) && (
+                      <button
+                        onClick={async () => {
+                          if (!isAuthenticated || !user) {
+                            console.log('❌ Accès Code Learning - Utilisateur non connecté');
+                            router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
+                            return;
+                          }
+
+                          try {
+                            console.log('🔄 Activation Code Learning pour:', user.email);
+                            
+                            const response = await fetch('/api/activate-code-learning', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({
+                                userId: user.id,
+                                email: user.email
+                              }),
+                            });
+
+                            const result = await response.json();
+
+                            if (result.success) {
+                              console.log('✅ Code Learning activé avec succès');
+                              setAlreadyActivatedModules(prev => [...prev, card.id]);
+                              alert('Code Learning activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation (10 tokens).');
+                              router.push('/encours');
+                            } else {
+                              console.error('❌ Erreur activation Code Learning:', result.error);
+                              alert(`Erreur lors de l'activation: ${result.error}`);
+                            }
+                          } catch (error) {
+                            console.error('❌ Erreur activation Code Learning:', error);
+                            alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                          }
+                        }}
+                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                      >
+                        <span className="text-xl">⚡</span>
+                        <span>
+                          {isAuthenticated && user ? `Activer Code Learning (10 tokens)` : `Connectez-vous pour activer Code Learning (10 tokens)`}
+                        </span>
+                      </button>
+                    )}
+
                     {/* Bouton d'accès spécial pour LibreSpeed */}
                     {isLibrespeed && !alreadyActivatedModules.includes(card.id) && (
                       <button
@@ -1280,8 +1341,41 @@ export default function CardDetailPage() {
         </div>
       )}
 
-      {/* Contenu principal - seulement pour les modules non-LibreSpeed, non-MeTube et non-PsiTransfer */}
-      {!isLibrespeed && !isMetube && !isPsitransfer && (
+      {/* Vidéo Hunyuan 3D - Zone séparée après la bannière */}
+      {isHunyuan3d && (
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {/* Colonne 1 - Vidéo */}
+            <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
+              <iframe
+                className="w-full h-full rounded-2xl"
+                src="https://www.youtube.com/embed/CP2cDFgbs8s?autoplay=0&rel=0&modestbranding=1"
+                title="Démonstration Hunyuan 3D"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            
+            {/* Colonne 2 - Système de boutons */}
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
+              <div className="text-left mb-8">
+                <div className="w-3/4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
+                  <div className="text-4xl font-bold mb-1">
+                    100 tokens
+                  </div>
+                  <div className="text-sm opacity-90">
+                    par utilisation
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contenu principal - seulement pour les modules non-LibreSpeed, non-MeTube, non-PsiTransfer et non-Hunyuan3d */}
+      {!isLibrespeed && !isMetube && !isPsitransfer && !isHunyuan3d && (
         <main className="max-w-7xl mx-auto px-6 py-12">
           <div className="space-y-12">
             {/* Grille principale */}

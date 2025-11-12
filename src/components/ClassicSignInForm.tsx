@@ -54,6 +54,8 @@ export default function ClassicSignInForm({
       if (result.token) {
         localStorage.setItem('auth_token', result.token);
         localStorage.setItem('user_data', JSON.stringify(result.user));
+        // Stocker la date de début de session pour vérifier l'expiration
+        localStorage.setItem('session_start_time', Date.now().toString());
       }
 
       console.log('Connexion réussie:', result.user);

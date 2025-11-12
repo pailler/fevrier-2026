@@ -70,3 +70,8 @@ Pour que les uploads > 1 MB fonctionnent, vous **DEVEZ** créer le sous-domaine 
 
 
 
+
+
+
+
+

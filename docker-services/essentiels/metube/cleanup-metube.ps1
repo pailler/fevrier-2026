@@ -51,3 +51,8 @@ docker exec metube-iahome sh -c "df -h /downloads" 2>&1
 Write-Host "`n💡 Pour automatiser ce nettoyage, configurez un cron job ou un script planifié" -ForegroundColor Yellow
 
 
+
+
+
+
+

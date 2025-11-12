@@ -1,15 +1,18 @@
 /**
  * Utilitaire pour vérifier la durée de session
- * Limite les sessions à 60 minutes (1 heure) pour tous les utilisateurs, y compris l'admin
+ * Limite les sessions à 60 minutes (1 heure) pour tous les utilisateurs
+ * Exception: Le compte admin (formateur_tic@hotmail.com) n'a jamais de déconnexion automatique
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 
 const SESSION_DURATION_MS = 60 * 60 * 1000; // 60 minutes (1 heure) en millisecondes
+const ADMIN_EMAIL = 'formateur_tic@hotmail.com';
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  getSupabaseUrl(),
+  getSupabaseServiceRoleKey()
 );
 
 export interface SessionDurationCheckResult {
@@ -145,7 +148,16 @@ export async function checkSessionDuration(session: any): Promise<SessionDuratio
     const userEmail = session.user.email;
     const userId = session.user.id;
 
-    // Tous les utilisateurs, y compris l'admin, ont une limite de 1 heure
+    // Exception: Le compte admin n'a jamais de déconnexion automatique
+    if (isAdminUser(userEmail)) {
+      console.log(`👑 Session admin (${userEmail}) - Pas de limite de durée`);
+      return {
+        isValid: true,
+        remainingMinutes: undefined // Illimité pour l'admin
+      };
+    }
+
+    // Tous les autres utilisateurs ont une limite de 1 heure
     let sessionCreatedAt: Date | null = null;
 
     // Méthode 1: Essayer d'extraire depuis le JWT token (iat) - la plus fiable
@@ -243,10 +255,8 @@ export async function checkSessionDuration(session: any): Promise<SessionDuratio
 
 /**
  * Vérifie si un utilisateur est l'admin (formateur_tic@hotmail.com)
- * Note: Même l'admin a maintenant une limite de session de 1 heure
+ * Note: L'admin n'a pas de limite de session (session illimitée)
  */
-const ADMIN_EMAIL = 'formateur_tic@hotmail.com';
-
 export function isAdminUser(email: string | undefined | null): boolean {
   return email === ADMIN_EMAIL;
 }

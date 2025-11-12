@@ -14,6 +14,7 @@ export const TOKEN_COSTS = {
   'pdf': 10,
   'meeting-reports': 100,
   'cogstudio': 10,
+  'code-learning': 10,
   
   // Applications premium (100 tokens)
   'qrcodes': 100

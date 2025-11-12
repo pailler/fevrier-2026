@@ -1,11 +1,8 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import { TokenProvider } from '../contexts/TokenContext'
 import ClientHeader from '../components/ClientHeader'
 import Footer from '../components/Footer'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'IA Home - Plateforme d\'Intelligence Artificielle | Formation IA & Outils IA',
@@ -127,6 +124,28 @@ export default function RootLayout({
             if (window.location.hostname === 'qrcodes.iahome.fr') {
               window.location.href = '/qrcodes';
             }
+            
+            // Bloquer les requêtes vers radar.cloudflare.com pour éviter les erreurs CORS
+            (function() {
+              const originalFetch = window.fetch;
+              window.fetch = function(...args) {
+                const url = args[0];
+                if (typeof url === 'string' && url.includes('radar.cloudflare.com')) {
+                  console.warn('Requête vers radar.cloudflare.com bloquée pour éviter les erreurs CORS');
+                  return Promise.reject(new Error('Blocked: radar.cloudflare.com'));
+                }
+                return originalFetch.apply(this, args);
+              };
+              
+              const originalXHROpen = XMLHttpRequest.prototype.open;
+              XMLHttpRequest.prototype.open = function(method, url, ...rest) {
+                if (typeof url === 'string' && url.includes('radar.cloudflare.com')) {
+                  console.warn('Requête XHR vers radar.cloudflare.com bloquée pour éviter les erreurs CORS');
+                  return;
+                }
+                return originalXHROpen.apply(this, [method, url, ...rest]);
+              };
+            })();
           `
         }} />
       </head>

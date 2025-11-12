@@ -31,9 +31,10 @@ async function getCurrentUser(request: NextRequest): Promise<string> {
     
     // Valider le token avec Supabase
     const { createClient } = await import('@supabase/supabase-js');
+    const { getSupabaseUrl, getSupabaseServiceRoleKey } = await import('@/utils/supabaseConfig');
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      getSupabaseUrl(),
+      getSupabaseServiceRoleKey()
     );
 
     const { data: { user }, error } = await supabase.auth.getUser(token);

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  getSupabaseUrl(),
+  getSupabaseServiceRoleKey()
 );
 
 // Version simplifiée qui ne vérifie pas la table profiles
@@ -201,9 +202,31 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Tokens consommés:', tokensToConsume, 'Restants:', newTokenCount, 'pour userId:', userId);
 
-    // Enregistrer l'utilisation dans l'historique via user_applications
+    // Enregistrer l'utilisation dans l'historique via user_applications et token_usage
     if (moduleId && moduleId !== 'test') {
       const now = new Date().toISOString();
+      
+      // Enregistrer dans token_usage si la table existe
+      try {
+        const { error: tokenUsageError } = await supabase
+          .from('token_usage')
+          .insert({
+            user_id: actualUserId,
+            module_id: moduleId,
+            module_name: moduleName || moduleId,
+            tokens_consumed: tokensToConsume,
+            usage_date: now,
+            action_type: 'module_usage'
+          });
+
+        if (tokenUsageError) {
+          console.log('ℹ️ Table token_usage non accessible ou inexistante:', tokenUsageError);
+        } else {
+          console.log('✅ Consommation enregistrée dans token_usage');
+        }
+      } catch (error) {
+        console.log('ℹ️ Table token_usage non accessible:', error);
+      }
       
       // Mettre à jour last_used_at pour l'historique
       // D'abord récupérer le usage_count actuel

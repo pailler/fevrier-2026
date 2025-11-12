@@ -118,3 +118,5 @@ Le Worker enregistre des logs dans Cloudflare Dashboard :
 - [Cloudflare Dashboard](https://dash.cloudflare.com/)
 - [Workers & Pages](https://dash.cloudflare.com/?to=/:account/workers)
 
+
+

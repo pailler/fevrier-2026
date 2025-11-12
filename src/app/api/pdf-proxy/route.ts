@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 import { supabase } from '../../../utils/supabaseClient';
 import { TokenActionService } from '../../../utils/tokenActionService';
 
@@ -55,8 +56,8 @@ export async function GET(request: NextRequest) {
 
     // Créer un client Supabase avec les cookies
     const supabaseWithCookies = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      getSupabaseUrl(),
+      getSupabaseAnonKey(),
       {
         auth: {
           persistSession: false,

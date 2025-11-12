@@ -1397,7 +1397,7 @@ export default function EncoursPage() {
                         }
                         
                         // Applications essentielles (10 tokens) - sans LibreSpeed (qui a son propre bouton)
-                        if (['metube', 'psitransfer', 'pdf', 'cogstudio'].includes(moduleId)) {
+                        if (['metube', 'psitransfer', 'pdf', 'cogstudio', 'code-learning'].includes(moduleId)) {
                           if (!user) {
                             console.error('❌ user is null in EssentialAccessButton');
                             return null;

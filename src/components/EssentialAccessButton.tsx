@@ -33,6 +33,7 @@ export default function EssentialAccessButton({
     'whisper': 'https://whisper.iahome.fr',
     'stablediffusion': 'https://stablediffusion.iahome.fr',
     'comfyui': 'https://comfyui.iahome.fr',
+    'code-learning': '/code-learning',
     // Meeting Reports : localhost:3050 en dev, meeting-reports.iahome.fr en prod
     'meeting-reports': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
       ? 'http://localhost:3050'
@@ -135,14 +136,18 @@ export default function EssentialAccessButton({
         throw new Error(`Module ${moduleId} non trouvé`);
       }
       
-      // Ouvrir le sous-domaine avec le token en paramètre
-      const directUrl = `${moduleUrl}?token=${encodeURIComponent(tokenData.token)}`;
-      
-      console.log(`🔗 ${moduleTitle}: Accès direct au sous-domaine avec token:`, directUrl);
-      window.open(directUrl, '_blank');
-      
-      // Appeler le callback pour notifier l'accès accordé
-      onAccessGranted?.(directUrl);
+      // Pour les routes internes (commençant par /), rediriger directement
+      if (moduleUrl.startsWith('/')) {
+        console.log(`🔗 ${moduleTitle}: Accès route interne:`, moduleUrl);
+        window.location.href = moduleUrl;
+        onAccessGranted?.(moduleUrl);
+      } else {
+        // Pour les sous-domaines externes, ajouter le token
+        const directUrl = `${moduleUrl}?token=${encodeURIComponent(tokenData.token)}`;
+        console.log(`🔗 ${moduleTitle}: Accès direct au sous-domaine avec token:`, directUrl);
+        window.open(directUrl, '_blank');
+        onAccessGranted?.(directUrl);
+      }
     } catch (err) {
       console.error(`❌ ${moduleTitle}: Erreur inattendue:`, err);
       setError('Une erreur inattendue est survenue.');

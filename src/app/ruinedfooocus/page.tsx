@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../utils/supabaseClient';
 
 export default function RuinedFooocusPage() {
   const router = useRouter();
@@ -12,12 +12,6 @@ export default function RuinedFooocusPage() {
     const checkAuthAndRedirect = async () => {
       try {
         ;
-        
-        // Créer un client Supabase côté client
-        const supabase = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        );
 
         ;
 

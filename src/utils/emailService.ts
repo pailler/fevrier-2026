@@ -1,3 +1,4 @@
+import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 import { Resend } from 'resend';
 
 export interface EmailData {
@@ -107,8 +108,8 @@ export class EmailService {
       // Récupérer le template depuis la base de données
       const { createClient } = await import('@supabase/supabase-js');
       const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
+        getSupabaseUrl(),
+        getSupabaseServiceRoleKey()
       );
 
       const { data: setting, error } = await supabase
@@ -165,8 +166,8 @@ export class EmailService {
       try {
         const { createClient } = await import('@supabase/supabase-js');
         const supabase = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!
+          getSupabaseUrl(),
+          getSupabaseServiceRoleKey()
         );
 
         await supabase
