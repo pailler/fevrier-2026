@@ -3,9 +3,8 @@ services:
     image: yanwk/comfyui:latest
     container_name: comfyui
     restart: unless-stopped
-    # SUPPRIMER l'exposition de port - plus d'accès direct
-    # ports:
-    #   - "8188:8188"
+    ports:
+      - "0.0.0.0:8188:8188"
     volumes:
       - ./models:/app/models
       - ./output:/app/output

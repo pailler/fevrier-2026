@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCustomAuth } from '../hooks/useCustomAuth';
@@ -10,6 +10,7 @@ import TokenBalanceLink from './TokenBalanceLink';
 
 export default function SimpleHeader() {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, isAuthenticated, signOut } = useCustomAuth();
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -52,37 +53,61 @@ export default function SimpleHeader() {
             <nav className="hidden md:flex items-center space-x-6">
               <Link 
                 href="/marketing" 
-                className="text-white hover:text-blue-100 font-medium transition-colors"
+                className={`font-medium transition-colors ${
+                  pathname === '/marketing' || pathname?.startsWith('/marketing/')
+                    ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-4'
+                    : 'text-white hover:text-blue-100'
+                }`}
               >
                 Découvrir
               </Link>
               <Link 
                 href="/formation" 
-                className="text-white hover:text-blue-100 font-medium transition-colors"
+                className={`font-medium transition-colors ${
+                  pathname === '/formation' || pathname?.startsWith('/formation/')
+                    ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-4'
+                    : 'text-white hover:text-blue-100'
+                }`}
               >
                 Formation
               </Link>
               <Link 
                 href="/blog" 
-                className="text-white hover:text-blue-100 font-medium transition-colors"
+                className={`font-medium transition-colors ${
+                  pathname === '/blog' || pathname?.startsWith('/blog/')
+                    ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-4'
+                    : 'text-white hover:text-blue-100'
+                }`}
               >
                 Blog
               </Link>
               <Link 
                 href="/essentiels" 
-                className="text-white hover:text-blue-100 font-medium transition-colors"
+                className={`font-medium transition-colors ${
+                  pathname === '/essentiels' || pathname?.startsWith('/essentiels/')
+                    ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-4'
+                    : 'text-white hover:text-blue-100'
+                }`}
               >
                 Essentiels
               </Link>
               <Link 
                 href="/applications" 
-                className="text-white hover:text-blue-100 font-medium transition-colors"
+                className={`font-medium transition-colors ${
+                  pathname === '/applications' || pathname?.startsWith('/applications/')
+                    ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-4'
+                    : 'text-white hover:text-blue-100'
+                }`}
               >
                 Applications IA
               </Link>
               <Link 
                 href="/pricing" 
-                className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-4 py-2 rounded-lg font-semibold transition-colors"
+                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                  pathname === '/pricing' || pathname?.startsWith('/pricing/')
+                    ? 'bg-yellow-500 hover:bg-yellow-600 text-gray-900 underline decoration-gray-900 decoration-2 underline-offset-2'
+                    : 'bg-yellow-400 hover:bg-yellow-500 text-gray-900'
+                }`}
               >
                 Offres
               </Link>
@@ -167,28 +192,44 @@ export default function SimpleHeader() {
                 <div className="text-sm text-blue-100 mb-2">Navigation</div>
                 <Link
                   href="/formation"
-                  className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors"
+                  className={`block px-4 py-2 transition-colors ${
+                    pathname === '/formation' || pathname?.startsWith('/formation/')
+                      ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
+                      : 'text-white hover:bg-blue-500'
+                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Formation
                 </Link>
                 <Link
                   href="/blog"
-                  className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors"
+                  className={`block px-4 py-2 transition-colors ${
+                    pathname === '/blog' || pathname?.startsWith('/blog/')
+                      ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
+                      : 'text-white hover:bg-blue-500'
+                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Blog
                 </Link>
                 <Link
                   href="/essentiels"
-                  className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors"
+                  className={`block px-4 py-2 transition-colors ${
+                    pathname === '/essentiels' || pathname?.startsWith('/essentiels/')
+                      ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
+                      : 'text-white hover:bg-blue-500'
+                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Essentiels
                 </Link>
                 <Link
                   href="/applications"
-                  className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors"
+                  className={`block px-4 py-2 transition-colors ${
+                    pathname === '/applications' || pathname?.startsWith('/applications/')
+                      ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
+                      : 'text-white hover:bg-blue-500'
+                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Applications IA

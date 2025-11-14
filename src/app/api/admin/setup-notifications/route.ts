@@ -82,15 +82,15 @@ export async function POST(request: NextRequest) {
       },
       {
         event_type: 'module_activated',
-        name: 'Module activé',
-        description: 'Notification envoyée lorsqu\'un module est activé pour un utilisateur',
+        name: 'Application activée',
+        description: 'Notification envoyée lorsqu\'une application est activée pour un utilisateur',
         is_enabled: true,
-        email_template_subject: 'Module activé - {{module_name}}',
+        email_template_subject: 'Application activée - {{module_name}}',
         email_template_body: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #2563eb;">Module activé</h2>
+            <h2 style="color: #2563eb;">Application activée</h2>
             <p>Bonjour {{user_name}},</p>
-            <p>Le module <strong>{{module_name}}</strong> a été activé pour votre compte.</p>
+            <p>L'application <strong>{{module_name}}</strong> a été activée pour votre compte.</p>
             <p>Vous pouvez maintenant y accéder depuis votre tableau de bord.</p>
             <hr>
             <p style="color: #666; font-size: 12px;">

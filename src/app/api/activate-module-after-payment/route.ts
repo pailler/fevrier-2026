@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
       ;
       return NextResponse.json({
         success: true,
-        message: 'Module déjà activé',
+        message: 'Application déjà activée',
         moduleInfo: moduleData
       });
     }
@@ -246,7 +246,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Module activé avec succès',
+      message: 'Application activée avec succès',
       moduleInfo: moduleData,
       activationData: activationData
     });

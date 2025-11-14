@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       console.error('❌ PsiTransfer Access: Module non trouvé ou inactif:', appError);
       return new NextResponse(JSON.stringify({
         success: false,
-        error: 'Module PsiTransfer non activé'
+        error: 'Application PsiTransfer non activée'
       }), {
         status: 404,
         headers: { 'Content-Type': 'application/json' }
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       console.log('❌ PsiTransfer Access: Module expiré');
       return new NextResponse(JSON.stringify({
         success: false,
-        error: 'Module PsiTransfer expiré'
+        error: 'Application PsiTransfer expirée'
       }), {
         status: 403,
         headers: { 'Content-Type': 'application/json' }

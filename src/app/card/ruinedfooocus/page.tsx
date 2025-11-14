@@ -424,8 +424,8 @@ export default function RuinedFooocusPage() {
                     <div className="flex items-center justify-center space-x-3 text-green-800">
                       <span className="text-2xl">✅</span>
                       <div className="text-center">
-                        <p className="font-semibold">Module déjà activé !</p>
-                        <p className="text-sm opacity-80">Vous pouvez accéder à ce module depuis vos applications</p>
+                        <p className="font-semibold">Application déjà activée !</p>
+                        <p className="text-sm opacity-80">Vous pouvez accéder à cette application depuis vos applications</p>
                       </div>
                     </div>
                     <div className="mt-3 text-center">
@@ -450,7 +450,7 @@ export default function RuinedFooocusPage() {
                       moduleDescription={card.description}
                       onActivationSuccess={() => {
                         setAlreadyActivatedModules(prev => [...prev, card.id]);
-                        alert(`✅ Module ${card.title} activé avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
+                        alert(`✅ Application ${card.title} activée avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
                       }}
                       onActivationError={(error) => {
                         console.error('Erreur activation:', error);
@@ -471,7 +471,7 @@ export default function RuinedFooocusPage() {
 
                       // Vérifier si le module est déjà activé avant de procéder au paiement
                       if (alreadyActivatedModules.includes(card.id)) {
-                        alert(`ℹ️ Le module ${card.title} est déjà activé ! Vous pouvez l'utiliser depuis vos applications.`);
+                        alert(`ℹ️ L'application ${card.title} est déjà activée ! Vous pouvez l'utiliser depuis vos applications.`);
                         return;
                       }
 

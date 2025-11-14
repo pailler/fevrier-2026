@@ -172,7 +172,7 @@ export default function ModulesPage() {
               
               {/* Bouton d'accès supprimé - Les utilisateurs peuvent accéder via les sous-domaines */}
               <div className="w-full bg-green-100 text-green-800 font-medium py-3 px-4 rounded-lg text-center">
-                ✅ Module activé - Accès via sous-domaine
+                ✅ Application activée - Accès via sous-domaine
               </div>
             </div>
           ))}

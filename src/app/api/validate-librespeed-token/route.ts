@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       ;
       return new NextResponse(JSON.stringify({
         success: false,
-        error: 'Module LibreSpeed non activé'
+        error: 'Application LibreSpeed non activée'
       }), {
         status: 403,
         headers: {

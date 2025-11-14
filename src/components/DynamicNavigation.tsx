@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { MenuService, MenuItem } from '../utils/menuService';
 
 interface DynamicNavigationProps {
@@ -21,6 +22,7 @@ export default function DynamicNavigation({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     // Marquer que nous sommes côté client
@@ -72,11 +74,16 @@ export default function DynamicNavigation({
   }
 
   const renderMenuItem = (item: MenuItem) => {
+    const isActive = item.url && (pathname === item.url || pathname?.startsWith(item.url + '/'));
     const linkProps = {
       href: item.url || '#',
       target: item.is_external ? '_blank' : item.target,
       rel: item.is_external ? 'noopener noreferrer' : undefined,
-      className: `text-white hover:text-blue-100 font-medium transition-colors ${
+      className: `font-medium transition-colors ${
+        isActive
+          ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-4'
+          : 'text-white hover:text-blue-100'
+      } ${
         isMobile ? 'block py-2 px-4 hover:bg-blue-500' : ''
       }`
     };

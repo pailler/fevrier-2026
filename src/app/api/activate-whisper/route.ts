@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     if (existingAccess) {
       return NextResponse.json({ 
         success: true, 
-        message: 'Module déjà activé',
+        message: 'Application déjà activée',
         accessId: existingAccess.id
       });
     }
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Module Whisper IA activé avec succès',
+      message: 'Application Whisper IA activée avec succès',
       accessId: accessData.id,
       expiresAt: expiresAt.toISOString()
     });

@@ -28,6 +28,17 @@ export default function ChatAI() {
     };
     getUser();
 
+    // Écouter les changements d'authentification
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
     // Message de bienvenue
     if (isOpen && messages.length === 0) {
       setMessages([
@@ -60,6 +71,10 @@ export default function ChatAI() {
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
+    // Récupérer la session actuelle avant d'envoyer
+    const { data: { session } } = await supabase.auth.getSession();
+    const currentUser = session?.user || user;
+
     const userMessage: Message = {
       id: Date.now().toString(),
       content: inputValue,
@@ -81,8 +96,11 @@ export default function ChatAI() {
         },
         body: JSON.stringify({
           message: inputValue,
-          userId: user?.id,
-          conversationHistory: messages.slice(-10) // Garder les 10 derniers messages pour le contexte
+          userId: currentUser?.id || null,
+          conversationHistory: messages.slice(-5).map(msg => ({
+            role: msg.role,
+            content: msg.content
+          })) // Garder les 5 derniers messages pour le contexte (réduit les tokens)
         }),
       });
 
@@ -96,7 +114,9 @@ export default function ChatAI() {
         };
         setMessages(prev => [...prev, assistantMessage]);
       } else {
-        throw new Error('Erreur lors de la communication avec l\'IA');
+        const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
+        console.error('Erreur API chat:', response.status, errorData);
+        throw new Error(errorData.error || 'Erreur lors de la communication avec l\'IA');
       }
     } catch (error) {
       console.error('Erreur chat:', error);

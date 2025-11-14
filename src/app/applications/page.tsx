@@ -460,20 +460,6 @@ export default function Home() {
         </button>
       )}
 
-      {/* Bouton flottant de gestion des modules seulement pour les admins */}
-      {isAuthenticated && user && role === 'admin' && (
-        <div className="fixed bottom-6 right-6 z-50">
-          <button
-            onClick={() => router.push('/admin')}
-            className="inline-flex items-center justify-center w-16 h-16 bg-green-600 text-white rounded-full shadow-xl hover:bg-green-700 transition-all duration-200 transform hover:scale-110"
-            title="Administration du site"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-          </button>
-        </div>
-      )}
     </div>
   );
 }

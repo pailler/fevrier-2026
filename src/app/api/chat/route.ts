@@ -3,27 +3,42 @@ import { supabase } from '../../../utils/supabaseClient';
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, userId, conversationHistory } = await request.json();
-
-    // Vérification de l'authentification
-    if (!userId) {
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      console.error('Erreur parsing JSON:', parseError);
       return NextResponse.json(
-        { error: 'Utilisateur non authentifié' },
-        { status: 401 }
+        { error: 'Format de requête invalide' },
+        { status: 400 }
       );
     }
 
-    // Logique de réponse IA
-    const response = await generateAIResponse(message, conversationHistory, userId);
+    const { message, userId, conversationHistory } = body;
 
-    // Sauvegarder la conversation dans la base de données
-    await saveConversation(userId, message, response);
+    // Le chatbot peut fonctionner sans authentification, mais on ne sauvegardera pas la conversation
+    // Si userId est null, on utilise un ID temporaire pour la session
+    const effectiveUserId = userId || 'anonymous';
+
+    // Logique de réponse IA
+    const response = await generateAIResponse(message, conversationHistory || [], effectiveUserId);
+
+    // Sauvegarder la conversation dans la base de données seulement si l'utilisateur est authentifié
+    if (userId) {
+      await saveConversation(userId, message, response);
+    }
 
     return NextResponse.json({ response });
   } catch (error) {
     console.error('Erreur dans l\'API chat:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Erreur interne du serveur';
+    console.error('Détails de l\'erreur:', {
+      message: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined
+    });
     return NextResponse.json(
-      { error: 'Erreur interne du serveur' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
@@ -34,80 +49,29 @@ async function generateAIResponse(message: string, conversationHistory: any[], u
     // Configuration OpenAI
     const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
     
-    ;
-    console.log('- OPENAI_API_KEY présent:', !!OPENAI_API_KEY);
-    console.log('- NODE_ENV:', process.env.NODE_ENV);
-    ;
-    
+    // Vérification de la clé API
     if (!OPENAI_API_KEY) {
       console.log('⚠️ Pas de clé OpenAI - Utilisation du fallback');
       // Fallback vers la logique simple si pas de clé API
       return await generateSimpleResponse(message, userId);
     }
-
-    ;
     
-    // Récupérer toutes les données contextuelles du projet IAHome
+    // Récupérer les données contextuelles du projet IAHome (optimisé pour réduire les tokens)
     const contextData = await getCompleteContextData(message, userId);
-    
-    ;
-    ;
-    console.log('- Articles:', contextData.blogArticles ? 'Oui' : 'Non');
-    console.log('- Services:', contextData.servicesData ? 'Oui' : 'Non');
 
     // Préparer l'historique des conversations pour le contexte
     const messages = [
       {
         role: 'system',
-        content: `Tu es IAHome Assistant, un assistant IA spécialisé dans l'aide aux utilisateurs de la plateforme IAHome.fr.
+        content: `IAHome Assistant. Plateforme IA: IAHome.fr
 
-IAHome est une plateforme complète d'intelligence artificielle qui propose :
+MODULES: ${contextData.modules}
 
-🎯 MODULES IA DISPONIBLES :
-${contextData.modules}
+SERVICES: ${contextData.servicesData}
 
-📝 ARTICLES DE BLOG :
-${contextData.blogArticles}
+TARIFS: ${contextData.pricingData}
 
-👥 UTILISATEURS ET ABONNEMENTS :
-${contextData.userData}
-
-💰 TARIFS ET PAIEMENTS :
-${contextData.pricingData}
-
-🔧 SERVICES ET OUTILS :
-${contextData.servicesData}
-
-📊 STATISTIQUES PLATEFORME :
-${contextData.statsData}
-
-🎨 FONCTIONNALITÉS SPÉCIALES :
-- Génération d'images avec Stable Diffusion, ComfyUI
-- Traitement de documents PDF avec Stirling PDF
-- Téléchargement de vidéos avec MeTube
-- Transfert de fichiers avec PsiTransfer
-- Tests de vitesse avec LibreSpeed
-- Génération de QR codes
-- Et bien plus encore !
-
-💡 CAPACITÉS :
-1. Aide technique complète sur tous les modules
-2. Support utilisateur et résolution de problèmes
-3. Informations sur les tarifs et abonnements
-4. Guide d'utilisation des fonctionnalités
-5. Recommandations personnalisées
-6. Support en français uniquement
-7. Réponses précises basées sur les vraies données de la plateforme
-
-🎯 TON RÔLE :
-- Répondre à toutes les questions sur IAHome
-- Aider avec les problèmes techniques
-- Expliquer les fonctionnalités
-- Guider les utilisateurs
-- Fournir des informations précises et à jour
-- Être amical et professionnel
-
-Réponds de manière détaillée et utile en te basant sur les vraies données de IAHome.`
+${contextData.statsData ? `STATS: ${contextData.statsData}\n` : ''}${contextData.userData ? `USER: ${contextData.userData}\n` : ''}Réponds en français, sois concis. Max 300 mots.`
       },
       ...conversationHistory.map(msg => ({
         role: msg.role,
@@ -128,9 +92,9 @@ Réponds de manière détaillée et utile en te basant sur les vraies données d
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4',
+        model: 'gpt-3.5-turbo', // Utiliser gpt-3.5-turbo au lieu de gpt-4 pour réduire les coûts
         messages: messages,
-        max_tokens: 1200,
+        max_tokens: 600, // Réduire de 1200 à 600 tokens
         temperature: 0.7,
         presence_penalty: 0.1,
         frequency_penalty: 0.1
@@ -166,17 +130,17 @@ async function getCompleteContextData(message: string, userId: string) {
       .select('*')
       .order('title', { ascending: true });
 
-    // Récupérer les articles de blog
+    // Récupérer les articles de blog (limité à 5 pour réduire les tokens)
     const { data: articles, error: articlesError } = await supabase
       .from('blog_articles')
       .select('*')
       .eq('status', 'published')
       .order('created_at', { ascending: false })
-      .limit(15);
+      .limit(5);
 
-    // Récupérer les données utilisateur si demandé
+    // Récupérer les données utilisateur si demandé (seulement si nécessaire)
     let userData = '';
-    if (lowerMessage.includes('mon compte') || lowerMessage.includes('profil') || lowerMessage.includes('abonnement')) {
+    if (userId && userId !== 'anonymous' && (lowerMessage.includes('mon compte') || lowerMessage.includes('profil') || lowerMessage.includes('abonnement'))) {
       const { data: userProfile, error: userError } = await supabase
         .from('profiles')
         .select('*')
@@ -196,72 +160,44 @@ async function getCompleteContextData(message: string, userId: string) {
       }
     }
 
-    // Récupérer les statistiques de la plateforme
-    const { count: totalUsers } = await supabase
-      .from('profiles')
-      .select('*', { count: 'exact', head: true });
+    // Récupérer les statistiques de la plateforme (seulement si demandé pour économiser les tokens)
+    let statsText = '';
+    if (lowerMessage.includes('statistique') || lowerMessage.includes('nombre') || lowerMessage.includes('combien')) {
+      const { count: totalUsers } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
 
-    const { count: totalModules } = await supabase
-      .from('modules')
-      .select('*', { count: 'exact', head: true });
+      const { count: totalModules } = await supabase
+        .from('modules')
+        .select('*', { count: 'exact', head: true });
 
-    const { count: totalArticles } = await supabase
-      .from('blog_articles')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'published');
+      statsText = `Stats: ${totalUsers || 0} utilisateurs, ${totalModules || 0} modules`;
+    }
 
-    // Récupérer les services disponibles
-    const servicesData = `
-Services IA disponibles :
-- Stable Diffusion (génération d'images)
-- ComfyUI (workflows IA avancés)
-- RuinedFooocus (génération rapide)
-- CogStudio (modèles personnalisés)
-- Stirling PDF (traitement PDF)
-- MeTube (téléchargement vidéos)
-- PsiTransfer (transfert fichiers)
-- LibreSpeed (tests de vitesse)
-- QR Codes (génération QR)
-- IA Photo (traitement photos)
-- IA Tube (plateforme vidéo)
-`;
+    // Services disponibles (version courte)
+    const servicesData = `Services: Stable Diffusion, ComfyUI, RuinedFooocus, PDF, MeTube, PsiTransfer, LibreSpeed, QR Codes`;
 
     // Formater les données
     const modulesText = !modulesError && modules ? 
       modules.map(module => 
-        `- ${module.title} (${module.category}, ${module.price}€): ${module.description}`
+        `- ${module.title} (${module.category}, ${module.price} tokens): ${module.description}`
       ).join('\n') : 'Aucun module disponible';
 
     const articlesText = !articlesError && articles ? 
       articles.map(article => 
-        `- ${article.title} (${article.category}): ${article.content.substring(0, 150)}...`
+        `- ${article.title} (${article.category})`
       ).join('\n') : 'Aucun article disponible';
 
-    const statsText = `
-Statistiques IAHome :
-- ${totalUsers || 0} utilisateurs inscrits
-- ${totalModules || 0} modules IA disponibles
-- ${totalArticles || 0} articles de blog publiés
-- Plateforme active 24/7
-- Support multilingue
-- Infrastructure cloud sécurisée
-`;
+    // statsText est maintenant défini conditionnellement ci-dessus
 
-    const pricingText = `
-Tarification IAHome :
-- Mes applis essentielles disponibles
-- Abonnements à partir de 5€/mois
-- Paiements sécurisés via Stripe
-- Facturation automatique
-- Support premium inclus
-`;
+    const pricingText = `Tarifs: Système de tokens. Modules: 10-100 tokens. Paiement Stripe.`;
 
     return {
       modules: modulesText,
       blogArticles: articlesText,
-      userData: userData || 'Informations utilisateur non disponibles',
+      userData: userData || '',
       servicesData,
-      statsData: statsText,
+      statsData: statsText || '',
       pricingData: pricingText
     };
 
@@ -298,7 +234,7 @@ async function generateSimpleResponse(message: string, userId: string) {
         .order('title', { ascending: true });
       
       if (!error && modules && modules.length > 0) {
-        const modulesList = modules.map(m => `${m.title} (${m.price}€)`).join(', ');
+        const modulesList = modules.map(m => `${m.title} (${m.price} tokens)`).join(', ');
         return `Nos modules IA disponibles incluent : ${modulesList}. Vous pouvez les trouver dans la section 'Mes applis' de votre tableau de bord. Chaque module a ses spécificités et fonctionnalités uniques.`;
       }
     } catch (error) {
@@ -315,7 +251,7 @@ async function generateSimpleResponse(message: string, userId: string) {
         .order('price', { ascending: true });
       
       if (!error && modules && modules.length > 0) {
-        const priceRange = `de ${modules[0].price}€ à ${modules[modules.length - 1].price}€`;
+        const priceRange = `de ${modules[0].price} tokens à ${modules[modules.length - 1].price} tokens`;
         return `Nos tarifs varient ${priceRange} selon les modules. Nous proposons des abonnements flexibles avec paiements sécurisés via Stripe. Vous pouvez consulter les détails dans votre espace personnel.`;
       }
     } catch (error) {
@@ -368,9 +304,9 @@ async function saveConversation(userId: string, userMessage: string, aiResponse:
       return;
     }
 
-    // Vérifier si l'utilisateur existe dans la table users
+    // Vérifier si l'utilisateur existe dans la table profiles
     const { data: user, error: userError } = await supabase
-      .from('users')
+      .from('profiles')
       .select('id')
       .eq('id', userId)
       .single();
@@ -381,7 +317,7 @@ async function saveConversation(userId: string, userMessage: string, aiResponse:
     }
 
     const { error } = await supabase
-      .from('chat_conversations')
+      .from('chatbot_config')
       .insert({
         user_id: userId,
         user_message: userMessage,

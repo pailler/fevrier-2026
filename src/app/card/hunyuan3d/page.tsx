@@ -547,8 +547,8 @@ export default function Hunyuan3DPage() {
                     <div className="flex items-center justify-center space-x-3 text-green-800">
                       <span className="text-2xl">✅</span>
                       <div className="text-center">
-                        <p className="font-semibold">Module déjà activé !</p>
-                        <p className="text-sm opacity-80">Vous pouvez accéder à ce module depuis vos applications</p>
+                        <p className="font-semibold">Application déjà activée !</p>
+                        <p className="text-sm opacity-80">Vous pouvez accéder à cette application depuis vos applications</p>
                       </div>
                     </div>
                     <div className="mt-3 text-center">
@@ -570,10 +570,10 @@ export default function Hunyuan3DPage() {
                       moduleId={card?.id || 'hunyuan3d'}
                       moduleName={card?.title || 'Hunyuan 3D'}
                       moduleCost={100}
-                      moduleDescription={card?.description || 'Module Hunyuan 3D activé'}
+                      moduleDescription={card?.description || 'Application Hunyuan 3D activée'}
                       onActivationSuccess={() => {
                         setAlreadyActivatedModules(prev => [...prev, card?.id || 'hunyuan3d']);
-                        alert(`✅ Module ${card?.title || 'Hunyuan 3D'} activé avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
+                        alert(`✅ Application ${card?.title || 'Hunyuan 3D'} activée avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
                       }}
                       onActivationError={(error) => {
                         console.error('Erreur activation:', error);

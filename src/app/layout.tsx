@@ -3,6 +3,8 @@ import './globals.css'
 import { TokenProvider } from '../contexts/TokenContext'
 import ClientHeader from '../components/ClientHeader'
 import Footer from '../components/Footer'
+import ConditionalComponents from '../components/ConditionalComponents'
+import ClientOnly from '../components/ClientOnly'
 
 export const metadata: Metadata = {
   title: 'IA Home - Plateforme d\'Intelligence Artificielle | Formation IA & Outils IA',
@@ -125,6 +127,69 @@ export default function RootLayout({
               window.location.href = '/qrcodes';
             }
             
+            // Gestionnaire d'erreur global pour les erreurs webpack
+            (function() {
+              window.addEventListener('error', function(event) {
+                const error = event.error || event.message || '';
+                const isWebpackError = 
+                  (typeof error === 'string' && (
+                    error.includes("can't access property") ||
+                    error.includes("e[o] is undefined") ||
+                    error.includes("ChunkLoadError") ||
+                    error.includes("Loading chunk")
+                  )) ||
+                  (error && error.message && (
+                    error.message.includes("can't access property") ||
+                    error.message.includes("e[o] is undefined") ||
+                    error.message.includes("ChunkLoadError") ||
+                    error.message.includes("Loading chunk")
+                  ));
+                
+                if (isWebpackError) {
+                  console.warn('⚠️ Erreur Webpack détectée:', error);
+                  console.warn('💡 Tentative de rechargement automatique dans 2 secondes...');
+                  
+                  // Vider le cache et recharger
+                  setTimeout(function() {
+                    if ('caches' in window) {
+                      caches.keys().then(function(names) {
+                        names.forEach(function(name) {
+                          caches.delete(name);
+                        });
+                        window.location.reload();
+                      });
+                    } else {
+                      window.location.reload();
+                    }
+                  }, 2000);
+                }
+              }, true);
+              
+              // Intercepter les erreurs non capturées
+              window.addEventListener('unhandledrejection', function(event) {
+                const error = event.reason || '';
+                const isWebpackError = 
+                  (typeof error === 'string' && (
+                    error.includes("can't access property") ||
+                    error.includes("e[o] is undefined") ||
+                    error.includes("ChunkLoadError")
+                  )) ||
+                  (error && error.message && (
+                    error.message.includes("can't access property") ||
+                    error.message.includes("e[o] is undefined") ||
+                    error.message.includes("ChunkLoadError")
+                  ));
+                
+                if (isWebpackError) {
+                  console.warn('⚠️ Erreur Webpack (promise rejection) détectée:', error);
+                  event.preventDefault();
+                  setTimeout(function() {
+                    window.location.reload();
+                  }, 2000);
+                }
+              });
+            })();
+            
             // Bloquer les requêtes vers radar.cloudflare.com pour éviter les erreurs CORS
             (function() {
               const originalFetch = window.fetch;
@@ -156,6 +221,9 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <ClientOnly>
+            <ConditionalComponents />
+          </ClientOnly>
         </TokenProvider>
       </body>
     </html>

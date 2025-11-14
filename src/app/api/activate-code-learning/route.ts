@@ -38,9 +38,9 @@ export async function POST(request: NextRequest) {
       targetUserId = userData.id;
     }
 
-    console.log('🔄 Activation du module Code Learning pour l\'utilisateur:', targetUserId);
+    console.log('🔄 Activation du module Apprendre le Code pour l\'utilisateur:', targetUserId);
 
-    // 1. Vérifier/Créer le module Code Learning
+    // 1. Vérifier/Créer le module Apprendre le Code
     let moduleId = 'code-learning';
     const { data: existingModule, error: moduleError } = await supabase
       .from('modules')
@@ -75,10 +75,10 @@ export async function POST(request: NextRequest) {
       }
 
       moduleId = newModule.id;
-      console.log('✅ Module Code Learning créé:', moduleId);
+      console.log('✅ Module Apprendre le Code créé:', moduleId);
     } else {
       moduleId = existingModule.id;
-      console.log('✅ Module Code Learning trouvé:', moduleId);
+      console.log('✅ Module Apprendre le Code trouvé:', moduleId);
     }
 
     // 2. Vérifier si l'utilisateur a déjà accès
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     if (existingAccess) {
       return NextResponse.json({
         success: true,
-        message: 'Accès Code Learning déjà activé',
+        message: 'Accès Apprendre le Code déjà activé',
         accessId: existingAccess.id,
         usageCount: existingAccess.usage_count,
         maxUsage: existingAccess.max_usage
@@ -129,18 +129,18 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    console.log('✅ Accès Code Learning créé avec succès:', accessData.id);
+    console.log('✅ Accès Apprendre le Code créé avec succès:', accessData.id);
 
     return NextResponse.json({
       success: true,
-      message: 'Code Learning activé avec succès',
+      message: 'Apprendre le Code activé avec succès',
       accessId: accessData.id,
       moduleId: moduleId,
       expiresAt: expiresAt.toISOString()
     });
 
   } catch (error) {
-    console.error('❌ Erreur activation Code Learning:', error);
+    console.error('❌ Erreur activation Apprendre le Code:', error);
     return NextResponse.json({ 
       success: false, 
       error: 'Erreur interne du serveur' 

@@ -200,7 +200,7 @@ export default function CodeLearningCardPage() {
                   <div className="flex items-center justify-center space-x-3 text-green-800">
                     <span className="text-2xl">✅</span>
                     <div className="text-center">
-                      <p className="font-semibold">Module déjà activé !</p>
+                      <p className="font-semibold">Application déjà activée !</p>
                       <p className="text-sm opacity-80">Tu peux accéder à l'application</p>
                     </div>
                   </div>

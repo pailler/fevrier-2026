@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     if (!accessError && existingAccess) {
       return NextResponse.json(
         { 
-          error: 'Module déjà activé',
+          error: 'Application déjà activée',
           alreadyActivated: true
         },
         { status: 400 }
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `Module ${moduleName} activé avec succès`,
+      message: `Application ${moduleName} activée avec succès`,
       tokensConsumed: moduleCost,
       tokensRemaining: newTokenCount,
       moduleId,

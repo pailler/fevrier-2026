@@ -71,8 +71,8 @@ export default function ModuleActivationButton({
         if (checkResponse.ok) {
           const checkData = await checkResponse.json();
           if (checkData.isActivated) {
-            setError('Module déjà activé');
-            onActivationError?.('Module déjà activé');
+            setError('Application déjà activée');
+            onActivationError?.('Application déjà activée');
             setIsLoading(false);
             return;
           }
@@ -197,7 +197,7 @@ export default function ModuleActivationButton({
           href="/login" 
           className="text-blue-600 hover:text-blue-800 text-sm text-center max-w-xs underline"
         >
-          Connectez-vous pour activer ce module
+          Connectez-vous pour activer cette application
         </Link>
       )}
       

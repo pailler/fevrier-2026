@@ -908,8 +908,8 @@ export default function CardDetailPage() {
                         <div className="flex items-center justify-center space-x-3 text-green-800">
                           <span className="text-2xl">✅</span>
                           <div className="text-center">
-                            <p className="font-semibold">Module déjà activé !</p>
-                            <p className="text-sm opacity-80">Vous pouvez accéder à ce module depuis vos applications</p>
+                            <p className="font-semibold">Application déjà activée !</p>
+                            <p className="text-sm opacity-80">Vous pouvez accéder à cette application depuis vos applications</p>
                           </div>
                         </div>
                         <div className="mt-3 text-center">
@@ -937,7 +937,7 @@ export default function CardDetailPage() {
 
                           // Vérifier si le module est déjà activé avant de procéder au paiement
                           if (alreadyActivatedModules.includes(card.id)) {
-                            alert(`ℹ️ Le module ${card.title} est déjà activé ! Vous pouvez l'utiliser depuis vos applications.`);
+                            alert(`ℹ️ L'application ${card.title} est déjà activée ! Vous pouvez l'utiliser depuis vos applications.`);
                             return;
                           }
 
@@ -981,18 +981,18 @@ export default function CardDetailPage() {
                     )}
 
 
-                    {/* Bouton d'accès spécial pour Code Learning */}
+                    {/* Bouton d'accès spécial pour Apprendre le Code */}
                     {isCodeLearning && !alreadyActivatedModules.includes(card.id) && (
                       <button
                         onClick={async () => {
                           if (!isAuthenticated || !user) {
-                            console.log('❌ Accès Code Learning - Utilisateur non connecté');
+                            console.log('❌ Accès Apprendre le Code - Utilisateur non connecté');
                             router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
                             return;
                           }
 
                           try {
-                            console.log('🔄 Activation Code Learning pour:', user.email);
+                            console.log('🔄 Activation Apprendre le Code pour:', user.email);
                             
                             const response = await fetch('/api/activate-code-learning', {
                               method: 'POST',
@@ -1008,16 +1008,16 @@ export default function CardDetailPage() {
                             const result = await response.json();
 
                             if (result.success) {
-                              console.log('✅ Code Learning activé avec succès');
+                              console.log('✅ Apprendre le Code activé avec succès');
                               setAlreadyActivatedModules(prev => [...prev, card.id]);
-                              alert('Code Learning activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation (10 tokens).');
+                              alert('Apprendre le Code activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation (10 tokens).');
                               router.push('/encours');
                             } else {
-                              console.error('❌ Erreur activation Code Learning:', result.error);
+                              console.error('❌ Erreur activation Apprendre le Code:', result.error);
                               alert(`Erreur lors de l'activation: ${result.error}`);
                             }
                           } catch (error) {
-                            console.error('❌ Erreur activation Code Learning:', error);
+                            console.error('❌ Erreur activation Apprendre le Code:', error);
                             alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                           }
                         }}
@@ -1025,7 +1025,7 @@ export default function CardDetailPage() {
                       >
                         <span className="text-xl">⚡</span>
                         <span>
-                          {isAuthenticated && user ? `Activer Code Learning (10 tokens)` : `Connectez-vous pour activer Code Learning (10 tokens)`}
+                          {isAuthenticated && user ? `Activer Apprendre le Code (10 tokens)` : `Connectez-vous pour activer Apprendre le Code (10 tokens)`}
                         </span>
                       </button>
                     )}

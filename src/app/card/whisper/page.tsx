@@ -506,8 +506,8 @@ export default function WhisperPage() {
                     <div className="flex items-center justify-center space-x-3 text-green-800">
                       <span className="text-2xl">✅</span>
                       <div className="text-center">
-                        <p className="font-semibold">Module déjà activé !</p>
-                        <p className="text-sm opacity-80">Vous pouvez accéder à ce module depuis vos applications</p>
+                        <p className="font-semibold">Application déjà activée !</p>
+                        <p className="text-sm opacity-80">Vous pouvez accéder à cette application depuis vos applications</p>
                       </div>
                     </div>
                     <div className="mt-3 text-center">
@@ -529,10 +529,10 @@ export default function WhisperPage() {
                       moduleId={card?.id || 'whisper'}
                       moduleName={card?.title || 'Whisper'}
                       moduleCost={100}
-                      moduleDescription={card?.description || 'Module Whisper activé'}
+                      moduleDescription={card?.description || 'Application Whisper activée'}
                       onActivationSuccess={() => {
                         setAlreadyActivatedModules(prev => [...prev, card?.id || 'whisper']);
-                        alert(`✅ Module ${card?.title || 'Whisper'} activé avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
+                        alert(`✅ Application ${card?.title || 'Whisper'} activée avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
                       }}
                       onActivationError={(error) => {
                         console.error('Erreur activation:', error);

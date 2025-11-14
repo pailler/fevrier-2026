@@ -11,7 +11,7 @@ const categoryLabels: Record<string, string> = {
   productivity: 'Productivité',
   tools: 'Outils',
   media: 'Média',
-  developer: 'Développement'
+  formation: 'Formation'
 };
 
 // Fonction pour mapper un subdomain vers sa page de détails /card/[id]
@@ -32,14 +32,15 @@ const getCardPageUrl = (subdomain: string): string | null => {
     'pdf': '/card/pdf',
     'psitransfer': '/card/psitransfer',
     'librespeed': '/card/librespeed',
-    'hunyuan3d': '/card/hunyuan3d'
+    'hunyuan3d': '/card/hunyuan3d',
+    'code-learning': '/card/code-learning'
   };
   
   return serviceToCardMapping[serviceName] || null;
 };
 
 export default function ServicesPage() {
-  const categories = ['ai', 'productivity', 'tools', 'media', 'developer'] as const;
+  const categories = ['ai', 'productivity', 'tools', 'media', 'formation'] as const;
 
   // Mettre à jour les métadonnées de la page
   useEffect(() => {

@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
 
     if (existingActivation) {
       return NextResponse.json(
-        { error: 'Module déjà activé' },
+        { error: 'Application déjà activée' },
         { status: 400 }
       );
     }
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Module Meeting Reports activé avec succès',
+      message: 'Application Meeting Reports activée avec succès',
       activation: activation,
       tokensRemaining: user.tokens - 100
     });

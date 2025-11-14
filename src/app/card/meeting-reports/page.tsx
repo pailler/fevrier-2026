@@ -514,8 +514,8 @@ export default function MeetingReportsPage() {
                     <div className="flex items-center justify-center space-x-3 text-green-800">
                       <span className="text-2xl">✅</span>
                       <div className="text-center">
-                        <p className="font-semibold">Module déjà activé !</p>
-                        <p className="text-sm opacity-80">Vous pouvez accéder à ce module depuis vos applications</p>
+                        <p className="font-semibold">Application déjà activée !</p>
+                        <p className="text-sm opacity-80">Vous pouvez accéder à cette application depuis vos applications</p>
                       </div>
                     </div>
                     <div className="mt-3 text-center">
@@ -537,10 +537,10 @@ export default function MeetingReportsPage() {
                       moduleId={card?.id || 'meeting-reports'}
                       moduleName={card?.title || 'Compte rendus IA'}
                       moduleCost={100}
-                      moduleDescription={card?.description || 'Module Compte rendus IA activé'}
+                      moduleDescription={card?.description || 'Application Compte rendus IA activée'}
                       onActivationSuccess={() => {
                         setAlreadyActivatedModules(prev => [...prev, card?.id || 'meeting-reports']);
-                        alert(`✅ Module ${card?.title || 'Compte rendus IA'} activé avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
+                        alert(`✅ Application ${card?.title || 'Compte rendus IA'} activée avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
                       }}
                       onActivationError={(error) => {
                         console.error('Erreur activation:', error);

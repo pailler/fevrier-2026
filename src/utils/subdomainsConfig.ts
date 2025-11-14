@@ -4,7 +4,7 @@ export interface SubdomainInfo {
   title: string;
   description: string;
   keywords: string[];
-  category: 'ai' | 'productivity' | 'tools' | 'media' | 'developer';
+  category: 'ai' | 'productivity' | 'tools' | 'media' | 'formation';
   icon?: string;
   features: string[];
   useCases: string[];
@@ -269,6 +269,28 @@ export const subdomainsConfig: SubdomainInfo[] = [
       'Prototyper des objets rapidement',
       'Générer du contenu 3D pour le design',
       'Explorer la création 3D avec l\'IA'
+    ]
+  },
+  {
+    subdomain: 'code-learning.iahome.fr',
+    url: 'https://iahome.fr/code-learning',
+    title: 'Apprendre le Code - Initiation à la Programmation | IA Home',
+    description: 'Des exercices courts et amusants pour découvrir la programmation. Parfait pour les enfants de 8 à 12 ans ! Apprenez les bases du code de manière ludique et interactive.',
+    keywords: ['apprendre code', 'programmation enfants', 'initiation code', 'apprendre programmation', 'code learning', 'éducation code', 'programmation ludique'],
+    category: 'formation',
+    icon: '💻',
+    features: [
+      'Exercices interactifs et amusants',
+      'Progression adaptée aux enfants',
+      'Apprentissage des concepts de base',
+      'Interface colorée et intuitive',
+      'Exercices pratiques variés'
+    ],
+    useCases: [
+      'Initier les enfants à la programmation',
+      'Apprendre les bases du code de manière ludique',
+      'Développer la logique et la résolution de problèmes',
+      'Découvrir la programmation étape par étape'
     ]
   }
 ];

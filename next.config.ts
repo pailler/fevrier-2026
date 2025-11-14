@@ -48,19 +48,55 @@ const nextConfig: NextConfig = {
   },
   
   // Configuration pour les assets statiques
+  // Générer un buildId unique basé sur le timestamp pour éviter les conflits de cache
   generateBuildId: async () => {
-    return 'production-build';
+    // Utiliser le timestamp pour un buildId unique, mais stable pendant le même build
+    // Cela évite les problèmes de chunks webpack corrompus
+    if (process.env.BUILD_ID) {
+      return process.env.BUILD_ID;
+    }
+    // En production, utiliser un hash basé sur la date pour invalider le cache
+    const timestamp = Date.now();
+    return `build-${timestamp}`;
   },
   
   transpilePackages: ['@supabase/supabase-js'],
   
   // Exclure les dossiers problématiques du build
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, webpack }) => {
     if (!isServer) {
       config.resolve = config.resolve || {};
       config.resolve.alias = {
         ...config.resolve.alias,
       };
+      
+      // Améliorer la gestion des chunks pour éviter les erreurs "can't access property call"
+      config.optimization = config.optimization || {};
+      config.optimization.splitChunks = {
+        ...config.optimization.splitChunks,
+        chunks: 'all',
+        cacheGroups: {
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            priority: -10,
+            reuseExistingChunk: true,
+          },
+        },
+      };
+      
+      // Ajouter une gestion d'erreur pour les chunks manquants
+      config.plugins = config.plugins || [];
+      config.plugins.push(
+        new webpack.DefinePlugin({
+          'process.env.NEXT_BUILD_ID': JSON.stringify(process.env.BUILD_ID || 'unknown'),
+        })
+      );
     }
     // Exclure hunyuan2-spz du traitement webpack
     config.watchOptions = {

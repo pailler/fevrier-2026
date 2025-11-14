@@ -9,7 +9,7 @@ const supabase = createClient(
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔄 Création du module Code Learning dans Supabase...');
+    console.log('🔄 Création du module Apprendre le Code dans Supabase...');
 
     // Vérifier si le module existe déjà
     const { data: existingModule, error: checkError } = await supabase
@@ -19,10 +19,10 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingModule) {
-      console.log('✅ Module Code Learning existe déjà:', existingModule.id);
+      console.log('✅ Module Apprendre le Code existe déjà:', existingModule.id);
       return NextResponse.json({
         success: true,
-        message: 'Module Code Learning existe déjà',
+        message: 'Module Apprendre le Code existe déjà',
         moduleId: existingModule.id
       });
     }
@@ -54,17 +54,17 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    console.log('✅ Module Code Learning créé avec succès:', newModule.id);
+    console.log('✅ Module Apprendre le Code créé avec succès:', newModule.id);
 
     return NextResponse.json({
       success: true,
-      message: 'Module Code Learning créé avec succès',
+      message: 'Module Apprendre le Code créé avec succès',
       moduleId: newModule.id,
       module: newModule
     });
 
   } catch (error) {
-    console.error('❌ Erreur création module Code Learning:', error);
+    console.error('❌ Erreur création module Apprendre le Code:', error);
     return NextResponse.json({ 
       success: false, 
       error: 'Erreur interne du serveur',
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
     if (error || !module) {
       return NextResponse.json({
         exists: false,
-        message: 'Module Code Learning non trouvé'
+        message: 'Module Apprendre le Code non trouvé'
       });
     }
 
@@ -100,5 +100,7 @@ export async function GET(request: NextRequest) {
     }, { status: 500 });
   }
 }
+
+
 
 
