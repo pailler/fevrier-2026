@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Le Labo Numérique">
+    <title>Le Labo Numérique : avec ta carte Geek, choisis ta réservation, plonge dans le jeu !</title>
+    <script>
+        // Forcer le rechargement sans cache - méthode radicale
+        const cssCacheBuster = '?v=' + Date.now() + '_' + Math.random().toString(36).substr(2, 9) + '_user_name_glow';
+        document.write('<link rel="stylesheet" href="styles.css' + cssCacheBuster + '">');
+    </script>
+    <style>
+        .backend-badge {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #4caf50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .backend-badge.offline {
+            background: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Badge Backend -->
+        <div class="backend-badge" id="backendBadge">🔌 Backend</div>
+        
+        <!-- Header -->
+        <header class="app-header">
+            <h1>Le Labo Numérique : avec ta carte Geek, choisis ta réservation, plonge dans le jeu !</h1>
+            <div class="header-buttons">
+                <button class="btn-rules" id="rulesBtn" title="Voir les règles">📋 Les règles</button>
+                <button class="btn-active-games" id="activeGamesBtn" title="Voir les jeux en cours">🎮 Jeu en cours</button>
+                <button class="refresh-btn" id="refreshBtn" title="Actualiser">🔄</button>
+                <button class="btn-admin" id="adminBtn" title="Mode administrateur">🔐 Admin</button>
+            </div>
+        </header>
+
+        <!-- Liste des consoles -->
+        <main class="consoles-list" id="consolesList">
+            <!-- Les consoles seront générées dynamiquement par JavaScript -->
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <p>Chargement des consoles...</p>
+            </div>
+        </main>
+
+        <!-- Tableau des réservations -->
+        <section class="reservations-table-section" id="reservationsTableSection">
+            <div class="section-header">
+                <h2>📋 Liste des réservations</h2>
+                <p style="color: #666; font-size: 14px; margin-top: 5px;">Emprunts du matériel du Labo : en cours, à venir, annulés...</p>
+            </div>
+            <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button id="deleteSelectedPastReservationsBtn" class="btn" style="background: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: none;">
+                        🗑️ Supprimer les réservations passées sélectionnées
+                    </button>
+                    <span id="selectedCount" style="color: #666; font-size: 14px; display: none;"></span>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="reservations-table" id="reservationsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">
+                                <input type="checkbox" id="selectAllCheckbox" style="cursor: pointer; width: 18px; height: 18px;" title="Sélectionner toutes les réservations passées">
+                            </th>
+                            <th class="sortable" data-sort="console">
+                                Console <span class="sort-indicator"></span>
+                            </th>
+                            <th class="sortable" data-sort="joueur">
+                                Joueur <span class="sort-indicator"></span>
+                            </th>
+                            <th>Statut</th>
+                            <th>Début théorique</th>
+                            <th>Fin théorique</th>
+                            <th>Durée</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reservationsTableBody">
+                        <!-- Les réservations seront générées dynamiquement -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Règles du bien jouer ensemble -->
+        <footer class="rules-footer">
+            <div class="rules-container">
+                <div class="rules-header">
+                    <h3>🌟 Règles du bien jouer ensemble</h3>
+                </div>
+                <div class="rules-content">
+                    <div class="rule-item">
+                        <span class="rule-icon">👤</span>
+                        <span class="rule-text">Utilise ton <strong>vrai prénom (pas de pseudo)</strong> et le <strong>numéro de ta carte de Geek</strong>.</span>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-icon">✅</span>
+                        <span class="rule-text">Valide ta réservation quand tu commences, sinon elle sera annulée après 5 minutes.</span>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-icon">🎮</span>
+                        <span class="rule-text">Laisse la partie en cours se terminer.</span>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-icon">1️⃣</span>
+                        <span class="rule-text"><strong>Tu ne peux faire qu'une réservation à la fois</strong>.</span>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-icon">⏰</span>
+                        <span class="rule-text"><strong>Tu es limité à deux heures d'écran par jour</strong>.</span>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-icon">⏱️</span>
+                        <span class="rule-text">Rends la console à l'heure prévue.</span>
+                    </div>
+                <div class="rule-item">
+                    <span class="rule-icon">❓</span>
+                    <span class="rule-text">En cas de doute, demande de l'aide à la personne présente au labo.</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-icon">🔐</span>
+                    <span class="rule-text">L'animateur se réserve le droit de modifier ou d'annuler toute réservation en cours.</span>
+                </div>
+            </div>
+            </div>
+        </footer>
+
+        <!-- Modal de réservation -->
+        <div class="modal" id="reservationModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Réserver une console</h2>
+                    <button class="close-btn" id="closeModal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="console-info" id="consoleInfo"></div>
+                    <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+                        <strong>⏱️ Durée d'emprunt :</strong> Choisissez <strong>10 minutes</strong>, <strong>30 minutes</strong> ou <strong>1 heure</strong>. Les réservations non validées à l'heure de début seront annulées 5 minutes après l'heure initiale de la réservation.
+                    </div>
+                    <div style="background: #e3f2fd; border-left: 4px solid #2196F3; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+                        <strong>🔒 Code PIN :</strong> Crée un code PIN de 4 chiffres. Tu en auras besoin pour modifier ou supprimer ta réservation.
+                    </div>
+                    
+                    <form id="reservationForm">
+                        <div class="form-group">
+                            <label for="userName">Ton prénom :</label>
+                            <input type="text" id="userName" required placeholder="Entre ton prénom" style="width: 100%; margin-top: 8px;">
+                            <div style="margin-top: 15px;">
+                                <label for="scanNumber">📷 Numéro à scanner :</label>
+                                <div style="display: flex; gap: 10px; align-items: center; margin-top: 8px;">
+                                    <input type="text" id="scanNumber" required placeholder="Ex: 8012908" pattern="^8\d{6}$" maxlength="7" inputmode="numeric" style="font-size: 20px; padding: 12px; border: 2px solid #667eea; border-radius: 8px; flex: 1; font-family: 'Courier New', monospace; text-align: center; letter-spacing: 2px;">
+                                    <button type="button" id="scanBarcodeInFormBtn" class="btn btn-primary" style="padding: 12px 20px; white-space: nowrap; font-size: 16px; font-weight: bold;">
+                                        📷 Scanner
+                                    </button>
+                                </div>
+                                <small style="color: #666; font-size: 14px; display: block; margin-top: 5px;">Format requis : 7 chiffres commençant par 8. Numéros autorisés : 8012908, 8012909, 8012910, 8012911</small>
+                                <small id="scanNumberError" style="color: #f44336; font-size: 14px; display: none; margin-top: 5px;">❌ Format invalide : doit être 7 chiffres commençant par 8</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Durée d'emprunt :</label>
+                            <div class="duration-buttons-container" style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button type="button" class="btn btn-secondary duration-btn" data-duration="10" style="flex: 1;">⏱️ 10 min</button>
+                                <button type="button" class="btn btn-secondary duration-btn" data-duration="30" style="flex: 1;">⏱️ 30 min</button>
+                                <button type="button" class="btn btn-secondary duration-btn" data-duration="60" style="flex: 1;">⏱️ 1 heure</button>
+                            </div>
+                            <div id="reservationTimeInfo" style="margin-top: 15px; padding: 15px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196F3;">
+                                <p style="margin: 0; font-weight: bold; color: #1976d2;">📅 Réservation</p>
+                                <p style="margin: 5px 0 0 0; color: #555;" id="timeDetails">Sélectionnez une durée</p>
+                            </div>
+                            <input type="hidden" id="startDate" required>
+                            <input type="hidden" id="endDate" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="pin">🔒 Code PIN (4 chiffres) :</label>
+                            <input type="password" id="pin" required placeholder="1234" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" style="font-size: 24px; text-align: center; letter-spacing: 8px; font-family: 'Courier New', monospace;">
+                            <small style="color: #666; font-size: 14px; display: block; margin-top: 5px;">Ce code te permettra de modifier ou supprimer ta réservation</small>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelBtn">Annuler</button>
+                            <button type="submit" class="btn btn-primary" id="reserveBtn">Réserver</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de détails/annulation -->
+        <div class="modal" id="detailsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="detailsModalTitle">Détails de la console</h2>
+                    <button class="close-btn" id="closeDetailsModal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="console-details" id="consoleDetails"></div>
+                    <div class="reservation-details" id="reservationDetails"></div>
+                    <div class="form-actions" id="detailsActions"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Admin -->
+        <div class="modal" id="adminModal">
+            <div class="modal-content" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h2 id="adminModalTitle">🔐 Mode Administrateur</h2>
+                    <button class="close-btn" id="closeAdminModal">×</button>
+                </div>
+                <div class="modal-body" id="adminModalBody">
+                    <!-- Le contenu sera généré dynamiquement -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Règles -->
+        <div class="modal" id="rulesModal">
+            <div class="modal-content" style="max-width: 800px;">
+                <div class="modal-header">
+                    <h2>🌟 Règles du bien jouer ensemble</h2>
+                    <button class="close-btn" id="closeRulesModal">×</button>
+                </div>
+                <div class="modal-body" id="rulesModalBody">
+                    <div class="rules-content">
+                        <div class="rule-item">
+                            <span class="rule-icon">👤</span>
+                            <span class="rule-text">Utilise ton <strong>vrai prénom (pas de pseudo)</strong> et le <strong>numéro de ta carte de Geek</strong>.</span>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">✅</span>
+                            <span class="rule-text">Valide ta réservation quand tu commences, sinon elle sera annulée après 5 minutes.</span>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">🎮</span>
+                            <span class="rule-text">Laisse la partie en cours se terminer.</span>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">1️⃣</span>
+                            <span class="rule-text"><strong>Tu ne peux faire qu'une réservation à la fois</strong>.</span>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">⏰</span>
+                            <span class="rule-text"><strong>Tu es limité à deux heures d'écran par jour</strong>.</span>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">⏱️</span>
+                            <span class="rule-text">Rends la console à l'heure prévue.</span>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">❓</span>
+                            <span class="rule-text">En cas de doute, demande de l'aide à la personne présente au labo.</span>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">🔐</span>
+                            <span class="rule-text">L'animateur se réserve le droit de modifier ou d'annuler toute réservation en cours.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de scan code-barres -->
+        <div class="modal" id="barcodeModal">
+            <div class="modal-content" style="max-width: 90%;">
+                <div class="modal-header">
+                    <h2>📷 Scanner un code-barres</h2>
+                    <button class="close-btn" id="closeBarcodeModal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div id="barcodeScannerContainer" style="text-align: center;">
+                        <video id="barcodeVideo" autoplay playsinline style="width: 100%; max-width: 640px; border-radius: 10px; background: #000;"></video>
+                        <div style="margin-top: 20px;">
+                            <p style="color: #666; font-size: 16px; font-weight: 500;">Positionnez le code-barres devant la caméra</p>
+                            <div id="barcodeStatus" style="margin-top: 15px; font-weight: bold; color: #4caf50; font-size: 18px; min-height: 30px;"></div>
+                            <div id="barcodeDetectedNumber" style="margin-top: 10px; padding: 12px; background: #e8f5e9; border: 2px solid #4caf50; border-radius: 8px; font-size: 24px; font-weight: bold; color: #2e7d32; font-family: 'Courier New', monospace; letter-spacing: 2px; display: none;">
+                                <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Numéro détecté :</div>
+                                <div id="barcodeNumberValue" style="text-align: center;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast notifications -->
+        <div class="toast" id="toast"></div>
+    </div>
+
+    <script>
+        // Forcer le rechargement sans cache - méthode radicale
+        const jsCacheBuster = '?v=' + Date.now() + '_' + Math.random().toString(36).substr(2, 9) + '_console_icons';
+        document.write('<script src="barcode-scanner.js' + jsCacheBuster + '"><\/script>');
+        document.write('<script src="app-backend.js' + jsCacheBuster + '"><\/script>');
+    </script>
+    <script>
+        // Détecter l'URL de l'API automatiquement
+        function getApiUrl() {
+            // Si on est sur le domaine public, utiliser l'URL complète avec le même domaine
+            if (window.location.hostname.includes('regispailler.fr') || window.location.hostname.includes('iahome.fr')) {
+                const protocol = window.location.protocol; // 'https:' ou 'http:'
+                const hostname = window.location.hostname; // 'consoles.regispailler.fr'
+                return `${protocol}//${hostname}/api/health`;
+            }
+            // Sinon, utiliser localhost pour le développement local (backend sur port 5001)
+            return 'http://localhost:5001/api/health';
+        }
+        
+        // Vérifier le statut du backend au chargement
+        async function checkBackendStatus() {
+            const badge = document.getElementById('backendBadge');
+            if (!badge) return;
+            
+            try {
+                const apiUrl = getApiUrl();
+                console.log('🔍 [checkBackendStatus] Vérification backend:', apiUrl);
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    cache: 'no-cache',
+                    mode: 'cors'
+                });
+                
+                if (!response.ok) {
+                    console.error(`❌ [checkBackendStatus] HTTP ${response.status}: ${response.statusText}`);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                if (data.success) {
+                    badge.textContent = '✅ Backend Connecté';
+                    badge.classList.remove('offline');
+                } else {
+                    throw new Error('Backend non disponible');
+                }
+            } catch (error) {
+                console.error('❌ [checkBackendStatus] Erreur:', error);
+                badge.textContent = '❌ Backend Offline';
+                badge.classList.add('offline');
+            }
+        }
+        
+        // Vérifier toutes les 10 secondes
+        checkBackendStatus();
+        setInterval(checkBackendStatus, 10000);
+    </script>
+</body>
+</html>

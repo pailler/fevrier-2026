@@ -18,14 +18,21 @@ function LoginContent() {
 
     // Vérifier les erreurs dans l'URL
     const errorParam = searchParams.get('error');
-    if (errorParam) {
+    const messageParam = searchParams.get('message');
+    
+    // Ne pas afficher d'erreur pour session_expired car c'est géré par le message
+    if (errorParam && errorParam !== 'session_expired') {
       setError('Une erreur est survenue lors de la connexion. Veuillez réessayer.');
     }
 
     // Vérifier les messages de succès dans l'URL
-    const messageParam = searchParams.get('message');
+    // Si c'est une session expirée, le message est déjà dans messageParam
     if (messageParam) {
       setSuccess(decodeURIComponent(messageParam));
+      // Ne pas afficher d'erreur si on a un message de session expirée
+      if (errorParam === 'session_expired') {
+        setError(null);
+      }
     }
   }, [searchParams]);
 

@@ -1,10 +1,85 @@
 import { MetadataRoute } from 'next'
+import { createClient } from '@supabase/supabase-js'
+import { getSupabaseUrl, getSupabaseAnonKey } from '@/utils/supabaseConfig'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+const supabase = createClient(getSupabaseUrl(), getSupabaseAnonKey())
+
+// Fonction pour récupérer les articles de blog publiés
+async function getBlogPosts() {
+  try {
+    const { data, error } = await supabase
+      .from('blog_articles')
+      .select('slug, updated_at, published_at')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false })
+
+    if (error) {
+      console.error('Erreur lors de la récupération des articles de blog:', error)
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    console.error('Erreur lors de la récupération des articles de blog:', error)
+    return []
+  }
+}
+
+// Fonction pour récupérer les pages dynamiques publiées
+async function getDynamicPages() {
+  try {
+    const { data, error } = await supabase
+      .from('pages')
+      .select('slug, updated_at')
+      .eq('is_published', true)
+      .order('updated_at', { ascending: false })
+
+    if (error) {
+      console.error('Erreur lors de la récupération des pages dynamiques:', error)
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    console.error('Erreur lors de la récupération des pages dynamiques:', error)
+    return []
+  }
+}
+
+// Fonction pour récupérer les articles de formation publiés
+async function getFormationArticles() {
+  try {
+    const { data, error } = await supabase
+      .from('formation_articles')
+      .select('slug, updated_at, published_at')
+      .eq('is_published', true)
+      .order('published_at', { ascending: false })
+
+    if (error) {
+      console.error('Erreur lors de la récupération des articles de formation:', error)
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    console.error('Erreur lors de la récupération des articles de formation:', error)
+    return []
+  }
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://iahome.fr'
   const currentDate = new Date().toISOString()
 
-  return [
+  // Récupérer les pages dynamiques en parallèle
+  const [blogPosts, dynamicPages, formationArticles] = await Promise.all([
+    getBlogPosts(),
+    getDynamicPages(),
+    getFormationArticles(),
+  ])
+
+  // Pages statiques
+  const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: currentDate,
@@ -129,5 +204,32 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.3,
     },
   ]
+
+  // Pages dynamiques - Articles de blog
+  const blogSitemapEntries: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: post.updated_at || post.published_at || currentDate,
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }))
+
+  // Pages dynamiques - Pages de contenu
+  const pagesSitemapEntries: MetadataRoute.Sitemap = dynamicPages.map((page) => ({
+    url: `${baseUrl}/${page.slug}`,
+    lastModified: page.updated_at || currentDate,
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }))
+
+  // Pages dynamiques - Articles de formation
+  const formationSitemapEntries: MetadataRoute.Sitemap = formationArticles.map((article) => ({
+    url: `${baseUrl}/formation/${article.slug}`,
+    lastModified: article.updated_at || article.published_at || currentDate,
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }))
+
+  // Combiner toutes les pages
+  return [...staticPages, ...blogSitemapEntries, ...pagesSitemapEntries, ...formationSitemapEntries]
 }
 

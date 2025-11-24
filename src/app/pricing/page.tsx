@@ -37,7 +37,7 @@ export default function PricingPage() {
               Nos Offres IA Home
             </h1>
             <p className="text-xl md:text-2xl text-green-100 max-w-3xl mx-auto mb-6 animate-fade-in-up-delayed">
-              Système de tokens dégressif : plus vous achetez, plus vous économisez par token
+              Système de tokens dégressif : plus vous achetez, plus vous économisez par token. Tous nos outils sont accessibles directement depuis votre navigateur, sans téléchargement.
             </p>
             <div className="bg-white/10 backdrop-blur-sm border-2 border-white/30 rounded-lg p-6 max-w-4xl mx-auto animate-fade-in-up-delayed">
               <h2 className="text-2xl font-bold text-white mb-3">
@@ -48,7 +48,7 @@ export default function PricingPage() {
                   <span className="text-yellow-300 mr-2 text-xl">✓</span>
                   <div>
                     <div className="font-semibold text-white">12+ Outils IA</div>
-                    <div className="text-sm text-green-100">Une plateforme complète</div>
+                    <div className="text-sm text-green-100">Une plateforme complète, sans téléchargement</div>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -90,38 +90,26 @@ export default function PricingPage() {
                 </div>
                 <div className="text-center mb-4">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">Pack Gratuit</h3>
-                  <div className="text-3xl font-bold text-green-600 mb-1">0€</div>
-                  <p className="text-sm text-gray-600">400 tokens</p>
-                  <p className="text-xs text-gray-500">Offre de départ</p>
-                  
-                  {/* Dates de début et fin */}
-                  <div className="mt-3 p-3 bg-white/50 rounded-lg">
-                    <div className="text-xs text-gray-600 text-center">
-                      <div className="mb-1">
-                        <span className="font-medium">Début :</span> Immédiat
-                      </div>
-                      <div>
-                        <span className="font-medium">Fin :</span> 3 mois après activation
-                      </div>
-                    </div>
-                  </div>
+                  <div className="text-3xl font-bold text-green-600 mb-2">0€</div>
+                  <div className="text-2xl font-bold text-green-700 mb-1">400 tokens</div>
+                  <p className="text-xs text-gray-500">Offre de découverte</p>
                 </div>
                 <ul className="space-y-2 mb-6 text-sm">
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">Parfait pour tester</span>
+                    <span className="text-gray-600"><strong>Parfait</strong> pour tester le service</span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">4 utilisations IA (400 tokens)</span>
+                    <span className="text-gray-600"><strong>4 utilisations IA</strong> (100 tokens/use)</span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">20 utilisations Applis essentielles</span>
+                    <span className="text-gray-600"><strong>40 utilisations</strong> Apps essentielles</span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">3 mois d'utilisation</span>
+                    <span className="text-gray-600">Accès <strong>immédiat</strong></span>
                   </li>
                 </ul>
                 <Link
@@ -132,46 +120,43 @@ export default function PricingPage() {
                 </Link>
               </div>
 
-              {/* Pack Basique */}
-              <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+              {/* Pack Découverte */}
+              <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 relative">
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                  <span className="inline-block bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg border-2 border-white whitespace-nowrap">
+                    🔥 Promo de lancement
+                  </span>
+                </div>
                 <div className="text-center mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Pack Basique</h3>
-                  <div className="text-3xl font-bold text-blue-600 mb-1">14,99€</div>
-                  <p className="text-sm text-gray-600">1000 tokens</p>
-                  <p className="text-xs text-gray-500">0,015€ par token</p>
-                  
-                  {/* Dates de début et fin */}
-                  <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="text-xs text-gray-600 text-center">
-                      <div className="mb-1">
-                        <span className="font-medium">Début :</span> Immédiat
-                      </div>
-                      <div>
-                        <span className="font-medium">Fin :</span> 3 mois après activation
-                      </div>
-                    </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Pack Découverte</h3>
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className="text-lg text-gray-400 line-through">12,00€</span>
+                    <div className="text-3xl font-bold text-blue-600">9,99€</div>
                   </div>
+                  <div className="text-2xl font-bold text-blue-700 mb-1">1 500 tokens</div>
+                  <p className="text-xs text-gray-500">0,0066 €/token</p>
+                  <p className="text-xs text-green-600 font-medium">Économie de <strong>34%</strong> vs tarif de base</p>
                 </div>
                 <ul className="space-y-2 mb-6 text-sm">
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">Idéal pour débuter</span>
+                    <span className="text-gray-600">Idéal pour les <strong>petits projets</strong></span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">10 utilisations IA</span>
+                    <span className="text-gray-600"><strong>15 utilisations IA</strong></span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">100 utilisations Applis essentielles</span>
+                    <span className="text-gray-600"><strong>150 utilisations</strong> Apps essentielles</span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">3 mois d'utilisation</span>
+                    <span className="text-gray-600">Activation <strong>instantanée</strong></span>
                   </li>
                 </ul>
                 <StripeButton 
-                  packageType="basic"
+                  packageType="discovery"
                   className="block w-full bg-gray-600 hover:bg-gray-700 text-white text-center px-4 py-2 rounded-lg font-medium transition-colors text-sm"
                 >
                   Acheter
@@ -180,46 +165,37 @@ export default function PricingPage() {
 
               {/* Pack Standard */}
               <div className="bg-white rounded-lg shadow-lg p-6 border-2 border-blue-600 relative">
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-medium">
-                    Populaire
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                  <span className="inline-block bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg border-2 border-white whitespace-nowrap">
+                    🔥 Le plus populaire
                   </span>
                 </div>
                 <div className="text-center mb-4">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">Pack Standard</h3>
-                  <div className="text-3xl font-bold text-blue-600 mb-1">29,99€</div>
-                  <p className="text-sm text-gray-600">3000 tokens</p>
-                  <p className="text-xs text-gray-500">0,010€ par token</p>
-                  <p className="text-xs text-green-600 font-medium">33% d'économie</p>
-                  
-                  {/* Dates de début et fin */}
-                  <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="text-xs text-gray-600 text-center">
-                      <div className="mb-1">
-                        <span className="font-medium">Début :</span> Immédiat
-                      </div>
-                      <div>
-                        <span className="font-medium">Fin :</span> 3 mois après activation
-                      </div>
-                    </div>
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className="text-lg text-gray-400 line-through">24,00€</span>
+                    <div className="text-3xl font-bold text-blue-600">19,99€</div>
                   </div>
+                  <div className="text-2xl font-bold text-blue-700 mb-1">5 000 tokens</div>
+                  <p className="text-xs text-gray-500">0,004 €/token</p>
+                  <p className="text-xs text-green-600 font-medium">Économie de <strong>47%</strong> vs tarif de base</p>
                 </div>
                 <ul className="space-y-2 mb-6 text-sm">
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">Le plus populaire</span>
+                    <span className="text-gray-600"><strong>Parfait</strong> pour un usage régulier</span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">30 utilisations IA</span>
+                    <span className="text-gray-600"><strong>50 utilisations IA</strong></span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">300 utilisations Applis essentielles</span>
+                    <span className="text-gray-600"><strong>500 utilisations</strong> Apps essentielles</span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">3 mois d'utilisation</span>
+                    <span className="text-gray-600"><strong>Meilleur</strong> rapport qualité-prix</span>
                   </li>
                 </ul>
                 <StripeButton 
@@ -230,52 +206,49 @@ export default function PricingPage() {
                 </StripeButton>
               </div>
 
-              {/* Pack Entreprise */}
-              <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+              {/* Pack Pro */}
+              <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 relative">
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                  <span className="inline-block bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg border-2 border-white whitespace-nowrap">
+                    🔥 Offre exclusive
+                  </span>
+                </div>
                 <div className="text-center mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Pack Entreprise</h3>
-                  <div className="text-3xl font-bold text-blue-600 mb-1">49,99€</div>
-                  <p className="text-sm text-gray-600">20000 tokens</p>
-                  <p className="text-xs text-gray-500">0,0025€ par token</p>
-                  <p className="text-xs text-green-600 font-medium">83% d'économie</p>
-                  
-                  {/* Dates de début et fin */}
-                  <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="text-xs text-gray-600 text-center">
-                      <div className="mb-1">
-                        <span className="font-medium">Début :</span> Immédiat
-                      </div>
-                      <div>
-                        <span className="font-medium">Fin :</span> 3 mois après activation
-                      </div>
-                    </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Pack Pro</h3>
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className="text-lg text-gray-400 line-through">75,00€</span>
+                    <div className="text-3xl font-bold text-blue-600">59,99€</div>
                   </div>
+                  <div className="text-2xl font-bold text-blue-700 mb-1">20 000 tokens</div>
+                  <p className="text-xs text-gray-500">0,003 €/token</p>
+                  <p className="text-xs text-green-600 font-medium">Économie de <strong>55%</strong> vs tarif de base</p>
                 </div>
                 <ul className="space-y-2 mb-6 text-sm">
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">Pour les équipes</span>
+                    <span className="text-gray-600">Pour les utilisateurs <strong>avancés</strong></span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">200 utilisations IA</span>
+                    <span className="text-gray-600"><strong>200 utilisations IA</strong></span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">2000 utilisations Applis essentielles</span>
+                    <span className="text-gray-600"><strong>2 000 utilisations</strong> Apps essentielles</span>
                   </li>
                   <li className="flex items-center">
                     <span className="text-green-500 mr-2">✓</span>
-                    <span className="text-gray-600">3 mois d'utilisation</span>
+                    <span className="text-gray-600">Support <strong>prioritaire</strong> inclus</span>
                   </li>
                 </ul>
                 <StripeButton 
-                  packageType="enterprise"
+                  packageType="pro"
                   className="block w-full bg-gray-600 hover:bg-gray-700 text-white text-center px-4 py-2 rounded-lg font-medium transition-colors text-sm"
                 >
                   Acheter
                 </StripeButton>
               </div>
+
             </div>
 
             {/* Coûts par application */}
@@ -290,14 +263,14 @@ export default function PricingPage() {
                   <div className="text-gray-600">(StableDiffusion, ComfyUI, etc.)</div>
                 </div>
                 <div className="bg-white rounded-lg p-4 text-center">
-                  <div className="text-lg font-bold text-blue-600 mb-1">10 tokens</div>
-                  <div className="text-gray-600">Applis essentielles</div>
-                  <div className="text-gray-600">(MeTube, PDF+, LibreSpeed, etc.)</div>
+                  <div className="text-lg font-bold text-blue-600 mb-1">100 tokens</div>
+                  <div className="text-gray-600">QR Codes dynamiques</div>
+                  <div className="text-gray-600">(Génération avec analytics)</div>
                 </div>
                 <div className="bg-white rounded-lg p-4 text-center">
                   <div className="text-lg font-bold text-blue-600 mb-1">10 tokens</div>
-                  <div className="text-gray-600">QR Codes</div>
-                  <div className="text-gray-600">PsiTransfer</div>
+                  <div className="text-gray-600">Autres applications</div>
+                  <div className="text-gray-600">(MeTube, PDF+, LibreSpeed, PsiTransfer, etc.)</div>
                 </div>
               </div>
             </div>
@@ -309,19 +282,22 @@ export default function PricingPage() {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                 <div className="bg-white rounded-lg p-4 text-center">
-                  <div className="text-lg font-bold text-gray-700 mb-1">Basique</div>
-                  <div className="text-gray-600">Prix de référence</div>
-                  <div className="text-blue-600 font-semibold">0,015€/token</div>
+                  <div className="text-lg font-bold text-gray-700 mb-1">Découverte</div>
+                  <div className="text-red-600 font-semibold">PROMO -17%</div>
+                  <div className="text-blue-600 font-semibold">0,0066€/token</div>
+                  <div className="text-xs text-gray-500 line-through mt-1">0,008€/token</div>
                 </div>
                 <div className="bg-white rounded-lg p-4 text-center">
                   <div className="text-lg font-bold text-gray-700 mb-1">Standard</div>
-                  <div className="text-green-600 font-semibold">33% d'économie</div>
-                  <div className="text-blue-600 font-semibold">0,010€/token</div>
+                  <div className="text-red-600 font-semibold">PROMO -17%</div>
+                  <div className="text-blue-600 font-semibold">0,004€/token</div>
+                  <div className="text-xs text-gray-500 line-through mt-1">0,0048€/token</div>
                 </div>
                 <div className="bg-white rounded-lg p-4 text-center">
-                  <div className="text-lg font-bold text-gray-700 mb-1">Entreprise</div>
-                  <div className="text-green-600 font-semibold">83% d'économie</div>
-                  <div className="text-blue-600 font-semibold">0,0025€/token</div>
+                  <div className="text-lg font-bold text-gray-700 mb-1">Pro</div>
+                  <div className="text-red-600 font-semibold">PROMO -20%</div>
+                  <div className="text-blue-600 font-semibold">0,003€/token</div>
+                  <div className="text-xs text-gray-500 line-through mt-1">0,00375€/token</div>
                 </div>
               </div>
             </div>

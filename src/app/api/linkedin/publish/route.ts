@@ -257,7 +257,7 @@ export async function GET(request: NextRequest) {
       .eq('post_id', postId)
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle(); // Utiliser maybeSingle() pour éviter l'erreur si aucun analytics
 
     return NextResponse.json({
       success: true,

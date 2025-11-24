@@ -13,10 +13,9 @@ export default function PaymentSuccessPage() {
   } | null>(null);
 
   const packageDetails = {
-    basic: { tokens: 100, price: 4.99, name: 'Pack Basique' },
-    standard: { tokens: 500, price: 19.99, name: 'Pack Standard' },
-    premium: { tokens: 1000, price: 29.99, name: 'Pack Premium' },
-    enterprise: { tokens: 10000, price: 199, name: 'Pack Entreprise' }
+    discovery: { tokens: 1500, price: 9.99, name: 'Pack Découverte' },
+    standard: { tokens: 5000, price: 19.99, name: 'Pack Standard' },
+    pro: { tokens: 20000, price: 59.99, name: 'Pack Pro' }
   };
 
   useEffect(() => {

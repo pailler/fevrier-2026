@@ -36,6 +36,9 @@ export async function POST(request: NextRequest) {
       case 'admin_alert':
         result = await notificationService.sendAdminAlert(email, 'Test système', 'Ceci est un test', 'medium');
         break;
+      case 'user_no_module_activated':
+        result = await notificationService.sendNoModuleActivatedNotification(email, 'Utilisateur Test');
+        break;
       default:
         result = await notificationService.sendTestEmail(email);
     }

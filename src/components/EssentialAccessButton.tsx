@@ -137,9 +137,14 @@ export default function EssentialAccessButton({
       }
       
       // Pour les routes internes (commençant par /), rediriger directement
+      // Exception : code-learning s'ouvre toujours dans un nouvel onglet
       if (moduleUrl.startsWith('/')) {
         console.log(`🔗 ${moduleTitle}: Accès route interne:`, moduleUrl);
-        window.location.href = moduleUrl;
+        if (moduleId === 'code-learning') {
+          window.open(moduleUrl, '_blank');
+        } else {
+          window.location.href = moduleUrl;
+        }
         onAccessGranted?.(moduleUrl);
       } else {
         // Pour les sous-domaines externes, ajouter le token

@@ -51,7 +51,7 @@ export default function CodeLearningPage() {
           <Breadcrumb 
             items={[
               { label: 'Accueil', href: '/' },
-              { label: 'Apprendre le code' }
+              { label: 'Apprendre le code informatique' }
             ]}
           />
         </div>

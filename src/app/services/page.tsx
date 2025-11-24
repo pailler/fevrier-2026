@@ -123,6 +123,8 @@ export default function ServicesPage() {
                 <p className="text-xl text-gray-700 mb-6">
                   Découvrez tous nos services disponibles sur IA Home. Des outils d'intelligence artificielle 
                   aux applications de productivité, explorez notre écosystème complet.
+                  <br />
+                  <span className="text-blue-700 font-semibold">Tous nos services sont des web-services accessibles directement depuis votre navigateur, sans téléchargement ni installation.</span>
                 </p>
               </div>
               
@@ -281,6 +283,12 @@ export default function ServicesPage() {
                 </a>
               );
             })}
+            <a
+              href="#developpement"
+              className="px-4 py-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow text-gray-700 hover:text-blue-600"
+            >
+              💻 Développement
+            </a>
           </nav>
 
           {/* Liste des services par catégorie */}
@@ -323,6 +331,9 @@ export default function ServicesPage() {
 
                       <p className="text-gray-600 mb-4 line-clamp-3">
                         {service.description}
+                        {!service.description?.toLowerCase().includes('sans téléchargement') && !service.description?.toLowerCase().includes('sans installation') && (
+                          <span className="text-gray-500"> • Sans téléchargement</span>
+                        )}
                       </p>
 
                       <div className="mb-4">
@@ -394,6 +405,97 @@ export default function ServicesPage() {
               </section>
             );
           })}
+
+          {/* Section Développement */}
+          <section id="developpement" className="mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+              <span className="text-4xl">💻</span>
+              Développement
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl">💻</span>
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-1">
+                        Services de Développement
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Solutions sur mesure
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-gray-600 mb-4">
+                  Nous proposons des développements simples et personnalisés pour répondre à vos besoins spécifiques. Des solutions web modernes et efficaces.
+                </p>
+
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                    Nos services :
+                  </h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li className="flex items-start">
+                      <span className="text-green-500 mr-2">✓</span>
+                      Système de réservation de matériel
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-500 mr-2">✓</span>
+                      Site web sur mesure
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-500 mr-2">✓</span>
+                      Portfolio professionnel
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-500 mr-2">✓</span>
+                      Applications web simples
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                    Cas d'usage :
+                  </h4>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li className="flex items-start">
+                      <span className="text-blue-500 mr-2">→</span>
+                      Gérer la réservation de matériel pour votre entreprise
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-500 mr-2">→</span>
+                      Présenter vos réalisations avec un portfolio professionnel
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="flex gap-2 flex-wrap mb-4">
+                  <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                    développement web
+                  </span>
+                  <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                    réservation
+                  </span>
+                  <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                    portfolio
+                  </span>
+                  <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                    sur mesure
+                  </span>
+                </div>
+
+                <Link
+                  href="/contact"
+                  className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                >
+                  Nous contacter →
+                </Link>
+              </div>
+            </div>
+          </section>
 
           {/* Section informative */}
           <section className="mt-16 bg-white rounded-xl shadow-sm border border-gray-200 p-8">

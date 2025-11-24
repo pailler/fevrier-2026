@@ -101,36 +101,93 @@ function AuthCallbackContent() {
           
         setStatus('Finalisation de votre connexion...');
         
+        // Récupérer le profil complet depuis la base de données pour avoir toutes les données
+        console.log('🔄 Récupération du profil complet depuis la base de données...');
+        const profileResponse = await fetch('/api/auth/get-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user.id,
+            email: user.email
+          })
+        });
+
+        let profileData = null;
+        if (profileResponse.ok) {
+          profileData = await profileResponse.json();
+          console.log('✅ Profil récupéré:', profileData);
+        } else {
+          console.warn('⚠️ Impossible de récupérer le profil, utilisation des données Supabase');
+          // Utiliser les données Supabase en fallback
+          profileData = {
+            id: user.id,
+            email: user.email,
+            full_name: user.user_metadata?.full_name || user.email,
+            role: 'user',
+            is_active: true,
+            email_verified: true
+          };
+        }
+
+        // Générer un JWT token comme pour les connexions classiques
+        console.log('🔄 Génération du token JWT...');
+        const tokenResponse = await fetch('/api/auth/generate-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: profileData.id || user.id,
+            email: profileData.email || user.email,
+            role: profileData.role || 'user'
+          })
+        });
+
+        let jwtToken = null;
+        if (tokenResponse.ok) {
+          const tokenData = await tokenResponse.json();
+          jwtToken = tokenData.token;
+          console.log('✅ Token JWT généré');
+        } else {
+          console.error('❌ Erreur lors de la génération du token JWT');
+          // Ne pas bloquer la connexion, utiliser le token Supabase en fallback
+          jwtToken = session?.access_token || null;
+        }
+        
         // Initialiser la session dans user_sessions pour le suivi de durée (non bloquant)
         fetch('/api/initialize-session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            userId: user.id,
-            userEmail: user.email
+            userId: profileData.id || user.id,
+            userEmail: profileData.email || user.email
           })
         }).catch(initError => {
           console.warn('⚠️ Erreur lors de l\'initialisation de la session (non bloquant):', initError);
         });
         
-        // Créer les données utilisateur pour localStorage
+        // Créer les données utilisateur pour localStorage (format identique aux connexions classiques)
         const userData = {
-          id: user.id,
-          email: user.email,
-          name: user.user_metadata?.full_name || user.email,
+          id: profileData.id || user.id,
+          email: profileData.email || user.email,
+          full_name: profileData.full_name || user.user_metadata?.full_name || user.email,
+          role: profileData.role || 'user',
+          is_active: profileData.is_active !== false,
+          email_verified: profileData.email_verified !== false,
           avatar_url: user.user_metadata?.avatar_url || null
         };
         
-        // Stocker dans localStorage
+        // Stocker dans localStorage (format identique aux connexions classiques)
         try {
           localStorage.setItem('user_data', JSON.stringify(userData));
-          if (session?.access_token) {
-            localStorage.setItem('auth_token', session.access_token);
+          if (jwtToken) {
+            localStorage.setItem('auth_token', jwtToken);
           }
+          // Stocker la date de début de session pour vérifier l'expiration
+          localStorage.setItem('session_start_time', Date.now().toString());
           
           // Déclencher l'événement de connexion
           window.dispatchEvent(new Event('userLoggedIn'));
           console.log('✅ Utilisateur stocké dans localStorage:', userData.email);
+          console.log('✅ Token JWT stocké');
         } catch (storageError) {
           console.error('❌ Erreur lors du stockage dans localStorage:', storageError);
           // Ne pas bloquer la connexion pour une erreur de localStorage

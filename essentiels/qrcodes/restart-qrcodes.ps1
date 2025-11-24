@@ -60,3 +60,6 @@ docker-compose logs -f qrcodes
 
 
 
+
+
+

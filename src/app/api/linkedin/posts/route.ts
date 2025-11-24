@@ -41,19 +41,39 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Récupérer les analytics pour chaque post
+    // Récupérer les analytics pour chaque post et normaliser les données
     const postsWithAnalytics = await Promise.all(
-      (posts || []).map(async (post) => {
+      (posts || []).map(async (post: any) => {
         const { data: analytics } = await supabaseAdmin
           .from('linkedin_analytics')
           .select('*')
           .eq('post_id', post.id)
           .order('created_at', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle(); // Utiliser maybeSingle() pour éviter l'erreur si aucun analytics
 
+        // Normaliser les données pour garantir que tous les champs sont valides
+        // S'assurer que url est toujours string | null (jamais undefined)
+        const normalizedUrl = (post.url && typeof post.url === 'string') ? post.url : null;
+        const normalizedExcerpt = (post.excerpt && typeof post.excerpt === 'string') ? post.excerpt : null;
+        const normalizedImageUrl = (post.image_url && typeof post.image_url === 'string') ? post.image_url : null;
+        
         return {
-          ...post,
+          id: post.id || '',
+          title: post.title || '',
+          content: post.content || '',
+          excerpt: normalizedExcerpt,
+          url: normalizedUrl, // Toujours string | null, jamais undefined
+          image_url: normalizedImageUrl,
+          type: (post.type === 'blog' || post.type === 'formation') ? post.type : 'blog',
+          source_id: post.source_id || null,
+          is_published: Boolean(post.is_published),
+          published_at: post.published_at || null,
+          scheduled_at: post.scheduled_at || null,
+          engagement: Number(post.engagement) || 0,
+          linkedin_post_id: post.linkedin_post_id || null,
+          error_message: post.error_message || null,
+          created_at: post.created_at || new Date().toISOString(),
           analytics: analytics || null
         };
       })
@@ -101,9 +121,9 @@ export async function POST(request: NextRequest) {
 
     const { title, content, url, image_url, type, source_id } = postData;
 
-    if (!title || !content || !url || !type) {
+    if (!title || !content || !type) {
       return NextResponse.json(
-        { success: false, error: 'title, content, url et type sont requis' },
+        { success: false, error: 'title, content et type sont requis' },
         { status: 400 }
       );
     }

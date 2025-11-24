@@ -1,0 +1,37 @@
+[
+  {
+    "id": "1",
+    "name": "PlayStation 4 - Console 1",
+    "type": "PlayStation 4",
+    "isAvailable": true,
+    "currentReservation": null
+  },
+  {
+    "id": "2",
+    "name": "PlayStation 4 - Console 2",
+    "type": "PlayStation 4",
+    "isAvailable": true,
+    "currentReservation": null
+  },
+  {
+    "id": "3",
+    "name": "Xbox One - Console 1",
+    "type": "Xbox One",
+    "isAvailable": true,
+    "currentReservation": null
+  },
+  {
+    "id": "4",
+    "name": "Nintendo Switch - Console 1",
+    "type": "Nintendo Switch",
+    "isAvailable": true,
+    "currentReservation": null
+  },
+  {
+    "id": "5",
+    "name": "PlayStation 5 - Console 1",
+    "type": "PlayStation 5",
+    "isAvailable": true,
+    "currentReservation": null
+  }
+]

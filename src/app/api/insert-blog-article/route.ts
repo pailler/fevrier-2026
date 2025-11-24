@@ -58,11 +58,11 @@ export async function POST(request: NextRequest) {
       const linkedinResult = await createLinkedInPost({
         title: article.title,
         content: article.content,
-        excerpt: article.excerpt,
-        url: articleUrl,
-        image_url: article.image_url || undefined,
+        excerpt: article.excerpt || null,
+        url: articleUrl || null,
+        image_url: article.image_url || null,
         type: 'blog',
-        source_id: data.id
+        source_id: data.id || null
       });
 
       if (linkedinResult.success) {

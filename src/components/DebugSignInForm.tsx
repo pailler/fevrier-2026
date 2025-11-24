@@ -72,6 +72,8 @@ export default function DebugSignInForm({
         // Stocker le token et les données utilisateur
         localStorage.setItem('auth_token', result.token);
         localStorage.setItem('user_data', JSON.stringify(result.user));
+        // Stocker la date de début de session pour vérifier l'expiration
+        localStorage.setItem('session_start_time', Date.now().toString());
         
         console.log('💾 Token stocké dans localStorage');
         console.log('👤 Données utilisateur:', result.user);

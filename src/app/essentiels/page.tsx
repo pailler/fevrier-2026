@@ -281,7 +281,7 @@ export default function Essentiels() {
                 Outils essentiels IAHome
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Les outils indispensables pour votre productivité : téléchargement, transfert, conversion et test de vitesse.
+                Les outils indispensables pour votre productivité : téléchargement, transfert, conversion et test de vitesse. Sans téléchargement.
               </p>
               
               {/* Barre de recherche et bouton Mes applis */}

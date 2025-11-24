@@ -7,26 +7,32 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 // Configuration des packages de tokens
 const TOKEN_PACKAGES = {
-  basic: {
-    name: 'Pack Basique',
-    price: 1499, // 14,99€ en centimes
-    tokens: 1000,
-    pricePerToken: 0.01499,
-    description: 'Idéal pour débuter'
+  discovery: {
+    name: 'Pack Découverte',
+    price: 999, // 9,99€ en centimes (PROMO)
+    originalPrice: 1200, // 12,00€ prix normal
+    tokens: 1500,
+    pricePerToken: 0.0066,
+    description: 'Idéal pour les petits projets',
+    isPromo: true
   },
   standard: {
     name: 'Pack Standard',
-    price: 2999, // 29,99€ en centimes
-    tokens: 3000,
-    pricePerToken: 0.009996,
-    description: 'Le plus populaire'
+    price: 1999, // 19,99€ en centimes (PROMO)
+    originalPrice: 2400, // 24,00€ prix normal
+    tokens: 5000,
+    pricePerToken: 0.004,
+    description: 'Le plus populaire',
+    isPromo: true
   },
-  enterprise: {
-    name: 'Pack Entreprise',
-    price: 4999, // 49,99€ en centimes
+  pro: {
+    name: 'Pack Pro',
+    price: 5999, // 59,99€ en centimes (PROMO)
+    originalPrice: 7500, // 75,00€ prix normal
     tokens: 20000,
-    pricePerToken: 0.0024995,
-    description: 'Pour les équipes'
+    pricePerToken: 0.003,
+    description: 'Pour les utilisateurs avancés',
+    isPromo: true
   }
 };
 

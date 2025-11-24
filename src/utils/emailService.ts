@@ -146,16 +146,21 @@ export class EmailService {
         return false;
       }
 
-      // Enregistrer le log de succès
-      await supabase
-        .from('notification_logs')
-        .insert({
-          event_type: eventType,
-          user_email: userEmail,
-          event_data: templateData,
-          email_sent: true,
-          email_sent_at: new Date().toISOString()
-        });
+      // Enregistrer le log de succès (sans échouer si la table n'existe pas)
+      try {
+        await supabase
+          .from('notification_logs')
+          .insert({
+            event_type: eventType,
+            user_email: userEmail,
+            event_data: templateData,
+            email_sent: true,
+            email_sent_at: new Date().toISOString()
+          });
+      } catch (logError) {
+        // Ignorer les erreurs de log, l'email a été envoyé avec succès
+        console.log('⚠️ Impossible d\'enregistrer le log (non bloquant):', logError);
+      }
 
       console.log(`✅ Notification ${eventType} envoyée à ${userEmail}`);
       return true;
@@ -170,15 +175,20 @@ export class EmailService {
           getSupabaseServiceRoleKey()
         );
 
-        await supabase
-          .from('notification_logs')
-          .insert({
-            event_type: eventType,
-            user_email: userEmail,
-            event_data: templateData,
-            email_sent: false,
-            email_error: error instanceof Error ? error.message : 'Erreur inconnue'
-          });
+        try {
+          await supabase
+            .from('notification_logs')
+            .insert({
+              event_type: eventType,
+              user_email: userEmail,
+              event_data: templateData,
+              email_sent: false,
+              email_error: error instanceof Error ? error.message : 'Erreur inconnue'
+            });
+        } catch (logInsertError) {
+          // Ignorer les erreurs de log
+          console.log('⚠️ Impossible d\'enregistrer le log d\'erreur (non bloquant):', logInsertError);
+        }
       } catch (logError) {
         console.error('Erreur lors de l\'enregistrement du log:', logError);
       }

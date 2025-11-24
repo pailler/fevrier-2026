@@ -58,6 +58,9 @@ export default function LargeFilesPage() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<'files' | 'types'>('files');
+  const [sortBy, setSortBy] = useState<'size' | 'name' | 'modified'>('size');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchData = async (isRefresh = false) => {
     try {
@@ -87,20 +90,21 @@ export default function LargeFilesPage() {
   const handleRefresh = async () => {
     try {
       setRefreshing(true);
+      setError(null);
       const response = await fetch('/api/admin/large-files', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'refresh' })
+        body: JSON.stringify({ action: 'recalculate' })
       });
       const result = await response.json();
 
       if (result.success) {
         setData(result.data);
       } else {
-        setError(result.error || 'Erreur lors de l\'actualisation');
+        setError(result.error || 'Erreur lors du recalcul');
       }
     } catch (err) {
-      setError('Erreur lors de l\'actualisation: ' + (err instanceof Error ? err.message : 'Erreur inconnue'));
+      setError('Erreur lors du recalcul: ' + (err instanceof Error ? err.message : 'Erreur inconnue'));
     } finally {
       setRefreshing(false);
     }
@@ -127,6 +131,52 @@ export default function LargeFilesPage() {
     if (['.css', '.scss', '.sass'].includes(ext)) return '🎨';
     if (['.html', '.htm'].includes(ext)) return '🌐';
     return '📄';
+  };
+
+  const getSortedAndFilteredFiles = () => {
+    if (!data) return [];
+    
+    let files = [...data.topFiles];
+    
+    // Filtrer par recherche
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      files = files.filter(file => 
+        file.path.toLowerCase().includes(query) ||
+        file.extension.toLowerCase().includes(query)
+      );
+    }
+    
+    // Trier
+    files.sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortBy) {
+        case 'size':
+          comparison = a.size - b.size;
+          break;
+        case 'name':
+          comparison = a.path.localeCompare(b.path);
+          break;
+        case 'modified':
+          comparison = new Date(a.modified).getTime() - new Date(b.modified).getTime();
+          break;
+      }
+      
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+    
+    return files;
+  };
+
+  const getSortedFileTypes = () => {
+    if (!data) return [];
+    return [...data.fileTypes].sort((a, b) => {
+      if (sortBy === 'size') {
+        return sortOrder === 'asc' ? a.totalSize - b.totalSize : b.totalSize - a.totalSize;
+      }
+      return sortOrder === 'asc' ? a.count - b.count : b.count - a.count;
+    });
   };
 
   if (loading) {
@@ -187,17 +237,18 @@ export default function LargeFilesPage() {
               <button
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                title="Recalculer les tailles de tous les fichiers"
               >
                 {refreshing ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Actualisation...</span>
+                    <span>Recalcul en cours...</span>
                   </>
                 ) : (
                   <>
                     <span>🔄</span>
-                    <span>Actualiser</span>
+                    <span>Recalculer les tailles</span>
                   </>
                 )}
               </button>
@@ -323,44 +374,92 @@ export default function LargeFilesPage() {
           <div className="p-6">
             {activeTab === 'files' && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Top {data.topFiles.length} des gros fichiers</h3>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Top {data.topFiles.length} des gros fichiers
+                    {searchQuery && ` (${getSortedAndFilteredFiles().length} résultats)`}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    <input
+                      type="text"
+                      placeholder="Rechercher un fichier..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as 'size' | 'name' | 'modified')}
+                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="size">Trier par taille</option>
+                      <option value="name">Trier par nom</option>
+                      <option value="modified">Trier par date</option>
+                    </select>
+                    <button
+                      onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+                      title={sortOrder === 'asc' ? 'Ordre croissant' : 'Ordre décroissant'}
+                    >
+                      {sortOrder === 'asc' ? '↑' : '↓'}
+                    </button>
+                  </div>
+                </div>
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fichier</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Taille</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                            onClick={() => { setSortBy('name'); setSortOrder(sortBy === 'name' && sortOrder === 'asc' ? 'desc' : 'asc'); }}>
+                          Fichier {sortBy === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                            onClick={() => { setSortBy('size'); setSortOrder(sortBy === 'size' && sortOrder === 'asc' ? 'desc' : 'asc'); }}>
+                          Taille {sortBy === 'size' && (sortOrder === 'asc' ? '↑' : '↓')}
+                        </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modifié</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                            onClick={() => { setSortBy('modified'); setSortOrder(sortBy === 'modified' && sortOrder === 'asc' ? 'desc' : 'asc'); }}>
+                          Modifié {sortBy === 'modified' && (sortOrder === 'asc' ? '↑' : '↓')}
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {data.topFiles.map((file, index) => (
-                        <tr key={file.path} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <span className="text-lg mr-2">{getFileIcon(file.extension)}</span>
-                              <div>
-                                <div className="text-sm font-medium text-gray-900 truncate max-w-md" title={file.path}>
-                                  {file.path}
-                                </div>
-                                <div className="text-sm text-gray-500">#{index + 1}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm font-medium text-gray-900">{file.sizeFormatted}</span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                              {file.extension || 'sans extension'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {formatDate(file.modified)}
+                      {getSortedAndFilteredFiles().length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                            {searchQuery ? 'Aucun fichier ne correspond à votre recherche' : 'Aucun fichier trouvé'}
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        getSortedAndFilteredFiles().map((file, index) => (
+                          <tr key={file.path} className="hover:bg-gray-50">
+                            <td className="px-6 py-4">
+                              <div className="flex items-center">
+                                <span className="text-lg mr-2">{getFileIcon(file.extension)}</span>
+                                <div className="min-w-0">
+                                  <div className="text-sm font-medium text-gray-900 truncate max-w-md" title={file.fullPath}>
+                                    {file.path}
+                                  </div>
+                                  <div className="text-xs text-gray-500">#{index + 1}</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className="text-sm font-medium text-gray-900">{file.sizeFormatted}</span>
+                              <div className="text-xs text-gray-500">{file.size.toLocaleString()} bytes</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                {file.extension || 'sans extension'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {formatDate(file.modified)}
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -369,7 +468,26 @@ export default function LargeFilesPage() {
 
             {activeTab === 'types' && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Types de fichiers par taille totale</h3>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Types de fichiers par taille totale</h3>
+                  <div className="flex gap-2">
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as 'size' | 'name' | 'modified')}
+                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="size">Trier par taille totale</option>
+                      <option value="name">Trier par nombre</option>
+                    </select>
+                    <button
+                      onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+                      title={sortOrder === 'asc' ? 'Ordre croissant' : 'Ordre décroissant'}
+                    >
+                      {sortOrder === 'asc' ? '↑' : '↓'}
+                    </button>
+                  </div>
+                </div>
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
@@ -381,7 +499,7 @@ export default function LargeFilesPage() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {data.fileTypes.map((type, index) => (
+                      {getSortedFileTypes().map((type, index) => (
                         <tr key={type.extension} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
@@ -396,6 +514,7 @@ export default function LargeFilesPage() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className="text-sm font-medium text-gray-900">{type.totalSizeFormatted}</span>
+                            <div className="text-xs text-gray-500">{type.totalSize.toLocaleString()} bytes</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className="text-sm text-gray-500">{type.averageSizeFormatted}</span>

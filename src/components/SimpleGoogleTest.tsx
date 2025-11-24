@@ -17,7 +17,10 @@ export default function SimpleGoogleTest() {
       
       // Test simple de la configuration Supabase
       const { data: { session } } = await supabase.auth.getSession();
-      console.log('🔍 Session actuelle:', session);
+      // Log réduit pour éviter d'afficher le token en production
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔍 Session actuelle:', { user: session?.user?.email, hasToken: !!session?.access_token });
+      }
       
       // Test de la table users
       const { data: users, error: usersError } = await supabase

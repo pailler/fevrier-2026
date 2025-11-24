@@ -142,7 +142,7 @@ export default function ModulesPage() {
             Mes applis d'accès
           </h2>
           <p className="text-gray-600">
-            Accédez directement à vos applis autorisées
+            Accédez directement à vos applis autorisées. Toutes nos applications sont accessibles depuis votre navigateur, sans téléchargement ni installation.
           </p>
         </div>
 

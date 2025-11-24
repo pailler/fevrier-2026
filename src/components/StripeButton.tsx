@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 
 interface StripeButtonProps {
-  packageType: 'basic' | 'standard' | 'premium' | 'enterprise';
+  packageType: 'discovery' | 'standard' | 'pro';
   className?: string;
   children: React.ReactNode;
 }

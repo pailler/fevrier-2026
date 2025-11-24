@@ -739,19 +739,28 @@ export default function QRCodesPage() {
                   </div>
                 </div>
                 
-                {/* Call to action */}
-                <div className="text-center pt-8">
-                  <p className="text-lg sm:text-xl text-gray-700 mb-6 max-w-4xl mx-auto">
-                    Prêt à révolutionner vos campagnes avec des QR codes ? Commencez dès maintenant et connectez le monde physique au numérique !
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <Link href="/register" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                      <span className="text-xl mr-2">🚀</span>
-                      Commencer maintenant
-                    </Link>
-                    <span className="text-sm text-gray-500">
-                      Accès instantané juste après inscription
-                    </span>
+                {/* Liens utiles */}
+                <div className="pt-8 border-t border-gray-200">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Liens utiles</h3>
+                  <div className="flex flex-wrap gap-3">
+                    <a
+                      href="https://www.qrcode.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium"
+                    >
+                      <span className="mr-2">📚</span>
+                      Documentation QR Codes
+                    </a>
+                    <a
+                      href="https://fr.wikipedia.org/wiki/QR_Code"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium"
+                    >
+                      <span className="mr-2">🌐</span>
+                      Wikipedia QR Code
+                    </a>
                   </div>
                 </div>
               </div>

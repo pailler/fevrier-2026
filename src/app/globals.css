@@ -328,3 +328,22 @@ body {
   font-weight: 600;
   color: #111827;
 }
+
+/* Assurer que les classes Tailwind fonctionnent SEULEMENT quand elles sont appliquées ensemble */
+.text-yellow-300.underline.decoration-yellow-300 {
+  color: rgb(253 224 71) !important;
+  text-decoration: underline !important;
+  text-decoration-color: rgb(253 224 71) !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 4px !important;
+}
+
+/* Supprimer TOUS les soulignements par défaut sur les liens de navigation */
+header nav#main-nav a[data-nav-path] {
+  text-decoration: none !important;
+  text-decoration-color: transparent !important;
+  text-decoration-thickness: 0 !important;
+  text-underline-offset: 0 !important;
+}
+
+/* Les styles inline appliqués par JavaScript avec setProperty('important') auront la priorité */

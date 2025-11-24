@@ -259,8 +259,13 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   // Vérifier si c'est le module Hunyuan 3D pour appliquer un style spécial
   const isHunyuan3D = module.title.toLowerCase().includes('hunyuan') || module.title.toLowerCase().includes('hunyuan3d') || module.title.toLowerCase().includes('3d') || module.id === 'hunyuan3d';
   
-  // Vérifier si c'est le module Apprendre le Code pour appliquer un style spécial
+  // Vérifier si c'est le module Apprendre le Code Informatique pour appliquer un style spécial
   const isCodeLearning = module.title.toLowerCase().includes('apprendre') || module.title.toLowerCase().includes('code learning') || module.title.toLowerCase().includes('code-learning') || module.id === 'code-learning';
+  
+  // Debug temporaire
+  if (module.id === 'code-learning' || module.title.toLowerCase().includes('apprendre')) {
+    console.log('🔍 Code Learning détecté:', { id: module.id, title: module.title, isCodeLearning });
+  }
 
   return (
     <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isIAPhoto ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isIATube ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isStirlingPDF ? 'ring-2 ring-gray-500 ring-opacity-50' : ''} ${isMeetingReports ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isHunyuan3D ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCodeLearning ? 'ring-2 ring-blue-500 ring-opacity-50' : ''}`}>
@@ -1645,7 +1650,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             </>
           ) : isCodeLearning ? (
             <>
-              {/* Style spécial pour Apprendre le Code - informations visibles en permanence */}
+              {/* Style spécial pour Apprendre le Code Informatique - informations visibles en permanence */}
               {/* Badge catégorie en haut à gauche */}
               <div className="absolute top-3 left-3 z-20">
                 <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
@@ -1653,10 +1658,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                 </span>
               </div>
               
-              {/* Logo Apprendre le Code au centre */}
+              {/* Logo Apprendre le Code Informatique au centre */}
               <div className="absolute inset-0 flex items-center justify-center z-20">
                 <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-blue-500/20">
-                  {/* Logo Apprendre le Code avec icône de code/programmation */}
+                  {/* Logo Apprendre le Code Informatique avec icône de code/programmation */}
                   <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
                     {/* Cercle de fond */}
                     <circle cx="12" cy="12" r="10" fill="#3B82F6" stroke="#2563EB" strokeWidth="1"/>
@@ -1687,7 +1692,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               {/* Badge prix et nom du module en haut à droite */}
               <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
                 <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                  Apprendre le Code
+                  Apprendre le Code Informatique
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
                   {formatPrice(module.price)}
@@ -1701,7 +1706,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                     {module.subtitle}
                   </p>
                 )}
-                {/* Badge "EDUCATION" pour Apprendre le Code */}
+                {/* Badge "EDUCATION" pour Apprendre le Code Informatique */}
                 <div className="mt-2">
                   <span className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
                     🎓 EDUCATION
@@ -1732,7 +1737,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
         <Link href={`/card/${moduleSlug}`} className="block group">
           {/* Titre du module - affiché pour tous les modules */}
           <h3 className="text-3xl sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
-            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : isHunyuan3D ? "Hunyuan 3D - Génération 3D par IA" : isCodeLearning ? "Apprendre le Code" : module.title}
+            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : isHunyuan3D ? "Hunyuan 3D - Génération 3D par IA" : isCodeLearning ? "Apprendre le Code Informatique" : module.title}
           </h3>
           {/* Pour les modules spéciaux, afficher seulement la description si pas de sous-titre */}
           {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isQRCodes || isWhisper || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports || isHunyuan3D || isCodeLearning ? (
@@ -1744,6 +1749,9 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
           ) : (
             <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
               {module.subtitle || module.description}
+              {!module.subtitle && !module.description?.toLowerCase().includes('sans téléchargement') && !module.description?.toLowerCase().includes('sans installation') && (
+                <span className="text-gray-500"> • Sans téléchargement</span>
+              )}
             </p>
           )}
         </Link>

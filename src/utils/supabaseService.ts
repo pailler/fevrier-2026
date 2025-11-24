@@ -111,9 +111,10 @@ export const getSupabaseClient = (): SupabaseClient => {
         autoRefreshToken: true,
         detectSessionInUrl: true,
         storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+        storageKey: 'sb-xemtoyzcihmncbrlsmhr-auth-token', // Clé de stockage unique pour éviter les conflits
         flowType: 'implicit', // Utiliser le flux implicite au lieu de PKCE
         // Configuration pour éviter les instances multiples
-        debug: true // Activer les logs pour debug
+        debug: false // Désactiver les logs pour réduire les avertissements
       },
       realtime: {
         // Configuration pour gérer l'absence de WebSocket

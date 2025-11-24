@@ -16,14 +16,23 @@ export default function GlobalError({
     console.error('❌ Error stack:', error.stack);
     
     // Détecter spécifiquement les erreurs webpack
-    const isWebpackError = 
-      error.message?.includes("can't access property") ||
-      error.message?.includes("e[o] is undefined") ||
-      error.message?.includes("ChunkLoadError") ||
-      error.message?.includes("Loading chunk") ||
-      error.stack?.includes("webpack");
+    // Ignorer les erreurs url.length pour éviter les boucles infinies
+    const isUrlLengthError = 
+      error.message?.includes("can't access property") &&
+      error.message?.includes("url") &&
+      error.message?.includes("undefined");
     
-    if (isWebpackError) {
+    const isWebpackError = 
+      !isUrlLengthError && (
+        error.message?.includes("ChunkLoadError") ||
+        error.message?.includes("Loading chunk") ||
+        error.stack?.includes("webpack")
+      );
+    
+    if (isUrlLengthError) {
+      console.error('❌ Erreur url.length détectée - Rechargement automatique désactivé pour éviter les boucles infinies');
+      console.error('💡 Veuillez vider le cache du navigateur manuellement (Ctrl+Shift+Delete)');
+    } else if (isWebpackError) {
       console.warn('⚠️ Erreur Webpack détectée - Tentative de rechargement automatique...');
       // Essayer de recharger la page après un court délai
       setTimeout(() => {
@@ -32,11 +41,16 @@ export default function GlobalError({
     }
   }, [error]);
 
+  const isUrlLengthError = 
+    error.message?.includes("can't access property") &&
+    error.message?.includes("url") &&
+    error.message?.includes("undefined");
+  
   const isWebpackError = 
-    error.message?.includes("can't access property") ||
-    error.message?.includes("e[o] is undefined") ||
-    error.message?.includes("ChunkLoadError") ||
-    error.message?.includes("Loading chunk");
+    !isUrlLengthError && (
+      error.message?.includes("ChunkLoadError") ||
+      error.message?.includes("Loading chunk")
+    );
 
   return (
     <html>

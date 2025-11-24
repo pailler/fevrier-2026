@@ -9,11 +9,11 @@ const supabaseAdmin = createClient(
 export interface LinkedInPostData {
   title: string;
   content: string;
-  excerpt?: string;
-  url: string;
-  image_url?: string;
+  excerpt?: string | null;
+  url: string | null;
+  image_url?: string | null;
   type: 'blog' | 'formation';
-  source_id: string; // ID de l'article ou de la formation
+  source_id: string | null; // ID de l'article ou de la formation
 }
 
 /**
@@ -29,7 +29,7 @@ export function generateLinkedInContent(data: LinkedInPostData): string {
   let postContent = `${emoji} Nouveau ${typeLabel} disponible !\n\n`;
   postContent += `📌 ${title}\n\n`;
   
-  if (excerpt) {
+  if (excerpt && typeof excerpt === 'string') {
     // Limiter l'extrait à 200 caractères pour LinkedIn
     const shortExcerpt = excerpt.length > 200 
       ? excerpt.substring(0, 197) + '...' 
@@ -37,7 +37,10 @@ export function generateLinkedInContent(data: LinkedInPostData): string {
     postContent += `${shortExcerpt}\n\n`;
   }
   
-  postContent += `🔗 Découvrez-en plus : ${url}\n\n`;
+  if (url) {
+    postContent += `🔗 Découvrez-en plus : ${url}\n\n`;
+  }
+  
   postContent += `#IA #IntelligenceArtificielle #Tech #Formation`;
   
   if (type === 'formation') {
@@ -56,14 +59,19 @@ export async function createLinkedInPost(data: LinkedInPostData): Promise<{ succ
   try {
     const postContent = generateLinkedInContent(data);
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://iahome.fr';
-    const fullUrl = data.url.startsWith('http') ? data.url : `${baseUrl}${data.url}`;
+    
+    // S'assurer que l'URL est valide
+    let fullUrl = data.url || '';
+    if (fullUrl && !fullUrl.startsWith('http')) {
+      fullUrl = `${baseUrl}${fullUrl.startsWith('/') ? '' : '/'}${fullUrl}`;
+    }
     
     // Créer le post LinkedIn dans la base de données
     const linkedinPost = {
       title: data.title,
       content: postContent,
       excerpt: data.excerpt || null,
-      url: fullUrl,
+      url: fullUrl || null,
       image_url: data.image_url || null,
       type: data.type,
       source_id: data.source_id,

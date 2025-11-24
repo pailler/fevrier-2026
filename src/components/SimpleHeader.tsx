@@ -55,9 +55,15 @@ export default function SimpleHeader() {
                 href="/marketing" 
                 className={`font-medium transition-colors ${
                   pathname === '/marketing' || pathname?.startsWith('/marketing/')
-                    ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-4'
+                    ? 'text-yellow-300'
                     : 'text-white hover:text-blue-100'
                 }`}
+                style={pathname === '/marketing' || pathname?.startsWith('/marketing/') ? {
+                  textDecoration: 'underline',
+                  textDecorationColor: 'rgb(253 224 71)',
+                  textDecorationThickness: '2px',
+                  textUnderlineOffset: '4px'
+                } : { textDecoration: 'none' }}
               >
                 Découvrir
               </Link>
@@ -65,9 +71,15 @@ export default function SimpleHeader() {
                 href="/formation" 
                 className={`font-medium transition-colors ${
                   pathname === '/formation' || pathname?.startsWith('/formation/')
-                    ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-4'
+                    ? 'text-yellow-300'
                     : 'text-white hover:text-blue-100'
                 }`}
+                style={pathname === '/formation' || pathname?.startsWith('/formation/') ? {
+                  textDecoration: 'underline',
+                  textDecorationColor: 'rgb(253 224 71)',
+                  textDecorationThickness: '2px',
+                  textUnderlineOffset: '4px'
+                } : { textDecoration: 'none' }}
               >
                 Formation
               </Link>
@@ -75,9 +87,15 @@ export default function SimpleHeader() {
                 href="/blog" 
                 className={`font-medium transition-colors ${
                   pathname === '/blog' || pathname?.startsWith('/blog/')
-                    ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-4'
+                    ? 'text-yellow-300'
                     : 'text-white hover:text-blue-100'
                 }`}
+                style={pathname === '/blog' || pathname?.startsWith('/blog/') ? {
+                  textDecoration: 'underline',
+                  textDecorationColor: 'rgb(253 224 71)',
+                  textDecorationThickness: '2px',
+                  textUnderlineOffset: '4px'
+                } : { textDecoration: 'none' }}
               >
                 Blog
               </Link>
@@ -85,9 +103,15 @@ export default function SimpleHeader() {
                 href="/essentiels" 
                 className={`font-medium transition-colors ${
                   pathname === '/essentiels' || pathname?.startsWith('/essentiels/')
-                    ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-4'
+                    ? 'text-yellow-300'
                     : 'text-white hover:text-blue-100'
                 }`}
+                style={pathname === '/essentiels' || pathname?.startsWith('/essentiels/') ? {
+                  textDecoration: 'underline',
+                  textDecorationColor: 'rgb(253 224 71)',
+                  textDecorationThickness: '2px',
+                  textUnderlineOffset: '4px'
+                } : { textDecoration: 'none' }}
               >
                 Essentiels
               </Link>
@@ -95,21 +119,30 @@ export default function SimpleHeader() {
                 href="/applications" 
                 className={`font-medium transition-colors ${
                   pathname === '/applications' || pathname?.startsWith('/applications/')
-                    ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-4'
+                    ? 'text-yellow-300'
                     : 'text-white hover:text-blue-100'
                 }`}
+                style={pathname === '/applications' || pathname?.startsWith('/applications/') ? {
+                  textDecoration: 'underline',
+                  textDecorationColor: 'rgb(253 224 71)',
+                  textDecorationThickness: '2px',
+                  textUnderlineOffset: '4px'
+                } : { textDecoration: 'none' }}
               >
                 Applications IA
               </Link>
               <Link 
                 href="/pricing" 
-                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                  pathname === '/pricing' || pathname?.startsWith('/pricing/')
-                    ? 'bg-yellow-500 hover:bg-yellow-600 text-gray-900 underline decoration-gray-900 decoration-2 underline-offset-2'
-                    : 'bg-yellow-400 hover:bg-yellow-500 text-gray-900'
-                }`}
+                className="flex items-center space-x-2 bg-purple-100 hover:bg-purple-200 px-4 py-2 rounded-full font-medium transition-colors group"
               >
-                Offres
+                <svg 
+                  className="w-4 h-4 text-indigo-600" 
+                  fill="currentColor" 
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                <span className="text-indigo-600">Obtenir Plus</span>
               </Link>
             </nav>
           </div>
@@ -130,7 +163,7 @@ export default function SimpleHeader() {
                     signOut();
                     router.push('/');
                   }}
-                  className="text-white hover:text-blue-100 transition-colors font-medium px-3 py-1 rounded-lg hover:bg-blue-500 cursor-pointer"
+                  className="text-white hover:text-blue-100 transition-colors px-3 py-1 rounded-lg hover:bg-blue-500 cursor-pointer text-sm"
                 >
                   Se déconnecter
                 </button>
@@ -191,6 +224,17 @@ export default function SimpleHeader() {
               <div className="px-4 py-2 border-b border-blue-500">
                 <div className="text-sm text-blue-100 mb-2">Navigation</div>
                 <Link
+                  href="/marketing"
+                  className={`block px-4 py-2 transition-colors ${
+                    pathname === '/marketing' || pathname?.startsWith('/marketing/')
+                      ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
+                      : 'text-white hover:bg-blue-500'
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Découvrir
+                </Link>
+                <Link
                   href="/formation"
                   className={`block px-4 py-2 transition-colors ${
                     pathname === '/formation' || pathname?.startsWith('/formation/')
@@ -234,6 +278,47 @@ export default function SimpleHeader() {
                 >
                   Applications IA
                 </Link>
+              </div>
+              
+              {/* Bouton Obtenir Plus - Section séparée pour plus de visibilité */}
+              <div className="px-4 py-3 border-b border-blue-500">
+                <div className="text-sm text-blue-100 mb-2">Premium</div>
+                <Link
+                  href="/pricing"
+                  className="flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700 text-white px-4 py-3 rounded-full font-semibold transition-all shadow-lg w-full"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <svg 
+                    className="w-5 h-5 text-yellow-300" 
+                    fill="currentColor" 
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <span className="text-white font-bold">Obtenir Plus</span>
+                </Link>
+              </div>
+
+              {/* Bouton Chat IA - Centré */}
+              <div className="px-4 py-3 border-b border-blue-500">
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    // Déclencher l'ouverture du chat via un événement personnalisé
+                    window.dispatchEvent(new CustomEvent('openChatAI'));
+                  }}
+                  className="flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-3 rounded-full font-semibold transition-all shadow-lg w-full mx-auto"
+                >
+                  <svg 
+                    className="w-5 h-5" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  <span className="text-white font-bold">Chat IA</span>
+                </button>
               </div>
 
               {/* Actions utilisateur */}

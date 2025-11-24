@@ -19,7 +19,7 @@ export default function MarketingPage() {
     {
       icon: '🚀',
       title: 'Accès Immédiat',
-      description: 'Aucune installation requise. Tous nos outils sont accessibles directement depuis votre navigateur.'
+      description: 'Aucun téléchargement, aucune installation. Tous nos outils sont des web-services accessibles directement depuis votre navigateur. Il suffit d\'un navigateur pour les utiliser !'
     },
     {
       icon: '💰',
@@ -42,9 +42,9 @@ export default function MarketingPage() {
       description: 'Plateforme française, support en français, conformité RGPD. Une solution de confiance.'
     },
     {
-      icon: '📚',
-      title: 'Formations Incluses',
-      description: 'Apprenez l\'IA à votre rythme avec nos formations interactives et nos tutoriels détaillés.'
+      icon: '🎁',
+      title: '200 tokens offerts',
+      description: '200 tokens offerts pour tout nouvel utilisateur. Commencez à utiliser nos services immédiatement sans dépenser un centime.'
     }
   ];
 
@@ -123,10 +123,12 @@ export default function MarketingPage() {
             <p className="text-xl md:text-2xl mb-8 text-blue-100 animate-fade-in-up-delayed">
               Découvrez nos outils d'intelligence artificielle professionnels. 
               Transcription, génération d'images, traitement de documents et bien plus.
+              <br />
+              <span className="text-yellow-200 font-semibold">Tous nos services sont accessibles directement depuis votre navigateur, sans téléchargement ni installation.</span>
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up-delayed">
               <Link
-                href="/pricing"
+                href="https://iahome.fr/applications"
                 className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg"
               >
                 Commencer Maintenant →
@@ -351,7 +353,7 @@ export default function MarketingPage() {
               Nos Services Populaires
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Découvrez nos outils les plus utilisés par des milliers d'utilisateurs
+              Découvrez nos outils les plus utilisés par des milliers d'utilisateurs. Tous accessibles directement depuis votre navigateur, sans téléchargement ni installation.
             </p>
           </div>
 
@@ -396,6 +398,319 @@ export default function MarketingPage() {
               className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all"
             >
               Voir Tous les Services
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Section Développement */}
+      <section className="py-20 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              💻 Services de Développement Personnalisé
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-4">
+              Faites développer votre application web sur mesure par IAHome. Des solutions professionnelles adaptées à vos besoins spécifiques.
+            </p>
+            <div className="inline-block bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-full font-bold text-lg shadow-lg">
+              ⚡ Livraison de l'application en temps record
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {/* Exemple 1: Boutique en ligne */}
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2 border-2 border-green-100">
+              <div className="flex items-center mb-4">
+                <span className="text-5xl mr-3">🛒</span>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Boutique en Ligne
+                </h3>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Créez votre e-commerce personnalisé avec gestion des produits, panier, paiements sécurisés et suivi des commandes. Interface moderne et responsive.
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                <span className="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-medium">
+                  E-commerce
+                </span>
+                <span className="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Paiement sécurisé
+                </span>
+                <span className="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Gestion stock
+                </span>
+              </div>
+              <ul className="text-sm text-gray-600 space-y-2 mb-4">
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2 font-bold">✓</span>
+                  Catalogue produits avec images
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2 font-bold">✓</span>
+                  Panier d'achat et checkout
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2 font-bold">✓</span>
+                  Intégration paiements (Stripe, PayPal)
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2 font-bold">✓</span>
+                  Dashboard administrateur
+                </li>
+              </ul>
+            </div>
+
+            {/* Exemple 2: Portfolio professionnel */}
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2 border-2 border-blue-100">
+              <div className="flex items-center mb-4">
+                <span className="text-5xl mr-3">🎨</span>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Portfolio Professionnel
+                </h3>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Présentez vos réalisations avec style. Portfolio élégant et moderne pour photographes, designers, développeurs ou créateurs de contenu.
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                <span className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Portfolio
+                </span>
+                <span className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Galerie
+                </span>
+                <span className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Responsive
+                </span>
+              </div>
+              <ul className="text-sm text-gray-600 space-y-2 mb-4">
+                <li className="flex items-start">
+                  <span className="text-blue-500 mr-2 font-bold">✓</span>
+                  Galerie photos/vidéos interactive
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-500 mr-2 font-bold">✓</span>
+                  Présentation de vos projets
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-500 mr-2 font-bold">✓</span>
+                  Formulaire de contact intégré
+                </li>
+                <li className="flex items-start">
+                  <span className="text-blue-500 mr-2 font-bold">✓</span>
+                  Design sur mesure et SEO optimisé
+                </li>
+              </ul>
+            </div>
+
+            {/* Exemple 3: Système de réservation */}
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2 border-2 border-purple-100">
+              <div className="flex items-center mb-4">
+                <span className="text-5xl mr-3">🎮</span>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Système de Réservation
+                </h3>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Gérez la réservation de matériels (jeux vidéo en médiathèque, équipements, salles, etc.). Interface intuitive avec calendrier et notifications.
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                <span className="bg-purple-100 text-purple-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Réservation
+                </span>
+                <span className="bg-purple-100 text-purple-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Calendrier
+                </span>
+                <span className="bg-purple-100 text-purple-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Gestion
+                </span>
+              </div>
+              <ul className="text-sm text-gray-600 space-y-2 mb-4">
+                <li className="flex items-start">
+                  <span className="text-purple-500 mr-2 font-bold">✓</span>
+                  Réservation de matériels (jeux vidéo, équipements)
+                </li>
+                <li className="flex items-start">
+                  <span className="text-purple-500 mr-2 font-bold">✓</span>
+                  Calendrier de disponibilité en temps réel
+                </li>
+                <li className="flex items-start">
+                  <span className="text-purple-500 mr-2 font-bold">✓</span>
+                  Notifications automatiques (email/SMS)
+                </li>
+                <li className="flex items-start">
+                  <span className="text-purple-500 mr-2 font-bold">✓</span>
+                  Suivi des emprunts et retours
+                </li>
+              </ul>
+            </div>
+
+            {/* Exemple 4: Application de gestion */}
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2 border-2 border-orange-100">
+              <div className="flex items-center mb-4">
+                <span className="text-5xl mr-3">📊</span>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Application de Gestion
+                </h3>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Outils de gestion personnalisés : inventaire, planning, suivi de projets, gestion de clients. Adapté à votre activité.
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                <span className="bg-orange-100 text-orange-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Gestion
+                </span>
+                <span className="bg-orange-100 text-orange-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Dashboard
+                </span>
+                <span className="bg-orange-100 text-orange-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Automatisation
+                </span>
+              </div>
+              <ul className="text-sm text-gray-600 space-y-2 mb-4">
+                <li className="flex items-start">
+                  <span className="text-orange-500 mr-2 font-bold">✓</span>
+                  Gestion d'inventaire et stock
+                </li>
+                <li className="flex items-start">
+                  <span className="text-orange-500 mr-2 font-bold">✓</span>
+                  Planning et calendrier partagé
+                </li>
+                <li className="flex items-start">
+                  <span className="text-orange-500 mr-2 font-bold">✓</span>
+                  Suivi de projets et tâches
+                </li>
+                <li className="flex items-start">
+                  <span className="text-orange-500 mr-2 font-bold">✓</span>
+                  Rapports et statistiques
+                </li>
+              </ul>
+            </div>
+
+            {/* Exemple 5: Plateforme de cours en ligne */}
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2 border-2 border-indigo-100">
+              <div className="flex items-center mb-4">
+                <span className="text-5xl mr-3">📚</span>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Plateforme de Cours
+                </h3>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Créez votre plateforme d'apprentissage en ligne avec vidéos, quiz, certificats et suivi de progression des étudiants.
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                <span className="bg-indigo-100 text-indigo-800 text-xs px-3 py-1 rounded-full font-medium">
+                  E-learning
+                </span>
+                <span className="bg-indigo-100 text-indigo-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Vidéos
+                </span>
+                <span className="bg-indigo-100 text-indigo-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Certificats
+                </span>
+              </div>
+              <ul className="text-sm text-gray-600 space-y-2 mb-4">
+                <li className="flex items-start">
+                  <span className="text-indigo-500 mr-2 font-bold">✓</span>
+                  Catalogue de cours avec vidéos
+                </li>
+                <li className="flex items-start">
+                  <span className="text-indigo-500 mr-2 font-bold">✓</span>
+                  Quiz et évaluations interactives
+                </li>
+                <li className="flex items-start">
+                  <span className="text-indigo-500 mr-2 font-bold">✓</span>
+                  Suivi de progression des apprenants
+                </li>
+                <li className="flex items-start">
+                  <span className="text-indigo-500 mr-2 font-bold">✓</span>
+                  Génération de certificats
+                </li>
+              </ul>
+            </div>
+
+            {/* Exemple 6: Application de livraison */}
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2 border-2 border-red-100">
+              <div className="flex items-center mb-4">
+                <span className="text-5xl mr-3">🚚</span>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Application de Livraison
+                </h3>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Gérez vos livraisons avec suivi en temps réel, notifications clients, planification d'itinéraires et gestion des livreurs.
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                <span className="bg-red-100 text-red-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Livraison
+                </span>
+                <span className="bg-red-100 text-red-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Suivi GPS
+                </span>
+                <span className="bg-red-100 text-red-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Notifications
+                </span>
+              </div>
+              <ul className="text-sm text-gray-600 space-y-2 mb-4">
+                <li className="flex items-start">
+                  <span className="text-red-500 mr-2 font-bold">✓</span>
+                  Suivi de commandes en temps réel
+                </li>
+                <li className="flex items-start">
+                  <span className="text-red-500 mr-2 font-bold">✓</span>
+                  Géolocalisation et itinéraires
+                </li>
+                <li className="flex items-start">
+                  <span className="text-red-500 mr-2 font-bold">✓</span>
+                  Notifications SMS/Email automatiques
+                </li>
+                <li className="flex items-start">
+                  <span className="text-red-500 mr-2 font-bold">✓</span>
+                  Interface livreur et client
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Section Avantages */}
+          <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl p-8 text-white shadow-2xl">
+            <div className="text-center mb-8">
+              <h3 className="text-3xl font-bold mb-4">Pourquoi Choisir IAHome pour votre Développement ?</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="text-4xl mb-3">⚡</div>
+                <h4 className="font-bold text-lg mb-2">Livraison Rapide</h4>
+                <p className="text-green-100 text-sm">Applications livrées en temps record selon vos besoins</p>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl mb-3">💻</div>
+                <h4 className="font-bold text-lg mb-2">100% Web</h4>
+                <p className="text-green-100 text-sm">Accessible depuis n'importe quel navigateur, sans téléchargement</p>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl mb-3">🎨</div>
+                <h4 className="font-bold text-lg mb-2">Sur Mesure</h4>
+                <p className="text-green-100 text-sm">Solutions personnalisées adaptées à votre activité</p>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl mb-3">🔧</div>
+                <h4 className="font-bold text-lg mb-2">Support Inclus</h4>
+                <p className="text-green-100 text-sm">Maintenance et support technique après livraison</p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="text-center mt-12">
+            <p className="text-xl text-gray-700 mb-6 font-semibold">
+              Vous avez un projet spécifique ? Discutons-en ensemble !
+            </p>
+            <Link
+              href="/contact"
+              className="inline-block bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg"
+            >
+              📧 Demander un Devis Gratuit
             </Link>
           </div>
         </div>

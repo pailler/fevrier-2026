@@ -1,0 +1,80 @@
+# Configuration Traefik pour Game Console Reservation
+# Sous-domaine: consoles.regispailler.fr
+# Note: SSL géré par Cloudflare, pas besoin de Let's Encrypt ici
+
+http:
+  routers:
+    # Route pour les API (priorité élevée pour capturer /api avant la route principale)
+    consoles-api:
+      rule: "Host(`consoles.regispailler.fr`) && PathPrefix(`/api`)"
+      service: consoles-backend-service
+      entryPoints:
+        - websecure
+        - web
+      priority: 100
+      middlewares:
+        - consoles-headers
+        - consoles-cors
+    
+    # Route principale pour le frontend
+    consoles:
+      rule: "Host(`consoles.regispailler.fr`)"
+      service: consoles-service
+      entryPoints:
+        - websecure
+        - web
+      # TLS désactivé car géré par Cloudflare
+      # tls:
+      #   certResolver: letsencrypt
+      middlewares:
+        - consoles-headers
+        - consoles-cors
+
+  services:
+    # Service pour le frontend (port 5000)
+    consoles-service:
+      loadBalancer:
+        servers:
+          # Utiliser host.docker.internal pour accéder aux services sur l'hôte depuis Docker
+          - url: "http://host.docker.internal:5000"
+        passHostHeader: true
+    
+    # Service pour le backend API (port 5001)
+    consoles-backend-service:
+      loadBalancer:
+        servers:
+          # Backend API sur le port 5001
+          - url: "http://host.docker.internal:5001"
+        passHostHeader: true
+
+  middlewares:
+    consoles-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-For: ""
+        customResponseHeaders:
+          X-Frame-Options: "SAMEORIGIN"
+          X-Content-Type-Options: "nosniff"
+          Referrer-Policy: "strict-origin-when-cross-origin"
+          Access-Control-Allow-Origin: "*"
+          Access-Control-Allow-Methods: "GET, POST, PUT, DELETE, OPTIONS"
+          Access-Control-Allow-Headers: "Content-Type, Authorization"
+          Access-Control-Max-Age: "3600"
+    
+    consoles-cors:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        accessControlAllowHeaders:
+          - Content-Type
+          - Authorization
+        accessControlAllowOriginList:
+          - "*"
+        accessControlMaxAge: 3600
+        addVaryHeader: true
+

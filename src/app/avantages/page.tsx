@@ -47,7 +47,7 @@ export default function AvantagesPage() {
       icon: '💰',
       title: 'Meilleur Rapport Qualité/Prix',
       description: 'Système de tokens dégressif. Économisez jusqu\'à 80% en achetant en volume.',
-      details: 'Pack Entreprise : 0,010€/token vs 0,049€/token pour le pack basique'
+      details: 'Pack Standard PROMO : 0,005€/token vs 0,0099€/token pour le pack basique'
     },
     {
       icon: '⚡',
@@ -409,7 +409,7 @@ export default function AvantagesPage() {
           <p className="text-xl mb-8 text-blue-100">
             Rejoignez des milliers d'utilisateurs satisfaits.
             <br />
-            Commencez dès aujourd'hui à partir de 4,99€.
+            Commencez dès aujourd'hui à partir de 9,90€.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

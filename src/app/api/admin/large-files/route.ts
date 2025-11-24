@@ -86,34 +86,43 @@ function shouldIgnoreFile(fileName: string): boolean {
 
 function analyzeDirectory(dirPath: string, results: FileInfo[] = []): FileInfo[] {
   try {
-    const items = fs.readdirSync(dirPath);
+    const items = fs.readdirSync(dirPath, { withFileTypes: true });
     
     for (const item of items) {
-      const fullPath = path.join(dirPath, item);
-      const stat = fs.statSync(fullPath);
+      const fullPath = path.join(dirPath, item.name);
       
-      if (stat.isDirectory()) {
-        if (!shouldIgnoreDir(item)) {
-          analyzeDirectory(fullPath, results);
+      try {
+        if (item.isDirectory()) {
+          if (!shouldIgnoreDir(item.name)) {
+            analyzeDirectory(fullPath, results);
+          }
+        } else if (item.isFile()) {
+          if (!shouldIgnoreFile(item.name)) {
+            // Recalculer la taille à chaque fois pour être sûr d'avoir les données à jour
+            const stat = fs.statSync(fullPath, { bigint: false });
+            
+            if (stat.size >= CONFIG.minSizeBytes) {
+              const relativePath = path.relative(process.cwd(), fullPath);
+              
+              results.push({
+                path: relativePath,
+                fullPath: fullPath,
+                size: stat.size,
+                sizeFormatted: formatBytes(stat.size),
+                extension: path.extname(item.name),
+                modified: stat.mtime.toISOString(),
+                created: stat.birthtime.toISOString()
+              });
+            }
+          }
         }
-      } else if (stat.isFile()) {
-        if (!shouldIgnoreFile(item) && stat.size >= CONFIG.minSizeBytes) {
-          const relativePath = path.relative(process.cwd(), fullPath);
-          
-          results.push({
-            path: relativePath,
-            fullPath: fullPath,
-            size: stat.size,
-            sizeFormatted: formatBytes(stat.size),
-            extension: path.extname(item),
-            modified: stat.mtime.toISOString(),
-            created: stat.birthtime.toISOString()
-          });
-        }
+      } catch (fileError) {
+        // Ignorer les erreurs d'accès aux fichiers individuels
+        console.warn(`Impossible d'analyser ${fullPath}:`, fileError instanceof Error ? fileError.message : 'Erreur inconnue');
       }
     }
   } catch (error) {
-    console.warn(`Erreur lors de l'analyse de ${dirPath}:`, error);
+    console.warn(`Erreur lors de l'analyse de ${dirPath}:`, error instanceof Error ? error.message : 'Erreur inconnue');
   }
   
   return results;
@@ -163,17 +172,24 @@ function calculateStats(files: FileInfo[]) {
   };
 }
 
-function analyzeLargeFiles(): AnalysisResult {
+function analyzeLargeFiles(forceRecalculate: boolean = false): AnalysisResult {
   console.log('🔍 Analyse des gros fichiers du projet iahome...');
+  if (forceRecalculate) {
+    console.log('🔄 Recalcul forcé des tailles de fichiers...');
+  }
   
   const startTime = Date.now();
+  // Toujours recalculer depuis le répertoire racine pour avoir les données à jour
   const files = analyzeDirectory('.');
   const endTime = Date.now();
   
+  // Trier par taille décroissante
   files.sort((a, b) => b.size - a.size);
   const topFiles = files.slice(0, CONFIG.maxFiles);
   const fileTypes = analyzeFileTypes(files);
   const stats = calculateStats(files);
+  
+  console.log(`✅ Analyse terminée: ${files.length} fichiers trouvés, ${formatBytes(stats.totalSize)} au total`);
   
   return {
     timestamp: new Date().toISOString(),
@@ -187,7 +203,7 @@ function analyzeLargeFiles(): AnalysisResult {
     },
     stats,
     topFiles,
-    fileTypes: fileTypes.slice(0, 10),
+    fileTypes: fileTypes.slice(0, 20), // Augmenter à 20 types pour plus d'informations
     summary: {
       filesAnalyzed: files.length,
       filesShown: topFiles.length,
@@ -205,8 +221,8 @@ export async function GET(request: NextRequest) {
   try {
     console.log('🔍 Démarrage de l\'analyse des gros fichiers...');
     
-    // Analyser les gros fichiers
-    const analysisResult = analyzeLargeFiles();
+    // Analyser les gros fichiers (recalcul toujours effectué pour avoir les données à jour)
+    const analysisResult = analyzeLargeFiles(false);
     
     console.log('✅ Analyse terminée:', {
       filesFound: analysisResult.summary.filesAnalyzed,
@@ -233,23 +249,31 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { action } = await request.json();
+    const body = await request.json().catch(() => ({}));
+    const { action } = body;
     
-    if (action === 'refresh') {
-      console.log('🔄 Actualisation de l\'analyse des gros fichiers...');
+    if (action === 'refresh' || action === 'recalculate') {
+      console.log('🔄 Recalcul des tailles des gros fichiers...');
       
-      const analysisResult = analyzeLargeFiles();
+      // Forcer le recalcul complet
+      const analysisResult = analyzeLargeFiles(true);
+      
+      console.log('✅ Recalcul terminé:', {
+        filesFound: analysisResult.summary.filesAnalyzed,
+        totalSize: analysisResult.summary.totalSize,
+        analysisTime: analysisResult.analysisTime + 'ms'
+      });
       
       return NextResponse.json({
         success: true,
         data: analysisResult,
-        message: 'Analyse actualisée avec succès'
+        message: 'Recalcul des tailles terminé avec succès'
       });
     }
     
     return NextResponse.json({
       success: false,
-      error: 'Action non reconnue'
+      error: 'Action non reconnue. Actions disponibles: refresh, recalculate'
     }, { status: 400 });
     
   } catch (error) {

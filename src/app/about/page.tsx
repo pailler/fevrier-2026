@@ -60,7 +60,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">Outils</h3>
                 <p className="text-gray-600">
-                  Des applications IA pratiques et faciles à utiliser
+                  Des applications IA pratiques et faciles à utiliser, accessibles directement depuis votre navigateur, sans téléchargement
                 </p>
               </div>
               <div className="text-center">

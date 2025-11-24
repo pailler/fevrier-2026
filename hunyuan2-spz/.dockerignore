@@ -1,0 +1,29 @@
+# Fichiers à ignorer lors du build Docker
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist/
+build/
+.git/
+.gitignore
+*.log
+temp/
+gradio_cache/
+*.bat
+*.cmd
+tools/git/
+tools/python/
+*.md
+HOW TO USE - INSTRUCTIONS.txt
+run-browser_(slower)/
+run-projectorz_(faster)/
+
+
+
+

@@ -1,0 +1,9 @@
+# Fichiers de configuration deemix (peuvent contenir des tokens)
+config/*
+!config/.gitkeep
+
+# Téléchargements
+downloads/*
+!downloads/.gitkeep
+
+

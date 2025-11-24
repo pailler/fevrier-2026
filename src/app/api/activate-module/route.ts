@@ -144,11 +144,35 @@ export async function POST(request: NextRequest) {
     console.log(`✅ Module ${moduleName} activé avec succès pour ${userEmail}`);
     console.log(`🪙 Tokens consommés: ${moduleCost}, Restants: ${newTokenCount}`);
 
+    // 7. Vérifier et attribuer le bonus de 200 tokens si c'est la première activation
+    let bonusApplied = false;
+    let finalTokenCount = newTokenCount;
+    try {
+      const bonusResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/check-first-module-bonus`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, userEmail })
+      });
+
+      if (bonusResponse.ok) {
+        const bonusData = await bonusResponse.json();
+        if (bonusData.success && bonusData.eligible) {
+          bonusApplied = true;
+          finalTokenCount = bonusData.newTotalTokens;
+          console.log(`🎁 Bonus de 200 tokens attribué ! Total: ${finalTokenCount}`);
+        }
+      }
+    } catch (bonusError) {
+      console.error('⚠️ Erreur lors de la vérification du bonus (non bloquant):', bonusError);
+    }
+
     return NextResponse.json({
       success: true,
       message: `Application ${moduleName} activée avec succès`,
       tokensConsumed: moduleCost,
-      tokensRemaining: newTokenCount,
+      tokensRemaining: finalTokenCount,
+      bonusApplied,
+      bonusTokens: bonusApplied ? 200 : 0,
       moduleId,
       moduleName,
       activationDate: new Date().toISOString()

@@ -84,6 +84,16 @@ export class NotificationService {
   }
 
   /**
+   * Envoyer une notification aux utilisateurs sans module activé
+   */
+  async sendNoModuleActivatedNotification(userEmail: string, userName: string): Promise<boolean> {
+    return this.emailService.sendNotificationEmail('user_no_module_activated', userEmail, {
+      user_name: userName,
+      signup_date: new Date().toLocaleDateString('fr-FR')
+    });
+  }
+
+  /**
    * Vérifier si le service de notifications est configuré
    */
   isConfigured(): boolean {

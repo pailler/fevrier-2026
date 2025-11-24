@@ -79,9 +79,6 @@ export default function AdminStatusBadge({
   // Variant 'header' par défaut
   return (
     <div className={`flex items-center space-x-3 text-sm ${className}`}>
-      <span className="hidden sm:inline">
-        {isAdmin ? 'Administrateur IAHome' : 'Connecté à IAHome'}
-      </span>
       {showEmail && (
         <span className="font-medium">{user.email}</span>
       )}

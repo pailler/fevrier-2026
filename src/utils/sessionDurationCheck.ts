@@ -42,55 +42,30 @@ function decodeJWT(token: string): any {
 }
 
 /**
- * Récupère ou crée une entrée de session dans la table user_sessions
+ * Récupère la date de création de la session active depuis la table user_sessions
+ * Ne crée PAS de nouvelle session - doit être créée via initializeUserSession lors de la connexion
  */
-async function getOrCreateSessionRecord(userId: string, userEmail: string): Promise<Date | null> {
+async function getSessionRecord(userId: string): Promise<Date | null> {
   try {
-    // Vérifier si une session existe déjà pour cet utilisateur (active depuis moins de 5 minutes)
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-    
+    // Récupérer la session active la plus récente pour cet utilisateur (peu importe son âge)
     const { data: existingSession, error: fetchError } = await supabase
       .from('user_sessions')
       .select('created_at')
       .eq('user_id', userId)
       .eq('is_active', true)
-      .gte('created_at', fiveMinutesAgo)
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (!fetchError && existingSession) {
       return new Date(existingSession.created_at);
     }
 
-    // Si pas de session récente, désactiver les anciennes sessions et créer une nouvelle
-    await supabase
-      .from('user_sessions')
-      .update({ is_active: false })
-      .eq('user_id', userId)
-      .eq('is_active', true);
-
-    // Créer une nouvelle entrée de session
-    const { data: newSession, error: createError } = await supabase
-      .from('user_sessions')
-      .insert({
-        user_id: userId,
-        user_email: userEmail,
-        created_at: new Date().toISOString(),
-        is_active: true,
-        last_accessed_at: new Date().toISOString()
-      })
-      .select('created_at')
-      .single();
-
-    if (createError) {
-      console.warn('⚠️ Erreur lors de la création de la session:', createError);
-      return null;
-    }
-
-    return new Date(newSession.created_at);
+    // Si aucune session active n'existe, retourner null
+    // La session doit être créée via initializeUserSession lors de la connexion
+    return null;
   } catch (error) {
-    console.error('Erreur gestion session:', error);
+    console.error('Erreur récupération session:', error);
     return null;
   }
 }
@@ -160,20 +135,18 @@ export async function checkSessionDuration(session: any): Promise<SessionDuratio
     // Tous les autres utilisateurs ont une limite de 1 heure
     let sessionCreatedAt: Date | null = null;
 
-    // Méthode 1: Essayer d'extraire depuis le JWT token (iat) - la plus fiable
-    if (session.access_token) {
-      try {
-        const decoded = decodeJWT(session.access_token);
-        if (decoded && decoded.iat) {
-          sessionCreatedAt = new Date(decoded.iat * 1000);
-          console.log('✅ Date de création depuis JWT iat:', sessionCreatedAt);
-        }
-      } catch (error) {
-        console.warn('⚠️ Impossible de décoder le token JWT:', error);
+    // Méthode 1: Récupérer depuis la table user_sessions (la plus fiable car ne change pas lors du rafraîchissement du token)
+    try {
+      const sessionRecordDate = await getSessionRecord(userId);
+      if (sessionRecordDate) {
+        sessionCreatedAt = sessionRecordDate;
+        console.log('✅ Date de création depuis user_sessions:', sessionCreatedAt);
       }
+    } catch (error) {
+      console.warn('⚠️ Erreur lors de la récupération depuis user_sessions:', error);
     }
 
-    // Méthode 2: Utiliser created_at ou issued_at de la session si disponible
+    // Méthode 2: Utiliser created_at ou issued_at de la session si disponible (fallback)
     if (!sessionCreatedAt) {
       if (session.created_at) {
         sessionCreatedAt = new Date(session.created_at);
@@ -184,16 +157,17 @@ export async function checkSessionDuration(session: any): Promise<SessionDuratio
       }
     }
 
-    // Méthode 3: Récupérer depuis la table user_sessions
-    if (!sessionCreatedAt) {
+    // Méthode 3: Essayer d'extraire depuis le JWT token (iat) - moins fiable car change lors du rafraîchissement
+    // Utilisé uniquement comme dernier recours
+    if (!sessionCreatedAt && session.access_token) {
       try {
-        const sessionRecordDate = await getOrCreateSessionRecord(userId, userEmail);
-        if (sessionRecordDate) {
-          sessionCreatedAt = sessionRecordDate;
-          console.log('✅ Date de création depuis user_sessions:', sessionCreatedAt);
+        const decoded = decodeJWT(session.access_token);
+        if (decoded && decoded.iat) {
+          sessionCreatedAt = new Date(decoded.iat * 1000);
+          console.log('⚠️ Date de création depuis JWT iat (peut être incorrecte si token rafraîchi):', sessionCreatedAt);
         }
       } catch (error) {
-        console.warn('⚠️ Erreur lors de la récupération depuis user_sessions:', error);
+        console.warn('⚠️ Impossible de décoder le token JWT:', error);
       }
     }
 

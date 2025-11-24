@@ -81,11 +81,17 @@ export default function DynamicNavigation({
       rel: item.is_external ? 'noopener noreferrer' : undefined,
       className: `font-medium transition-colors ${
         isActive
-          ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-4'
+          ? 'text-yellow-300'
           : 'text-white hover:text-blue-100'
       } ${
         isMobile ? 'block py-2 px-4 hover:bg-blue-500' : ''
-      }`
+      }`,
+      style: isActive ? {
+        textDecoration: 'underline',
+        textDecorationColor: 'rgb(253 224 71)',
+        textDecorationThickness: '2px',
+        textUnderlineOffset: '4px'
+      } : {}
     };
 
     const linkContent = (

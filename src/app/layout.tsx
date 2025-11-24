@@ -5,6 +5,7 @@ import ClientHeader from '../components/ClientHeader'
 import Footer from '../components/Footer'
 import ConditionalComponents from '../components/ConditionalComponents'
 import ClientOnly from '../components/ClientOnly'
+import ScrollToTop from '../components/ScrollToTop'
 
 export const metadata: Metadata = {
   title: 'IA Home - Plateforme d\'Intelligence Artificielle | Formation IA & Outils IA',
@@ -105,8 +106,8 @@ export const metadata: Metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
   viewportFit: 'cover',
   themeColor: '#2563eb',
 }
@@ -120,8 +121,76 @@ export default function RootLayout({
     <html lang="fr" className="font-system">
       <head>
         <meta name="format-detection" content="telephone=no" />
+        {/* Google Search Console Verification */}
+        {process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && (
+          <meta name="google-site-verification" content={process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION} />
+        )}
         <script dangerouslySetInnerHTML={{
           __html: `
+            // FORCER LE VIDAGE DU CACHE AU CHARGEMENT - VERSION AGRESSIVE
+            (function() {
+              const CACHE_VERSION = 'v' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
+              console.log('🔄 Version cache:', CACHE_VERSION);
+              
+              // VIDER TOUS LES CACHES IMMÉDIATEMENT
+              if ('caches' in window) {
+                caches.keys().then(function(names) {
+                  console.log('🗑️ Suppression de', names.length, 'caches...');
+                  names.forEach(function(name) {
+                    caches.delete(name).then(function() {
+                      console.log('✅ Cache supprimé:', name);
+                    });
+                  });
+                });
+              }
+              
+              // Vider le cache du navigateur
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  registrations.forEach(function(registration) {
+                    registration.unregister();
+                    console.log('✅ Service Worker désenregistré');
+                  });
+                });
+              }
+              
+              // Vider localStorage et sessionStorage des anciennes versions
+              const oldKeys = [];
+              for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && (key.includes('cache') || key.includes('version'))) {
+                  oldKeys.push(key);
+                }
+              }
+              oldKeys.forEach(function(key) {
+                localStorage.removeItem(key);
+                console.log('🗑️ Clé supprimée:', key);
+              });
+              
+              // Vérifier si c'est un nouveau chargement ou un rechargement en boucle
+              const lastCacheVersion = localStorage.getItem('cache_version');
+              const reloadCount = parseInt(localStorage.getItem('reload_count') || '0', 10);
+              
+              // Si la version du cache n'a pas changé et qu'on a déjà rechargé, arrêter la boucle
+              if (lastCacheVersion === CACHE_VERSION && reloadCount > 0) {
+                console.warn('⚠️ Boucle de rechargement détectée - Arrêt du rechargement automatique');
+                localStorage.setItem('reload_count', '0');
+                return; // Arrêter l'exécution pour éviter la boucle
+              }
+              
+              // Si c'est un nouveau chargement, incrémenter le compteur
+              if (lastCacheVersion !== CACHE_VERSION) {
+                localStorage.setItem('reload_count', '0');
+              } else {
+                localStorage.setItem('reload_count', (reloadCount + 1).toString());
+              }
+              
+              localStorage.setItem('cache_version', CACHE_VERSION);
+              
+              // NE PAS modifier les attributs href/src des ressources - cela cause des rechargements infinis
+              // NE PAS forcer de rechargement automatique
+            })();
+            
             // Redirection automatique pour qrcodes.iahome.fr
             if (window.location.hostname === 'qrcodes.iahome.fr') {
               window.location.href = '/qrcodes';
@@ -129,25 +198,34 @@ export default function RootLayout({
             
             // Gestionnaire d'erreur global pour les erreurs webpack
             (function() {
+              let reloadCount = 0;
+              const MAX_RELOADS = 2; // Limiter à 2 rechargements pour éviter les boucles infinies
+              
               window.addEventListener('error', function(event) {
                 const error = event.error || event.message || '';
+                const errorMessage = (typeof error === 'string' ? error : (error && error.message ? error.message : ''));
+                
+                // Ignorer les erreurs liées à url.length pour éviter les boucles infinies
+                if (errorMessage.includes("can't access property") && errorMessage.includes("url") && errorMessage.includes("undefined")) {
+                  console.warn('⚠️ Erreur url.length détectée - Rechargement automatique désactivé pour éviter les boucles');
+                  event.preventDefault();
+                  return;
+                }
+                
                 const isWebpackError = 
                   (typeof error === 'string' && (
-                    error.includes("can't access property") ||
-                    error.includes("e[o] is undefined") ||
                     error.includes("ChunkLoadError") ||
                     error.includes("Loading chunk")
                   )) ||
                   (error && error.message && (
-                    error.message.includes("can't access property") ||
-                    error.message.includes("e[o] is undefined") ||
                     error.message.includes("ChunkLoadError") ||
                     error.message.includes("Loading chunk")
                   ));
                 
-                if (isWebpackError) {
+                if (isWebpackError && reloadCount < MAX_RELOADS) {
+                  reloadCount++;
                   console.warn('⚠️ Erreur Webpack détectée:', error);
-                  console.warn('💡 Tentative de rechargement automatique dans 2 secondes...');
+                  console.warn('💡 Tentative de rechargement automatique dans 2 secondes... (' + reloadCount + '/' + MAX_RELOADS + ')');
                   
                   // Vider le cache et recharger
                   setTimeout(function() {
@@ -162,30 +240,44 @@ export default function RootLayout({
                       window.location.reload();
                     }
                   }, 2000);
+                } else if (isWebpackError) {
+                  console.error('❌ Trop de tentatives de rechargement. Veuillez vider manuellement le cache.');
                 }
               }, true);
               
               // Intercepter les erreurs non capturées
+              let rejectionReloadCount = 0;
+              const MAX_REJECTION_RELOADS = 2;
+              
               window.addEventListener('unhandledrejection', function(event) {
                 const error = event.reason || '';
+                const errorMessage = (typeof error === 'string' ? error : (error && error.message ? error.message : ''));
+                
+                // Ignorer les erreurs liées à url.length pour éviter les boucles infinies
+                if (errorMessage.includes("can't access property") && errorMessage.includes("url") && errorMessage.includes("undefined")) {
+                  console.warn('⚠️ Erreur url.length (promise rejection) détectée - Rechargement automatique désactivé');
+                  event.preventDefault();
+                  return;
+                }
+                
                 const isWebpackError = 
                   (typeof error === 'string' && (
-                    error.includes("can't access property") ||
-                    error.includes("e[o] is undefined") ||
                     error.includes("ChunkLoadError")
                   )) ||
                   (error && error.message && (
-                    error.message.includes("can't access property") ||
-                    error.message.includes("e[o] is undefined") ||
                     error.message.includes("ChunkLoadError")
                   ));
                 
-                if (isWebpackError) {
+                if (isWebpackError && rejectionReloadCount < MAX_REJECTION_RELOADS) {
+                  rejectionReloadCount++;
                   console.warn('⚠️ Erreur Webpack (promise rejection) détectée:', error);
                   event.preventDefault();
                   setTimeout(function() {
                     window.location.reload();
                   }, 2000);
+                } else if (isWebpackError) {
+                  console.error('❌ Trop de tentatives de rechargement (promise rejection).');
+                  event.preventDefault();
                 }
               });
             })();
@@ -223,6 +315,7 @@ export default function RootLayout({
           <Footer />
           <ClientOnly>
             <ConditionalComponents />
+            <ScrollToTop />
           </ClientOnly>
         </TokenProvider>
       </body>

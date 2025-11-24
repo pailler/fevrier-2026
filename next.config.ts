@@ -57,7 +57,8 @@ const nextConfig: NextConfig = {
     }
     // En production, utiliser un hash basé sur la date pour invalider le cache
     const timestamp = Date.now();
-    return `build-${timestamp}`;
+    const random = Math.random().toString(36).substring(2, 10);
+    return `build-${timestamp}-${random}`;
   },
   
   transpilePackages: ['@supabase/supabase-js'],
@@ -169,7 +170,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Cache-Control',
-            value: 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800'
+            value: 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
           },
           {
             key: 'X-DNS-Prefetch-Control',
@@ -182,7 +183,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable'
+            value: 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
           },
           {
             key: 'Content-Type',
@@ -199,7 +200,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable'
+            value: 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
           },
           {
             key: 'Content-Type',
@@ -216,7 +217,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable'
+            value: 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
           },
           {
             key: 'Content-Type',
@@ -233,7 +234,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable'
+            value: 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
           },
           {
             key: 'X-Content-Type-Options',

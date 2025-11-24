@@ -359,6 +359,18 @@ export default function AdminDashboard() {
             <h3 className="font-medium text-gray-900">Paramètres</h3>
             <p className="text-sm text-gray-600">Configuration système</p>
           </a>
+
+          <a href="/admin/linkedin" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block">
+            <div className="text-2xl mb-2">💼</div>
+            <h3 className="font-medium text-gray-900">LinkedIn</h3>
+            <p className="text-sm text-gray-600">Gérer les posts LinkedIn</p>
+          </a>
+
+          <a href="/admin/notifications" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block">
+            <div className="text-2xl mb-2">📧</div>
+            <h3 className="font-medium text-gray-900">Notifications & Emails</h3>
+            <p className="text-sm text-gray-600">Envoyer des mails aux utilisateurs</p>
+          </a>
         </div>
       </div>
 

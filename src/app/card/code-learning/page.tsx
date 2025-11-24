@@ -90,7 +90,7 @@ export default function CodeLearningCardPage() {
           <Breadcrumb 
             items={[
               { label: 'Accueil', href: '/' },
-              { label: 'Apprendre le code' }
+              { label: 'Apprendre le code informatique' }
             ]}
           />
         </div>
@@ -220,7 +220,7 @@ export default function CodeLearningCardPage() {
                 <div className="w-full">
                   <ModuleActivationButton
                     moduleId={moduleId}
-                    moduleName="Apprendre le Code"
+                    moduleName="Apprendre le Code Informatique"
                     moduleCost={10}
                     moduleDescription="Application d'apprentissage du code pour enfants"
                     onActivationSuccess={() => {

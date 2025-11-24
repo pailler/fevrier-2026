@@ -6,8 +6,8 @@ import { getSupabaseClient } from '../../../utils/supabaseService';
 interface NotificationSetting {
   id: string;
   event_type: string;
-  name: string;
-  description: string;
+  name?: string;
+  description?: string;
   is_enabled: boolean;
   email_template_subject: string;
   email_template_body: string;
@@ -35,6 +35,12 @@ export default function AdminNotifications() {
   const [testSending, setTestSending] = useState(false);
   const [resendStatus, setResendStatus] = useState<any>(null);
   const [testingNotifications, setTestingNotifications] = useState<{[key: string]: boolean}>({});
+
+  // État pour l'envoi du mail "sans module activé"
+  const [noModuleEmail, setNoModuleEmail] = useState('');
+  const [noModuleUserName, setNoModuleUserName] = useState('');
+  const [noModuleSending, setNoModuleSending] = useState(false);
+  const [noModuleResult, setNoModuleResult] = useState<{success: boolean; message: string} | null>(null);
 
   useEffect(() => {
     loadData();
@@ -191,6 +197,57 @@ export default function AdminNotifications() {
     }
   };
 
+  const sendNoModuleEmail = async () => {
+    if (!noModuleEmail) {
+      alert('Veuillez saisir une adresse email');
+      return;
+    }
+
+    setNoModuleSending(true);
+    setNoModuleResult(null);
+
+    try {
+      const response = await fetch('/api/test-no-module-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: noModuleEmail,
+          userName: noModuleUserName || noModuleEmail.split('@')[0] || 'Utilisateur'
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setNoModuleResult({
+          success: true,
+          message: `✅ Email envoyé avec succès à ${data.email}`
+        });
+        // Recharger les logs pour voir la nouvelle entrée
+        loadData();
+        // Réinitialiser les champs après 3 secondes
+        setTimeout(() => {
+          setNoModuleEmail('');
+          setNoModuleUserName('');
+          setNoModuleResult(null);
+        }, 3000);
+      } else {
+        setNoModuleResult({
+          success: false,
+          message: `❌ Erreur: ${data.message || data.error || 'Erreur inconnue'}`
+        });
+      }
+    } catch (error) {
+      console.error('❌ Erreur lors de l\'envoi:', error);
+      setNoModuleResult({
+        success: false,
+        message: '❌ Erreur lors de l\'envoi de l\'email'
+      });
+    } finally {
+      setNoModuleSending(false);
+    }
+  };
+
   const getStatusBadge = (enabled: boolean) => {
     return enabled ? (
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -339,6 +396,118 @@ export default function AdminNotifications() {
         </div>
       </div>
 
+      {/* Envoi mail "Sans module activé" */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-sm border-2 border-blue-200 p-6">
+        <div className="mb-4">
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">📧</span>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">
+                Envoyer le mail "Sans module activé"
+              </h2>
+              <p className="text-sm text-gray-600">
+                Mail de bienvenue avec tutoriel et offre de 200 tokens bonus
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="no-module-email" className="block text-sm font-medium text-gray-700 mb-1">
+              Adresse email *
+            </label>
+            <input
+              id="no-module-email"
+              type="email"
+              value={noModuleEmail}
+              onChange={(e) => setNoModuleEmail(e.target.value)}
+              placeholder="utilisateur@example.com"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="no-module-name" className="block text-sm font-medium text-gray-700 mb-1">
+              Nom de l'utilisateur (optionnel)
+            </label>
+            <input
+              id="no-module-name"
+              type="text"
+              value={noModuleUserName}
+              onChange={(e) => setNoModuleUserName(e.target.value)}
+              placeholder="Prénom ou nom d'utilisateur"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Si vide, le nom sera extrait de l'adresse email
+            </p>
+          </div>
+
+          {noModuleResult && (
+            <div className={`p-3 rounded-lg ${
+              noModuleResult.success 
+                ? 'bg-green-50 border border-green-200 text-green-800' 
+                : 'bg-red-50 border border-red-200 text-red-800'
+            }`}>
+              <p className="text-sm font-medium">{noModuleResult.message}</p>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <a
+              href="/admin/notifications/preview"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium transition-colors text-center flex items-center justify-center"
+            >
+              👁️ Voir l'aperçu
+            </a>
+            <button
+              onClick={sendNoModuleEmail}
+              disabled={!noModuleEmail || noModuleSending}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+            >
+              {noModuleSending ? (
+                <span className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Envoi en cours...
+                </span>
+              ) : (
+                '📧 Envoyer le mail'
+              )}
+            </button>
+          </div>
+
+          <div className="mt-4 p-4 bg-white border border-blue-200 rounded-lg">
+            <p className="text-sm text-gray-900 font-semibold mb-3 flex items-center">
+              <span className="mr-2">💡</span>
+              Contenu du mail :
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="flex items-start space-x-2">
+                <span className="text-blue-600 mt-0.5">✓</span>
+                <span className="text-sm text-gray-700">Tutoriel simple en 4 étapes</span>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-blue-600 mt-0.5">✓</span>
+                <span className="text-sm text-gray-700">200 tokens bonus (3 jours)</span>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-blue-600 mt-0.5">✓</span>
+                <span className="text-sm text-gray-700">Liens vers Modules/Applications</span>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-blue-600 mt-0.5">✓</span>
+                <span className="text-sm text-gray-700">Design responsive</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Paramètres de notifications */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
@@ -352,25 +521,27 @@ export default function AdminNotifications() {
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
                     <h3 className="text-lg font-medium text-gray-900">
-                      {setting.name}
+                      {setting.name || setting.event_type}
                     </h3>
                     {getStatusBadge(setting.is_enabled)}
                   </div>
                   
-                  <p className="text-sm text-gray-600 mb-3">
-                    {setting.description}
-                  </p>
+                  {setting.description && (
+                    <p className="text-sm text-gray-600 mb-3">
+                      {setting.description}
+                    </p>
+                  )}
                   
                   <div className="text-xs text-gray-500 mb-2">
                     <strong>Type d'événement:</strong> {setting.event_type}
                   </div>
                   
                   <div className="text-xs text-gray-500 mb-2">
-                    <strong>Sujet:</strong> {setting.email_template_subject}
+                    <strong>Sujet:</strong> {setting.email_template_subject || 'Non défini'}
                   </div>
                   
                   <div className="text-xs text-gray-500">
-                    <strong>Corps:</strong> {setting.email_template_body.substring(0, 100)}...
+                    <strong>Corps:</strong> {setting.email_template_body ? `${setting.email_template_body.substring(0, 100)}...` : 'Non défini'}
                   </div>
                 </div>
                 

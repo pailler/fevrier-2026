@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Breadcrumb from '../../../components/Breadcrumb';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
 import { TOKEN_COSTS } from '../../../utils/tokenActionService';
+import { getAppLinks } from '../../../utils/appUsefulLinks';
 // import { NotificationServiceClient } from '../../../utils/notificationServiceClient';
 // import AuthorizedAccessButton from '../../../components/AuthorizedAccessButton';
 
@@ -211,8 +212,11 @@ export default function CardDetailPage() {
       
       console.log(`🔗 ${moduleTitle}: Accès direct à:`, accessUrl);
       
-      // Pour les routes internes (commençant par /), rediriger dans le même onglet
-      if (accessUrl.startsWith('/')) {
+      // Pour le module code-learning, toujours ouvrir dans un nouvel onglet
+      if (moduleId === 'code-learning') {
+        window.open(accessUrl, '_blank');
+      } else if (accessUrl.startsWith('/')) {
+        // Pour les autres routes internes (commençant par /), rediriger dans le même onglet
         window.location.href = accessUrl;
       } else {
         window.open(accessUrl, '_blank');
@@ -981,18 +985,18 @@ export default function CardDetailPage() {
                     )}
 
 
-                    {/* Bouton d'accès spécial pour Apprendre le Code */}
+                    {/* Bouton d'accès spécial pour Apprendre le Code Informatique */}
                     {isCodeLearning && !alreadyActivatedModules.includes(card.id) && (
                       <button
                         onClick={async () => {
                           if (!isAuthenticated || !user) {
-                            console.log('❌ Accès Apprendre le Code - Utilisateur non connecté');
+                            console.log('❌ Accès Apprendre le Code Informatique - Utilisateur non connecté');
                             router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
                             return;
                           }
 
                           try {
-                            console.log('🔄 Activation Apprendre le Code pour:', user.email);
+                            console.log('🔄 Activation Apprendre le Code Informatique pour:', user.email);
                             
                             const response = await fetch('/api/activate-code-learning', {
                               method: 'POST',
@@ -1008,16 +1012,16 @@ export default function CardDetailPage() {
                             const result = await response.json();
 
                             if (result.success) {
-                              console.log('✅ Apprendre le Code activé avec succès');
+                              console.log('✅ Apprendre le Code Informatique activé avec succès');
                               setAlreadyActivatedModules(prev => [...prev, card.id]);
-                              alert('Apprendre le Code activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation (10 tokens).');
+                              alert('Apprendre le Code Informatique activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation (10 tokens).');
                               router.push('/encours');
                             } else {
-                              console.error('❌ Erreur activation Apprendre le Code:', result.error);
+                              console.error('❌ Erreur activation Apprendre le Code Informatique:', result.error);
                               alert(`Erreur lors de l'activation: ${result.error}`);
                             }
                           } catch (error) {
-                            console.error('❌ Erreur activation Apprendre le Code:', error);
+                            console.error('❌ Erreur activation Apprendre le Code Informatique:', error);
                             alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                           }
                         }}
@@ -1025,7 +1029,7 @@ export default function CardDetailPage() {
                       >
                         <span className="text-xl">⚡</span>
                         <span>
-                          {isAuthenticated && user ? `Activer Apprendre le Code (10 tokens)` : `Connectez-vous pour activer Apprendre le Code (10 tokens)`}
+                          {isAuthenticated && user ? `Activer Apprendre le Code Informatique (10 tokens)` : `Connectez-vous pour activer Apprendre le Code Informatique (10 tokens)`}
                         </span>
                       </button>
                     )}
@@ -1429,6 +1433,9 @@ export default function CardDetailPage() {
                 <div className="text-center max-w-5xl mx-auto">
                   <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
                     {card.description}
+                    {!card.description?.toLowerCase().includes('sans téléchargement') && !card.description?.toLowerCase().includes('sans installation') && (
+                      <span className="text-gray-600"> • Sans téléchargement</span>
+                    )}
                   </p>
                   {card.subtitle && (
                     <p className="text-base sm:text-lg text-gray-600 italic mb-8">
@@ -1638,19 +1645,25 @@ export default function CardDetailPage() {
                   </div>
                 </div>
                 
-                {/* Call to action */}
-                <div className="text-center pt-8">
-                  <p className="text-lg sm:text-xl text-gray-700 mb-6 max-w-4xl mx-auto">
-                    Prêt à découvrir {card.title} ? Commencez dès maintenant et profitez de toutes ses fonctionnalités !
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <Link href="/signup" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                      <span className="text-xl mr-2">🚀</span>
-                      Commencer maintenant
-                    </Link>
-                    <span className="text-sm text-gray-500">
-                      Accès instantané juste après inscription
-                    </span>
+                {/* Liens utiles */}
+                <div className="pt-8 border-t border-gray-200">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Liens utiles</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {getAppLinks(card.id).map((link, index) => (
+                      <a
+                        key={index}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium"
+                      >
+                        <span className="mr-2">{link.icon || '🔗'}</span>
+                        {link.label}
+                      </a>
+                    ))}
+                    {getAppLinks(card.id).length === 0 && (
+                      <p className="text-gray-500 text-sm">Aucun lien disponible pour cette application.</p>
+                    )}
                   </div>
                 </div>
               </div>

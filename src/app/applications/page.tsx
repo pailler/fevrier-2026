@@ -255,7 +255,7 @@ export default function Home() {
                 Accès directs à la puissance GPU, IA et outils essentiels
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Le numérique à portée de main, pour une utilisation simple et directe.
+                Le numérique à portée de main, pour une utilisation simple et directe. Sans téléchargement.
               </p>
               
               {/* Barre de recherche et bouton Mes applis */}

@@ -1,0 +1,43 @@
+services:
+  deemix:
+    image: registry.gitlab.com/bockiii/deemix-docker:latest
+    container_name: deemix-iahome
+    restart: unless-stopped
+    ports:
+      - "6595:6595"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      # Optionnel: Configuration du répertoire de téléchargement
+      - DOWNLOAD_PATH=/downloads
+    volumes:
+      # Répertoire de téléchargement - chemin spécifique pour deemix
+      - /volume1/downloads/deemix:/downloads
+      # Configuration deemix (volume nommé pour éviter les problèmes de permissions)
+      - deemix-config:/config
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:6595 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - iahome-network
+    # Labels Traefik (optionnel - décommentez si vous voulez exposer via Traefik)
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.deemix.rule=Host(`deemix.iahome.fr`)"
+    #   - "traefik.http.routers.deemix.entrypoints=websecure"
+    #   - "traefik.http.routers.deemix.tls=true"
+    #   - "traefik.http.routers.deemix.tls.certresolver=letsencrypt"
+    #   - "traefik.http.services.deemix.loadbalancer.server.port=6595"
+
+volumes:
+  deemix-config:
+    driver: local
+
+networks:
+  iahome-network:
+    external: true
+

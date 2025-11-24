@@ -67,6 +67,7 @@ Thumbs.db
 # Fichiers de backup
 *.backup
 *.bakdocker-services/essentiels/pdf/temp/
+docker-services/essentiels/pdf/temp/**/OSL_PIPE*
 ffmpeg.zip
 
 # Fichiers LFS volumineux (> 100 Mo) - exclus du dépôt GitHub

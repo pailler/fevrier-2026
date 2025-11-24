@@ -32,13 +32,9 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
         <div className="flex items-center justify-between h-10">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center space-x-3">
-              <span className="hidden sm:inline">Administrateur IAHome</span>
             </div>
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-3">
-                <span className="text-blue-100 text-sm">
-                  Administrateur IAHome
-                </span>
                 <span className="text-blue-100 text-sm font-medium">
                   {user.email}
                 </span>

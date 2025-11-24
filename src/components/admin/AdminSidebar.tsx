@@ -12,6 +12,7 @@ const navigation = [
   { name: 'Paiements', href: '/admin/payments', icon: '💳' },
   { name: 'Tokens', href: '/admin/tokens', icon: '🪙' },
   { name: 'Contenu', href: '/admin/content', icon: '📝' },
+  { name: 'LinkedIn', href: '/admin/linkedin', icon: '💼' },
   { name: 'Événements', href: '/admin/events', icon: '📋' },
   { name: 'Notifications', href: '/admin/notifications', icon: '🔔' },
   { name: 'Fichiers volumineux', href: '/admin/large-files', icon: '📁' },
