@@ -186,38 +186,47 @@ export async function checkSessionDuration(session: any): Promise<SessionDuratio
       };
     }
 
-    // Calculer l'âge de la session
-    const now = new Date();
-    const sessionAge = now.getTime() - sessionCreatedAt.getTime();
-
-    // Si l'âge calculé est négatif (problème de synchronisation), considérer comme valide
-    if (sessionAge < 0) {
-      console.warn('⚠️ Âge de session négatif détecté, considérer comme valide');
-      return {
-        isValid: true
-      };
-    }
-
-    // Vérifier si la session a dépassé 60 minutes
-    if (sessionAge > SESSION_DURATION_MS) {
-      const exceededMinutes = Math.floor((sessionAge - SESSION_DURATION_MS) / (60 * 1000));
-      console.log(`❌ Session expirée pour ${userEmail}: ${exceededMinutes} minutes au-delà de la limite`);
-      return {
-        isValid: false,
-        reason: `Session expirée (durée maximale de 60 minutes dépassée de ${exceededMinutes} minutes)`
-      };
-    }
-
-    // Calculer le temps restant
-    const remainingMs = SESSION_DURATION_MS - sessionAge;
-    const remainingMinutes = Math.floor(remainingMs / (60 * 1000));
-
-    console.log(`✅ Session valide pour ${userEmail}: ${remainingMinutes} minutes restantes`);
-
+    // DÉSACTIVÉ : Plus de vérification de durée de session - toujours valide
+    // La déconnexion automatique après 1 heure est désactivée
+    console.log(`✅ Session valide pour ${userEmail} (déconnexion automatique désactivée)`);
     return {
       isValid: true,
-      remainingMinutes: Math.max(0, remainingMinutes)
+      remainingMinutes: undefined // Illimité
     };
+
+    // CODE DÉSACTIVÉ - Ancienne logique de vérification de durée
+    // Calculer l'âge de la session
+    // const now = new Date();
+    // const sessionAge = now.getTime() - sessionCreatedAt.getTime();
+
+    // // Si l'âge calculé est négatif (problème de synchronisation), considérer comme valide
+    // if (sessionAge < 0) {
+    //   console.warn('⚠️ Âge de session négatif détecté, considérer comme valide');
+    //   return {
+    //     isValid: true
+    //   };
+    // }
+
+    // // Vérifier si la session a dépassé 60 minutes
+    // if (sessionAge > SESSION_DURATION_MS) {
+    //   const exceededMinutes = Math.floor((sessionAge - SESSION_DURATION_MS) / (60 * 1000));
+    //   console.log(`❌ Session expirée pour ${userEmail}: ${exceededMinutes} minutes au-delà de la limite`);
+    //   return {
+    //     isValid: false,
+    //     reason: `Session expirée (durée maximale de 60 minutes dépassée de ${exceededMinutes} minutes)`
+    //   };
+    // }
+
+    // // Calculer le temps restant
+    // const remainingMs = SESSION_DURATION_MS - sessionAge;
+    // const remainingMinutes = Math.floor(remainingMs / (60 * 1000));
+
+    // console.log(`✅ Session valide pour ${userEmail}: ${remainingMinutes} minutes restantes`);
+
+    // return {
+    //   isValid: true,
+    //   remainingMinutes: Math.max(0, remainingMinutes)
+    // };
   } catch (error) {
     // En cas d'erreur, considérer la session comme valide pour éviter de bloquer les utilisateurs
     console.error('❌ Erreur lors de la vérification de durée de session:', error);

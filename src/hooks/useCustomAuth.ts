@@ -64,8 +64,12 @@ export function useCustomAuth() {
   }, []);
 
   // Fonction pour vérifier et déconnecter si la session a expiré
+  // DÉSACTIVÉE : Plus de déconnexion automatique après 1 heure
   const checkSessionExpiry = useCallback(async () => {
     if (!isClient) return;
+
+    // Désactivation de la déconnexion automatique - toujours retourner sans déconnecter
+    return;
 
     try {
       const token = localStorage.getItem('auth_token');
@@ -87,8 +91,9 @@ export function useCustomAuth() {
         return; // Ne pas déconnecter l'admin
       }
 
-      // Si la session a dépassé 1 heure, déconnecter
-      if (sessionAge > SESSION_DURATION_MS) {
+      // DÉSACTIVÉ : Si la session a dépassé 1 heure, déconnecter
+      // Plus de déconnexion automatique
+      if (false && sessionAge > SESSION_DURATION_MS) {
         // Vérifier si on est déjà sur la page de login pour éviter les redirections multiples
         if (window.location.pathname === '/login') {
           return; // Déjà sur la page de login, ne rien faire
@@ -105,10 +110,30 @@ export function useCustomAuth() {
           }
         }
 
-        // Nettoyer localStorage
+        // Nettoyer complètement le localStorage (y compris les tokens Supabase)
         localStorage.removeItem('auth_token');
         localStorage.removeItem('user_data');
         localStorage.removeItem('session_start_time');
+        
+        // Nettoyer également le storage Supabase pour éviter les conflits
+        try {
+          const supabaseStorageKey = 'sb-xemtoyzcihmncbrlsmhr-auth-token';
+          localStorage.removeItem(supabaseStorageKey);
+          
+          // Nettoyer toutes les clés Supabase potentielles
+          Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('sb-') || key.includes('supabase')) {
+              localStorage.removeItem(key);
+            }
+          });
+        } catch (storageError) {
+          console.warn('⚠️ Erreur lors du nettoyage du storage Supabase:', storageError);
+        }
+        
+        // Réinitialiser l'instance Supabase pour éviter les instances multiples
+        if (typeof window !== 'undefined' && (window as any).__supabaseClientInstance) {
+          delete (window as any).__supabaseClientInstance;
+        }
         
         // Réinitialiser le compteur d'erreurs réseau
         networkErrorCountRef.current = 0;
@@ -195,11 +220,11 @@ export function useCustomAuth() {
           const now = Date.now();
           const sessionAge = now - sessionStart;
           
-          // Si la session est expirée (sauf pour admin), arrêter immédiatement
-          if (sessionAge > SESSION_DURATION_MS && !isAdminUser(user.email)) {
-            checkSessionExpiry();
-            return;
-          }
+          // DÉSACTIVÉ : Plus de vérification de durée de session
+          // if (sessionAge > SESSION_DURATION_MS && !isAdminUser(user.email)) {
+          //   checkSessionExpiry();
+          //   return;
+          // }
         }
         
         // Vérifier la connectivité réseau avant de faire des appels
@@ -255,11 +280,12 @@ export function useCustomAuth() {
             const now = Date.now();
             const sessionAge = now - sessionStart;
             
-            if (sessionAge > SESSION_DURATION_MS) {
-              // Session expirée, déconnecter
-              checkSessionExpiry();
-              return;
-            }
+            // DÉSACTIVÉ : Plus de vérification de durée de session
+            // if (sessionAge > SESSION_DURATION_MS) {
+            //   // Session expirée, déconnecter
+            //   checkSessionExpiry();
+            //   return;
+            // }
           }
         }
         
@@ -335,10 +361,11 @@ export function useCustomAuth() {
           if (sessionStartTime) {
             const sessionStart = parseInt(sessionStartTime, 10);
             const sessionAge = Date.now() - sessionStart;
-            if (sessionAge > SESSION_DURATION_MS) {
-              // Session expirée, ignorer silencieusement les erreurs de rafraîchissement
-              return;
-            }
+            // DÉSACTIVÉ : Plus de vérification de durée de session
+            // if (sessionAge > SESSION_DURATION_MS) {
+            //   // Session expirée, ignorer silencieusement les erreurs de rafraîchissement
+            //   return;
+            // }
           }
           
           networkErrorCountRef.current += 1;
@@ -465,13 +492,14 @@ export function useCustomAuth() {
             const sessionStart = parseInt(sessionStartTime, 10);
             const sessionAge = Date.now() - sessionStart;
             
+            // DÉSACTIVÉ : Plus de vérification de durée de session
             // Si la session est expirée et que ce n'est pas une déconnexion explicite, ignorer l'événement
-            if (sessionAge > SESSION_DURATION_MS && event !== 'SIGNED_OUT') {
-              // Ignorer silencieusement les tentatives de rafraîchissement quand la session est expirée
-              if (event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-                return;
-              }
-            }
+            // if (sessionAge > SESSION_DURATION_MS && event !== 'SIGNED_OUT') {
+            //   // Ignorer silencieusement les tentatives de rafraîchissement quand la session est expirée
+            //   if (event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+            //     return;
+            //   }
+            // }
           }
           
           // Si une session existe et qu'on a un token mais pas de session_start_time, synchroniser
@@ -662,15 +690,33 @@ export function useCustomAuth() {
 
   // Fonction pour se connecter
   const signIn = useCallback((user: User, token: string) => {
-    // Connexion utilisateur
+    // Nettoyer d'abord les données résiduelles pour éviter les conflits
+    try {
+      // Nettoyer les anciennes clés avant de stocker les nouvelles
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_data');
+      localStorage.removeItem('session_start_time');
+      
+      // Nettoyer les clés Supabase potentielles (elles seront recréées si nécessaire)
+      const supabaseStorageKey = 'sb-xemtoyzcihmncbrlsmhr-auth-token';
+      localStorage.removeItem(supabaseStorageKey);
+      
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sb-') && key !== supabaseStorageKey) {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch (cleanupError) {
+      console.warn('⚠️ Erreur lors du nettoyage avant connexion:', cleanupError);
+    }
     
+    // Stocker les nouvelles données d'authentification
     localStorage.setItem('auth_token', token);
     localStorage.setItem('user_data', JSON.stringify(user));
     // Stocker la date de début de session pour vérifier l'expiration
     localStorage.setItem('session_start_time', Date.now().toString());
     
-    // Données sauvegardées
-    
+    // Mettre à jour l'état d'authentification
     setAuthState({
       user,
       token,
@@ -683,24 +729,14 @@ export function useCustomAuth() {
       detail: { user, token } 
     }));
     
-    // État mis à jour
+    console.log('✅ Connexion réussie pour:', user.email);
   }, []);
 
   // Fonction pour se déconnecter
   const signOut = useCallback(async () => {
-    // Déconnexion utilisateur
+    console.log('🔄 Déconnexion en cours...');
     
-    // Déconnecter Supabase Auth
-    try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.warn('⚠️ Erreur lors de la déconnexion Supabase:', error);
-    }
-    
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_data');
-    localStorage.removeItem('session_start_time');
-    
+    // Mettre à jour l'état immédiatement pour éviter les conflits
     setAuthState({
       user: null,
       token: null,
@@ -708,12 +744,77 @@ export function useCustomAuth() {
       loading: false
     });
     
-    // Déclencher un événement personnalisé pour notifier les autres composants
+    // Déclencher l'événement de déconnexion immédiatement pour notifier les autres composants
     window.dispatchEvent(new CustomEvent('userLoggedOut'));
     
-    if (process.env.NODE_ENV === 'development') {
-      ;
+    // Déconnecter Supabase Auth avec un timeout pour éviter les blocages
+    try {
+      const signOutPromise = supabase.auth.signOut();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), 2000)
+      );
+      await Promise.race([signOutPromise, timeoutPromise]);
+    } catch (error) {
+      // Ignorer les erreurs de timeout ou autres erreurs de déconnexion
+      // Le nettoyage manuel ci-dessous garantit que tout est nettoyé
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('⚠️ Erreur lors de la déconnexion Supabase:', error);
+      }
     }
+    
+    // Nettoyer complètement le localStorage (y compris les tokens Supabase)
+    try {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_data');
+      localStorage.removeItem('session_start_time');
+      
+      // Nettoyer également le storage Supabase pour éviter les conflits
+      const supabaseStorageKey = 'sb-xemtoyzcihmncbrlsmhr-auth-token';
+      localStorage.removeItem(supabaseStorageKey);
+      
+      // Nettoyer toutes les clés Supabase potentielles
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sb-') || key.includes('supabase')) {
+          localStorage.removeItem(key);
+        }
+      });
+      
+      // Nettoyer également sessionStorage pour éviter les conflits
+      try {
+        sessionStorage.removeItem('session_expired_redirected');
+        Object.keys(sessionStorage).forEach(key => {
+          if (key.startsWith('sb-') || key.includes('supabase') || key.includes('auth')) {
+            sessionStorage.removeItem(key);
+          }
+        });
+      } catch (sessionError) {
+        // Ignorer les erreurs de sessionStorage
+      }
+    } catch (storageError) {
+      console.warn('⚠️ Erreur lors du nettoyage du storage:', storageError);
+    }
+    
+    // Réinitialiser l'instance Supabase pour éviter les instances multiples
+    if (typeof window !== 'undefined') {
+      // Supprimer l'instance globale
+      if ((window as any).__supabaseClientInstance) {
+        delete (window as any).__supabaseClientInstance;
+      }
+      
+      // Importer et utiliser resetSupabaseClient si disponible
+      try {
+        const { resetSupabaseClient } = require('../utils/supabaseService');
+        resetSupabaseClient();
+      } catch (resetError) {
+        // Si l'import échoue, continuer sans erreur
+      }
+    }
+    
+    // Attendre un peu pour s'assurer que tous les listeners sont nettoyés
+    // Cela évite les conflits lors de la reconnexion immédiate
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    console.log('✅ Déconnexion complète');
   }, []);
 
   // Fonction pour obtenir les headers d'authentification

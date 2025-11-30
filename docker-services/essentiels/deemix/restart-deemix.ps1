@@ -17,3 +17,10 @@ Write-Host "`n📋 Démarrage du conteneur..." -ForegroundColor Yellow
 & "$scriptPath\start-deemix.ps1"
 
 
+
+
+
+
+
+
+

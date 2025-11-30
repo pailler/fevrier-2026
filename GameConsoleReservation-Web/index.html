@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Le Labo Numérique">
-    <title>Le Labo Numérique : avec ta carte Geek, choisis ta réservation, plonge dans le jeu !</title>
+    <title>Réservation à l'accueil du Labo Numérique</title>
     <script>
         // Forcer le rechargement sans cache - méthode radicale
         const cssCacheBuster = '?v=' + Date.now() + '_' + Math.random().toString(36).substr(2, 9) + '_user_name_glow';
@@ -42,12 +42,13 @@
         
         <!-- Header -->
         <header class="app-header">
-            <h1>Le Labo Numérique : avec ta carte Geek, choisis ta réservation, plonge dans le jeu !</h1>
+            <div class="header-title-container">
+                <h1>Réservation à l'accueil du Labo Numérique</h1>
+                <h2 class="header-subtitle">Avec ta carte Geek, choisis ta réservation et plonge dans le jeu !</h2>
+            </div>
             <div class="header-buttons">
-                <button class="btn-rules" id="rulesBtn" title="Voir les règles">📋 Les règles</button>
+                <button class="btn-rules" id="rulesBtn" title="Comment ça marche ?">❓ Comment ça marche ?</button>
                 <button class="btn-active-games" id="activeGamesBtn" title="Voir les jeux en cours">🎮 Jeu en cours</button>
-                <button class="refresh-btn" id="refreshBtn" title="Actualiser">🔄</button>
-                <button class="btn-admin" id="adminBtn" title="Mode administrateur">🔐 Admin</button>
             </div>
         </header>
 
@@ -59,47 +60,6 @@
             </div>
         </main>
 
-        <!-- Tableau des réservations -->
-        <section class="reservations-table-section" id="reservationsTableSection">
-            <div class="section-header">
-                <h2>📋 Liste des réservations</h2>
-                <p style="color: #666; font-size: 14px; margin-top: 5px;">Emprunts du matériel du Labo : en cours, à venir, annulés...</p>
-            </div>
-            <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <button id="deleteSelectedPastReservationsBtn" class="btn" style="background: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: none;">
-                        🗑️ Supprimer les réservations passées sélectionnées
-                    </button>
-                    <span id="selectedCount" style="color: #666; font-size: 14px; display: none;"></span>
-                </div>
-            </div>
-            <div class="table-container">
-                <table class="reservations-table" id="reservationsTable">
-                    <thead>
-                        <tr>
-                            <th style="width: 50px;">
-                                <input type="checkbox" id="selectAllCheckbox" style="cursor: pointer; width: 18px; height: 18px;" title="Sélectionner toutes les réservations passées">
-                            </th>
-                            <th class="sortable" data-sort="console">
-                                Console <span class="sort-indicator"></span>
-                            </th>
-                            <th class="sortable" data-sort="joueur">
-                                Joueur <span class="sort-indicator"></span>
-                            </th>
-                            <th>Statut</th>
-                            <th>Début théorique</th>
-                            <th>Fin théorique</th>
-                            <th>Durée</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="reservationsTableBody">
-                        <!-- Les réservations seront générées dynamiquement -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
         <!-- Règles du bien jouer ensemble -->
         <footer class="rules-footer">
             <div class="rules-container">
@@ -107,6 +67,10 @@
                     <h3>🌟 Règles du bien jouer ensemble</h3>
                 </div>
                 <div class="rules-content">
+                    <div class="rule-item">
+                        <span class="rule-icon">🎫</span>
+                        <span class="rule-text">Si tu n'as pas encore ta carte Geek, demande à l'animateur du Labo.</span>
+                    </div>
                     <div class="rule-item">
                         <span class="rule-icon">👤</span>
                         <span class="rule-text">Utilise ton <strong>vrai prénom (pas de pseudo)</strong> et le <strong>numéro de ta carte de Geek</strong>.</span>
@@ -140,6 +104,10 @@
                     <span class="rule-text">L'animateur se réserve le droit de modifier ou d'annuler toute réservation en cours.</span>
                 </div>
             </div>
+            </div>
+            <!-- Bouton Admin après les règles -->
+            <div style="text-align: center; padding: 20px 0 0 0;">
+                <button class="btn-admin" id="adminBtn" title="Mode administrateur">🔐 Admin</button>
             </div>
         </footer>
 
@@ -223,7 +191,7 @@
 
         <!-- Modal Admin -->
         <div class="modal" id="adminModal">
-            <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-content" style="max-width: 95%; max-height: 90vh; overflow-y: auto;">
                 <div class="modal-header">
                     <h2 id="adminModalTitle">🔐 Mode Administrateur</h2>
                     <button class="close-btn" id="closeAdminModal">×</button>
@@ -243,6 +211,10 @@
                 </div>
                 <div class="modal-body" id="rulesModalBody">
                     <div class="rules-content">
+                        <div class="rule-item">
+                            <span class="rule-icon">🎫</span>
+                            <span class="rule-text">Si tu n'as pas encore ta carte Geek, demande à l'animateur du Labo.</span>
+                        </div>
                         <div class="rule-item">
                             <span class="rule-icon">👤</span>
                             <span class="rule-text">Utilise ton <strong>vrai prénom (pas de pseudo)</strong> et le <strong>numéro de ta carte de Geek</strong>.</span>

@@ -102,6 +102,22 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
       // En production : utiliser les sous-domaines publics
       const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
       
+      // Mapping des module_id (numériques ou slugs) vers les slugs
+      const moduleIdMapping: { [key: string]: string } = {
+        '1': 'pdf',      // PDF+ -> pdf
+        '2': 'metube',   // MeTube -> metube
+        '3': 'librespeed', // LibreSpeed -> librespeed
+        '4': 'psitransfer', // PsiTransfer -> psitransfer
+        '5': 'qrcodes',  // QR Codes -> qrcodes
+        '7': 'stablediffusion', // Stable Diffusion -> stablediffusion
+        '8': 'ruinedfooocus', // Ruined Fooocus -> ruinedfooocus
+        '10': 'comfyui', // ComfyUI -> comfyui
+        '11': 'cogstudio', // Cog Studio -> cogstudio
+        'home-assistant': 'home-assistant', // Home Assistant -> home-assistant
+        'meeting-reports': 'meeting-reports', // Meeting Reports -> meeting-reports
+        'hunyuan3d': 'hunyuan3d', // Hunyuan 3D -> hunyuan3d
+      };
+      
       const moduleSubdomains: Record<string, string> = {
         'librespeed': 'https://librespeed.iahome.fr',
         'metube': 'https://metube.iahome.fr',
@@ -117,12 +133,18 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'cogstudio': 'https://cogstudio.iahome.fr',
         // Hunyuan 3D : localhost:8888 en dev, hunyuan3d.iahome.fr en prod
         'hunyuan3d': isDevelopment ? 'http://localhost:8888' : 'https://hunyuan3d.iahome.fr',
+        // Home Assistant : localhost:8123 en dev, homeassistant.iahome.fr en prod
+        'home-assistant': isDevelopment ? 'http://localhost:8123' : 'https://homeassistant.iahome.fr',
       };
       
+      // Convertir module_id numérique en slug si nécessaire
+      const slug = moduleIdMapping[moduleId] || moduleId;
+      
       // Obtenir l'URL du sous-domaine pour ce module
-      const moduleUrl = moduleSubdomains[moduleId];
+      const moduleUrl = moduleSubdomains[slug];
       
       if (!moduleUrl) {
+        console.error(`❌ Module non trouvé - moduleId: ${moduleId}, slug: ${slug}, mapping disponible:`, Object.keys(moduleSubdomains));
         throw new Error(`Module ${moduleId} non trouvé`);
       }
       

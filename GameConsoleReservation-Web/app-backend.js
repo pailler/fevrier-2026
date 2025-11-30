@@ -4,13 +4,20 @@
 // Configuration de l'API - Détection automatique de l'URL
 // Utilise l'URL actuelle si on est sur le domaine public, sinon localhost pour le développement
 function getApiBaseUrl() {
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    
     // Si on est sur le domaine public (consoles.regispailler.fr), utiliser l'URL complète avec le même domaine
-    if (window.location.hostname.includes('regispailler.fr') || window.location.hostname.includes('iahome.fr')) {
+    if (hostname.includes('regispailler.fr') || hostname.includes('iahome.fr')) {
         // Utiliser l'URL complète avec le même protocole et domaine
-        const protocol = window.location.protocol; // 'https:' ou 'http:'
-        const hostname = window.location.hostname; // 'consoles.regispailler.fr'
         return `${protocol}//${hostname}/api`;
     }
+    
+    // Si on est sur le NAS (192.168.1.130), utiliser l'IP du NAS
+    if (hostname === '192.168.1.130' || hostname.includes('192.168.1.130')) {
+        return 'http://192.168.1.130:5001/api';
+    }
+    
     // Sinon, utiliser localhost pour le développement local (backend sur port 5001)
     return 'http://localhost:5001/api';
 }
@@ -541,6 +548,11 @@ class App {
             console.log('🎨 [init] Appel de renderConsoles()...');
             await this.renderConsoles();
             console.log('✅ [init] Consoles rendues');
+            
+            // Ne pas charger le tableau des réservations au démarrage
+            // Il sera chargé uniquement dans le modal admin
+            console.log('✅ [init] Tableau des réservations sera chargé dans le modal admin');
+            
             this.setupEventListeners();
             console.log('✅ [init] Event listeners configurés');
             
@@ -667,14 +679,17 @@ class App {
         });
         
         // Bouton refresh
-        document.getElementById('refreshBtn').addEventListener('click', async () => {
-            try {
-                await this.renderConsoles();
-                this.showToast('Liste actualisée', 'success');
-            } catch (error) {
-                this.showToast('Erreur lors de l\'actualisation', 'error');
-            }
-        });
+        const refreshBtn = document.getElementById('refreshBtn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', async () => {
+                try {
+                    await this.renderConsoles();
+                    this.showToast('Liste actualisée', 'success');
+                } catch (error) {
+                    this.showToast('Erreur lors de l\'actualisation', 'error');
+                }
+            });
+        }
 
         // Bouton "Jeu en cours" - Filtrer les consoles avec des jeux actifs
         document.getElementById('activeGamesBtn').addEventListener('click', () => {
@@ -1025,7 +1040,7 @@ class App {
                             </div>
                             <div style="flex: 1; min-width: 0;">
                                 <div class="console-name" style="font-size: 24px; font-weight: 700; margin-bottom: 5px;">${gameConsole.name}</div>
-                                <div class="console-type" style="font-size: 18px; color: #666;">${gameConsole.type}</div>
+                                <div class="console-type" style="font-size: 18px; color: #666;">Clique pour réserver</div>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
@@ -2611,7 +2626,7 @@ class App {
     async askForPIN(message = 'Entrez votre code PIN (4 chiffres) :') {
         return new Promise((resolve) => {
             const modal = document.createElement('div');
-            modal.className = 'modal active';
+            modal.className = 'modal active pin-modal';
             modal.id = 'pinModal';
             modal.innerHTML = `
                 <div class="modal-content" style="max-width: 400px;">
@@ -2718,22 +2733,22 @@ class App {
             const reservations = await this.reservationManager.loadReservations();
             const consoles = await this.reservationManager.loadConsoles();
             
-            const tableBody = document.getElementById('reservationsTableBody');
-            const section = document.getElementById('reservationsTableSection');
+            // Chercher le tableau dans le modal admin
+            const tableBody = document.getElementById('adminReservationsTableBody');
             
-            if (!tableBody || !section) {
-                console.error('Éléments du tableau non trouvés');
+            if (!tableBody) {
+                console.error('Éléments du tableau non trouvés dans le modal admin');
                 return;
             }
             
-            // Toujours afficher la section
-            section.style.display = 'block';
+            // Mettre à jour les références pour les boutons et checkboxes
+            const selectAllCheckbox = document.getElementById('adminSelectAllCheckbox');
+            const deleteBtn = document.getElementById('adminDeleteSelectedPastReservationsBtn');
+            const selectedCount = document.getElementById('adminSelectedCount');
             
             if (!reservations || reservations.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: #666;">Aucune réservation pour le moment</td></tr>';
                 // Masquer le bouton de suppression en masse
-                const deleteBtn = document.getElementById('deleteSelectedPastReservationsBtn');
-                const selectAllCheckbox = document.getElementById('selectAllCheckbox');
                 if (deleteBtn) deleteBtn.style.display = 'none';
                 if (selectAllCheckbox) selectAllCheckbox.style.display = 'none';
                 return;
@@ -2929,8 +2944,7 @@ class App {
             });
             
             // Afficher/masquer le bouton de suppression en masse selon s'il y a des réservations passées
-            const deleteBtn = document.getElementById('deleteSelectedPastReservationsBtn');
-            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            // Utiliser les variables déjà définies au début de la fonction
             if (pastReservations.length > 0) {
                 if (deleteBtn) deleteBtn.style.display = 'block';
                 if (selectAllCheckbox) selectAllCheckbox.style.display = 'block';
@@ -2948,7 +2962,7 @@ class App {
             // RESTAURER l'état des checkboxes après la régénération et la configuration des listeners
             if (selectedReservationIds.size > 0) {
                 // Marquer qu'on est en train de restaurer l'état pour éviter les conflits
-                const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+                // Utiliser la variable selectAllCheckbox déjà définie au début de la fonction
                 if (selectAllCheckbox) {
                     selectAllCheckbox.dataset.restoring = 'true';
                 }
@@ -2974,16 +2988,16 @@ class App {
                     // Mettre à jour le compteur et le bouton
                     const checkboxes = document.querySelectorAll('.reservation-checkbox:checked');
                     const count = checkboxes.length;
-                    const selectedCountSpan = document.getElementById('selectedCount');
-                    const deleteBtn = document.getElementById('deleteSelectedPastReservationsBtn');
-                    if (selectedCountSpan) {
+                    // Utiliser la variable selectedCount déjà définie au début de la fonction
+                    if (selectedCount) {
                         if (count > 0) {
-                            selectedCountSpan.textContent = `${count} réservation(s) sélectionnée(s)`;
-                            selectedCountSpan.style.display = 'block';
+                            selectedCount.textContent = `${count} réservation(s) sélectionnée(s)`;
+                            selectedCount.style.display = 'block';
                         } else {
-                            selectedCountSpan.style.display = 'none';
+                            selectedCount.style.display = 'none';
                         }
                     }
+                    // Utiliser la variable deleteBtn déjà définie au début de la fonction
                     if (deleteBtn) {
                         deleteBtn.disabled = count === 0;
                         deleteBtn.style.opacity = count === 0 ? '0.5' : '1';
@@ -3288,7 +3302,50 @@ class App {
         const allowedScanNumbers = await this.reservationManager.loadAllowedScanNumbers();
         
         let adminHTML = `
-            <!-- Section 1: Gestion des numéros autorisés -->
+            <!-- Section 1: Liste des réservations (en haut) -->
+            <div style="margin-bottom: 30px; padding: 20px; background: #fff; border: 2px solid #667eea; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div style="margin-bottom: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4caf50;">
+                    <strong style="font-size: 18px; color: #2e7d32;">📋 Liste des réservations</strong>
+                    <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">
+                        Emprunts du matériel du Labo : en cours, à venir, annulés...
+                    </p>
+                </div>
+                <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <button id="adminDeleteSelectedPastReservationsBtn" class="btn" style="background: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: none;">
+                            🗑️ Supprimer les réservations passées sélectionnées
+                        </button>
+                        <span id="adminSelectedCount" style="color: #666; font-size: 14px; display: none;"></span>
+                    </div>
+                </div>
+                <div class="table-container" style="overflow-x: auto; background: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                    <table class="reservations-table" id="adminReservationsTable" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px; padding: 12px; text-align: center; background: #f5f5f5; border-bottom: 2px solid #ddd;">
+                                    <input type="checkbox" id="adminSelectAllCheckbox" style="cursor: pointer; width: 18px; height: 18px;" title="Sélectionner toutes les réservations passées">
+                                </th>
+                                <th class="sortable" data-sort="console" style="padding: 12px; text-align: left; background: #f5f5f5; border-bottom: 2px solid #ddd; cursor: pointer;">
+                                    Console <span class="sort-indicator"></span>
+                                </th>
+                                <th class="sortable" data-sort="joueur" style="padding: 12px; text-align: left; background: #f5f5f5; border-bottom: 2px solid #ddd; cursor: pointer;">
+                                    Joueur <span class="sort-indicator"></span>
+                                </th>
+                                <th style="padding: 12px; text-align: left; background: #f5f5f5; border-bottom: 2px solid #ddd;">Statut</th>
+                                <th style="padding: 12px; text-align: left; background: #f5f5f5; border-bottom: 2px solid #ddd;">Début théorique</th>
+                                <th style="padding: 12px; text-align: left; background: #f5f5f5; border-bottom: 2px solid #ddd;">Fin théorique</th>
+                                <th style="padding: 12px; text-align: left; background: #f5f5f5; border-bottom: 2px solid #ddd;">Durée</th>
+                                <th style="padding: 12px; text-align: left; background: #f5f5f5; border-bottom: 2px solid #ddd;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminReservationsTableBody">
+                            <!-- Les réservations seront générées dynamiquement -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Section 2: Gestion des numéros autorisés -->
             <div style="margin-bottom: 30px; padding: 20px; background: #fff; border: 2px solid #667eea; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                 <div style="margin-bottom: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
                     <strong style="font-size: 18px; color: #856404;">📋 Gestion des numéros autorisés pour les réservations</strong>
@@ -3378,7 +3435,7 @@ class App {
                 </div>
             </div>
             
-            <!-- Section 2: Gestion des consoles -->
+            <!-- Section 3: Gestion des consoles -->
             <div style="margin-bottom: 20px; padding: 20px; background: #fff; border: 2px solid #667eea; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                 <div style="margin-bottom: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196F3;">
                     <strong style="font-size: 18px; color: #1976d2;">🎮 Gestion de la disponibilité des consoles</strong>
@@ -3449,7 +3506,138 @@ class App {
         
         adminHTML += `</div></div>`;
         
+        // Section 4: Ajouter un nouvel objet à réserver
+        adminHTML += `
+            <!-- Section 4: Ajouter un nouvel objet -->
+            <div style="margin-bottom: 20px; padding: 20px; background: #fff; border: 2px solid #667eea; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div style="margin-bottom: 20px; padding: 15px; background: #f3e5f5; border-radius: 8px; border-left: 4px solid #9c27b0;">
+                    <strong style="font-size: 18px; color: #7b1fa2;">➕ Ajouter un nouvel objet à réserver</strong>
+                    <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">
+                        Ajoutez de nouveaux objets (manettes, casques, etc.) disponibles pour les réservations.
+                    </p>
+                </div>
+                
+                <form id="addConsoleForm" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #555; font-size: 14px;">
+                            📝 Nom de l'objet * :
+                        </label>
+                        <input type="text" 
+                               id="newConsoleName" 
+                               required
+                               placeholder="Ex: Switch2 : manette N°5" 
+                               style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px;">
+                        <small style="display: block; margin-top: 5px; color: #666; font-size: 12px;">
+                            Nom complet de l'objet tel qu'il apparaîtra dans la liste
+                        </small>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #555; font-size: 14px;">
+                            🏷️ Type d'objet * :
+                        </label>
+                        <input type="text" 
+                               id="newConsoleType" 
+                               required
+                               placeholder="Ex: Manette Switch, Casque VR, Casque audio..." 
+                               style="width: 100%; padding: 12px; border: 2px solid #667eea; border-radius: 8px; font-size: 16px;">
+                        <small style="display: block; margin-top: 5px; color: #666; font-size: 12px;">
+                            Type ou catégorie de l'objet
+                        </small>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #555; font-size: 14px;">
+                            ⏱️ Durées autorisées (en minutes) * :
+                        </label>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+                            ${[10, 15, 20, 30, 45, 60, 90, 120].map(duration => `
+                                <label style="display: flex; align-items: center; cursor: pointer; padding: 8px 12px; background: ${[10, 30, 60].includes(duration) ? '#e3f2fd' : '#fff'}; border: 2px solid ${[10, 30, 60].includes(duration) ? '#2196F3' : '#ddd'}; border-radius: 6px; transition: all 0.2s;">
+                                    <input type="checkbox" 
+                                           class="new-console-duration-checkbox" 
+                                           data-duration="${duration}"
+                                           ${[10, 30, 60].includes(duration) ? 'checked' : ''}
+                                           style="margin-right: 6px; cursor: pointer;">
+                                    <span style="font-size: 14px; font-weight: ${[10, 30, 60].includes(duration) ? 'bold' : 'normal'}; color: ${[10, 30, 60].includes(duration) ? '#1976d2' : '#666'};">
+                                        ${duration === 60 ? '1 heure' : duration === 90 ? '1h30' : duration === 120 ? '2 heures' : `${duration} min`}
+                                    </span>
+                                </label>
+                            `).join('')}
+                        </div>
+                        <small style="display: block; margin-top: 5px; color: #666; font-size: 12px;">
+                            Sélectionnez au moins une durée. Par défaut: 10 min, 30 min, 1 heure
+                        </small>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button type="submit" 
+                                id="addConsoleBtn"
+                                style="flex: 1; padding: 15px; background: #9c27b0; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s;">
+                            ➕ Ajouter l'objet
+                        </button>
+                        <button type="button" 
+                                id="cancelAddConsoleBtn"
+                                style="padding: 15px 30px; background: #f5f5f5; color: #666; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; cursor: pointer; transition: all 0.3s;">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Section 5: Liste des objets (avec possibilité de suppression) -->
+            <div style="margin-bottom: 20px; padding: 20px; background: #fff; border: 2px solid #667eea; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div style="margin-bottom: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                    <strong style="font-size: 18px; color: #856404;">🗑️ Supprimer un objet</strong>
+                    <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">
+                        Supprimez un objet de la liste. Attention : impossible de supprimer un objet avec une réservation en cours.
+                    </p>
+                </div>
+                <div id="adminConsolesDeleteList" style="display: flex; flex-direction: column; gap: 15px;">
+        `;
+        
+        consoles.forEach(gameConsole => {
+            const hasReservation = gameConsole.currentReservation !== null;
+            const canDelete = !hasReservation;
+            
+            adminHTML += `
+                <div class="admin-console-delete-item" style="padding: 15px; border: 2px solid ${canDelete ? '#f44336' : '#ccc'}; border-radius: 8px; background: ${canDelete ? '#ffebee' : '#f5f5f5'}; opacity: ${canDelete ? '1' : '0.6'};">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            <div style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">${gameConsole.name}</div>
+                            <div style="font-size: 14px; color: #666;">Type: ${gameConsole.type}</div>
+                            ${hasReservation ? `<div style="font-size: 12px; color: #ff9800; margin-top: 5px;">⚠️ Réservation en cours - Impossible de supprimer</div>` : ''}
+                        </div>
+                        <div style="margin-left: 15px;">
+                            <button type="button" 
+                                    class="btn-delete-console" 
+                                    data-console-id="${gameConsole.id}"
+                                    data-console-name="${gameConsole.name.replace(/"/g, '&quot;')}"
+                                    ${canDelete ? '' : 'disabled'}
+                                    style="padding: 10px 20px; background: ${canDelete ? '#f44336' : '#ccc'}; color: white; border: none; border-radius: 8px; cursor: ${canDelete ? 'pointer' : 'not-allowed'}; font-weight: bold; transition: background 0.3s;"
+                                    ${canDelete ? '' : 'title="Impossible de supprimer : réservation en cours"'}>
+                                🗑️ Supprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        adminHTML += `
+                </div>
+            </div>
+        `;
+        
         body.innerHTML = adminHTML;
+        
+        // Rendre le tableau des réservations dans le modal admin
+        await this.renderReservationsTable();
+        
+        // Configurer le formulaire d'ajout de console
+        this.setupAddConsoleForm();
+        
+        // Configurer les boutons de suppression de console
+        this.setupDeleteConsoleButtons();
         
         // Ajouter les event listeners pour les checkboxes de durées
         const durationCheckboxes = body.querySelectorAll('.duration-checkbox');
@@ -4077,9 +4265,10 @@ class App {
     }
     
     setupBulkDeleteReservations() {
-        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-        const deleteBtn = document.getElementById('deleteSelectedPastReservationsBtn');
-        const selectedCountSpan = document.getElementById('selectedCount');
+        // Chercher d'abord dans le modal admin, sinon dans la section principale
+        const selectAllCheckbox = document.getElementById('adminSelectAllCheckbox') || document.getElementById('selectAllCheckbox');
+        const deleteBtn = document.getElementById('adminDeleteSelectedPastReservationsBtn') || document.getElementById('deleteSelectedPastReservationsBtn');
+        const selectedCountSpan = document.getElementById('adminSelectedCount') || document.getElementById('selectedCount');
         
         // Fonction pour mettre à jour le compteur et l'état du bouton
         const updateSelectionState = () => {
@@ -4222,7 +4411,7 @@ class App {
                 }
                 
                 // Désactiver le bouton pendant la suppression
-                const btnToDisable = document.getElementById('deleteSelectedPastReservationsBtn') || newDeleteBtn;
+                const btnToDisable = document.getElementById('adminDeleteSelectedPastReservationsBtn') || newDeleteBtn;
                 btnToDisable.disabled = true;
                 const originalText = btnToDisable.textContent;
                 btnToDisable.textContent = '⏳ Suppression en cours...';
@@ -4236,7 +4425,7 @@ class App {
                         const reservationId = selectedIds[i];
                         try {
                             // Mettre à jour le texte du bouton avec le progrès
-                            const btnToUpdate = document.getElementById('deleteSelectedPastReservationsBtn');
+                            const btnToUpdate = document.getElementById('adminDeleteSelectedPastReservationsBtn');
                             if (btnToUpdate) {
                                 btnToUpdate.textContent = `⏳ Suppression ${i + 1}/${selectedIds.length}...`;
                             }
@@ -4299,7 +4488,7 @@ class App {
                     
                     // Restaurer le bouton
                     try {
-                        const btnToRestore = document.getElementById('deleteSelectedPastReservationsBtn');
+                        const btnToRestore = document.getElementById('adminDeleteSelectedPastReservationsBtn');
                         if (btnToRestore) {
                             btnToRestore.disabled = false;
                             btnToRestore.textContent = originalText;
@@ -4322,6 +4511,160 @@ class App {
         if (!selectAllCheckbox || !selectAllCheckbox.dataset.restoring) {
             updateSelectionState();
         }
+    }
+    
+    setupAddConsoleForm() {
+        const form = document.getElementById('addConsoleForm');
+        const cancelBtn = document.getElementById('cancelAddConsoleBtn');
+        
+        if (!form) return;
+        
+        // Réinitialiser le formulaire
+        form.addEventListener('reset', () => {
+            document.getElementById('newConsoleName').value = '';
+            document.getElementById('newConsoleType').value = '';
+            // Réinitialiser les checkboxes de durées à la sélection par défaut
+            document.querySelectorAll('.new-console-duration-checkbox').forEach(cb => {
+                cb.checked = [10, 30, 60].includes(parseInt(cb.dataset.duration));
+            });
+        });
+        
+        // Bouton annuler
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                form.reset();
+            });
+        }
+        
+        // Soumission du formulaire
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const nameInput = document.getElementById('newConsoleName');
+            const typeInput = document.getElementById('newConsoleType');
+            const durationCheckboxes = document.querySelectorAll('.new-console-duration-checkbox:checked');
+            
+            const name = nameInput.value.trim();
+            const type = typeInput.value.trim();
+            const allowedDurations = Array.from(durationCheckboxes)
+                .map(cb => parseInt(cb.dataset.duration))
+                .sort((a, b) => a - b);
+            
+            // Validation
+            if (!name || !type) {
+                this.showToast('Le nom et le type sont requis', 'error');
+                return;
+            }
+            
+            if (allowedDurations.length === 0) {
+                this.showToast('Au moins une durée doit être sélectionnée', 'error');
+                return;
+            }
+            
+            // Désactiver le bouton pendant la création
+            const submitBtn = document.getElementById('addConsoleBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Création...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/consoles`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name,
+                        type,
+                        allowedDurations
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.showToast(`Objet "${name}" ajouté avec succès`, 'success');
+                    
+                    // Réinitialiser le formulaire
+                    form.reset();
+                    
+                    // Recharger les consoles
+                    await this.reservationManager.loadConsoles();
+                    
+                    // Recharger l'interface admin
+                    await this.showAdminModal();
+                    
+                    // Recharger l'affichage des consoles
+                    await this.renderConsoles();
+                } else {
+                    this.showToast(data.message || 'Erreur lors de l\'ajout de l\'objet', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'ajout de l\'objet:', error);
+                this.showToast('Erreur lors de l\'ajout de l\'objet', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+    }
+    
+    setupDeleteConsoleButtons() {
+        const deleteButtons = document.querySelectorAll('.btn-delete-console');
+        
+        deleteButtons.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const consoleId = btn.dataset.consoleId;
+                const consoleName = btn.dataset.consoleName;
+                
+                // Demander confirmation
+                const confirmed = confirm(
+                    `Êtes-vous sûr de vouloir supprimer "${consoleName}" ?\n\nCette action est irréversible et impossible si une réservation est en cours.`
+                );
+                
+                if (!confirmed) {
+                    return;
+                }
+                
+                // Désactiver le bouton
+                btn.disabled = true;
+                const originalText = btn.textContent;
+                btn.textContent = '⏳ Suppression...';
+                
+                try {
+                    const response = await fetch(`${API_BASE_URL}/consoles/${consoleId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.showToast(`Objet "${consoleName}" supprimé avec succès`, 'success');
+                        
+                        // Recharger les consoles
+                        await this.reservationManager.loadConsoles();
+                        
+                        // Recharger l'interface admin
+                        await this.showAdminModal();
+                        
+                        // Recharger l'affichage des consoles
+                        await this.renderConsoles();
+                    } else {
+                        this.showToast(data.message || 'Erreur lors de la suppression de l\'objet', 'error');
+                        btn.disabled = false;
+                        btn.textContent = originalText;
+                    }
+                } catch (error) {
+                    console.error('Erreur lors de la suppression de l\'objet:', error);
+                    this.showToast('Erreur lors de la suppression de l\'objet', 'error');
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            });
+        });
     }
 }
 

@@ -92,7 +92,8 @@ export class TokenActionServiceClient {
       'code-learning': 10,
       
       // Applications premium (100 tokens)
-      'qrcodes': 100
+      'qrcodes': 100,
+      'home-assistant': 100
     };
 
     return costs[moduleId] || null;

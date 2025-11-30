@@ -28,7 +28,8 @@ export default function Essentiels() {
     'psitransfer',
     'qrcodes',
     'pdf',
-    'code-learning'
+    'code-learning',
+    'home-assistant'
   ];
 
   // Vérification de l'authentification (optionnelle pour cette page)
@@ -104,6 +105,14 @@ export default function Essentiels() {
             module.title.toLowerCase().includes(essentialId.replace('-', ' '))
           )) && module.id !== 'whisper'
         ) || [];
+
+        // Debug: vérifier si Home Assistant est dans les modules
+        const homeAssistantModule = essentialModulesData.find(m => m.id === 'home-assistant' || m.title.toLowerCase().includes('domotisez'));
+        if (homeAssistantModule) {
+          console.log('✅ Home Assistant trouvé dans les modules essentiels:', homeAssistantModule);
+        } else {
+          console.log('⚠️ Home Assistant non trouvé dans les modules essentiels. Modules disponibles:', essentialModulesData.map(m => ({ id: m.id, title: m.title })));
+        }
 
         setModules(essentialModulesData);
       } catch (err) {

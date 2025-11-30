@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codes Home Assistant - Recherche de Cartes</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Bannière fusionnée IAHome + YouTube -->
+        <section class="fused-banner">
+            <!-- Partie gauche : IAHome -->
+            <div class="fused-banner-part">
+                <div class="banner-background">
+                    <!-- Éléments décoratifs animés -->
+                    <div class="decorative-circle circle-yellow"></div>
+                    <div class="decorative-circle circle-green"></div>
+                    <div class="decorative-icon icon-controller">🏠</div>
+                </div>
+                <div class="banner-brand-content">
+                    <h1 class="banner-brand-title">IAHome</h1>
+                    <p class="banner-brand-subtitle">Codes Home Assistant</p>
+                </div>
+            </div>
+
+            <!-- Partie droite : Adamhome -->
+            <div class="fused-banner-part">
+                <div class="youtube-background">
+                    <div class="youtube-decorative youtube-circle-1"></div>
+                    <div class="youtube-decorative youtube-circle-2"></div>
+                    <div class="youtube-decorative youtube-circle-3"></div>
+                </div>
+                <div class="banner-brand-content">
+                    <p class="banner-partnership">En partenariat avec</p>
+                    <h1 class="banner-brand-title">Adamhome</h1>
+                    <p class="banner-brand-subtitle">@pailleradamhome</p>
+                    <a href="https://www.youtube.com/@pailleradamhome" target="_blank" rel="noopener noreferrer" class="banner-brand-link">
+                        <span class="banner-brand-link-icon">▶️</span>
+                        <span>Voir la chaîne</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section avec les informations principales (titre, progression, manuel) -->
+        <section class="main-info-section">
+            <div class="main-info-content">
+                <h1 class="main-title">🏠 Codes Home Assistant</h1>
+                <p class="main-subtitle">Recherchez et copiez facilement les codes de cartes Lovelace</p>
+                <p class="main-codes-count" id="totalCodesCount">Chargement...</p>
+                
+                <!-- Barre de progression -->
+                <div class="progress-section">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progressBar">
+                            <span class="progress-text" id="progressText">0%</span>
+                        </div>
+                    </div>
+                    <p class="progress-info" id="progressInfo">0 codes disponibles</p>
+                </div>
+                
+                <!-- Section Manuel -->
+                <div class="manual-card-integrated">
+                    <div class="manual-header-integrated">
+                        <div class="manual-icon-integrated">📖</div>
+                        <div class="manual-content-integrated">
+                            <h2>Manuel Complet Home Assistant</h2>
+                            <p>Guide complet d'installation, configuration et création de dashboards professionnels</p>
+                        </div>
+                    </div>
+                    <div class="manual-actions-integrated">
+                        <a href="manuel-home-assistant.pdf" target="_blank" class="btn-manual-download-integrated" download>
+                            <span class="btn-icon">📥</span>
+                            <span>Télécharger le PDF</span>
+                        </a>
+                        <button class="btn-manual-view-integrated" id="viewManualBtn">
+                            <span class="btn-icon">👁️</span>
+                            <span>Voir le manuel</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="info-section">
+            <div class="info-card">
+                <div class="info-header">
+                    <h2>Home Assistant, Qu'est-ce que c'est ? (déplie chaque partie)</h2>
+                    <button class="btn-toggle-info" id="toggleInfo" aria-label="Masquer/Afficher les explications">
+                        <span class="toggle-icon">▼</span>
+                    </button>
+                </div>
+                <div class="info-content" id="infoContent">
+                    <div class="info-item">
+                        <div class="info-item-header">
+                            <h3>🎴 Cartes Lovelace</h3>
+                            <button class="btn-toggle-item" data-item="cartes" aria-label="Plier/Déplier">
+                                <span class="toggle-icon-item">▲</span>
+                            </button>
+                        </div>
+                        <div class="info-item-content collapsed" id="infoItem-cartes">
+                            <p>Les cartes Lovelace sont les éléments visuels de votre interface Home Assistant. Elles permettent d'afficher et de contrôler vos entités (lumières, capteurs, interrupteurs, etc.) de manière élégante et personnalisée.</p>
+                            <p><strong>Comment les utiliser :</strong></p>
+                            <ol>
+                                <li>Copiez le code YAML de la carte qui vous intéresse</li>
+                                <li>Dans Home Assistant, allez dans <strong>Paramètres</strong> → <strong>Tableaux de bord</strong> → <strong>Lovelace</strong></li>
+                                <li>Cliquez sur les <strong>3 points</strong> (⋮) en haut à droite → <strong>Modifier le tableau de bord</strong></li>
+                                <li>Cliquez sur <strong>+ Ajouter une carte</strong> → <strong>Code éditeur</strong></li>
+                                <li>Collez le code YAML et adaptez les noms d'entités (ex: <code>light.salon</code> → <code>light.votre_lumiere</code>)</li>
+                                <li>Cliquez sur <strong>Sauvegarder</strong></li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-item-header">
+                            <h3>🔧 Templates</h3>
+                            <button class="btn-toggle-item" data-item="templates" aria-label="Plier/Déplier">
+                                <span class="toggle-icon-item">▲</span>
+                            </button>
+                        </div>
+                        <div class="info-item-content collapsed" id="infoItem-templates">
+                            <p>Les templates sont des capteurs ou entités calculés dynamiquement à partir d'autres entités. Ils permettent de créer des données personnalisées, des calculs, ou des conditions complexes.</p>
+                            <p><strong>Comment les utiliser :</strong></p>
+                            <ol>
+                                <li>Copiez le code template (section <strong>Templates & Automations</strong>)</li>
+                                <li>Dans Home Assistant, allez dans <strong>Paramètres</strong> → <strong>Appareils et services</strong> → <strong>Helpers</strong></li>
+                                <li>Ou éditez directement le fichier <code>configuration.yaml</code> dans le dossier <code>config</code></li>
+                                <li>Ajoutez le code dans la section <code>template:</code></li>
+                                <li>Redémarrez Home Assistant ou rechargez les templates via <strong>Paramètres</strong> → <strong>Appareils et services</strong> → <strong>Template</strong> → <strong>Recharger</strong></li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-item-header">
+                            <h3>⚙️ Automatisations</h3>
+                            <button class="btn-toggle-item" data-item="automatisations" aria-label="Plier/Déplier">
+                                <span class="toggle-icon-item">▲</span>
+                            </button>
+                        </div>
+                        <div class="info-item-content collapsed" id="infoItem-automatisations">
+                            <p>Les automatisations permettent d'automatiser des actions en fonction de conditions (ex: allumer la lumière quand il fait nuit, envoyer une notification si une porte s'ouvre, etc.).</p>
+                            <p><strong>Comment les utiliser :</strong></p>
+                            <ol>
+                                <li>Copiez le code d'automation (section <strong>Templates & Automations</strong>)</li>
+                                <li>Dans Home Assistant, allez dans <strong>Paramètres</strong> → <strong>Automatisations et scènes</strong> → <strong>Automatisations</strong></li>
+                                <li>Cliquez sur <strong>+ Créer une automatisation</strong> → <strong>Créer une nouvelle automatisation</strong></li>
+                                <li>Cliquez sur les <strong>3 points</strong> (⋮) → <strong>Modifier en YAML</strong></li>
+                                <li>Collez le code YAML et adaptez les entités selon vos besoins</li>
+                                <li>Cliquez sur <strong>Sauvegarder</strong></li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-item-header">
+                            <h3>🔌 Intégrations</h3>
+                            <button class="btn-toggle-item" data-item="integrations" aria-label="Plier/Déplier">
+                                <span class="toggle-icon-item">▲</span>
+                            </button>
+                        </div>
+                        <div class="info-item-content collapsed" id="infoItem-integrations">
+                            <p>Les intégrations permettent de connecter Home Assistant à des appareils, services et plateformes externes (caméras, capteurs, assistants vocaux, services météo, etc.). Elles étendent les capacités de votre installation Home Assistant.</p>
+                            <p><strong>Comment les utiliser :</strong></p>
+                            <ol>
+                                <li>Dans Home Assistant, allez dans <strong>Paramètres</strong> → <strong>Appareils et services</strong></li>
+                                <li>Cliquez sur <strong>+ Ajouter une intégration</strong> en bas à droite</li>
+                                <li>Recherchez l'intégration souhaitée dans la liste ou utilisez la barre de recherche</li>
+                                <li>Suivez les instructions de configuration (saisie d'identifiants, autorisations, etc.)</li>
+                                <li>Une fois configurée, l'intégration apparaîtra dans <strong>Appareils et services</strong> avec ses entités</li>
+                                <li>Vous pourrez ensuite utiliser ces entités dans vos cartes Lovelace, templates et automatisations</li>
+                            </ol>
+                            <p><strong>Astuce :</strong> Certaines intégrations nécessitent une configuration via le fichier <code>configuration.yaml</code>. Consultez la documentation officielle de Home Assistant pour les détails spécifiques à chaque intégration.</p>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-section">
+            <div class="search-bar">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Rechercher un code (ex: banner, button, météo, slider...)"
+                    autocomplete="off"
+                >
+                <span class="search-icon">🔍</span>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Catégories :</label>
+                    <div class="category-filters" id="categoryFilters"></div>
+                </div>
+                <div class="filter-group">
+                    <label>Tags actifs :</label>
+                    <div class="active-tags" id="activeTags"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <div class="results-header">
+                <span id="resultsCount">0 codes trouvés</span>
+                <button id="clearFilters" class="btn-clear">Effacer les filtres</button>
+            </div>
+
+            <div class="codes-grid" id="codesGrid">
+                <!-- Les codes seront injectés ici -->
+            </div>
+
+            <div class="no-results" id="noResults" style="display: none;">
+                <p>😔 Aucun code trouvé</p>
+                <p>Essayez de modifier vos critères de recherche</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal pour afficher les explications de termes -->
+    <div class="modal" id="termModal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2 id="termModalTitle">Explication</h2>
+                <button class="modal-close" id="termModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="termModalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour afficher le manuel PDF -->
+    <div class="modal" id="manualModal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>Manuel Complet Home Assistant</h2>
+                <button class="modal-close" id="manualModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="pdf-viewer-container">
+                    <iframe id="pdfViewer" src="manuel-home-assistant.pdf" type="application/pdf" frameborder="0"></iframe>
+                </div>
+                <div class="pdf-actions">
+                    <a href="manuel-home-assistant.pdf" download class="btn-download-pdf">
+                        <span>📥 Télécharger le PDF</span>
+                    </a>
+                </div>
+                <div class="manual-external-links" id="manualExternalLinks">
+                    <h3>Liens utiles du manuel</h3>
+                    <div class="external-links-grid" id="externalLinksGrid">
+                        <!-- Les liens seront injectés dynamiquement par JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour afficher le code complet -->
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Code</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="code-description" id="modalDescription"></div>
+                <div class="code-tags" id="modalTags"></div>
+                <div class="code-source-link" id="codeSourceLink" style="display: none;">
+                    <a id="sourceLink" href="#" target="_blank" rel="noopener noreferrer">
+                        🔗 Autres codes de même type
+                    </a>
+                </div>
+                <div class="code-screenshot" id="modalScreenshot" style="display: none;">
+                    <img id="modalScreenshotImg" src="" alt="Capture d'écran" loading="lazy">
+                </div>
+                
+                <div class="code-block">
+                    <div class="code-header">
+                        <span>Code YAML</span>
+                        <button class="btn-copy" id="copyCodeBtn" data-code="">
+                            📋 Copier
+                        </button>
+                    </div>
+                    <pre id="modalCode"><code></code></pre>
+                </div>
+                <div class="copy-success" id="copySuccess">✓ Code copié !</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+

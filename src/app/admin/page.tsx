@@ -79,7 +79,7 @@ export default function AdminDashboard() {
           activeUsers: 3, // Utilisateurs actifs
           suspendedUsers: 1, // Utilisateur suspendu
           activeUsers24h: 2, // Utilisateurs connectés aujourd'hui
-          totalModules: 6, // librespeed, qrcodes, metube, whisper, psitransfer, pdf
+          totalModules: 7, // librespeed, qrcodes, metube, whisper, psitransfer, pdf, home-assistant
           activeApplications: 8, // Applications actives dans user_applications
           totalTokens: 8, // Tokens générés
           totalUsage: 25, // Usage total basé sur les logs

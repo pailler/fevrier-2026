@@ -452,7 +452,22 @@ export default function EncoursPage() {
           try {
             // Trouver les informations du module correspondant
             const moduleInfo = modulesData.find(module => module.id.toString() === access.module_id?.toString()) || {};
-            const isFree = moduleInfo.price === 0 || moduleInfo.price === '0' || moduleInfo.price === null;
+            
+            // Définir la liste des modules essentiels par ID
+            const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'qrcodes-statiques', 'code-learning', 'home-assistant'];
+            const moduleId = (access.module_id || '').toString().toLowerCase();
+            const moduleTitle = (access.module_title || moduleInfo.title || '').toLowerCase();
+            
+            // Vérifier si c'est un module essentiel par ID ou titre
+            const isEssential = essentialModules.some(essentialId => 
+              moduleId === essentialId || 
+              moduleId.includes(essentialId.toLowerCase()) ||
+              moduleTitle.includes(essentialId.toLowerCase()) ||
+              moduleTitle.includes(essentialId.replace('-', ' '))
+            );
+            
+            // Un module est gratuit s'il est essentiel OU si son prix est 0
+            const isFree = isEssential || moduleInfo.price === 0 || moduleInfo.price === '0' || moduleInfo.price === null;
             
             const module: UserModule = {
               id: access.id || 'unknown',
@@ -536,6 +551,7 @@ export default function EncoursPage() {
       '7': 'stablediffusion', // Stable Diffusion -> stablediffusion
       '8': 'ruinedfooocus', // Ruined Fooocus -> ruinedfooocus
       '10': 'comfyui', // ComfyUI -> comfyui
+      'home-assistant': 'home-assistant', // Home Assistant -> home-assistant
       '11': 'cogstudio', // Cog Studio -> cogstudio
       'meeting-reports': 'meeting-reports', // Meeting Reports -> meeting-reports
       'qrcodes-statiques': 'qrcodes-statiques', // QR Codes Statiques
@@ -563,6 +579,10 @@ export default function EncoursPage() {
       'hunyuan3d': (typeof window !== 'undefined' && window.location.hostname === 'localhost') 
         ? 'http://localhost:8888' 
         : 'https://hunyuan3d.iahome.fr',
+      // Home Assistant : localhost:8123 en dev, homeassistant.iahome.fr en prod
+      'home-assistant': (typeof window !== 'undefined' && window.location.hostname === 'localhost') 
+        ? 'http://localhost:8123' 
+        : 'https://homeassistant.iahome.fr',
     };
     
     // Convertir module_id numérique en slug si nécessaire
@@ -590,6 +610,7 @@ export default function EncoursPage() {
       'pdf': 10,
       'meeting-reports': 10,
       'cogstudio': 10,
+      'home-assistant': 100,
       
       // Applications premium (100 tokens)
       'qrcodes': 100,
@@ -662,7 +683,22 @@ export default function EncoursPage() {
         })
         .map(access => {
           const moduleInfo = refreshModulesData.find(module => module.id.toString() === access.module_id?.toString()) || {};
-          const isFree = moduleInfo.price === 0 || moduleInfo.price === '0' || moduleInfo.price === null;
+          
+          // Définir la liste des modules essentiels par ID
+          const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'qrcodes-statiques', 'code-learning', 'home-assistant'];
+          const moduleId = (access.module_id || '').toString().toLowerCase();
+          const moduleTitle = (access.module_title || moduleInfo.title || '').toLowerCase();
+          
+          // Vérifier si c'est un module essentiel par ID ou titre
+          const isEssential = essentialModules.some(essentialId => 
+            moduleId === essentialId || 
+            moduleId.includes(essentialId.toLowerCase()) ||
+            moduleTitle.includes(essentialId.toLowerCase()) ||
+            moduleTitle.includes(essentialId.replace('-', ' '))
+          );
+          
+          // Un module est gratuit s'il est essentiel OU si son prix est 0
+          const isFree = isEssential || moduleInfo.price === 0 || moduleInfo.price === '0' || moduleInfo.price === null;
           
           return {
             id: access.id,
@@ -977,7 +1013,7 @@ export default function EncoursPage() {
             {/* Statistiques améliorées */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">📊 Résumé de vos applications</h2>
-              <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-blue-600">{userModules.length}</div>
                   <div className="text-sm text-gray-600">Total actifs</div>
@@ -992,13 +1028,7 @@ export default function EncoursPage() {
                   <div className="text-2xl font-bold text-purple-600">
                     {userModules.filter(m => !m.is_free).length}
                   </div>
-                  <div className="text-sm text-gray-600">Modules IA</div>
-                </div>
-                <div className="bg-orange-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-orange-600">
-                    {userModules.filter(m => m.expires_at && new Date(m.expires_at) > new Date()).length}
-                  </div>
-                  <div className="text-sm text-gray-600">Accès temporaires</div>
+                  <div className="text-sm text-gray-600">Mes applis IA</div>
                 </div>
                 <div className="bg-red-50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-red-600">
@@ -1013,7 +1043,7 @@ export default function EncoursPage() {
             <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-2xl shadow-2xl border-4 border-white overflow-hidden">
               <div className="p-8">
                 {/* En-tête */}
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center mb-6">
                   <div className="flex items-center space-x-3">
                     <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
                       <span className="text-3xl">🪙</span>
@@ -1023,29 +1053,7 @@ export default function EncoursPage() {
                       <p className="text-blue-100 text-sm">Gérez votre crédit token</p>
                     </div>
                   </div>
-                <button
-                  onClick={fetchTokenData}
-                  disabled={loadingTokens}
-                    className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium backdrop-blur-sm border border-white/30 transition-all disabled:opacity-50"
-                >
-                    {loadingTokens ? (
-                      <span className="flex items-center">
-                        <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Actualisation...
-                      </span>
-                    ) : (
-                      <span className="flex items-center">
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                        Actualiser
-                      </span>
-                    )}
-                </button>
-              </div>
+                </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Solde de tokens - Mis en avant */}

@@ -24,6 +24,26 @@ export default function AlternativeSignInForm({
     setError(null);
 
     try {
+      // Nettoyer les données résiduelles avant la connexion pour éviter les conflits
+      try {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_data');
+        localStorage.removeItem('session_start_time');
+        
+        const supabaseStorageKey = 'sb-xemtoyzcihmncbrlsmhr-auth-token';
+        localStorage.removeItem(supabaseStorageKey);
+        
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('sb-') || key.includes('supabase')) {
+            localStorage.removeItem(key);
+          }
+        });
+        
+        await new Promise(resolve => setTimeout(resolve, 50));
+      } catch (cleanupError) {
+        console.warn('⚠️ Erreur lors du nettoyage préalable:', cleanupError);
+      }
+      
       // Utiliser exclusivement l'API alternative pour la connexion
       const response = await fetch('/api/auth/signin-alternative', {
         method: 'POST',
@@ -86,7 +106,7 @@ export default function AlternativeSignInForm({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
           placeholder="votre@email.com"
         />
       </div>
@@ -101,7 +121,7 @@ export default function AlternativeSignInForm({
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
           placeholder="Votre mot de passe"
         />
       </div>

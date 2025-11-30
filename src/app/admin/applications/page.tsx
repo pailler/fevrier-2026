@@ -195,6 +195,11 @@ export default function AdminApplications() {
             tokenCost = 100;
             estimatedRevenue = stats.totalUsage * tokenCost * 0.01; // 0.01€ par token
             description = `Générateur de codes QR dynamiques. Coût: ${tokenCost} tokens par génération.`;
+          } else if (moduleId.includes('home-assistant') || moduleId.includes('homeassistant')) {
+            // Application domotique : 100 tokens par activation
+            tokenCost = 100;
+            estimatedRevenue = stats.totalUsage * tokenCost * 0.01; // 0.01€ par token
+            description = `Manuel utilisateur ultra complet pour domotiser votre habitat. Coût: ${tokenCost} tokens par activation.`;
           } else {
             // Applications par défaut
             tokenCost = 10;
@@ -202,9 +207,19 @@ export default function AdminApplications() {
             description = `Application utilitaire. Coût: ${tokenCost} tokens par utilisation.`;
           }
 
+          // Formater le nom du module
+          let moduleName = moduleId.charAt(0).toUpperCase() + moduleId.slice(1);
+          if (moduleId.includes('home-assistant') || moduleId.includes('homeassistant')) {
+            moduleName = 'Home Assistant';
+          } else if (moduleId.includes('code-learning')) {
+            moduleName = 'Code Learning';
+          } else if (moduleId.includes('meeting-reports')) {
+            moduleName = 'Meeting Reports';
+          }
+
           return {
             id: moduleId,
-            name: moduleId.charAt(0).toUpperCase() + moduleId.slice(1),
+            name: moduleName,
             description,
             status,
             users: stats.users,
@@ -263,6 +278,8 @@ export default function AdminApplications() {
       return '📱'; // QR Codes
     } else if (appName.includes('psitransfer')) {
       return '📤'; // Transfert
+    } else if (appName.includes('home-assistant') || appName.includes('homeassistant')) {
+      return '🏠'; // Domotique
     }
     return '📱'; // Par défaut
   };

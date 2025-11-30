@@ -132,21 +132,22 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect('https://iahome.fr/login?redirect=/encours', 302);
     }
 
-    // Vérifier la durée de session (60 minutes)
-    const durationCheck = await checkSessionDuration(session);
-    
-    if (!durationCheck.isValid) {
-      console.log('❌ Session expirée:', durationCheck.reason);
-      
-      // Déconnecter Supabase Auth si la session a expiré
-      try {
-        await supabaseWithCookies.auth.signOut();
-      } catch (error) {
-        console.warn('⚠️ Erreur lors de la déconnexion Supabase:', error);
-      }
-      
-      return NextResponse.redirect(`https://iahome.fr/login?redirect=/encours&error=session_expired&message=${encodeURIComponent('Votre session a expiré après 1 heure. Veuillez vous reconnecter.')}`, 302);
-    }
+    // DÉSACTIVÉ : Plus de vérification de durée de session (déconnexion automatique supprimée)
+    // La vérification de durée de session est désactivée pour permettre des sessions illimitées
+    // const durationCheck = await checkSessionDuration(session);
+    // 
+    // if (!durationCheck.isValid) {
+    //   console.log('❌ Session expirée:', durationCheck.reason);
+    //   
+    //   // Déconnecter Supabase Auth si la session a expiré
+    //   try {
+    //     await supabaseWithCookies.auth.signOut();
+    //   } catch (error) {
+    //     console.warn('⚠️ Erreur lors de la déconnexion Supabase:', error);
+    //   }
+    //   
+    //   return NextResponse.redirect(`https://iahome.fr/login?redirect=/encours&error=session_expired&message=${encodeURIComponent('Votre session a expiré après 1 heure. Veuillez vous reconnecter.')}`, 302);
+    // }
 
     console.log('👤 Utilisateur authentifié:', session.user.email);
 

@@ -202,6 +202,8 @@ export default function CardDetailPage() {
         'meeting-reports': isDevelopment ? 'http://localhost:3050' : 'https://meeting-reports.iahome.fr',
         'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
         'cogstudio': 'https://cogstudio.iahome.fr',
+        // Home Assistant : localhost:8123 en dev, homeassistant.iahome.fr en prod
+        'home-assistant': isDevelopment ? 'http://localhost:8123' : 'https://homeassistant.iahome.fr',
       };
 
       const accessUrl = applicationUrls[moduleId];

@@ -95,3 +95,10 @@ taskkill /PID <PID> /F
 ✅ **Simple** : Une seule commande pour tout démarrer
 ✅ **Fiable** : Vérifie les dépendances avant de démarrer
 
+
+
+
+
+
+
+

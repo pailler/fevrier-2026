@@ -119,3 +119,10 @@ async function replaceAllObtenirPlus() {
 
 replaceAllObtenirPlus();
 
+
+
+
+
+
+
+

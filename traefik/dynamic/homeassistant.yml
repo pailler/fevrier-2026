@@ -1,0 +1,35 @@
+# Configuration Home Assistant pour Cloudflare SSL
+# Service qui sert les codes Home Assistant depuis essentiels/codes-ha
+http:
+  routers:
+    # Route pour les challenges Let's Encrypt (si nécessaire)
+    homeassistant-acme:
+      rule: "Host(`homeassistant.iahome.fr`) && PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["web"]
+      service: homeassistant-direct
+      priority: 1000
+
+    # Route principale (Cloudflare SSL - HTTP vers Traefik)
+    homeassistant-main:
+      rule: "Host(`homeassistant.iahome.fr`)"
+      entryPoints: ["web"]
+      service: homeassistant-service
+      middlewares: ["security-headers@file", "compress@file"]
+      priority: 10
+
+  services:
+    # Service pour les challenges Let's Encrypt
+    homeassistant-direct:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:8123"
+        passHostHeader: true
+
+    # Service principal pour Home Assistant (codes)
+    homeassistant-service:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:8123"
+        passHostHeader: true
+
+

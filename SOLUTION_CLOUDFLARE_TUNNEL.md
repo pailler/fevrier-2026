@@ -60,3 +60,10 @@ Traefik route ensuite automatiquement :
 - `/api/*` → Backend (port 5001)
 - `/*` → Frontend (port 5000)
 
+
+
+
+
+
+
+

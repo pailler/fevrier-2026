@@ -15,6 +15,19 @@ function LoginContent() {
   useEffect(() => {
     // Marquer que nous sommes côté client
     setIsClient(true);
+    
+    // Filtrer les erreurs CORS YouTube dans la console (elles sont normales et n'affectent pas la connexion)
+    if (typeof window !== 'undefined') {
+      const originalError = console.error;
+      console.error = (...args: any[]) => {
+        const message = args.join(' ');
+        // Ignorer les erreurs CORS YouTube qui sont normales
+        if (message.includes('youtube.com') && message.includes('CORS')) {
+          return; // Ne pas afficher ces erreurs
+        }
+        originalError.apply(console, args);
+      };
+    }
 
     // Vérifier les erreurs dans l'URL
     const errorParam = searchParams.get('error');

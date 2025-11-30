@@ -17,7 +17,8 @@ export const TOKEN_COSTS = {
   'code-learning': 10,
   
   // Applications premium (100 tokens)
-  'qrcodes': 100
+  'qrcodes': 100,
+  'home-assistant': 100
 } as const;
 
 export type ModuleId = keyof typeof TOKEN_COSTS;

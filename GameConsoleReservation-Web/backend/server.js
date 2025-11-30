@@ -390,6 +390,112 @@ app.put('/api/consoles/:id/availability', (req, res) => {
     }
 });
 
+// POST /api/consoles - Créer une nouvelle console/objet
+app.post('/api/consoles', (req, res) => {
+    console.log('[POST /api/consoles] Création d\'une nouvelle console');
+    try {
+        const { name, type, allowedDurations } = req.body;
+        
+        // Validation
+        if (!name || !type) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Le nom et le type sont requis' 
+            });
+        }
+        
+        // Vérifier que le nom n'existe pas déjà
+        let data = readData();
+        const existingConsole = data.consoles.find(c => c.name.toLowerCase() === name.toLowerCase());
+        if (existingConsole) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Une console avec ce nom existe déjà' 
+            });
+        }
+        
+        // Générer un nouvel ID unique
+        const maxId = Math.max(...data.consoles.map(c => parseInt(c.id) || 0), 0);
+        const newId = (maxId + 1).toString();
+        
+        // Créer la nouvelle console
+        const newConsole = {
+            id: newId,
+            name: name.trim(),
+            type: type.trim(),
+            isAvailable: true,
+            currentReservation: null,
+            allowedDurations: allowedDurations && Array.isArray(allowedDurations) && allowedDurations.length > 0 
+                ? allowedDurations.sort((a, b) => a - b)
+                : [10, 30, 60] // Par défaut
+        };
+        
+        // Ajouter la console
+        data.consoles.push(newConsole);
+        
+        // Enregistrer l'opération
+        logOperation(data, {
+            type: 'console_created',
+            details: {
+                consoleId: newId,
+                consoleName: newConsole.name,
+                consoleType: newConsole.type
+            }
+        });
+        
+        writeData(data);
+        
+        console.log(`[POST /api/consoles] Console créée: ${newConsole.name} (ID: ${newId})`);
+        res.json({ success: true, console: newConsole });
+    } catch (error) {
+        console.error('[POST /api/consoles] Erreur:', error);
+        res.status(500).json({ success: false, message: 'Erreur lors de la création de la console', error: error.message });
+    }
+});
+
+// DELETE /api/consoles/:id - Supprimer une console
+app.delete('/api/consoles/:id', (req, res) => {
+    console.log(`[DELETE /api/consoles/:id] Suppression de la console ${req.params.id}`);
+    try {
+        const { id } = req.params;
+        let data = readData();
+        
+        const gameConsole = data.consoles.find(c => c.id === id);
+        if (!gameConsole) {
+            return res.status(404).json({ success: false, message: 'Console non trouvée' });
+        }
+        
+        // Vérifier qu'il n'y a pas de réservation en cours
+        if (gameConsole.currentReservation) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Impossible de supprimer une console avec une réservation en cours' 
+            });
+        }
+        
+        // Supprimer la console
+        data.consoles = data.consoles.filter(c => c.id !== id);
+        
+        // Enregistrer l'opération
+        logOperation(data, {
+            type: 'console_deleted',
+            details: {
+                consoleId: id,
+                consoleName: gameConsole.name,
+                consoleType: gameConsole.type
+            }
+        });
+        
+        writeData(data);
+        
+        console.log(`[DELETE /api/consoles/:id] Console supprimée: ${gameConsole.name} (ID: ${id})`);
+        res.json({ success: true, message: 'Console supprimée avec succès' });
+    } catch (error) {
+        console.error('[DELETE /api/consoles/:id] Erreur:', error);
+        res.status(500).json({ success: false, message: 'Erreur lors de la suppression de la console', error: error.message });
+    }
+});
+
 // PUT /api/consoles/:id/durations - Mettre à jour les durées autorisées d'une console
 app.put('/api/consoles/:id/durations', (req, res) => {
     console.log(`[PUT /api/consoles/:id/durations] Requête reçue pour console ${req.params.id}, durations:`, req.body.allowedDurations);

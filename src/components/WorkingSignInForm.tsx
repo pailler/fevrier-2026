@@ -30,6 +30,31 @@ export default function WorkingSignInForm({
     setError(null);
 
     try {
+      // Nettoyer les données résiduelles avant la connexion pour éviter les conflits
+      // Cela garantit qu'une déconnexion précédente est complètement nettoyée
+      try {
+        // Nettoyer les clés d'authentification
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_data');
+        localStorage.removeItem('session_start_time');
+        
+        // Nettoyer les clés Supabase potentielles
+        const supabaseStorageKey = 'sb-xemtoyzcihmncbrlsmhr-auth-token';
+        localStorage.removeItem(supabaseStorageKey);
+        
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('sb-') || key.includes('supabase')) {
+            localStorage.removeItem(key);
+          }
+        });
+        
+        // Attendre un peu pour s'assurer que le nettoyage est complet
+        await new Promise(resolve => setTimeout(resolve, 50));
+      } catch (cleanupError) {
+        // Ignorer les erreurs de nettoyage, continuer avec la connexion
+        console.warn('⚠️ Erreur lors du nettoyage préalable:', cleanupError);
+      }
+      
       // Utiliser notre système d'authentification personnalisé qui fonctionne
       const response = await fetch('/api/auth/signin-alternative', {
         method: 'POST',
@@ -103,7 +128,7 @@ export default function WorkingSignInForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
             placeholder="votre@email.com"
           />
         </div>
@@ -118,7 +143,7 @@ export default function WorkingSignInForm({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
             placeholder="Votre mot de passe"
           />
         </div>

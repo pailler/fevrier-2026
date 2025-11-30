@@ -5,6 +5,7 @@ import Link from "next/link";
 import Breadcrumb from "../../../components/Breadcrumb";
 import FormationContent from "../../../components/FormationContent";
 import { useParams } from "next/navigation";
+import { getArticleImage } from "../../../utils/articleImageGenerator";
 
 interface FormationArticle {
   id: string;
@@ -28,7 +29,6 @@ export default function FormationArticlePage() {
   const [article, setArticle] = useState<FormationArticle | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [imageError, setImageError] = useState(false);
 
 
   useEffect(() => {
@@ -123,30 +123,16 @@ export default function FormationArticlePage() {
         <article className="bg-white rounded-lg shadow-md overflow-hidden">
           {/* Image de l'article */}
           <div className="w-full h-64 md:h-96 relative overflow-hidden">
-            {article.image_url ? (
-              <img
-                src={article.image_url}
-                alt={article.title}
-                className="w-full h-full object-cover"
-                                 onError={(e) => {
-                   // Fallback vers une image par défaut si l'image ne se charge pas
-                   console.log('Erreur de chargement image:', article.image_url);
-                   setImageError(true);
-                   const target = e.target as HTMLImageElement;
-                   target.src = '/images/iaphoto.jpg';
-                 }}
-                onLoad={() => {
-                  console.log('Image chargée avec succès:', article.image_url);
-                }}
-              />
-            ) : (
-                             // Image par défaut si aucune image n'est définie
-               <img
-                 src="/images/iaphoto.jpg"
-                 alt={article.title}
-                 className="w-full h-full object-cover"
-               />
-            )}
+            <img
+              src={getArticleImage(article, 'formation')}
+              alt={article.title}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                // Fallback vers une image par défaut si l'image ne se charge pas
+                const target = e.target as HTMLImageElement;
+                target.src = '/images/iaphoto.jpg';
+              }}
+            />
           </div>
           
           <div className="p-8">

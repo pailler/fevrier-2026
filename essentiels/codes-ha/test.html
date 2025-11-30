@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Codes Home Assistant</title>
+</head>
+<body>
+    <h1>Test de l'application</h1>
+    <p>Si vous voyez cette page, le serveur fonctionne.</p>
+    <p><a href="index.html">Aller à l'application</a></p>
+    <script>
+        // Test de chargement JSON
+        fetch('codes-cartes.json')
+            .then(response => response.json())
+            .then(data => {
+                console.log('✅ JSON chargé avec succès:', data);
+                document.body.innerHTML += '<p style="color: green;">✅ JSON chargé avec succès !</p>';
+            })
+            .catch(error => {
+                console.error('❌ Erreur:', error);
+                document.body.innerHTML += '<p style="color: red;">❌ Erreur de chargement JSON: ' + error + '</p>';
+            });
+    </script>
+</body>
+</html>
+
+

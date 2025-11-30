@@ -227,7 +227,8 @@ export default function AdminEvents() {
             if (profile && module) {
               // Simuler la consommation de tokens basée sur le type de module
               const tokenCost = module.id.includes('ai') || module.id.includes('stable') || module.id.includes('cog') || module.id.includes('sd') ? 100 : 
-                               module.id.includes('metube') || module.id.includes('librespeed') ? 10 : 10;
+                               module.id.includes('metube') || module.id.includes('librespeed') ? 10 : 
+                               module.id.includes('home-assistant') || module.id.includes('homeassistant') || module.id.includes('qrcodes') ? 100 : 10;
               
               allEvents.push({
                 id: `token_consumed_sim_${app.id}_${app.usage_count}`,

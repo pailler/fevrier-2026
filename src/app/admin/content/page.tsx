@@ -97,19 +97,28 @@ export default function AdminContent() {
             return acc;
           }, {} as Record<string, any>);
 
-          // Définir les modules essentiels
-          const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes'];
+          // Définir les modules essentiels et premium
+          const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed'];
+          const premiumModules = ['qrcodes', 'home-assistant'];
           
           Object.values(appGroups).forEach((app: any) => {
             const isEssential = essentialModules.some(essentialId => 
               app.id === essentialId || 
               app.title.toLowerCase().includes(essentialId.toLowerCase())
             );
+            const isPremium = premiumModules.some(premiumId => 
+              app.id === premiumId || 
+              app.title.toLowerCase().includes(premiumId.toLowerCase())
+            );
+
+            let contentType: 'application' | 'blog' | 'formation' | 'page' | 'essentiel' = 'application';
+            if (isEssential) contentType = 'essentiel';
+            else if (isPremium) contentType = 'application'; // Les modules premium sont traités comme applications
 
             allContent.push({
               id: app.id,
               title: app.title,
-              type: isEssential ? 'essentiel' : 'application',
+              type: contentType,
               status: app.status,
               created_at: app.created_at,
               last_used_at: app.last_used_at,

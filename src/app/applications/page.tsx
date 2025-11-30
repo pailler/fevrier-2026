@@ -159,7 +159,7 @@ export default function Home() {
 
 
   // Modules essentiels à exclure de la page applications
-  const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'code-learning'];
+  const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'code-learning', 'home-assistant'];
   
   // Filtrer les modules
   const filteredModules = modules
@@ -252,7 +252,7 @@ export default function Home() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
-                Accès directs à la puissance GPU, IA et outils essentiels
+                Utilisez à distance la puissance GPU des ordinateurs IAHome
               </h1>
               <p className="text-xl text-gray-700 mb-6">
                 Le numérique à portée de main, pour une utilisation simple et directe. Sans téléchargement.

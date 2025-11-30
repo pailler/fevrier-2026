@@ -51,3 +51,10 @@ Après configuration, attendez 1-2 minutes puis testez :
 
 Si cloudflared utilise le dashboard, cette configuration dans le fichier sera ignorée. Vous devez configurer dans le dashboard.
 
+
+
+
+
+
+
+

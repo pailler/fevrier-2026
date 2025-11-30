@@ -87,10 +87,68 @@ function getSupabaseConfig() {
 }
 
 // Instance singleton pour éviter les instances multiples
+// Utiliser une variable globale pour s'assurer qu'il n'y a qu'une seule instance
 let clientInstance: SupabaseClient | null = null;
+let isCreating = false;
+
+// Vérifier si une instance existe déjà dans le contexte global (pour éviter les doublons)
+if (typeof window !== 'undefined') {
+  // @ts-ignore - Propriété globale pour éviter les instances multiples
+  if ((window as any).__supabaseClientInstance) {
+    clientInstance = (window as any).__supabaseClientInstance;
+    console.log('✅ Réutilisation de l\'instance Supabase existante');
+  }
+}
+
+// Fonction pour réinitialiser l'instance Supabase (utile après déconnexion)
+export const resetSupabaseClient = (): void => {
+  clientInstance = null;
+  isCreating = false;
+  if (typeof window !== 'undefined') {
+    delete (window as any).__supabaseClientInstance;
+  }
+  console.log('🔄 Instance Supabase réinitialisée');
+};
 
 export const getSupabaseClient = (): SupabaseClient => {
-  if (!clientInstance) {
+  // Vérifier d'abord dans le contexte global (priorité)
+  if (typeof window !== 'undefined') {
+    const globalInstance = (window as any).__supabaseClientInstance;
+    if (globalInstance && globalInstance.auth) {
+      console.log('✅ Réutilisation de l\'instance Supabase globale existante');
+      clientInstance = globalInstance;
+      return globalInstance;
+    }
+  }
+  
+  // Si une instance existe déjà, la retourner
+  if (clientInstance) {
+    return clientInstance;
+  }
+  
+  // Si une création est en cours, retourner l'instance existante si elle existe
+  if (isCreating) {
+    console.warn('⚠️ Création d\'instance Supabase en cours, réutilisation si disponible...');
+    // Si on a une instance globale, l'utiliser
+    if (typeof window !== 'undefined') {
+      const globalInstance = (window as any).__supabaseClientInstance;
+      if (globalInstance && globalInstance.auth) {
+        clientInstance = globalInstance;
+        return globalInstance;
+      }
+    }
+    // Si on a déjà une instance locale, l'utiliser
+    if (clientInstance) {
+      return clientInstance;
+    }
+    // Sinon, attendre un peu et réessayer (mais de manière synchrone pour éviter les problèmes)
+    // En pratique, cela ne devrait pas arriver car isCreating est rapidement false
+    // On va quand même créer une nouvelle instance pour éviter les blocages
+  }
+  
+  isCreating = true;
+  
+  try {
     const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig();
     
     // Protection supplémentaire : s'assurer que les valeurs ne sont jamais undefined
@@ -104,17 +162,16 @@ export const getSupabaseClient = (): SupabaseClient => {
       throw new Error(errorMsg);
     }
     
-    // Configuration optimisée pour éviter les conflits
+    // Configuration optimisée pour éviter les conflits et instances multiples
     clientInstance = createClient(finalUrl, finalKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: true,
+        detectSessionInUrl: true, // IMPORTANT: Doit être true pour que PKCE fonctionne
         storage: typeof window !== 'undefined' ? window.localStorage : undefined,
         storageKey: 'sb-xemtoyzcihmncbrlsmhr-auth-token', // Clé de stockage unique pour éviter les conflits
-        flowType: 'implicit', // Utiliser le flux implicite au lieu de PKCE
-        // Configuration pour éviter les instances multiples
-        debug: false // Désactiver les logs pour réduire les avertissements
+        flowType: 'pkce', // Utiliser PKCE (recommandé par Supabase pour une meilleure fiabilité)
+        debug: false, // Désactiver les logs pour réduire les avertissements
       },
       realtime: {
         // Configuration pour gérer l'absence de WebSocket
@@ -128,7 +185,19 @@ export const getSupabaseClient = (): SupabaseClient => {
         }
       }
     });
+    
+    // Stocker l'instance dans le contexte global pour éviter les doublons
+    if (typeof window !== 'undefined') {
+      // @ts-ignore - Propriété globale pour éviter les instances multiples
+      (window as any).__supabaseClientInstance = clientInstance;
+      console.log('✅ Instance Supabase stockée dans le contexte global');
+    }
+    
+    console.log('✅ Instance Supabase créée (singleton)');
+  } finally {
+    isCreating = false;
   }
+  
   return clientInstance;
 };
 

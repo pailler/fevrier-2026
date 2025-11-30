@@ -368,7 +368,7 @@ export default function StableDiffusionPage() {
         {/* Première vidéo - Introduction */}
         <div className="mb-8">
           <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">Introduction à StableDiffusion</h3>
-          <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 max-w-2xl mx-auto">
+          <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 max-w-4xl mx-auto">
             <iframe
               className="w-full h-full rounded-2xl"
               src="https://www.youtube.com/embed/L-gOZrVjHKA?autoplay=0&rel=0&modestbranding=1"
@@ -748,28 +748,19 @@ export default function StableDiffusionPage() {
                   </div>
                 </div>
                 
-                {/* Liens utiles */}
-                <div className="pt-8 border-t border-gray-200">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Liens utiles</h3>
-                  <div className="flex flex-wrap gap-3">
-                    <a
-                      href="https://github.com/Stability-AI/stablediffusion"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium"
-                    >
-                      <span className="mr-2">🔗</span>
-                      GitHub Stable Diffusion
-                    </a>
-                    <a
-                      href="https://github.com/Stability-AI/stablediffusion#readme"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm font-medium"
-                    >
-                      <span className="mr-2">📚</span>
-                      Documentation
-                    </a>
+                {/* Call to action */}
+                <div className="text-center pt-8">
+                  <p className="text-lg sm:text-xl text-gray-700 mb-6 max-w-4xl mx-auto">
+                    Prêt à créer des images extraordinaires avec StableDiffusion ? Commencez dès maintenant et explorez les possibilités infinies de l'IA générative !
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <Link href="/register" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                      <span className="text-xl mr-2">🚀</span>
+                      Commencer maintenant
+                    </Link>
+                    <span className="text-sm text-gray-500">
+                      Accès instantané juste après inscription
+                    </span>
                   </div>
                 </div>
               </div>

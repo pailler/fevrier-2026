@@ -150,8 +150,8 @@ export default function AdminTokens() {
               } else if (moduleId.includes('metube') || moduleId.includes('librespeed') ||
                          moduleId.includes('pdf') || moduleId.includes('psitransfer')) {
                 return 10; // Applications essentielles
-              } else if (moduleId.includes('qrcodes')) {
-                return 100; // QR Codes
+              } else if (moduleId.includes('qrcodes') || moduleId.includes('home-assistant') || moduleId.includes('homeassistant')) {
+                return 100; // QR Codes et Home Assistant (premium)
               }
               return 10; // Par défaut
             };
@@ -368,6 +368,8 @@ export default function AdminTokens() {
       return '📱';
     } else if (moduleName.includes('psitransfer')) {
       return '📤';
+    } else if (moduleName.includes('home-assistant') || moduleName.includes('homeassistant')) {
+      return '🏠';
     }
     return '📱';
   };

@@ -4,6 +4,7 @@ import { supabase } from "../../../utils/supabaseClient";
 import Link from "next/link";
 import Breadcrumb from "../../../components/Breadcrumb";
 import { useParams } from "next/navigation";
+import { getArticleImage } from "../../../utils/articleImageGenerator";
 
 interface BlogArticle {
   id: string;
@@ -146,15 +147,18 @@ export default function BlogArticlePage() {
         {/* Article */}
         <article className="bg-white rounded-lg shadow-md overflow-hidden">
           {/* Image de l'article */}
-          {article.image_url && (
-            <div className="w-full h-64 md:h-96 relative overflow-hidden">
-              <img
-                src={article.image_url}
-                alt={article.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
+          <div className="w-full h-64 md:h-96 relative overflow-hidden">
+            <img
+              src={getArticleImage(article, 'blog')}
+              alt={article.title}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                // Fallback vers une image par défaut si l'image ne se charge pas
+                const target = e.target as HTMLImageElement;
+                target.src = '/images/iaphoto.jpg';
+              }}
+            />
+          </div>
           
           <div className="p-8">
             {/* En-tête de l'article */}

@@ -113,7 +113,7 @@ export default function AdminSettings() {
       
       // Séparer applications et essentiels
       const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed'];
-      const premiumModules = ['qrcodes'];
+      const premiumModules = ['qrcodes', 'home-assistant'];
       const applications = userApps.filter(app => !essentialModules.includes(app.module_id) && !premiumModules.includes(app.module_id));
       const essentiels = userApps.filter(app => essentialModules.includes(app.module_id));
       const premium = userApps.filter(app => premiumModules.includes(app.module_id));

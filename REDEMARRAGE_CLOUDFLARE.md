@@ -57,3 +57,10 @@ Si après 3 minutes l'erreur 404 persiste toujours :
    - DNS → Records
    - Vérifiez que `consoles` (CNAME) pointe bien vers votre tunnel Cloudflare
 
+
+
+
+
+
+
+

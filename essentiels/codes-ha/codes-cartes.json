@@ -1,0 +1,2534 @@
+{
+  "categories": [
+    {
+      "id": "banner",
+      "name": "Cartes Bannière",
+      "description": "Cartes bannière avec images de fond",
+      "codes": [
+        {
+          "id": "banner-meteo",
+          "name": "Banner Card Météo",
+          "description": "Bannière avec image de fond pour la section météo",
+          "tags": [
+            "bannière",
+            "météo",
+            "image"
+          ],
+          "screenshot": "banner-meteo.png",
+          "code": "- type: custom:banner-card\n  background: url(\"/local/photos/meteo.jpg\")\n  heading: METEO\n  link: /lovelace/meteo\n  row_size: 4\n  entities:\n    - entity: sensor.le_chesnay_cloud_cover\n      name: Nuageux\n    - entity: sensor.le_chesnay_rain_chance\n      name: Chance pluie\n    - entity: sensor.le_chesnay_rain_today\n      name: Pluie tombée\n    - entity: sensor.78_weather_alert\n      name: Vigilance\n  card_mod:\n    style: |\n      ha-card .heading {\n        font-size: 1.55em;\n        font-weight: 400\n      }"
+        },
+        {
+          "id": "banner-eclairage",
+          "name": "Banner Card Éclairage",
+          "description": "Bannière pour la section éclairage",
+          "tags": [
+            "bannière",
+            "éclairage",
+            "lumière"
+          ],
+          "code": "- type: custom:banner-card\n  background: url(\"/local/photos/ampoules.jpg\")\n  heading: ON/OFF\n  link: /lovelace/lumieres\n  row_size: 4\n  card_mod:\n    style: |\n      ha-card {\n        --ha-card-header-color: black;\n        color: black !important;\n        font-size: 0.65em;\n        font-weight: 90\n      }\n      .heading {\n        color: black !important;\n      }"
+        },
+        {
+          "id": "banner-surveillance",
+          "name": "Banner Card Surveillance",
+          "description": "Bannière pour la section surveillance",
+          "tags": [
+            "bannière",
+            "surveillance"
+          ],
+          "code": "- type: custom:banner-card\n  background: url(\"/local/photos/nas.png\")\n  heading: SURVEILLANCE\n  link: /lovelace/nas\n  row_size: 4\n  entities:\n    - entity: sensor.ds224_temperature\n      name: Serveur\n    - entity: sensor.pc_pailler_tempgpu\n      name: PC\n    - entity: sensor.youtube_view_count\n      name: Vues Youtube\n    - entity: sensor.ble_moisture_plante_patio\n      name: Plante patio\n  card_mod:\n    style: |\n      ha-card .heading {\n        font-size: 1.55em;\n        font-weight: 400\n      }"
+        }
+      ]
+    },
+    {
+      "id": "button",
+      "name": "Cartes Bouton",
+      "description": "Cartes bouton personnalisées",
+      "codes": [
+        {
+          "id": "button-simple",
+          "name": "Button Card Simple",
+          "description": "Bouton simple avec toggle",
+          "tags": [
+            "bouton",
+            "simple",
+            "bascule"
+          ],
+          "code": "- type: custom:button-card\n  entity: light.salon\n  name: Salon\n  icon: mdi:lightbulb\n  tap_action:\n    action: toggle"
+        },
+        {
+          "id": "button-styled",
+          "name": "Button Card avec Styles",
+          "description": "Bouton avec styles personnalisés",
+          "tags": [
+            "bouton",
+            "style",
+            "personnalisé"
+          ],
+          "code": "- type: custom:button-card\n  entity: light.salon\n  name: Salon\n  icon: mdi:lightbulb\n  styles:\n    card:\n      - background-color: \"#3498db\"\n      - color: white\n      - font-size: 20px\n  tap_action:\n    action: toggle"
+        },
+        {
+          "id": "button-animation",
+          "name": "Button Card avec Animation",
+          "description": "Bouton avec animation CSS",
+          "tags": [
+            "bouton",
+            "animation",
+            "css"
+          ],
+          "code": "- type: custom:button-card\n  entity: light.salon\n  name: Salon allumé !\n  icon: mdi:outdoor-lamp\n  styles:\n    icon:\n      - animation: drop-shadow 5s infinite alternate\n  extra_styles: |\n    @keyframes drop-shadow {\n      from { filter: drop-shadow(1.95rem 0 0 pink);}\n      to { filter: drop-shadow(0 0 0.95rem chartreuse);}\n    }"
+        },
+        {
+          "id": "button-youtube-stats",
+          "name": "Button Card YouTube - Statistiques",
+          "description": "Bouton YouTube avec statistiques personnalisées",
+          "tags": [
+            "bouton",
+            "youtube",
+            "statistiques",
+            "champs_personnalisés"
+          ],
+          "code": "- type: custom:button-card\n  entity: sensor.youtube_subscriber_count\n  name: Abonnés YouTube\n  icon: mdi:youtube\n  show_state: true\n  state:\n    - value: online\n      color: red\n  styles:\n    card:\n      - background-color: \"#FF0000\"\n      - color: white\n      - font-size: 56px\n      - padding: 2px"
+        },
+        {
+          "id": "button-youtube-custom",
+          "name": "Button Card YouTube - Champs Personnalisés",
+          "description": "Bouton YouTube avec champs personnalisés et grille",
+          "tags": [
+            "bouton",
+            "youtube",
+            "champs_personnalisés",
+            "grid"
+          ],
+          "code": "- type: custom:button-card\n  name: Ma chaîne YouTube ADAMHOME\n  icon: mdi:youtube\n  show_icon: true\n  show_name: true\n  custom_fields:\n    stats: |\n      [[[\n        const subs = states['sensor.youtube_subscriber_count']?.state ?? 'N/A';\n        const views = states['sensor.youtube_view_count']?.state ?? 'N/A';\n        const videos = states['sensor.youtube_video_count']?.state ?? 'N/A';\n        const last = states['sensor.youtube_monetization_status']?.state ?? 'N/A';\n        return `\n          <div style=\"font-size: 14px; text-align: left; margin-top: 8px;\">\n            👥 Abonnés : ${subs}<br>\n            👁️ Vues : ${views}<br>\n            🎬 Vidéos : ${videos}<br>\n            📅 Monétisation : ${last}\n          </div>\n        `;\n      ]]]\n  styles:\n    grid:\n      - grid-template-areas: '\"i n\" \"stats stats\"'\n      - grid-template-columns: 100px 1fr\n      - grid-template-rows: auto auto\n    card:\n      - background-color: \"#FF0000\"\n      - color: white\n      - padding: 12px\n      - border-radius: 30px\n      - height: auto\n    name:\n      - font-weight: bold\n      - font-size: 20px\n    icon:\n      - color: white"
+        },
+        {
+          "id": "button-youtube-link",
+          "name": "Button Card YouTube - Lien Externe",
+          "description": "Bouton YouTube avec lien vers chaîne",
+          "tags": [
+            "bouton",
+            "youtube",
+            "lien",
+            "url"
+          ],
+          "code": "- type: custom:button-card\n  entity: sensor.youtube_subscriber_count\n  name: Abonnés YouTube\n  icon: mdi:youtube\n  show_state: true\n  styles:\n    card:\n      - background-color: var(--card-background-color)\n      - color: var(--primary-text-color)\n      - font-size: 26px\n      - font-weight: bold\n      - padding: 12px\n      - border-radius: 16px\n      - box-shadow: 0 2px 10px rgba(0,0,0,0.1)\n    name:\n      - font-size: 18px\n    state:\n      - font-size: 58px\n      - color: var(--accent-color)\n  tap_action:\n    action: url\n    url_path: https://www.youtube.com/@pailleradamhome"
+        },
+        {
+          "id": "button-script",
+          "name": "Button Card - Script",
+          "description": "Bouton pour lancer un script",
+          "tags": [
+            "bouton",
+            "script",
+            "action"
+          ],
+          "code": "- type: button\n  name: Playlist Aléatoire\n  icon: mdi:shuffle-variant\n  tap_action:\n    action: call-service\n    service: script.lancer_playlist_bruitages"
+        },
+        {
+          "id": "button-playlist",
+          "name": "Button Card - Playlist Ménage",
+          "description": "Bouton pour lancer une playlist",
+          "tags": [
+            "bouton",
+            "playlist",
+            "média"
+          ],
+          "code": "- type: button\n  name: 🎵 Playlist Ménage\n  icon: mdi:music\n  tap_action:\n    action: call-service\n    service: media_player.play_media\n    target:\n      entity_id: media_player.votre_lecteur\n    data:\n      media_content_id: https://regispailler.fr/as/sharing/bvnhA1Y3\n      media_content_type: audio/m3u"
+        },
+        {
+          "id": "button-start-stop",
+          "name": "Button Cards - Démarrer/Arrêter",
+          "description": "Boutons pour démarrer et arrêter un service",
+          "tags": [
+            "bouton",
+            "service",
+            "démarrage"
+          ],
+          "code": "- type: vertical-stack\n  cards:\n    - show_name: true\n      show_icon: true\n      type: button\n      name: Démarrer PORTAINER\n      icon: mdi:play\n      tap_action:\n        action: call-service\n        service: script.start_portainer\n      show_state: true\n    - show_name: true\n      show_icon: true\n      type: button\n      name: Arrêter PORTAINER\n      icon: mdi:account\n      tap_action:\n        action: call-service\n        service: script.stop_portainer\n      show_state: true"
+        }
+      ]
+    },
+    {
+      "id": "mushroom",
+      "name": "Cartes Mushroom",
+      "description": "Cartes modernes et élégantes",
+      "codes": [
+        {
+          "id": "mushroom-entity",
+          "name": "Mushroom Entity Card",
+          "description": "Carte entité avec style Mushroom",
+          "tags": [
+            "mushroom",
+            "entity",
+            "personne"
+          ],
+          "code": "- type: custom:mushroom-entity-card\n  entity: person.regis_pailler\n  name: Régis\n  icon: mdi:account\n  layout: horizontal\n  primary_info: name\n  secondary_info: state\n  tap_action:\n    action: more-info\n  card_mod:\n    style: |\n      ha-card {\n        border-radius: 16px;\n        box-shadow: var(--ha-card-box-shadow);\n        margin-bottom: 8px;\n        transition: all 0.3s ease;\n      }\n      ha-card:hover {\n        transform: scale(1.015);\n        box-shadow: 0 4px 20px rgba(0, 150, 255, 0.2);\n      }"
+        },
+        {
+          "id": "mushroom-alarm",
+          "name": "Mushroom Alarm Card",
+          "description": "Carte d'alarme avec style Mushroom",
+          "tags": [
+            "mushroom",
+            "alarme",
+            "sécurité"
+          ],
+          "code": "- type: custom:mushroom-alarm-control-panel-card\n  entity: alarm_control_panel.alarmo\n  name: Alarme\n  states:\n    - armed_home\n    - armed_away\n    - disarmed\n    - armed_night\n    - armed_vacation\n    - armed_custom_bypass\n  card_mod:\n    style: |\n      ha-card {\n        border-radius: 16px;\n        box-shadow: var(--ha-card-box-shadow);\n        margin-bottom: 8px;\n        transition: all 0.3s ease;\n      }\n      ha-card:hover {\n        transform: scale(1.015);\n        box-shadow: 0 4px 20px rgba(255, 165, 0, 0.2);\n      }"
+        },
+        {
+          "id": "mushroom-template",
+          "name": "Mushroom Template Card",
+          "description": "Carte template avec calculs dynamiques",
+          "tags": [
+            "mushroom",
+            "template",
+            "dynamique"
+          ],
+          "code": "- type: custom:mushroom-template-card\n  primary: >\n    {{ expand('group.portes_fenetres') | selectattr('state','eq','on')\n    | list | count }} ouvert(s)\n  secondary: Portes/Fenêtres ouvertes\n  icon: mdi:door-open\n  icon_color: >\n    {% if expand('group.portes_fenetres') |\n    selectattr('state','eq','on') | list | count > 0 %}\n      red\n    {% else %}\n      green\n    {% endif %}\n  layout: horizontal\n  tap_action:\n    action: more-info\n  entity: binary_sensor.capteur_distance_porte_fenetre_ouverture_2"
+        },
+        {
+          "id": "mushroom-chips",
+          "name": "Mushroom Chips Card",
+          "description": "Carte chips Mushroom avec conditions",
+          "tags": [
+            "mushroom",
+            "chips",
+            "conditionnel"
+          ],
+          "code": "- type: custom:mushroom-chips-card\n  chips:\n    - type: conditional\n      conditions:\n        - condition: state\n          entity: light.salle_de_bain_lumiere_3\n          state: \"on\"\n      chip:\n        type: action\n        name: salle de bain\n        icon: mdi:ceiling-light\n        double_tap_action:\n          action: none\n        tap_action:\n          action: navigate\n          navigation_path: /lovelace/lumieres"
+        },
+        {
+          "id": "mushroom-entity-font",
+          "name": "Mushroom Entity Card - Police Personnalisée",
+          "description": "Carte Mushroom avec police personnalisée",
+          "tags": [
+            "mushroom",
+            "entity",
+            "police"
+          ],
+          "code": "- type: custom:mushroom-entity-card\n  entity: person.regis_pailler\n  card_mod:\n    style: |\n      ha-card {\n        font-family: \"Lucida Handwriting\";\n        --card-primary-font-size: 18px\n      }"
+        },
+        {
+          "id": "mushroom-glassmorphism",
+          "name": "Mushroom Glassmorphism - Effet Verre",
+          "description": "Carte Mushroom avec effet glassmorphism moderne et script de blur dynamique",
+          "tags": [
+            "mushroom",
+            "glassmorphism",
+            "verre",
+            "blur",
+            "moderne",
+            "script"
+          ],
+          "code": "- type: custom:mushroom-entity-card\n  entity: light.salon\n  name: Salon\n  icon: mdi:lightbulb-on\n  layout: horizontal\n  primary_info: name\n  secondary_info: state\n  card_mod:\n    style: |\n      ha-card {\n        background: rgba(255, 255, 255, 0.1) !important;\n        backdrop-filter: blur(20px) saturate(180%) !important;\n        -webkit-backdrop-filter: blur(20px) saturate(180%) !important;\n        border: 1px solid rgba(255, 255, 255, 0.3) !important;\n        border-radius: 20px !important;\n        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;\n        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;\n      }\n      ha-card:hover {\n        transform: translateY(-5px) scale(1.02) !important;\n        box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5) !important;\n        border-color: rgba(255, 255, 255, 0.5) !important;\n        backdrop-filter: blur(30px) saturate(200%) !important;\n      }\n    script: |\n      const card = this;\n      const entity = card.querySelector('state-badge');\n      if (entity) {\n        const state = entity.getAttribute('state');\n        if (state === 'on') {\n          card.style.setProperty('--card-background', 'rgba(255, 193, 7, 0.2)');\n        } else {\n          card.style.setProperty('--card-background', 'rgba(255, 255, 255, 0.1)');\n        }\n      }"
+        },
+        {
+          "id": "mushroom-gradient-animated",
+          "name": "Mushroom Gradient Animé - Arc-en-ciel",
+          "description": "Carte Mushroom avec gradient animé et script de changement de couleur dynamique",
+          "tags": [
+            "mushroom",
+            "gradient",
+            "animation",
+            "arc-en-ciel",
+            "script",
+            "moderne"
+          ],
+          "code": "- type: custom:mushroom-entity-card\n  entity: sensor.temperature_salon\n  name: Température\n  icon: mdi:thermometer\n  layout: horizontal\n  primary_info: name\n  secondary_info: state\n  card_mod:\n    style: |\n      ha-card {\n        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab) !important;\n        background-size: 400% 400% !important;\n        animation: gradient-shift 15s ease infinite !important;\n        border-radius: 20px !important;\n        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;\n        color: white !important;\n        border: none !important;\n      }\n      @keyframes gradient-shift {\n        0% { background-position: 0% 50%; }\n        50% { background-position: 100% 50%; }\n        100% { background-position: 0% 50%; }\n      }\n    script: |\n      const card = this;\n      const stateBadge = card.querySelector('state-badge');\n      if (stateBadge) {\n        const temp = parseFloat(stateBadge.getAttribute('state') || 0);\n        let gradient;\n        if (temp < 15) {\n          gradient = 'linear-gradient(-45deg, #4facfe, #00f2fe)'; // Bleu froid\n        } else if (temp < 22) {\n          gradient = 'linear-gradient(-45deg, #43e97b, #38f9d7)'; // Vert\n        } else if (temp < 26) {\n          gradient = 'linear-gradient(-45deg, #fa709a, #fee140)'; // Jaune/Rose\n        } else {\n          gradient = 'linear-gradient(-45deg, #ff6b6b, #ee5a6f)'; // Rouge chaud\n        }\n        card.style.background = gradient;\n      }"
+        },
+        {
+          "id": "mushroom-neon-glow",
+          "name": "Mushroom Neon Glow - Effet Néon",
+          "description": "Carte Mushroom avec effet néon animé et script de pulsation dynamique",
+          "tags": [
+            "mushroom",
+            "neon",
+            "glow",
+            "lumière",
+            "script",
+            "cyberpunk"
+          ],
+          "code": "- type: custom:mushroom-entity-card\n  entity: light.salon\n  name: Éclairage\n  icon: mdi:lightbulb-on\n  layout: horizontal\n  primary_info: name\n  secondary_info: state\n  card_mod:\n    style: |\n      ha-card {\n        background: #0a0a0a !important;\n        border: 2px solid var(--neon-color, #00ffff) !important;\n        border-radius: 15px !important;\n        box-shadow: \n          0 0 10px var(--neon-color, #00ffff),\n          0 0 20px var(--neon-color, #00ffff),\n          0 0 30px var(--neon-color, #00ffff),\n          inset 0 0 10px rgba(0, 255, 255, 0.1) !important;\n        animation: neon-pulse 2s ease-in-out infinite alternate !important;\n        color: var(--neon-color, #00ffff) !important;\n      }\n      @keyframes neon-pulse {\n        from {\n          box-shadow: \n            0 0 10px var(--neon-color, #00ffff),\n            0 0 20px var(--neon-color, #00ffff),\n            0 0 30px var(--neon-color, #00ffff),\n            inset 0 0 10px rgba(0, 255, 255, 0.1) !important;\n        }\n        to {\n          box-shadow: \n            0 0 20px var(--neon-color, #00ffff),\n            0 0 30px var(--neon-color, #00ffff),\n            0 0 40px var(--neon-color, #00ffff),\n            0 0 50px var(--neon-color, #00ffff),\n            inset 0 0 20px rgba(0, 255, 255, 0.2) !important;\n        }\n      }\n    script: |\n      const card = this;\n      const stateBadge = card.querySelector('state-badge');\n      if (stateBadge) {\n        const state = stateBadge.getAttribute('state');\n        const neonColors = {\n          'on': '#00ff00',\n          'off': '#ff0000',\n          'unavailable': '#888888'\n        };\n        const color = neonColors[state] || '#00ffff';\n        card.style.setProperty('--neon-color', color);\n        card.style.borderColor = color;\n        card.style.color = color;\n      }"
+        },
+        {
+          "id": "mushroom-3d-transform",
+          "name": "Mushroom 3D Transform - Rotation 3D",
+          "description": "Carte Mushroom avec transformation 3D au survol et script de suivi de souris",
+          "tags": [
+            "mushroom",
+            "3d",
+            "rotation",
+            "transform",
+            "script",
+            "interactif"
+          ],
+          "code": "- type: custom:mushroom-entity-card\n  entity: sensor.temperature_salon\n  name: Température\n  icon: mdi:thermometer\n  layout: horizontal\n  primary_info: name\n  secondary_info: state\n  card_mod:\n    style: |\n      ha-card {\n        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;\n        border-radius: 20px !important;\n        perspective: 1000px !important;\n        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;\n        transform-style: preserve-3d !important;\n        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;\n        color: white !important;\n        border: none !important;\n      }\n      ha-card:hover {\n        transform: rotateY(15deg) rotateX(5deg) scale(1.05) !important;\n        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;\n      }\n    script: |\n      const card = this;\n      let mouseX = 0, mouseY = 0;\n      card.addEventListener('mousemove', (e) => {\n        const rect = card.getBoundingClientRect();\n        mouseX = (e.clientX - rect.left - rect.width / 2) / rect.width;\n        mouseY = (e.clientY - rect.top - rect.height / 2) / rect.height;\n        const rotateY = mouseX * 15;\n        const rotateX = -mouseY * 15;\n        card.style.transform = `perspective(1000px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(1.05)`;\n      });\n      card.addEventListener('mouseleave', () => {\n        card.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1)';\n      });"
+        },
+        {
+          "id": "mushroom-morphing-blob",
+          "name": "Mushroom Morphing Blob - Forme Animée",
+          "description": "Carte Mushroom avec forme blob animée et script de morphing dynamique",
+          "tags": [
+            "mushroom",
+            "blob",
+            "morphing",
+            "forme",
+            "script",
+            "animation"
+          ],
+          "code": "- type: custom:mushroom-entity-card\n  entity: sensor.humidite_salon\n  name: Humidité\n  icon: mdi:water-percent\n  layout: horizontal\n  primary_info: name\n  secondary_info: state\n  card_mod:\n    style: |\n      ha-card {\n        position: relative !important;\n        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;\n        border-radius: 30px !important;\n        overflow: hidden !important;\n        color: white !important;\n        border: none !important;\n      }\n      ha-card::before {\n        content: '' !important;\n        position: absolute !important;\n        width: 200% !important;\n        height: 200% !important;\n        background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%) !important;\n        border-radius: 50% !important;\n        top: -50% !important;\n        left: -50% !important;\n        animation: blob-morph 8s ease-in-out infinite !important;\n      }\n      @keyframes blob-morph {\n        0%, 100% { transform: translate(0, 0) scale(1); border-radius: 50%; }\n        25% { transform: translate(20px, -20px) scale(1.1); border-radius: 60% 40% 30% 70%; }\n        50% { transform: translate(-20px, 20px) scale(0.9); border-radius: 30% 60% 70% 40%; }\n        75% { transform: translate(20px, 20px) scale(1.05); border-radius: 40% 60%; }\n      }\n    script: |\n      const card = this;\n      const stateBadge = card.querySelector('state-badge');\n      if (stateBadge) {\n        const humidity = parseFloat(stateBadge.getAttribute('state') || 0);\n        const blob = card.querySelector('::before');\n        if (humidity < 30) {\n          card.style.setProperty('--blob-color', 'rgba(255, 200, 87, 0.3)');\n        } else if (humidity < 60) {\n          card.style.setProperty('--blob-color', 'rgba(87, 200, 255, 0.3)');\n        } else {\n          card.style.setProperty('--blob-color', 'rgba(200, 255, 87, 0.3)');\n        }\n      }"
+        },
+        {
+          "id": "mushroom-shimmer-effect",
+          "name": "Mushroom Shimmer - Effet Brillant",
+          "description": "Carte Mushroom avec effet shimmer animé et script de brillance dynamique",
+          "tags": [
+            "mushroom",
+            "shimmer",
+            "brillant",
+            "reflet",
+            "script",
+            "luxe"
+          ],
+          "code": "- type: custom:mushroom-entity-card\n  entity: light.salon\n  name: Éclairage\n  icon: mdi:lightbulb-on\n  layout: horizontal\n  primary_info: name\n  secondary_info: state\n  card_mod:\n    style: |\n      ha-card {\n        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;\n        border-radius: 20px !important;\n        position: relative !important;\n        overflow: hidden !important;\n        color: white !important;\n        border: none !important;\n        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;\n      }\n      ha-card::before {\n        content: '' !important;\n        position: absolute !important;\n        top: 0 !important;\n        left: -100% !important;\n        width: 100% !important;\n        height: 100% !important;\n        background: linear-gradient(\n          90deg,\n          transparent,\n          rgba(255, 255, 255, 0.4),\n          transparent\n        ) !important;\n        animation: shimmer 3s infinite !important;\n      }\n      @keyframes shimmer {\n        0% { left: -100%; }\n        100% { left: 100%; }\n      }\n    script: |\n      const card = this;\n      const stateBadge = card.querySelector('state-badge');\n      if (stateBadge) {\n        const state = stateBadge.getAttribute('state');\n        if (state === 'on') {\n          const shimmer = card.querySelector('::before');\n          card.style.setProperty('--shimmer-speed', '1s');\n          card.style.setProperty('--shimmer-opacity', '0.6');\n        } else {\n          card.style.setProperty('--shimmer-speed', '3s');\n          card.style.setProperty('--shimmer-opacity', '0.2');\n        }\n      }"
+        },
+        {
+          "id": "mushroom-pulse-glow",
+          "name": "Mushroom Pulse Glow - Pulsation Lumineuse",
+          "description": "Carte Mushroom avec pulsation lumineuse et script de rythme dynamique",
+          "tags": [
+            "mushroom",
+            "pulse",
+            "glow",
+            "pulsation",
+            "script",
+            "rythme"
+          ],
+          "code": "- type: custom:mushroom-entity-card\n  entity: sensor.temperature_salon\n  name: Température\n  icon: mdi:thermometer\n  layout: horizontal\n  primary_info: name\n  secondary_info: state\n  card_mod:\n    style: |\n      ha-card {\n        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;\n        border-radius: 20px !important;\n        position: relative !important;\n        color: white !important;\n        border: none !important;\n        box-shadow: 0 0 20px rgba(245, 87, 108, 0.5) !important;\n        animation: pulse-glow 2s ease-in-out infinite !important;\n      }\n      @keyframes pulse-glow {\n        0%, 100% {\n          box-shadow: 0 0 20px rgba(245, 87, 108, 0.5), 0 0 40px rgba(245, 87, 108, 0.3) !important;\n          transform: scale(1) !important;\n        }\n        50% {\n          box-shadow: 0 0 30px rgba(245, 87, 108, 0.8), 0 0 60px rgba(245, 87, 108, 0.5) !important;\n          transform: scale(1.02) !important;\n        }\n      }\n    script: |\n      const card = this;\n      const stateBadge = card.querySelector('state-badge');\n      if (stateBadge) {\n        const temp = parseFloat(stateBadge.getAttribute('state') || 0);\n        let pulseSpeed = '2s';\n        let glowIntensity = '0.5';\n        if (temp > 25) {\n          pulseSpeed = '1s';\n          glowIntensity = '0.8';\n          card.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)';\n        } else if (temp < 15) {\n          pulseSpeed = '3s';\n          glowIntensity = '0.3';\n          card.style.background = 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)';\n        }\n        card.style.setProperty('--pulse-speed', pulseSpeed);\n        card.style.setProperty('--glow-intensity', glowIntensity);\n      }"
+        },
+        {
+          "id": "mushroom-interactive-hover",
+          "name": "Mushroom Interactive Hover - Effet Magnétique",
+          "description": "Carte Mushroom avec effet magnétique interactif et script de suivi de curseur",
+          "tags": [
+            "mushroom",
+            "magnétique",
+            "hover",
+            "interactif",
+            "script",
+            "cursor"
+          ],
+          "code": "- type: custom:mushroom-entity-card\n  entity: sensor.temperature_salon\n  name: Température\n  icon: mdi:thermometer\n  layout: horizontal\n  primary_info: name\n  secondary_info: state\n  card_mod:\n    style: |\n      ha-card {\n        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;\n        border-radius: 20px !important;\n        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1) !important;\n        color: white !important;\n        border: none !important;\n        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;\n      }\n      ha-card:hover {\n        transform: scale(1.05) translateY(-5px) !important;\n        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;\n      }\n    script: |\n      const card = this;\n      let isHovering = false;\n      card.addEventListener('mouseenter', () => {\n        isHovering = true;\n        card.style.cursor = 'pointer';\n      });\n      card.addEventListener('mousemove', (e) => {\n        if (isHovering) {\n          const rect = card.getBoundingClientRect();\n          const x = e.clientX - rect.left - rect.width / 2;\n          const y = e.clientY - rect.top - rect.height / 2;\n          const rotateX = (y / rect.height) * 10;\n          const rotateY = (x / rect.width) * -10;\n          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05) translateY(-5px)`;\n        }\n      });\n      card.addEventListener('mouseleave', () => {\n        isHovering = false;\n        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1) translateY(0px)';\n      });"
+        },
+        {
+          "id": "mushroom-dynamic-color",
+          "name": "Mushroom Dynamic Color - Couleur Dynamique",
+          "description": "Carte Mushroom avec changement de couleur dynamique basé sur l'état et script de calcul",
+          "tags": [
+            "mushroom",
+            "couleur",
+            "dynamique",
+            "script",
+            "état",
+            "calcul"
+          ],
+          "code": "- type: custom:mushroom-entity-card\n  entity: sensor.temperature_salon\n  name: Température\n  icon: mdi:thermometer\n  layout: horizontal\n  primary_info: name\n  secondary_info: state\n  card_mod:\n    style: |\n      ha-card {\n        background: var(--dynamic-bg, linear-gradient(135deg, #667eea 0%, #764ba2 100%)) !important;\n        border-radius: 20px !important;\n        color: white !important;\n        border: none !important;\n        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;\n        transition: all 0.5s ease !important;\n      }\n    script: |\n      const card = this;\n      const stateBadge = card.querySelector('state-badge');\n      if (stateBadge) {\n        const temp = parseFloat(stateBadge.getAttribute('state') || 0);\n        let gradient;\n        if (temp < 10) {\n          gradient = 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)'; // Bleu foncé\n        } else if (temp < 18) {\n          gradient = 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'; // Bleu clair\n        } else if (temp < 22) {\n          gradient = 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'; // Vert\n        } else if (temp < 26) {\n          gradient = 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'; // Jaune/Rose\n        } else if (temp < 30) {\n          gradient = 'linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%)'; // Orange/Rose\n        } else {\n          gradient = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)'; // Rouge\n        }\n        card.style.setProperty('--dynamic-bg', gradient);\n        card.style.background = gradient;\n      }"
+        }
+      ]
+    },
+    {
+      "id": "weather",
+      "name": "Cartes Météo",
+      "description": "Cartes pour afficher les informations météorologiques",
+      "codes": [
+        {
+          "id": "weather-chart",
+          "name": "Weather Chart Card",
+          "description": "Graphique météo complet avec toutes les informations",
+          "tags": [
+            "météo",
+            "graphique",
+            "graphique"
+          ],
+          "code": "- type: custom:weather-chart-card\n  entity: weather.le_chesnay\n  show_main: true\n  show_temperature: true\n  show_current_condition: true\n  show_attributes: true\n  show_time: true\n  show_time_seconds: true\n  show_day: true\n  show_date: true\n  show_humidity: true\n  show_pressure: true\n  show_wind_direction: true\n  show_wind_speed: true\n  show_sun: true\n  show_feels_like: false\n  show_dew_point: false\n  show_wind_gust_speed: false\n  show_visibility: false\n  show_last_changed: true\n  use_12hour_format: false\n  icons_size: \"34\"\n  animated_icons: true\n  icon_style: style2\n  forecast:\n    precipitation_type: rainfall\n    show_probability: false\n    labels_font_size: \"11\"\n    precip_bar_size: \"100\"\n    style: style1\n    show_wind_forecast: true\n    condition_icons: true\n    round_temp: false\n    type: daily\n    number_of_forecasts: \"0\"\n    disable_animation: false\n  units:\n    pressure: \"\"\n    speed: \"\"\n  current_temp_size: \"32\"\n  time_size: \"26\"\n  uv: sensor.le_chesnay_uv\n  day_date_size: \"20\"\n  card_mod:\n    style: |\n      ha-card {\n        --ha-card-background: #3498db;\n        color: var(--primary-color);\n      }\n      ha-card {\n        color: white;\n      }"
+        },
+        {
+          "id": "weather-radar",
+          "name": "Weather Radar Card",
+          "description": "Carte radar météo avec animation",
+          "tags": [
+            "météo",
+            "radar",
+            "carte"
+          ],
+          "code": "- type: custom:weather-radar-card\n  map_style: Satellite\n  zoom_level: 6\n  static_map: false\n  show_marker: true\n  show_scale: true\n  show_zoom: true\n  show_playback: true\n  show_range: true\n  square_map: true\n  show_recenter: true\n  extra_labels: false\n  data_source: RainViewer-Original\n  card_title: Carte radar"
+        },
+        {
+          "id": "weather-meteofrance",
+          "name": "Météo-France Weather Card",
+          "description": "Carte météo Météo-France conditionnelle",
+          "tags": [
+            "météo",
+            "meteofrance",
+            "conditionnel"
+          ],
+          "code": "- type: conditional\n  conditions:\n    - entity: sensor.le_chesnay_next_rain\n      state_not: unknown\n  card:\n    type: custom:meteofrance-weather-card\n    entity: weather.le_chesnay\n    number_of_forecasts: \"5\"\n    details: false\n    rainForecastEntity: sensor.le_chesnay_next_rain\n    current: false\n    alert_forecast: false\n    forecast: false\n    foreground: blue\n    card_mod:\n      style: |\n        ha-card {\n          --ha-card-background: #ffffff;\n          color: var(--primary-color);\n        }\n        ha-card {\n          color: black;\n        }"
+        },
+        {
+          "id": "weather-mameteo-entities",
+          "name": "Carte Entities - Données MaMétéo",
+          "description": "Affiche les données météo récupérées via l'automation MaMétéo",
+          "tags": [
+            "météo",
+            "entités",
+            "mameteo",
+            "données"
+          ],
+          "code": "- type: entities\n  title: Données Météo-France (6mn)\n  entities:\n    - entity: mameteo.temperature\n      name: Température\n    - entity: mameteo.humidite\n      name: Humidité\n    - entity: mameteo.pression\n      name: Pression\n    - entity: mameteo.vent_force\n      name: Vent\n    - entity: mameteo.rafale_force\n      name: Rafales\n    - entity: mameteo.precipitation\n      name: Précipitations\n    - entity: mameteo.puissance_solaire\n      name: Puissance solaire\n    - entity: mameteo.ensoleillement\n      name: Ensoleillement\n    - entity: mameteo.visibilite\n      name: Visibilité"
+        },
+        {
+          "id": "weather-mameteo-gauge",
+          "name": "Jauges Météo MaMétéo",
+          "description": "Jauges pour afficher les données météo MaMétéo",
+          "tags": [
+            "météo",
+            "jauge",
+            "mameteo",
+            "graphique"
+          ],
+          "code": "- type: horizontal-stack\n  cards:\n    - type: gauge\n      entity: mameteo.temperature\n      name: Température\n      needle: true\n      min: -10\n      max: 40\n      severity:\n        green: 15\n        yellow: 25\n        red: 35\n    - type: gauge\n      entity: mameteo.humidite\n      name: Humidité\n      needle: true\n      min: 0\n      max: 100\n      severity:\n        green: 40\n        yellow: 60\n        red: 70\n    - type: gauge\n      entity: mameteo.pression\n      name: Pression\n      needle: true\n      min: 980\n      max: 1050\n      severity:\n        green: 1010\n        yellow: 1000\n        red: 990"
+        },
+        {
+          "id": "meteoalarm-card",
+          "name": "Meteoalarm Card",
+          "description": "Carte d'alerte météo",
+          "tags": [
+            "météo",
+            "alerte",
+            "vigilance"
+          ],
+          "code": "- type: custom:meteoalarm-card\n  entities:\n    - entity: sensor.78_weather_alert\n  integration: meteofrance\n  disable_swiper: false\n  hide_when_no_warning: true"
+        }
+      ]
+    },
+    {
+      "id": "slider",
+      "name": "Cartes Slider Bouton",
+      "description": "Cartes avec slider pour contrôler l'intensité",
+      "codes": [
+        {
+          "id": "slider-gradient",
+          "name": "Slider avec Gradient",
+          "description": "Slider avec fond gradient",
+          "tags": [
+            "slider",
+            "gradient",
+            "intensité"
+          ],
+          "code": "- type: custom:slider-button-card\n  entity: light.toilettes_lumiere\n  slider:\n    direction: left-right\n    background: gradient\n    use_state_color: true\n    use_percentage_bg_opacity: false\n    show_track: false\n    toggle_on_click: false\n    force_square: false\n  show_name: true\n  show_state: true\n  compact: false\n  icon:\n    show: true\n    use_state_color: true\n    tap_action:\n      action: toggle\n    icon: \"\"\n  action_button:\n    mode: custom\n    icon: mdi:light-recessed\n    show: true\n    show_spinner: true"
+        },
+        {
+          "id": "slider-solid",
+          "name": "Slider avec Fond Solide",
+          "description": "Slider avec fond solide",
+          "tags": [
+            "slider",
+            "solid",
+            "intensité"
+          ],
+          "code": "- type: custom:slider-button-card\n  entity: light.salon_lumiere\n  slider:\n    direction: left-right\n    background: solid\n    use_state_color: false\n    use_percentage_bg_opacity: false\n    show_track: false\n    toggle_on_click: false\n    force_square: false\n  show_name: true\n  show_state: true\n  compact: false\n  icon:\n    show: true\n    use_state_color: true\n    tap_action:\n      action: toggle\n    icon: \"\"\n  action_button:\n    mode: custom\n    icon: mdi:outdoor-lamp\n    show: true\n    show_spinner: true"
+        },
+        {
+          "id": "slider-triangle",
+          "name": "Slider avec Triangle",
+          "description": "Slider avec fond triangle",
+          "tags": [
+            "slider",
+            "triangle",
+            "intensité"
+          ],
+          "code": "- type: custom:slider-button-card\n  entity: light.patio_lumiere_2\n  slider:\n    direction: left-right\n    background: triangle\n    use_state_color: true\n    use_percentage_bg_opacity: false\n    show_track: false\n    toggle_on_click: false\n    force_square: false\n  show_name: true\n  show_state: true\n  compact: false\n  icon:\n    show: true\n    use_state_color: true\n    tap_action:\n      action: toggle\n    icon: \"\"\n  action_button:\n    mode: custom\n    icon: mdi:bulkhead-light\n    show: true\n    show_spinner: true"
+        }
+      ]
+    },
+    {
+      "id": "graph",
+      "name": "Graphiques",
+      "description": "Cartes de graphiques et statistiques",
+      "codes": [
+        {
+          "id": "apexcharts-pie",
+          "name": "ApexCharts Pie Chart",
+          "description": "Graphique en secteurs pour statistiques",
+          "tags": [
+            "graphique",
+            "camembert",
+            "statistiques"
+          ],
+          "code": "- type: custom:apexcharts-card\n  header:\n    title: Temps d'allumage des lumières (7 jours)\n    show: true\n  chart_type: pie\n  update_interval: 1h\n  series:\n    - entity: light.salle_de_bain_lumiere_3\n      name: Salle de Bain\n    - entity: light.toilettes_lumiere\n      name: Toilettes\n    - entity: light.patio_lumiere_2\n      name: Patio\n    - entity: light.dressing_lumiere\n      name: Dressing\n    - entity: light.chevet_lumiere\n      name: Chevet"
+        },
+        {
+          "id": "apexcharts-donut",
+          "name": "ApexCharts Donut Chart",
+          "description": "Graphique donut pour utilisation mémoire",
+          "tags": [
+            "graphique",
+            "donut",
+            "mémoire"
+          ],
+          "code": "- type: custom:apexcharts-card\n  chart_type: donut\n  header:\n    title: Utilisation mémoire (RAM)\n    show: true\n  series:\n    - name: RAM utilisée\n      entity: sensor.pc_pailler_utilisationmemoire\n      color: \"#e74c3c\"\n    - name: RAM libre\n      entity: sensor.pc_pailler_utilisationmemoire\n      transform: return 100 - x;\n      color: \"#2ecc71\""
+        },
+        {
+          "id": "history-graph",
+          "name": "History Graph",
+          "description": "Graphique historique des températures",
+          "tags": [
+            "graphique",
+            "historique",
+            "température"
+          ],
+          "code": "- type: history-graph\n  entities:\n    - entity: sensor.rasp5_cpu_thermal_1_temperature\n      name: Tc RPI5\n    - entity: sensor.ds224_disque_1_temperature\n      name: Tc NAS Disque1\n    - entity: sensor.ds224_disque_2_temperature\n      name: Tc NAS Disque2\n  hours_to_show: 12\n  logarithmic_scale: false\n  card_mod:\n    style: |\n      ha-card {\n        --ha-card-background: white;\n        color: var(--primary-color);\n      }\n      ha-card {\n        color: white;\n      }"
+        }
+      ]
+    },
+    {
+      "id": "gauge",
+      "name": "Jauges",
+      "description": "Cartes avec jauges circulaires",
+      "codes": [
+        {
+          "id": "gauge-humidity",
+          "name": "Jauge Humidité",
+          "description": "Jauge pour l'humidité",
+          "tags": [
+            "jauge",
+            "humidité",
+            "environnement"
+          ],
+          "code": "- type: gauge\n  entity: sensor.netatmo_humidity\n  name: Humidité\n  needle: true\n  min: 0\n  max: 100\n  severity:\n    green: 40\n    yellow: 60\n    red: 70"
+        },
+        {
+          "id": "gauge-co2",
+          "name": "Jauge CO2",
+          "description": "Jauge pour le taux de CO2",
+          "tags": [
+            "jauge",
+            "co2",
+            "environnement"
+          ],
+          "code": "- type: gauge\n  entity: sensor.netatmo_co2\n  needle: true\n  severity:\n    green: 450\n    yellow: 800\n    red: 1500\n  min: 0\n  max: 3500\n  name: Taux de CO2"
+        },
+        {
+          "id": "gauge-cpu",
+          "name": "Jauge CPU",
+          "description": "Jauge pour utilisation CPU",
+          "tags": [
+            "jauge",
+            "cpu",
+            "système"
+          ],
+          "code": "- type: gauge\n  entity: sensor.pc_pailler_cpu\n  needle: true\n  severity:\n    green: 0\n    yellow: 60\n    red: 80\n  min: 0\n  max: 100\n  name: Ordinateur (CPU)"
+        }
+      ]
+    },
+    {
+      "id": "conditional",
+      "name": "Cartes Conditionnelles",
+      "description": "Cartes qui s'affichent selon des conditions",
+      "codes": [
+        {
+          "id": "conditional-light-on",
+          "name": "Carte Conditionnelle Lumière Allumée",
+          "description": "Affiche une carte si la lumière est allumée",
+          "tags": [
+            "conditionnel",
+            "lumière",
+            "alerte"
+          ],
+          "code": "- type: conditional\n  conditions:\n    - condition: state\n      entity: light.salon_lumiere\n      state: \"on\"\n  card:\n    show_name: true\n    show_icon: true\n    type: custom:button-card\n    name: Lampe du salon allumée !\n    icon: mdi:outdoor-lamp\n    hold_action:\n      action: toggle\n    styles:\n      icon:\n        - animation: drop-shadow 5s infinite alternate\n    extra_styles: |\n      @keyframes drop-shadow {\n        from { filter: drop-shadow(1.95rem 0 0 pink);}\n        to { filter: drop-shadow(0 0 0.95rem chartreuse);}\n      }"
+        },
+        {
+          "id": "conditional-storm",
+          "name": "Carte Conditionnelle Orages",
+          "description": "Affiche les informations sur les orages",
+          "tags": [
+            "conditionnel",
+            "orage",
+            "météo"
+          ],
+          "code": "- type: conditional\n  conditions:\n    - condition: state\n      entity: binary_sensor.orages_en_approche\n      state: \"on\"\n  card:\n    type: entities\n    entities:\n      - entity: sensor.blitzortung_radar_orages_lightning_azimuth\n      - entity: sensor.blitzortung_radar_orages_lightning_counter\n      - entity: sensor.blitzortung_radar_orages_lightning_distance\n    title: Orages alentours (-30kms)\n    state_color: white\n    card_mod:\n      style: |\n        ha-card {\n          color: yellow;\n        }"
+        }
+      ]
+    },
+    {
+      "id": "grid",
+      "name": "Grilles",
+      "description": "Organisation en grille de cartes",
+      "codes": [
+        {
+          "id": "grid-buttons",
+          "name": "Grille de Boutons",
+          "description": "Grille 3 colonnes avec boutons d'éclairage",
+          "tags": [
+            "grille",
+            "boutons",
+            "éclairage"
+          ],
+          "code": "- square: false\n  columns: 3\n  type: grid\n  cards:\n    - show_name: false\n      show_icon: true\n      type: button\n      entity: scene.mode_defaut_lampe_de_chevet\n      show_state: false\n      icon: mdi:floor-lamp-outline\n      name: Chevet\n      icon_height: 25px\n      hold_action:\n        action: toggle\n      tap_action:\n        action: toggle\n    - show_name: false\n      show_icon: true\n      type: button\n      entity: scene.mode_defaut_lampe_du_dressing\n      show_state: false\n      icon: mdi:light-flood-down\n      name: Dressing\n      icon_height: 25px\n      hold_action:\n        action: toggle\n      tap_action:\n        action: toggle"
+        }
+      ]
+    },
+    {
+      "id": "other",
+      "name": "Autres Cartes",
+      "description": "Autres types de cartes utiles",
+      "codes": [
+        {
+          "id": "lunar-phase",
+          "name": "Lunar Phase Card",
+          "description": "Carte des phases de la lune",
+          "tags": [
+            "lune",
+            "phase",
+            "astronomie"
+          ],
+          "code": "- type: custom:lunar-phase-card\n  entity: \"\"\n  12hr_format: false\n  calendar_modal: false\n  compact_view: false\n  default_card: base\n  hide_buttons: false\n  mile_unit: false\n  moon_position: left\n  number_decimals: 2\n  selected_language: fr\n  show_background: true\n  southern_hemisphere: false\n  use_custom: false\n  use_default: true\n  use_entity: false\n  latitude: 48.82264642994285\n  longitude: 2.120168209075928\n  location:\n    city: Le Chesnay-Rocquencourt\n    country: France"
+        },
+        {
+          "id": "alarmo",
+          "name": "Alarmo Card",
+          "description": "Carte de contrôle d'alarme",
+          "tags": [
+            "alarme",
+            "sécurité",
+            "alarmo"
+          ],
+          "code": "- type: custom:alarmo-card\n  entity: alarm_control_panel.alarmo\n  name: Alarme Intrusion\n  button_scale_actions: 1.5\n  button_scale_keypad: 1\n  use_clear_icon: true\n  keep_keypad_visible: false\n  states:\n    disarmed:\n      hide: true\n      button_label: Désarmer\n      state_label: Désactivée\n  show_messages: true"
+        },
+        {
+          "id": "calendar",
+          "name": "Calendar Card",
+          "description": "Carte calendrier avec rendez-vous",
+          "tags": [
+            "calendrier",
+            "rdv",
+            "événements"
+          ],
+          "code": "- initial_view: listWeek\n  type: calendar\n  entities:\n    - calendar.regis_pailler\n    - calendar.jours_feries_en_france\n    - calendar.adam_pailler\n  title: RDV semaine"
+        },
+        {
+          "id": "logbook",
+          "name": "Logbook Card",
+          "description": "Carte logbook pour événements",
+          "tags": [
+            "journal",
+            "événements",
+            "historique"
+          ],
+          "code": "- type: logbook\n  entities:\n    - automation.sonnette\n  hours_to_show: 12\n  title: Evenements du jour\n  theme: waves\n  card_mod:\n    style: |\n      ha-card {\n        --ha-card-background: white;\n        color: var(--primary-color);\n      }\n      ha-card {\n        color: black;\n      }"
+        },
+        {
+          "id": "entity-card",
+          "name": "Entity Card - Conversation IA",
+          "description": "Carte entité pour conversation avec IA",
+          "tags": [
+            "entity",
+            "ia",
+            "conversation"
+          ],
+          "code": "- type: entity\n  entity: conversation.google_generative_ai\n  name: Piloter l'appartement avec l'intelligence artificielle\n  state_color: true\n  attribute: friendly_name\n  theme: waves"
+        },
+        {
+          "id": "glance-card",
+          "name": "Glance Card",
+          "description": "Carte glance pour afficher plusieurs entités",
+          "tags": [
+            "aperçu",
+            "entités",
+            "vue_globale"
+          ],
+          "code": "- type: glance\n  entities:\n    - entity: sensor.portainer_status_docker\n      name: Portainer Status\n      icon: mdi:view-dashboard\n  show_name: true\n  show_icon: true\n  show_state: true\n  state_color: true"
+        },
+        {
+          "id": "glance-docker",
+          "name": "Glance Card - Docker Containers",
+          "description": "Carte glance pour statut des conteneurs Docker",
+          "tags": [
+            "aperçu",
+            "docker",
+            "conteneurs"
+          ],
+          "code": "- show_name: true\n  show_icon: true\n  show_state: true\n  type: glance\n  title: Docker Containers Status\n  entities:\n    - entity: sensor.portainer_status_color\n      name: Portainer\n    - entity: sensor.n8n_status_color\n      name: n8n\n    - entity: sensor.portainer_status_docker\n  state_color: true"
+        },
+        {
+          "id": "entity-docker",
+          "name": "Entity Card - Docker Status",
+          "description": "Carte entité avec icône conditionnelle pour Docker",
+          "tags": [
+            "entity",
+            "docker",
+            "conditionnel"
+          ],
+          "code": "- type: entity\n  entity: sensor.portainer_status_docker\n  name: Portainer Docker (visible si on)\n  icon: |\n    {% if is_state('sensor.portainer_status_docker', 'running') %}\n      mdi:docker\n    {% elif is_state('sensor.portainer_status_docker', 'stopped') %}\n      mdi:docker-off\n    {% else %}\n      mdi:help-circle\n    {% endif %}\n  state_color: true"
+        },
+        {
+          "id": "markdown-card",
+          "name": "Markdown Card",
+          "description": "Carte markdown avec contenu dynamique",
+          "tags": [
+            "markdown",
+            "template",
+            "dynamique"
+          ],
+          "code": "- type: markdown\n  content: |\n    {% set state = states('sensor.portainer_status_docker') %}\n    {% set color = 'success' if state == 'running' else 'error' if state == 'exited' else 'warning' %}\n    <ha-card>\n      <div class=\"container {{ color }}\">\n        <ha-icon icon=\"\n          {% if state == 'running' %}mdi:docker\n          {% elif state == 'exited' %}mdi:alert-circle\n          {% else %}mdi:help-circle{% endif %}\"\n        ></ha-icon>\n        <div class=\"state\">{{ state }}</div>\n      </div>\n    </ha-card>\n  style: |\n    ha-card {\n      padding: 16px;\n      text-align: center;\n    }\n    .container {\n      display: flex;\n      flex-direction: column;\n      align-items: center;\n      padding: 16px;\n      border-radius: 8px;\n    }\n    .success {\n      background: var(--success-color);\n      color: var(--text-primary-color);\n    }\n    .error {\n      background: var(--error-color);\n      color: var(--text-primary-color);\n    }\n    .warning {\n      background: var(--warning-color);\n      color: var(--text-primary-color);\n    }\n    ha-icon {\n      --mdc-icon-size: 48px;\n      margin-bottom: 16px;\n    }\n    .state {\n      font-size: 1.2rem;\n      font-weight: bold;\n      text-transform: capitalize;\n    }"
+        },
+        {
+          "id": "minimalistic-area",
+          "name": "Minimalistic Area Card",
+          "description": "Carte zone minimaliste",
+          "tags": [
+            "zone",
+            "minimaliste",
+            "zone"
+          ],
+          "code": "- type: custom:minimalistic-area-card\n  title: Son de l'ordinateur\n  area: as_smg950f_airplay\n  hide_unavailable: false\n  tap_action:\n    action: navigate\n    navigation_path: /config/areas/area/as_smg950f_airplay\n  entities:\n    - light.boitier_lumiere\n    - switch.sonoff_10013e576c\n    - sensor.4_boutons_musique_batterie"
+        },
+        {
+          "id": "media-control",
+          "name": "Media Control Card",
+          "description": "Carte de contrôle média",
+          "tags": [
+            "média",
+            "musique",
+            "lecteur"
+          ],
+          "code": "- type: media-control\n  entity: media_player.musique_bose"
+        },
+        {
+          "id": "picture-glance",
+          "name": "Picture Glance Card",
+          "description": "Carte image avec aperçu et entités",
+          "tags": [
+            "image",
+            "aperçu",
+            "caméra"
+          ],
+          "code": "- camera_view: auto\n  type: picture-glance\n  title: Camera patio\n  image: https://demo.home-assistant.io/stub_config/kitchen.png\n  entities:\n    - entity: camera.192_168_1_13\n    - entity: camera.192_168_1_38\n  camera_image: camera.www_video_surveillance_direct_com"
+        },
+        {
+          "id": "tile-card",
+          "name": "Tile Card",
+          "description": "Carte tuile avec état conditionnel",
+          "tags": [
+            "tuile",
+            "conditionnel",
+            "alerte"
+          ],
+          "code": "- type: tile\n  entity: sensor.quest_battery_level\n  vertical: false\n  hide_state: false\n  show_entity_picture: false\n  name: Casque Oculus Quest 2 à charger\n  state_content:\n    - state\n    - last-changed\n  card_mod:\n    style: |\n      ha-card {\n        --ha-card-background: red;\n        color: var(--primary-color);\n      }\n      ha-card {\n        color: white;\n      }"
+        },
+        {
+          "id": "fullscreen-card",
+          "name": "Fullscreen Card",
+          "description": "Carte plein écran",
+          "tags": [
+            "plein_écran",
+            "affichage"
+          ],
+          "code": "- type: custom:fullscreen-card"
+        },
+        {
+          "id": "entities-docker",
+          "name": "Entities Card - Surveillance Docker",
+          "description": "Carte entities pour surveillance Docker",
+          "tags": [
+            "entités",
+            "docker",
+            "surveillance"
+          ],
+          "code": "- type: entities\n  entities:\n    - entity: sensor.ha_containers_active\n    - entity: sensor.ha_containers_cpu_usage\n    - entity: sensor.ha_containers_memory_used\n  state_color: true\n  title: Surveillance Docker"
+        },
+        {
+          "id": "vertical-stack-docker",
+          "name": "Vertical Stack - Docker Status",
+          "description": "Stack vertical avec statut Docker et graphique",
+          "tags": [
+            "pile_verticale",
+            "docker",
+            "graphique"
+          ],
+          "code": "- type: vertical-stack\n  cards:\n    - type: entity\n      entity: sensor.portainer_status_docker\n      name: Docker Status\n      icon: |\n        {% set state = states('sensor.portainer_status_docker') %}\n        {% if state == 'running' %} mdi:docker\n        {% elif state == 'exited' %} mdi:alert-circle\n        {% else %} mdi:help-circle\n        {% endif %}\n      state_color: true\n    - type: history-graph\n      title: Historique du statut (24h)\n      hours_to_show: 24\n      entities:\n        - entity: sensor.portainer_status_docker\n          name: Portainer\n          state_color: true"
+        }
+      ]
+    },
+    {
+      "id": "templates-automations",
+      "name": "Templates & Automatisations",
+      "description": "Templates de capteurs et automations pour récupérer des données",
+      "codes": [
+        {
+          "id": "template-rayonnement",
+          "name": "Template Sensor - Rayonnement Normalisé",
+          "description": "Template sensor pour calculer le rayonnement normalisé depuis les données Météo-France",
+          "tags": [
+            "template",
+            "capteur",
+            "météo",
+            "rayonnement"
+          ],
+          "code": "template:\n  - sensor:\n    - name: rayonnement normalisé\n      # sensor.rayonnement_normalise\n      state: \"{{ (state_attr('mameteo.data','raw') | from_json)['ray_glo01'] }}\"\n      unit_of_measurement: \"J/m2@6mn\""
+        },
+        {
+          "id": "automation-meteofrance-6mn",
+          "name": "Automation Météo-France - Données 6 minutes",
+          "description": "Automation complète pour récupérer les données d'observation Météo-France toutes les 6 minutes via l'API",
+          "tags": [
+            "automatisation",
+            "météo",
+            "meteofrance",
+            "api",
+            "python"
+          ],
+          "code": "automation:\n  # Météo France - data 6mn\n  # interrogation de l'API de Météo France : données d'observation (6'), fréquence de modif : 6 minutes\n  - id: mameteo_data_6mn\n    alias: MaMétéo - data 6mn\n    description: 'interrogation de l''API de Météo France'\n    mode: single\n    trigger:\n      - platform: time_pattern\n        # toutes les 6 minutes\n        minutes: \"/6\"\n    condition: []\n    action:\n      - service: python_script.exec\n        data:\n          key: !secret mf_key_obs\n          title: Python inline\n          source: |\n            from datetime import datetime\n            import requests\n            import urllib.parse\n\n            try:\n              serveur = 'https://public-api.meteofrance.fr/public/DPObs/v1'\n              key = data.get(\"key\", \"\")\n              service = '/station/infrahoraire-6m'\n              station = '74182001' # code de la station sélectionnée : Annecy Meythet\n              datage = datetime.utcnow().strftime(\"%Y-%m-%dT%H:%M:%SZ\")     # en UTC\n            \n              url = serveur + service + '?id_station=' + station + '&date=' + urllib.parse.quote(datage) + '&format=json&apikey=' + urllib.parse.quote(key)\n              r = requests.get(url)\n              rstr = str(r)\n              print(r)\n              if '<400>' in rstr:\n                hass.states.set('mameteo.data', '400: Contrôle de paramètres en erreur')\n              elif '<404>' in rstr:\n                hass.states.set('mameteo.data', '404: Jeu de données inexistant')\n              elif '<Response [200]>' in rstr:\n                print('analyse du json')\n                resp = r.json()[0]\n                print('resp=', resp)\n                datage = datetime.strftime( datetime.strptime(resp['reference_time'], '%Y-%m-%dT%H:%M:%SZ'), '%d/%m/%Y %H:%M:%S' )\n                hass.states.set( 'mameteo.data', datetime.now().strftime(\"%d/%m/%Y %H:%M:%S\"),\n                                  {\n                                    'raw': str(resp).replace('\\'', '\\\"'),\n                                    'raw2': str(resp),\n                                    'reference_time': datage,\n                                    'temperature': resp['t']-273.15,\n                                    'humidite': resp['u'],\n                                    'pression': resp['pres']/100,\n                                    'vent_direction': resp['dd'],\n                                    'vent_force': resp['ff']*3.6,\n                                    'rafale_direction': resp['dxi10'],\n                                    'rafale_force': resp['fxi10']*3.6,\n                                    'precipitation': resp['rr_per'],\n                                    'puissance_solaire': resp['ray_glo01']/360,\n                                    'ensoleillement': resp['insolh'],\n                                    'visibilite': resp['vv'],\n                                    'origine': 'Météo France, Données Observation 6mn'\n                                  })\n                hass.states.set( 'mameteo.reference_time',   datage,                 { 'unit_of_measurement': 'UTC' } )\n                hass.states.set( 'mameteo.temperature',      resp['t']-273.15,       { 'unit_of_measurement': '°C' } )\n                hass.states.set( 'mameteo.humidite',         resp['u'],              { 'unit_of_measurement': '%' } )\n                hass.states.set( 'mameteo.pression',         resp['pres']/100,       { 'unit_of_measurement': 'hPa' } )\n                hass.states.set( 'mameteo.vent_direction',   resp['dd'],             { 'unit_of_measurement': '°' } )\n                hass.states.set( 'mameteo.vent_force',       resp['ff']*3.6,         { 'unit_of_measurement': 'km/h' } )\n                hass.states.set( 'mameteo.rafale_direction', resp['dxi10'],          { 'unit_of_measurement': '°' } )\n                hass.states.set( 'mameteo.rafale_force',     resp['fxi10']*3.6,      { 'unit_of_measurement': 'km/h' } )\n                hass.states.set( 'mameteo.precipitation',    resp['rr_per'],         { 'unit_of_measurement': 'mm/1h' } )\n                hass.states.set( 'mameteo.puissance_solaire',resp['ray_glo01']/360,  { 'unit_of_measurement': 'W/m²' } )\n                hass.states.set( 'mameteo.ensoleillement',   resp['insolh'],         { 'unit_of_measurement': 'mn' } )\n                hass.states.set( 'mameteo.visibilite',       resp['vv'],             { 'unit_of_measurement': 'm' } )\n              else:\n                hass.states.set('mameteo.data', 'erreur non définie: ' + rstr)\n            except Exception as e:\n                print(f'exception: {e=}')\n            print('automation.mameteo_data_6mn: terminé')"
+        },
+        {
+          "id": "automation-alerte-batterie-faible",
+          "name": "Automation - Alerte Batterie Faible",
+          "description": "Notification lorsque la batterie d'un appareil est faible (< 20%)",
+          "tags": [
+            "automatisation",
+            "batterie",
+            "alerte",
+            "notification"
+          ],
+          "code": "automation:\n  - id: alerte_batterie_faible\n    alias: Alerte - Batterie faible\n    description: Notification quand une batterie est faible (< 20%)\n    mode: single\n    trigger:\n      - platform: numeric_state\n        entity_id:\n          - sensor.quest_battery_level\n          - sensor.sm_g950f_battery_level\n          - sensor.brosse_a_dents_batterie\n          - sensor.mi_battery_level\n        below: 20\n    condition:\n      - condition: state\n        entity_id: '{{ trigger.entity_id }}'\n        state_not: 'charging'\n        attribute: charger_type\n    action:\n      - service: notify.mobile_app_votre_telephone\n        data:\n          title: \"🔋 Batterie faible\"\n          message: \"{{ state_attr(trigger.entity_id, 'friendly_name') }} : {{ states(trigger.entity_id) }}%\"\n          data:\n            priority: high"
+        },
+        {
+          "id": "automation-fermer-fenetre-pluie",
+          "name": "Automation - Fermer Fenêtre si Risque de Pluie",
+          "description": "Alerte pour fermer les fenêtres/portes si risque de pluie détecté",
+          "tags": [
+            "automatisation",
+            "météo",
+            "fenêtre",
+            "alerte",
+            "pluie"
+          ],
+          "code": "automation:\n  - id: fermer_fenetre_pluie\n    alias: Fermer fenêtre si risque de pluie\n    description: Alerte si fenêtre ouverte et risque de pluie\n    mode: single\n    trigger:\n      - platform: state\n        entity_id:\n          - binary_sensor.capteur_distance_porte_fenetre_ouverture\n          - binary_sensor.capteur_distance_chambre_ouverture_2\n        to: 'on'\n      - platform: state\n        entity_id: weather.le_chesnay\n        to: 'rainy'\n    condition:\n      - condition: or\n        conditions:\n          - condition: state\n            entity_id: binary_sensor.capteur_distance_porte_fenetre_ouverture\n            state: 'on'\n          - condition: state\n            entity_id: binary_sensor.capteur_distance_chambre_ouverture_2\n            state: 'on'\n      - condition: state\n        entity_id: weather.le_chesnay\n        state: 'rainy'\n    action:\n      - service: notify.mobile_app_votre_telephone\n        data:\n          title: \"🌧️ Risque de pluie\"\n          message: \"Fermer la fenêtre/porte (risque de pluie)\"\n          data:\n            priority: high"
+        },
+        {
+          "id": "automation-fermer-fenetre-chaleur",
+          "name": "Automation - Fermer Fenêtre si Température Élevée",
+          "description": "Alerte pour fermer les fenêtres si température extérieure > 30°C",
+          "tags": [
+            "automatisation",
+            "température",
+            "fenêtre",
+            "alerte",
+            "chaleur"
+          ],
+          "code": "automation:\n  - id: fermer_fenetre_chaleur\n    alias: Fermer fenêtre si température élevée\n    description: Alerte si fenêtre ouverte et température extérieure > 30°C\n    mode: single\n    trigger:\n      - platform: state\n        entity_id:\n          - binary_sensor.capteur_distance_chambre_ouverture_2\n        to: 'on'\n      - platform: numeric_state\n        entity_id: sensor.le_chesnay_temperature_2\n        above: 30\n    condition:\n      - condition: state\n        entity_id: binary_sensor.capteur_distance_chambre_ouverture_2\n        state: 'on'\n      - condition: numeric_state\n        entity_id: sensor.le_chesnay_temperature_2\n        above: 30\n    action:\n      - service: notify.mobile_app_votre_telephone\n        data:\n          title: \"🌡️ Température élevée\"\n          message: \"Fermer la fenêtre de la chambre (trop chaud)\"\n          data:\n            priority: normal"
+        },
+        {
+          "id": "automation-alerte-co2",
+          "name": "Automation - Alerte CO2 Critique",
+          "description": "Notification si le taux de CO2 est critique et nécessite d'ouvrir les fenêtres",
+          "tags": [
+            "automatisation",
+            "co2",
+            "alerte",
+            "air",
+            "qualité"
+          ],
+          "code": "automation:\n  - id: alerte_co2_critique\n    alias: Alerte - CO2 critique\n    description: Notification si taux de CO2 trop élevé\n    mode: single\n    trigger:\n      - platform: state\n        entity_id: binary_sensor.taux_de_co2_critique\n        to: 'on'\n    condition:\n      - condition: state\n        entity_id: binary_sensor.taux_de_co2_critique\n        state: 'on'\n    action:\n      - service: notify.mobile_app_votre_telephone\n        data:\n          title: \"⚠️ CO2 Critique\"\n          message: \"Ouvrir les fenêtres ! Taux de CO2 : {{ states('sensor.netatmo_co2') }} ppm\"\n          data:\n            priority: high\n            actions:\n              - action: \"ouvrir_fenetres\"\n                title: \"Ouvrir les fenêtres\""
+        },
+        {
+          "id": "automation-alerte-machine-laver",
+          "name": "Automation - Alerte Machine à Laver en Cours",
+          "description": "Notification quand la machine à laver est en cours d'utilisation",
+          "tags": [
+            "automatisation",
+            "machine",
+            "alerte",
+            "appareil"
+          ],
+          "code": "automation:\n  - id: alerte_machine_laver\n    alias: Alerte - Machine à laver en cours\n    description: Notification quand la machine à laver fonctionne\n    mode: single\n    trigger:\n      - platform: numeric_state\n        entity_id: sensor.prise_de_courant_courant\n        above: 0.1\n    condition:\n      - condition: numeric_state\n        entity_id: sensor.prise_de_courant_courant\n        above: 0.1\n    action:\n      - service: notify.mobile_app_votre_telephone\n        data:\n          title: \"🧺 Machine à laver\"\n          message: \"Machine à laver en cours d'utilisation\"\n          data:\n            priority: low"
+        },
+        {
+          "id": "automation-alerte-frigo-ouvert",
+          "name": "Automation - Alerte Frigo Ouvert",
+          "description": "Notification si le frigo reste ouvert trop longtemps",
+          "tags": [
+            "automatisation",
+            "frigo",
+            "alerte",
+            "économie"
+          ],
+          "code": "automation:\n  - id: alerte_frigo_ouvert\n    alias: Alerte - Frigo ouvert\n    description: Notification si le frigo est ouvert\n    mode: single\n    trigger:\n      - platform: state\n        entity_id: switch.capteur_frigo_commutateur\n        to: 'on'\n        for:\n          minutes: 2\n    condition:\n      - condition: state\n        entity_id: switch.capteur_frigo_commutateur\n        state: 'on'\n    action:\n      - service: notify.mobile_app_votre_telephone\n        data:\n          title: \"🚨 Frigo ouvert !\"\n          message: \"Le frigo est ouvert depuis plus de 2 minutes\"\n          data:\n            priority: high"
+        },
+        {
+          "id": "automation-alerte-docker",
+          "name": "Automation - Alerte Docker Conteneur Arrêté",
+          "description": "Notification si un conteneur Docker important s'arrête",
+          "tags": [
+            "automatisation",
+            "docker",
+            "alerte",
+            "conteneur",
+            "surveillance"
+          ],
+          "code": "automation:\n  - id: alerte_docker_arrete\n    alias: Alerte - Docker conteneur arrêté\n    description: Notification si un conteneur Docker s'arrête\n    mode: single\n    trigger:\n      - platform: state\n        entity_id:\n          - sensor.portainer_status_docker\n          - sensor.vaultwarden_status_docker\n        to:\n          - 'stopped'\n          - 'exited'\n          - 'unavailable'\n    condition:\n      - condition: or\n        conditions:\n          - condition: state\n            entity_id: '{{ trigger.entity_id }}'\n            state: 'stopped'\n          - condition: state\n            entity_id: '{{ trigger.entity_id }}'\n            state: 'exited'\n          - condition: state\n            entity_id: '{{ trigger.entity_id }}'\n            state: 'unavailable'\n    action:\n      - service: notify.mobile_app_votre_telephone\n        data:\n          title: \"🐳 Docker - Conteneur arrêté\"\n          message: \"{{ state_attr(trigger.entity_id, 'friendly_name') }} : {{ states(trigger.entity_id) }}\"\n          data:\n            priority: high"
+        },
+        {
+          "id": "automation-alerte-orages",
+          "name": "Automation - Alerte Orages en Approche",
+          "description": "Notification si des orages sont détectés à proximité",
+          "tags": [
+            "automatisation",
+            "orage",
+            "météo",
+            "alerte",
+            "blitzortung"
+          ],
+          "code": "automation:\n  - id: alerte_orages_approche\n    alias: Alerte - Orages en approche\n    description: Notification si orages détectés à proximité\n    mode: single\n    trigger:\n      - platform: state\n        entity_id: binary_sensor.orages_en_approche\n        to: 'on'\n    condition:\n      - condition: state\n        entity_id: binary_sensor.orages_en_approche\n        state: 'on'\n    action:\n      - service: notify.mobile_app_votre_telephone\n        data:\n          title: \"⚡ Orages en approche\"\n          message: \"Orages détectés à {{ states('sensor.blitzortung_radar_orages_lightning_distance') }} km\"\n          data:\n            priority: high"
+        }
+      ]
+    },
+    {
+      "id": "communaute",
+      "name": "Codes Communautaires",
+      "description": "Cartes Lovelace courantes de la communauté Home Assistant (distinctes de vos codes personnels)",
+      "codes": [
+        {
+          "id": "thermostat-card",
+          "name": "Thermostat Card",
+          "description": "Carte thermostat pour contrôler le chauffage/climatisation",
+          "tags": [
+            "thermostat",
+            "chauffage",
+            "climatisation",
+            "température"
+          ],
+          "code": "- type: thermostat\n  entity: climate.maison\n  name: Thermostat\n  theme: default"
+        },
+        {
+          "id": "climate-card",
+          "name": "Climate Card",
+          "description": "Carte climat complète avec contrôle de température",
+          "tags": [
+            "climate",
+            "thermostat",
+            "température",
+            "chauffage"
+          ],
+          "code": "- type: thermostat\n  entity: climate.salon\n  name: Température Salon\n  hvac_modes:\n    - heat\n    - cool\n    - off"
+        },
+        {
+          "id": "statistics-card",
+          "name": "Statistics Card",
+          "description": "Carte statistiques pour afficher des données agrégées",
+          "tags": [
+            "statistiques",
+            "graphique",
+            "données"
+          ],
+          "code": "- type: statistics\n  entity: sensor.temperature_salon\n  name: Température moyenne\n  period: day\n  stat_types:\n    - mean\n    - min\n    - max"
+        },
+        {
+          "id": "mini-graph-card",
+          "name": "Mini Graph Card",
+          "description": "Graphique compact pour afficher l'historique d'une entité",
+          "tags": [
+            "graphique",
+            "historique",
+            "mini",
+            "courbe"
+          ],
+          "code": "- type: custom:mini-graph-card\n  entity: sensor.temperature_salon\n  name: Température\n  hours_to_show: 24\n  points_per_hour: 0.5\n  line_color: '#3498db'\n  fill: fade"
+        },
+        {
+          "id": "picture-card",
+          "name": "Picture Card",
+          "description": "Carte image simple avec action",
+          "tags": [
+            "image",
+            "photo",
+            "action"
+          ],
+          "code": "- type: picture\n  image: /local/photos/salon.jpg\n  tap_action:\n    action: navigate\n    navigation_path: /lovelace/salon"
+        },
+        {
+          "id": "map-card",
+          "name": "Map Card",
+          "description": "Carte pour afficher les positions des device trackers",
+          "tags": [
+            "carte",
+            "géolocalisation",
+            "position",
+            "tracker"
+          ],
+          "code": "- type: map\n  entities:\n    - device_tracker.telephone\n    - device_tracker.tablette\n  default_zoom: 14"
+        },
+        {
+          "id": "iframe-card",
+          "name": "Iframe Card",
+          "description": "Carte pour intégrer une page web externe",
+          "tags": [
+            "iframe",
+            "web",
+            "intégration"
+          ],
+          "code": "- type: iframe\n  url: https://www.example.com\n  aspect_ratio: 50%"
+        },
+        {
+          "id": "horizontal-stack",
+          "name": "Horizontal Stack",
+          "description": "Empilement horizontal de cartes",
+          "tags": [
+            "stack",
+            "horizontal",
+            "organisation"
+          ],
+          "code": "- type: horizontal-stack\n  cards:\n    - type: entity\n      entity: light.salon\n    - type: entity\n      entity: light.cuisine"
+        },
+        {
+          "id": "auto-entities-card",
+          "name": "Auto Entities Card",
+          "description": "Carte qui affiche automatiquement des entités selon des filtres",
+          "tags": [
+            "auto-entities",
+            "filtre",
+            "automatique",
+            "entités"
+          ],
+          "code": "- type: custom:auto-entities\n  card:\n    type: entities\n    title: Lumières allumées\n  filter:\n    include:\n      - domain: light\n        state: 'on'"
+        },
+        {
+          "id": "fold-entity-row",
+          "name": "Fold Entity Row",
+          "description": "Ligne pliable pour regrouper des entités",
+          "tags": [
+            "fold",
+            "pliable",
+            "organisation",
+            "entités"
+          ],
+          "code": "- type: entities\n  entities:\n    - type: custom:fold-entity-row\n      head:\n        type: section\n        label: Lumières\n      entities:\n        - light.salon\n        - light.cuisine"
+        },
+        {
+          "id": "card-mod-styled",
+          "name": "Card Mod - Style Personnalisé",
+          "description": "Exemple de style personnalisé avec card-mod",
+          "tags": [
+            "card-mod",
+            "style",
+            "personnalisation"
+          ],
+          "code": "- type: entity\n  entity: light.salon\n  card_mod:\n    style: |\n      ha-card {\n        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n        color: white;\n        border-radius: 20px;\n      }"
+        },
+        {
+          "id": "sensor-card",
+          "name": "Sensor Card",
+          "description": "Carte pour afficher un capteur avec icône",
+          "tags": [
+            "sensor",
+            "capteur",
+            "entité"
+          ],
+          "code": "- type: sensor\n  entity: sensor.temperature_salon\n  name: Température\n  icon: mdi:thermometer\n  graph: line"
+        },
+        {
+          "id": "history-card",
+          "name": "History Card",
+          "description": "Carte historique pour afficher l'évolution d'une entité",
+          "tags": [
+            "historique",
+            "graphique",
+            "évolution"
+          ],
+          "code": "- type: history\n  entities:\n    - sensor.temperature_salon\n    - sensor.temperature_cuisine\n  hours_to_show: 24"
+        },
+        {
+          "id": "input-number-card",
+          "name": "Input Number Card",
+          "description": "Carte pour contrôler un input_number",
+          "tags": [
+            "input",
+            "nombre",
+            "contrôle"
+          ],
+          "code": "- type: entity\n  entity: input_number.volume\n  name: Volume\n  icon: mdi:volume-high"
+        },
+        {
+          "id": "input-select-card",
+          "name": "Input Select Card",
+          "description": "Carte pour sélectionner une option",
+          "tags": [
+            "input",
+            "select",
+            "option"
+          ],
+          "code": "- type: entity\n  entity: input_select.mode_maison\n  name: Mode Maison\n  icon: mdi:home"
+        },
+        {
+          "id": "input-text-card",
+          "name": "Input Text Card",
+          "description": "Carte pour saisir du texte",
+          "tags": [
+            "input",
+            "texte",
+            "saisie"
+          ],
+          "code": "- type: entity\n  entity: input_text.note\n  name: Note\n  icon: mdi:text"
+        },
+        {
+          "id": "input-button-card",
+          "name": "Input Button Card",
+          "description": "Carte pour déclencher un bouton",
+          "tags": [
+            "input",
+            "bouton",
+            "action"
+          ],
+          "code": "- type: entity\n  entity: button.scenario_cinema\n  name: Scénario Cinéma\n  icon: mdi:movie"
+        },
+        {
+          "id": "input-datetime-card",
+          "name": "Input Datetime Card",
+          "description": "Carte pour sélectionner une date/heure",
+          "tags": [
+            "input",
+            "datetime",
+            "date",
+            "heure"
+          ],
+          "code": "- type: entity\n  entity: input_datetime.reveil\n  name: Réveil\n  icon: mdi:alarm"
+        },
+        {
+          "id": "input-boolean-card",
+          "name": "Input Boolean Card",
+          "description": "Carte pour activer/désactiver un booléen",
+          "tags": [
+            "input",
+            "boolean",
+            "toggle"
+          ],
+          "code": "- type: entity\n  entity: input_boolean.mode_absence\n  name: Mode Absence\n  icon: mdi:home-export"
+        },
+        {
+          "id": "timer-card",
+          "name": "Timer Card",
+          "description": "Carte pour contrôler un timer",
+          "tags": [
+            "timer",
+            "chronomètre",
+            "temps"
+          ],
+          "code": "- type: entity\n  entity: timer.cuisine\n  name: Timer Cuisine\n  icon: mdi:timer"
+        },
+        {
+          "id": "scene-card",
+          "name": "Scene Card",
+          "description": "Carte pour activer une scène",
+          "tags": [
+            "scene",
+            "scénario",
+            "action"
+          ],
+          "code": "- type: entity\n  entity: scene.cinema\n  name: Scène Cinéma\n  icon: mdi:movie-open"
+        },
+        {
+          "id": "script-card",
+          "name": "Script Card",
+          "description": "Carte pour exécuter un script",
+          "tags": [
+            "script",
+            "action",
+            "exécution"
+          ],
+          "code": "- type: entity\n  entity: script.allumer_tout\n  name: Allumer Tout\n  icon: mdi:lightbulb-on"
+        },
+        {
+          "id": "cover-card",
+          "name": "Cover Card",
+          "description": "Carte pour contrôler un volet/store",
+          "tags": [
+            "cover",
+            "volet",
+            "store",
+            "rideau"
+          ],
+          "code": "- type: entity\n  entity: cover.volet_salon\n  name: Volet Salon\n  icon: mdi:blinds"
+        },
+        {
+          "id": "fan-card",
+          "name": "Fan Card",
+          "description": "Carte pour contrôler un ventilateur",
+          "tags": [
+            "fan",
+            "ventilateur",
+            "ventilation"
+          ],
+          "code": "- type: entity\n  entity: fan.salon\n  name: Ventilateur Salon\n  icon: mdi:fan"
+        },
+        {
+          "id": "lock-card",
+          "name": "Lock Card",
+          "description": "Carte pour contrôler une serrure",
+          "tags": [
+            "lock",
+            "serrure",
+            "sécurité"
+          ],
+          "code": "- type: entity\n  entity: lock.porte_entree\n  name: Porte d'entrée\n  icon: mdi:lock"
+        },
+        {
+          "id": "vacuum-card",
+          "name": "Vacuum Card",
+          "description": "Carte pour contrôler un aspirateur robot",
+          "tags": [
+            "vacuum",
+            "aspirateur",
+            "robot"
+          ],
+          "code": "- type: entity\n  entity: vacuum.robot_aspirateur\n  name: Aspirateur Robot\n  icon: mdi:robot-vacuum"
+        },
+        {
+          "id": "water-heater-card",
+          "name": "Water Heater Card",
+          "description": "Carte pour contrôler un chauffe-eau",
+          "tags": [
+            "water_heater",
+            "chauffe-eau",
+            "eau"
+          ],
+          "code": "- type: entity\n  entity: water_heater.ballon\n  name: Ballon Eau Chaude\n  icon: mdi:water-boiler"
+        },
+        {
+          "id": "humidifier-card",
+          "name": "Humidifier Card",
+          "description": "Carte pour contrôler un humidificateur",
+          "tags": [
+            "humidifier",
+            "humidificateur",
+            "air"
+          ],
+          "code": "- type: entity\n  entity: humidifier.salon\n  name: Humidificateur\n  icon: mdi:air-humidifier"
+        },
+        {
+          "id": "number-card",
+          "name": "Number Card",
+          "description": "Carte pour contrôler un nombre",
+          "tags": [
+            "number",
+            "nombre",
+            "contrôle"
+          ],
+          "code": "- type: entity\n  entity: number.volume_musique\n  name: Volume Musique\n  icon: mdi:volume-high"
+        },
+        {
+          "id": "select-card",
+          "name": "Select Card",
+          "description": "Carte pour sélectionner une option",
+          "tags": [
+            "select",
+            "sélection",
+            "option"
+          ],
+          "code": "- type: entity\n  entity: select.mode_maison\n  name: Mode Maison\n  icon: mdi:home"
+        },
+        {
+          "id": "text-card",
+          "name": "Text Card",
+          "description": "Carte pour afficher du texte",
+          "tags": [
+            "text",
+            "texte",
+            "affichage"
+          ],
+          "code": "- type: markdown\n  content: |\n    # Bienvenue\n    Ceci est une carte markdown simple."
+        },
+        {
+          "id": "time-card",
+          "name": "Time Card",
+          "description": "Carte pour afficher l'heure",
+          "tags": [
+            "time",
+            "heure",
+            "horloge"
+          ],
+          "code": "- type: custom:digital-clock\n  use_military: false\n  hide_seconds: false"
+        },
+        {
+          "id": "weather-entity-card",
+          "name": "Weather Entity Card",
+          "description": "Carte météo simple avec entité weather",
+          "tags": [
+            "weather",
+            "météo",
+            "entité"
+          ],
+          "code": "- type: weather-forecast\n  entity: weather.ma_ville\n  name: Météo\n  show_forecast: true"
+        },
+        {
+          "id": "alarm-panel-card",
+          "name": "Alarm Panel Card",
+          "description": "Carte pour contrôler un panneau d'alarme",
+          "tags": [
+            "alarm",
+            "alarme",
+            "sécurité",
+            "panel"
+          ],
+          "code": "- type: alarm-panel\n  entity: alarm_control_panel.maison\n  name: Alarme Maison"
+        },
+        {
+          "id": "camera-card",
+          "name": "Camera Card",
+          "description": "Carte pour afficher une caméra",
+          "tags": [
+            "camera",
+            "caméra",
+            "vidéo"
+          ],
+          "code": "- type: picture-entity\n  entity: camera.salon\n  name: Caméra Salon\n  camera_image: camera.salon"
+        },
+        {
+          "id": "person-card",
+          "name": "Person Card",
+          "description": "Carte pour afficher une personne",
+          "tags": [
+            "person",
+            "personne",
+            "présence"
+          ],
+          "code": "- type: entity\n  entity: person.jean\n  name: Jean\n  icon: mdi:account"
+        },
+        {
+          "id": "update-card",
+          "name": "Update Card",
+          "description": "Carte pour afficher les mises à jour disponibles",
+          "tags": [
+            "update",
+            "mise_à_jour",
+            "système"
+          ],
+          "code": "- type: entity\n  entity: update.home_assistant_core_update\n  name: Mise à jour HA\n  icon: mdi:package-up"
+        },
+        {
+          "id": "sun-card",
+          "name": "Sun Card",
+          "description": "Carte pour afficher les informations du soleil",
+          "tags": [
+            "sun",
+            "soleil",
+            "astronomie"
+          ],
+          "code": "- type: entity\n  entity: sun.sun\n  name: Soleil\n  icon: mdi:weather-sunny"
+        },
+        {
+          "id": "zone-card",
+          "name": "Zone Card",
+          "description": "Carte pour afficher une zone",
+          "tags": [
+            "zone",
+            "area",
+            "région"
+          ],
+          "code": "- type: entity\n  entity: zone.maison\n  name: Zone Maison\n  icon: mdi:home"
+        },
+        {
+          "id": "counter-card",
+          "name": "Counter Card",
+          "description": "Carte pour afficher et contrôler un compteur",
+          "tags": [
+            "counter",
+            "compteur",
+            "nombre"
+          ],
+          "code": "- type: entity\n  entity: counter.visiteurs\n  name: Visiteurs\n  icon: mdi:counter"
+        },
+        {
+          "id": "proximity-card",
+          "name": "Proximity Card",
+          "description": "Carte pour afficher la proximité",
+          "tags": [
+            "proximity",
+            "proximité",
+            "distance"
+          ],
+          "code": "- type: entity\n  entity: proximity.maison\n  name: Proximité\n  icon: mdi:map-marker-distance"
+        },
+        {
+          "id": "utility-meter-card",
+          "name": "Utility Meter Card",
+          "description": "Carte pour afficher un compteur d'utilité",
+          "tags": [
+            "utility_meter",
+            "compteur",
+            "énergie"
+          ],
+          "code": "- type: entity\n  entity: sensor.electricite_jour\n  name: Électricité Jour\n  icon: mdi:flash"
+        },
+        {
+          "id": "todo-card",
+          "name": "Todo Card",
+          "description": "Carte pour afficher une liste de tâches",
+          "tags": [
+            "todo",
+            "tâche",
+            "liste"
+          ],
+          "code": "- type: entity\n  entity: todo.ma_liste\n  name: Ma Liste\n  icon: mdi:format-list-checks"
+        },
+        {
+          "id": "image-entity-card",
+          "name": "Image Entity Card",
+          "description": "Carte pour afficher une image depuis une entité",
+          "tags": [
+            "image",
+            "picture",
+            "entité"
+          ],
+          "code": "- type: picture-entity\n  entity: camera.salon\n  name: Salon\n  image: /local/photos/salon.jpg"
+        },
+        {
+          "id": "websocket-card",
+          "name": "Websocket Card",
+          "description": "Carte pour afficher des données WebSocket",
+          "tags": [
+            "websocket",
+            "données",
+            "temps_réel"
+          ],
+          "code": "- type: custom:websocket-card\n  entity: sensor.temps_reel\n  name: Données Temps Réel"
+        },
+        {
+          "id": "entities-card-base",
+          "name": "Entities Card (Base)",
+          "description": "Carte de base pour afficher une liste d'entités (section 7.2 du manuel)",
+          "tags": [
+            "entities",
+            "entités",
+            "liste",
+            "base"
+          ],
+          "code": "- type: entities\n  title: Mes Entités\n  entities:\n    - entity: light.salon\n    - entity: light.cuisine\n    - entity: sensor.temperature"
+        },
+        {
+          "id": "vertical-stack-base",
+          "name": "Vertical Stack (Base)",
+          "description": "Empilement vertical de cartes (section 7.2 du manuel)",
+          "tags": [
+            "vertical-stack",
+            "stack",
+            "vertical",
+            "base",
+            "organisation"
+          ],
+          "code": "- type: vertical-stack\n  cards:\n    - type: entity\n      entity: light.salon\n    - type: entity\n      entity: light.cuisine\n    - type: sensor\n      entity: sensor.temperature"
+        },
+        {
+          "id": "card-mod-exemple",
+          "name": "Card Mod - Exemple Complet",
+          "description": "Exemple de personnalisation avec card-mod (section 11.3 du manuel)",
+          "tags": [
+            "card-mod",
+            "style",
+            "personnalisation",
+            "css"
+          ],
+          "code": "- type: entity\n  entity: light.salon\n  name: Salon\n  card_mod:\n    style: |\n      ha-card {\n        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n        color: white;\n        border-radius: 20px;\n        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);\n      }\n      .state {\n        font-size: 2rem;\n        font-weight: bold;\n      }"
+        },
+        {
+          "id": "card-mod-animation",
+          "name": "Card Mod - Avec Animation",
+          "description": "Card-mod avec animation CSS (section 11.4 du manuel)",
+          "tags": [
+            "card-mod",
+            "animation",
+            "css",
+            "style"
+          ],
+          "code": "- type: entity\n  entity: light.salon\n  name: Salon\n  card_mod:\n    style: |\n      ha-card {\n        animation: pulse 2s ease-in-out infinite;\n      }\n      @keyframes pulse {\n        0%, 100% { transform: scale(1); }\n        50% { transform: scale(1.05); }\n      }"
+        },
+        {
+          "id": "entities-card-advanced",
+          "name": "Entities Card - Avancée",
+          "description": "Carte entities avec options avancées",
+          "tags": [
+            "entities",
+            "entités",
+            "avancé",
+            "options"
+          ],
+          "code": "- type: entities\n  title: État de la Maison\n  show_header_toggle: true\n  entities:\n    - entity: light.salon\n      name: Salon\n      icon: mdi:lightbulb\n    - entity: sensor.temperature\n      name: Température\n    - entity: binary_sensor.fenetre\n      name: Fenêtre\n  state_color: true"
+        },
+        {
+          "id": "glance-card-base",
+          "name": "Glance Card (Base)",
+          "description": "Carte glance de base pour vue d'ensemble (section 7.2 du manuel)",
+          "tags": [
+            "glance",
+            "aperçu",
+            "vue_globale",
+            "base"
+          ],
+          "code": "- type: glance\n  title: Vue d'ensemble\n  entities:\n    - entity: light.salon\n    - entity: light.cuisine\n    - entity: sensor.temperature\n  show_name: true\n  show_icon: true\n  show_state: true"
+        },
+        {
+          "id": "history-graph-base",
+          "name": "History Graph (Base)",
+          "description": "Graphique historique de base (section 7.2 du manuel)",
+          "tags": [
+            "history-graph",
+            "graphique",
+            "historique",
+            "base"
+          ],
+          "code": "- type: history-graph\n  title: Historique Température\n  entities:\n    - entity: sensor.temperature_salon\n    - entity: sensor.temperature_cuisine\n  hours_to_show: 24\n  refresh_interval: 30"
+        },
+        {
+          "id": "gauge-card-base",
+          "name": "Gauge Card (Base)",
+          "description": "Jauge circulaire de base (section 7.2 du manuel)",
+          "tags": [
+            "gauge",
+            "jauge",
+            "circulaire",
+            "base"
+          ],
+          "code": "- type: gauge\n  entity: sensor.temperature\n  name: Température\n  min: 0\n  max: 50\n  severity:\n    green: 18\n    yellow: 25\n    red: 35"
+        },
+        {
+          "id": "button-card-base",
+          "name": "Button Card (Base)",
+          "description": "Bouton de base (section 7.2 du manuel)",
+          "tags": [
+            "button",
+            "bouton",
+            "action",
+            "base"
+          ],
+          "code": "- type: button\n  name: Allumer Salon\n  icon: mdi:lightbulb\n  tap_action:\n    action: toggle\n    entity_id: light.salon"
+        },
+        {
+          "id": "grid-card-base",
+          "name": "Grid Card (Base)",
+          "description": "Grille de cartes de base (section 7.2 du manuel)",
+          "tags": [
+            "grid",
+            "grille",
+            "organisation",
+            "base"
+          ],
+          "code": "- type: grid\n  columns: 3\n  square: false\n  cards:\n    - type: entity\n      entity: light.salon\n    - type: entity\n      entity: light.cuisine\n    - type: entity\n      entity: light.chambre"
+        },
+        {
+          "id": "sensor-card-humidity",
+          "name": "Sensor Card - Humidité",
+          "description": "Carte capteur pour l'humidité",
+          "tags": [
+            "sensor",
+            "capteur",
+            "humidité",
+            "environnement"
+          ],
+          "code": "- type: sensor\n  entity: sensor.humidite_salon\n  name: Humidité\n  icon: mdi:water-percent\n  graph: line\n  unit: '%'"
+        },
+        {
+          "id": "sensor-card-temperature",
+          "name": "Sensor Card - Température",
+          "description": "Carte capteur pour la température",
+          "tags": [
+            "sensor",
+            "capteur",
+            "température",
+            "environnement"
+          ],
+          "code": "- type: sensor\n  entity: sensor.temperature_salon\n  name: Température\n  icon: mdi:thermometer\n  graph: line\n  unit: '°C'"
+        },
+        {
+          "id": "sensor-card-battery",
+          "name": "Sensor Card - Batterie",
+          "description": "Carte capteur pour niveau de batterie",
+          "tags": [
+            "sensor",
+            "capteur",
+            "batterie",
+            "énergie"
+          ],
+          "code": "- type: sensor\n  entity: sensor.telephone_batterie\n  name: Batterie\n  icon: mdi:battery\n  graph: line\n  unit: '%'"
+        },
+        {
+          "id": "thermostat-card-advanced",
+          "name": "Thermostat Card - Avancée",
+          "description": "Carte thermostat avec options avancées",
+          "tags": [
+            "thermostat",
+            "chauffage",
+            "climatisation",
+            "température",
+            "avancé"
+          ],
+          "code": "- type: thermostat\n  entity: climate.maison\n  name: Thermostat Maison\n  hvac_modes:\n    - heat\n    - cool\n    - auto\n    - off\n  theme: default"
+        },
+        {
+          "id": "climate-card-heat",
+          "name": "Climate Card - Mode Chauffage",
+          "description": "Carte climat en mode chauffage uniquement",
+          "tags": [
+            "climate",
+            "thermostat",
+            "chauffage",
+            "température"
+          ],
+          "code": "- type: thermostat\n  entity: climate.salon\n  name: Chauffage Salon\n  hvac_modes:\n    - heat\n    - off"
+        },
+        {
+          "id": "entities-card-sensors",
+          "name": "Entities Card - Capteurs",
+          "description": "Carte entities pour afficher plusieurs capteurs",
+          "tags": [
+            "entities",
+            "entités",
+            "capteur",
+            "sensor",
+            "liste"
+          ],
+          "code": "- type: entities\n  title: Capteurs Environnement\n  entities:\n    - entity: sensor.temperature\n      name: Température\n    - entity: sensor.humidite\n      name: Humidité\n    - entity: sensor.co2\n      name: CO2\n  show_header_toggle: false"
+        },
+        {
+          "id": "entities-card-lights",
+          "name": "Entities Card - Lumières",
+          "description": "Carte entities pour contrôler les lumières",
+          "tags": [
+            "entities",
+            "entités",
+            "light",
+            "lumière",
+            "liste"
+          ],
+          "code": "- type: entities\n  title: Éclairage\n  entities:\n    - entity: light.salon\n    - entity: light.cuisine\n    - entity: light.chambre\n  show_header_toggle: true\n  state_color: true"
+        },
+        {
+          "id": "glance-card-lights",
+          "name": "Glance Card - Lumières",
+          "description": "Carte glance pour vue d'ensemble des lumières",
+          "tags": [
+            "glance",
+            "aperçu",
+            "light",
+            "lumière",
+            "vue_globale"
+          ],
+          "code": "- type: glance\n  title: Éclairage\n  entities:\n    - entity: light.salon\n    - entity: light.cuisine\n    - entity: light.chambre\n  show_name: true\n  show_icon: true\n  show_state: true\n  state_color: true"
+        },
+        {
+          "id": "history-graph-multiple",
+          "name": "History Graph - Multiples Entités",
+          "description": "Graphique historique avec plusieurs entités",
+          "tags": [
+            "history-graph",
+            "graphique",
+            "historique",
+            "multiples"
+          ],
+          "code": "- type: history-graph\n  title: Historique Températures\n  entities:\n    - entity: sensor.temperature_salon\n      name: Salon\n    - entity: sensor.temperature_cuisine\n      name: Cuisine\n    - entity: sensor.temperature_exterieure\n      name: Extérieur\n  hours_to_show: 24"
+        },
+        {
+          "id": "gauge-card-humidity",
+          "name": "Gauge Card - Humidité",
+          "description": "Jauge pour l'humidité",
+          "tags": [
+            "gauge",
+            "jauge",
+            "humidité",
+            "circulaire"
+          ],
+          "code": "- type: gauge\n  entity: sensor.humidite\n  name: Humidité\n  min: 0\n  max: 100\n  severity:\n    green: 40\n    yellow: 60\n    red: 70\n  needle: true"
+        },
+        {
+          "id": "gauge-card-cpu",
+          "name": "Gauge Card - CPU",
+          "description": "Jauge pour utilisation CPU",
+          "tags": [
+            "gauge",
+            "jauge",
+            "cpu",
+            "système",
+            "circulaire"
+          ],
+          "code": "- type: gauge\n  entity: sensor.cpu_usage\n  name: CPU\n  min: 0\n  max: 100\n  severity:\n    green: 0\n    yellow: 60\n    red: 80\n  needle: true"
+        },
+        {
+          "id": "button-card-scene",
+          "name": "Button Card - Scène",
+          "description": "Bouton pour activer une scène",
+          "tags": [
+            "button",
+            "bouton",
+            "scene",
+            "scénario",
+            "action"
+          ],
+          "code": "- type: button\n  name: Scène Cinéma\n  icon: mdi:movie\n  tap_action:\n    action: activate\n    entity_id: scene.cinema"
+        },
+        {
+          "id": "button-card-service",
+          "name": "Button Card - Service",
+          "description": "Bouton pour appeler un service",
+          "tags": [
+            "button",
+            "bouton",
+            "service",
+            "action"
+          ],
+          "code": "- type: button\n  name: Allumer Tout\n  icon: mdi:lightbulb-on\n  tap_action:\n    action: call-service\n    service: light.turn_on\n    target:\n      entity_id: all"
+        },
+        {
+          "id": "vertical-stack-mixed",
+          "name": "Vertical Stack - Cartes Mixtes",
+          "description": "Stack vertical avec différents types de cartes",
+          "tags": [
+            "vertical-stack",
+            "stack",
+            "vertical",
+            "mixte",
+            "organisation"
+          ],
+          "code": "- type: vertical-stack\n  cards:\n    - type: entity\n      entity: sensor.temperature\n    - type: gauge\n      entity: sensor.humidite\n    - type: history-graph\n      entities:\n        - entity: sensor.temperature"
+        },
+        {
+          "id": "horizontal-stack-lights",
+          "name": "Horizontal Stack - Lumières",
+          "description": "Stack horizontal pour contrôler plusieurs lumières",
+          "tags": [
+            "horizontal-stack",
+            "stack",
+            "horizontal",
+            "light",
+            "lumière",
+            "organisation"
+          ],
+          "code": "- type: horizontal-stack\n  cards:\n    - type: entity\n      entity: light.salon\n    - type: entity\n      entity: light.cuisine\n    - type: entity\n      entity: light.chambre"
+        },
+        {
+          "id": "grid-card-square",
+          "name": "Grid Card - Carrée",
+          "description": "Grille avec cartes carrées",
+          "tags": [
+            "grid",
+            "grille",
+            "square",
+            "carré",
+            "organisation"
+          ],
+          "code": "- type: grid\n  columns: 4\n  square: true\n  cards:\n    - type: entity\n      entity: light.salon\n    - type: entity\n      entity: light.cuisine\n    - type: entity\n      entity: light.chambre\n    - type: entity\n      entity: light.bureau"
+        },
+        {
+          "id": "markdown-card-info",
+          "name": "Markdown Card - Information",
+          "description": "Carte markdown pour afficher des informations",
+          "tags": [
+            "markdown",
+            "texte",
+            "information",
+            "affichage"
+          ],
+          "code": "- type: markdown\n  content: |\n    # Bienvenue\n    \n    Ceci est une carte markdown qui permet d'afficher du texte formaté.\n    \n    - Liste à puces\n    - Item 2\n    - Item 3"
+        },
+        {
+          "id": "markdown-card-template",
+          "name": "Markdown Card - Template",
+          "description": "Carte markdown avec template dynamique",
+          "tags": [
+            "markdown",
+            "template",
+            "dynamique",
+            "texte"
+          ],
+          "code": "- type: markdown\n  content: |\n    ## État de la Maison\n    \n    Température: {{ states('sensor.temperature') }}°C\n    \n    Humidité: {{ states('sensor.humidite') }}%\n    \n    Lumières allumées: {{ states.light | selectattr('state', 'eq', 'on') | list | count }}"
+        },
+        {
+          "id": "picture-card-entity",
+          "name": "Picture Card - Entity",
+          "description": "Carte image avec entité",
+          "tags": [
+            "picture",
+            "image",
+            "photo",
+            "entité"
+          ],
+          "code": "- type: picture-entity\n  entity: camera.salon\n  name: Caméra Salon\n  image: /local/photos/salon.jpg\n  tap_action:\n    action: more-info"
+        },
+        {
+          "id": "picture-card-action",
+          "name": "Picture Card - Action",
+          "description": "Carte image avec action de navigation",
+          "tags": [
+            "picture",
+            "image",
+            "photo",
+            "action"
+          ],
+          "code": "- type: picture\n  image: /local/photos/maison.jpg\n  tap_action:\n    action: navigate\n    navigation_path: /lovelace/maison"
+        },
+        {
+          "id": "input-number-volume",
+          "name": "Input Number - Volume",
+          "description": "Input number pour contrôler le volume",
+          "tags": [
+            "input",
+            "number",
+            "nombre",
+            "volume",
+            "contrôle"
+          ],
+          "code": "- type: entity\n  entity: input_number.volume_musique\n  name: Volume Musique\n  icon: mdi:volume-high\n  min: 0\n  max: 100\n  step: 5"
+        },
+        {
+          "id": "input-number-temperature",
+          "name": "Input Number - Température",
+          "description": "Input number pour définir une température",
+          "tags": [
+            "input",
+            "number",
+            "nombre",
+            "température",
+            "contrôle"
+          ],
+          "code": "- type: entity\n  entity: input_number.temperature_cible\n  name: Température Cible\n  icon: mdi:thermometer\n  min: 15\n  max: 30\n  step: 0.5"
+        },
+        {
+          "id": "input-select-mode",
+          "name": "Input Select - Mode",
+          "description": "Input select pour choisir un mode",
+          "tags": [
+            "input",
+            "select",
+            "sélection",
+            "mode",
+            "option"
+          ],
+          "code": "- type: entity\n  entity: input_select.mode_maison\n  name: Mode Maison\n  icon: mdi:home\n  options:\n    - Normal\n    - Absence\n    - Vacances"
+        },
+        {
+          "id": "input-text-note",
+          "name": "Input Text - Note",
+          "description": "Input text pour saisir une note",
+          "tags": [
+            "input",
+            "text",
+            "texte",
+            "saisie",
+            "note"
+          ],
+          "code": "- type: entity\n  entity: input_text.note_rapide\n  name: Note Rapide\n  icon: mdi:text\n  max: 100"
+        },
+        {
+          "id": "input-boolean-presence",
+          "name": "Input Boolean - Présence",
+          "description": "Input boolean pour simuler la présence",
+          "tags": [
+            "input",
+            "boolean",
+            "toggle",
+            "présence"
+          ],
+          "code": "- type: entity\n  entity: input_boolean.simulation_presence\n  name: Simulation Présence\n  icon: mdi:home-export"
+        },
+        {
+          "id": "input-datetime-reveil",
+          "name": "Input Datetime - Réveil",
+          "description": "Input datetime pour définir l'heure de réveil",
+          "tags": [
+            "input",
+            "datetime",
+            "date",
+            "heure",
+            "réveil"
+          ],
+          "code": "- type: entity\n  entity: input_datetime.reveil\n  name: Réveil\n  icon: mdi:alarm\n  has_date: false\n  has_time: true"
+        },
+        {
+          "id": "timer-card-cuisine",
+          "name": "Timer Card - Cuisine",
+          "description": "Timer pour la cuisine",
+          "tags": [
+            "timer",
+            "chronomètre",
+            "temps",
+            "cuisine"
+          ],
+          "code": "- type: entity\n  entity: timer.cuisine\n  name: Timer Cuisine\n  icon: mdi:timer\n  tap_action:\n    action: toggle"
+        },
+        {
+          "id": "scene-card-cinema",
+          "name": "Scene Card - Cinéma",
+          "description": "Scène pour le mode cinéma",
+          "tags": [
+            "scene",
+            "scénario",
+            "cinéma",
+            "action"
+          ],
+          "code": "- type: entity\n  entity: scene.cinema\n  name: Scène Cinéma\n  icon: mdi:movie-open\n  tap_action:\n    action: activate"
+        },
+        {
+          "id": "script-card-allumer",
+          "name": "Script Card - Allumer",
+          "description": "Script pour allumer les lumières",
+          "tags": [
+            "script",
+            "action",
+            "exécution",
+            "lumière"
+          ],
+          "code": "- type: entity\n  entity: script.allumer_toutes_lumieres\n  name: Allumer Tout\n  icon: mdi:lightbulb-on"
+        },
+        {
+          "id": "cover-card-volet",
+          "name": "Cover Card - Volet",
+          "description": "Carte pour contrôler un volet",
+          "tags": [
+            "cover",
+            "volet",
+            "store",
+            "rideau",
+            "contrôle"
+          ],
+          "code": "- type: entity\n  entity: cover.volet_salon\n  name: Volet Salon\n  icon: mdi:blinds\n  tap_action:\n    action: toggle"
+        },
+        {
+          "id": "fan-card-ventilateur",
+          "name": "Fan Card - Ventilateur",
+          "description": "Carte pour contrôler un ventilateur",
+          "tags": [
+            "fan",
+            "ventilateur",
+            "ventilation",
+            "air",
+            "contrôle"
+          ],
+          "code": "- type: entity\n  entity: fan.salon\n  name: Ventilateur Salon\n  icon: mdi:fan\n  tap_action:\n    action: toggle"
+        },
+        {
+          "id": "lock-card-serrure",
+          "name": "Lock Card - Serrure",
+          "description": "Carte pour contrôler une serrure",
+          "tags": [
+            "lock",
+            "serrure",
+            "sécurité",
+            "contrôle"
+          ],
+          "code": "- type: entity\n  entity: lock.porte_entree\n  name: Porte d'entrée\n  icon: mdi:lock\n  tap_action:\n    action: toggle"
+        },
+        {
+          "id": "vacuum-card-robot",
+          "name": "Vacuum Card - Robot",
+          "description": "Carte pour contrôler un aspirateur robot",
+          "tags": [
+            "vacuum",
+            "aspirateur",
+            "robot",
+            "contrôle"
+          ],
+          "code": "- type: entity\n  entity: vacuum.robot_aspirateur\n  name: Aspirateur Robot\n  icon: mdi:robot-vacuum\n  tap_action:\n    action: more-info"
+        },
+        {
+          "id": "water-heater-card-ballon",
+          "name": "Water Heater Card - Ballon",
+          "description": "Carte pour contrôler un ballon d'eau chaude",
+          "tags": [
+            "water_heater",
+            "chauffe-eau",
+            "eau",
+            "contrôle"
+          ],
+          "code": "- type: entity\n  entity: water_heater.ballon\n  name: Ballon Eau Chaude\n  icon: mdi:water-boiler\n  tap_action:\n    action: more-info"
+        },
+        {
+          "id": "humidifier-card-salon",
+          "name": "Humidifier Card - Salon",
+          "description": "Carte pour contrôler un humidificateur",
+          "tags": [
+            "humidifier",
+            "humidificateur",
+            "air",
+            "contrôle"
+          ],
+          "code": "- type: entity\n  entity: humidifier.salon\n  name: Humidificateur Salon\n  icon: mdi:air-humidifier\n  tap_action:\n    action: toggle"
+        },
+        {
+          "id": "number-card-volume",
+          "name": "Number Card - Volume",
+          "description": "Carte pour contrôler un nombre (volume)",
+          "tags": [
+            "number",
+            "nombre",
+            "volume",
+            "contrôle"
+          ],
+          "code": "- type: entity\n  entity: number.volume_musique\n  name: Volume Musique\n  icon: mdi:volume-high\n  min: 0\n  max: 100"
+        },
+        {
+          "id": "select-card-mode",
+          "name": "Select Card - Mode",
+          "description": "Carte pour sélectionner un mode",
+          "tags": [
+            "select",
+            "sélection",
+            "mode",
+            "option"
+          ],
+          "code": "- type: entity\n  entity: select.mode_maison\n  name: Mode Maison\n  icon: mdi:home"
+        },
+        {
+          "id": "text-card-info",
+          "name": "Text Card - Information",
+          "description": "Carte texte pour afficher des informations",
+          "tags": [
+            "text",
+            "texte",
+            "information",
+            "affichage"
+          ],
+          "code": "- type: markdown\n  content: |\n    ## Informations\n    \n    Température actuelle: 22°C\n    \n    Mode: Normal"
+        },
+        {
+          "id": "time-card-digital",
+          "name": "Time Card - Horloge Digitale",
+          "description": "Carte horloge digitale",
+          "tags": [
+            "time",
+            "heure",
+            "horloge",
+            "digital"
+          ],
+          "code": "- type: custom:digital-clock\n  use_military: false\n  hide_seconds: false\n  format: 'HH:mm:ss'"
+        },
+        {
+          "id": "weather-card-forecast",
+          "name": "Weather Card - Prévisions",
+          "description": "Carte météo avec prévisions",
+          "tags": [
+            "weather",
+            "météo",
+            "prévisions",
+            "forecast"
+          ],
+          "code": "- type: weather-forecast\n  entity: weather.ma_ville\n  name: Météo\n  show_forecast: true\n  forecast_days: 5"
+        },
+        {
+          "id": "alarm-panel-card-advanced",
+          "name": "Alarm Panel Card - Avancée",
+          "description": "Carte panneau d'alarme avec options",
+          "tags": [
+            "alarm",
+            "alarme",
+            "sécurité",
+            "panel",
+            "avancé"
+          ],
+          "code": "- type: alarm-panel\n  entity: alarm_control_panel.maison\n  name: Alarme Maison\n  states:\n    - armed_home\n    - armed_away\n    - disarmed"
+        },
+        {
+          "id": "camera-card-live",
+          "name": "Camera Card - Live",
+          "description": "Carte caméra en direct",
+          "tags": [
+            "camera",
+            "caméra",
+            "vidéo",
+            "live"
+          ],
+          "code": "- type: picture-entity\n  entity: camera.salon\n  name: Caméra Salon\n  camera_image: camera.salon\n  camera_view: live"
+        },
+        {
+          "id": "person-card-location",
+          "name": "Person Card - Localisation",
+          "description": "Carte personne avec localisation",
+          "tags": [
+            "person",
+            "personne",
+            "présence",
+            "localisation"
+          ],
+          "code": "- type: entity\n  entity: person.jean\n  name: Jean\n  icon: mdi:account\n  tap_action:\n    action: more-info"
+        },
+        {
+          "id": "update-card-system",
+          "name": "Update Card - Système",
+          "description": "Carte pour les mises à jour système",
+          "tags": [
+            "update",
+            "mise_à_jour",
+            "système",
+            "ha"
+          ],
+          "code": "- type: entity\n  entity: update.home_assistant_core_update\n  name: Mise à jour HA\n  icon: mdi:package-up\n  tap_action:\n    action: more-info"
+        },
+        {
+          "id": "sun-card-info",
+          "name": "Sun Card - Informations",
+          "description": "Carte soleil avec informations détaillées",
+          "tags": [
+            "sun",
+            "soleil",
+            "astronomie",
+            "lever",
+            "coucher"
+          ],
+          "code": "- type: entity\n  entity: sun.sun\n  name: Soleil\n  icon: mdi:weather-sunny\n  tap_action:\n    action: more-info"
+        },
+        {
+          "id": "zone-card-area",
+          "name": "Zone Card - Zone",
+          "description": "Carte pour afficher une zone",
+          "tags": [
+            "zone",
+            "area",
+            "région",
+            "localisation"
+          ],
+          "code": "- type: entity\n  entity: zone.maison\n  name: Zone Maison\n  icon: mdi:home\n  tap_action:\n    action: more-info"
+        },
+        {
+          "id": "counter-card-visiteurs",
+          "name": "Counter Card - Visiteurs",
+          "description": "Compteur pour les visiteurs",
+          "tags": [
+            "counter",
+            "compteur",
+            "visiteurs",
+            "nombre"
+          ],
+          "code": "- type: entity\n  entity: counter.visiteurs\n  name: Visiteurs\n  icon: mdi:counter\n  tap_action:\n    action: more-info"
+        },
+        {
+          "id": "proximity-card-distance",
+          "name": "Proximity Card - Distance",
+          "description": "Carte proximité avec distance",
+          "tags": [
+            "proximity",
+            "proximité",
+            "distance",
+            "localisation"
+          ],
+          "code": "- type: entity\n  entity: proximity.maison\n  name: Proximité\n  icon: mdi:map-marker-distance\n  tap_action:\n    action: more-info"
+        },
+        {
+          "id": "utility-meter-card-electricity",
+          "name": "Utility Meter Card - Électricité",
+          "description": "Compteur d'utilité pour l'électricité",
+          "tags": [
+            "utility_meter",
+            "compteur",
+            "énergie",
+            "électricité"
+          ],
+          "code": "- type: entity\n  entity: sensor.electricite_jour\n  name: Électricité Jour\n  icon: mdi:flash\n  tap_action:\n    action: more-info"
+        },
+        {
+          "id": "todo-card-liste",
+          "name": "Todo Card - Liste",
+          "description": "Carte liste de tâches",
+          "tags": [
+            "todo",
+            "tâche",
+            "liste",
+            "organisation"
+          ],
+          "code": "- type: entity\n  entity: todo.ma_liste\n  name: Ma Liste\n  icon: mdi:format-list-checks\n  tap_action:\n    action: more-info"
+        }
+      ]
+    },
+    {
+      "id": "nouveautes-2025",
+      "name": "Nouveautés Home Assistant 2025",
+      "description": "Nouvelles fonctionnalités et améliorations introduites dans Home Assistant en 2025",
+      "codes": [
+        {
+          "id": "tile-card-2025-9",
+          "name": "Tile Card avec Tendances 24h (2025.9)",
+          "description": "Nouvelle carte Tile avec affichage des tendances sur 24 heures, introduite dans la version 2025.9",
+          "tags": [
+            "tile",
+            "tendances",
+            "2025.9",
+            "nouveauté",
+            "graphique"
+          ],
+          "code": "- type: tile\n  entity: sensor.temperature_salon\n  name: Température Salon\n  show_trend: true\n  trend_period: 24h\n  icon: mdi:thermometer"
+        },
+        {
+          "id": "tile-card-media-controls",
+          "name": "Tile Card - Contrôles Média (2025.9)",
+          "description": "Nouveaux contrôles pour les lecteurs multimédias dans les cartes Tile (version 2025.9)",
+          "tags": [
+            "tile",
+            "média",
+            "lecteur",
+            "2025.9",
+            "nouveauté"
+          ],
+          "code": "- type: tile\n  entity: media_player.salon\n  name: Lecteur Salon\n  show_media_controls: true\n  media_controls:\n    - play_pause\n    - volume\n    - next_previous"
+        },
+        {
+          "id": "tile-card-fan-controls",
+          "name": "Tile Card - Contrôles Ventilateur (2025.9)",
+          "description": "Gestion des ventilateurs dans les cartes Tile avec nouveaux contrôles (version 2025.9)",
+          "tags": [
+            "tile",
+            "ventilateur",
+            "fan",
+            "2025.9",
+            "nouveauté"
+          ],
+          "code": "- type: tile\n  entity: fan.salon\n  name: Ventilateur Salon\n  show_fan_controls: true\n  fan_controls:\n    - speed\n    - oscillation\n    - direction"
+        },
+        {
+          "id": "dashboard-experimental-2025-9",
+          "name": "Tableau de Bord Expérimental (2025.9)",
+          "description": "Nouveau tableau de bord simplifié pour débutants introduit dans la version 2025.9",
+          "tags": [
+            "tableau de bord",
+            "expérimental",
+            "débutant",
+            "2025.9",
+            "nouveauté"
+          ],
+          "code": "# Activer le tableau de bord expérimental\n# Configuration → Tableaux de bord → Activer le mode expérimental\n# Ce mode simplifie l'interface pour les débutants tout en conservant\n# les fonctionnalités avancées pour les utilisateurs expérimentés"
+        },
+        {
+          "id": "automation-sidebar-2025-9",
+          "name": "Éditeur Automatisations - Barre Latérale (2025.9)",
+          "description": "Nouvelle barre latérale dans l'éditeur d'automatisations pour une meilleure gestion (version 2025.9)",
+          "tags": [
+            "automatisation",
+            "éditeur",
+            "barre latérale",
+            "2025.9",
+            "nouveauté"
+          ],
+          "code": "# La barre latérale dans l'éditeur d'automatisations permet de :\n# - Organiser les déclencheurs, conditions et actions\n# - Glisser-déposer pour réorganiser\n# - Accès rapide aux entités et services\n# Disponible dans Configuration → Automatisations et scènes → Créer une automatisation"
+        },
+        {
+          "id": "ai-tasks-2025-8",
+          "name": "AI Tasks - Intégration IA (2025.8)",
+          "description": "Nouvelle fonctionnalité AI Tasks permettant d'envoyer des fichiers/images à une IA et utiliser la réponse dans les automatisations (version 2025.8)",
+          "tags": [
+            "ia",
+            "intelligence artificielle",
+            "ai tasks",
+            "2025.8",
+            "nouveauté",
+            "automatisation"
+          ],
+          "code": "alias: \"Analyse Image avec IA\"\ndescription: \"Utilise AI Tasks pour analyser une image\"\ntrigger:\n  - platform: state\n    entity_id: camera.entree\n    to: 'on'\naction:\n  - service: ai_tasks.process_image\n    data:\n      image: camera.entree\n      task: \"Détecter s'il y a une personne dans l'image\"\n  - service: notify.mobile_app_telephone\n    data:\n      message: \"{{ ai_tasks.result }}\""
+        },
+        {
+          "id": "ai-automation-suggestions-2025-8",
+          "name": "Suggestions IA pour Automatisations (2025.8)",
+          "description": "L'IA suggère automatiquement un nom, une description et des étiquettes lors de la création d'automatisations (version 2025.8)",
+          "tags": [
+            "ia",
+            "intelligence artificielle",
+            "suggestions",
+            "automatisation",
+            "2025.8",
+            "nouveauté"
+          ],
+          "code": "# Lors de la création d'une automatisation dans l'éditeur :\n# 1. Configurez votre déclencheur, conditions et actions\n# 2. L'IA analyse automatiquement votre automatisation\n# 3. Des suggestions apparaissent pour :\n#    - Le nom de l'automatisation\n#    - La description\n#    - Les étiquettes (tags)\n# 4. Acceptez ou modifiez les suggestions\n# Disponible dans Configuration → Automatisations et scènes"
+        },
+        {
+          "id": "tts-reactive-voice-2025-8",
+          "name": "Text-to-Speech Voix Réactive (2025.8)",
+          "description": "Le Text-to-Speech commence à parler immédiatement, rendant les annonces vocales plus naturelles (version 2025.8)",
+          "tags": [
+            "tts",
+            "text-to-speech",
+            "voix",
+            "annonce",
+            "2025.8",
+            "nouveauté"
+          ],
+          "code": "alias: \"Annonce Vocale Réactive\"\ndescription: \"Utilise la nouvelle voix réactive pour les annonces\"\ntrigger:\n  - platform: state\n    entity_id: sensor.temperature_salon\n    above: 25\naction:\n  - service: tts.speak\n    target:\n      entity_id: media_player.salon\n    data:\n      message: \"Attention, la température du salon dépasse 25 degrés\"\n      cache: false\n      # La voix réactive commence immédiatement sans délai"
+        },
+        {
+          "id": "extended-voices-2025-5",
+          "name": "Support Voix Étendu (2025.5)",
+          "description": "Intégration de milliers de nouvelles voix pour les annonces vocales (version 2025.5)",
+          "tags": [
+            "tts",
+            "voix",
+            "annonce",
+            "2025.5",
+            "nouveauté"
+          ],
+          "code": "# Configuration dans configuration.yaml :\ntts:\n  - platform: google_translate\n    language: fr-FR\n    voice: fr-FR-Wavenet-C  # Nouvelle voix disponible\n    # Ou utilisez d'autres voix :\n    # - fr-FR-Wavenet-A (féminine)\n    # - fr-FR-Wavenet-B (masculine)\n    # - fr-FR-Wavenet-D (féminine)\n    # - fr-FR-Wavenet-E (masculine)\n    # - fr-FR-Wavenet-F (féminine)\n\n# Utilisation dans une automatisation :\naction:\n  - service: tts.speak\n    target:\n      entity_id: media_player.salon\n    data:\n      message: \"Bienvenue à la maison\"\n      language: fr-FR\n      voice: fr-FR-Wavenet-C"
+        },
+        {
+          "id": "dashboard-panels-2025-11",
+          "name": "Panneaux Thématiques Tableau de Bord (2025.11)",
+          "description": "Organisation en panneaux thématiques pour faciliter la navigation (version 2025.11)",
+          "tags": [
+            "tableau de bord",
+            "panneaux",
+            "thématique",
+            "navigation",
+            "2025.11",
+            "nouveauté"
+          ],
+          "code": "# Configuration des panneaux thématiques :\n# Configuration → Tableaux de bord → Organiser en panneaux\n\n# Exemple de structure avec panneaux :\nviews:\n  - title: Accueil\n    path: accueil\n    panel: true\n    cards:\n      - type: vertical-stack\n        cards:\n          - type: entities\n            title: Lumières\n            entities:\n              - light.salon\n              - light.cuisine\n          - type: entities\n            title: Climatisation\n            entities:\n              - climate.salon\n              - climate.chambre\n          - type: entities\n            title: Sécurité\n            entities:\n              - alarm_control_panel.alarmo\n              - binary_sensor.porte_entree"
+        },
+        {
+          "id": "dashboard-device-info-2025-11",
+          "name": "Affichage Informations Dispositifs (2025.11)",
+          "description": "Personnalisation avancée : afficher le nom, la zone d'installation ou une combinaison pour chaque dispositif (version 2025.11)",
+          "tags": [
+            "tableau de bord",
+            "dispositif",
+            "personnalisation",
+            "zone",
+            "2025.11",
+            "nouveauté"
+          ],
+          "code": "# Configuration dans l'éditeur de tableau de bord :\n# Configuration → Tableaux de bord → Paramètres d'affichage\n\n# Exemple avec affichage personnalisé :\n- type: entities\n  title: Mes Dispositifs\n  show_header_toggle: false\n  entities:\n    - entity: light.salon\n      name: Salon - Lumière Principale  # Nom personnalisé\n      secondary_info: zone  # Affiche la zone d'installation\n    - entity: light.cuisine\n      name: Cuisine - Plafonnier\n      secondary_info: last-changed  # Affiche la dernière modification\n    - entity: sensor.temperature_salon\n      name: Température Salon\n      secondary_info: \"{{ states.sensor.temperature_salon.attributes.device_class }}\"  # Info personnalisée"
+        },
+        {
+          "id": "favorites-entities-2025-11",
+          "name": "Entités Favorites Intelligentes (2025.11)",
+          "description": "Affichage intelligent et centralisé des entités favorites les plus utilisées (version 2025.11)",
+          "tags": [
+            "favoris",
+            "entités",
+            "intelligent",
+            "2025.11",
+            "nouveauté"
+          ],
+          "code": "# Configuration des entités favorites :\n# Configuration → Appareils et services → Sélectionner une entité → Ajouter aux favoris\n\n# Exemple de carte avec entités favorites :\n- type: entities\n  title: Mes Favoris\n  show_header_toggle: false\n  entities:\n    # Les entités favorites sont automatiquement organisées\n    # par fréquence d'utilisation et accessibilité\n    - entity: light.salon\n    - entity: climate.salon\n    - entity: media_player.salon\n    - entity: alarm_control_panel.alarmo\n\n# Ou utilisez le widget favoris natif :\n- type: favorites\n  title: Accès Rapide\n  # Affiche automatiquement vos entités les plus utilisées"
+        },
+        {
+          "id": "backup-improvements-2025-1",
+          "name": "Améliorations Système de Sauvegarde (2025.1)",
+          "description": "Système de sauvegarde amélioré : sauvegardes plus rapides et meilleure gestion des versions (version 2025.1)",
+          "tags": [
+            "sauvegarde",
+            "backup",
+            "versions",
+            "2025.1",
+            "nouveauté"
+          ],
+          "code": "# Nouveau système de sauvegarde dans Configuration → Sauvegardes\n\n# Automatisation pour sauvegarde automatique :\nalias: \"Sauvegarde Automatique Quotidienne\"\ndescription: \"Sauvegarde automatique avec le nouveau système\"\ntrigger:\n  - platform: time\n    at: \"02:00:00\"\naction:\n  - service: backup.create\n    data:\n      name: \"Sauvegarde_Automatique_{{ now().strftime('%Y%m%d') }}\"\n      password: !secret backup_password\n      # Le nouveau système permet :\n      # - Sauvegardes incrémentielles (plus rapides)\n      # - Gestion automatique des versions\n      # - Compression améliorée\n      # - Vérification d'intégrité automatique"
+        },
+        {
+          "id": "ui-improvements-2025-5",
+          "name": "Améliorations Interface Utilisateur (2025.5)",
+          "description": "Refonte de l'interface pour une navigation plus intuitive et personnalisation accrue des tableaux de bord (version 2025.5)",
+          "tags": [
+            "interface",
+            "ui",
+            "navigation",
+            "personnalisation",
+            "2025.5",
+            "nouveauté"
+          ],
+          "code": "# Nouvelles fonctionnalités UI disponibles :\n# - Navigation améliorée avec menu latéral redessiné\n# - Glisser-déposer pour réorganiser les cartes\n# - Prévisualisation en temps réel des modifications\n# - Thèmes améliorés avec plus d'options de personnalisation\n# - Mode sombre amélioré avec transitions fluides\n\n# Exemple de personnalisation avancée :\n- type: vertical-stack\n  cards:\n    - type: markdown\n      content: |\n        # Mon Tableau de Bord Personnalisé\n        Interface améliorée avec nouvelles fonctionnalités 2025.5\n    - type: entities\n      title: Contrôles Rapides\n      # Utilisez les nouvelles options de personnalisation\n      card_mod:\n        style: |\n          ha-card {\n            border-radius: 16px;\n            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);\n          }"
+        },
+        {
+          "id": "automation-editor-2025-5",
+          "name": "Éditeur Automatisations Amélioré (2025.5)",
+          "description": "Nouvelles actions et déclencheurs pour des automatisations plus complexes (version 2025.5)",
+          "tags": [
+            "automatisation",
+            "éditeur",
+            "actions",
+            "déclencheurs",
+            "2025.5",
+            "nouveauté"
+          ],
+          "code": "alias: \"Exemple Automatisation Avancée 2025.5\"\ndescription: \"Utilise les nouvelles fonctionnalités de l'éditeur\"\ntrigger:\n  # Nouveaux types de déclencheurs disponibles :\n  - platform: state\n    entity_id: sensor.temperature_salon\n    above: 25\n    for:\n      minutes: 10\n  - platform: numeric_state\n    entity_id: sensor.humidite_salon\n    above: 70\n    below: 90\ncondition:\n  # Nouvelles conditions disponibles :\n  - condition: and\n    conditions:\n      - condition: state\n        entity_id: person.regis\n        state: home\n      - condition: time\n        after: \"08:00:00\"\n        before: \"22:00:00\"\naction:\n  # Nouvelles actions disponibles :\n  - service: climate.set_temperature\n    target:\n      entity_id: climate.salon\n    data:\n      temperature: 22\n  - delay:\n      seconds: 5\n  - service: notify.mobile_app_telephone\n    data:\n      title: \"Climatisation ajustée\"\n      message: \"La température a été réduite à 22°C\"\n  # Nouvelles options de répétition et boucles\n  - repeat:\n      count: 3\n      sequence:\n        - service: light.turn_on\n          target:\n            entity_id: light.salon\n          data:\n            brightness_pct: 50"
+        }
+      ]
+    },
+    {
+      "id": "hyper-design",
+      "name": "✨ Hyper Design Moderne",
+      "description": "Codes ultra-modernes avec glassmorphism, gradients animés, effets 3D et animations CSS avancées",
+      "codes": [
+        {
+          "id": "glassmorphism-card",
+          "name": "Glassmorphism Card - Effet Verre",
+          "description": "Carte avec effet glassmorphism (verre dépoli) ultra-moderne",
+          "tags": [
+            "glassmorphism",
+            "moderne",
+            "verre",
+            "blur",
+            "transparent"
+          ],
+          "code": "- type: custom:button-card\n  entity: light.salon\n  name: Salon\n  icon: mdi:lightbulb-on\n  card_mod:\n    style: |\n      ha-card {\n        background: rgba(255, 255, 255, 0.1) !important;\n        backdrop-filter: blur(20px) saturate(180%) !important;\n        -webkit-backdrop-filter: blur(20px) saturate(180%) !important;\n        border: 1px solid rgba(255, 255, 255, 0.3) !important;\n        border-radius: 20px !important;\n        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;\n        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;\n      }\n      ha-card:hover {\n        transform: translateY(-5px) scale(1.02) !important;\n        box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5) !important;\n        border-color: rgba(255, 255, 255, 0.5) !important;\n      }"
+        },
+        {
+          "id": "gradient-animated-card",
+          "name": "Gradient Animé - Arc-en-ciel",
+          "description": "Carte avec gradient animé arc-en-ciel fluide",
+          "tags": [
+            "gradient",
+            "animation",
+            "arc-en-ciel",
+            "moderne",
+            "coloré"
+          ],
+          "code": "- type: custom:button-card\n  entity: sensor.temperature_salon\n  name: Température\n  icon: mdi:thermometer\n  card_mod:\n    style: |\n      ha-card {\n        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab) !important;\n        background-size: 400% 400% !important;\n        animation: gradient-shift 15s ease infinite !important;\n        border-radius: 20px !important;\n        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;\n        color: white !important;\n        padding: 20px !important;\n      }\n      @keyframes gradient-shift {\n        0% { background-position: 0% 50%; }\n        50% { background-position: 100% 50%; }\n        100% { background-position: 0% 50%; }\n      }"
+        },
+        {
+          "id": "neon-glow-card",
+          "name": "Neon Glow - Effet Néon",
+          "description": "Carte avec effet néon et lueur animée",
+          "tags": [
+            "neon",
+            "glow",
+            "lumière",
+            "moderne",
+            "cyberpunk"
+          ],
+          "code": "- type: custom:button-card\n  entity: light.salon\n  name: Éclairage\n  icon: mdi:lightbulb-on\n  card_mod:\n    style: |\n      ha-card {\n        background: #0a0a0a !important;\n        border: 2px solid #00ffff !important;\n        border-radius: 15px !important;\n        box-shadow: \n          0 0 10px #00ffff,\n          0 0 20px #00ffff,\n          0 0 30px #00ffff,\n          inset 0 0 10px rgba(0, 255, 255, 0.1) !important;\n        animation: neon-pulse 2s ease-in-out infinite alternate !important;\n        color: #00ffff !important;\n        padding: 20px !important;\n      }\n      @keyframes neon-pulse {\n        from {\n          box-shadow: \n            0 0 10px #00ffff,\n            0 0 20px #00ffff,\n            0 0 30px #00ffff,\n            inset 0 0 10px rgba(0, 255, 255, 0.1) !important;\n        }\n        to {\n          box-shadow: \n            0 0 20px #00ffff,\n            0 0 30px #00ffff,\n            0 0 40px #00ffff,\n            0 0 50px #00ffff,\n            inset 0 0 20px rgba(0, 255, 255, 0.2) !important;\n        }\n      }"
+        },
+        {
+          "id": "3d-flip-card",
+          "name": "3D Flip Card - Rotation 3D",
+          "description": "Carte avec effet de rotation 3D au survol",
+          "tags": [
+            "3d",
+            "rotation",
+            "flip",
+            "transform",
+            "moderne"
+          ],
+          "code": "- type: custom:button-card\n  entity: sensor.temperature_salon\n  name: Température\n  icon: mdi:thermometer\n  card_mod:\n    style: |\n      ha-card {\n        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;\n        border-radius: 20px !important;\n        perspective: 1000px !important;\n        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;\n        transform-style: preserve-3d !important;\n        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;\n        color: white !important;\n        padding: 20px !important;\n      }\n      ha-card:hover {\n        transform: rotateY(15deg) rotateX(5deg) scale(1.05) !important;\n        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;\n      }"
+        },
+        {
+          "id": "morphing-blob-card",
+          "name": "Morphing Blob - Forme Animée",
+          "description": "Carte avec forme blob animée en arrière-plan",
+          "tags": [
+            "blob",
+            "morphing",
+            "forme",
+            "animation",
+            "moderne"
+          ],
+          "code": "- type: custom:button-card\n  entity: sensor.humidite_salon\n  name: Humidité\n  icon: mdi:water-percent\n  card_mod:\n    style: |\n      ha-card {\n        position: relative !important;\n        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;\n        border-radius: 30px !important;\n        overflow: hidden !important;\n        color: white !important;\n        padding: 20px !important;\n      }\n      ha-card::before {\n        content: '' !important;\n        position: absolute !important;\n        width: 200% !important;\n        height: 200% !important;\n        background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%) !important;\n        border-radius: 50% !important;\n        top: -50% !important;\n        left: -50% !important;\n        animation: blob-morph 8s ease-in-out infinite !important;\n      }\n      @keyframes blob-morph {\n        0%, 100% { transform: translate(0, 0) scale(1); border-radius: 50%; }\n        25% { transform: translate(20px, -20px) scale(1.1); border-radius: 60% 40% 30% 70%; }\n        50% { transform: translate(-20px, 20px) scale(0.9); border-radius: 30% 60% 70% 40%; }\n        75% { transform: translate(20px, 20px) scale(1.05); border-radius: 40% 60%; }\n      }"
+        },
+        {
+          "id": "holographic-card",
+          "name": "Holographic Card - Effet Holographique",
+          "description": "Carte avec effet holographique iridescent",
+          "tags": [
+            "holographic",
+            "iridescent",
+            "prisme",
+            "moderne",
+            "futuriste"
+          ],
+          "code": "- type: custom:button-card\n  entity: sensor.temperature_salon\n  name: Température\n  icon: mdi:thermometer\n  card_mod:\n    style: |\n      ha-card {\n        background: linear-gradient(\n          135deg,\n          rgba(255, 0, 150, 0.8) 0%,\n          rgba(0, 255, 255, 0.8) 25%,\n          rgba(255, 255, 0, 0.8) 50%,\n          rgba(255, 0, 150, 0.8) 75%,\n          rgba(0, 255, 255, 0.8) 100%\n        ) !important;\n        background-size: 400% 400% !important;\n        animation: holographic-shift 3s ease infinite !important;\n        border-radius: 20px !important;\n        box-shadow: \n          0 0 20px rgba(255, 0, 150, 0.5),\n          0 0 40px rgba(0, 255, 255, 0.5),\n          inset 0 0 20px rgba(255, 255, 255, 0.2) !important;\n        color: white !important;\n        padding: 20px !important;\n        position: relative !important;\n        overflow: hidden !important;\n      }\n      ha-card::before {\n        content: '' !important;\n        position: absolute !important;\n        top: -50% !important;\n        left: -50% !important;\n        width: 200% !important;\n        height: 200% !important;\n        background: linear-gradient(\n          45deg,\n          transparent 30%,\n          rgba(255, 255, 255, 0.3) 50%,\n          transparent 70%\n        ) !important;\n        animation: holographic-sweep 2s linear infinite !important;\n      }\n      @keyframes holographic-shift {\n        0%, 100% { background-position: 0% 50%; }\n        50% { background-position: 100% 50%; }\n      }\n      @keyframes holographic-sweep {\n        0% { transform: rotate(0deg); }\n        100% { transform: rotate(360deg); }\n      }"
+        },
+        {
+          "id": "particle-background-card",
+          "name": "Particle Background - Particules Animées",
+          "description": "Carte avec particules animées en arrière-plan",
+          "tags": [
+            "particules",
+            "animation",
+            "fond",
+            "moderne",
+            "dynamique"
+          ],
+          "code": "- type: custom:button-card\n  entity: light.salon\n  name: Éclairage\n  icon: mdi:lightbulb-on\n  card_mod:\n    style: |\n      ha-card {\n        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;\n        border-radius: 20px !important;\n        position: relative !important;\n        overflow: hidden !important;\n        color: white !important;\n        padding: 20px !important;\n      }\n      ha-card::before,\n      ha-card::after {\n        content: '' !important;\n        position: absolute !important;\n        width: 4px !important;\n        height: 4px !important;\n        background: white !important;\n        border-radius: 50% !important;\n        box-shadow: \n          50px 50px white,\n          100px 100px white,\n          150px 150px white,\n          200px 200px white,\n          250px 250px white !important;\n        animation: particles-float 20s linear infinite !important;\n      }\n      ha-card::after {\n        animation-delay: -10s !important;\n        box-shadow: \n          75px 75px white,\n          125px 125px white,\n          175px 175px white,\n          225px 225px white,\n          275px 275px white !important;\n      }\n      @keyframes particles-float {\n        0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }\n        100% { transform: translate(300px, -300px) rotate(360deg); opacity: 0; }\n      }"
+        },
+        {
+          "id": "liquid-glass-card",
+          "name": "Liquid Glass - Verre Liquide",
+          "description": "Carte avec effet de verre liquide animé",
+          "tags": [
+            "liquid",
+            "glass",
+            "fluide",
+            "moderne",
+            "animation"
+          ],
+          "code": "- type: custom:button-card\n  entity: sensor.temperature_salon\n  name: Température\n  icon: mdi:thermometer\n  card_mod:\n    style: |\n      ha-card {\n        background: rgba(255, 255, 255, 0.05) !important;\n        backdrop-filter: blur(30px) !important;\n        -webkit-backdrop-filter: blur(30px) !important;\n        border: 1px solid rgba(255, 255, 255, 0.2) !important;\n        border-radius: 25px !important;\n        position: relative !important;\n        overflow: hidden !important;\n        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;\n        color: white !important;\n        padding: 20px !important;\n      }\n      ha-card::before {\n        content: '' !important;\n        position: absolute !important;\n        top: -50% !important;\n        left: -50% !important;\n        width: 200% !important;\n        height: 200% !important;\n        background: linear-gradient(\n          45deg,\n          transparent,\n          rgba(255, 255, 255, 0.1),\n          transparent\n        ) !important;\n        animation: liquid-flow 3s ease-in-out infinite !important;\n      }\n      @keyframes liquid-flow {\n        0% { transform: translate(-50%, -50%) rotate(0deg); }\n        100% { transform: translate(-50%, -50%) rotate(360deg); }\n      }"
+        },
+        {
+          "id": "cyber-grid-card",
+          "name": "Cyber Grid - Grille Cyberpunk",
+          "description": "Carte avec grille cyberpunk animée",
+          "tags": [
+            "cyberpunk",
+            "grille",
+            "futuriste",
+            "moderne",
+            "tech"
+          ],
+          "code": "- type: custom:button-card\n  entity: sensor.temperature_salon\n  name: Température\n  icon: mdi:thermometer\n  card_mod:\n    style: |\n      ha-card {\n        background: #0a0a0a !important;\n        border: 2px solid #00ff00 !important;\n        border-radius: 15px !important;\n        position: relative !important;\n        overflow: hidden !important;\n        color: #00ff00 !important;\n        padding: 20px !important;\n        box-shadow: 0 0 20px rgba(0, 255, 0, 0.3) !important;\n      }\n      ha-card::before {\n        content: '' !important;\n        position: absolute !important;\n        top: 0 !important;\n        left: 0 !important;\n        right: 0 !important;\n        bottom: 0 !important;\n        background-image: \n          linear-gradient(rgba(0, 255, 0, 0.1) 1px, transparent 1px),\n          linear-gradient(90deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px) !important;\n        background-size: 20px 20px !important;\n        animation: grid-move 20s linear infinite !important;\n      }\n      @keyframes grid-move {\n        0% { transform: translate(0, 0); }\n        100% { transform: translate(20px, 20px); }\n      }"
+        },
+        {
+          "id": "shimmer-effect-card",
+          "name": "Shimmer Effect - Effet Brillant",
+          "description": "Carte avec effet shimmer (brillance) animé",
+          "tags": [
+            "shimmer",
+            "brillant",
+            "reflet",
+            "moderne",
+            "luxe"
+          ],
+          "code": "- type: custom:button-card\n  entity: light.salon\n  name: Éclairage\n  icon: mdi:lightbulb-on\n  card_mod:\n    style: |\n      ha-card {\n        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;\n        border-radius: 20px !important;\n        position: relative !important;\n        overflow: hidden !important;\n        color: white !important;\n        padding: 20px !important;\n        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;\n      }\n      ha-card::before {\n        content: '' !important;\n        position: absolute !important;\n        top: 0 !important;\n        left: -100% !important;\n        width: 100% !important;\n        height: 100% !important;\n        background: linear-gradient(\n          90deg,\n          transparent,\n          rgba(255, 255, 255, 0.4),\n          transparent\n        ) !important;\n        animation: shimmer 3s infinite !important;\n      }\n      @keyframes shimmer {\n        0% { left: -100%; }\n        100% { left: 100%; }\n      }"
+        },
+        {
+          "id": "magnetic-hover-card",
+          "name": "Magnetic Hover - Effet Magnétique",
+          "description": "Carte avec effet magnétique qui suit la souris",
+          "tags": [
+            "magnétique",
+            "hover",
+            "interactif",
+            "moderne",
+            "cursor"
+          ],
+          "code": "- type: custom:button-card\n  entity: sensor.temperature_salon\n  name: Température\n  icon: mdi:thermometer\n  card_mod:\n    style: |\n      ha-card {\n        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;\n        border-radius: 20px !important;\n        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1) !important;\n        color: white !important;\n        padding: 20px !important;\n        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;\n      }\n      ha-card:hover {\n        transform: scale(1.05) translateY(-5px) !important;\n        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;\n      }"
+        },
+        {
+          "id": "glitch-effect-card",
+          "name": "Glitch Effect - Effet Glitch",
+          "description": "Carte avec effet glitch cyberpunk",
+          "tags": [
+            "glitch",
+            "cyberpunk",
+            "défaut",
+            "moderne",
+            "tech"
+          ],
+          "code": "- type: custom:button-card\n  entity: sensor.temperature_salon\n  name: Température\n  icon: mdi:thermometer\n  card_mod:\n    style: |\n      ha-card {\n        background: #0a0a0a !important;\n        border: 2px solid #ff00ff !important;\n        border-radius: 15px !important;\n        color: #00ffff !important;\n        padding: 20px !important;\n        position: relative !important;\n        overflow: hidden !important;\n      }\n      ha-card::before,\n      ha-card::after {\n        content: attr(data-name) !important;\n        position: absolute !important;\n        top: 20px !important;\n        left: 20px !important;\n        width: 100% !important;\n        height: 100% !important;\n        background: inherit !important;\n      }\n      ha-card::before {\n        left: 2px !important;\n        text-shadow: -2px 0 #ff00ff !important;\n        clip: rect(44px, 450px, 56px, 0) !important;\n        animation: glitch-anim 5s infinite linear alternate-reverse !important;\n      }\n      ha-card::after {\n        left: -2px !important;\n        text-shadow: -2px 0 #00ffff, 2px 2px #ff00ff !important;\n        animation: glitch-anim2 1s infinite linear alternate-reverse !important;\n      }\n      @keyframes glitch-anim {\n        0% { clip: rect(31px, 9999px, 94px, 0); }\n        20% { clip: rect(54px, 9999px, 66px, 0); }\n        40% { clip: rect(12px, 9999px, 36px, 0); }\n        60% { clip: rect(78px, 9999px, 98px, 0); }\n        80% { clip: rect(23px, 9999px, 89px, 0); }\n        100% { clip: rect(45px, 9999px, 67px, 0); }\n      }\n      @keyframes glitch-anim2 {\n        0% { clip: rect(65px, 9999px, 100px, 0); }\n        20% { clip: rect(12px, 9999px, 59px, 0); }\n        40% { clip: rect(79px, 9999px, 19px, 0); }\n        60% { clip: rect(45px, 9999px, 78px, 0); }\n        80% { clip: rect(23px, 9999px, 98px, 0); }\n        100% { clip: rect(67px, 9999px, 34px, 0); }\n      }"
+        },
+        {
+          "id": "floating-elements-card",
+          "name": "Floating Elements - Éléments Flottants",
+          "description": "Carte avec éléments décoratifs flottants",
+          "tags": [
+            "floating",
+            "flottant",
+            "décoratif",
+            "moderne",
+            "animation"
+          ],
+          "code": "- type: custom:button-card\n  entity: sensor.temperature_salon\n  name: Température\n  icon: mdi:thermometer\n  card_mod:\n    style: |\n      ha-card {\n        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;\n        border-radius: 20px !important;\n        position: relative !important;\n        overflow: hidden !important;\n        color: white !important;\n        padding: 20px !important;\n      }\n      ha-card::before,\n      ha-card::after {\n        content: '✦' !important;\n        position: absolute !important;\n        font-size: 2rem !important;\n        color: rgba(255, 255, 255, 0.3) !important;\n        animation: float 6s ease-in-out infinite !important;\n      }\n      ha-card::before {\n        top: 20% !important;\n        left: 10% !important;\n        animation-delay: 0s !important;\n      }\n      ha-card::after {\n        bottom: 20% !important;\n        right: 10% !important;\n        animation-delay: 3s !important;\n      }\n      @keyframes float {\n        0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }\n        50% { transform: translateY(-20px) rotate(180deg); opacity: 0.7; }\n      }"
+        }
+      ]
+    }
+  ]
+}

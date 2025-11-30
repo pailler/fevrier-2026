@@ -148,10 +148,17 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   };
 
   // Fonction pour obtenir l'image appropriée selon le module
-  const getModuleImage = (title: string, imageUrl?: string) => {
-    // Forcer l'utilisation d'images JPG simples
+  const getModuleImage = (title: string, imageUrl?: string, moduleId?: string) => {
+    // Vérifier d'abord si c'est un module spécial qui n'utilise pas d'image
     const titleLower = title.toLowerCase();
+    const idLower = (moduleId || '').toLowerCase();
     
+    // Modules qui n'utilisent pas d'image (fond avec gradient)
+    if (idLower === 'home-assistant' || idLower === 'homeassistant' || titleLower.includes('domotisez votre habitat')) {
+      return null; // Pas d'image pour Home Assistant
+    }
+    
+    // Forcer l'utilisation d'images JPG simples
     // Mapping précis vers les images JPG existantes
     
     if (titleLower.includes('stable') || titleLower.includes('diffusion') || titleLower.includes('sd')) {
@@ -196,7 +203,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   };
 
   // Forcer l'utilisation des images JPG simples - éliminer les zones noires
-  const imageUrl = getModuleImage(module.title, module.image_url);
+  const imageUrl = getModuleImage(module.title, module.image_url, module.id);
 
   // Supprimer la gestion d'erreur qui empêche l'affichage des images
   // const handleImageError = () => {
@@ -262,19 +269,59 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   // Vérifier si c'est le module Apprendre le Code Informatique pour appliquer un style spécial
   const isCodeLearning = module.title.toLowerCase().includes('apprendre') || module.title.toLowerCase().includes('code learning') || module.title.toLowerCase().includes('code-learning') || module.id === 'code-learning';
   
+  // Vérifier si c'est le module Home Assistant pour appliquer un style spécial
+  const isHomeAssistant = module.title.toLowerCase().includes('home assistant') || module.title.toLowerCase().includes('home-assistant') || module.title.toLowerCase().includes('domotisez votre habitat') || module.id === 'home-assistant' || module.id === 'homeassistant';
+  
+  // Debug temporaire pour Home Assistant - LOG TRÈS VISIBLE
+  if (module.id === 'home-assistant' || module.title.toLowerCase().includes('home') || module.title.toLowerCase().includes('domotisez')) {
+    console.log('%c🔍 Home Assistant détecté:', 'color: orange; font-size: 16px; font-weight: bold;', { id: module.id, title: module.title, isHomeAssistant, imageUrl });
+    if (!isHomeAssistant) {
+      console.warn('%c⚠️ Home Assistant NON détecté malgré l\'ID/titre correspondant!', 'color: red; font-size: 14px; font-weight: bold;', { 
+        id: module.id, 
+        title: module.title,
+        checks: {
+          idMatch: module.id === 'home-assistant',
+          titleIncludesHome: module.title.toLowerCase().includes('home assistant'),
+          titleIncludesDomotisez: module.title.toLowerCase().includes('domotisez votre habitat')
+        }
+      });
+    }
+  }
+  
   // Debug temporaire
   if (module.id === 'code-learning' || module.title.toLowerCase().includes('apprendre')) {
     console.log('🔍 Code Learning détecté:', { id: module.id, title: module.title, isCodeLearning });
   }
 
   return (
-    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isIAPhoto ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isIATube ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isStirlingPDF ? 'ring-2 ring-gray-500 ring-opacity-50' : ''} ${isMeetingReports ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isHunyuan3D ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCodeLearning ? 'ring-2 ring-blue-500 ring-opacity-50' : ''}`}>
+    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isIAPhoto ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isIATube ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isStirlingPDF ? 'ring-2 ring-gray-500 ring-opacity-50' : ''} ${isMeetingReports ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isHunyuan3D ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCodeLearning ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isHomeAssistant ? 'ring-2 ring-orange-500 ring-opacity-50' : ''}`}>
       
       {/* Image du module - Cliquable */}
       <Link href={`/card/${moduleSlug}`} className="block">
-        <div className={`relative h-48 cursor-pointer group overflow-hidden ${isMeetingReports ? 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700' : isHunyuan3D ? 'bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-700' : isCodeLearning ? 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600' : isMeTube ? 'bg-gradient-to-br from-red-500 via-pink-600 to-purple-600' : isLibrespeed ? 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600' : 'bg-gradient-to-br from-blue-50 to-indigo-100'}`}>
+        <div 
+          className={`relative h-48 cursor-pointer group overflow-hidden ${isMeetingReports ? 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700' : isHunyuan3D ? 'bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-700' : isCodeLearning ? 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600' : isHomeAssistant ? 'bg-gradient-to-br from-orange-400 via-red-500 to-blue-600' : isMeTube ? 'bg-gradient-to-br from-red-500 via-pink-600 to-purple-600' : isLibrespeed ? 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600' : 'bg-gradient-to-br from-blue-50 to-indigo-100'}`} 
+          style={isHomeAssistant ? { 
+            background: 'linear-gradient(to bottom right, #fb923c, #ef4444, #2563eb)',
+            backgroundImage: 'none'
+          } : {}}
+        >
           {/* Particules animées pour Meeting Reports */}
           {isMeetingReports && (
+            <>
+              <div className="absolute inset-0">
+                <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+                <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
+                <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
+                <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
+                <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
+              </div>
+              {/* Effet de vague en bas */}
+              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
+            </>
+          )}
+          
+          {/* Particules animées pour Home Assistant */}
+          {isHomeAssistant && (
             <>
               <div className="absolute inset-0">
                 <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
@@ -300,7 +347,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
           )}
           
           {/* Image simple sans gestion d'erreur - forcer l'affichage (masquée pour les modules spéciaux) */}
-          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && !isHunyuan3D && !isCodeLearning && (
+          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && !isHunyuan3D && !isCodeLearning && !isHomeAssistant && imageUrl && (
             <img 
               src={imageUrl} 
               alt={module.title}
@@ -310,7 +357,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
           )}
           
           {/* Overlay au survol - seulement pour les modules non-spéciaux */}
-          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && !isHunyuan3D && !isCodeLearning && (
+          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && !isHunyuan3D && !isCodeLearning && !isHomeAssistant && (
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
               <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white bg-opacity-90 rounded-full p-3">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1714,6 +1761,70 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                 </div>
               </div>
             </>
+          ) : isHomeAssistant ? (
+            <>
+              {/* Style spécial pour Home Assistant - informations visibles en permanence */}
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-green-500 to-teal-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  DOMOTIQUE
+                </span>
+              </div>
+              
+              {/* Logo Home Assistant au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-orange-500/20">
+                  {/* Logo Home Assistant avec icône de maison/domotique */}
+                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
+                    {/* Cercle de fond */}
+                    <circle cx="12" cy="12" r="10" fill="#F97316" stroke="#EA580C" strokeWidth="1"/>
+                    
+                    {/* Icône de maison/domotique */}
+                    {/* Toit de la maison */}
+                    <path d="M12 4 L4 10 L4 18 L20 18 L20 10 Z" fill="white" opacity="0.95"/>
+                    
+                    {/* Porte */}
+                    <rect x="10" y="14" width="4" height="4" rx="0.5" fill="#F97316" opacity="0.9"/>
+                    
+                    {/* Fenêtres */}
+                    <rect x="6" y="11" width="2.5" height="2.5" rx="0.3" fill="#F97316" opacity="0.9"/>
+                    <rect x="15.5" y="11" width="2.5" height="2.5" rx="0.3" fill="#F97316" opacity="0.9"/>
+                    
+                    {/* Signal domotique (ondes) */}
+                    <path d="M18 6 Q20 6 20 8" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.8"/>
+                    <path d="M18 4 Q22 4 22 8" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6"/>
+                    
+                    {/* Points décoratifs (capteurs) */}
+                    <circle cx="6" cy="6" r="0.8" fill="white" opacity="0.6"/>
+                    <circle cx="18" cy="6" r="0.8" fill="white" opacity="0.6"/>
+                    <circle cx="6" cy="18" r="0.8" fill="white" opacity="0.6"/>
+                    <circle cx="18" cy="18" r="0.8" fill="white" opacity="0.6"/>
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Badge prix en haut à droite */}
+              <div className="absolute top-3 right-3 z-20">
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(100)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {(module.subtitle || module.description) && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle || (module.description?.toLowerCase().startsWith('avec home assistant') ? module.description : `Avec Home Assistant, ${module.description || 'domotisez votre habitat (maison, garage, lieu de vacances, lieu de travail, etc.) sans frais d\'installation, ni frais de logiciels puisque tout est open-source. Des centaines de codes prêts à l\'emploi sont aussi mis à disposition gratuitement.'}`)}
+                  </p>
+                )}
+                {/* Badge "DOMOTIQUE" pour Home Assistant */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-green-400 to-teal-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    🏠 DOMOTIQUE
+                  </span>
+                </div>
+              </div>
+            </>
           ) : (
             <>
               {/* Style normal pour les autres modules */}
@@ -1737,13 +1848,13 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
         <Link href={`/card/${moduleSlug}`} className="block group">
           {/* Titre du module - affiché pour tous les modules */}
           <h3 className="text-3xl sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
-            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : isHunyuan3D ? "Hunyuan 3D - Génération 3D par IA" : isCodeLearning ? "Apprendre le Code Informatique" : module.title}
+            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : isHunyuan3D ? "Hunyuan 3D - Génération 3D par IA" : isCodeLearning ? "Apprendre le Code Informatique" : isHomeAssistant ? "Domotisez votre habitat" : module.title}
           </h3>
           {/* Pour les modules spéciaux, afficher seulement la description si pas de sous-titre */}
-          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isQRCodes || isWhisper || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports || isHunyuan3D || isCodeLearning ? (
+          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isQRCodes || isWhisper || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports || isHunyuan3D || isCodeLearning || isHomeAssistant ? (
             !module.subtitle && (
               <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
-                {isComfyUI ? "ComfyUI : contrôle total sur chaque étape de la création d'image" : isMeetingReports ? "Transformez automatiquement vos réunions en rapports professionnels avec l'IA" : isHunyuan3D ? "Hunyuan 3D : Générez des modèles 3D à partir d'images avec l'intelligence artificielle" : module.description}
+                {isComfyUI ? "ComfyUI : contrôle total sur chaque étape de la création d'image" : isMeetingReports ? "Transformez automatiquement vos réunions en rapports professionnels avec l'IA" : isHunyuan3D ? "Hunyuan 3D : Générez des modèles 3D à partir d'images avec l'intelligence artificielle" : isHomeAssistant ? (module.description?.toLowerCase().startsWith('avec home assistant') ? module.description : `Avec Home Assistant, ${module.description || 'domotisez votre habitat (maison, garage, lieu de vacances, lieu de travail, etc.) sans frais d\'installation, ni frais de logiciels puisque tout est open-source. Des centaines de codes prêts à l\'emploi sont aussi mis à disposition gratuitement.'}`) : module.description}
               </p>
             )
           ) : (

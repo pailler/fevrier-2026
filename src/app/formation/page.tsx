@@ -5,6 +5,7 @@ import { useSession, useUser } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Breadcrumb from '../../components/Breadcrumb';
+import { getArticleImage } from '../../utils/articleImageGenerator';
 
 interface FormationArticle {
   id: string;
@@ -361,15 +362,18 @@ export default function FormationPage() {
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
               >
                 {/* Image de l'article */}
-                {article.image_url && (
-                  <div className="w-full h-48 relative overflow-hidden">
-                    <img
-                      src={article.image_url}
-                      alt={article.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
+                <div className="w-full h-48 relative overflow-hidden">
+                  <img
+                    src={getArticleImage(article, 'formation')}
+                    alt={article.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // Fallback vers une image par défaut si l'image ne se charge pas
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/images/iaphoto.jpg';
+                    }}
+                  />
+                </div>
                 
                 <div className="p-6">
                   {/* En-tête avec catégorie et icônes d'action */}

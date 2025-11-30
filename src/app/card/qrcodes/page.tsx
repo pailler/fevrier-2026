@@ -202,6 +202,7 @@ export default function QRCodesPage() {
             price: 100,
             features: [
               'QR codes dynamiques : modifiez l\'URL sans recréer le code',
+              'Modification après création avec token de gestion',
               'QR codes statiques et dynamiques',
               'Personnalisation avancée (couleurs, logo)',
               'Analytics en temps réel',
@@ -238,6 +239,8 @@ export default function QRCodesPage() {
           category: 'QR CODE GENERATOR',
           price: 100,
           features: [
+            'QR codes dynamiques : modifiez l\'URL sans recréer le code',
+            'Modification après création avec token de gestion',
             'QR codes statiques et dynamiques',
             'Personnalisation avancée (couleurs, logo)',
             'Analytics en temps réel',
@@ -585,6 +588,136 @@ export default function QRCodesPage() {
                     </div>
                   </div>
 
+                  {/* Chapitre 2.5: QR Codes Dynamiques - Modification après création */}
+                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-8 rounded-2xl border-2 border-emerald-300 shadow-xl">
+                    <div className="flex items-center mb-6">
+                      <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                        <span className="text-white text-xl font-bold">⚡</span>
+                      </div>
+                      <h4 className="text-2xl font-bold text-emerald-900">QR Codes Dynamiques : Modifiez sans recréer</h4>
+                    </div>
+                    <div className="space-y-6 text-gray-700">
+                      <div className="bg-white/60 p-6 rounded-xl border border-emerald-200">
+                        <h5 className="text-xl font-bold text-emerald-900 mb-4">✨ Fonction de modification après création</h5>
+                        <p className="text-lg leading-relaxed mb-4">
+                          Contrairement aux QR codes statiques, les <strong>QR codes dynamiques</strong> vous permettent de 
+                          <strong className="text-emerald-700"> modifier l'URL de destination à tout moment</strong> sans avoir à recréer le code.
+                        </p>
+                        <div className="space-y-3">
+                          <div className="flex items-start space-x-3">
+                            <span className="text-emerald-600 font-bold text-xl mt-1">✓</span>
+                            <p className="flex-1">
+                              <strong>Modification instantanée :</strong> Changez l'URL de redirection, les couleurs, le logo 
+                              ou tout autre paramètre directement depuis votre tableau de bord, sans toucher au QR code physique.
+                            </p>
+                          </div>
+                          <div className="flex items-start space-x-3">
+                            <span className="text-emerald-600 font-bold text-xl mt-1">✓</span>
+                            <p className="flex-1">
+                              <strong>Token de gestion sécurisé :</strong> Chaque QR code dynamique génère un token unique 
+                              qui vous permet de le modifier ultérieurement. Conservez ce token en lieu sûr pour accéder à 
+                              la fonction de modification.
+                            </p>
+                          </div>
+                          <div className="flex items-start space-x-3">
+                            <span className="text-emerald-600 font-bold text-xl mt-1">✓</span>
+                            <p className="flex-1">
+                              <strong>URL de gestion dédiée :</strong> Une URL de gestion vous est fournie lors de la création 
+                              pour modifier facilement votre QR code à tout moment.
+                            </p>
+                          </div>
+                          <div className="flex items-start space-x-3">
+                            <span className="text-emerald-600 font-bold text-xl mt-1">✓</span>
+                            <p className="flex-1">
+                              <strong>Mise à jour en temps réel :</strong> Les modifications sont appliquées instantanément. 
+                              Tous les scans futurs redirigeront vers la nouvelle URL sans que vous ayez besoin de réimprimer 
+                              ou redistribuer le QR code.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-white/60 p-6 rounded-xl border border-teal-200">
+                        <h5 className="text-xl font-bold text-teal-900 mb-4">🎯 Avantages des QR Codes Dynamiques</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-3">
+                            <div className="flex items-start space-x-2">
+                              <span className="text-teal-600 font-bold">💡</span>
+                              <div>
+                                <strong className="text-teal-900">Économie de ressources :</strong>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  Plus besoin de réimprimer vos supports marketing. Modifiez l'URL et le QR code existant 
+                                  continue de fonctionner avec la nouvelle destination.
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-start space-x-2">
+                              <span className="text-teal-600 font-bold">📊</span>
+                              <div>
+                                <strong className="text-teal-900">Campagnes marketing flexibles :</strong>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  Adaptez vos campagnes en temps réel selon les promotions, événements ou saisons sans 
+                                  changer vos supports physiques.
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-start space-x-2">
+                              <span className="text-teal-600 font-bold">🔄</span>
+                              <div>
+                                <strong className="text-teal-900">Correction d'erreurs facile :</strong>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  Corrigez une URL incorrecte ou mettez à jour une information obsolète en quelques clics, 
+                                  sans impact sur les QR codes déjà distribués.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="space-y-3">
+                            <div className="flex items-start space-x-2">
+                              <span className="text-teal-600 font-bold">📈</span>
+                              <div>
+                                <strong className="text-teal-900">A/B Testing :</strong>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  Testez différentes pages de destination pour optimiser vos conversions sans créer 
+                                  plusieurs QR codes.
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-start space-x-2">
+                              <span className="text-teal-600 font-bold">🌍</span>
+                              <div>
+                                <strong className="text-teal-900">Personnalisation géographique :</strong>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  Redirigez vers différentes pages selon la localisation, la langue ou d'autres critères 
+                                  sans modifier le QR code physique.
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-start space-x-2">
+                              <span className="text-teal-600 font-bold">⚡</span>
+                              <div>
+                                <strong className="text-teal-900">Réactivité maximale :</strong>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  Réagissez rapidement aux changements de marché, aux événements imprévus ou aux opportunités 
+                                  commerciales en modifiant vos redirections instantanément.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-emerald-100/80 p-4 rounded-lg border border-emerald-300">
+                        <p className="text-sm text-emerald-900">
+                          <strong>💾 Important :</strong> Lors de la création d'un QR code dynamique, vous recevrez un 
+                          <strong> token de gestion</strong> et une <strong>URL de gestion</strong>. Conservez ces informations 
+                          précieusement pour pouvoir modifier votre QR code ultérieurement. Sans ce token, vous ne pourrez 
+                          pas modifier le QR code après sa création.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Chapitre 3: Fonctionnalités avancées */}
                   <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-8 rounded-2xl border border-purple-200 shadow-lg">
                     <div className="flex items-center mb-6">
@@ -712,7 +845,7 @@ export default function QRCodesPage() {
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          Gratuit - Accès illimité
+                          100 tokens par utilisation
                         </p>
                       </div>
                     </div>
