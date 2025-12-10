@@ -26,8 +26,8 @@ function Write-Info {
 }
 
 # Chemins pour les services consoles
-$BackendPath = Join-Path $RootPath "GameConsoleReservation-Web\backend"
-$FrontendPath = Join-Path $RootPath "GameConsoleReservation-Web"
+$BackendPath = Join-Path $env:USERPROFILE "Documents\GameConsoleReservation-Web\backend"
+$FrontendPath = Join-Path $env:USERPROFILE "Documents\GameConsoleReservation-Web"
 $FrontendPort = 5000
 $BackendPort = 5001
 

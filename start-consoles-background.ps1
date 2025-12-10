@@ -8,8 +8,8 @@ param(
 $ErrorActionPreference = "Stop"
 
 $RootPath = Split-Path -Parent $MyInvocation.MyCommand.Path
-$BackendPath = Join-Path $RootPath "GameConsoleReservation-Web\backend"
-$FrontendPath = Join-Path $RootPath "GameConsoleReservation-Web"
+$BackendPath = Join-Path $RootPath "C:\Users\AAA\Documents\GameConsoleReservation-Web\backend"
+$FrontendPath = Join-Path $RootPath "C:\Users\AAA\Documents\GameConsoleReservation-Web"
 
 $FrontendPort = 5000
 $BackendPort = 5001
@@ -171,6 +171,22 @@ if ($backendOk -and $frontendOk) {
     Write-Host "   Backend: $(if ($backendOk) {'✅'} else {'❌'})" -ForegroundColor $(if ($backendOk) {'Green'} else {'Red'})
     Write-Host "   Frontend: $(if ($frontendOk) {'✅'} else {'❌'})" -ForegroundColor $(if ($frontendOk) {'Green'} else {'Red'})
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -69,9 +69,10 @@ Write-Info "Démarrage du serveur HTTP sur le port 8123..."
 
 try {
     # Créer un script temporaire pour démarrer le serveur
-    $tempScript = Join-Path $env:TEMP "start-homeassistant-$(Get-Date -Format 'yyyyMMddHHmmss').ps1"
+    $timestamp = Get-Date -Format "yyyyMMddHHmmss"
+    $tempScript = Join-Path $env:TEMP "start-homeassistant-$timestamp.ps1"
     $scriptContent = @"
-Set-Location '$codesHaPath'
+Set-Location "$codesHaPath"
 python -m http.server 8123
 "@
     $scriptContent | Out-File -FilePath $tempScript -Encoding UTF8
@@ -119,4 +120,9 @@ python -m http.server 8123
     Write-Error "Erreur lors du démarrage du serveur: $_"
     exit 1
 }
+
+
+
+
+
 

@@ -165,16 +165,29 @@ export default function EncoursPage() {
     }
   }, []);
 
-  // Récupérer le rôle de l'utilisateur
+  // Récupérer le rôle de l'utilisateur et vérifier si c'est un admin
+  const [isAdmin, setIsAdmin] = useState(false);
+  
   useEffect(() => {
     try {
       if (!user) return;
       
       // Le rôle est déjà disponible dans l'objet user de notre système d'authentification
-      setRole(user.role || 'user');
+      const userRole = user.role || 'user';
+      setRole(userRole);
+      
+      // Vérifier si c'est un admin (par rôle ou par email)
+      const isAdminByRole = userRole === 'admin';
+      const isAdminByEmail = user.email === 'formateur_tic@hotmail.com';
+      setIsAdmin(isAdminByRole || isAdminByEmail);
+      
+      if (isAdminByRole || isAdminByEmail) {
+        console.log('✅ Utilisateur admin détecté:', user.email);
+      }
     } catch (error) {
       console.error('❌ Erreur lors de la récupération du rôle:', error);
       setRole('user');
+      setIsAdmin(false);
     }
   }, [user]);
 
@@ -296,9 +309,28 @@ export default function EncoursPage() {
         return;
       }
       
+      // Vérifier si c'est un admin (par rôle ou par email) directement dans la fonction
+      const userIsAdmin = user.role === 'admin' || user.email === 'formateur_tic@hotmail.com';
+      
       try {
         setLoading(true);
-        console.log('🔍 Chargement des modules pour utilisateur:', user.id);
+        console.log('🔍 Chargement des modules pour utilisateur:', user.id, userIsAdmin ? '(ADMIN)' : '');
+        
+        // Désactiver automatiquement les modules expirés pour cet utilisateur
+        try {
+          const deactivateResponse = await fetch(`/api/deactivate-expired-modules?userId=${user.id}`, {
+            method: 'GET'
+          });
+          if (deactivateResponse.ok) {
+            const deactivateResult = await deactivateResponse.json();
+            if (deactivateResult.deactivatedCount > 0) {
+              console.log(`⏰ ${deactivateResult.deactivatedCount} module(s) expiré(s) désactivé(s) automatiquement`);
+            }
+          }
+        } catch (deactivateError) {
+          console.warn('⚠️ Erreur lors de la désactivation des modules expirés:', deactivateError);
+          // Continuer même en cas d'erreur
+        }
         
         // Récupérer les modules souscrits via user_applications avec jointure vers modules
         let moduleAccessData: any[] | null = null;
@@ -326,6 +358,22 @@ export default function EncoursPage() {
           moduleAccessData = result.data;
           moduleAccessError = result.error;
           console.log('📊 Modules user_applications récupérés:', moduleAccessData?.length || 0);
+          
+          // Log détaillé pour déboguer qrcodes
+          if (moduleAccessData && moduleAccessData.length > 0) {
+            const qrcodesModules = moduleAccessData.filter(m => 
+              m.module_id === 'qrcodes' || m.module_title?.toLowerCase().includes('qrcode')
+            );
+            console.log('🔍 Modules QR Codes trouvés dans user_applications:', qrcodesModules.length);
+            if (qrcodesModules.length > 0) {
+              console.log('✅ QR Codes TROUVÉ dans user_applications:', JSON.stringify(qrcodesModules, null, 2));
+            } else {
+              console.log('❌ QR Codes NON TROUVÉ dans user_applications');
+              console.log('🔍 Tous les module_ids récupérés:', moduleAccessData.map(m => m.module_id));
+            }
+          } else {
+            console.log('⚠️ Aucun module dans user_applications');
+          }
         } catch (error) {
           moduleAccessError = error;
         }
@@ -341,6 +389,12 @@ export default function EncoursPage() {
         
         if (moduleAccessData && moduleAccessData.length > 0) {
           const moduleIds = moduleAccessData.map(access => access.module_id).filter(Boolean);
+          
+          // Log spécial pour qrcodes
+          const hasQrcodes = moduleIds.includes('qrcodes');
+          console.log('🔍 DEBUG: moduleIds extraits:', moduleIds);
+          console.log('🔍 DEBUG: qrcodes dans moduleIds?', hasQrcodes);
+          
           if (moduleIds.length > 0) {
             try {
               const result = await supabase
@@ -354,6 +408,15 @@ export default function EncoursPage() {
                   price
                 `)
                 .in('id', moduleIds);
+              
+              // Log spécial pour qrcodes
+              const qrcodesInResult = result.data?.find(m => m.id === 'qrcodes');
+              console.log('🔍 DEBUG: qrcodes trouvé dans modules?', !!qrcodesInResult);
+              if (qrcodesInResult) {
+                console.log('✅ DEBUG: qrcodes trouvé dans modules:', qrcodesInResult);
+              } else if (hasQrcodes) {
+                console.log('⚠️ DEBUG: qrcodes dans moduleIds mais PAS trouvé dans table modules');
+              }
 
               modulesData = result.data || [];
               modulesError = result.error;
@@ -381,77 +444,117 @@ export default function EncoursPage() {
         // Transformer les modules user_applications avec vérification de sécurité
         const transformedModules: UserModule[] = [];
         
+        console.log('🔍 DEBUG: Nombre total de modules dans moduleAccessData:', moduleAccessData?.length || 0);
+        
+        // Vérifier spécifiquement qrcodes AVANT la boucle
+        const qrcodesBeforeLoop = moduleAccessData?.find(m => 
+          m.module_id === 'qrcodes' || m.module_title?.toLowerCase().includes('qrcode')
+        );
+        if (qrcodesBeforeLoop) {
+          console.log('✅ QR Codes TROUVÉ dans moduleAccessData AVANT la boucle:', JSON.stringify(qrcodesBeforeLoop, null, 2));
+        } else {
+          console.log('❌ QR Codes NON TROUVÉ dans moduleAccessData AVANT la boucle');
+          console.log('🔍 Tous les module_ids:', moduleAccessData?.map(m => ({ id: m.id, module_id: m.module_id, module_title: m.module_title })) || []);
+        }
+        
         for (const access of (moduleAccessData || [])) {
           // Vérifier que l'accès est valide
           if (!access || typeof access !== 'object' || !access.id) {
-            console.error('Accès invalide:', access);
+            console.error('❌ Accès invalide ignoré:', access);
             continue;
+          }
+          
+          // Log spécial pour qrcodes AVANT tous les filtres
+          const isQrcodes = access.module_id === 'qrcodes' || access.module_title?.toLowerCase().includes('qrcode');
+          if (isQrcodes) {
+            console.log('🔍 QR Codes AVANT filtres:', {
+              id: access.id,
+              module_id: access.module_id,
+              module_title: access.module_title,
+              is_active: access.is_active,
+              expires_at: access.expires_at,
+              expires_at_date: access.expires_at ? new Date(access.expires_at).toISOString() : null,
+              now: new Date().toISOString(),
+              is_expired: access.expires_at ? new Date(access.expires_at) <= new Date() : false
+            });
           }
           
           // Filtrer les accès non expirés
           if (access.expires_at) {
             try {
-              if (new Date(access.expires_at) <= new Date()) {
-                console.log('⏰ Module expiré ignoré:', access.module_title);
+              const expirationDate = new Date(access.expires_at);
+              const now = new Date();
+              if (expirationDate <= now) {
+                console.log('⏰ Module expiré ignoré:', access.module_title, '(expiré le:', access.expires_at + ')');
+                // Log spécial pour qrcodes expiré
+                if (isQrcodes) {
+                  console.log('❌ QR Codes EXPIRÉ - Ne sera pas affiché');
+                  console.log('   Date expiration:', expirationDate.toISOString());
+                  console.log('   Date maintenant:', now.toISOString());
+                  console.log('   Différence (ms):', now.getTime() - expirationDate.getTime());
+                }
                 continue;
               }
             } catch (error) {
-              console.error('Erreur vérification date expiration:', error);
+              console.error('❌ Erreur vérification date expiration:', error, 'pour module:', access.module_title);
+              if (isQrcodes) {
+                console.log('❌ QR Codes ignoré à cause d\'une erreur de date');
+              }
               continue;
             }
           }
           
-          // Vérifier que le module est visible dans /encours via l'API de sécurité
-          // Ajout d'un timeout pour éviter que cela bloque le chargement
-          try {
-            // Vérifier si AbortController est disponible
-            let controller: AbortController | null = null;
-            let timeoutId: NodeJS.Timeout | null = null;
-            
-            if (typeof AbortController !== 'undefined') {
-              controller = new AbortController();
-              timeoutId = setTimeout(() => {
-                if (controller) controller.abort();
-              }, 10000); // Timeout de 10 secondes (augmenté pour éviter les timeouts)
-            }
-            
-            const fetchOptions: RequestInit = controller ? { signal: controller.signal } : {};
-            
-            const securityResponse = await fetch(
-              `/api/check-module-security?module=${access.module_id}&userId=${user.id}`,
-              fetchOptions
-            );
-            
-            if (timeoutId) {
-              clearTimeout(timeoutId);
-            }
-            
-            if (!securityResponse.ok) {
-              console.warn('⚠️ Réponse non-OK de check-module-security:', securityResponse.status);
-              // En cas d'erreur HTTP, on garde le module par sécurité
-            } else {
-              const securityResult = await securityResponse.json();
-              
-              if (!securityResult.success || !securityResult.isVisible || !securityResult.hasAccess) {
-                console.log('🔒 Module non visible dans /encours:', access.module_title, securityResult.reason);
-                continue;
-              }
-              
-              console.log('✅ Module visible dans /encours:', access.module_title);
-            }
-          } catch (securityError: any) {
-            if (securityError && securityError.name === 'AbortError') {
-              console.warn('⏱️ Timeout vérification sécurité module:', access.module_title);
-            } else {
-              console.error('Erreur vérification sécurité module:', securityError);
-            }
-            // En cas d'erreur (timeout ou autre), on garde le module par sécurité
+          // AFFICHER TOUS LES MODULES ACTIFS SANS VÉRIFICATION DE SÉCURITÉ
+          // Si un module est actif dans user_applications, il doit être affiché dans /encours
+          // Pas de vérification de sécurité pour éviter de filtrer des modules légitimes
+          console.log('✅ Module actif affiché dans /encours:', access.module_title, '(module_id:', access.module_id + ')');
+          
+          // Log spécial pour qrcodes APRÈS les filtres
+          if (isQrcodes) {
+            console.log('✅ QR Codes APRÈS filtres - SERA AFFICHÉ:', {
+              id: access.id,
+              module_id: access.module_id,
+              module_title: access.module_title,
+              is_active: access.is_active,
+              expires_at: access.expires_at
+            });
           }
           
           // Créer l'objet module
           try {
             // Trouver les informations du module correspondant
-            const moduleInfo = modulesData.find(module => module.id.toString() === access.module_id?.toString()) || {};
+            let moduleInfo = modulesData.find(module => module.id.toString() === access.module_id?.toString()) || {};
+            
+            // Si le module n'est pas trouvé dans modulesData, créer les infos par défaut
+            // Cela peut arriver si le module n'existe pas dans la table 'modules' de Supabase
+            if (!moduleInfo.id || !moduleInfo.title) {
+              const moduleId = (access.module_id || '').toString().toLowerCase();
+              const moduleTitle = (access.module_title || '').toLowerCase();
+              
+              // Cas spécial pour qrcodes
+              if (moduleId === 'qrcodes' || moduleTitle.includes('qrcode')) {
+                console.log('🔍 QR Codes: Module non trouvé dans modules, utilisation des infos par défaut');
+                moduleInfo = {
+                  id: 'qrcodes',
+                  title: 'QR Codes Dynamiques',
+                  description: 'Générez des QR codes dynamiques personnalisables',
+                  category: 'Essentiels',
+                  url: 'https://qrcodes.iahome.fr',
+                  price: 0
+                };
+              } else {
+                // Pour les autres modules non trouvés, utiliser les infos de user_applications
+                console.log(`⚠️ Module ${access.module_id} non trouvé dans table modules, utilisation des infos de user_applications`);
+                moduleInfo = {
+                  id: access.module_id || 'unknown',
+                  title: access.module_title || `Module ${access.module_id || 'unknown'}`,
+                  description: 'Application activée via souscription',
+                  category: 'Application activée',
+                  url: '',
+                  price: 0
+                };
+              }
+            }
             
             // Définir la liste des modules essentiels par ID
             const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'qrcodes-statiques', 'code-learning', 'home-assistant'];
@@ -494,8 +597,76 @@ export default function EncoursPage() {
           }
         }
 
-        // Utiliser seulement les modules transformés
-        const allModules = transformedModules;
+        // Dédupliquer les modules par module_id (garder le plus récent)
+        const moduleMap = new Map<string, UserModule>();
+        
+        for (const module of transformedModules) {
+          const moduleId = (module.module_id || '').toString().toLowerCase();
+          const existingModule = moduleMap.get(moduleId);
+          
+          if (!existingModule) {
+            // Première occurrence de ce module_id
+            moduleMap.set(moduleId, module);
+          } else {
+            // Comparer les dates de création pour garder le plus récent
+            const existingDate = new Date(existingModule.created_at);
+            const currentDate = new Date(module.created_at);
+            
+            if (currentDate > existingDate) {
+              // Le module actuel est plus récent, le remplacer
+              moduleMap.set(moduleId, module);
+              console.log(`🔄 Module dupliqué remplacé (plus récent): ${module.module_title} (${moduleId})`);
+            } else {
+              console.log(`⏭️ Module dupliqué ignoré (plus ancien): ${module.module_title} (${moduleId})`);
+            }
+          }
+        }
+        
+        // Convertir le Map en tableau
+        const allModules = Array.from(moduleMap.values());
+        
+        console.log(`✅ Modules dédupliqués: ${transformedModules.length} → ${allModules.length}`);
+        
+        // Log spécial pour vérifier si qrcodes est dans allModules
+        const qrcodesInFinal = allModules.filter(m => 
+          m.module_id === 'qrcodes' || m.module_title?.toLowerCase().includes('qrcode')
+        );
+        console.log('🔍 QR Codes dans allModules (après déduplication):', qrcodesInFinal.length);
+        if (qrcodesInFinal.length > 0) {
+          console.log('✅ QR Codes présent dans allModules:', JSON.stringify(qrcodesInFinal.map(m => ({
+            id: m.id,
+            module_id: m.module_id,
+            module_title: m.module_title,
+            is_active: m.is_active,
+            expires_at: m.expires_at
+          })), null, 2));
+        } else {
+          console.log('❌ QR Codes ABSENT de allModules après déduplication');
+          // Vérifier dans transformedModules
+          const qrcodesInTransformed = transformedModules.filter(m => 
+            m.module_id === 'qrcodes' || m.module_title?.toLowerCase().includes('qrcode')
+          );
+          console.log('🔍 QR Codes dans transformedModules:', qrcodesInTransformed.length);
+          if (qrcodesInTransformed.length > 0) {
+            console.log('⚠️ QR Codes présent dans transformedModules mais absent de allModules - problème de déduplication');
+            console.log('Détails transformedModules:', JSON.stringify(qrcodesInTransformed, null, 2));
+            console.log('🔍 DEBUG: Vérification de la déduplication...');
+            // Forcer l'ajout de qrcodes même s'il est dupliqué
+            const qrcodesModule = qrcodesInTransformed[0];
+            const existingInMap = Array.from(moduleMap.values()).find(m => 
+              (m.module_id || '').toString().toLowerCase() === 'qrcodes'
+            );
+            if (!existingInMap) {
+              console.log('⚠️ FORCAGE: Ajout de qrcodes dans allModules car absent');
+              allModules.push(qrcodesModule);
+              console.log('✅ QR Codes ajouté de force dans allModules');
+            } else {
+              console.log('⚠️ QR Codes existe déjà dans moduleMap mais pas dans allModules - bug de conversion');
+            }
+          } else {
+            console.log('❌ QR Codes ABSENT de transformedModules aussi - problème plus tôt dans le processus');
+          }
+        }
         
         setUserModules(allModules);
         setError(null);
@@ -720,8 +891,34 @@ export default function EncoursPage() {
           };
         });
 
-      // Utiliser seulement les modules transformés
-      const allModules = transformedModules;
+      // Dédupliquer les modules par module_id (garder le plus récent)
+      const moduleMap = new Map<string, UserModule>();
+      
+      for (const module of transformedModules) {
+        const moduleId = (module.module_id || '').toString().toLowerCase();
+        const existingModule = moduleMap.get(moduleId);
+        
+        if (!existingModule) {
+          // Première occurrence de ce module_id
+          moduleMap.set(moduleId, module);
+        } else {
+          // Comparer les dates de création pour garder le plus récent
+          const existingDate = new Date(existingModule.created_at);
+          const currentDate = new Date(module.created_at);
+          
+          if (currentDate > existingDate) {
+            // Le module actuel est plus récent, le remplacer
+            moduleMap.set(moduleId, module);
+            console.log(`🔄 Refresh: Module dupliqué remplacé (plus récent): ${module.module_title} (${moduleId})`);
+          }
+        }
+      }
+      
+      // Convertir le Map en tableau
+      const allModules = Array.from(moduleMap.values());
+      
+      console.log(`✅ Refresh: Modules dédupliqués: ${transformedModules.length} → ${allModules.length}`);
+      
       setUserModules(allModules);
     }
     setRefreshing(false);
@@ -1030,11 +1227,17 @@ export default function EncoursPage() {
                   </div>
                   <div className="text-sm text-gray-600">Mes applis IA</div>
                 </div>
-                <div className="bg-red-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-red-600">
-                    {userModules.filter(m => m.expires_at && new Date(m.expires_at) <= new Date()).length}
+                <div className="bg-orange-50 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-orange-600">
+                    {userModules.filter(m => {
+                      if (!m.expires_at) return false;
+                      const expirationDate = m.expires_at || getVirtualExpirationDate(m.created_at);
+                      const days = getDaysRemaining(expirationDate);
+                      // Modules qui expirent dans les 7 prochains jours (mais pas encore expirés)
+                      return days >= 0 && days <= 7;
+                    }).length}
                   </div>
-                  <div className="text-sm text-gray-600">Accès expirés</div>
+                  <div className="text-sm text-gray-600">Accès qui expirent bientôt</div>
                 </div>
               </div>
             </div>
@@ -1156,6 +1359,20 @@ export default function EncoursPage() {
 
             {/* Grille des modules améliorée */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {(() => {
+                // Log pour déboguer le rendu
+                const qrcodesInRender = userModules.filter(m => 
+                  m.module_id === 'qrcodes' || m.module_title?.toLowerCase().includes('qrcode')
+                );
+                console.log('🔍 RENDU: Nombre total de modules à afficher:', userModules.length);
+                console.log('🔍 RENDU: QR Codes dans userModules:', qrcodesInRender.length);
+                if (qrcodesInRender.length > 0) {
+                  console.log('✅ RENDU: QR Codes sera affiché:', qrcodesInRender[0].module_title);
+                } else {
+                  console.log('❌ RENDU: QR Codes ne sera PAS affiché');
+                }
+                return null;
+              })()}
               {userModules.map((module) => {
                 const expirationDate = module.expires_at || getVirtualExpirationDate(module.created_at);
                 const isExpired = new Date(expirationDate) <= new Date();

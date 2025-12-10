@@ -86,3 +86,10 @@ docker-services/essentiels/metube/downloads/*.mkv
 docker-services/essentiels/metube/downloads/*.webm
 meeting-reports/uploads/*.mp3
 meeting-reports/uploads/*.FLAC
+
+# Fichiers de base de données SQLite
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+docker-services/essentiels/n8n/data/*.sqlite*

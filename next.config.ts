@@ -166,7 +166,7 @@ const nextConfig: NextConfig = {
           // CORS headers retirés - gérés par les routes API individuelles
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; connect-src 'self' http://localhost:8003 http://localhost:7960 https://hunyuan3d.iahome.fr https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io wss://*.supabase.co wss://*.supabase.io https://*.cloudflareaccess.com https://cloudflare.com https://*.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://iahome.fr/cdn-cgi/ https://*.cloudflareaccess.com https://*.cloudflare.com; style-src 'self' 'unsafe-inline' https://*.cloudflareaccess.com https://*.cloudflare.com; img-src 'self' data: https:; font-src 'self' data: https://*.cloudflareaccess.com https://*.cloudflare.com; frame-src 'self' https: https://*.cloudflareaccess.com https://hunyuan3d.iahome.fr; frame-ancestors 'self'; report-uri /api/csp-report;"
+            value: "default-src 'self' https://iahome.fr https://*.iahome.fr; connect-src 'self' https://iahome.fr https://*.iahome.fr http://localhost:8003 http://localhost:7960 https://hunyuan3d.iahome.fr https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io wss://*.supabase.co wss://*.supabase.io https://*.cloudflareaccess.com https://cloudflare.com https://*.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://iahome.fr https://*.iahome.fr https://iahome.fr/_next/static/ https://*.iahome.fr/_next/static/ https://iahome.fr/cdn-cgi/ https://*.cloudflareaccess.com https://*.cloudflare.com; style-src 'self' 'unsafe-inline' https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; img-src 'self' data: https://iahome.fr https://*.iahome.fr https:; font-src 'self' data: https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; worker-src 'self' blob: https://iahome.fr https://*.iahome.fr; frame-src 'self' https: https://*.cloudflareaccess.com https://hunyuan3d.iahome.fr; frame-ancestors 'self'; report-uri /api/csp-report;"
           },
           {
             key: 'Cache-Control',
@@ -175,6 +175,14 @@ const nextConfig: NextConfig = {
           {
             key: 'X-DNS-Prefetch-Control',
             value: 'on'
+          },
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'require-corp'
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin'
           }
         ]
       },

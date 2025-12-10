@@ -1509,6 +1509,16 @@
                     console.log('QR code généré avec succès:', result);
                     console.log('Longueur du QR code base64:', result.qr_code ? result.qr_code.length : 0);
                     
+                    // Vérifier si le workflow doit être réinitialisé (fin d'utilisation)
+                    if (result.shouldResetWorkflow) {
+                        console.log('⚠️ Quota atteint, réinitialisation du workflow...');
+                        setTimeout(() => {
+                            resetWorkflow();
+                            showError('Votre quota d\'utilisation est atteint. Le workflow a été réinitialisé.');
+                        }, 2000);
+                        return Promise.resolve();
+                    }
+                    
                     // Stocker les données globalement
                     currentQRCodeData = result.qr_code;
                     currentQRCodeId = result.qr_id;

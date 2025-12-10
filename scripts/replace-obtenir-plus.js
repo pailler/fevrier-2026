@@ -126,3 +126,19 @@ replaceAllObtenirPlus();
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

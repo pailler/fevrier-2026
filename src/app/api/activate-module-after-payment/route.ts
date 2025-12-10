@@ -131,28 +131,14 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Module trouvé dans la base de données:', moduleData.title);
 
-    // Vérifier si l'utilisateur a déjà accès à ce module
+    // Vérifier si l'utilisateur a déjà un accès (actif ou expiré)
     const { data: existingAccess, error: accessError } = await supabase
       .from('user_applications')
       .select('*')
       .eq('user_id', userId)
       .eq('module_id', moduleId)
-      .eq('is_active', true)
       .single();
 
-    if (existingAccess) {
-      ;
-      return NextResponse.json({
-        success: true,
-        message: 'Application déjà activée',
-        moduleInfo: moduleData
-      });
-    }
-
-    ;
-
-    // Activer le module pour l'utilisateur avec quota de 50 utilisations par mois
-    // Déterminer la durée d'expiration selon le type de module
     const now = new Date();
     const aiModules = ['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui'];
     const isAIModule = aiModules.some(id => moduleId.toLowerCase().includes(id));
@@ -164,33 +150,81 @@ export async function POST(request: NextRequest) {
     } else {
       expiresAt.setDate(expiresAt.getDate() + 90); // 3 mois
     }
-    
-    const { data: activationData, error: activationError } = await supabase
-      .from('user_applications')
-      .insert([
-        {
-          user_id: userId,
-          module_id: moduleId,
-          module_title: moduleTitle,
+
+    let activationData;
+
+    if (existingAccess && !accessError) {
+      // Vérifier si l'accès est actif et non expiré
+      const isActive = existingAccess.is_active;
+      const isExpired = existingAccess.expires_at ? new Date(existingAccess.expires_at) <= now : false;
+
+      if (isActive && !isExpired) {
+        console.log('✅ Module déjà activé pour l\'utilisateur');
+        return NextResponse.json({
+          success: true,
+          message: 'Application déjà activée',
+          moduleInfo: moduleData
+        });
+      }
+
+      // Si le module est expiré ou désactivé, le réactiver avec usage_count = 0
+      console.log('🔄 Réactivation du module (module expiré ou désactivé)');
+      const { data: reactivatedAccess, error: reactivateError } = await supabase
+        .from('user_applications')
+        .update({
           is_active: true,
           access_level: 'paid',
-          usage_count: 0,
+          usage_count: 0, // Réinitialiser le compteur d'utilisation
           max_usage: 50, // Quota de 50 utilisations
-          expires_at: expiresAt.toISOString(), // Expire dans 1 mois
-        }
-      ])
-      .select()
-      .single();
+          expires_at: expiresAt.toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existingAccess.id)
+        .select()
+        .single();
 
-    if (activationError) {
-      console.error('❌ Erreur lors de l\'activation du module:', activationError);
-      return NextResponse.json(
-        { success: false, error: 'Erreur lors de l\'activation du module' },
-        { status: 500 }
-      );
+      if (reactivateError) {
+        console.error('❌ Erreur lors de la réactivation du module:', reactivateError);
+        return NextResponse.json(
+          { success: false, error: 'Erreur lors de la réactivation du module' },
+          { status: 500 }
+        );
+      }
+
+      activationData = reactivatedAccess;
+      console.log('✅ Module réactivé avec succès:', activationData);
+    } else {
+      // Créer un nouvel accès
+      console.log('🆕 Création d\'un nouvel accès pour le module');
+
+      const { data: newAccess, error: activationError } = await supabase
+        .from('user_applications')
+        .insert([
+          {
+            user_id: userId,
+            module_id: moduleId,
+            module_title: moduleTitle,
+            is_active: true,
+            access_level: 'paid',
+            usage_count: 0,
+            max_usage: 50, // Quota de 50 utilisations
+            expires_at: expiresAt.toISOString(),
+          }
+        ])
+        .select()
+        .single();
+
+      if (activationError) {
+        console.error('❌ Erreur lors de l\'activation du module:', activationError);
+        return NextResponse.json(
+          { success: false, error: 'Erreur lors de l\'activation du module' },
+          { status: 500 }
+        );
+      }
+
+      activationData = newAccess;
+      console.log('✅ Module activé avec succès:', activationData);
     }
-
-    console.log('✅ Module activé avec succès:', activationData);
 
     // Envoyer une notification d'activation du module
     try {

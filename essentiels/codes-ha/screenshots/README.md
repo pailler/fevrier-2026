@@ -39,3 +39,19 @@ Ce dossier contient les captures d'écran des codes Home Assistant.
 - `weather-chart.png` pour le code avec l'ID `weather-chart`
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

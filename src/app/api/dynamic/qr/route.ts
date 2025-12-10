@@ -90,7 +90,32 @@ export async function POST(request: NextRequest) {
       result.redirect_url = result.redirect_url.replace('/redirect/', '/r/');
     }
     
-    // L'historique est maintenant géré via user_applications dans le système de tokens
+    // Incrémenter l'utilisation si l'utilisateur est authentifié
+    let shouldResetWorkflow = false;
+    if (userId && result.success) {
+      try {
+        const incrementResponse = await fetch(`${request.nextUrl.origin}/api/increment-qrcodes-access`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId })
+        });
+        
+        if (incrementResponse.ok) {
+          const incrementResult = await incrementResponse.json();
+          if (incrementResult.shouldResetWorkflow) {
+            shouldResetWorkflow = true;
+            console.log('⚠️ QR Dynamic: Quota atteint, workflow doit être réinitialisé');
+          }
+        }
+      } catch (incrementError) {
+        console.warn('⚠️ QR Dynamic: Erreur lors de l\'incrémentation (non bloquant):', incrementError);
+      }
+    }
+    
+    // Ajouter le flag de réinitialisation du workflow
+    result.shouldResetWorkflow = shouldResetWorkflow;
     
     // Retourner avec les en-têtes CORS
     const nextResponse = NextResponse.json(result);

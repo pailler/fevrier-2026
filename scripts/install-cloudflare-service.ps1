@@ -100,7 +100,9 @@ if (-not $cloudflaredPath) {
 
 Write-Step "📋 Vérification de la configuration" "Cyan"
 
-$configPath = Join-Path $PSScriptRoot "cloudflare-active-config.yml"
+# Le fichier de configuration est à la racine du projet (un niveau au-dessus de scripts/)
+$RootPath = Split-Path -Parent $PSScriptRoot
+$configPath = Join-Path $RootPath "cloudflare-active-config.yml"
 if (-not (Test-Path $configPath)) {
     Write-Error "Le fichier cloudflare-active-config.yml n'existe pas"
     Write-Host "   Chemin attendu : $configPath" -ForegroundColor Gray

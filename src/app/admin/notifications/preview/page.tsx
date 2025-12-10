@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useCustomAuth } from '@/hooks/useCustomAuth';
-import { createClient } from '@supabase/supabase-js';
-import { getSupabaseUrl, getSupabaseAnonKey } from '@/utils/supabaseConfig';
+import { supabase } from '@/utils/supabaseClient';
 
 export default function EmailPreviewPage() {
   const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
@@ -23,8 +22,7 @@ export default function EmailPreviewPage() {
 
   const loadEmailTemplate = async () => {
     try {
-      const supabase = createClient(getSupabaseUrl(), getSupabaseAnonKey());
-      
+      // Utiliser l'instance singleton pour éviter les instances multiples
       const { data: setting, error } = await supabase
         .from('notification_settings')
         .select('*')

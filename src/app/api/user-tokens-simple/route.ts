@@ -177,30 +177,89 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Consommer les tokens
-    const newTokenCount = currentTokens - tokensToConsume;
+    // Consommer les tokens avec une condition optimiste pour éviter les race conditions
+    // Cette condition garantit que la mise à jour ne se fait que si les tokens n'ont pas changé entre la lecture et l'écriture
+    let newTokenCount = currentTokens - tokensToConsume;
     
-    const { error: updateError } = await supabase
+    const { data: updatedTokens, error: updateError } = await supabase
       .from('user_tokens')
       .update({ 
         tokens: newTokenCount,
         updated_at: new Date().toISOString()
       })
-      .eq('user_id', actualUserId);
+      .eq('user_id', actualUserId)
+      .eq('tokens', currentTokens) // Condition optimiste : ne mettre à jour que si les tokens n'ont pas changé
+      .select()
+      .single();
 
-    if (updateError) {
-      console.error('❌ Erreur lors de la mise à jour des tokens:', updateError);
-      return NextResponse.json(
-        { 
-          error: 'Plus de tokens ? Rechargez',
-          message: 'Plus de tokens ? Rechargez',
-          pricingUrl: 'https://iahome.fr/pricing'
-        },
-        { status: 500 }
-      );
+    // Si la mise à jour a échoué (probablement à cause de la condition optimiste), vérifier à nouveau
+    if (updateError || !updatedTokens) {
+      console.warn('⚠️ Mise à jour échouée (possible race condition), revérification du solde...');
+      
+      // Récupérer le solde actuel à nouveau
+      const { data: recheckTokens, error: recheckError } = await supabase
+        .from('user_tokens')
+        .select('tokens')
+        .eq('user_id', actualUserId)
+        .single();
+      
+      if (recheckError || !recheckTokens) {
+        console.error('❌ Erreur lors de la revérification des tokens:', recheckError);
+        return NextResponse.json(
+          { 
+            error: 'Erreur lors de la mise à jour des tokens',
+            message: 'Veuillez réessayer',
+            pricingUrl: 'https://iahome.fr/pricing'
+          },
+          { status: 500 }
+        );
+      }
+      
+      const recheckCurrentTokens = recheckTokens.tokens || 0;
+      
+      // Vérifier à nouveau si l'utilisateur a assez de tokens
+      if (recheckCurrentTokens < tokensToConsume) {
+        console.log('❌ Tokens insuffisants après revérification:', recheckCurrentTokens, '<', tokensToConsume);
+        return NextResponse.json(
+          { 
+            error: 'Tokens insuffisants',
+            currentTokens: recheckCurrentTokens,
+            requiredTokens: tokensToConsume,
+            insufficient: true
+          },
+          { status: 400 }
+        );
+      }
+      
+      // Réessayer avec le nouveau solde
+      const retryNewTokenCount = recheckCurrentTokens - tokensToConsume;
+      const { error: retryError } = await supabase
+        .from('user_tokens')
+        .update({ 
+          tokens: retryNewTokenCount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', actualUserId)
+        .eq('tokens', recheckCurrentTokens); // Condition optimiste avec le nouveau solde
+      
+      if (retryError) {
+        console.error('❌ Erreur lors de la deuxième tentative de mise à jour:', retryError);
+        return NextResponse.json(
+          { 
+            error: 'Plus de tokens ? Rechargez',
+            message: 'Plus de tokens ? Rechargez',
+            pricingUrl: 'https://iahome.fr/pricing'
+          },
+          { status: 500 }
+        );
+      }
+      
+      // Utiliser le nouveau solde pour la réponse
+      newTokenCount = retryNewTokenCount;
+      console.log('✅ Tokens consommés (après retry):', tokensToConsume, 'Restants:', newTokenCount, 'pour userId:', userId);
+    } else {
+      console.log('✅ Tokens consommés:', tokensToConsume, 'Restants:', newTokenCount, 'pour userId:', userId);
     }
-
-    console.log('✅ Tokens consommés:', tokensToConsume, 'Restants:', newTokenCount, 'pour userId:', userId);
 
     // Enregistrer l'utilisation dans l'historique via user_applications et token_usage
     if (moduleId && moduleId !== 'test') {
@@ -229,30 +288,22 @@ export async function POST(request: NextRequest) {
       }
       
       // Mettre à jour last_used_at pour l'historique
-      // D'abord récupérer le usage_count actuel
-      const { data: currentApp, error: fetchError } = await supabase
+      // NE PAS incrémenter usage_count ici car cela sera fait par /api/increment-module-access
+      // Cela évite la double incrémentation
+      const { error: historyError } = await supabase
         .from('user_applications')
-        .select('usage_count')
+        .update({
+          last_used_at: now
+          // usage_count sera incrémenté par /api/increment-module-access
+        })
         .eq('user_id', actualUserId)
-        .eq('module_id', moduleId)
-        .single();
+        .eq('module_id', moduleId);
 
-      if (!fetchError && currentApp) {
-        const { error: historyError } = await supabase
-          .from('user_applications')
-          .update({
-            last_used_at: now,
-            usage_count: (currentApp.usage_count || 0) + 1
-          })
-          .eq('user_id', actualUserId)
-          .eq('module_id', moduleId);
-
-        if (historyError) {
-          console.error('❌ Erreur enregistrement historique user_applications:', historyError);
-          // Ne pas faire échouer la requête pour une erreur d'historique
-        } else {
-          console.log('✅ Utilisation enregistrée dans user_applications');
-        }
+      if (historyError) {
+        console.error('❌ Erreur enregistrement historique user_applications:', historyError);
+        // Ne pas faire échouer la requête pour une erreur d'historique
+      } else {
+        console.log('✅ Utilisation enregistrée dans user_applications (last_used_at mis à jour)');
       }
     }
 

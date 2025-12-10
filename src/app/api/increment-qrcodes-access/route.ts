@@ -126,13 +126,21 @@ export async function POST(request: Request) {
     console.log('✅ QR Codes Access: Compteur incrémenté:', newUsageCount, '/', maxUsage);
     console.log(`✅ QR Codes Access: ${tokensToConsume} tokens consommés. Restants:`, userTokens.tokens - tokensToConsume);
 
+    // Vérifier si le quota est atteint (fin d'utilisation)
+    const isQuotaReached = maxUsage && newUsageCount >= maxUsage;
+    
+    if (isQuotaReached) {
+      console.log('⚠️ QR Codes Access: Quota atteint, workflow doit être réinitialisé');
+    }
+
     return new NextResponse(JSON.stringify({
       success: true,
       usage_count: updatedApp.usage_count,
       max_usage: updatedApp.max_usage,
       last_accessed_at: updatedApp.last_accessed_at,
       tokens_consumed: tokensToConsume,
-      tokens_remaining: userTokens.tokens - tokensToConsume
+      tokens_remaining: userTokens.tokens - tokensToConsume,
+      shouldResetWorkflow: isQuotaReached // Flag pour réinitialiser le workflow
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }

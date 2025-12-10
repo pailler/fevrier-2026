@@ -27,9 +27,10 @@ function Write-Info {
     Write-Host "ℹ️  $Message" -ForegroundColor Cyan
 }
 
-# Chemins pour les services consoles
-$BackendPath = Join-Path $RootPath "GameConsoleReservation-Web\backend"
-$FrontendPath = Join-Path $RootPath "GameConsoleReservation-Web"
+# Chemins pour les services consoles (déplacé en dehors de iahome)
+$GameConsolePath = Join-Path $env:USERPROFILE "Documents\GameConsoleReservation-Web"
+$BackendPath = Join-Path $GameConsolePath "backend"
+$FrontendPath = $GameConsolePath
 $FrontendPort = 5000
 $BackendPort = 5001
 
@@ -50,14 +51,16 @@ if ($Stop) {
 if ($Status) {
     Write-Step "📊 Statut de tous les services" "Cyan"
     
-    # Cloudflare Tunnel
+    # Cloudflare Tunnel (méthode directe)
     Write-Host "`nCloudflare Tunnel :" -ForegroundColor Yellow
-    $cfService = Get-Service -Name "cloudflared" -ErrorAction SilentlyContinue
-    if ($cfService) {
-        Write-Host "   Statut : $($cfService.Status)" -ForegroundColor $(if ($cfService.Status -eq 'Running') {'Green'} else {'Red'})
-        Write-Host "   Démarrage : $($cfService.StartType)" -ForegroundColor White
+    $cloudflaredProcess = Get-Process -Name "cloudflared" -ErrorAction SilentlyContinue
+    if ($cloudflaredProcess) {
+        Write-Host "   Statut : ✅ En cours d'exécution" -ForegroundColor Green
+        Write-Host "   PID : $($cloudflaredProcess.Id)" -ForegroundColor White
+        Write-Host "   Démarrage : $($cloudflaredProcess.StartTime)" -ForegroundColor White
     } else {
-        Write-Host "   ❌ Service non installé" -ForegroundColor Red
+        Write-Host "   ❌ Non démarré" -ForegroundColor Red
+        Write-Host "   💡 Démarrez avec : .\scripts\start-cloudflare-simple.ps1" -ForegroundColor Gray
     }
     
     # Docker
@@ -139,19 +142,108 @@ Write-Host "`n╔═════════════════════
 Write-Host "║  Démarrage de tous les services IAHome              ║" -ForegroundColor Cyan
 Write-Host "╚════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
 
-# Vérifier Cloudflare Tunnel
+# Vérifier Cloudflare Tunnel (méthode directe qui fonctionne)
 Write-Step "🔍 Vérification de Cloudflare Tunnel" "Cyan"
-$cfService = Get-Service -Name "cloudflared" -ErrorAction SilentlyContinue
-if ($cfService) {
-    if ($cfService.Status -ne 'Running') {
-        Write-Info "Démarrage de Cloudflare Tunnel..."
-        Start-Service -Name "cloudflared" -ErrorAction SilentlyContinue
-        Start-Sleep -Seconds 3
-    }
-    Write-Success "Cloudflare Tunnel : $($cfService.Status)"
+$cloudflaredProcess = Get-Process -Name "cloudflared" -ErrorAction SilentlyContinue
+if ($cloudflaredProcess) {
+    Write-Success "Cloudflare Tunnel : En cours d'exécution (PID: $($cloudflaredProcess.Id))"
 } else {
-    Write-Host "⚠️  Service Cloudflare Tunnel non trouvé" -ForegroundColor Yellow
-    Write-Host "   Installez-le avec : .\install-cloudflare-service.ps1" -ForegroundColor Gray
+    Write-Info "Démarrage de Cloudflare Tunnel (méthode directe)..."
+    
+    # Utiliser la méthode qui fonctionne : démarrage direct sans service Windows
+    $configPath = Join-Path $RootPath "cloudflare-active-config.yml"
+    $cloudflared = Get-Command cloudflared -ErrorAction SilentlyContinue
+    
+    if ($cloudflared -and (Test-Path $configPath)) {
+        try {
+            $configFullPath = (Resolve-Path $configPath).Path
+            $process = Start-Process -FilePath $cloudflared.Source `
+                -ArgumentList "tunnel", "--config", $configFullPath, "run" `
+                -WorkingDirectory $RootPath `
+                -WindowStyle Hidden `
+                -PassThru `
+                -ErrorAction Stop
+            
+            Start-Sleep -Seconds 3
+            
+            if (-not $process.HasExited) {
+                $pidFile = Join-Path $RootPath "cloudflared.pid"
+                $process.Id | Out-File -FilePath $pidFile -Encoding ASCII
+                Write-Success "Cloudflare Tunnel : Démarré (PID: $($process.Id))"
+            } else {
+                Write-Host "⚠️  Cloudflare Tunnel n'a pas démarré correctement" -ForegroundColor Yellow
+            }
+        } catch {
+            Write-Host "⚠️  Erreur lors du démarrage de Cloudflare Tunnel: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
+    } else {
+        Write-Host "⚠️  cloudflared ou configuration non trouvés" -ForegroundColor Yellow
+    }
+}
+
+# Démarrer l'application Next.js principale (iahome.fr)
+Write-Step "🌐 Démarrage de l'application Next.js (iahome.fr)" "Green"
+
+# Vérifier si l'application est déjà démarrée
+$nextjsRunning = $false
+try {
+    $nextjsResponse = Invoke-WebRequest -Uri "http://localhost:3000" -TimeoutSec 2 -ErrorAction SilentlyContinue
+    if ($nextjsResponse.StatusCode -eq 200) { $nextjsRunning = $true }
+} catch {}
+
+if (-not $nextjsRunning) {
+    Write-Info "Démarrage de Next.js sur le port 3000..."
+    
+    # Vérifier si on est en mode production ou développement
+    $packageJson = Join-Path $RootPath "package.json"
+    if (Test-Path $packageJson) {
+        Push-Location $RootPath
+        
+        # Essayer de démarrer en mode production d'abord
+        $env:NODE_ENV = "production"
+        $env:PORT = "3000"
+        
+        $nextjsScript = @"
+cd '$RootPath'
+`$env:NODE_ENV='production'
+`$env:PORT='3000'
+npm start
+"@
+        
+        $nextjsProcess = Start-Process powershell -ArgumentList "-NoExit", "-WindowStyle", "Hidden", "-Command", $nextjsScript -PassThru -ErrorAction SilentlyContinue
+        
+        if ($nextjsProcess) {
+            Write-Success "Next.js démarré (PID: $($nextjsProcess.Id))"
+            Start-Sleep -Seconds 5
+            
+            # Vérifier que ça répond
+            $maxRetries = 6
+            $retryCount = 0
+            while ($retryCount -lt $maxRetries) {
+                try {
+                    $testResponse = Invoke-WebRequest -Uri "http://localhost:3000" -TimeoutSec 3 -UseBasicParsing -ErrorAction Stop
+                    if ($testResponse.StatusCode -eq 200) {
+                        Write-Success "Application Next.js accessible sur http://localhost:3000"
+                        break
+                    }
+                } catch {
+                    $retryCount++
+                    if ($retryCount -lt $maxRetries) {
+                        Start-Sleep -Seconds 5
+                    }
+                }
+            }
+        } else {
+            Write-Host "⚠️  Impossible de démarrer Next.js" -ForegroundColor Yellow
+            Write-Host "   Vérifiez que npm est installé et que les dépendances sont installées" -ForegroundColor Gray
+        }
+        
+        Pop-Location
+    } else {
+        Write-Host "⚠️  package.json introuvable" -ForegroundColor Yellow
+    }
+} else {
+    Write-Success "Application Next.js déjà démarrée"
 }
 
 # Démarrer Docker Desktop et tous les services
@@ -280,7 +372,12 @@ if (-not $homeAssistantRunning) {
 # Résumé final
 Write-Step "✅ Démarrage terminé !" "Green"
 Write-Host "`n📋 Services démarrés :" -ForegroundColor Cyan
-Write-Host "   ✅ Cloudflare Tunnel (service Windows)" -ForegroundColor Green
+$cloudflaredProcess = Get-Process -Name "cloudflared" -ErrorAction SilentlyContinue
+if ($cloudflaredProcess) {
+    Write-Host "   ✅ Cloudflare Tunnel (méthode directe - PID: $($cloudflaredProcess.Id))" -ForegroundColor Green
+} else {
+    Write-Host "   ⚠️  Cloudflare Tunnel (non démarré)" -ForegroundColor Yellow
+}
 Write-Host "   ✅ Docker et conteneurs" -ForegroundColor Green
 Write-Host "   ✅ Services consoles (backend + frontend)" -ForegroundColor Green
 Write-Host "   ✅ Home Assistant (port 8123)" -ForegroundColor Green

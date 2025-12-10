@@ -74,11 +74,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Vérifier si le quota est atteint (fin d'utilisation)
+    const isQuotaReached = application.max_usage && newUsageCount >= application.max_usage;
+    
+    if (isQuotaReached) {
+      console.log(`⚠️ Usage: Quota atteint pour module ${moduleId}, workflow doit être réinitialisé`);
+    }
+
     return NextResponse.json({
       success: true,
       usage_count: newUsageCount,
       max_usage: application.max_usage,
-      message: 'Usage count updated successfully'
+      message: 'Usage count updated successfully',
+      shouldResetWorkflow: isQuotaReached // Flag pour réinitialiser le workflow
     });
 
   } catch (error) {
