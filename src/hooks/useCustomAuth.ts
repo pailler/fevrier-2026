@@ -213,6 +213,11 @@ export function useCustomAuth() {
         // Vérification de l'authentification
         const user = JSON.parse(userData);
         
+        // Forcer le rôle admin si l'email correspond à l'admin
+        if (isAdminUser(user.email)) {
+          user.role = 'admin';
+        }
+        
         // Vérifier d'abord si la session est expirée (sans faire d'appel réseau)
         const sessionStartTime = localStorage.getItem('session_start_time');
         if (sessionStartTime) {
@@ -225,6 +230,11 @@ export function useCustomAuth() {
           //   checkSessionExpiry();
           //   return;
           // }
+        }
+        
+        // Forcer le rôle admin si l'email correspond à l'admin
+        if (isAdminUser(user.email)) {
+          user.role = 'admin';
         }
         
         // Vérifier la connectivité réseau avant de faire des appels
@@ -259,6 +269,10 @@ export function useCustomAuth() {
             // Utiliser les données en cache et arrêter le chargement immédiatement
             // Ne pas attendre MAX_NETWORK_ERRORS en mode déconnecté
             console.warn('⚠️ Erreur réseau ou timeout - Utilisation des données en cache');
+            // Forcer le rôle admin si l'email correspond à l'admin
+            if (isAdminUser(user.email)) {
+              user.role = 'admin';
+            }
             setAuthState({
               user,
               token,
@@ -289,6 +303,11 @@ export function useCustomAuth() {
           }
         }
         
+        // Forcer le rôle admin si l'email correspond à l'admin (au cas où il n'est pas déjà défini)
+        if (isAdminUser(user.email)) {
+          user.role = 'admin';
+        }
+        
         // Utilisateur authentifié
         setAuthState({
           user,
@@ -306,6 +325,10 @@ export function useCustomAuth() {
         if (token && userData) {
           try {
             const user = JSON.parse(userData);
+            // Forcer le rôle admin si l'email correspond à l'admin
+            if (isAdminUser(user.email)) {
+              user.role = 'admin';
+            }
             setAuthState({
               user,
               token,
@@ -634,6 +657,10 @@ export function useCustomAuth() {
           if (token && userData) {
             try {
               const user = JSON.parse(userData);
+              // Forcer le rôle admin si l'email correspond à l'admin
+              if (isAdminUser(user.email)) {
+                user.role = 'admin';
+              }
               return {
                 user,
                 token,
@@ -708,6 +735,11 @@ export function useCustomAuth() {
       });
     } catch (cleanupError) {
       console.warn('⚠️ Erreur lors du nettoyage avant connexion:', cleanupError);
+    }
+    
+    // Forcer le rôle admin si l'email correspond à l'admin
+    if (isAdminUser(user.email)) {
+      user.role = 'admin';
     }
     
     // Stocker les nouvelles données d'authentification

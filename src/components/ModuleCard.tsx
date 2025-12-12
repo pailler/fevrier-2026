@@ -48,6 +48,8 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       'meeting-reports': 'meeting-reports',
       'hunyuan3d': 'hunyuan3d',
       'whisper': 'whisper',
+      'home-assistant': 'home-assistant',
+      'administration': 'administration',
     };
 
     // Vérifier d'abord le mapping direct
@@ -95,6 +97,12 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     }
     if (titleLower.includes('whisper')) {
       return 'whisper';
+    }
+    if (titleLower.includes('home assistant') || titleLower.includes('home-assistant') || titleLower.includes('domotique')) {
+      return 'home-assistant';
+    }
+    if (titleLower.includes('administration') || titleLower.includes('services administratifs')) {
+      return 'administration';
     }
 
     // Fallback: utiliser l'ID tel quel (peut-être déjà un slug valide)

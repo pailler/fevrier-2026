@@ -200,6 +200,11 @@ export default function AdminApplications() {
             tokenCost = 100;
             estimatedRevenue = stats.totalUsage * tokenCost * 0.01; // 0.01€ par token
             description = `Manuel utilisateur ultra complet pour domotiser votre habitat. Coût: ${tokenCost} tokens par activation.`;
+          } else if (moduleId.includes('administration')) {
+            // Services de l'Administration : 10 tokens par activation
+            tokenCost = 10;
+            estimatedRevenue = stats.totalUsage * tokenCost * 0.01; // 0.01€ par token
+            description = `Portail centralisé pour accéder rapidement aux principaux services de l'administration française. Coût: ${tokenCost} tokens par activation.`;
           } else {
             // Applications par défaut
             tokenCost = 10;
@@ -215,6 +220,8 @@ export default function AdminApplications() {
             moduleName = 'Code Learning';
           } else if (moduleId.includes('meeting-reports')) {
             moduleName = 'Meeting Reports';
+          } else if (moduleId.includes('administration')) {
+            moduleName = 'Services de l\'Administration';
           }
 
           return {
@@ -280,6 +287,8 @@ export default function AdminApplications() {
       return '📤'; // Transfert
     } else if (appName.includes('home-assistant') || appName.includes('homeassistant')) {
       return '🏠'; // Domotique
+    } else if (appName.includes('administration')) {
+      return '🏛️'; // Administration
     }
     return '📱'; // Par défaut
   };

@@ -60,11 +60,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="text-gray-300 hover:text-white transition-colors">
-                  Tous nos Services
-                </Link>
-              </li>
-              <li>
                 <Link href="/blog?category=community" className="text-gray-300 hover:text-white transition-colors">
                   Communauté
                 </Link>

@@ -12,8 +12,8 @@ interface PromotionalBannerProps {
 
 export default function PromotionalBanner({
   message = "🎉 Nouveau : Découvrez nos outils IA professionnels !",
-  ctaText = "Voir les services",
-  ctaLink = "/services",
+  ctaText = "Voir les applications",
+  ctaLink = "/applications",
   variant = 'default',
   dismissible = true
 }: PromotionalBannerProps) {

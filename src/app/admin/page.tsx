@@ -330,7 +330,7 @@ export default function AdminDashboard() {
             <p className="text-sm text-gray-600">{stats.totalUsers} utilisateurs enregistrés</p>
           </a>
           
-          <a href="/admin/modules" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block">
+          <a href="/admin/applications" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block">
             <div className="text-2xl mb-2">🧩</div>
             <h3 className="font-medium text-gray-900">Configurer les modules</h3>
             <p className="text-sm text-gray-600">{stats.totalModules} modules disponibles</p>

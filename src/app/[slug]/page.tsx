@@ -59,7 +59,6 @@ export default function DynamicPage() {
     'payment-cancel',
     'marketing',
     'avantages',
-    'services',
     'stablediffusion',
     'comfyui',
     'whisper',

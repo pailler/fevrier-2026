@@ -10,6 +10,9 @@ import TokenBalance from './TokenBalance';
 import { NotificationServiceClient } from '../utils/notificationServiceClient';
 import { useIframeDetection } from '../utils/useIframeDetection';
 
+// Version du Header - Incrémenter pour forcer le rechargement
+const HEADER_VERSION = '2.4.0';
+
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
@@ -20,7 +23,10 @@ export default function Header() {
 
   // Vérifier le rôle de l'utilisateur
   useEffect(() => {
-    if (user?.role) {
+    // Vérifier si l'utilisateur est l'admin (formateur_tic@hotmail.com)
+    if (user?.email === 'formateur_tic@hotmail.com') {
+      setRole('admin');
+    } else if (user?.role) {
       setRole(user.role);
     } else {
       setRole('user');
@@ -79,6 +85,33 @@ export default function Header() {
     };
   }, [pathname]);
 
+  // Fermer le menu mobile quand on clique en dehors ou qu'on change de page
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (isMobileMenuOpen && !target.closest('.mobile-menu-container') && !target.closest('button[aria-label="Menu mobile"]')) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('click', handleClickOutside);
+      // Empêcher le scroll du body quand le menu est ouvert
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
+  // Fermer le menu quand on change de page
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   // Fonction pour obtenir l'URL d'accès d'un module
   const getModuleAccessUrl = async (moduleName: string) => {
@@ -105,7 +138,11 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-blue-600 text-white shadow-sm">
+    <header 
+      className="bg-blue-600 text-white shadow-sm" 
+      data-header-version={HEADER_VERSION}
+      suppressHydrationWarning
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section supérieure - Informations de connexion */}
         <div className="flex items-center justify-between h-10">
@@ -137,7 +174,7 @@ export default function Header() {
               ) : (
                 <div className="flex items-center space-x-3">
                   <span className="text-blue-100 text-sm font-medium">
-                    {user?.email}
+                    {user?.full_name || user?.email?.split('@')[0] || 'Utilisateur'}
                   </span>
                   <div className={`px-3 py-1 rounded-full text-xs font-bold ${
                     role === 'admin' 
@@ -169,8 +206,8 @@ export default function Header() {
 
         {/* Section principale - Navigation et utilisateur */}
         <div className="flex items-center justify-between h-16 border-t border-blue-500">
-          <div className="flex items-center space-x-6">
-            <Link href="/" className="flex items-center space-x-2 hover:opacity-90 transition-opacity" aria-label="Accueil IAhome">
+          <div className="flex items-center space-x-2 md:space-x-6 flex-1 min-w-0">
+            <Link href="/" className="flex items-center space-x-2 hover:opacity-90 transition-opacity flex-shrink-0" aria-label="Accueil IAhome">
               <div className="relative h-8 w-auto md:h-9 lg:h-10">
                 <Image
                   src="/iahome-logo.svg"
@@ -184,17 +221,31 @@ export default function Header() {
               <span className="text-xl font-bold text-white hidden sm:inline">IAhome</span>
             </Link>
             
-            {/* Bouton Mes applis avec tokens pour mobile UNIQUEMENT - entre le logo et le menu */}
+            {/* Bouton "Mes applis activées" avec tokens - Desktop et Mobile */}
             {isAuthenticated && user && (
-              <div className="flex md:hidden items-center space-x-3">
+              <div className="flex items-center space-x-2 md:space-x-3 flex-shrink-0">
                 <Link
-                  href="/encours" data-active={pathname === '/encours' || pathname?.startsWith('/encours/') ? 'true' : 'false'}
-                  className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 font-bold px-4 py-2.5 rounded-lg text-lg hover:from-yellow-500 hover:to-yellow-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2"
+                  href="/encours" 
+                  data-active={pathname === '/encours' || pathname?.startsWith('/encours/') ? 'true' : 'false'}
+                  className="group relative bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 text-white font-bold px-3 py-2.5 md:px-5 md:py-3 rounded-lg md:rounded-2xl text-sm md:text-base hover:from-green-600 hover:via-emerald-600 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 flex items-center space-x-1.5 md:space-x-3 border-2 border-white/20 hover:border-white/40 animate-pulse-subtle whitespace-nowrap"
+                  title="Cliquez pour accéder à vos applications activées"
                 >
-                  <span className="text-xl">📱</span>
-                  <span>Mes applis</span>
+                  {/* Effet de brillance animé */}
+                  <div className="absolute inset-0 rounded-lg md:rounded-2xl bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                  
+                  <span className="text-base md:text-xl relative z-10">📱</span>
+                  <span className="relative z-10 text-sm md:text-base font-semibold">Mes applis activées</span>
+                  <svg className="w-4 h-4 md:w-5 md:h-5 relative z-10 group-hover:translate-x-1 transition-transform hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 </Link>
-                <TokenBalance className="text-yellow-300 font-bold text-xl" showIcon={true} />
+                <div className="relative flex-shrink-0">
+                  <TokenBalance 
+                    className="text-yellow-300 md:text-yellow-200 font-bold text-base md:text-xl bg-yellow-400/20 md:bg-white/10 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl backdrop-blur-sm border-2 border-yellow-300/50 md:border-yellow-300/30 shadow-lg md:shadow-md" 
+                    showIcon={true}
+                    linkToPricing={true}
+                  />
+                </div>
               </div>
             )}
 
@@ -256,17 +307,6 @@ export default function Header() {
                 Applications IA
               </Link>
               <Link 
-                href="/services" 
-                data-nav-path="/services"
-                className={`font-medium transition-colors ${
-                  pathname === '/services' || pathname?.startsWith('/services/')
-                    ? 'text-yellow-300'
-                    : 'text-white hover:text-blue-100'
-                }`}
-              >
-                Services
-              </Link>
-              <Link 
                 href="/pricing" 
                 className="flex items-center space-x-2 bg-purple-100 hover:bg-purple-200 text-purple-800 px-4 py-2 rounded-full font-semibold transition-all shadow-sm hover:shadow-md"
               >
@@ -285,16 +325,7 @@ export default function Header() {
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated && (
               <>
-                <TokenBalance
-                  className="text-blue-100 hover:text-white transition-colors"
-                />
-                <Link
-                  href="/encours" data-active={pathname === '/encours' || pathname?.startsWith('/encours/') ? 'true' : 'false'}
-                  className="hidden md:flex bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors items-center space-x-1"
-                >
-                  <span>📱</span>
-                  <span>Mes applis</span>
-                </Link>
+                {/* Le bouton "Mes applis activées" est maintenant près du logo, on garde juste les tokens ici si besoin */}
               </>
             )}
             
@@ -311,54 +342,65 @@ export default function Header() {
           {/* Menu mobile */}
           <div className="md:hidden">
             <button 
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-white hover:text-blue-100 transition-colors"
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsMobileMenuOpen(!isMobileMenuOpen);
+              }}
+              className="text-white hover:text-blue-100 transition-colors p-2"
+              aria-expanded={isMobileMenuOpen}
+              aria-label="Menu mobile"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-              </svg>
+              {isMobileMenuOpen ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+              )}
             </button>
           </div>
         </div>
 
         {/* Menu mobile déroulant */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-blue-500 py-4">
-            <div className="space-y-2">
+          <div 
+            className="md:hidden border-t border-blue-500 py-4 mobile-menu-container"
+            onClick={(e) => {
+              // Fermer le menu si on clique sur le conteneur (mais pas sur les liens)
+              if (e.target === e.currentTarget) {
+                setIsMobileMenuOpen(false);
+              }
+            }}
+          >
+            <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
               {/* Navigation principale */}
               <div className="px-4 py-2 border-b border-blue-500">
                 <div className="text-sm text-blue-100 mb-2">Navigation</div>
-              <Link
-                href="/marketing"
-                className={`block px-4 py-2 transition-colors ${
-                  pathname === '/marketing' || pathname?.startsWith('/marketing/')
-                    ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
-                    : 'text-white hover:bg-blue-500'
-                }`}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Découvrir
-              </Link>
-              <Link
-                href="/services"
-                className={`block px-4 py-2 transition-colors ${
-                  pathname === '/services' || pathname?.startsWith('/services/')
-                    ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
-                    : 'text-white hover:bg-blue-500'
-                }`}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Services
-              </Link>
-              <Link
-                href="/formation"
-                className={`block px-4 py-2 transition-colors ${
-                  pathname === '/formation' || pathname?.startsWith('/formation/')
-                    ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
-                    : 'text-white hover:bg-blue-500'
-                }`}
-              >
-                Formation
+                <Link
+                  href="/marketing"
+                  className={`block px-4 py-2 transition-colors ${
+                    pathname === '/marketing' || pathname?.startsWith('/marketing/')
+                      ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
+                      : 'text-white hover:bg-blue-500'
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Découvrir
+                </Link>
+                <Link
+                  href="/formation"
+                  className={`block px-4 py-2 transition-colors ${
+                    pathname === '/formation' || pathname?.startsWith('/formation/')
+                      ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
+                      : 'text-white hover:bg-blue-500'
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Formation
                 </Link>
                 <Link
                   href="/blog"
@@ -367,6 +409,7 @@ export default function Header() {
                       ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
                       : 'text-white hover:bg-blue-500'
                   }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Blog
                 </Link>
@@ -377,6 +420,7 @@ export default function Header() {
                       ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
                       : 'text-white hover:bg-blue-500'
                   }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Essentiels
                 </Link>
@@ -387,6 +431,7 @@ export default function Header() {
                       ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
                       : 'text-white hover:bg-blue-500'
                   }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Applications IA
                 </Link>
@@ -415,16 +460,21 @@ export default function Header() {
                 <>
                   <div className="px-4 py-2 border-b border-blue-500">
                     <div className="text-sm text-blue-100 mb-2">Compte</div>
-                    <div className="flex items-center justify-between py-2">
-                      <span className="text-white">{user?.email}</span>
-                <TokenBalance
-                  className="text-blue-100 hover:text-white transition-colors"
-                />
+                    <div className="py-2">
+                      <span className="text-white text-sm font-medium">{user?.full_name || user?.email?.split('@')[0] || 'Utilisateur'}</span>
                     </div>
                     <button
-                      onClick={async () => { 
-                        await signOut(); 
-                        router.push('/login'); 
+                      type="button"
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        try {
+                          await signOut();
+                          setIsMobileMenuOpen(false);
+                          router.push('/login');
+                        } catch (error) {
+                          console.error('Erreur lors de la déconnexion:', error);
+                        }
                       }}
                       className="block px-4 py-2 text-white hover:text-blue-100 hover:bg-blue-500 rounded-lg transition-colors w-full text-left text-sm"
                     >
@@ -437,6 +487,23 @@ export default function Header() {
           </div>
         )}
       </div>
+      
+      <style jsx>{`
+        @keyframes pulse-subtle {
+          0%, 100% {
+            opacity: 1;
+            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
+          }
+          50% {
+            opacity: 0.95;
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.5);
+          }
+        }
+        
+        .animate-pulse-subtle {
+          animation: pulse-subtle 2s ease-in-out infinite;
+        }
+      `}</style>
     </header>
   );
 } 

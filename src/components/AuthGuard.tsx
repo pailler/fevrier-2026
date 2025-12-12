@@ -106,7 +106,7 @@ export default function AuthGuard({ children, moduleName, requireSubscription = 
             </button>
             
             <button
-              onClick={() => router.push('/register')}
+              onClick={() => router.push('/signup')}
               className="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors"
             >
               Créer un compte

@@ -121,16 +121,74 @@ export default function RootLayout({
     <html lang="fr" className="font-system">
       <head>
         <meta name="format-detection" content="telephone=no" />
+        {/* Empêcher la mise en cache pour le Header - Version agressive */}
+        <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0" />
+        <meta httpEquiv="Pragma" content="no-cache" />
+        <meta httpEquiv="Expires" content="0" />
+        <meta name="cache-control" content="no-cache, no-store, must-revalidate" />
+        <meta name="expires" content="0" />
+        <meta name="pragma" content="no-cache" />
         {/* Google Search Console Verification */}
         {process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && (
           <meta name="google-site-verification" content={process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION} />
         )}
         <script dangerouslySetInnerHTML={{
           __html: `
-            // FORCER LE VIDAGE DU CACHE AU CHARGEMENT - VERSION AGRESSIVE
+            // VIDAGE DU CACHE AU CHARGEMENT - VERSION AGRESSIVE POUR MOBILE
             (function() {
               const CACHE_VERSION = 'v' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
+              const HEADER_VERSION = '2.4.0';
               console.log('🔄 Version cache:', CACHE_VERSION);
+              console.log('🔄 Version Header attendue:', HEADER_VERSION);
+              
+              // Vérifier la version du Header stockée
+              const storedHeaderVersion = localStorage.getItem('header_version');
+              
+              // Si la version stockée est différente, vider tous les caches et forcer le rechargement
+              if (storedHeaderVersion && storedHeaderVersion !== HEADER_VERSION) {
+                console.log('🔄 Version Header différente détectée (' + storedHeaderVersion + ' vs ' + HEADER_VERSION + ') - Vidage cache et rechargement');
+                
+                // VIDER TOUS LES CACHES IMMÉDIATEMENT
+                if ('caches' in window) {
+                  caches.keys().then(function(names) {
+                    console.log('🗑️ Suppression de', names.length, 'caches...');
+                    names.forEach(function(name) {
+                      caches.delete(name);
+                    });
+                  });
+                }
+                
+                // Vider le cache du navigateur
+                if ('serviceWorker' in navigator) {
+                  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    registrations.forEach(function(registration) {
+                      registration.unregister();
+                    });
+                  });
+                }
+                
+                // Vider localStorage et sessionStorage
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Stocker la nouvelle version
+                localStorage.setItem('header_version', HEADER_VERSION);
+                localStorage.setItem('cache_version', CACHE_VERSION);
+                
+                // Forcer le rechargement avec cache bypass
+                const timestamp = Date.now();
+                const url = new URL(window.location.href);
+                url.searchParams.set('_v', timestamp.toString());
+                url.searchParams.set('_h', HEADER_VERSION);
+                url.searchParams.set('_cb', '1');
+                window.location.replace(url.toString());
+                return;
+              }
+              
+              // Si aucune version n'est stockée, la stocker
+              if (!storedHeaderVersion) {
+                localStorage.setItem('header_version', HEADER_VERSION);
+              }
               
               // VIDER TOUS LES CACHES IMMÉDIATEMENT
               if ('caches' in window) {
@@ -154,41 +212,74 @@ export default function RootLayout({
                 });
               }
               
-              // Vider localStorage et sessionStorage des anciennes versions
+              // Vider localStorage et sessionStorage des anciennes versions de cache
               const oldKeys = [];
               for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
-                if (key && (key.includes('cache') || key.includes('version'))) {
+                if (key && (key.includes('cache') || key.includes('version')) && key !== 'header_version') {
                   oldKeys.push(key);
                 }
               }
               oldKeys.forEach(function(key) {
                 localStorage.removeItem(key);
-                console.log('🗑️ Clé supprimée:', key);
               });
-              
-              // Vérifier si c'est un nouveau chargement ou un rechargement en boucle
-              const lastCacheVersion = localStorage.getItem('cache_version');
-              const reloadCount = parseInt(localStorage.getItem('reload_count') || '0', 10);
-              
-              // Si la version du cache n'a pas changé et qu'on a déjà rechargé, arrêter la boucle
-              if (lastCacheVersion === CACHE_VERSION && reloadCount > 0) {
-                console.warn('⚠️ Boucle de rechargement détectée - Arrêt du rechargement automatique');
-                localStorage.setItem('reload_count', '0');
-                return; // Arrêter l'exécution pour éviter la boucle
-              }
-              
-              // Si c'est un nouveau chargement, incrémenter le compteur
-              if (lastCacheVersion !== CACHE_VERSION) {
-                localStorage.setItem('reload_count', '0');
-              } else {
-                localStorage.setItem('reload_count', (reloadCount + 1).toString());
-              }
               
               localStorage.setItem('cache_version', CACHE_VERSION);
               
-              // NE PAS modifier les attributs href/src des ressources - cela cause des rechargements infinis
-              // NE PAS forcer de rechargement automatique
+              // Vérifier la version du Header dans le DOM après chargement
+              function checkHeaderVersion() {
+                const header = document.querySelector('header[data-header-version]');
+                if (header) {
+                  const domVersion = header.getAttribute('data-header-version');
+                  console.log('📋 Version Header DOM:', domVersion, 'Attendue:', HEADER_VERSION);
+                  if (domVersion && domVersion !== HEADER_VERSION) {
+                    console.log('🔄 Version Header DOM incohérente (' + domVersion + ' vs ' + HEADER_VERSION + ') - Rechargement forcé');
+                    localStorage.setItem('header_version', HEADER_VERSION);
+                    // Vider tous les caches avant le rechargement
+                    if ('caches' in window) {
+                      caches.keys().then(function(names) {
+                        names.forEach(function(name) {
+                          caches.delete(name);
+                        });
+                      });
+                    }
+                    const timestamp = Date.now();
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('_v', timestamp.toString());
+                    url.searchParams.set('_h', HEADER_VERSION);
+                    url.searchParams.set('_cb', '1');
+                    url.searchParams.set('_force', '1');
+                    window.location.replace(url.toString());
+                  } else if (domVersion === HEADER_VERSION) {
+                    console.log('✅ Version Header correcte:', domVersion);
+                    // S'assurer que la version est stockée
+                    localStorage.setItem('header_version', HEADER_VERSION);
+                  }
+                } else {
+                  // Réessayer après un court délai (max 10 tentatives)
+                  const attempts = parseInt(sessionStorage.getItem('header_check_attempts') || '0', 10);
+                  if (attempts < 10) {
+                    sessionStorage.setItem('header_check_attempts', (attempts + 1).toString());
+                    setTimeout(checkHeaderVersion, 200);
+                  } else {
+                    sessionStorage.removeItem('header_check_attempts');
+                    console.warn('⚠️ Header non trouvé après 10 tentatives');
+                  }
+                }
+              }
+              
+              // Vérifier après le chargement du DOM (plusieurs fois pour être sûr)
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() {
+                  setTimeout(checkHeaderVersion, 100);
+                  setTimeout(checkHeaderVersion, 500);
+                  setTimeout(checkHeaderVersion, 1000);
+                });
+              } else {
+                setTimeout(checkHeaderVersion, 100);
+                setTimeout(checkHeaderVersion, 500);
+                setTimeout(checkHeaderVersion, 1000);
+              }
             })();
             
             // Redirection automatique pour qrcodes.iahome.fr

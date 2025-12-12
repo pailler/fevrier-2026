@@ -44,6 +44,7 @@ export default function EssentialAccessButton({
       : 'https://hunyuan3d.iahome.fr',
     'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
     'cogstudio': 'https://cogstudio.iahome.fr',
+    'administration': '/administration',
   };
 
   const handleAccess = async () => {
@@ -163,17 +164,34 @@ export default function EssentialAccessButton({
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4">
+    <div className="flex flex-col items-center space-y-2">
       <button
         onClick={handleAccess}
         disabled={isLoading || !user}
-        className={`px-6 py-3 rounded-lg text-white font-semibold transition-colors duration-300
+        className={`px-6 py-3 rounded-lg text-white font-semibold transition-all duration-300 flex items-center space-x-2
           ${isLoading || !user
             ? 'bg-gray-400 cursor-not-allowed'
+            : moduleId === 'administration'
+            ? 'bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl'
             : 'bg-blue-600 hover:bg-blue-700'
           }`}
       >
-        {isLoading ? '⏳ Ouverture...' : `🔧 Accéder à ${moduleTitle} (10 tokens)`}
+        {isLoading ? (
+          <>
+            <span>⏳</span>
+            <span>Ouverture...</span>
+          </>
+        ) : moduleId === 'administration' ? (
+          <>
+            <span>🏛️</span>
+            <span>Accéder aux services administratifs (10 tokens)</span>
+          </>
+        ) : (
+          <>
+            <span>🔧</span>
+            <span>Accéder à {moduleTitle} (10 tokens)</span>
+          </>
+        )}
       </button>
 
       {error && (

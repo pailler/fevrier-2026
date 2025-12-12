@@ -557,7 +557,7 @@ export default function EncoursPage() {
             }
             
             // Définir la liste des modules essentiels par ID
-            const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'qrcodes-statiques', 'code-learning', 'home-assistant'];
+            const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'qrcodes-statiques', 'code-learning', 'home-assistant', 'administration'];
             const moduleId = (access.module_id || '').toString().toLowerCase();
             const moduleTitle = (access.module_title || moduleInfo.title || '').toLowerCase();
             
@@ -727,6 +727,7 @@ export default function EncoursPage() {
       'meeting-reports': 'meeting-reports', // Meeting Reports -> meeting-reports
       'qrcodes-statiques': 'qrcodes-statiques', // QR Codes Statiques
       'hunyuan3d': 'hunyuan3d', // Hunyuan 3D -> hunyuan3d
+      'administration': 'administration', // Administration -> administration
     };
 
     // Mapping des slugs vers les URLs directes des applications
@@ -754,6 +755,8 @@ export default function EncoursPage() {
       'home-assistant': (typeof window !== 'undefined' && window.location.hostname === 'localhost') 
         ? 'http://localhost:8123' 
         : 'https://homeassistant.iahome.fr',
+      // Administration : page de liens vers les services administratifs
+      'administration': '/administration',
     };
     
     // Convertir module_id numérique en slug si nécessaire
@@ -782,6 +785,7 @@ export default function EncoursPage() {
       'meeting-reports': 10,
       'cogstudio': 10,
       'home-assistant': 100,
+      'administration': 10,
       
       // Applications premium (100 tokens)
       'qrcodes': 100,
@@ -856,7 +860,7 @@ export default function EncoursPage() {
           const moduleInfo = refreshModulesData.find(module => module.id.toString() === access.module_id?.toString()) || {};
           
           // Définir la liste des modules essentiels par ID
-          const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'qrcodes-statiques', 'code-learning', 'home-assistant'];
+          const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'qrcodes-statiques', 'code-learning', 'home-assistant', 'administration'];
           const moduleId = (access.module_id || '').toString().toLowerCase();
           const moduleTitle = (access.module_title || moduleInfo.title || '').toLowerCase();
           
@@ -1199,7 +1203,7 @@ export default function EncoursPage() {
               Vous n'avez pas encore souscrit à des applications. Découvrez notre collection de nos modules essentiels et applis IA et commencez à explorer !
             </p>
             <Link 
-              href="/services" 
+              href="/applications" 
               className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             >
               Activez vos applications IAHome gratuitement

@@ -13,9 +13,9 @@ export default function PaymentSuccessPage() {
   } | null>(null);
 
   const packageDetails = {
-    discovery: { tokens: 1500, price: 9.99, name: 'Pack Découverte' },
-    standard: { tokens: 5000, price: 19.99, name: 'Pack Standard' },
-    pro: { tokens: 20000, price: 59.99, name: 'Pack Pro' }
+    discovery: { tokens: 1500, price: 4.99, name: 'Pack Découverte' },
+    standard: { tokens: 8000, price: 14.99, name: 'Pack Standard' },
+    pro: { tokens: 30000, price: 49.99, name: 'Pack Entreprise' }
   };
 
   useEffect(() => {

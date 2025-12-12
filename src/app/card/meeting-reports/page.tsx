@@ -282,7 +282,7 @@ export default function MeetingReportsPage() {
       setAlreadyActivatedModules(prev => [...prev, card.id]);
       
       // Rediriger vers la page de transition
-      router.push('/transition?module=' + encodeURIComponent(card.title) + '&id=' + card.id);
+      router.push('/encours');
       
     } catch (error) {
       console.error('Erreur lors de l\'activation du module:', error);

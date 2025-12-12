@@ -121,7 +121,7 @@ export default function MarketingPage() {
               <span className="text-yellow-300">Pour Tous Vos Besoins</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-blue-100 animate-fade-in-up-delayed">
-              Découvrez nos outils d'intelligence artificielle professionnels. 
+              En plus des applis essentielles pour vos usages numériques courants, découvrez nos outils d'intelligence artificielle professionnels. 
               Transcription, génération d'images, traitement de documents et bien plus.
               <br />
               <span className="text-yellow-200 font-semibold">Tous nos services sont accessibles directement depuis votre navigateur, sans téléchargement ni installation.</span>
@@ -134,7 +134,7 @@ export default function MarketingPage() {
                 Commencer Maintenant →
               </Link>
               <Link
-                href="/services"
+                href="/applications"
                 className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all"
               >
                 Voir Tous les Services
@@ -394,7 +394,7 @@ export default function MarketingPage() {
 
           <div className="text-center mt-12">
             <Link
-              href="/services"
+              href="/applications"
               className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all"
             >
               Voir Tous les Services

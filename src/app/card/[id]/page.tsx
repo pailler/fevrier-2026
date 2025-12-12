@@ -204,6 +204,8 @@ export default function CardDetailPage() {
         'cogstudio': 'https://cogstudio.iahome.fr',
         // Home Assistant : localhost:8123 en dev, homeassistant.iahome.fr en prod
         'home-assistant': isDevelopment ? 'http://localhost:8123' : 'https://homeassistant.iahome.fr',
+        // Administration : page interne
+        'administration': '/administration',
       };
 
       const accessUrl = applicationUrls[moduleId];

@@ -516,9 +516,10 @@ export default function AdminUsers() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-wrap gap-1">
                       {user.modules.length > 0 ? (
-                        user.modules.map((module) => (
+                        // Dédupliquer les modules et utiliser une clé unique
+                        Array.from(new Set(user.modules)).map((module, index) => (
                           <span
-                            key={module}
+                            key={`${user.id}-${module}-${index}`}
                             className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
                           >
                             {module}
