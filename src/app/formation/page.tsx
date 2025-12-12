@@ -243,7 +243,7 @@ export default function FormationPage() {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl animate-fade-in-up">
-              <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4 animate-progress-bar">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4 animate-progress-bar">
                 Formations IAHome
               </h1>
               <p className="text-xl text-gray-700 mb-6 animate-fade-in-up-delayed">

@@ -33,7 +33,7 @@ export default function PricingPage() {
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-12 animate-fade-in-up">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight animate-text-glow">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight animate-text-glow">
               Nos Offres IA Home
             </h1>
             <p className="text-xl md:text-2xl text-green-100 max-w-3xl mx-auto mb-6 animate-fade-in-up-delayed">

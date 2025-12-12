@@ -85,32 +85,50 @@ export default function Header() {
     };
   }, [pathname]);
 
-  // Fermer le menu mobile quand on clique en dehors ou qu'on change de page
+  // Fermer le menu mobile quand on clique en dehors
   useEffect(() => {
+    if (!isMobileMenuOpen) {
+      document.body.style.overflow = '';
+      return;
+    }
+
+    // Empêcher le scroll du body quand le menu est ouvert
+    document.body.style.overflow = 'hidden';
+
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (isMobileMenuOpen && !target.closest('.mobile-menu-container') && !target.closest('button[aria-label="Menu mobile"]')) {
-        setIsMobileMenuOpen(false);
+      try {
+        const target = event.target as HTMLElement;
+        if (!target) return;
+        
+        const menuButton = target.closest('button[aria-label="Menu mobile"]');
+        const menuContainer = target.closest('.mobile-menu-container');
+        
+        // Ne fermer que si on clique en dehors du menu ET du bouton
+        if (!menuContainer && !menuButton) {
+          setIsMobileMenuOpen(false);
+        }
+      } catch (error) {
+        console.error('Erreur dans handleClickOutside:', error);
       }
     };
 
-    if (isMobileMenuOpen) {
-      document.addEventListener('click', handleClickOutside);
-      // Empêcher le scroll du body quand le menu est ouvert
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    // Utiliser un délai pour éviter que le clic sur le bouton ne déclenche immédiatement la fermeture
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 300);
 
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      clearTimeout(timeoutId);
+      document.removeEventListener('mousedown', handleClickOutside);
       document.body.style.overflow = '';
     };
   }, [isMobileMenuOpen]);
 
   // Fermer le menu quand on change de page
   useEffect(() => {
-    setIsMobileMenuOpen(false);
+    if (isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+    }
   }, [pathname]);
 
   // Fonction pour obtenir l'URL d'accès d'un module
@@ -207,7 +225,11 @@ export default function Header() {
         {/* Section principale - Navigation et utilisateur */}
         <div className="flex items-center justify-between h-16 border-t border-blue-500">
           <div className="flex items-center space-x-2 md:space-x-6 flex-1 min-w-0">
-            <Link href="/" className="flex items-center space-x-2 hover:opacity-90 transition-opacity flex-shrink-0" aria-label="Accueil IAhome">
+            <Link 
+              href="/" 
+              className="flex items-center space-x-2 hover:opacity-90 transition-opacity flex-shrink-0" 
+              aria-label="Accueil IAhome"
+            >
               <div className="relative h-8 w-auto md:h-9 lg:h-10">
                 <Image
                   src="/iahome-logo.svg"
@@ -344,13 +366,22 @@ export default function Header() {
             <button 
               type="button"
               onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsMobileMenuOpen(!isMobileMenuOpen);
+                try {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsMobileMenuOpen((prev) => {
+                    const newValue = !prev;
+                    return newValue;
+                  });
+                } catch (error) {
+                  console.error('Erreur lors du toggle du menu mobile:', error);
+                  setIsMobileMenuOpen(false);
+                }
               }}
               className="text-white hover:text-blue-100 transition-colors p-2"
               aria-expanded={isMobileMenuOpen}
               aria-label="Menu mobile"
+              id="mobile-menu-button"
             >
               {isMobileMenuOpen ? (
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -368,15 +399,14 @@ export default function Header() {
         {/* Menu mobile déroulant */}
         {isMobileMenuOpen && (
           <div 
-            className="md:hidden border-t border-blue-500 py-4 mobile-menu-container"
+            id="mobile-menu"
+            className="md:hidden border-t border-blue-500 py-4 mobile-menu-container bg-blue-600 max-h-[calc(100vh-4rem)] overflow-y-auto"
             onClick={(e) => {
-              // Fermer le menu si on clique sur le conteneur (mais pas sur les liens)
-              if (e.target === e.currentTarget) {
-                setIsMobileMenuOpen(false);
-              }
+              // Empêcher la propagation pour éviter la fermeture accidentelle
+              e.stopPropagation();
             }}
           >
-            <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
+            <div className="space-y-2">
               {/* Navigation principale */}
               <div className="px-4 py-2 border-b border-blue-500">
                 <div className="text-sm text-blue-100 mb-2">Navigation</div>
@@ -435,6 +465,29 @@ export default function Header() {
                 >
                   Applications IA
                 </Link>
+              </div>
+
+              {/* Bouton Chat IA - Mobile */}
+              <div className="px-4 py-3 border-b border-blue-500">
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    // Déclencher l'ouverture du chat via un événement personnalisé
+                    window.dispatchEvent(new CustomEvent('openChatAI'));
+                  }}
+                  className="flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-3 rounded-full font-semibold transition-all shadow-lg w-full mx-auto"
+                >
+                  <svg 
+                    className="w-5 h-5" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  <span className="text-white font-bold">Chat IA</span>
+                  <span className="text-white font-semibold text-sm sm:text-base">conversation</span>
+                </button>
               </div>
 
               {/* Bouton Obtenir Plus - Mobile */}

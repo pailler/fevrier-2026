@@ -136,6 +136,11 @@ export default function RootLayout({
           __html: `
             // VIDAGE DU CACHE AU CHARGEMENT - VERSION AGRESSIVE POUR MOBILE
             (function() {
+              // Vérifier que nous sommes côté client
+              if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+                return;
+              }
+              
               const CACHE_VERSION = 'v' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
               const HEADER_VERSION = '2.4.0';
               console.log('🔄 Version cache:', CACHE_VERSION);
@@ -253,42 +258,53 @@ export default function RootLayout({
                   } else if (domVersion === HEADER_VERSION) {
                     console.log('✅ Version Header correcte:', domVersion);
                     // S'assurer que la version est stockée
-                    localStorage.setItem('header_version', HEADER_VERSION);
+                    if (typeof localStorage !== 'undefined') {
+                      localStorage.setItem('header_version', HEADER_VERSION);
+                    }
                   }
                 } else {
                   // Réessayer après un court délai (max 10 tentatives)
-                  const attempts = parseInt(sessionStorage.getItem('header_check_attempts') || '0', 10);
-                  if (attempts < 10) {
-                    sessionStorage.setItem('header_check_attempts', (attempts + 1).toString());
-                    setTimeout(checkHeaderVersion, 200);
-                  } else {
-                    sessionStorage.removeItem('header_check_attempts');
-                    console.warn('⚠️ Header non trouvé après 10 tentatives');
+                  if (typeof sessionStorage !== 'undefined') {
+                    const attempts = parseInt(sessionStorage.getItem('header_check_attempts') || '0', 10);
+                    if (attempts < 10) {
+                      sessionStorage.setItem('header_check_attempts', (attempts + 1).toString());
+                      setTimeout(checkHeaderVersion, 200);
+                    } else {
+                      sessionStorage.removeItem('header_check_attempts');
+                      console.warn('⚠️ Header non trouvé après 10 tentatives');
+                    }
                   }
                 }
               }
               
               // Vérifier après le chargement du DOM (plusieurs fois pour être sûr)
-              if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', function() {
+              if (typeof document !== 'undefined') {
+                if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', function() {
+                    setTimeout(checkHeaderVersion, 100);
+                    setTimeout(checkHeaderVersion, 500);
+                    setTimeout(checkHeaderVersion, 1000);
+                  });
+                } else {
                   setTimeout(checkHeaderVersion, 100);
                   setTimeout(checkHeaderVersion, 500);
                   setTimeout(checkHeaderVersion, 1000);
-                });
-              } else {
-                setTimeout(checkHeaderVersion, 100);
-                setTimeout(checkHeaderVersion, 500);
-                setTimeout(checkHeaderVersion, 1000);
+                }
               }
             })();
             
             // Redirection automatique pour qrcodes.iahome.fr
-            if (window.location.hostname === 'qrcodes.iahome.fr') {
+            if (typeof window !== 'undefined' && window.location && window.location.hostname === 'qrcodes.iahome.fr') {
               window.location.href = '/qrcodes';
             }
             
             // Gestionnaire d'erreur global pour les erreurs webpack
             (function() {
+              // Vérifier que nous sommes côté client
+              if (typeof window === 'undefined') {
+                return;
+              }
+              
               let reloadCount = 0;
               const MAX_RELOADS = 2; // Limiter à 2 rechargements pour éviter les boucles infinies
               
@@ -375,6 +391,11 @@ export default function RootLayout({
             
             // Bloquer les requêtes vers radar.cloudflare.com pour éviter les erreurs CORS
             (function() {
+              // Vérifier que nous sommes côté client
+              if (typeof window === 'undefined' || typeof window.fetch === 'undefined') {
+                return;
+              }
+              
               const originalFetch = window.fetch;
               window.fetch = function(...args) {
                 const url = args[0];
@@ -385,8 +406,9 @@ export default function RootLayout({
                 return originalFetch.apply(this, args);
               };
               
-              const originalXHROpen = XMLHttpRequest.prototype.open;
-              XMLHttpRequest.prototype.open = function(method, url, ...rest) {
+              if (typeof XMLHttpRequest !== 'undefined') {
+                const originalXHROpen = XMLHttpRequest.prototype.open;
+                XMLHttpRequest.prototype.open = function(method, url, ...rest) {
                 if (typeof url === 'string' && url.includes('radar.cloudflare.com')) {
                   console.warn('Requête XHR vers radar.cloudflare.com bloquée pour éviter les erreurs CORS');
                   return;

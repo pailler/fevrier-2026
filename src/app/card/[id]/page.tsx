@@ -622,7 +622,7 @@ export default function CardDetailPage() {
             <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
               {/* Contenu texte */}
               <div className="flex-1 max-w-2xl">
-                <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
                   Testez votre vitesse internet en temps réel
                 </h1>
                 <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
@@ -730,7 +730,7 @@ export default function CardDetailPage() {
             <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
               {/* Contenu texte */}
               <div className="flex-1 max-w-2xl">
-                <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
                   Téléchargez vos vidéos YouTube préférées
                 </h1>
                 <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
@@ -1394,7 +1394,7 @@ export default function CardDetailPage() {
                 <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
                   <div className="mb-8">
                     <div className="flex-1">
-                      <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-2 leading-tight">
+                      <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-2 leading-tight">
                         {card.title}
                       </h1>
                       {card.subtitle && (

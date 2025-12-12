@@ -80,10 +80,17 @@ function AuthCallbackContent() {
         }
         
         // Fonction pour récupérer la session avec retry
-        const getSessionWithRetry = async (maxRetries = 10, delay = 500): Promise<{ session: any; error: any }> => {
+        const getSessionWithRetry = async (maxRetries = 10, initialDelay = 500): Promise<{ session: any; error: any }> => {
+          let delay = initialDelay;
+          
           for (let attempt = 1; attempt <= maxRetries; attempt++) {
             console.log(`🔄 Tentative ${attempt}/${maxRetries} de récupération de la session...`);
             setStatus(`Récupération de votre session... (${attempt}/${maxRetries})`);
+            
+            // Pour la première tentative, attendre un peu plus longtemps
+            if (attempt === 1) {
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            }
             
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             
@@ -175,8 +182,14 @@ function AuthCallbackContent() {
           }, 5000);
         });
         
-        // Si on a des paramètres OAuth, forcer Supabase à traiter l'URL immédiatement
+        // Si on a des paramètres OAuth, attendre un peu avant de traiter pour s'assurer que tout est prêt
         if (hasOAuthParams && typeof window !== 'undefined') {
+          console.log('🔄 Paramètres OAuth détectés - Attente initiale pour s\'assurer que tout est prêt...');
+          
+          // Attendre un peu plus longtemps lors de la première tentative pour laisser le temps à Supabase
+          // de traiter correctement le callback OAuth
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          
           console.log('🔄 Forçage du traitement de l\'URL OAuth par Supabase...');
           
           // Extraire le code de l'URL si présent (pour PKCE)

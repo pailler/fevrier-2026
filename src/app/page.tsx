@@ -16,7 +16,9 @@ export default function Home() {
 
   // Vérification de la configuration et redirection
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window === 'undefined') return;
+    
+    try {
       const hostname = window.location.hostname;
       const urlParams = new URLSearchParams(window.location.search);
       const token = urlParams.get('token');
@@ -45,6 +47,8 @@ export default function Home() {
           return;
         }
       }
+    } catch (error) {
+      console.error('Erreur dans useEffect de redirection:', error);
     }
   }, [router]);
 
@@ -56,6 +60,150 @@ export default function Home() {
       
       <div className="min-h-screen bg-blue-50 font-sans">
         <Breadcrumb />
+
+      {/* Section Admin - Visible uniquement pour les administrateurs */}
+      {isAuthenticated && user && user.role === 'admin' && (
+        <section className="py-8 bg-gradient-to-r from-red-50 to-orange-50 relative overflow-hidden border-t-4 border-red-200">
+          {/* Particules flottantes */}
+          <div className="absolute inset-0">
+            <div className="absolute top-16 left-16 w-2 h-2 bg-red-300/40 rounded-full animate-pulse"></div>
+            <div className="absolute top-24 right-24 w-1.5 h-1.5 bg-orange-300/50 rounded-full animate-bounce"></div>
+            <div className="absolute bottom-16 left-24 w-2 h-2 bg-red-400/30 rounded-full animate-pulse"></div>
+            <div className="absolute bottom-24 right-16 w-1 h-1 bg-orange-400/40 rounded-full animate-bounce"></div>
+          </div>
+
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+              {/* Contenu gauche */}
+              <div className="flex-1 max-w-2xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">👑</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
+                    Gestion administrateur IAHome
+                  </h2>
+                </div>
+                <p className="text-lg text-gray-600 mb-6">
+                  Accédez aux outils d'administration pour gérer les utilisateurs, les modules et la configuration de la plateforme.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link 
+                    href="/admin/users" 
+                    className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
+                  >
+                    <span className="mr-2">👑</span>
+                    Accès admin
+                  </Link>
+                </div>
+              </div>
+
+              {/* Illustration droite */}
+              <div className="flex-1 flex justify-center">
+                <div className="relative w-80 h-64">
+                  {/* Icône admin centrale */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="relative">
+                      {/* Cercle principal */}
+                      <div className="w-32 h-32 bg-red-100 border-4 border-red-300 rounded-full flex items-center justify-center relative">
+                        <div className="text-center">
+                          <div className="text-4xl font-bold text-red-600">👑</div>
+                          <div className="text-sm text-red-700 font-medium">Admin</div>
+                        </div>
+                      </div>
+                      
+                      {/* Éléments décoratifs */}
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-orange-400 rounded-full animate-pulse"></div>
+                      <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-red-400 rounded-full animate-bounce"></div>
+                      <div className="absolute top-0 left-0 w-3 h-3 bg-orange-500 rounded-full animate-ping"></div>
+                      <div className="absolute bottom-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Particules autour */}
+                  <div className="absolute top-12 left-12 w-1.5 h-1.5 bg-red-400 rounded-full animate-ping"></div>
+                  <div className="absolute top-20 right-12 w-1 h-1 bg-orange-400 rounded-full animate-pulse"></div>
+                  <div className="absolute bottom-12 left-16 w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce"></div>
+                  <div className="absolute bottom-20 right-16 w-1 h-1 bg-orange-500 rounded-full animate-ping"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Section Utilisateur Classique - Visible pour les utilisateurs authentifiés non-admin */}
+      {isAuthenticated && user && user.role !== 'admin' && (
+        <section className="py-8 bg-gradient-to-r from-green-50 to-blue-50 relative overflow-hidden border-t-4 border-green-200">
+          {/* Particules flottantes */}
+          <div className="absolute inset-0">
+            <div className="absolute top-16 left-16 w-2 h-2 bg-green-300/40 rounded-full animate-pulse"></div>
+            <div className="absolute top-24 right-24 w-1.5 h-1.5 bg-blue-300/50 rounded-full animate-bounce"></div>
+            <div className="absolute bottom-16 left-24 w-2 h-2 bg-green-400/30 rounded-full animate-pulse"></div>
+            <div className="absolute bottom-24 right-16 w-1 h-1 bg-blue-400/40 rounded-full animate-bounce"></div>
+          </div>
+
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+              {/* Contenu gauche */}
+              <div className="flex-1 max-w-2xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">📱</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
+                    Mes applications activées
+                  </h2>
+                </div>
+                <p className="text-lg text-gray-600 mb-6">
+                  Gérez vos applications essentielles ou vos outils d'intelligence artificielle en un seul endroit.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link 
+                    href="/encours" 
+                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
+                  >
+                    <span className="mr-2">📱</span>
+                    Acces à mes applis
+                  </Link>
+                </div>
+              </div>
+
+              {/* Illustration droite */}
+              <div className="flex-1 flex justify-center">
+                <div className="relative w-80 h-64">
+                  {/* Icône applications centrale */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="relative">
+                      {/* Cercle principal */}
+                      <div className="w-32 h-32 bg-green-100 border-4 border-green-300 rounded-full flex items-center justify-center relative">
+                        <div className="text-center">
+                          <div className="text-4xl font-bold text-green-600">📱</div>
+                          <div className="text-sm text-green-700 font-medium">Mes applis</div>
+                        </div>
+                      </div>
+                      
+                      {/* Éléments décoratifs */}
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-400 rounded-full animate-pulse"></div>
+                      <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-green-400 rounded-full animate-bounce"></div>
+                      <div className="absolute top-0 left-0 w-3 h-3 bg-blue-500 rounded-full animate-ping"></div>
+                      <div className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Particules autour */}
+                  <div className="absolute top-12 left-12 w-1.5 h-1.5 bg-green-400 rounded-full animate-ping"></div>
+                  <div className="absolute top-20 right-12 w-1 h-1 bg-blue-400 rounded-full animate-pulse"></div>
+                  <div className="absolute bottom-12 left-16 w-1.5 h-1.5 bg-green-500 rounded-full animate-bounce"></div>
+                  <div className="absolute bottom-20 right-16 w-1 h-1 bg-blue-500 rounded-full animate-ping"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
 {/* Section héros principale */}
       <section className="bg-gradient-to-br from-yellow-100 via-green-50 to-green-200 py-16 relative overflow-hidden">
@@ -72,7 +220,7 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
-              <h1 className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
+              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
                 Gagnez une longueur d'avance avec l'Intelligence Artificielle
               </h1>
               <p className="text-xl text-gray-700 mb-6">
@@ -138,78 +286,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section Admin - Visible uniquement pour les administrateurs */}
-      {isAuthenticated && user && user.role === 'admin' && (
-        <section className="py-8 bg-gradient-to-r from-red-50 to-orange-50 relative overflow-hidden border-t-4 border-red-200">
-          {/* Particules flottantes */}
-          <div className="absolute inset-0">
-            <div className="absolute top-16 left-16 w-2 h-2 bg-red-300/40 rounded-full animate-pulse"></div>
-            <div className="absolute top-24 right-24 w-1.5 h-1.5 bg-orange-300/50 rounded-full animate-bounce"></div>
-            <div className="absolute bottom-16 left-24 w-2 h-2 bg-red-400/30 rounded-full animate-pulse"></div>
-            <div className="absolute bottom-24 right-16 w-1 h-1 bg-orange-400/40 rounded-full animate-bounce"></div>
-          </div>
-
-          <div className="max-w-7xl mx-auto px-6 relative z-10">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-              {/* Contenu gauche */}
-              <div className="flex-1 max-w-2xl">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">👑</span>
-                  </div>
-                  <h2 className="text-3xl lg:text-4xl font-bold text-gray-800">
-                    Gestion administrateur IAHome
-                  </h2>
-                </div>
-                <p className="text-lg text-gray-600 mb-6">
-                  Accédez aux outils d'administration pour gérer les utilisateurs, les modules et la configuration de la plateforme.
-                </p>
-                
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Link 
-                    href="/admin/users" 
-                    className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center"
-                  >
-                    <span className="mr-2">👥</span>
-                    Accès admin
-                  </Link>
-                </div>
-              </div>
-
-              {/* Illustration droite */}
-              <div className="flex-1 flex justify-center">
-                <div className="relative w-80 h-64">
-                  {/* Icône admin centrale */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="relative">
-                      {/* Cercle principal */}
-                      <div className="w-32 h-32 bg-red-100 border-4 border-red-300 rounded-full flex items-center justify-center relative">
-                        <div className="text-center">
-                          <div className="text-4xl font-bold text-red-600">👑</div>
-                          <div className="text-sm text-red-700 font-medium">Admin</div>
-                        </div>
-                      </div>
-                      
-                      {/* Éléments décoratifs */}
-                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-orange-400 rounded-full animate-pulse"></div>
-                      <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-red-400 rounded-full animate-bounce"></div>
-                      <div className="absolute top-0 left-0 w-3 h-3 bg-orange-500 rounded-full animate-ping"></div>
-                      <div className="absolute bottom-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                    </div>
-                  </div>
-                  
-                  {/* Particules autour */}
-                  <div className="absolute top-12 left-12 w-1.5 h-1.5 bg-red-400 rounded-full animate-ping"></div>
-                  <div className="absolute top-20 right-12 w-1 h-1 bg-orange-400 rounded-full animate-pulse"></div>
-                  <div className="absolute bottom-12 left-16 w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce"></div>
-                  <div className="absolute bottom-20 right-16 w-1 h-1 bg-orange-500 rounded-full animate-ping"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Section Formation */}
       <section className="py-8 bg-gradient-to-r from-blue-50 to-green-50 relative overflow-hidden">
         {/* Particules flottantes */}
@@ -224,7 +300,7 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             {/* Contenu gauche */}
             <div className="flex-1 max-w-2xl">
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
                 Formation
               </h2>
               <p className="text-lg text-gray-600 mb-6">
@@ -321,7 +397,7 @@ export default function Home() {
 
             {/* Contenu droite */}
             <div className="flex-1 max-w-2xl">
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
                 Blog
               </h2>
               <p className="text-lg text-gray-600 mb-6">
@@ -356,7 +432,7 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             {/* Contenu gauche */}
             <div className="flex-1 max-w-2xl">
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
                 Communauté
               </h2>
               <p className="text-lg text-gray-600 mb-6">
@@ -413,7 +489,7 @@ export default function Home() {
       <section className="py-16 bg-gradient-to-r from-gray-50 to-blue-50 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
               Prêt à commencer ?
             </h2>
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">

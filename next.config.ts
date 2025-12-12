@@ -204,15 +204,32 @@ const nextConfig: NextConfig = {
         ]
       },
       {
-        source: '/_next/static/js/(.*)',
+        source: '/_next/static/js/(.*)\\.js',
         headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/javascript; charset=utf-8'
+          },
           {
             key: 'Cache-Control',
             value: 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
           },
           {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          }
+        ]
+      },
+      {
+        source: '/_next/static/js/(.*)',
+        headers: [
+          {
             key: 'Content-Type',
-            value: 'application/javascript'
+            value: 'application/javascript; charset=utf-8'
+          },
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
           },
           {
             key: 'X-Content-Type-Options',
@@ -229,7 +246,24 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Type',
-            value: 'application/javascript'
+            value: 'application/javascript; charset=utf-8'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          }
+        ]
+      },
+      {
+        source: '/_next/static/chunks/default-(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
+          },
+          {
+            key: 'Content-Type',
+            value: 'application/javascript; charset=utf-8'
           },
           {
             key: 'X-Content-Type-Options',
