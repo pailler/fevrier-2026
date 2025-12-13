@@ -1,6 +1,7 @@
 'use client';
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useTranslations } from 'next-intl';
 import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
@@ -10,6 +11,7 @@ import ModuleCard from '../../components/ModuleCard';
 
 export default function Home() {
   const router = useRouter();
+  const t = useTranslations();
   const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
   const [role, setRole] = useState<string | null>(null);
   const [selectedModules, setSelectedModules] = useState<any[]>([]);
@@ -252,10 +254,10 @@ export default function Home() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
-                Utilisez à distance la puissance GPU des ordinateurs IAHome
+                {t('applications.title')}
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Le numérique à portée de main, pour une utilisation simple et directe. Sans téléchargement.
+                {t('applications.subtitle')}
               </p>
               
               {/* Barre de recherche et bouton Mes applis */}
@@ -263,7 +265,7 @@ export default function Home() {
                 <div className="relative flex-1">
                   <input
                     type="text"
-                    placeholder="Applis"
+                    placeholder={t('applications.search')}
                     className="w-full px-6 py-4 pl-12 pr-16 rounded-xl border-2 border-green-200 bg-white/80 backdrop-blur-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-200 transition-all"
                     value={search}
                     onChange={e => setSearch(e.target.value)}
@@ -274,7 +276,7 @@ export default function Home() {
                     </svg>
                   </div>
                   <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-yellow-500 to-green-600 text-white px-4 py-2 rounded-lg hover:from-yellow-600 hover:to-green-700 transition-all font-medium">
-                    Rechercher
+                    {t('common.search')}
                   </button>
                 </div>
                 
@@ -329,7 +331,7 @@ export default function Home() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                       </svg>
                     </div>
-                    <div className="text-gray-500">Chargement des applications...</div>
+                    <div className="text-gray-500">{t('applications.loading')}</div>
                   </div>
                 ) : error ? (
                   <div className="col-span-full text-center py-12">
@@ -338,18 +340,18 @@ export default function Home() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                       </svg>
                     </div>
-                    <div className="text-red-600 font-medium mb-2">Erreur de chargement</div>
+                    <div className="text-red-600 font-medium mb-2">{t('applications.error')}</div>
                     <div className="text-gray-500 mb-4">{error}</div>
                     <button
                       onClick={() => window.location.reload()}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                     >
-                      Réessayer
+                      {t('common.retry')}
                     </button>
                   </div>
                 ) : filteredModules.length === 0 ? (
                   <div className="col-span-full text-left py-12">
-                    <div className="text-gray-500">Aucun template trouvé pour "{search}"</div>
+                    <div className="text-gray-500">{t('applications.noResults')}</div>
                   </div>
                 ) : currentModules.length === 0 ? (
                   <div className="col-span-full text-left py-12">

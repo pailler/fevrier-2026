@@ -126,8 +126,9 @@ function ResetPasswordContent() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 bg-white placeholder:text-gray-400"
                   placeholder="Au moins 8 caractères"
+                  style={{ color: '#111827' }}
                 />
                 <p className="mt-1 text-xs text-gray-500">
                   Doit contenir au moins une majuscule, une minuscule et un chiffre
@@ -144,8 +145,9 @@ function ResetPasswordContent() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 bg-white placeholder:text-gray-400"
                   placeholder="Confirmez votre mot de passe"
+                  style={{ color: '#111827' }}
                 />
               </div>
 

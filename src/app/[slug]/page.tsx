@@ -30,6 +30,11 @@ export default function DynamicPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Si le slug est vide ou undefined, ne rien faire (laisser Next.js gérer la route racine)
+  if (!slug || slug === '') {
+    return null;
+  }
+
   // Routes exclues - certaines nécessitent une redirection, d'autres non
   const excludedRoutes = [
     'token-generated',

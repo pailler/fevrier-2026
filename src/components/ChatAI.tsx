@@ -35,7 +35,21 @@ export default function ChatAI() {
       }
     );
 
-    return () => subscription.unsubscribe();
+    // Écouter l'événement personnalisé pour ouvrir le chat depuis le menu mobile
+    const handleOpenChat = () => {
+      setIsOpen(true);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('openChatAI', handleOpenChat);
+    }
+
+    return () => {
+      subscription.unsubscribe();
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('openChatAI', handleOpenChat);
+      }
+    };
   }, []);
 
   useEffect(() => {

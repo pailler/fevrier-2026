@@ -16,7 +16,7 @@ export default function SimpleHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-blue-600 text-white shadow-sm">
+    <header className="bg-blue-600 text-white shadow-sm" data-header-version="4.0.0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section unique - Navigation et utilisateur */}
         <div className="flex items-center justify-between h-16">
@@ -35,15 +35,20 @@ export default function SimpleHeader() {
               <span className="text-xl font-bold text-white hidden sm:inline">IAhome</span>
             </Link>
             
-            {/* Bouton Mes applis avec tokens pour mobile UNIQUEMENT - à droite du logo */}
+            {/* Bouton "Mes applis activées" avec tokens pour mobile - VERSION 4.0.0 */}
             {isAuthenticated && user && (
-              <div className="flex md:hidden items-center space-x-3">
+              <div className="flex md:hidden items-center space-x-3" data-button-version="4.0.0">
                 <Link
                   href="/encours"
-                  className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 font-bold px-4 py-2.5 rounded-lg text-lg hover:from-yellow-500 hover:to-yellow-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2"
+                  data-button-type="mes-applis-actives"
+                  className="bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 text-white font-bold px-4 py-2.5 rounded-lg text-lg hover:from-green-600 hover:via-emerald-600 hover:to-green-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2"
+                  style={{
+                    backgroundColor: 'rgb(34, 197, 94)',
+                    backgroundImage: 'linear-gradient(to right, rgb(34, 197, 94), rgb(16, 185, 129), rgb(22, 163, 74))'
+                  }}
                 >
                   <span className="text-xl">📱</span>
-                  <span>Mes applis</span>
+                  <span>Mes applis activées</span>
                 </Link>
                 <TokenBalance className="text-yellow-300 font-bold text-xl" showIcon={true} />
               </div>

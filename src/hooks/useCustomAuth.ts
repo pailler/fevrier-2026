@@ -70,101 +70,6 @@ export function useCustomAuth() {
 
     // Désactivation de la déconnexion automatique - toujours retourner sans déconnecter
     return;
-
-    try {
-      const token = localStorage.getItem('auth_token');
-      const userData = localStorage.getItem('user_data');
-      const sessionStartTime = localStorage.getItem('session_start_time');
-
-      if (!token || !userData || !sessionStartTime) {
-        return; // Pas de session active
-      }
-
-      const sessionStart = parseInt(sessionStartTime, 10);
-      const now = Date.now();
-      const sessionAge = now - sessionStart;
-
-      // Vérifier si l'utilisateur est admin (exception: pas de déconnexion automatique)
-      const user = JSON.parse(userData);
-      if (isAdminUser(user.email)) {
-        console.log('👑 Utilisateur admin détecté - Pas de déconnexion automatique');
-        return; // Ne pas déconnecter l'admin
-      }
-
-      // DÉSACTIVÉ : Si la session a dépassé 1 heure, déconnecter
-      // Plus de déconnexion automatique
-      if (false && sessionAge > SESSION_DURATION_MS) {
-        // Vérifier si on est déjà sur la page de login pour éviter les redirections multiples
-        if (window.location.pathname === '/login') {
-          return; // Déjà sur la page de login, ne rien faire
-        }
-        
-        // Déconnecter Supabase Auth silencieusement (sans logs excessifs)
-        try {
-          await supabase.auth.signOut();
-        } catch (error) {
-          // Ignorer silencieusement les erreurs de déconnexion en mode déconnecté
-          if (!isNetworkError(error)) {
-            // Seulement logger si ce n'est pas une erreur réseau
-            console.warn('⚠️ Erreur lors de la déconnexion Supabase:', error);
-          }
-        }
-
-        // Nettoyer complètement le localStorage (y compris les tokens Supabase)
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('user_data');
-        localStorage.removeItem('session_start_time');
-        
-        // Nettoyer également le storage Supabase pour éviter les conflits
-        try {
-          const supabaseStorageKey = 'sb-xemtoyzcihmncbrlsmhr-auth-token';
-          localStorage.removeItem(supabaseStorageKey);
-          
-          // Nettoyer toutes les clés Supabase potentielles
-          Object.keys(localStorage).forEach(key => {
-            if (key.startsWith('sb-') || key.includes('supabase')) {
-              localStorage.removeItem(key);
-            }
-          });
-        } catch (storageError) {
-          console.warn('⚠️ Erreur lors du nettoyage du storage Supabase:', storageError);
-        }
-        
-        // Réinitialiser l'instance Supabase pour éviter les instances multiples
-        if (typeof window !== 'undefined' && (window as any).__supabaseClientInstance) {
-          delete (window as any).__supabaseClientInstance;
-        }
-        
-        // Réinitialiser le compteur d'erreurs réseau
-        networkErrorCountRef.current = 0;
-
-        // Mettre à jour l'état
-        setAuthState({
-          user: null,
-          token: null,
-          isAuthenticated: false,
-          loading: false
-        });
-
-        // Déclencher l'événement de déconnexion
-        window.dispatchEvent(new CustomEvent('userLoggedOut'));
-
-        // Rediriger vers la page de connexion avec un message (une seule fois)
-        const currentPath = window.location.pathname;
-        // Vérifier qu'on n'est pas déjà en train de rediriger
-        if (!sessionStorage.getItem('session_expired_redirected')) {
-          sessionStorage.setItem('session_expired_redirected', 'true');
-          router.push(`/login?redirect=${encodeURIComponent(currentPath)}&error=session_expired&message=${encodeURIComponent('Votre session a expiré après 1 heure. Veuillez vous reconnecter.')}`);
-          
-          // Nettoyer le flag après 5 secondes pour permettre une nouvelle redirection si nécessaire
-          setTimeout(() => {
-            sessionStorage.removeItem('session_expired_redirected');
-          }, 5000);
-        }
-      }
-    } catch (error) {
-      console.error('❌ Erreur lors de la vérification de session:', error);
-    }
   }, [isClient, router]);
 
   useEffect(() => {
@@ -620,10 +525,10 @@ export function useCustomAuth() {
       }
     );
 
-    // Vérifier périodiquement la session (toutes les minutes)
+    // Vérifier périodiquement la session (toutes les 5 minutes pour améliorer les performances)
     sessionCheckIntervalRef.current = setInterval(() => {
       checkSessionExpiry();
-    }, 60 * 1000); // Vérifier toutes les minutes
+    }, 5 * 60 * 1000); // Vérifier toutes les 5 minutes au lieu d'1 minute
 
     // Écouter les changements dans localStorage
     const handleStorageChange = (e: StorageEvent) => {

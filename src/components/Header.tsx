@@ -1,17 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import DynamicNavigation from './DynamicNavigation';
 import TokenBalance from './TokenBalance';
+import LanguageSwitcher from './LanguageSwitcher';
 import { NotificationServiceClient } from '../utils/notificationServiceClient';
 import { useIframeDetection } from '../utils/useIframeDetection';
 
 // Version du Header - Incrémenter pour forcer le rechargement
-const HEADER_VERSION = '2.4.0';
+const HEADER_VERSION = '4.0.0';
 
 export default function Header() {
   const router = useRouter();
@@ -20,6 +22,28 @@ export default function Header() {
   const [role, setRole] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isInIframe = useIframeDetection();
+  const t = useTranslations();
+
+  // Fonction mémorisée pour fermer le menu
+  const closeMobileMenu = useCallback((e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setIsMobileMenuOpen(false);
+  }, []);
+
+  // Fonction mémorisée pour toggle le menu
+  const toggleMobileMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsMobileMenuOpen((prev) => !prev);
+  }, []);
+
+  // Protection contre les erreurs de référence
+  if (typeof window === 'undefined') {
+    return null;
+  }
 
   // Vérifier le rôle de l'utilisateur
   useEffect(() => {
@@ -35,58 +59,65 @@ export default function Header() {
 
   // Appliquer les styles de soulignement uniquement au menu actif
   useEffect(() => {
-    const applyStyles = () => {
-      const nav = document.getElementById('main-nav');
-      if (!nav) return;
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return;
+    }
 
-      const links = nav.querySelectorAll('a[data-nav-path]');
-      
-      // Logs de debug uniquement en développement
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`🔍 [Menu] Pathname: ${pathname}, Liens trouvés: ${links.length}`);
+    const applyStyles = () => {
+      try {
+        const nav = document.getElementById('main-nav');
+        if (!nav) return;
+
+        const links = nav.querySelectorAll('a[data-nav-path]');
+        
+        // Logs désactivés pour améliorer les performances
+        
+        links.forEach((link) => {
+          try {
+            const navPath = link.getAttribute('data-nav-path');
+            const isActive = navPath && (pathname === navPath || pathname?.startsWith(navPath + '/'));
+            
+            const element = link as HTMLElement;
+            
+            // FORCER la suppression de tous les styles de soulignement d'abord
+            element.style.setProperty('text-decoration', 'none', 'important');
+            element.style.setProperty('text-decoration-color', 'transparent', 'important');
+            element.style.setProperty('text-decoration-thickness', '0', 'important');
+            element.style.setProperty('text-underline-offset', '0', 'important');
+            
+            // Puis appliquer le soulignement SEULEMENT si actif
+            if (isActive) {
+              element.style.setProperty('text-decoration', 'underline', 'important');
+              element.style.setProperty('text-decoration-color', 'rgb(253, 224, 71)', 'important');
+              element.style.setProperty('text-decoration-thickness', '2px', 'important');
+              element.style.setProperty('text-underline-offset', '4px', 'important');
+            }
+          } catch (error) {
+            // Ignorer silencieusement les erreurs de style
+          }
+        });
+      } catch (error) {
+        // Ignorer silencieusement les erreurs
       }
-      
-      links.forEach((link) => {
-        const navPath = link.getAttribute('data-nav-path');
-        const isActive = navPath && (pathname === navPath || pathname?.startsWith(navPath + '/'));
-        
-        const element = link as HTMLElement;
-        
-        // FORCER la suppression de tous les styles de soulignement d'abord
-        element.style.setProperty('text-decoration', 'none', 'important');
-        element.style.setProperty('text-decoration-color', 'transparent', 'important');
-        element.style.setProperty('text-decoration-thickness', '0', 'important');
-        element.style.setProperty('text-underline-offset', '0', 'important');
-        
-        // Puis appliquer le soulignement SEULEMENT si actif
-        if (isActive) {
-          element.style.setProperty('text-decoration', 'underline', 'important');
-          element.style.setProperty('text-decoration-color', 'rgb(253, 224, 71)', 'important');
-          element.style.setProperty('text-decoration-thickness', '2px', 'important');
-          element.style.setProperty('text-underline-offset', '4px', 'important');
-        }
-      });
     };
 
     // Appliquer immédiatement
     applyStyles();
     
-    // Réappliquer après plusieurs délais pour s'assurer que le DOM est prêt
-    const timeout1 = setTimeout(applyStyles, 50);
-    const timeout2 = setTimeout(applyStyles, 200);
-    const timeout3 = setTimeout(applyStyles, 500);
-    const timeout4 = setTimeout(applyStyles, 1000);
+    // Réappliquer une seule fois après un court délai pour s'assurer que le DOM est prêt
+    const timeout = setTimeout(applyStyles, 50); // Réduit de 100ms à 50ms
     
     return () => {
-      clearTimeout(timeout1);
-      clearTimeout(timeout2);
-      clearTimeout(timeout3);
-      clearTimeout(timeout4);
+      clearTimeout(timeout);
     };
   }, [pathname]);
 
   // Fermer le menu mobile quand on clique en dehors
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return;
+    }
+
     if (!isMobileMenuOpen) {
       document.body.style.overflow = '';
       return;
@@ -95,40 +126,51 @@ export default function Header() {
     // Empêcher le scroll du body quand le menu est ouvert
     document.body.style.overflow = 'hidden';
 
-    const handleClickOutside = (event: MouseEvent) => {
+    let isHandling = false;
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      // Éviter les appels multiples simultanés
+      if (isHandling) return;
+      isHandling = true;
+      
+      setTimeout(() => {
+        isHandling = false;
+      }, 100);
+
       try {
         const target = event.target as HTMLElement;
         if (!target) return;
         
-        const menuButton = target.closest('button[aria-label="Menu mobile"]');
+        // Vérifier si le clic est sur le bouton menu ou dans le menu
+        const menuButton = target.closest('#mobile-menu-button');
         const menuContainer = target.closest('.mobile-menu-container');
+        const menuElement = document.getElementById('mobile-menu');
         
-        // Ne fermer que si on clique en dehors du menu ET du bouton
-        if (!menuContainer && !menuButton) {
+        // Ne fermer que si on clique vraiment en dehors
+        if (!menuContainer && !menuButton && !menuElement?.contains(target)) {
           setIsMobileMenuOpen(false);
         }
       } catch (error) {
-        console.error('Erreur dans handleClickOutside:', error);
+        // Ignorer silencieusement pour éviter les boucles
       }
     };
 
-    // Utiliser un délai pour éviter que le clic sur le bouton ne déclenche immédiatement la fermeture
+    // Utiliser un délai court pour éviter les conflits avec le clic sur le bouton
     const timeoutId = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside);
-    }, 300);
+      document.addEventListener('mousedown', handleClickOutside, { passive: true, capture: false });
+      document.addEventListener('touchstart', handleClickOutside, { passive: true, capture: false });
+    }, 100);
 
     return () => {
       clearTimeout(timeoutId);
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
       document.body.style.overflow = '';
     };
   }, [isMobileMenuOpen]);
 
   // Fermer le menu quand on change de page
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      setIsMobileMenuOpen(false);
-    }
+    setIsMobileMenuOpen(false);
   }, [pathname]);
 
   // Fonction pour obtenir l'URL d'accès d'un module
@@ -157,77 +199,80 @@ export default function Header() {
 
   return (
     <header 
-      className="bg-blue-600 text-white shadow-sm" 
+      className="bg-blue-600 text-white shadow-sm relative w-full" 
       data-header-version={HEADER_VERSION}
       suppressHydrationWarning
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full overflow-x-hidden">
         {/* Section supérieure - Informations de connexion */}
-        <div className="flex items-center justify-between h-10">
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center space-x-3">
-              <span className="hidden sm:inline">Bienvenue sur IAhome</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              {loading ? (
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-blue-200 border-t-white rounded-full animate-spin"></div>
-                  <span className="text-blue-100 text-sm">Chargement...</span>
-                </div>
-              ) : !isAuthenticated ? (
-                <div className="flex items-center space-x-3">
-                  <button 
-                    className="text-blue-100 hover:text-white transition-colors text-sm"
-                    onClick={() => router.push('/login')}
-                  >
-                    Se connecter
-                  </button>
-                  <button 
-                    className="bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors"
-                    onClick={() => router.push('/signup')}
-                  >
-                    Commencer
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-3">
-                  <span className="text-blue-100 text-sm font-medium">
-                    {user?.full_name || user?.email?.split('@')[0] || 'Utilisateur'}
-                  </span>
-                  <div className={`px-3 py-1 rounded-full text-xs font-bold ${
+        <div className="flex items-center justify-between h-10 border-b border-blue-500/30">
+          <div className="flex items-center space-x-4 text-sm">
+            {isAuthenticated && user ? (
+              <>
+                <span className="text-blue-100">
+                  {user.role === 'admin' ? `👑 ${t('common.admin')}` : `👤 ${t('common.connected')}`} : {user?.full_name || user?.email?.split('@')[0] || t('common.user')}
+                </span>
+                {role && (
+                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                     role === 'admin' 
-                      ? 'bg-red-600 text-white' 
-                      : 'bg-green-500 text-white'
+                      ? 'bg-red-500/20 text-red-100 border border-red-400/50' 
+                      : 'bg-green-500/20 text-green-100 border border-green-400/50'
                   }`}>
-                    {role === 'admin' ? '👑 ADMIN' : 'CONNECTÉ'}
-                  </div>
-                  <button
-                    onClick={async () => { 
-                      try {
-                        const notificationService = NotificationServiceClient.getInstance();
-                        await notificationService.notifyUserLogout(user?.email || '', user?.email?.split('@')[0] || 'Utilisateur');
-                      } catch (notificationError) {
-                        console.error('❌ Erreur lors de l\'envoi de la notification de déconnexion:', notificationError);
-                      }
-                      signOut();
-                      router.push('/login'); 
-                    }}
-                    className="text-white hover:text-blue-100 transition-colors px-3 py-1 rounded-lg hover:bg-blue-500 cursor-pointer text-sm"
-                  >
-                    Se déconnecter
-                  </button>
-                </div>
-              )}
+                    {role === 'admin' ? 'ADMIN' : t('common.user').toUpperCase()}
+                  </span>
+                )}
+              </>
+            ) : (
+              <span className="text-blue-100">{t('common.welcome')}</span>
+            )}
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            <div className="hidden sm:block">
+              <LanguageSwitcher />
             </div>
+            {isAuthenticated && user ? (
+              <button
+                onClick={async (e) => {
+                  try {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    await signOut();
+                    router.push('/login');
+                  } catch (error) {
+                    console.error('Erreur lors de la déconnexion:', error);
+                  }
+                }}
+                className="text-blue-100 hover:text-white text-sm font-medium transition-colors"
+              >
+                {t('header.signOut')}
+              </button>
+            ) : (
+              <div className="flex items-center space-x-3">
+                <Link 
+                  href="/login" 
+                  className="text-blue-100 hover:text-white text-sm font-medium transition-colors"
+                >
+                  {t('header.signIn')}
+                </Link>
+                <span className="text-blue-500">|</span>
+                <Link 
+                  href="/signup" 
+                  className="text-blue-100 hover:text-white text-sm font-medium transition-colors"
+                >
+                  S'inscrire
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Section principale - Navigation et utilisateur */}
-        <div className="flex items-center justify-between h-16 border-t border-blue-500">
-          <div className="flex items-center space-x-2 md:space-x-6 flex-1 min-w-0">
+        <div className="flex items-center justify-between h-16 w-full relative overflow-x-hidden">
+          <div className="flex items-center space-x-2 md:space-x-6 flex-1 min-w-0 w-full overflow-x-hidden">
             <Link 
               href="/" 
-              className="flex items-center space-x-2 hover:opacity-90 transition-opacity flex-shrink-0" 
+              className="flex items-center space-x-2 hover:opacity-90 transition-opacity flex-shrink-0 cursor-pointer" 
               aria-label="Accueil IAhome"
             >
               <div className="relative h-8 w-auto md:h-9 lg:h-10">
@@ -240,17 +285,30 @@ export default function Header() {
                   className="h-8 md:h-9 lg:h-10 w-auto"
                 />
               </div>
-              <span className="text-xl font-bold text-white hidden sm:inline">IAhome</span>
+              <span className="text-lg sm:text-xl font-bold text-white">IAhome</span>
             </Link>
             
-            {/* Bouton "Mes applis activées" avec tokens - Desktop et Mobile */}
+            {/* Bouton "Mes applis activées" avec tokens - Desktop et Mobile - VERSION 4.0.0 */}
             {isAuthenticated && user && (
-              <div className="flex items-center space-x-2 md:space-x-3 flex-shrink-0">
+              <div className="flex items-center space-x-2 md:space-x-3 flex-shrink-0" data-button-version="4.0.0" style={{ display: 'flex', visibility: 'visible', zIndex: 50 }}>
                 <Link
                   href="/encours" 
                   data-active={pathname === '/encours' || pathname?.startsWith('/encours/') ? 'true' : 'false'}
-                  className="group relative bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 text-white font-bold px-3 py-2.5 md:px-5 md:py-3 rounded-lg md:rounded-2xl text-sm md:text-base hover:from-green-600 hover:via-emerald-600 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 flex items-center space-x-1.5 md:space-x-3 border-2 border-white/20 hover:border-white/40 animate-pulse-subtle whitespace-nowrap"
+                  data-button-type="mes-applis-actives"
+                  className="group relative bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 text-white font-bold px-3 py-2.5 md:px-5 md:py-3 rounded-lg md:rounded-2xl text-sm md:text-base hover:from-green-600 hover:via-emerald-600 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 flex items-center space-x-1.5 md:space-x-3 border-2 border-white/20 hover:border-white/40 animate-pulse-subtle whitespace-nowrap z-50"
                   title="Cliquez pour accéder à vos applications activées"
+                  style={{ 
+                    WebkitTapHighlightColor: 'transparent',
+                    WebkitTouchCallout: 'none',
+                    userSelect: 'none',
+                    backgroundColor: 'rgb(34, 197, 94)',
+                    backgroundImage: 'linear-gradient(to right, rgb(34, 197, 94), rgb(16, 185, 129), rgb(22, 163, 74))',
+                    display: 'flex',
+                    visibility: 'visible',
+                    opacity: '1',
+                    zIndex: 50,
+                    position: 'relative'
+                  }}
                 >
                   {/* Effet de brillance animé */}
                   <div className="absolute inset-0 rounded-lg md:rounded-2xl bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
@@ -261,7 +319,7 @@ export default function Header() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </Link>
-                <div className="relative flex-shrink-0">
+                <div className="relative flex-shrink-0 z-50">
                   <TokenBalance 
                     className="text-yellow-300 md:text-yellow-200 font-bold text-base md:text-xl bg-yellow-400/20 md:bg-white/10 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl backdrop-blur-sm border-2 border-yellow-300/50 md:border-yellow-300/30 shadow-lg md:shadow-md" 
                     showIcon={true}
@@ -345,6 +403,9 @@ export default function Header() {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
+            {/* Sélecteur de langue - Visible sur desktop */}
+            <LanguageSwitcher />
+            
             {isAuthenticated && (
               <>
                 {/* Le bouton "Mes applis activées" est maintenant près du logo, on garde juste les tokens ici si besoin */}
@@ -365,20 +426,8 @@ export default function Header() {
           <div className="md:hidden">
             <button 
               type="button"
-              onClick={(e) => {
-                try {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsMobileMenuOpen((prev) => {
-                    const newValue = !prev;
-                    return newValue;
-                  });
-                } catch (error) {
-                  console.error('Erreur lors du toggle du menu mobile:', error);
-                  setIsMobileMenuOpen(false);
-                }
-              }}
-              className="text-white hover:text-blue-100 transition-colors p-2"
+              onClick={toggleMobileMenu}
+              className="text-white hover:text-blue-100 transition-colors p-2 z-50 relative"
               aria-expanded={isMobileMenuOpen}
               aria-label="Menu mobile"
               id="mobile-menu-button"
@@ -400,15 +449,33 @@ export default function Header() {
         {isMobileMenuOpen && (
           <div 
             id="mobile-menu"
-            className="md:hidden border-t border-blue-500 py-4 mobile-menu-container bg-blue-600 max-h-[calc(100vh-4rem)] overflow-y-auto"
+            className="md:hidden border-t border-blue-500 py-4 mobile-menu-container bg-blue-600 max-h-[calc(100vh-4rem)] overflow-y-auto w-full z-40 relative"
+            style={{
+              width: '100%',
+              maxWidth: '100vw',
+              boxSizing: 'border-box',
+              margin: 0,
+              padding: 0,
+              position: 'relative',
+              left: 0,
+              right: 0
+            }}
             onClick={(e) => {
               // Empêcher la propagation pour éviter la fermeture accidentelle
               e.stopPropagation();
             }}
           >
-            <div className="space-y-2">
+            <div className="space-y-2 w-full">
+              {/* Sélecteur de langue - Mobile */}
+              <div className="px-2 sm:px-4 py-2 border-b border-blue-500 w-full">
+                <div className="text-sm text-blue-100 mb-2">{t('common.language')}</div>
+                <div className="px-4">
+                  <LanguageSwitcher />
+                </div>
+              </div>
+              
               {/* Navigation principale */}
-              <div className="px-4 py-2 border-b border-blue-500">
+              <div className="px-2 sm:px-4 py-2 border-b border-blue-500 w-full">
                 <div className="text-sm text-blue-100 mb-2">Navigation</div>
                 <Link
                   href="/marketing"
@@ -417,7 +484,7 @@ export default function Header() {
                       ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
                       : 'text-white hover:bg-blue-500'
                   }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={closeMobileMenu}
                 >
                   Découvrir
                 </Link>
@@ -428,7 +495,7 @@ export default function Header() {
                       ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
                       : 'text-white hover:bg-blue-500'
                   }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={closeMobileMenu}
                 >
                   Formation
                 </Link>
@@ -439,7 +506,7 @@ export default function Header() {
                       ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
                       : 'text-white hover:bg-blue-500'
                   }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={closeMobileMenu}
                 >
                   Blog
                 </Link>
@@ -450,7 +517,7 @@ export default function Header() {
                       ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
                       : 'text-white hover:bg-blue-500'
                   }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={closeMobileMenu}
                 >
                   Essentiels
                 </Link>
@@ -461,21 +528,29 @@ export default function Header() {
                       ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
                       : 'text-white hover:bg-blue-500'
                   }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={closeMobileMenu}
                 >
                   Applications IA
                 </Link>
               </div>
 
               {/* Bouton Chat IA - Mobile */}
-              <div className="px-4 py-3 border-b border-blue-500">
+              <div className="px-2 sm:px-4 py-3 border-b border-blue-500 w-full">
                 <button
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeMobileMenu();
                     // Déclencher l'ouverture du chat via un événement personnalisé
-                    window.dispatchEvent(new CustomEvent('openChatAI'));
+                    if (typeof window !== 'undefined' && typeof CustomEvent !== 'undefined') {
+                      try {
+                        window.dispatchEvent(new CustomEvent('openChatAI'));
+                      } catch (error) {
+                        console.error('Erreur lors de l\'ouverture du chat:', error);
+                      }
+                    }
                   }}
-                  className="flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-3 rounded-full font-semibold transition-all shadow-lg w-full mx-auto"
+                  className="flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-3 sm:px-4 py-2.5 sm:py-3 rounded-full font-semibold transition-all shadow-lg w-full"
                 >
                   <svg 
                     className="w-5 h-5" 
@@ -491,11 +566,11 @@ export default function Header() {
               </div>
 
               {/* Bouton Obtenir Plus - Mobile */}
-              <div className="px-4 py-3 border-b border-blue-500">
+              <div className="px-2 sm:px-4 py-3 border-b border-blue-500 w-full">
                 <Link
                   href="/pricing"
                   className="flex items-center justify-center space-x-2 bg-purple-100 hover:bg-purple-200 text-purple-800 px-4 py-3 rounded-full font-semibold transition-all shadow-sm hover:shadow-md w-full"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={closeMobileMenu}
                 >
                   <svg 
                     className="w-5 h-5 text-purple-700" 
@@ -511,7 +586,7 @@ export default function Header() {
               {/* Actions utilisateur */}
               {isAuthenticated && (
                 <>
-                  <div className="px-4 py-2 border-b border-blue-500">
+                  <div className="px-2 sm:px-4 py-2 border-b border-blue-500 w-full">
                     <div className="text-sm text-blue-100 mb-2">Compte</div>
                     <div className="py-2">
                       <span className="text-white text-sm font-medium">{user?.full_name || user?.email?.split('@')[0] || 'Utilisateur'}</span>
@@ -519,14 +594,16 @@ export default function Header() {
                     <button
                       type="button"
                       onClick={async (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
                         try {
-                          await signOut();
+                          e.preventDefault();
+                          e.stopPropagation();
                           setIsMobileMenuOpen(false);
+                          await signOut();
                           router.push('/login');
                         } catch (error) {
                           console.error('Erreur lors de la déconnexion:', error);
+                          // Fermer le menu même en cas d'erreur
+                          setIsMobileMenuOpen(false);
                         }
                       }}
                       className="block px-4 py-2 text-white hover:text-blue-100 hover:bg-blue-500 rounded-lg transition-colors w-full text-left text-sm"

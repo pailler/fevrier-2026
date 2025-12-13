@@ -1,0 +1,153 @@
+{
+  "common": {
+    "welcome": "Welcome to IAhome",
+    "admin": "Administrator",
+    "connected": "Connected",
+    "user": "User",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "language": "Language",
+    "retry": "Retry"
+  },
+  "header": {
+    "adminAccess": "Admin access",
+    "myApps": "My activated apps",
+    "applications": "Applications",
+    "essentials": "Essentials",
+    "training": "Training",
+    "blog": "Blog",
+    "community": "Community",
+    "contact": "Contact",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "profile": "Profile"
+  },
+  "home": {
+    "hero": {
+      "title": "Get ahead with Artificial Intelligence",
+      "description": "Learn, practice and grow: AI simplifies your daily life, boosts your projects and multiplies your ideas. No download required.",
+      "exploreApps": "Explore applications",
+      "seeEssentials": "See essentials",
+      "subtitle": "Explore our complete collection of artificial intelligence tools designed to simplify your work and boost your productivity. All our services are web services accessible directly from your browser, without installation or download."
+    },
+    "admin": {
+      "title": "IAHome Administrator Management",
+      "description": "Access administration tools to manage users, modules and platform configuration.",
+      "access": "Admin access"
+    },
+    "user": {
+      "title": "My activated applications",
+      "description": "Manage your essential applications or artificial intelligence tools in one place.",
+      "access": "Access my apps"
+    },
+    "training": {
+      "title": "Training",
+      "description": "Learn AI at your own pace with our structured training and courses adapted to all levels.",
+      "seeTraining": "See training"
+    },
+    "blog": {
+      "title": "Blog",
+      "description": "Stay informed about the latest AI trends with our articles, tutorials and expert analysis.",
+      "readBlog": "Read blog"
+    },
+    "community": {
+      "title": "Community",
+      "description": "Join our community of AI experts and enthusiasts to exchange and learn together.",
+      "join": "Join community"
+    },
+    "contact": {
+      "title": "Ready to get started?",
+      "description": "Discover the power of AI with our professional tools and join a growing community.",
+      "startNow": "Start now",
+      "contactUs": "Contact us"
+    }
+  },
+  "footer": {
+    "description": "Direct access to AI power and tools.",
+    "project": "The project",
+    "resources": "Resources",
+    "aiApplications": "AI Applications",
+    "community": "Community",
+    "news": "News",
+    "training": "Training",
+    "youtubeChannel": "YouTube Channel",
+    "copyright": "© 2025 IAHome. All rights reserved.",
+    "privacy": "Privacy",
+    "cookies": "Cookies",
+    "terms": "Terms of use",
+    "contact": "Contact"
+  },
+  "blog": {
+    "title": "IAHome Blog",
+    "subtitle": "Artificial Intelligence: tools, resources and best practices",
+    "loading": "Loading articles...",
+    "all": "All",
+    "categories": {
+      "resources": "Resources",
+      "community": "Community",
+      "pricing": "Pricing",
+      "enterprise": "Enterprise",
+      "product": "Product",
+      "examples": "Examples"
+    },
+    "noArticles": "No articles available",
+    "noArticlesCategory": "No articles in category \"{category}\"",
+    "createFirst": "Create the first article",
+    "readTime": "{minutes} min read",
+    "by": "By",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Are you sure you want to delete this article?",
+    "addArticle": "Add article",
+    "adminRequired": "You must have administrator rights to add articles."
+  },
+  "formation": {
+    "title": "IAHome Training",
+    "subtitle": "Master artificial intelligence with our expert training and educational resources",
+    "loading": "Loading training courses...",
+    "all": "All training courses",
+    "levels": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "themes": {
+      "ai": "Artificial Intelligence",
+      "3d": "3D Printing",
+      "photography": "Photography",
+      "webdev": "Web Development",
+      "software": "Software",
+      "support": "Support"
+    },
+    "noFormations": "No training courses available",
+    "noFormationsCategory": "No training courses in category \"{category}\"",
+    "createFirst": "Create the first training course",
+    "readTime": "{minutes} min read",
+    "by": "By",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Are you sure you want to delete this training course?",
+    "addFormation": "Add training course",
+    "adminRequired": "You must have administrator rights to add training courses."
+  },
+  "applications": {
+    "title": "Discover our AI Applications",
+    "subtitle": "Explore our complete collection of artificial intelligence tools",
+    "search": "Search for an application...",
+    "loading": "Loading applications...",
+    "error": "Error loading applications",
+    "noResults": "No applications found",
+    "filter": "Filter",
+    "all": "All",
+    "free": "Free",
+    "paid": "Paid"
+  }
+}
+

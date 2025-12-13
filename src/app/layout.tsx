@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
+import { NextIntlClientProvider } from 'next-intl';
 import './globals.css'
+import frMessages from '../../messages/fr.json'
 import { TokenProvider } from '../contexts/TokenContext'
 import ClientHeader from '../components/ClientHeader'
 import Footer from '../components/Footer'
@@ -112,11 +114,16 @@ export const viewport = {
   themeColor: '#2563eb',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  // Charger les messages français par défaut pour le layout racine
+  // Le layout [locale] gérera les autres locales (en) via getMessages()
+  // On utilise directement les messages français car le layout racine n'a pas de locale dans son contexte
+  const messages = frMessages;
+
   return (
     <html lang="fr" className="font-system">
       <head>
@@ -141,156 +148,83 @@ export default function RootLayout({
                 return;
               }
               
-              const CACHE_VERSION = 'v' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
-              const HEADER_VERSION = '2.4.0';
-              console.log('🔄 Version cache:', CACHE_VERSION);
-              console.log('🔄 Version Header attendue:', HEADER_VERSION);
+              const HEADER_VERSION = '4.0.0';
               
-              // Vérifier la version du Header stockée
+              // Vérifier la version du Header stockée AVANT toute opération coûteuse
               const storedHeaderVersion = localStorage.getItem('header_version');
               
-              // Si la version stockée est différente, vider tous les caches et forcer le rechargement
-              if (storedHeaderVersion && storedHeaderVersion !== HEADER_VERSION) {
-                console.log('🔄 Version Header différente détectée (' + storedHeaderVersion + ' vs ' + HEADER_VERSION + ') - Vidage cache et rechargement');
-                
-                // VIDER TOUS LES CACHES IMMÉDIATEMENT
+              // VIDER LES CACHES UNIQUEMENT si version différente (optimisation performance)
+              if (storedHeaderVersion !== HEADER_VERSION) {
+                // VIDER TOUS LES CACHES UNIQUEMENT SI NÉCESSAIRE
                 if ('caches' in window) {
-                  caches.keys().then(function(names) {
-                    console.log('🗑️ Suppression de', names.length, 'caches...');
-                    names.forEach(function(name) {
-                      caches.delete(name);
+                  // Exécuter en arrière-plan pour ne pas bloquer
+                  setTimeout(function() {
+                    caches.keys().then(function(names) {
+                      names.forEach(function(name) {
+                        caches.delete(name).catch(function() {});
+                      });
                     });
-                  });
+                  }, 0);
                 }
                 
-                // Vider le cache du navigateur
+                // Vider le cache du navigateur en arrière-plan
                 if ('serviceWorker' in navigator) {
-                  navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                    registrations.forEach(function(registration) {
-                      registration.unregister();
+                  setTimeout(function() {
+                    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                      registrations.forEach(function(registration) {
+                        registration.unregister().catch(function() {});
+                      });
                     });
+                  }, 0);
+                }
+                // Vider localStorage et sessionStorage des anciennes versions
+                const oldKeys = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                  const key = localStorage.key(i);
+                  if (key && (key.includes('header') || key.includes('cache') || key.includes('version') || key.includes('banner'))) {
+                    oldKeys.push(key);
+                  }
+                }
+                oldKeys.forEach(function(key) {
+                  localStorage.removeItem(key);
+                });
+                
+                // Vider sessionStorage aussi
+                if (typeof sessionStorage !== 'undefined') {
+                  const sessionOldKeys = [];
+                  for (let i = 0; i < sessionStorage.length; i++) {
+                    const key = sessionStorage.key(i);
+                    if (key && (key.includes('header') || key.includes('cache') || key.includes('version') || key.includes('banner'))) {
+                      sessionOldKeys.push(key);
+                    }
+                  }
+                  sessionOldKeys.forEach(function(key) {
+                    sessionStorage.removeItem(key);
                   });
                 }
-                
-                // Vider localStorage et sessionStorage
-                localStorage.clear();
-                sessionStorage.clear();
                 
                 // Stocker la nouvelle version
                 localStorage.setItem('header_version', HEADER_VERSION);
-                localStorage.setItem('cache_version', CACHE_VERSION);
                 
-                // Forcer le rechargement avec cache bypass
+                // FORCER le rechargement immédiat avec cache bypass
                 const timestamp = Date.now();
                 const url = new URL(window.location.href);
                 url.searchParams.set('_v', timestamp.toString());
                 url.searchParams.set('_h', HEADER_VERSION);
                 url.searchParams.set('_cb', '1');
+                url.searchParams.set('_force', '1');
+                url.searchParams.set('_clear', '1');
+                url.searchParams.set('_radical', '1');
                 window.location.replace(url.toString());
                 return;
               }
               
-              // Si aucune version n'est stockée, la stocker
-              if (!storedHeaderVersion) {
-                localStorage.setItem('header_version', HEADER_VERSION);
-              }
+              // Toujours stocker la version actuelle
+              localStorage.setItem('header_version', HEADER_VERSION);
               
-              // VIDER TOUS LES CACHES IMMÉDIATEMENT
-              if ('caches' in window) {
-                caches.keys().then(function(names) {
-                  console.log('🗑️ Suppression de', names.length, 'caches...');
-                  names.forEach(function(name) {
-                    caches.delete(name).then(function() {
-                      console.log('✅ Cache supprimé:', name);
-                    });
-                  });
-                });
-              }
               
-              // Vider le cache du navigateur
-              if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                  registrations.forEach(function(registration) {
-                    registration.unregister();
-                    console.log('✅ Service Worker désenregistré');
-                  });
-                });
-              }
-              
-              // Vider localStorage et sessionStorage des anciennes versions de cache
-              const oldKeys = [];
-              for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && (key.includes('cache') || key.includes('version')) && key !== 'header_version') {
-                  oldKeys.push(key);
-                }
-              }
-              oldKeys.forEach(function(key) {
-                localStorage.removeItem(key);
-              });
-              
-              localStorage.setItem('cache_version', CACHE_VERSION);
-              
-              // Vérifier la version du Header dans le DOM après chargement
-              function checkHeaderVersion() {
-                const header = document.querySelector('header[data-header-version]');
-                if (header) {
-                  const domVersion = header.getAttribute('data-header-version');
-                  console.log('📋 Version Header DOM:', domVersion, 'Attendue:', HEADER_VERSION);
-                  if (domVersion && domVersion !== HEADER_VERSION) {
-                    console.log('🔄 Version Header DOM incohérente (' + domVersion + ' vs ' + HEADER_VERSION + ') - Rechargement forcé');
-                    localStorage.setItem('header_version', HEADER_VERSION);
-                    // Vider tous les caches avant le rechargement
-                    if ('caches' in window) {
-                      caches.keys().then(function(names) {
-                        names.forEach(function(name) {
-                          caches.delete(name);
-                        });
-                      });
-                    }
-                    const timestamp = Date.now();
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('_v', timestamp.toString());
-                    url.searchParams.set('_h', HEADER_VERSION);
-                    url.searchParams.set('_cb', '1');
-                    url.searchParams.set('_force', '1');
-                    window.location.replace(url.toString());
-                  } else if (domVersion === HEADER_VERSION) {
-                    console.log('✅ Version Header correcte:', domVersion);
-                    // S'assurer que la version est stockée
-                    if (typeof localStorage !== 'undefined') {
-                      localStorage.setItem('header_version', HEADER_VERSION);
-                    }
-                  }
-                } else {
-                  // Réessayer après un court délai (max 10 tentatives)
-                  if (typeof sessionStorage !== 'undefined') {
-                    const attempts = parseInt(sessionStorage.getItem('header_check_attempts') || '0', 10);
-                    if (attempts < 10) {
-                      sessionStorage.setItem('header_check_attempts', (attempts + 1).toString());
-                      setTimeout(checkHeaderVersion, 200);
-                    } else {
-                      sessionStorage.removeItem('header_check_attempts');
-                      console.warn('⚠️ Header non trouvé après 10 tentatives');
-                    }
-                  }
-                }
-              }
-              
-              // Vérifier après le chargement du DOM (plusieurs fois pour être sûr)
-              if (typeof document !== 'undefined') {
-                if (document.readyState === 'loading') {
-                  document.addEventListener('DOMContentLoaded', function() {
-                    setTimeout(checkHeaderVersion, 100);
-                    setTimeout(checkHeaderVersion, 500);
-                    setTimeout(checkHeaderVersion, 1000);
-                  });
-                } else {
-                  setTimeout(checkHeaderVersion, 100);
-                  setTimeout(checkHeaderVersion, 500);
-                  setTimeout(checkHeaderVersion, 1000);
-                }
-              }
+              // DÉSACTIVÉ : Vérification de version simplifiée pour améliorer les performances
+              // La vérification ne se fait que si la version stockée est différente
             })();
             
             // Redirection automatique pour qrcodes.iahome.fr
@@ -331,8 +265,7 @@ export default function RootLayout({
                 
                 if (isWebpackError && reloadCount < MAX_RELOADS) {
                   reloadCount++;
-                  console.warn('⚠️ Erreur Webpack détectée:', error);
-                  console.warn('💡 Tentative de rechargement automatique dans 2 secondes... (' + reloadCount + '/' + MAX_RELOADS + ')');
+                  // Logs réduits pour améliorer les performances
                   
                   // Vider le cache et recharger
                   setTimeout(function() {
@@ -377,7 +310,7 @@ export default function RootLayout({
                 
                 if (isWebpackError && rejectionReloadCount < MAX_REJECTION_RELOADS) {
                   rejectionReloadCount++;
-                  console.warn('⚠️ Erreur Webpack (promise rejection) détectée:', error);
+                  // Logs réduits pour améliorer les performances
                   event.preventDefault();
                   setTimeout(function() {
                     window.location.reload();
@@ -400,7 +333,6 @@ export default function RootLayout({
               window.fetch = function(...args) {
                 const url = args[0];
                 if (typeof url === 'string' && url.includes('radar.cloudflare.com')) {
-                  console.warn('Requête vers radar.cloudflare.com bloquée pour éviter les erreurs CORS');
                   return Promise.reject(new Error('Blocked: radar.cloudflare.com'));
                 }
                 return originalFetch.apply(this, args);
@@ -410,7 +342,6 @@ export default function RootLayout({
                 const originalXHROpen = XMLHttpRequest.prototype.open;
                 XMLHttpRequest.prototype.open = function(method, url, ...rest) {
                 if (typeof url === 'string' && url.includes('radar.cloudflare.com')) {
-                  console.warn('Requête XHR vers radar.cloudflare.com bloquée pour éviter les erreurs CORS');
                   return;
                 }
                 return originalXHROpen.apply(this, [method, url, ...rest]);
@@ -420,17 +351,19 @@ export default function RootLayout({
         }} />
       </head>
       <body className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <TokenProvider>
-          <ClientHeader />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
-          <ClientOnly>
-            <ConditionalComponents />
-            <ScrollToTop />
-          </ClientOnly>
-        </TokenProvider>
+        <NextIntlClientProvider messages={messages}>
+          <TokenProvider>
+            <ClientHeader />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+            <ClientOnly>
+              <ConditionalComponents />
+              <ScrollToTop />
+            </ClientOnly>
+          </TokenProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   )

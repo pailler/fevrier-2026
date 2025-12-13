@@ -194,7 +194,6 @@ export default function EncoursPage() {
   // Charger les données de tokens
   const fetchTokenData = useCallback(async () => {
     if (!user?.id) {
-      console.log('🔄 fetchTokenData: Pas d\'utilisateur, arrêt');
       // ✅ Mettre à jour les valeurs par défaut même si pas d'utilisateur
       setTokenBalance(0);
       setTokenHistory([]);
@@ -202,19 +201,16 @@ export default function EncoursPage() {
     }
     
     try {
-      console.log('🔄 fetchTokenData: Début du rafraîchissement des tokens');
       setLoadingTokens(true);
       
       // Charger le solde de tokens
       const tokenService = TokenActionServiceClient.getInstance();
       const balance = await tokenService.getUserTokenBalance(user.id);
       setTokenBalance(balance || 0); // ✅ Valeur par défaut si null
-      console.log('🔄 fetchTokenData: Solde mis à jour:', balance);
       
       // Charger l'historique d'utilisation
       const history = await tokenService.getUserTokenHistory(user.id, 20);
       setTokenHistory(history || []); // ✅ Tableau vide par défaut si null
-      console.log('🔄 fetchTokenData: Historique mis à jour:', history?.length || 0, 'entrées');
       
     } catch (error) {
       console.error('❌ fetchTokenData: Erreur chargement tokens:', error);
@@ -233,11 +229,7 @@ export default function EncoursPage() {
     // Vérifier si WebSocket est disponible
     const isWebSocketAvailable = typeof window !== 'undefined' && typeof WebSocket !== 'undefined';
     
-    if (!isWebSocketAvailable) {
-      console.warn('⚠️ WebSocket non disponible, utilisation du polling uniquement');
-    } else {
-      console.log('🔔 Configuration de l\'écoute en temps réel pour l\'historique des tokens');
-    }
+    // WebSocket check silencieux pour améliorer les performances
 
     let channel: any = null;
 
@@ -256,19 +248,13 @@ export default function EncoursPage() {
               filter: `user_id=eq.${user.id}`
             },
             (payload) => {
-              console.log('🔔 Nouvelle utilisation détectée en temps réel:', payload.new);
               // Rafraîchir immédiatement l'historique (sans dépendance pour éviter les boucles)
               // eslint-disable-next-line react-hooks/exhaustive-deps
-              fetchTokenData().catch(err => console.error('Erreur fetchTokenData depuis Realtime:', err));
+              fetchTokenData().catch(() => {});
             }
           )
-          .subscribe((status) => {
-            console.log('🔔 Statut de l\'abonnement Realtime:', status);
-            if (status === 'SUBSCRIBED') {
-              console.log('✅ Abonnement Realtime actif');
-            } else if (status === 'CHANNEL_ERROR') {
-              console.warn('⚠️ Erreur d\'abonnement Realtime, utilisation du polling de secours');
-            }
+          .subscribe(() => {
+            // Abonnement silencieux pour améliorer les performances
           });
       } catch (error: any) {
         console.error('❌ Erreur lors de la configuration Realtime:', error);
@@ -279,12 +265,12 @@ export default function EncoursPage() {
       }
     }
 
-    // Polling de secours toutes les 5 secondes (toujours actif même si Realtime fonctionne)
+    // Polling de secours toutes les 60 secondes (réduit pour améliorer les performances)
     const pollingInterval = setInterval(() => {
-      console.log('🔄 Polling de secours - Vérification des nouvelles utilisations');
+      // Polling silencieux pour améliorer les performances
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      fetchTokenData().catch(err => console.error('Erreur fetchTokenData depuis polling:', err));
-    }, 5000);
+      fetchTokenData().catch(() => {});
+    }, 60000); // Augmenté de 30s à 60s pour réduire la charge
 
     // Nettoyer l'abonnement et le polling au démontage
     return () => {
@@ -1522,14 +1508,10 @@ export default function EncoursPage() {
                               moduleTitle={moduleTitle}
                               onAccessGranted={(url) => {
                                 console.log(`🔗 ${moduleTitle}: Accès autorisé:`, url);
-                                console.log('🔄 onAccessGranted: Rafraîchissement immédiat des tokens');
-                                // Rafraîchir l'historique des tokens après utilisation
-                                fetchTokenData();
-                                // Rafraîchir aussi après un délai pour s'assurer que les données sont mises à jour
+                                // Rafraîchir l'historique des tokens après utilisation (une seule fois après 1s)
                                 setTimeout(() => {
-                                  console.log('🔄 onAccessGranted: Rafraîchissement différé des tokens');
-                                  fetchTokenData();
-                                }, 2000);
+                                  fetchTokenData().catch(() => {});
+                                }, 1000);
                               }}
                               onAccessDenied={(reason) => {
                                 console.log(`❌ ${moduleTitle}: Accès refusé:`, reason);
@@ -1550,15 +1532,11 @@ export default function EncoursPage() {
                               user={user}
                               onAccessGranted={(url) => {
                                 console.log(`🔗 ${moduleTitle}: Accès autorisé:`, url);
-                                console.log('🔄 onAccessGranted: Rafraîchissement immédiat des tokens et modules');
-                                fetchTokenData();
-                                // Rafraîchir aussi les modules pour mettre à jour usage_count
-                                refreshData();
+                                // Rafraîchir les tokens et modules après utilisation (une seule fois après 1s)
                                 setTimeout(() => {
-                                  console.log('🔄 onAccessGranted: Rafraîchissement différé des tokens et modules');
-                                  fetchTokenData();
+                                  fetchTokenData().catch(() => {});
                                   refreshData();
-                                }, 2000);
+                                }, 1000);
                               }}
                               onAccessDenied={(reason) => {
                                 console.log(`❌ ${moduleTitle}: Accès refusé:`, reason);
@@ -1579,15 +1557,11 @@ export default function EncoursPage() {
                               user={user}
                               onAccessGranted={(url) => {
                                 console.log(`🔗 ${moduleTitle}: Accès autorisé:`, url);
-                                console.log('🔄 onAccessGranted: Rafraîchissement immédiat des tokens et modules');
-                                fetchTokenData();
-                                // Rafraîchir aussi les modules pour mettre à jour usage_count
-                                refreshData();
+                                // Rafraîchir les tokens et modules après utilisation (une seule fois après 1s)
                                 setTimeout(() => {
-                                  console.log('🔄 onAccessGranted: Rafraîchissement différé des tokens et modules');
-                                  fetchTokenData();
+                                  fetchTokenData().catch(() => {});
                                   refreshData();
-                                }, 2000);
+                                }, 1000);
                               }}
                               onAccessDenied={(reason) => {
                                 console.log(`❌ ${moduleTitle}: Accès refusé:`, reason);
@@ -1608,14 +1582,10 @@ export default function EncoursPage() {
                               user={user}
                               onAccessGranted={(url) => {
                                 console.log(`🔗 ${moduleTitle}: Accès autorisé:`, url);
-                                console.log('🔄 onAccessGranted: Rafraîchissement immédiat des tokens');
-                                // Rafraîchir l'historique des tokens après utilisation
-                                fetchTokenData();
-                                // Rafraîchir aussi après un délai pour s'assurer que les données sont mises à jour
+                                // Rafraîchir l'historique des tokens après utilisation (une seule fois après 1s)
                                 setTimeout(() => {
-                                  console.log('🔄 onAccessGranted: Rafraîchissement différé des tokens');
-                                  fetchTokenData();
-                                }, 2000);
+                                  fetchTokenData().catch(() => {});
+                                }, 1000);
                               }}
                               onAccessDenied={(reason) => {
                                 console.log(`❌ ${moduleTitle}: Accès refusé:`, reason);
@@ -1638,14 +1608,10 @@ export default function EncoursPage() {
                               moduleTitle={moduleTitle}
                               onAccessGranted={(url) => {
                                 console.log(`🔗 ${moduleTitle}: Accès autorisé:`, url);
-                                console.log('🔄 onAccessGranted: Rafraîchissement immédiat des tokens');
-                                // Rafraîchir l'historique des tokens après utilisation
-                                fetchTokenData();
-                                // Rafraîchir aussi après un délai pour s'assurer que les données sont mises à jour
+                                // Rafraîchir l'historique des tokens après utilisation (une seule fois après 1s)
                                 setTimeout(() => {
-                                  console.log('🔄 onAccessGranted: Rafraîchissement différé des tokens');
-                                  fetchTokenData();
-                                }, 2000);
+                                  fetchTokenData().catch(() => {});
+                                }, 1000);
                               }}
                               onAccessDenied={(reason) => {
                                 console.log(`❌ ${moduleTitle}: Accès refusé:`, reason);
@@ -1669,14 +1635,10 @@ export default function EncoursPage() {
                             moduleCost={getModuleCost(module.module_id)}
                             onAccessGranted={(url) => {
                               console.log(`🔗 ${module.module_title}: Accès autorisé:`, url);
-                              console.log('🔄 onAccessGranted: Rafraîchissement immédiat des tokens');
-                              // Rafraîchir l'historique des tokens après utilisation
-                              fetchTokenData();
-                              // Rafraîchir aussi après un délai pour s'assurer que les données sont mises à jour
+                              // Rafraîchir l'historique des tokens après utilisation (une seule fois après 1s)
                               setTimeout(() => {
-                                console.log('🔄 onAccessGranted: Rafraîchissement différé des tokens');
-                                fetchTokenData();
-                              }, 2000);
+                                fetchTokenData().catch(() => {});
+                              }, 1000);
                             }}
                             onAccessDenied={(reason) => {
                               console.log(`❌ ${module.module_title}: Accès refusé:`, reason);

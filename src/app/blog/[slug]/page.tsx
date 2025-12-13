@@ -149,7 +149,12 @@ export default function BlogArticlePage() {
           {/* Image de l'article */}
           <div className="w-full h-64 md:h-96 relative overflow-hidden">
             <img
-              src={getArticleImage(article, 'blog')}
+              src={getArticleImage({ 
+                id: article.id, 
+                image_url: article.image_url,
+                title: article.title,
+                category: article.category
+              }, 'blog')}
               alt={article.title}
               className="w-full h-full object-cover"
               onError={(e) => {

@@ -29,12 +29,23 @@ function ForgotPasswordContent() {
 
       if (response.ok) {
         setMessage(result.message);
+        setError('');
       } else {
-        setError(result.error || 'Erreur lors de la demande de réinitialisation');
+        // Afficher l'erreur avec plus de détails si disponibles
+        const errorMessage = result.error || 'Erreur lors de la demande de réinitialisation';
+        const errorDetails = result.details ? ` (${result.details})` : '';
+        setError(errorMessage + errorDetails);
+        setMessage('');
+        console.error('❌ Erreur lors de la demande de réinitialisation:', {
+          status: response.status,
+          error: result.error,
+          details: result.details
+        });
       }
     } catch (error) {
-      console.error('Erreur lors de la demande:', error);
-      setError('Une erreur est survenue lors de la demande');
+      console.error('❌ Erreur lors de la demande:', error);
+      setError('Une erreur est survenue lors de la demande. Veuillez réessayer plus tard.');
+      setMessage('');
     } finally {
       setLoading(false);
     }
@@ -68,7 +79,7 @@ function ForgotPasswordContent() {
             </div>
           )}
 
-          <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+          <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100 text-gray-900">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
@@ -80,8 +91,9 @@ function ForgotPasswordContent() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white placeholder:text-gray-400"
                   placeholder="votre@email.com"
+                  style={{ color: '#111827' }}
                 />
               </div>
 

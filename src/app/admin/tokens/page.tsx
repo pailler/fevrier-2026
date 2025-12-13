@@ -312,11 +312,10 @@ export default function AdminTokens() {
 
       channelsRef.current = channels;
 
-      // Polling de secours toutes les 30 secondes (toujours actif même si Realtime fonctionne)
+      // Polling de secours toutes les 60 secondes (réduit pour améliorer les performances)
       const pollingInterval = setInterval(() => {
-        console.log('🔄 Polling de secours - Vérification des nouvelles consommations');
         loadTokenConsumptions();
-      }, 30000);
+      }, 60000); // Augmenté de 30s à 60s pour réduire la charge
 
       // Nettoyer les abonnements et le polling au démontage
       return () => {

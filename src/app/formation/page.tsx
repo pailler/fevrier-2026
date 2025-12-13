@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from "react";
+import { useTranslations } from 'next-intl';
 import { supabase } from "../../utils/supabaseClient";
 import { useSession, useUser } from "@supabase/auth-helpers-react";
 import Link from "next/link";
@@ -25,6 +26,7 @@ interface FormationArticle {
 
 export default function FormationPage() {
   const router = useRouter();
+  const t = useTranslations();
   const [articles, setArticles] = useState<FormationArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -125,24 +127,24 @@ export default function FormationPage() {
 
   // Catégories de niveau
   const levelCategories = [
-    { value: 'Débutant', label: 'Débutant', color: 'bg-green-100 text-green-800' },
-    { value: 'Intermédiaire', label: 'Intermédiaire', color: 'bg-yellow-100 text-yellow-800' },
-    { value: 'Avancé', label: 'Avancé', color: 'bg-red-100 text-red-800' }
+    { value: 'Débutant', label: t('formation.levels.beginner'), color: 'bg-green-100 text-green-800' },
+    { value: 'Intermédiaire', label: t('formation.levels.intermediate'), color: 'bg-yellow-100 text-yellow-800' },
+    { value: 'Avancé', label: t('formation.levels.advanced'), color: 'bg-red-100 text-red-800' }
   ];
 
   // Catégories thématiques
   const themeCategories = [
-    { value: 'Intelligence artificielle', label: 'Intelligence artificielle', color: 'bg-blue-100 text-blue-800' },
-    { value: 'Impression 3D', label: 'Impression 3D', color: 'bg-purple-100 text-purple-800' },
-    { value: 'Photographie', label: 'Photographie', color: 'bg-pink-100 text-pink-800' },
-    { value: 'Développement Web', label: 'Développement Web', color: 'bg-indigo-100 text-indigo-800' },
-    { value: 'Logiciels', label: 'Logiciels', color: 'bg-gray-100 text-gray-800' },
-    { value: 'Assistance', label: 'Assistance', color: 'bg-orange-100 text-orange-800' }
+    { value: 'Intelligence artificielle', label: t('formation.themes.ai'), color: 'bg-blue-100 text-blue-800' },
+    { value: 'Impression 3D', label: t('formation.themes.3d'), color: 'bg-purple-100 text-purple-800' },
+    { value: 'Photographie', label: t('formation.themes.photography'), color: 'bg-pink-100 text-pink-800' },
+    { value: 'Développement Web', label: t('formation.themes.webdev'), color: 'bg-indigo-100 text-indigo-800' },
+    { value: 'Logiciels', label: t('formation.themes.software'), color: 'bg-gray-100 text-gray-800' },
+    { value: 'Assistance', label: t('formation.themes.support'), color: 'bg-orange-100 text-orange-800' }
   ];
 
   // Toutes les catégories combinées
   const allCategories = [
-    { value: 'all', label: 'Toutes les formations', color: 'bg-gray-100 text-gray-800' },
+    { value: 'all', label: t('formation.all'), color: 'bg-gray-100 text-gray-800' },
     ...levelCategories,
     ...themeCategories
   ];
@@ -160,7 +162,7 @@ export default function FormationPage() {
   };
 
   const handleDeleteArticle = async (articleId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette formation ?')) {
+    if (!confirm(t('formation.deleteConfirm'))) {
       return;
     }
 
@@ -186,7 +188,7 @@ export default function FormationPage() {
     }
     
     if (!isAdmin) {
-      alert('Vous devez avoir les droits d\'administrateur pour ajouter des formations.');
+      alert(t('formation.adminRequired'));
       return;
     }
     
@@ -203,7 +205,7 @@ export default function FormationPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Chargement des formations...</p>
+            <p className="mt-4 text-gray-600">{t('formation.loading')}</p>
           </div>
         </div>
       </div>
@@ -244,10 +246,10 @@ export default function FormationPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl animate-fade-in-up">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4 animate-progress-bar">
-                Formations IAHome
+                {t('formation.title')}
               </h1>
               <p className="text-xl text-gray-700 mb-6 animate-fade-in-up-delayed">
-                Maîtrisez l'intelligence artificielle avec nos formations expertes et nos ressources pédagogiques
+                {t('formation.subtitle')}
               </p>
             </div>
             
@@ -330,7 +332,7 @@ export default function FormationPage() {
         {filteredArticles.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-500 mb-4">
-              {categoryFilter === 'all' ? 'Aucune formation disponible' : `Aucune formation dans la catégorie "${categoryFilter}"`}
+              {categoryFilter === 'all' ? t('formation.noFormations') : t('formation.noFormationsCategory', { category: categoryFilter })}
             </div>
             {isAdmin ? (
               <button
@@ -340,7 +342,7 @@ export default function FormationPage() {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
-                Créer la première formation
+                {t('formation.createFirst')}
               </button>
             ) : session ? (
               <button
@@ -350,7 +352,7 @@ export default function FormationPage() {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
-                Créer la première formation
+                {t('formation.createFirst')}
               </button>
             ) : null}
           </div>
@@ -364,7 +366,12 @@ export default function FormationPage() {
                 {/* Image de l'article */}
                 <div className="w-full h-48 relative overflow-hidden">
                   <img
-                    src={getArticleImage(article, 'formation')}
+                    src={getArticleImage({ 
+                      id: article.id, 
+                      image_url: article.image_url,
+                      title: article.title,
+                      category: article.category
+                    }, 'formation')}
                     alt={article.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -395,7 +402,7 @@ export default function FormationPage() {
                          });
                        })()}
                        <span className="text-sm text-gray-500">
-                         {article.read_time} min de lecture
+                         {t('formation.readTime', { minutes: article.read_time })}
                        </span>
                      </div>
                     
@@ -405,7 +412,7 @@ export default function FormationPage() {
                         <button
                           onClick={() => handleEditArticle(article)}
                           className="p-1 text-gray-400 hover:text-yellow-600 transition-colors"
-                          title="Modifier"
+                          title={t('formation.edit')}
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
@@ -414,7 +421,7 @@ export default function FormationPage() {
                         <button
                           onClick={() => handleDeleteArticle(article.id)}
                           className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                          title="Supprimer"
+                          title={t('formation.delete')}
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -438,7 +445,7 @@ export default function FormationPage() {
                   </p>
 
                   <div className="flex items-center text-sm text-gray-500">
-                    <span>Par {article.author}</span>
+                    <span>{t('formation.by')} {article.author}</span>
                     <span className="mx-2">•</span>
                     <span>{formatDate(article.published_at)}</span>
                   </div>
@@ -454,7 +461,7 @@ export default function FormationPage() {
             <button
               onClick={handleAdminRedirect}
               className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-full shadow-xl hover:bg-blue-700 transition-all duration-200 transform hover:scale-110"
-              title="Ajouter une formation"
+              title={t('formation.addFormation')}
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

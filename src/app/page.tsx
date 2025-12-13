@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
+import { useTranslations } from 'next-intl';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import Breadcrumb from '../components/Breadcrumb';
 import StructuredData from '../components/StructuredData';
@@ -13,6 +14,7 @@ export const dynamic = 'force-dynamic';
 export default function Home() {
   const router = useRouter();
   const { user, isAuthenticated, loading } = useCustomAuth();
+  const t = useTranslations();
 
   // Vérification de la configuration et redirection
   useEffect(() => {
@@ -81,11 +83,11 @@ export default function Home() {
                     <span className="text-white font-bold text-lg">👑</span>
                   </div>
                   <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
-                    Gestion administrateur IAHome
+                    {t('home.admin.title')}
                   </h2>
                 </div>
                 <p className="text-lg text-gray-600 mb-6">
-                  Accédez aux outils d'administration pour gérer les utilisateurs, les modules et la configuration de la plateforme.
+                  {t('home.admin.description')}
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-3">
@@ -94,7 +96,7 @@ export default function Home() {
                     className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
                   >
                     <span className="mr-2">👑</span>
-                    Accès admin
+                    {t('home.admin.access')}
                   </Link>
                 </div>
               </div>
@@ -153,11 +155,11 @@ export default function Home() {
                     <span className="text-white font-bold text-lg">📱</span>
                   </div>
                   <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
-                    Mes applications activées
+                    {t('home.user.title')}
                   </h2>
                 </div>
                 <p className="text-lg text-gray-600 mb-6">
-                  Gérez vos applications essentielles ou vos outils d'intelligence artificielle en un seul endroit.
+                  {t('home.user.description')}
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-3">
@@ -166,7 +168,7 @@ export default function Home() {
                     className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
                   >
                     <span className="mr-2">📱</span>
-                    Acces à mes applis
+                    {t('home.user.access')}
                   </Link>
                 </div>
               </div>
@@ -221,10 +223,10 @@ export default function Home() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
-                Gagnez une longueur d'avance avec l'Intelligence Artificielle
+                {t('home.hero.title')}
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Apprenez, pratiquez et grandissez : l'IA simplifie votre quotidien, boost vos projets et décuple vos idées. Sans téléchargement.
+                {t('home.hero.description')}
               </p>
               
               {/* Boutons d'action */}
@@ -233,19 +235,19 @@ export default function Home() {
                   href="/applications" 
                   className="bg-gradient-to-r from-yellow-500 to-green-600 text-white px-6 py-4 rounded-xl hover:from-yellow-600 hover:to-green-700 transition-all font-medium text-center"
                 >
-                  Explorer les applications &gt;
+                  {t('home.hero.exploreApps')} &gt;
                 </Link>
                 <Link 
                   href="/essentiels" 
                   className="text-orange-600 hover:text-orange-700 font-medium px-6 py-4 transition-colors text-center"
                 >
-                  Voir les essentiels &gt;
+                  {t('home.hero.seeEssentials')} &gt;
                 </Link>
                 </div>
                 
               {/* Texte supplémentaire */}
               <div className="mt-6 text-sm text-gray-600">
-                <p className="font-medium">Explorez notre collection complète d'outils d'intelligence artificielle conçus pour simplifier votre travail et booster votre productivité. Tous nos services sont des web-services accessibles directement depuis votre navigateur, sans installation ni téléchargement.</p>
+                <p className="font-medium">{t('home.hero.subtitle')}</p>
               </div>
             </div>
             
@@ -301,17 +303,17 @@ export default function Home() {
             {/* Contenu gauche */}
             <div className="flex-1 max-w-2xl">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
-                Formation
+                {t('home.training.title')}
               </h2>
               <p className="text-lg text-gray-600 mb-6">
-                Apprenez l'IA à votre rythme avec nos formations structurées et nos cours adaptés à tous les niveaux.
+                {t('home.training.description')}
               </p>
               
               <Link 
                 href="/formation" 
                 className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center"
               >
-                Voir les formations
+                {t('home.training.seeTraining')}
                 <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -398,17 +400,17 @@ export default function Home() {
             {/* Contenu droite */}
             <div className="flex-1 max-w-2xl">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
-                Blog
+                {t('home.blog.title')}
               </h2>
               <p className="text-lg text-gray-600 mb-6">
-                Restez informé des dernières tendances IA avec nos articles, tutoriels et analyses d'experts.
+                {t('home.blog.description')}
               </p>
               
               <Link 
                 href="/blog" 
                 className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center"
               >
-                Lire le blog
+                {t('home.blog.readBlog')}
                 <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -433,17 +435,17 @@ export default function Home() {
             {/* Contenu gauche */}
             <div className="flex-1 max-w-2xl">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
-                Communauté
+                {t('home.community.title')}
               </h2>
               <p className="text-lg text-gray-600 mb-6">
-                Rejoignez notre communauté d'experts et d'enthousiastes de l'IA pour échanger et apprendre ensemble.
+                {t('home.community.description')}
               </p>
               
               <Link 
                 href="/community" 
                 className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center"
               >
-                Rejoindre la communauté
+                {t('home.community.join')}
                 <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -490,10 +492,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
-              Prêt à commencer ?
+              {t('home.contact.title')}
             </h2>
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Découvrez la puissance de l'IA avec nos outils professionnels et rejoignez une communauté en pleine croissance.
+              {t('home.contact.description')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -501,13 +503,13 @@ export default function Home() {
                 href="/applications" 
                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-medium transition-colors"
               >
-                Commencer maintenant
+                {t('home.contact.startNow')}
               </Link>
               <Link 
                 href="/contact" 
                 className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 rounded-lg font-medium transition-colors"
               >
-                Nous contacter
+                {t('home.contact.contactUs')}
               </Link>
             </div>
           </div>

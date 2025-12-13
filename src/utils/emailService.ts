@@ -19,8 +19,24 @@ export class EmailService {
 
   private initializeResend() {
     const apiKey = process.env.RESEND_API_KEY;
+    
+    console.log('📧 Initialisation du service email:', {
+      hasApiKey: !!apiKey,
+      apiKeyLength: apiKey?.length || 0,
+      apiKeyPrefix: apiKey?.substring(0, 5) || 'N/A',
+      fromEmail: process.env.RESEND_FROM_EMAIL || 'non configuré',
+      nodeEnv: process.env.NODE_ENV || 'non défini'
+    });
+    
     if (!apiKey) {
-      console.warn('RESEND_API_KEY not configured - email service disabled');
+      console.error('❌ RESEND_API_KEY not configured - email service disabled');
+      console.error('📧 Vérifiez que RESEND_API_KEY est défini dans vos variables d\'environnement');
+      this.isConfigured = false;
+      return;
+    }
+
+    if (apiKey.trim() === '') {
+      console.error('❌ RESEND_API_KEY est vide - email service disabled');
       this.isConfigured = false;
       return;
     }
@@ -28,9 +44,16 @@ export class EmailService {
     try {
       this.resend = new Resend(apiKey);
       this.isConfigured = true;
-      console.log('Email service initialized successfully');
+      console.log('✅ Email service initialized successfully');
+      console.log('📧 Configuration:', {
+        fromEmail: process.env.RESEND_FROM_EMAIL || 'IAHome <noreply@iahome.fr>',
+        provider: 'Resend'
+      });
     } catch (error) {
-      console.error('Failed to initialize email service:', error);
+      console.error('❌ Failed to initialize email service:', error);
+      if (error instanceof Error) {
+        console.error('📧 Error details:', error.message);
+      }
       this.isConfigured = false;
     }
   }
@@ -45,13 +68,24 @@ export class EmailService {
   async sendEmail(emailData: EmailData): Promise<boolean> {
     try {
       if (!this.isConfigured || !this.resend) {
-        console.warn('Email service not configured - skipping email send');
+        console.error('❌ Email service not configured - RESEND_API_KEY missing or invalid');
+        console.error('📧 Configuration check:', {
+          isConfigured: this.isConfigured,
+          hasResend: !!this.resend,
+          hasApiKey: !!process.env.RESEND_API_KEY,
+          apiKeyLength: process.env.RESEND_API_KEY?.length || 0
+        });
         return false;
       }
 
       const { to, subject, html, from = process.env.RESEND_FROM_EMAIL || 'IAHome <noreply@iahome.fr>' } = emailData;
-
-      ;
+      
+      console.log('📧 Tentative d\'envoi d\'email:', {
+        to,
+        from,
+        subject,
+        htmlLength: html.length
+      });
       
       const result = await this.resend.emails.send({
         from,
@@ -61,17 +95,23 @@ export class EmailService {
       });
 
       if (result.error) {
-        console.error('Email send error:', result.error);
-        console.log('📧 Résultat envoi email: false');
+        console.error('❌ Email send error:', result.error);
+        console.error('📧 Détails de l\'erreur:', JSON.stringify(result.error, null, 2));
         return false;
       }
 
-      console.log('📧 Résultat envoi email: true');
-      console.log('Email sent successfully:', result.data?.id);
+      console.log('✅ Email sent successfully:', {
+        emailId: result.data?.id,
+        to,
+        subject
+      });
       return true;
     } catch (error) {
-      console.error('Email service error:', error);
-      console.log('📧 Résultat envoi email: false');
+      console.error('❌ Email service error:', error);
+      if (error instanceof Error) {
+        console.error('📧 Error message:', error.message);
+        console.error('📧 Error stack:', error.stack);
+      }
       return false;
     }
   }
@@ -195,6 +235,48 @@ export class EmailService {
 
       return false;
     }
+  }
+
+  async sendPasswordResetEmail(
+    userEmail: string,
+    userName: string | null,
+    resetUrl: string
+  ): Promise<boolean> {
+    return this.sendEmail({
+      to: userEmail,
+      subject: 'Réinitialisation de votre mot de passe - IAHome',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="color: white; margin: 0; font-size: 28px;">🔐 Réinitialisation de mot de passe</h1>
+          </div>
+          <div style="background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px;">
+            <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+              Bonjour ${userName || 'utilisateur'},
+            </p>
+            <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+              Vous avez demandé à réinitialiser votre mot de passe sur IAHome. Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe :
+            </p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${resetUrl}" style="display: inline-block; background: #2563eb; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
+                Réinitialiser mon mot de passe
+              </a>
+            </div>
+            <p style="color: #6b7280; font-size: 14px; line-height: 1.6;">
+              Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :<br>
+              <a href="${resetUrl}" style="color: #2563eb; word-break: break-all;">${resetUrl}</a>
+            </p>
+            <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin-top: 30px;">
+              <strong>⚠️ Important :</strong> Ce lien est valide pendant 24 heures. Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.
+            </p>
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+            <p style="color: #9ca3af; font-size: 12px; text-align: center;">
+              Cet email a été envoyé automatiquement par IAHome. Ne répondez pas à cet email.
+            </p>
+          </div>
+        </div>
+      `
+    });
   }
 
   isServiceConfigured(): boolean {
