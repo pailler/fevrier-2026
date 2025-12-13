@@ -1,11 +1,8 @@
 'use client';
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
 import DynamicNavigation from './DynamicNavigation';
 
 export default function Footer() {
-  const t = useTranslations();
-  
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -17,7 +14,7 @@ export default function Footer() {
               <span className="text-2xl font-bold text-blue-400">IAhome</span>
             </div>
             <p className="text-gray-300 mb-4">
-              {t('footer.description')}
+              Accès direct à la puissance et aux outils IA.
             </p>
             <div className="flex space-x-4">
               <a href="https://www.youtube.com/@pailleradamhome" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-500 transition-colors" title="Chaîne YouTube d'Adam Pailler">
@@ -45,7 +42,7 @@ export default function Footer() {
 
           {/* Section Le projet */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">{t('footer.project')}</h3>
+            <h3 className="text-lg font-semibold mb-4">Le projet</h3>
             <DynamicNavigation 
               menuName="footer" 
               className="space-y-2"
@@ -55,26 +52,26 @@ export default function Footer() {
 
           {/* Section Ressources */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">{t('footer.resources')}</h3>
+            <h3 className="text-lg font-semibold mb-4">Ressources</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/" className="text-gray-300 hover:text-white transition-colors">
-                  {t('footer.aiApplications')}
+                  Applications IA
                 </Link>
               </li>
               <li>
                 <Link href="/blog?category=community" className="text-gray-300 hover:text-white transition-colors">
-                  {t('footer.community')}
+                  Communauté
                 </Link>
               </li>
               <li>
                 <Link href="/blog?category=product" className="text-gray-300 hover:text-white transition-colors">
-                  {t('footer.news')}
+                  Actualités
                 </Link>
               </li>
               <li>
                 <Link href="/formation" className="text-gray-300 hover:text-white transition-colors">
-                  {t('footer.training')}
+                  Formation
                 </Link>
               </li>
               <li>
@@ -87,7 +84,7 @@ export default function Footer() {
                   <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                   </svg>
-                  {t('footer.youtubeChannel')}
+                  Chaîne YouTube
                 </a>
               </li>
             </ul>
@@ -98,20 +95,20 @@ export default function Footer() {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-gray-400 text-sm">
-              {t('footer.copyright')}
+              © 2025 IAHome. Tous droits réservés.
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 mt-4 md:mt-0">
               <Link href="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
-                {t('footer.privacy')}
+                Confidentialité
               </Link>
               <Link href="/cookies" className="text-gray-400 hover:text-white text-sm transition-colors">
-                {t('footer.cookies')}
+                Cookies
               </Link>
               <Link href="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">
-                {t('footer.terms')}
+                Conditions d'utilisation
               </Link>
               <Link href="/contact" className="text-gray-400 hover:text-white text-sm transition-colors">
-                {t('footer.contact')}
+                Contact
               </Link>
             </div>
           </div>

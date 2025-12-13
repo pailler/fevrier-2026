@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useState } from "react";
-import { useTranslations } from 'next-intl';
 import { supabase } from "../../utils/supabaseClient";
 import { useSession, useUser } from "@supabase/auth-helpers-react";
 import Link from "next/link";
@@ -23,7 +22,6 @@ interface BlogArticle {
 
 export default function BlogPage() {
   const router = useRouter();
-  const t = useTranslations();
   const [articles, setArticles] = useState<BlogArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -116,13 +114,13 @@ export default function BlogPage() {
     : articles.filter(article => article.category === categoryFilter);
 
   const categories = [
-    { value: 'all', label: t('blog.all') },
-    { value: 'resources', label: t('blog.categories.resources') },
-    { value: 'community', label: t('blog.categories.community') },
-    { value: 'pricing', label: t('blog.categories.pricing') },
-    { value: 'enterprise', label: t('blog.categories.enterprise') },
-    { value: 'product', label: t('blog.categories.product') },
-    { value: 'examples', label: t('blog.categories.examples') }
+    { value: 'all', label: 'Tous' },
+    { value: 'resources', label: 'Resources' },
+    { value: 'community', label: 'Community' },
+    { value: 'pricing', label: 'Pricing' },
+    { value: 'enterprise', label: 'Enterprise' },
+    { value: 'product', label: 'Product' },
+    { value: 'examples', label: 'Examples' }
   ];
 
   const formatDate = (dateString: string) => {
@@ -138,7 +136,7 @@ export default function BlogPage() {
   };
 
   const handleDeleteArticle = async (articleId: string) => {
-    if (!confirm(t('blog.deleteConfirm'))) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
       return;
     }
 
@@ -164,7 +162,7 @@ export default function BlogPage() {
     }
     
     if (!isAdmin) {
-      alert(t('blog.adminRequired'));
+      alert('Vous devez avoir les droits d\'administrateur pour ajouter des articles.');
       return;
     }
     
@@ -181,7 +179,7 @@ export default function BlogPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">{t('blog.loading')}</p>
+            <p className="mt-4 text-gray-600">Chargement des articles...</p>
           </div>
         </div>
       </div>
@@ -222,10 +220,10 @@ export default function BlogPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl animate-fade-in-up">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4 animate-typewriter">
-                {t('blog.title')}
+                Blog IAHome
               </h1>
               <p className="text-xl text-gray-700 mb-6 animate-fade-in-up-delayed">
-                {t('blog.subtitle')}
+                L'intelligence artificielle : les outils, les ressources et les meilleures pratiques
               </p>
             </div>
             
@@ -291,7 +289,7 @@ export default function BlogPage() {
         {filteredArticles.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-500 mb-4">
-              {categoryFilter === 'all' ? t('blog.noArticles') : t('blog.noArticlesCategory', { category: categoryFilter })}
+              {categoryFilter === 'all' ? 'Aucun article disponible' : `Aucun article dans la catégorie "${categoryFilter}"`}
             </div>
             {isAdmin ? (
               <button
@@ -301,7 +299,7 @@ export default function BlogPage() {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
-                {t('blog.createFirst')}
+                Créer le premier article
               </button>
             ) : session ? (
               <button
@@ -311,7 +309,7 @@ export default function BlogPage() {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
-                {t('blog.createFirst')}
+                Créer le premier article
               </button>
             ) : null}
           </div>
@@ -349,7 +347,7 @@ export default function BlogPage() {
                         {article.category.charAt(0).toUpperCase() + article.category.slice(1)}
                       </span>
                       <span className="ml-2 text-sm text-gray-500">
-                        {t('blog.readTime', { minutes: article.read_time })}
+                        {article.read_time} min de lecture
                       </span>
                     </div>
                     
@@ -359,7 +357,7 @@ export default function BlogPage() {
                         <button
                           onClick={() => handleEditArticle(article)}
                           className="p-1 text-gray-400 hover:text-yellow-600 transition-colors"
-                          title={t('blog.edit')}
+                          title="Modifier"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
@@ -368,7 +366,7 @@ export default function BlogPage() {
                         <button
                           onClick={() => handleDeleteArticle(article.id)}
                           className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                          title={t('blog.delete')}
+                          title="Supprimer"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -392,7 +390,7 @@ export default function BlogPage() {
                   </p>
 
                   <div className="flex items-center text-sm text-gray-500">
-                    <span>{t('blog.by')} {article.author}</span>
+                    <span>Par {article.author}</span>
                     <span className="mx-2">•</span>
                     <span>{formatDate(article.published_at)}</span>
                   </div>
@@ -408,7 +406,7 @@ export default function BlogPage() {
             <button
               onClick={handleAdminRedirect}
               className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white rounded-full shadow-xl hover:bg-blue-700 transition-all duration-200 transform hover:scale-110"
-              title={t('blog.addArticle')}
+              title="Ajouter un article"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

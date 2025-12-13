@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import createIntlMiddleware from 'next-intl/middleware';
-import { routing } from './i18n/routing';
 
 // Routes protégées qui nécessitent une authentification
 const protectedRoutes = [
@@ -17,14 +15,7 @@ const protectedRoutes = [
   '/admin/dashboard'
 ];
 
-// Créer le middleware i18n
-const intlMiddleware = createIntlMiddleware(routing);
-
 export async function middleware(request: NextRequest) {
-  // Appliquer le middleware i18n en premier
-  const response = intlMiddleware(request);
-  
-  // Continuer avec la logique existante
   const { pathname } = request.nextUrl;
   const hostname = request.headers.get('host') || '';
   const xForwardedHost = request.headers.get('x-forwarded-host') || '';
@@ -51,7 +42,7 @@ export async function middleware(request: NextRequest) {
       console.log('✅ LibreSpeed: Token présent, laisser passer vers LibreSpeed');
       // Ne pas rediriger, laisser Cloudflare Tunnel gérer le routage
       // Le service localhost:8085 sera accessible via Cloudflare Tunnel
-      return response || NextResponse.next();
+      return NextResponse.next();
     } else {
       // Aucun token - Redirect Rules devrait avoir déjà intercepté
       // Si on arrive ici, c'est que Redirect Rules n'a pas fonctionné
@@ -122,16 +113,11 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return response || NextResponse.next();
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    // Match all pathnames except for
-    // - … if they start with `/api`, `/_next` or `/_vercel`
-    // - … the ones containing a dot (e.g. `favicon.ico`)
-    '/((?!api|_next|_vercel|.*\\..*).*)',
-    // Also match root path
-    '/'
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.).*)'
   ],
 }; 

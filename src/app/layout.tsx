@@ -1,7 +1,5 @@
 import type { Metadata } from 'next'
-import { NextIntlClientProvider } from 'next-intl';
 import './globals.css'
-import frMessages from '../../messages/fr.json'
 import { TokenProvider } from '../contexts/TokenContext'
 import ClientHeader from '../components/ClientHeader'
 import Footer from '../components/Footer'
@@ -114,16 +112,11 @@ export const viewport = {
   themeColor: '#2563eb',
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  // Charger les messages français par défaut pour le layout racine
-  // Le layout [locale] gérera les autres locales (en) via getMessages()
-  // On utilise directement les messages français car le layout racine n'a pas de locale dans son contexte
-  const messages = frMessages;
-
   return (
     <html lang="fr" className="font-system">
       <head>
@@ -351,19 +344,17 @@ export default async function RootLayout({
         }} />
       </head>
       <body className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <NextIntlClientProvider messages={messages}>
-          <TokenProvider>
-            <ClientHeader />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
-            <ClientOnly>
-              <ConditionalComponents />
-              <ScrollToTop />
-            </ClientOnly>
-          </TokenProvider>
-        </NextIntlClientProvider>
+        <TokenProvider>
+          <ClientHeader />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+          <ClientOnly>
+            <ConditionalComponents />
+            <ScrollToTop />
+          </ClientOnly>
+        </TokenProvider>
       </body>
     </html>
   )

@@ -4,11 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import DynamicNavigation from './DynamicNavigation';
 import TokenBalance from './TokenBalance';
-import LanguageSwitcher from './LanguageSwitcher';
 import { NotificationServiceClient } from '../utils/notificationServiceClient';
 import { useIframeDetection } from '../utils/useIframeDetection';
 
@@ -22,7 +20,6 @@ export default function Header() {
   const [role, setRole] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isInIframe = useIframeDetection();
-  const t = useTranslations();
 
   // Fonction mémorisée pour fermer le menu
   const closeMobileMenu = useCallback((e?: React.MouseEvent) => {
@@ -210,7 +207,7 @@ export default function Header() {
             {isAuthenticated && user ? (
               <>
                 <span className="text-blue-100">
-                  {user.role === 'admin' ? `👑 ${t('common.admin')}` : `👤 ${t('common.connected')}`} : {user?.full_name || user?.email?.split('@')[0] || t('common.user')}
+                  {user.role === 'admin' ? '👑 Administrateur' : '👤 Connecté'} : {user?.full_name || user?.email?.split('@')[0] || 'Utilisateur'}
                 </span>
                 {role && (
                   <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
@@ -218,19 +215,16 @@ export default function Header() {
                       ? 'bg-red-500/20 text-red-100 border border-red-400/50' 
                       : 'bg-green-500/20 text-green-100 border border-green-400/50'
                   }`}>
-                    {role === 'admin' ? 'ADMIN' : t('common.user').toUpperCase()}
+                    {role === 'admin' ? 'ADMIN' : 'UTILISATEUR'}
                   </span>
                 )}
               </>
             ) : (
-              <span className="text-blue-100">{t('common.welcome')}</span>
+              <span className="text-blue-100">Bienvenue sur IAhome</span>
             )}
           </div>
           
           <div className="flex items-center space-x-4">
-            <div className="hidden sm:block">
-              <LanguageSwitcher />
-            </div>
             {isAuthenticated && user ? (
               <button
                 onClick={async (e) => {
@@ -245,7 +239,7 @@ export default function Header() {
                 }}
                 className="text-blue-100 hover:text-white text-sm font-medium transition-colors"
               >
-                {t('header.signOut')}
+                Se déconnecter
               </button>
             ) : (
               <div className="flex items-center space-x-3">
@@ -253,7 +247,7 @@ export default function Header() {
                   href="/login" 
                   className="text-blue-100 hover:text-white text-sm font-medium transition-colors"
                 >
-                  {t('header.signIn')}
+                  Se connecter
                 </Link>
                 <span className="text-blue-500">|</span>
                 <Link 
@@ -403,9 +397,6 @@ export default function Header() {
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
-            {/* Sélecteur de langue - Visible sur desktop */}
-            <LanguageSwitcher />
-            
             {isAuthenticated && (
               <>
                 {/* Le bouton "Mes applis activées" est maintenant près du logo, on garde juste les tokens ici si besoin */}
@@ -466,14 +457,6 @@ export default function Header() {
             }}
           >
             <div className="space-y-2 w-full">
-              {/* Sélecteur de langue - Mobile */}
-              <div className="px-2 sm:px-4 py-2 border-b border-blue-500 w-full">
-                <div className="text-sm text-blue-100 mb-2">{t('common.language')}</div>
-                <div className="px-4">
-                  <LanguageSwitcher />
-                </div>
-              </div>
-              
               {/* Navigation principale */}
               <div className="px-2 sm:px-4 py-2 border-b border-blue-500 w-full">
                 <div className="text-sm text-blue-100 mb-2">Navigation</div>
