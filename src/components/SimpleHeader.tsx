@@ -106,35 +106,23 @@ export default function SimpleHeader() {
               </Link>
               <Link 
                 href="/essentiels" 
-                className={`font-medium transition-colors ${
+                className={`font-semibold transition-all duration-300 px-4 py-2 rounded-lg ${
                   pathname === '/essentiels' || pathname?.startsWith('/essentiels/')
-                    ? 'text-yellow-300'
-                    : 'text-white hover:text-blue-100'
+                    ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg shadow-yellow-500/50'
+                    : 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-white hover:from-yellow-500/30 hover:to-orange-500/30 hover:shadow-md hover:shadow-yellow-500/30'
                 }`}
-                style={pathname === '/essentiels' || pathname?.startsWith('/essentiels/') ? {
-                  textDecoration: 'underline',
-                  textDecorationColor: 'rgb(253 224 71)',
-                  textDecorationThickness: '2px',
-                  textUnderlineOffset: '4px'
-                } : { textDecoration: 'none' }}
               >
-                Essentiels
+                ⭐ Applis essentielles
               </Link>
               <Link 
                 href="/applications" 
-                className={`font-medium transition-colors ${
+                className={`font-semibold transition-all duration-300 px-4 py-2 rounded-lg ${
                   pathname === '/applications' || pathname?.startsWith('/applications/')
-                    ? 'text-yellow-300'
-                    : 'text-white hover:text-blue-100'
+                    ? 'bg-gradient-to-r from-green-400 to-blue-500 text-white shadow-lg shadow-green-500/50'
+                    : 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white hover:from-green-500/30 hover:to-blue-500/30 hover:shadow-md hover:shadow-green-500/30'
                 }`}
-                style={pathname === '/applications' || pathname?.startsWith('/applications/') ? {
-                  textDecoration: 'underline',
-                  textDecorationColor: 'rgb(253 224 71)',
-                  textDecorationThickness: '2px',
-                  textUnderlineOffset: '4px'
-                } : { textDecoration: 'none' }}
               >
-                Applications IA
+                🤖 Applis IA
               </Link>
               <Link 
                 href="/pricing" 
@@ -263,25 +251,25 @@ export default function SimpleHeader() {
                 </Link>
                 <Link
                   href="/essentiels"
-                  className={`block px-4 py-2 transition-colors ${
+                  className={`block px-4 py-3 transition-all duration-300 rounded-lg font-semibold ${
                     pathname === '/essentiels' || pathname?.startsWith('/essentiels/')
-                      ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
-                      : 'text-white hover:bg-blue-500'
+                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg shadow-yellow-500/50'
+                      : 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-white hover:from-yellow-500/30 hover:to-orange-500/30 hover:shadow-md'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Essentiels
+                  ⭐ Applis essentielles
                 </Link>
                 <Link
                   href="/applications"
-                  className={`block px-4 py-2 transition-colors ${
+                  className={`block px-4 py-3 transition-all duration-300 rounded-lg font-semibold ${
                     pathname === '/applications' || pathname?.startsWith('/applications/')
-                      ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
-                      : 'text-white hover:bg-blue-500'
+                      ? 'bg-gradient-to-r from-green-400 to-blue-500 text-white shadow-lg shadow-green-500/50'
+                      : 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white hover:from-green-500/30 hover:to-blue-500/30 hover:shadow-md'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Applications IA
+                  🤖 Applis IA
                 </Link>
               </div>
               
