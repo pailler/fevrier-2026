@@ -654,6 +654,10 @@ export default function EncoursPage() {
           }
         }
         
+        console.log('✅ fetchUserModules: Modules finaux à afficher:', allModules.length);
+        if (allModules.length > 0) {
+          console.log('✅ fetchUserModules: Premier module:', allModules[0].module_title);
+        }
         setUserModules(allModules);
         setError(null);
         
@@ -714,6 +718,7 @@ export default function EncoursPage() {
       'qrcodes-statiques': 'qrcodes-statiques', // QR Codes Statiques
       'hunyuan3d': 'hunyuan3d', // Hunyuan 3D -> hunyuan3d
       'administration': 'administration', // Administration -> administration
+      'prompt-generator': 'prompt-generator', // Générateur de Prompts IA -> prompt-generator
     };
 
     // Mapping des slugs vers les URLs directes des applications
@@ -743,6 +748,10 @@ export default function EncoursPage() {
         : 'https://homeassistant.iahome.fr',
       // Administration : page de liens vers les services administratifs
       'administration': '/administration',
+      // Générateur de Prompts IA : localhost:9001 en dev
+      'prompt-generator': (typeof window !== 'undefined' && window.location.hostname === 'localhost') 
+        ? 'http://localhost:9001/prompt-generator' 
+        : 'https://prompt-generator.iahome.fr',
     };
     
     // Convertir module_id numérique en slug si nécessaire
@@ -762,6 +771,7 @@ export default function EncoursPage() {
       'ruinedfooocus': 100,
       'comfyui': 100,
       'hunyuan3d': 100,
+      'prompt-generator': 100,
       
       // Applications essentielles (10 tokens)
       'librespeed': 10,
@@ -1496,7 +1506,7 @@ export default function EncoursPage() {
                         const moduleTitle = module.module_title;
                         
                         // Applications IA (100 tokens)
-                        if (['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui', 'hunyuan3d'].includes(moduleId)) {
+                        if (['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui', 'hunyuan3d', 'prompt-generator'].includes(moduleId)) {
                           if (!user) {
                             console.error('❌ user is null in AIAccessButton');
                             return null;
@@ -1596,7 +1606,7 @@ export default function EncoursPage() {
                         }
                         
                         // Applications essentielles (10 tokens) - sans LibreSpeed (qui a son propre bouton)
-                        if (['metube', 'psitransfer', 'pdf', 'cogstudio', 'code-learning'].includes(moduleId)) {
+                        if (['metube', 'psitransfer', 'pdf', 'cogstudio', 'code-learning', 'administration'].includes(moduleId)) {
                           if (!user) {
                             console.error('❌ user is null in EssentialAccessButton');
                             return null;

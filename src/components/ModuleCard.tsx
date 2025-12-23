@@ -50,6 +50,8 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       'whisper': 'whisper',
       'home-assistant': 'home-assistant',
       'administration': 'administration',
+      'apprendre-autrement': 'apprendre-autrement',
+      'prompt-generator': 'prompt-generator'
     };
 
     // Vérifier d'abord le mapping direct
@@ -103,6 +105,12 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     }
     if (titleLower.includes('administration') || titleLower.includes('services administratifs')) {
       return 'administration';
+    }
+    if (titleLower.includes('apprendre autrement') || titleLower.includes('apprendre-autrement')) {
+      return 'apprendre-autrement';
+    }
+    if (titleLower.includes('prompt') || titleLower.includes('générateur de prompts') || titleLower.includes('prompt-generator')) {
+      return 'prompt-generator';
     }
 
     // Fallback: utiliser l'ID tel quel (peut-être déjà un slug valide)
@@ -274,11 +282,20 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   // Vérifier si c'est le module Hunyuan 3D pour appliquer un style spécial
   const isHunyuan3D = module.title.toLowerCase().includes('hunyuan') || module.title.toLowerCase().includes('hunyuan3d') || module.title.toLowerCase().includes('3d') || module.id === 'hunyuan3d';
   
-  // Vérifier si c'est le module Apprendre le Code Informatique pour appliquer un style spécial
-  const isCodeLearning = module.title.toLowerCase().includes('apprendre') || module.title.toLowerCase().includes('code learning') || module.title.toLowerCase().includes('code-learning') || module.id === 'code-learning';
+  // Vérifier si c'est le module Apprendre le Code aux enfants pour appliquer un style spécial
+  const isCodeLearning = (module.title.toLowerCase().includes('apprendre') && module.title.toLowerCase().includes('code')) || module.title.toLowerCase().includes('code learning') || module.title.toLowerCase().includes('code-learning') || module.id === 'code-learning';
+  
+  // Vérifier si c'est le module Apprendre Autrement pour appliquer un style spécial
+  const isApprendreAutrement = (module.title.toLowerCase().includes('apprendre autrement') || module.title.toLowerCase().includes('apprendre-autrement')) && !isCodeLearning || module.id === 'apprendre-autrement';
   
   // Vérifier si c'est le module Home Assistant pour appliquer un style spécial
   const isHomeAssistant = module.title.toLowerCase().includes('home assistant') || module.title.toLowerCase().includes('home-assistant') || module.title.toLowerCase().includes('domotisez votre habitat') || module.id === 'home-assistant' || module.id === 'homeassistant';
+  
+  // Vérifier si c'est le module Services de l'Administration pour appliquer un style spécial
+  const isAdministration = module.title.toLowerCase().includes('administration') || module.title.toLowerCase().includes('services administratifs') || module.id === 'administration';
+  
+  // Vérifier si c'est le module Générateur de Prompts IA pour appliquer un style spécial
+  const isPromptGenerator = module.title.toLowerCase().includes('prompt') || module.title.toLowerCase().includes('générateur de prompts') || module.id === 'prompt-generator';
   
   // Debug temporaire pour Home Assistant - LOG TRÈS VISIBLE
   if (module.id === 'home-assistant' || module.title.toLowerCase().includes('home') || module.title.toLowerCase().includes('domotisez')) {
@@ -302,12 +319,12 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   }
 
   return (
-    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isIAPhoto ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isIATube ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isStirlingPDF ? 'ring-2 ring-gray-500 ring-opacity-50' : ''} ${isMeetingReports ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isHunyuan3D ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCodeLearning ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isHomeAssistant ? 'ring-2 ring-orange-500 ring-opacity-50' : ''}`}>
+    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isIAPhoto ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isIATube ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isStirlingPDF ? 'ring-2 ring-gray-500 ring-opacity-50' : ''} ${isMeetingReports ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isHunyuan3D ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCodeLearning ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isApprendreAutrement ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isHomeAssistant ? 'ring-2 ring-orange-500 ring-opacity-50' : ''} ${isAdministration ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPromptGenerator ? 'ring-2 ring-purple-500 ring-opacity-50' : ''}`}>
       
       {/* Image du module - Cliquable */}
       <Link href={`/card/${moduleSlug}`} className="block">
         <div 
-          className={`relative h-48 cursor-pointer group overflow-hidden ${isMeetingReports ? 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700' : isHunyuan3D ? 'bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-700' : isCodeLearning ? 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600' : isHomeAssistant ? 'bg-gradient-to-br from-orange-400 via-red-500 to-blue-600' : isMeTube ? 'bg-gradient-to-br from-red-500 via-pink-600 to-purple-600' : isLibrespeed ? 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600' : 'bg-gradient-to-br from-blue-50 to-indigo-100'}`} 
+          className={`relative h-48 cursor-pointer group overflow-hidden ${isMeetingReports ? 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700' : isHunyuan3D ? 'bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-700' : isCodeLearning ? 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600' : isApprendreAutrement ? 'bg-gradient-to-br from-purple-500 via-pink-600 to-orange-500' : isPromptGenerator ? 'bg-gradient-to-br from-purple-500 via-pink-600 to-orange-500' : isHomeAssistant ? 'bg-gradient-to-br from-orange-400 via-red-500 to-blue-600' : isAdministration ? 'bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600' : isMeTube ? 'bg-gradient-to-br from-red-500 via-pink-600 to-purple-600' : isLibrespeed ? 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600' : 'bg-gradient-to-br from-blue-50 to-indigo-100'}`} 
           style={isHomeAssistant ? { 
             background: 'linear-gradient(to bottom right, #fb923c, #ef4444, #2563eb)',
             backgroundImage: 'none'
@@ -343,6 +360,23 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             </>
           )}
           
+          {/* Particules animées pour Administration */}
+          {isAdministration && (
+            <>
+              <div className="absolute inset-0">
+                <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+                <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
+                <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
+                <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
+                <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
+                <div className="absolute top-32 left-1/2 w-1.5 h-1.5 bg-blue-300/30 rounded-full animate-pulse"></div>
+                <div className="absolute bottom-32 right-1/4 w-1 h-1 bg-indigo-300/30 rounded-full animate-bounce"></div>
+              </div>
+              {/* Effet de vague en bas */}
+              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
+            </>
+          )}
+          
           {module.youtube_url && (
             <div className="absolute inset-0 flex items-center justify-center z-10">
               <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
@@ -355,7 +389,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
           )}
           
           {/* Image simple sans gestion d'erreur - forcer l'affichage (masquée pour les modules spéciaux) */}
-          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && !isHunyuan3D && !isCodeLearning && !isHomeAssistant && imageUrl && (
+          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && !isHunyuan3D && !isCodeLearning && !isApprendreAutrement && !isHomeAssistant && !isAdministration && imageUrl && (
             <img 
               src={imageUrl} 
               alt={module.title}
@@ -365,7 +399,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
           )}
           
           {/* Overlay au survol - seulement pour les modules non-spéciaux */}
-          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && !isHunyuan3D && !isCodeLearning && !isHomeAssistant && (
+          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && !isHunyuan3D && !isCodeLearning && !isHomeAssistant && !isAdministration && (
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
               <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white bg-opacity-90 rounded-full p-3">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1705,7 +1739,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             </>
           ) : isCodeLearning ? (
             <>
-              {/* Style spécial pour Apprendre le Code Informatique - informations visibles en permanence */}
+              {/* Style spécial pour Apprendre le Code aux enfants - informations visibles en permanence */}
               {/* Badge catégorie en haut à gauche */}
               <div className="absolute top-3 left-3 z-20">
                 <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
@@ -1713,10 +1747,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                 </span>
               </div>
               
-              {/* Logo Apprendre le Code Informatique au centre */}
+              {/* Logo Apprendre le Code aux enfants au centre */}
               <div className="absolute inset-0 flex items-center justify-center z-20">
                 <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-blue-500/20">
-                  {/* Logo Apprendre le Code Informatique avec icône de code/programmation */}
+                  {/* Logo Apprendre le Code aux enfants avec icône de code/programmation */}
                   <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
                     {/* Cercle de fond */}
                     <circle cx="12" cy="12" r="10" fill="#3B82F6" stroke="#2563EB" strokeWidth="1"/>
@@ -1747,7 +1781,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               {/* Badge prix et nom du module en haut à droite */}
               <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
                 <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                  Apprendre le Code Informatique
+                  Apprendre le Code aux enfants
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
                   {formatPrice(module.price)}
@@ -1761,10 +1795,53 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                     {module.subtitle}
                   </p>
                 )}
-                {/* Badge "EDUCATION" pour Apprendre le Code Informatique */}
+                {/* Badge "EDUCATION" pour Apprendre le Code aux enfants */}
                 <div className="mt-2">
                   <span className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
                     🎓 EDUCATION
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : isApprendreAutrement ? (
+            <>
+              {/* Style spécial pour Apprendre Autrement - informations visibles en permanence */}
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Logo Apprendre Autrement au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-purple-500/20">
+                  {/* Logo Apprendre Autrement avec icône arc-en-ciel */}
+                  <span className="text-6xl">🌈</span>
+                </div>
+              </div>
+              
+              {/* Badge prix et nom du module en haut à droite */}
+              <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                <span className="bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  Apprendre Autrement
+                </span>
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "ÉDUCATION ADAPTÉE" pour Apprendre Autrement */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-purple-400 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    🎓 ÉDUCATION ADAPTÉE
                   </span>
                 </div>
               </div>
@@ -1833,6 +1910,62 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                 </div>
               </div>
             </>
+          ) : isAdministration ? (
+            <>
+              {/* Style spécial pour Services de l'Administration - informations visibles en permanence */}
+              {/* Particules animées pour Administration */}
+              <div className="absolute inset-0">
+                <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+                <div className="absolute top-20 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
+                <div className="absolute bottom-10 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse"></div>
+                <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-bounce"></div>
+                <div className="absolute top-1/2 left-1/3 w-1 h-1 bg-white/15 rounded-full animate-pulse"></div>
+                <div className="absolute top-32 left-1/2 w-1.5 h-1.5 bg-blue-300/30 rounded-full animate-pulse"></div>
+                <div className="absolute bottom-32 right-1/4 w-1 h-1 bg-indigo-300/30 rounded-full animate-bounce"></div>
+              </div>
+              {/* Effet de vague en bas */}
+              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/10 to-transparent"></div>
+              
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-20">
+                <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  {module.category || 'SERVICES PUBLICS'}
+                </span>
+              </div>
+              
+              {/* Logo Services de l'Administration au centre */}
+              <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-blue-500/30 transform hover:scale-105 transition-transform duration-300">
+                  {/* Icône de bâtiment administratif */}
+                  <span className="text-8xl">🏛️</span>
+                </div>
+              </div>
+              
+              {/* Badge prix et nom du module en haut à droite */}
+              <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+                <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  Services Administratifs
+                </span>
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+            
+              {/* Overlay avec sous-titre en bas - visible en permanence */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white/90 text-sm leading-relaxed drop-shadow-lg line-clamp-2 mb-2">
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "SERVICES PUBLICS" pour Administration */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-blue-400 to-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    🏛️ SERVICES PUBLICS
+                  </span>
+                </div>
+              </div>
+            </>
           ) : (
             <>
               {/* Style normal pour les autres modules */}
@@ -1856,10 +1989,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
         <Link href={`/card/${moduleSlug}`} className="block group">
           {/* Titre du module - affiché pour tous les modules */}
           <h3 className="text-3xl sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
-            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : isHunyuan3D ? "Hunyuan 3D - Génération 3D par IA" : isCodeLearning ? "Apprendre le Code Informatique" : isHomeAssistant ? "Domotisez votre habitat" : module.title}
+            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : isHunyuan3D ? "Hunyuan 3D - Génération 3D par IA" : isCodeLearning ? "Apprendre le Code aux enfants" : isApprendreAutrement ? "Apprendre Autrement" : isPromptGenerator ? "Générateur de Prompts IA" : isHomeAssistant ? "Domotisez votre habitat" : isAdministration ? "Services de l'Administration" : module.title}
           </h3>
           {/* Pour les modules spéciaux, afficher seulement la description si pas de sous-titre */}
-          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isQRCodes || isWhisper || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports || isHunyuan3D || isCodeLearning || isHomeAssistant ? (
+          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isQRCodes || isWhisper || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports || isHunyuan3D || isCodeLearning || isApprendreAutrement || isPromptGenerator || isHomeAssistant || isAdministration ? (
             !module.subtitle && (
               <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
                 {isComfyUI ? "ComfyUI : contrôle total sur chaque étape de la création d'image" : isMeetingReports ? "Transformez automatiquement vos réunions en rapports professionnels avec l'IA" : isHunyuan3D ? "Hunyuan 3D : Générez des modèles 3D à partir d'images avec l'intelligence artificielle" : isHomeAssistant ? (module.description?.toLowerCase().startsWith('avec home assistant') ? module.description : `Avec Home Assistant, ${module.description || 'domotisez votre habitat (maison, garage, lieu de vacances, lieu de travail, etc.) sans frais d\'installation, ni frais de logiciels puisque tout est open-source. Des centaines de codes prêts à l\'emploi sont aussi mis à disposition gratuitement.'}`) : module.description}

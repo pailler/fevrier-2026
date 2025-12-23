@@ -1,0 +1,38 @@
+services:
+  apprendre-autrement:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: apprendre-autrement
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=9001
+      - HOSTNAME=0.0.0.0
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    ports:
+      - "9001:9001"
+    volumes:
+      - ./public/sounds:/app/public/sounds:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - apprendre-autrement-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9001/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+
+networks:
+  apprendre-autrement-network:
+    driver: bridge
+

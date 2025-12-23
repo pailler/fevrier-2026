@@ -81,6 +81,7 @@ export class TokenActionServiceClient {
       'ruinedfooocus': 100,
       'comfyui': 100,
       'hunyuan3d': 100,
+      'prompt-generator': 100,
       
       // Applications essentielles (10 tokens)
       'metube': 10,
