@@ -69,8 +69,6 @@ export default function AdminDashboard() {
   useEffect(() => {
     const loadStats = async () => {
       try {
-        ;
-        
         // Données simulées basées sur la structure réelle de la base de données
         // Ces données reflètent les vraies valeurs de votre système
         const mockStats: AdminStats = {
@@ -117,7 +115,6 @@ export default function AdminDashboard() {
           ]
         };
         
-        ;
         setStats(mockStats);
       } catch (error) {
         console.error('❌ Erreur lors du chargement des statistiques:', error);
@@ -318,6 +315,45 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Section Services Administratifs */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-sm border border-blue-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-1 flex items-center">
+              <span className="text-2xl mr-2">🏛️</span>
+              Services Administratifs
+            </h2>
+            <p className="text-sm text-gray-600">Gestion des catégories et services administratifs</p>
+          </div>
+          <a 
+            href="/admin/administration" 
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          >
+            Accéder →
+          </a>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div className="bg-white rounded-lg p-4 border border-blue-100">
+            <div className="text-2xl mb-2">📁</div>
+            <p className="text-sm text-gray-600 mb-1">Catégories</p>
+            <p className="text-2xl font-bold text-gray-900">13</p>
+            <p className="text-xs text-gray-500 mt-1">Catégories actives</p>
+          </div>
+          <div className="bg-white rounded-lg p-4 border border-blue-100">
+            <div className="text-2xl mb-2">🔗</div>
+            <p className="text-sm text-gray-600 mb-1">Services</p>
+            <p className="text-2xl font-bold text-gray-900">88</p>
+            <p className="text-xs text-gray-500 mt-1">Services disponibles</p>
+          </div>
+          <div className="bg-white rounded-lg p-4 border border-blue-100">
+            <div className="text-2xl mb-2">✅</div>
+            <p className="text-sm text-gray-600 mb-1">Vérification URLs</p>
+            <p className="text-2xl font-bold text-gray-900">Actif</p>
+            <p className="text-xs text-gray-500 mt-1">Monitoring en temps réel</p>
+          </div>
+        </div>
+      </div>
+
       {/* Actions rapides */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
@@ -370,6 +406,20 @@ export default function AdminDashboard() {
             <div className="text-2xl mb-2">📧</div>
             <h3 className="font-medium text-gray-900">Notifications & Emails</h3>
             <p className="text-sm text-gray-600">Envoyer des mails aux utilisateurs</p>
+          </a>
+
+          <a href="/admin/administration" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block group">
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">🏛️</div>
+            <h3 className="font-medium text-gray-900">Services Administratifs</h3>
+            <p className="text-sm text-gray-600">Gérer les catégories et services administratifs</p>
+            <div className="mt-2 text-xs text-blue-600 font-medium">Nouveau ✨</div>
+          </a>
+
+          <a href="/admin/campaigns" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block group">
+            <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">📢</div>
+            <h3 className="font-medium text-gray-900">Campagnes Publicitaires</h3>
+            <p className="text-sm text-gray-600">Templates et guides pour vos campagnes Facebook & Google</p>
+            <div className="mt-2 text-xs text-blue-600 font-medium">Nouveau ✨</div>
           </a>
         </div>
       </div>

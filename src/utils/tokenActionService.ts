@@ -7,6 +7,8 @@ export const TOKEN_COSTS = {
   'comfyui': 100,
   'hunyuan3d': 100,
   'prompt-generator': 100,
+  'ai-detector': 100,
+  'ia-generator': 100, // Alias pour ai-detector
   
   // Applications essentielles (10 tokens)
   'metube': 10,
@@ -16,6 +18,7 @@ export const TOKEN_COSTS = {
   'meeting-reports': 100,
   'cogstudio': 10,
   'code-learning': 10,
+  'apprendre-autrement': 10,
   'administration': 10,
   
   // Applications premium (100 tokens)
@@ -33,6 +36,15 @@ export interface TokenConsumptionResult {
   pricingUrl?: string;
 }
 
+// Mapping des alias vers les IDs de modules réels
+const MODULE_ID_ALIASES: { [key: string]: keyof typeof TOKEN_COSTS } = {
+  'ia-generator': 'ai-detector',
+  'ia_generator': 'ai-detector',
+  'iagenerator': 'ai-detector',
+  'ai-detector': 'ai-detector',
+  'aidetector': 'ai-detector',
+};
+
 export class TokenActionService {
   private static instance: TokenActionService;
 
@@ -43,14 +55,43 @@ export class TokenActionService {
     return TokenActionService.instance;
   }
 
+  // Normaliser l'ID du module (gérer les alias)
+  private normalizeModuleId(moduleId: string): keyof typeof TOKEN_COSTS | null {
+    const normalized = moduleId.toLowerCase().trim();
+    
+    // Vérifier d'abord les alias
+    if (MODULE_ID_ALIASES[normalized]) {
+      return MODULE_ID_ALIASES[normalized];
+    }
+    
+    // Vérifier si c'est directement dans TOKEN_COSTS
+    if (normalized in TOKEN_COSTS) {
+      return normalized as keyof typeof TOKEN_COSTS;
+    }
+    
+    return null;
+  }
+
   async checkAndConsumeTokens(
     userId: string,
-    moduleId: ModuleId,
+    moduleId: ModuleId | string,
     action: string,
     moduleTitle: string
   ): Promise<TokenConsumptionResult> {
     try {
-      const cost = TOKEN_COSTS[moduleId];
+      // Normaliser l'ID du module pour gérer les alias
+      const normalizedModuleId = this.normalizeModuleId(moduleId as string);
+      
+      if (!normalizedModuleId) {
+        return {
+          success: false,
+          tokensConsumed: 0,
+          tokensRemaining: 0,
+          reason: `Module ${moduleId} non trouvé. Modules disponibles: ${Object.keys(TOKEN_COSTS).join(', ')}`
+        };
+      }
+      
+      const cost = TOKEN_COSTS[normalizedModuleId];
       if (!cost) {
         return {
           success: false,
@@ -69,9 +110,9 @@ export class TokenActionService {
         body: JSON.stringify({
           userId,
           tokensToConsume: cost,
-          moduleId: moduleId,
+          moduleId: normalizedModuleId, // Utiliser l'ID normalisé
           moduleName: moduleTitle,
-          action: `${moduleId}.${action}`,
+          action: `${normalizedModuleId}.${action}`,
           description: `Accès à ${moduleTitle}`
         })
       });

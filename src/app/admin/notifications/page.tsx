@@ -6,8 +6,8 @@ import { getSupabaseClient } from '../../../utils/supabaseService';
 interface NotificationSetting {
   id: string;
   event_type: string;
-  name?: string;
-  description?: string;
+  name: string;
+  description: string;
   is_enabled: boolean;
   email_template_subject: string;
   email_template_body: string;
@@ -384,7 +384,7 @@ export default function AdminNotifications() {
             value={testEmail}
             onChange={(e) => setTestEmail(e.target.value)}
             placeholder="Email de test..."
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent placeholder:text-gray-400"
           />
           <button
             onClick={sendTestEmail}
@@ -425,7 +425,7 @@ export default function AdminNotifications() {
               value={noModuleEmail}
               onChange={(e) => setNoModuleEmail(e.target.value)}
               placeholder="utilisateur@example.com"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400"
             />
           </div>
 
@@ -439,7 +439,7 @@ export default function AdminNotifications() {
               value={noModuleUserName}
               onChange={(e) => setNoModuleUserName(e.target.value)}
               placeholder="Prénom ou nom d'utilisateur"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400"
             />
             <p className="mt-1 text-xs text-gray-500">
               Si vide, le nom sera extrait de l'adresse email
@@ -456,30 +456,20 @@ export default function AdminNotifications() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <a
-              href="/admin/notifications/preview"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium transition-colors text-center flex items-center justify-center"
-            >
-              👁️ Voir l'aperçu
-            </a>
-            <button
-              onClick={sendNoModuleEmail}
-              disabled={!noModuleEmail || noModuleSending}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
-            >
-              {noModuleSending ? (
-                <span className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Envoi en cours...
-                </span>
-              ) : (
-                '📧 Envoyer le mail'
-              )}
-            </button>
-          </div>
+          <button
+            onClick={sendNoModuleEmail}
+            disabled={!noModuleEmail || noModuleSending}
+            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+          >
+            {noModuleSending ? (
+              <span className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Envoi en cours...
+              </span>
+            ) : (
+              '📧 Envoyer le mail'
+            )}
+          </button>
 
           <div className="mt-4 p-4 bg-white border border-blue-200 rounded-lg">
             <p className="text-sm text-gray-900 font-semibold mb-3 flex items-center">
@@ -489,7 +479,7 @@ export default function AdminNotifications() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <div className="flex items-start space-x-2">
                 <span className="text-blue-600 mt-0.5">✓</span>
-                <span className="text-sm text-gray-700">Tutoriel simple en 4 étapes</span>
+                <span className="text-sm text-gray-700">Tutoriel simple en 3 étapes</span>
               </div>
               <div className="flex items-start space-x-2">
                 <span className="text-blue-600 mt-0.5">✓</span>
@@ -521,27 +511,25 @@ export default function AdminNotifications() {
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
                     <h3 className="text-lg font-medium text-gray-900">
-                      {setting.name || setting.event_type}
+                      {setting.name}
                     </h3>
                     {getStatusBadge(setting.is_enabled)}
                   </div>
                   
-                  {setting.description && (
-                    <p className="text-sm text-gray-600 mb-3">
-                      {setting.description}
-                    </p>
-                  )}
+                  <p className="text-sm text-gray-600 mb-3">
+                    {setting.description}
+                  </p>
                   
                   <div className="text-xs text-gray-500 mb-2">
                     <strong>Type d'événement:</strong> {setting.event_type}
                   </div>
                   
                   <div className="text-xs text-gray-500 mb-2">
-                    <strong>Sujet:</strong> {setting.email_template_subject || 'Non défini'}
+                    <strong>Sujet:</strong> {setting.email_template_subject}
                   </div>
                   
                   <div className="text-xs text-gray-500">
-                    <strong>Corps:</strong> {setting.email_template_body ? `${setting.email_template_body.substring(0, 100)}...` : 'Non défini'}
+                    <strong>Corps:</strong> {setting.email_template_body.substring(0, 100)}...
                   </div>
                 </div>
                 

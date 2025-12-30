@@ -17,6 +17,51 @@ export default function CodeLearningPage() {
   const router = useRouter();
   const [completedExercises, setCompletedExercises] = useState<string[]>([]);
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
+  const [tokenValidated, setTokenValidated] = useState(false);
+  const [tokenError, setTokenError] = useState<string | null>(null);
+
+  // Valider le token au chargement de la page
+  useEffect(() => {
+    const validateToken = async () => {
+      if (typeof window === 'undefined') return;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+
+      if (!token) {
+        setTokenError('Token d\'accès manquant. Veuillez accéder à cette page via le bouton "Accéder à Apprendre le Code aux enfants".');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/validate-internal-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            token: token,
+            moduleId: 'code-learning'
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          setTokenError(errorData.error || 'Token invalide ou expiré. Veuillez réessayer.');
+          return;
+        }
+
+        // Token valide, nettoyer l'URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        setTokenValidated(true);
+      } catch (err) {
+        console.error('Erreur validation token:', err);
+        setTokenError('Erreur lors de la validation du token. Veuillez réessayer.');
+      }
+    };
+
+    validateToken();
+  }, []);
 
   // Charger la progression depuis localStorage
   useEffect(() => {
@@ -42,6 +87,38 @@ export default function CodeLearningPage() {
 
   const totalExercises = exercises.length;
   const progress = (completedExercises.length / totalExercises) * 100;
+
+  // Afficher l'erreur de token si présente
+  if (tokenError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <p className="text-red-800 font-medium mb-2">⚠️ Erreur d'accès</p>
+            <p className="text-red-600 mb-4">{tokenError}</p>
+            <button
+              onClick={() => router.push('/encours')}
+              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+            >
+              Retour aux modules
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Afficher un loader pendant la validation du token
+  if (!tokenValidated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+          <p className="text-gray-600">Vérification de l'accès...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">

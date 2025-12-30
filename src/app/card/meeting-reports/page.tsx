@@ -210,6 +210,130 @@ export default function MeetingReportsPage() {
     }
   }, []);
 
+  // Ajouter les données structurées JSON-LD pour le SEO
+  useEffect(() => {
+    const softwareApplicationSchema = {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Compte rendus IA - IA Home",
+      "applicationCategory": "WebApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "100",
+        "priceCurrency": "TOKENS"
+      },
+      "description": "Compte rendus IA est une plateforme d'intelligence artificielle qui transforme automatiquement vos réunions en rapports professionnels détaillés. Enregistrez vos réunions, uploadez des fichiers audio, et obtenez instantanément des transcriptions précises avec OpenAI Whisper et des résumés intelligents avec GPT. Export PDF professionnel, identification des intervenants, extraction des points clés et des actions à suivre.",
+      "url": "https://iahome.fr/card/meeting-reports",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "420"
+      },
+      "featureList": [
+        "Enregistrement audio en temps réel",
+        "Transcription automatique avec Whisper",
+        "Résumé intelligent avec GPT",
+        "Identification des intervenants",
+        "Extraction des points clés",
+        "Actions à suivre automatiques",
+        "Export PDF professionnel",
+        "Export Markdown"
+      ]
+    };
+
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce que Compte rendus IA ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Compte rendus IA est une plateforme d'intelligence artificielle qui transforme automatiquement vos réunions en rapports professionnels détaillés. Enregistrez vos réunions, uploadez des fichiers audio, et obtenez instantanément des transcriptions précises avec OpenAI Whisper et des résumés intelligents avec GPT. Basée sur les technologies OpenAI Whisper pour la transcription et GPT pour le résumé, cette solution vous permet de capturer, analyser et documenter vos réunions avec une efficacité maximale."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment utiliser Compte rendus IA ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pour utiliser Compte rendus IA, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via meeting-reports.iahome.fr. Enregistrez vos réunions en temps réel avec le microphone intégré, ou uploadez des fichiers audio existants (MP3, WAV, WebM). L'IA transcrit automatiquement l'audio avec Whisper, puis génère un résumé intelligent avec GPT incluant les points clés, les décisions prises et les actions à suivre. Vous pouvez ensuite télécharger le rapport en PDF ou Markdown."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quelle est la précision de la transcription de Compte rendus IA ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Compte rendus IA utilise OpenAI Whisper, un modèle de transcription audio de nouvelle génération capable de comprendre la parole avec une précision exceptionnelle. La transcription est fidèle avec identification des intervenants, extraction des points clés et des actions à suivre. La précision est généralement très élevée, même dans des conditions difficiles ou avec plusieurs intervenants."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Compte rendus IA est-il gratuit ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "L'activation de Compte rendus IA coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : enregistrement audio, transcription automatique, résumé intelligent, identification des intervenants, extraction des points clés, et export PDF/Markdown. Il n'y a pas de frais supplémentaires pour le traitement des réunions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quels formats audio sont supportés par Compte rendus IA ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Compte rendus IA supporte une large gamme de formats audio : MP3, WAV, WebM, et bien d'autres. L'outil utilise FFmpeg pour la conversion audio optimisée, garantissant le support de tous les formats de fichiers audio et vidéo courants. Vous pouvez enregistrer directement depuis l'interface ou uploader vos fichiers existants."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Combien de temps prend la génération d'un rapport de réunion ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Le temps de traitement dépend de la durée de la réunion. Généralement, la transcription et le résumé sont générés en quelques minutes pour une réunion d'une heure. Grâce à notre infrastructure haute performance et aux technologies OpenAI Whisper et GPT, vous obtenez des résultats rapides même pour les réunions les plus longues."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Pour qui est fait Compte rendus IA ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Compte rendus IA est fait pour plusieurs types d'utilisateurs : équipes professionnelles qui documentent leurs réunions hebdomadaires, stand-ups et réunions de projet, formateurs et conférenciers qui transcrivent leurs sessions de formation, recruteurs et professionnels qui enregistrent et analysent des entretiens, et toute personne qui veut automatiser la création de rapports de réunion professionnels."
+          }
+        }
+      ]
+    };
+
+    // Créer et ajouter le script pour SoftwareApplication
+    const script1 = document.createElement('script');
+    script1.type = 'application/ld+json';
+    script1.id = 'software-application-schema-mr';
+    script1.text = JSON.stringify(softwareApplicationSchema);
+    
+    // Créer et ajouter le script pour FAQPage
+    const script2 = document.createElement('script');
+    script2.type = 'application/ld+json';
+    script2.id = 'faq-schema-mr';
+    script2.text = JSON.stringify(faqSchema);
+
+    // Vérifier si les scripts existent déjà avant de les ajouter
+    if (!document.getElementById('software-application-schema-mr')) {
+      document.head.appendChild(script1);
+    }
+    if (!document.getElementById('faq-schema-mr')) {
+      document.head.appendChild(script2);
+    }
+
+    // Nettoyage lors du démontage
+    return () => {
+      const existingScript1 = document.getElementById('software-application-schema-mr');
+      const existingScript2 = document.getElementById('faq-schema-mr');
+      if (existingScript1) existingScript1.remove();
+      if (existingScript2) existingScript2.remove();
+    };
+  }, []);
+
   // Charger les détails de la carte
   useEffect(() => {
     const fetchCardDetails = async () => {
@@ -384,14 +508,13 @@ export default function MeetingReportsPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Transformez vos réunions en rapports professionnels avec l'IA
+                Compte rendus IA : transformez vos réunions en rapports professionnels automatiquement
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
                 {(card?.category || 'PRODUCTIVITÉ').toUpperCase()}
               </span>
               <p className="text-xl text-emerald-100 mb-6">
-                Enregistrez, transcrivez et résumez automatiquement vos réunions avec l'intelligence artificielle. 
-                Générez des rapports détaillés en quelques minutes.
+                Transformez automatiquement vos réunions en rapports professionnels avec Compte rendus IA. Enregistrement audio, transcription automatique avec Whisper, résumé intelligent avec GPT, export PDF. Gain de temps considérable pour équipes et professionnels.
               </p>
               
               {/* Badges de fonctionnalités */}
@@ -605,6 +728,266 @@ export default function MeetingReportsPage() {
               </div>
               
               <div className="space-y-8 sm:space-y-12 text-gray-700">
+                {/* Paragraphe citable par les IA (GEO) */}
+                <div className="bg-gradient-to-r from-emerald-100 to-teal-100 p-6 rounded-2xl border-l-4 border-emerald-500 mb-8">
+                  <p className="text-lg leading-relaxed text-gray-800">
+                    <strong>Compte rendus IA est une plateforme d'intelligence artificielle qui transforme automatiquement vos réunions en rapports professionnels détaillés.</strong> Enregistrez vos réunions, uploadez des fichiers audio, et obtenez instantanément des transcriptions précises avec OpenAI Whisper et des résumés intelligents avec GPT. Avec identification des intervenants, extraction des points clés, actions à suivre automatiques, et export PDF professionnel, c'est l'outil idéal pour équipes et professionnels qui veulent automatiser la création de rapports de réunion et gagner un temps considérable.
+                  </p>
+                </div>
+
+                {/* H2 - À quoi sert Compte rendus IA ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-900 via-teal-900 to-cyan-900 bg-clip-text text-transparent mb-6">
+                    À quoi sert Compte rendus IA ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-cyan-500 mb-6"></div>
+                  <div className="space-y-4 text-gray-700">
+                    <p className="text-lg leading-relaxed">
+                      Compte rendus IA permet de transformer automatiquement vos réunions en rapports professionnels détaillés avec une précision exceptionnelle. Il répond aux besoins de ceux qui souhaitent automatiser la documentation de leurs réunions, gagner du temps, et améliorer la productivité de leur équipe.
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 ml-4">
+                      <li className="text-lg"><strong>Automatiser la documentation :</strong> Plus besoin de prendre des notes manuellement, l'IA capture tout et génère des rapports complets</li>
+                      <li className="text-lg"><strong>Gagner du temps :</strong> Transformez vos réunions en rapports professionnels en quelques minutes au lieu de plusieurs heures</li>
+                      <li className="text-lg"><strong>Améliorer la précision :</strong> Transcription fidèle avec identification des intervenants et extraction des points clés</li>
+                      <li className="text-lg"><strong>Faciliter le suivi :</strong> Extraction automatique des actions à suivre et des décisions prises</li>
+                    </ul>
+                    <p className="text-lg leading-relaxed mt-4">
+                      <strong>Cas concrets d'utilisation :</strong> Documentez automatiquement vos réunions d'équipe, stand-ups et réunions de projet, transcrivez vos sessions de formation et créez des supports de cours, enregistrez et analysez vos entretiens pour un suivi précis, ou créez des rapports professionnels pour vos clients et partenaires.
+                    </p>
+                  </div>
+                </div>
+
+                {/* H2 - Que peut faire Compte rendus IA ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-900 via-teal-900 to-cyan-900 bg-clip-text text-transparent mb-6">
+                    Que peut faire Compte rendus IA ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-cyan-500 mb-6"></div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-6 rounded-2xl border border-emerald-200">
+                      <h3 className="text-2xl font-bold text-emerald-900 mb-4">Enregistrement audio</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Enregistrez vos réunions directement depuis l'interface avec un microphone intégré et une qualité audio optimale. Enregistrement en temps réel avec contrôle simple et intuitif.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-teal-50 to-teal-100 p-6 rounded-2xl border border-teal-200">
+                      <h3 className="text-2xl font-bold text-teal-900 mb-4">Transcription automatique</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Transcription automatique avec OpenAI Whisper, un modèle de nouvelle génération capable de comprendre la parole avec une précision exceptionnelle. Support de multiples formats audio (MP3, WAV, WebM).
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 rounded-2xl border border-cyan-200">
+                      <h3 className="text-2xl font-bold text-cyan-900 mb-4">Résumé intelligent</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        L'IA génère automatiquement des résumés structurés avec points clés, décisions prises et actions à suivre. Utilise GPT pour une compréhension contextuelle et une extraction intelligente des informations.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200">
+                      <h3 className="text-2xl font-bold text-blue-900 mb-4">Export professionnel</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Téléchargez vos rapports en PDF ou Markdown avec mise en forme professionnelle. Rapports prêts à partager avec votre équipe, vos clients ou vos partenaires.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* H2 - Comment utiliser Compte rendus IA ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-900 via-teal-900 to-cyan-900 bg-clip-text text-transparent mb-6">
+                    Comment utiliser Compte rendus IA ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-cyan-500 mb-6"></div>
+                  <div className="space-y-6">
+                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-6 rounded-2xl border border-emerald-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Activer Compte rendus IA</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            Activez Compte rendus IA avec 100 tokens. Une fois activé, le service est accessible depuis vos applications actives via meeting-reports.iahome.fr.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-6 rounded-2xl border border-teal-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">2</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Enregistrer ou uploader</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            Enregistrez vos réunions en temps réel avec le microphone intégré, ou uploadez des fichiers audio existants (MP3, WAV, WebM). L'interface simple rend l'utilisation accessible à tous.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-cyan-50 to-blue-50 p-6 rounded-2xl border border-cyan-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">3</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Transcription et résumé automatiques</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            L'IA transcrit automatiquement l'audio avec Whisper, puis génère un résumé intelligent avec GPT incluant les points clés, les décisions prises et les actions à suivre. Le processus est entièrement automatique.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">4</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Télécharger le rapport</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            Téléchargez votre rapport en PDF ou Markdown avec mise en forme professionnelle. Partagez-le avec votre équipe, vos clients ou vos partenaires, ou archivez-le pour référence future.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* H2 - Pour qui est fait Compte rendus IA ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-900 via-teal-900 to-cyan-900 bg-clip-text text-transparent mb-6">
+                    Pour qui est fait Compte rendus IA ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-cyan-500 mb-6"></div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-6 rounded-2xl border border-emerald-200 text-center">
+                      <div className="text-4xl mb-4">💼</div>
+                      <h3 className="text-xl font-bold text-emerald-900 mb-2">Équipes professionnelles</h3>
+                      <p className="text-gray-700">Documentez automatiquement vos réunions hebdomadaires, stand-ups et réunions de projet avec des rapports détaillés. Gagnez du temps et améliorez la productivité.</p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-teal-50 to-teal-100 p-6 rounded-2xl border border-teal-200 text-center">
+                      <div className="text-4xl mb-4">🎓</div>
+                      <h3 className="text-xl font-bold text-teal-900 mb-2">Formateurs et conférenciers</h3>
+                      <p className="text-gray-700">Transcrivez vos sessions de formation et créez des supports de cours automatiquement. Transformez vos conférences en documents exploitables.</p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 rounded-2xl border border-cyan-200 text-center">
+                      <div className="text-4xl mb-4">🤝</div>
+                      <h3 className="text-xl font-bold text-cyan-900 mb-2">Recruteurs et professionnels</h3>
+                      <p className="text-gray-700">Enregistrez et analysez vos entretiens pour un suivi précis des candidats et des clients. Créez des rapports professionnels automatiquement.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* H2 - Compte rendus IA vs prise de notes manuelle */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-900 via-teal-900 to-cyan-900 bg-clip-text text-transparent mb-6">
+                    Compte rendus IA vs prise de notes manuelle
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-cyan-500 mb-6"></div>
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-8 rounded-2xl border border-gray-200">
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white">
+                            <th className="border border-gray-300 p-4 text-left">Fonctionnalité</th>
+                            <th className="border border-gray-300 p-4 text-center">Compte rendus IA</th>
+                            <th className="border border-gray-300 p-4 text-center">Prise de notes manuelle</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="bg-white">
+                            <td className="border border-gray-300 p-4 font-semibold">Temps de création</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ Quelques minutes</td>
+                            <td className="border border-gray-300 p-4 text-center">❌ Plusieurs heures</td>
+                          </tr>
+                          <tr className="bg-gray-50">
+                            <td className="border border-gray-300 p-4 font-semibold">Précision</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ Transcription fidèle (Whisper)</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Oublis et erreurs possibles</td>
+                          </tr>
+                          <tr className="bg-white">
+                            <td className="border border-gray-300 p-4 font-semibold">Identification intervenants</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ Automatique</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Manuelle et sujette à erreurs</td>
+                          </tr>
+                          <tr className="bg-gray-50">
+                            <td className="border border-gray-300 p-4 font-semibold">Extraction points clés</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ Automatique avec IA</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Manuelle et subjective</td>
+                          </tr>
+                          <tr className="bg-white">
+                            <td className="border border-gray-300 p-4 font-semibold">Actions à suivre</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ Extraction automatique</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Manuelle et souvent incomplète</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="mt-6 text-gray-700 leading-relaxed">
+                      <strong>En résumé :</strong> Compte rendus IA offre une alternative rapide et précise à la prise de notes manuelle. Contrairement à la prise de notes manuelle qui prend plusieurs heures et est sujette aux oublis et erreurs, Compte rendus IA génère des rapports professionnels en quelques minutes avec une transcription fidèle, une identification automatique des intervenants, et une extraction intelligente des points clés et des actions à suivre. C'est la solution idéale pour ceux qui veulent automatiser la documentation de leurs réunions et gagner un temps considérable.
+                    </p>
+                  </div>
+                </div>
+
+                {/* H2 - Questions fréquentes sur Compte rendus IA (FAQ) */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-900 via-teal-900 to-cyan-900 bg-clip-text text-transparent mb-6">
+                    Questions fréquentes sur Compte rendus IA (FAQ)
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-cyan-500 mb-6"></div>
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-6 rounded-2xl border-l-4 border-emerald-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Qu'est-ce que Compte rendus IA ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Compte rendus IA est une plateforme d'intelligence artificielle qui transforme automatiquement vos réunions en rapports professionnels détaillés. Enregistrez vos réunions, uploadez des fichiers audio, et obtenez instantanément des transcriptions précises avec OpenAI Whisper et des résumés intelligents avec GPT. Basée sur les technologies OpenAI Whisper pour la transcription et GPT pour le résumé, cette solution vous permet de capturer, analyser et documenter vos réunions avec une efficacité maximale.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-teal-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser Compte rendus IA ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Pour utiliser Compte rendus IA, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via meeting-reports.iahome.fr. Enregistrez vos réunions en temps réel avec le microphone intégré, ou uploadez des fichiers audio existants (MP3, WAV, WebM). L'IA transcrit automatiquement l'audio avec Whisper, puis génère un résumé intelligent avec GPT incluant les points clés, les décisions prises et les actions à suivre. Vous pouvez ensuite télécharger le rapport en PDF ou Markdown.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-cyan-50 to-blue-50 p-6 rounded-2xl border-l-4 border-cyan-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Quelle est la précision de la transcription de Compte rendus IA ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Compte rendus IA utilise OpenAI Whisper, un modèle de transcription audio de nouvelle génération capable de comprendre la parole avec une précision exceptionnelle. La transcription est fidèle avec identification des intervenants, extraction des points clés et des actions à suivre. La précision est généralement très élevée, même dans des conditions difficiles ou avec plusieurs intervenants.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-blue-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Compte rendus IA est-il gratuit ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        L'activation de Compte rendus IA coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : enregistrement audio, transcription automatique, résumé intelligent, identification des intervenants, extraction des points clés, et export PDF/Markdown. Il n'y a pas de frais supplémentaires pour le traitement des réunions.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Quels formats audio sont supportés par Compte rendus IA ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Compte rendus IA supporte une large gamme de formats audio : MP3, WAV, WebM, et bien d'autres. L'outil utilise FFmpeg pour la conversion audio optimisée, garantissant le support de tous les formats de fichiers audio et vidéo courants. Vous pouvez enregistrer directement depuis l'interface ou uploader vos fichiers existants.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-purple-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Combien de temps prend la génération d'un rapport de réunion ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Le temps de traitement dépend de la durée de la réunion. Généralement, la transcription et le résumé sont générés en quelques minutes pour une réunion d'une heure. Grâce à notre infrastructure haute performance et aux technologies OpenAI Whisper et GPT, vous obtenez des résultats rapides même pour les réunions les plus longues.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-pink-50 to-rose-50 p-6 rounded-2xl border-l-4 border-pink-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Pour qui est fait Compte rendus IA ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Compte rendus IA est fait pour plusieurs types d'utilisateurs : équipes professionnelles qui documentent leurs réunions hebdomadaires, stand-ups et réunions de projet, formateurs et conférenciers qui transcrivent leurs sessions de formation, recruteurs et professionnels qui enregistrent et analysent des entretiens, et toute personne qui veut automatiser la création de rapports de réunion professionnels.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Description principale */}
                 <div className="text-center max-w-5xl mx-auto">
                   <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">

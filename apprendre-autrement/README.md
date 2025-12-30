@@ -74,7 +74,7 @@ apprendre-autrement/
 
 L'application utilise localStorage pour sauvegarder la progression. Tous les paramètres d'accessibilité et la progression sont stockés localement dans le navigateur.
 
-### Configuration du Générateur de Prompts IA
+### Configuration du Générateur de prompts
 
 Le générateur de prompts nécessite une clé API OpenAI pour fonctionner.
 

@@ -17,13 +17,22 @@ export default function Home() {
   const [modules, setModules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [forceShowContent, setForceShowContent] = useState(false);
 
   const [userSubscriptions, setUserSubscriptions] = useState<{[key: string]: boolean}>({});
   const [showScrollToTop, setShowScrollToTop] = useState(false);
 
   // Vérification de l'authentification (optionnelle pour cette page)
   useEffect(() => {
-    if (authLoading) return; // Attendre que l'authentification soit vérifiée
+    // Protection : si authLoading reste à true trop longtemps, ne pas bloquer
+    if (authLoading) {
+      // Timeout de sécurité : ne pas attendre indéfiniment
+      const authTimeout = setTimeout(() => {
+        console.warn('⚠️ authLoading prend trop de temps, continuation du chargement...');
+      }, 5000);
+      
+      return () => clearTimeout(authTimeout);
+    }
     
     // Authentification vérifiée
   }, [isAuthenticated, user, authLoading]);
@@ -70,26 +79,63 @@ export default function Home() {
   }, [user]);
 
   useEffect(() => {
+    // Protection contre un chargement infini : forcer l'arrêt après 8 secondes
+    const globalTimeout = setTimeout(() => {
+      console.warn('⏱️ Timeout global: arrêt forcé du chargement après 8 secondes');
+      setLoading(false);
+      setForceShowContent(true); // Forcer l'affichage du contenu
+      if (!error) {
+        setError('Le chargement a pris trop de temps. Affichage du contenu disponible.');
+      }
+      // Si modules est vide, initialiser avec un tableau vide
+      if (modules.length === 0) {
+        setModules([]);
+      }
+    }, 8000);
+
     // Charger les modules depuis Supabase
     const fetchModules = async () => {
       try {
         setError(null);
         setLoading(true);
         
-        // Test de connexion de base
-        const { data: testData, error: testError } = await supabase
-          .from('modules')
-          .select('count')
-          .limit(1);
+        // Wrapper les requêtes dans un Promise.race avec timeout pour éviter les blocages (réduit à 5 secondes)
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout: La requête Supabase a pris plus de 5 secondes')), 5000)
+        );
+        
+        // Test de connexion de base avec timeout
+        let testResult: any;
+        try {
+          const testQuery = supabase
+            .from('modules')
+            .select('count')
+            .limit(1);
+          testResult = await Promise.race([testQuery, timeoutPromise]);
+        } catch (error) {
+          console.error('❌ Erreur lors de la requête de test Supabase (timeout ou erreur):', error);
+          testResult = { data: null, error: error };
+        }
+        
+        const { error: testError } = testResult || { error: new Error('Résultat Supabase indéfini') };
         
         if (testError) {
           throw new Error(`Erreur de connexion à la base de données: ${testError.message}`);
         }
         
-        // Récupérer les modules (structure simple sans jointure)
-        const { data: modulesData, error: modulesError } = await supabase
-          .from('modules')
-          .select('*');
+        // Récupérer les modules (structure simple sans jointure) avec timeout
+        let modulesResult: any;
+        try {
+          const modulesQuery = supabase
+            .from('modules')
+            .select('*');
+          modulesResult = await Promise.race([modulesQuery, timeoutPromise]);
+        } catch (error) {
+          console.error('❌ Erreur lors de la requête modules Supabase (timeout ou erreur):', error);
+          modulesResult = { data: null, error: error };
+        }
+        
+        const { data: modulesData, error: modulesError } = modulesResult || { data: null, error: new Error('Résultat Supabase indéfini') };
         
         if (modulesError) {
           throw new Error(`Erreur lors du chargement des modules: ${modulesError.message}`);
@@ -119,12 +165,19 @@ export default function Home() {
       } catch (error) {
         console.error('Erreur lors du chargement des modules:', error);
         setError(error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite');
+        setModules([]); // Initialiser avec un tableau vide en cas d'erreur
       } finally {
-        setLoading(false);
+        clearTimeout(globalTimeout);
+        setLoading(false); // ✅ Toujours arrêter le chargement, même en cas d'erreur
       }
     };
     
     fetchModules();
+    
+    // Cleanup function
+    return () => {
+      clearTimeout(globalTimeout);
+    };
   }, []);
 
   useEffect(() => {
@@ -158,8 +211,8 @@ export default function Home() {
 
 
 
-  // Modules essentiels à exclure de la page applications
-  const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'code-learning', 'home-assistant'];
+  // Modules essentiels à exclure de la page applications (affichés dans la page essentiels)
+  const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'code-learning', 'apprendre-autrement', 'home-assistant', 'administration'];
   
   // Filtrer les modules
   const filteredModules = modules
@@ -255,7 +308,7 @@ export default function Home() {
                 Utilisez à distance la puissance GPU des ordinateurs IAHome
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Le numérique à portée de main, pour une utilisation simple et directe. Sans téléchargement.
+                Le numérique à portée de main, pour une utilisation simple et directe de l'IA. Sans téléchargement.
               </p>
               
               {/* Barre de recherche et bouton Mes applis */}
@@ -322,7 +375,7 @@ export default function Home() {
 
               {/* Grille de templates */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {loading ? (
+                {loading && !forceShowContent ? (
                   <div className="col-span-full text-center py-12">
                     <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <svg className="w-8 h-8 text-blue-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">

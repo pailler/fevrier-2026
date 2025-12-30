@@ -141,3 +141,11 @@ Cette version fonctionne sans JavaScript et évite l'erreur `startsWith`.
 
 
 
+
+
+
+
+
+
+
+

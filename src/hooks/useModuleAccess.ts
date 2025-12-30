@@ -116,6 +116,8 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'home-assistant': 'home-assistant', // Home Assistant -> home-assistant
         'meeting-reports': 'meeting-reports', // Meeting Reports -> meeting-reports
         'hunyuan3d': 'hunyuan3d', // Hunyuan 3D -> hunyuan3d
+        'prompt-generator': 'prompt-generator', // Générateur de prompts -> prompt-generator
+        'apprendre-autrement': 'apprendre-autrement', // Apprendre Autrement -> apprendre-autrement
       };
       
       const moduleSubdomains: Record<string, string> = {
@@ -135,6 +137,12 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'hunyuan3d': isDevelopment ? 'http://localhost:8888' : 'https://hunyuan3d.iahome.fr',
         // Home Assistant : localhost:8123 en dev, homeassistant.iahome.fr en prod
         'home-assistant': isDevelopment ? 'http://localhost:8123' : 'https://homeassistant.iahome.fr',
+        // Générateur de prompts : utiliser directement l'URL de production (via Traefik)
+        'prompt-generator': 'https://prompt-generator.iahome.fr',
+        // Apprendre Autrement : redirection directe vers l'application (racine)
+        'apprendre-autrement': isDevelopment ? 'http://localhost:9001' : 'https://apprendre-autrement.iahome.fr',
+        // Détecteur de Contenu IA : sur le domaine principal
+        'ai-detector': isDevelopment ? 'http://localhost:3000/ai-detector' : 'https://iahome.fr/ai-detector',
       };
       
       // Convertir module_id numérique en slug si nécessaire

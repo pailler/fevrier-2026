@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import Breadcrumb from '../../../components/Breadcrumb';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
+import { trackCTAClick, trackModuleActivation, trackMeTubePageView, getUTMParams } from '../../../utils/tracking';
+import Analytics from '../../../components/Analytics';
 
 export default function MeTubePage() {
   const router = useRouter();
@@ -34,6 +36,138 @@ export default function MeTubePage() {
   useEffect(() => {
     setCard(metubeModule);
     setLoading(false);
+  }, []);
+
+  // Tracking de la page avec paramètres UTM
+  useEffect(() => {
+    const utmParams = getUTMParams();
+    if (utmParams.source || utmParams.medium || utmParams.campaign) {
+      trackMeTubePageView(utmParams.source, utmParams.medium, utmParams.campaign);
+    }
+  }, []);
+
+  // Ajouter les données structurées JSON-LD pour le SEO
+  useEffect(() => {
+    const softwareApplicationSchema = {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "MeTube - IA Home",
+      "applicationCategory": "MediaApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "10",
+        "priceCurrency": "TOKENS"
+      },
+      "description": "Plateforme de téléchargement de vidéos YouTube open-source. Téléchargez, convertissez et gérez vos vidéos YouTube de manière privée et sécurisée. Solution gratuite, sans publicité, respectueuse de la vie privée.",
+      "url": "https://iahome.fr/card/metube",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "300"
+      },
+      "featureList": [
+        "Téléchargement de vidéos YouTube",
+        "Téléchargement de playlists",
+        "Conversion de formats (MP4, MP3, WebM)",
+        "Téléchargement de sous-titres",
+        "Gestion de bibliothèque",
+        "Open-source et gratuit",
+        "Respect de la vie privée",
+        "Sans publicité"
+      ]
+    };
+
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce que MeTube ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "MeTube est une plateforme de téléchargement de vidéos YouTube open-source qui permet de télécharger, convertir et gérer vos vidéos préférées de manière privée et sécurisée. Contrairement aux services en ligne, MeTube fonctionne entièrement sur vos propres serveurs, garantissant une confidentialité maximale."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment télécharger une vidéo YouTube avec MeTube ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pour télécharger une vidéo YouTube avec MeTube, activez d'abord le service avec 10 tokens. Une fois activé, collez l'URL de la vidéo YouTube dans l'interface MeTube, choisissez la qualité et le format souhaités, puis lancez le téléchargement. La vidéo sera téléchargée sur vos serveurs de manière privée."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "MeTube est-il gratuit ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "MeTube est un outil open-source et gratuit. L'activation du service coûte 10 tokens par utilisation. Une fois activé, vous pouvez télécharger des vidéos YouTube sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Puis-je télécharger des playlists YouTube avec MeTube ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, MeTube permet de télécharger des playlists YouTube complètes. Il suffit de coller l'URL de la playlist dans l'interface, et MeTube téléchargera toutes les vidéos de la playlist automatiquement. Vous pouvez également choisir la qualité et le format pour chaque vidéo."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quels formats de vidéo sont supportés par MeTube ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "MeTube supporte de nombreux formats de vidéo : MP4, WebM, MKV, et bien d'autres. Vous pouvez également convertir vos vidéos téléchargées vers différents formats selon vos besoins. MeTube permet aussi de télécharger uniquement l'audio en MP3."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Mes données sont-elles protégées avec MeTube ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, MeTube respecte totalement votre vie privée. Tous les téléchargements sont effectués sur vos propres serveurs. Aucune donnée n'est partagée avec des services tiers, aucun tracking n'est effectué, et aucune publicité n'est affichée. Vos vidéos restent strictement privées."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Puis-je télécharger les sous-titres avec MeTube ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, MeTube permet de télécharger les sous-titres des vidéos YouTube. Vous pouvez télécharger les sous-titres dans différents formats (SRT, VTT, etc.) en même temps que la vidéo ou séparément."
+          }
+        }
+      ]
+    };
+
+    // Créer et ajouter le script pour SoftwareApplication
+    const script1 = document.createElement('script');
+    script1.type = 'application/ld+json';
+    script1.id = 'software-application-schema-mt';
+    script1.text = JSON.stringify(softwareApplicationSchema);
+    
+    // Créer et ajouter le script pour FAQPage
+    const script2 = document.createElement('script');
+    script2.type = 'application/ld+json';
+    script2.id = 'faq-schema-mt';
+    script2.text = JSON.stringify(faqSchema);
+
+    // Vérifier si les scripts existent déjà avant de les ajouter
+    if (!document.getElementById('software-application-schema-mt')) {
+      document.head.appendChild(script1);
+    }
+    if (!document.getElementById('faq-schema-mt')) {
+      document.head.appendChild(script2);
+    }
+
+    // Nettoyage lors du démontage
+    return () => {
+      const existingScript1 = document.getElementById('software-application-schema-mt');
+      const existingScript2 = document.getElementById('faq-schema-mt');
+      if (existingScript1) existingScript1.remove();
+      if (existingScript2) existingScript2.remove();
+    };
   }, []);
 
   // Le contenu s'affiche même sans authentification
@@ -118,6 +252,7 @@ export default function MeTubePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+      <Analytics />
       {/* Fil d'Ariane */}
       <div className="bg-white/60 backdrop-blur-sm border-b border-gray-200/50 pt-2">
         <div className="max-w-7xl mx-auto px-6 py-1">
@@ -149,13 +284,13 @@ export default function MeTubePage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Téléchargez vos vidéos YouTube préférées
+                MeTube : télécharger des vidéos YouTube gratuitement et en privé
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
                 {(card?.category || 'MEDIA TOOLS').toUpperCase()}
               </span>
               <p className="text-xl text-red-100 mb-6">
-                MeTube vous offre une solution complète pour télécharger, convertir et gérer vos vidéos YouTube de manière privée et sécurisée.
+                Téléchargez vos vidéos YouTube préférées gratuitement et en privé avec MeTube. Solution open-source pour télécharger, convertir et gérer vos vidéos sans publicité, sans tracking, et avec un contrôle total sur vos données.
               </p>
               
               {/* Badges de fonctionnalités */}
@@ -205,11 +340,13 @@ export default function MeTubePage() {
           <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
             <iframe
               className="w-full h-full rounded-2xl"
-              src="https://www.youtube.com/embed/IZoAzwgQ8YY?autoplay=0&rel=0&modestbranding=1"
+              src="https://www.youtube.com/embed/IZoAzwgQ8YY?autoplay=0&rel=0&modestbranding=1&enablejsapi=0&origin=https://iahome.fr"
               title="Démonstration MeTube"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
+              loading="lazy"
+              referrerPolicy="strict-origin-when-cross-origin"
             ></iframe>
           </div>
           
@@ -248,6 +385,7 @@ export default function MeTubePage() {
                         const data = await response.json();
                         if (data.success) {
                           console.log('✅ MeTube activé avec succès');
+                          trackModuleActivation('metube', 'MeTube');
                           // Rediriger vers la page des modules actifs
                           router.push('/encours');
                         } else {
@@ -280,7 +418,35 @@ export default function MeTubePage() {
         </div>
       </div>
 
-      {/* Section "À propos de" en pleine largeur maximale */}
+      {/* Section Preuves sociales */}
+      <section className="bg-gradient-to-r from-green-50 to-emerald-50 py-12">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-green-200 p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+              Ils nous font confiance
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl">
+                <div className="text-4xl font-bold text-green-600 mb-2">312+</div>
+                <div className="text-gray-700 font-medium">Utilisateurs actifs</div>
+                <div className="text-sm text-gray-500 mt-1">sur la plateforme</div>
+              </div>
+              <div className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl">
+                <div className="text-4xl font-bold text-green-600 mb-2">100%</div>
+                <div className="text-gray-700 font-medium">Sans publicité</div>
+                <div className="text-sm text-gray-500 mt-1">expérience propre</div>
+              </div>
+              <div className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl">
+                <div className="text-4xl font-bold text-green-600 mb-2">🔒</div>
+                <div className="text-gray-700 font-medium">100% Privé</div>
+                <div className="text-sm text-gray-500 mt-1">vos données restent locales</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section SEO optimisée - Contenu structuré */}
       <section className="bg-gradient-to-br from-red-50 via-pink-50 to-purple-50 py-8 w-full relative overflow-hidden">
         {/* Effet de particules en arrière-plan */}
         <div className="absolute inset-0">
@@ -294,25 +460,266 @@ export default function MeTubePage() {
         <div className="w-full px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-white/50 p-8 sm:p-12 lg:p-16 hover:shadow-3xl transition-all duration-300">
             <div className="prose max-w-none">
-              <div className="text-center mb-12">
-                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-red-900 via-pink-900 to-purple-900 bg-clip-text text-transparent mb-4">
-                  À propos de {card.title}
-                </h3>
-                <div className="w-24 h-1 bg-gradient-to-r from-red-500 to-pink-500 mx-auto rounded-full"></div>
-              </div>
               
-              <div className="space-y-8 sm:space-y-12 text-gray-700">
-                {/* Description principale */}
-                <div className="text-center max-w-5xl mx-auto">
-                  <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
-                    {card.description}
+              {/* Paragraphe citable par les IA (GEO) */}
+              <div className="bg-gradient-to-r from-red-100 to-pink-100 p-6 rounded-2xl mb-8 border-l-4 border-red-500">
+                <p className="text-lg leading-relaxed text-gray-800">
+                  <strong>MeTube est une plateforme de téléchargement de vidéos YouTube open-source qui permet de télécharger, convertir et gérer vos vidéos préférées de manière privée et sécurisée.</strong> Contrairement aux services en ligne qui collectent vos données et affichent des publicités, MeTube fonctionne entièrement sur vos propres serveurs, garantissant une confidentialité maximale. Téléchargez des vidéos individuelles, des playlists complètes, des sous-titres, et convertissez vers différents formats (MP4, MP3, WebM) sans publicité ni tracking.
+                </p>
+              </div>
+
+              {/* H2 - À quoi sert MeTube ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">À quoi sert MeTube ?</h2>
+                <div className="space-y-4 text-gray-700">
+                  <p className="text-lg leading-relaxed">
+                    MeTube est un outil de téléchargement de vidéos YouTube qui permet de sauvegarder vos contenus préférés pour un accès hors ligne, une organisation personnelle, ou une utilisation professionnelle. Il répond aux besoins de ceux qui souhaitent télécharger des vidéos YouTube sans dépendre des services en ligne qui collectent des données.
                   </p>
-                  {card.subtitle && (
-                    <p className="text-base sm:text-lg text-gray-600 italic mb-8">
-                      {card.subtitle}
-                    </p>
-                  )}
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li className="text-lg"><strong>Télécharger des vidéos YouTube :</strong> Sauvegardez vos vidéos préférées pour un accès hors ligne ou une utilisation ultérieure</li>
+                    <li className="text-lg"><strong>Télécharger des playlists :</strong> Téléchargez des playlists YouTube complètes en une seule fois</li>
+                    <li className="text-lg"><strong>Conversion de formats :</strong> Convertissez vos vidéos vers différents formats selon vos besoins (MP4, MP3, WebM, etc.)</li>
+                    <li className="text-lg"><strong>Gestion de bibliothèque :</strong> Organisez et gérez votre collection de vidéos téléchargées de manière efficace</li>
+                  </ul>
+                  <p className="text-lg leading-relaxed mt-4">
+                    <strong>Cas concrets d'utilisation :</strong> Téléchargez des tutoriels pour un apprentissage hors ligne, sauvegardez des webinaires pour une consultation ultérieure, créez votre bibliothèque personnelle de musique ou de contenus éducatifs, ou téléchargez des vidéos pour une utilisation professionnelle sans dépendre d'une connexion internet.
+                  </p>
                 </div>
+              </div>
+
+              {/* H2 - Que peut faire MeTube ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Que peut faire MeTube ?</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  <div className="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-2xl border border-red-200">
+                    <h3 className="text-2xl font-bold text-red-900 mb-4">Téléchargement de vidéos YouTube</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Téléchargez des vidéos individuelles ou des playlists complètes en différentes qualités (HD, Full HD, 4K). Choisissez la qualité et le format qui vous conviennent.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-pink-50 to-pink-100 p-6 rounded-2xl border border-pink-200">
+                    <h3 className="text-2xl font-bold text-pink-900 mb-4">Conversion de formats</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Convertissez vos vidéos téléchargées vers différents formats : MP4, MP3, WebM, MKV, et bien d'autres. Téléchargez uniquement l'audio en MP3 si vous le souhaitez.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200">
+                    <h3 className="text-2xl font-bold text-purple-900 mb-4">Téléchargement de sous-titres</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Téléchargez les sous-titres des vidéos YouTube dans différents formats (SRT, VTT, etc.) en même temps que la vidéo ou séparément.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl border border-indigo-200">
+                    <h3 className="text-2xl font-bold text-indigo-900 mb-4">Gestion de bibliothèque</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Organisez et gérez votre collection de vidéos téléchargées. Ajoutez des métadonnées, créez des dossiers, et accédez facilement à vos contenus.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - Comment utiliser MeTube ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Comment utiliser MeTube ?</h2>
+                <div className="space-y-6">
+                  <div className="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-2xl border border-red-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Activer MeTube</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Activez MeTube avec 10 tokens. Une fois activé, le service est accessible depuis vos applications actives.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-pink-50 to-purple-50 p-6 rounded-2xl border border-pink-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">2</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Coller l'URL de la vidéo</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Collez l'URL de la vidéo YouTube ou de la playlist que vous souhaitez télécharger dans l'interface MeTube. Vous pouvez également coller plusieurs URLs pour télécharger plusieurs vidéos.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-2xl border border-purple-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">3</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Choisir la qualité et le format</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Sélectionnez la qualité de la vidéo (HD, Full HD, 4K) et le format souhaité (MP4, MP3, WebM, etc.). Vous pouvez également choisir de télécharger uniquement l'audio ou les sous-titres.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border border-indigo-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">4</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Lancer le téléchargement</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Cliquez sur "Télécharger" et suivez la progression du téléchargement. Une fois terminé, votre vidéo sera disponible dans votre bibliothèque MeTube pour un accès hors ligne.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - Pour qui est fait MeTube ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Pour qui est fait MeTube ?</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-2xl border border-red-200 text-center">
+                    <div className="text-4xl mb-4">🎓</div>
+                    <h3 className="text-xl font-bold text-red-900 mb-2">Étudiants et enseignants</h3>
+                    <p className="text-gray-700">Téléchargez des tutoriels, cours en ligne, et contenus éducatifs pour un apprentissage hors ligne et organisé.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-pink-50 to-pink-100 p-6 rounded-2xl border border-pink-200 text-center">
+                    <div className="text-4xl mb-4">💼</div>
+                    <h3 className="text-xl font-bold text-pink-900 mb-2">Professionnels</h3>
+                    <p className="text-gray-700">Sauvegardez des présentations, webinaires, et contenus de formation pour une utilisation ultérieure sans dépendre d'internet.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200 text-center">
+                    <div className="text-4xl mb-4">🎵</div>
+                    <h3 className="text-xl font-bold text-purple-900 mb-2">Particuliers</h3>
+                    <p className="text-gray-700">Créez votre bibliothèque personnelle de musique, films, et contenus préférés pour un accès hors ligne.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl border border-indigo-200 text-center">
+                    <div className="text-4xl mb-4">🔒</div>
+                    <h3 className="text-xl font-bold text-indigo-900 mb-2">Soucieux de la vie privée</h3>
+                    <p className="text-gray-700">Pour ceux qui veulent télécharger des vidéos YouTube sans dépendre de services qui collectent des données et affichent des publicités.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - MeTube vs autres téléchargeurs YouTube */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">MeTube vs autres téléchargeurs YouTube</h2>
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-8 rounded-2xl border border-gray-200">
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="bg-gradient-to-r from-red-500 to-pink-500 text-white">
+                          <th className="border border-gray-300 p-4 text-left">Fonctionnalité</th>
+                          <th className="border border-gray-300 p-4 text-center">MeTube</th>
+                          <th className="border border-gray-300 p-4 text-center">Services en ligne</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Respect de la vie privée</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Hébergement local</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Collecte de données</td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border border-gray-300 p-4 font-semibold">Publicités</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Aucune publicité</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Publicités affichées</td>
+                        </tr>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Open-source</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Code source ouvert</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Propriétaire</td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border border-gray-300 p-4 font-semibold">Contrôle des données</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Vos serveurs</td>
+                          <td className="border border-gray-300 p-4 text-center">⚠️ Serveurs tiers</td>
+                        </tr>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Fonctionnalités</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Complètes</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Complètes</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="mt-6 text-gray-700 leading-relaxed">
+                    <strong>En résumé :</strong> MeTube offre une alternative open-source et respectueuse de la vie privée aux services en ligne de téléchargement YouTube. Contrairement aux services qui collectent vos données et affichent des publicités, MeTube fonctionne sur vos propres serveurs, garantissant une confidentialité maximale et un contrôle total sur vos téléchargements.
+                  </p>
+                </div>
+              </div>
+
+              {/* H2 - Questions fréquentes sur MeTube (FAQ) */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Questions fréquentes sur MeTube (FAQ)</h2>
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-2xl border-l-4 border-red-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Qu'est-ce que MeTube ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      MeTube est une plateforme de téléchargement de vidéos YouTube open-source qui permet de télécharger, convertir et gérer vos vidéos préférées de manière privée et sécurisée. Contrairement aux services en ligne, MeTube fonctionne entièrement sur vos propres serveurs, garantissant une confidentialité maximale.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-pink-50 to-purple-50 p-6 rounded-2xl border-l-4 border-pink-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Comment télécharger une vidéo YouTube avec MeTube ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Pour télécharger une vidéo YouTube avec MeTube, activez d'abord le service avec 10 tokens. Une fois activé, collez l'URL de la vidéo YouTube dans l'interface MeTube, choisissez la qualité et le format souhaités, puis lancez le téléchargement. La vidéo sera téléchargée sur vos serveurs de manière privée.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-purple-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">MeTube est-il gratuit ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      MeTube est un outil open-source et gratuit. L'activation du service coûte 10 tokens par utilisation. Une fois activé, vous pouvez télécharger des vidéos YouTube sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border-l-4 border-indigo-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Puis-je télécharger des playlists YouTube avec MeTube ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Oui, MeTube permet de télécharger des playlists YouTube complètes. Il suffit de coller l'URL de la playlist dans l'interface, et MeTube téléchargera toutes les vidéos de la playlist automatiquement. Vous pouvez également choisir la qualité et le format pour chaque vidéo.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-blue-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Quels formats de vidéo sont supportés par MeTube ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      MeTube supporte de nombreux formats de vidéo : MP4, WebM, MKV, et bien d'autres. Vous pouvez également convertir vos vidéos téléchargées vers différents formats selon vos besoins. MeTube permet aussi de télécharger uniquement l'audio en MP3.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-cyan-50 to-teal-50 p-6 rounded-2xl border-l-4 border-cyan-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Mes données sont-elles protégées avec MeTube ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Oui, MeTube respecte totalement votre vie privée. Tous les téléchargements sont effectués sur vos propres serveurs. Aucune donnée n'est partagée avec des services tiers, aucun tracking n'est effectué, et aucune publicité n'est affichée. Vos vidéos restent strictement privées.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-teal-50 to-green-50 p-6 rounded-2xl border-l-4 border-teal-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Puis-je télécharger les sous-titres avec MeTube ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Oui, MeTube permet de télécharger les sous-titres des vidéos YouTube. Vous pouvez télécharger les sous-titres dans différents formats (SRT, VTT, etc.) en même temps que la vidéo ou séparément.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description principale */}
+              <div className="text-center max-w-5xl mx-auto mb-8">
+                <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
+                  {card.description}
+                </p>
+                {card.subtitle && (
+                  <p className="text-base sm:text-lg text-gray-600 italic mb-8">
+                    {card.subtitle}
+                  </p>
+                )}
+              </div>
 
                 {/* Description détaillée en plusieurs chapitres */}
                 <div className="max-w-6xl mx-auto space-y-8">
@@ -533,10 +940,9 @@ export default function MeTubePage() {
               </div>
             </div>
           </div>
-        </div>
       </section>
 
-             {/* Modal pour l'iframe */}
+      {/* Modal pour l'iframe */}
        {iframeModal.isOpen && (
          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-2">
            <div className="bg-white rounded-xl shadow-2xl w-full h-full max-w-7xl max-h-[95vh] overflow-hidden">

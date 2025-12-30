@@ -52,8 +52,7 @@ export async function GET(request: NextRequest) {
     if (tokensError) {
       // PGRST116 = "No rows returned" - c'est normal si l'utilisateur n'a pas de tokens
       if (tokensError.code === 'PGRST116') {
-        console.log('⚠️ Utilisateur sans tokens (doit passer par les achats):', actualUserId);
-        console.log('⚠️ Email:', userId.includes('@') ? userId : 'N/A');
+        // Ne pas logger d'erreur, c'est normal pour un nouvel utilisateur
         return NextResponse.json({
           tokens: 0,
           tokensRemaining: 0,
@@ -62,11 +61,13 @@ export async function GET(request: NextRequest) {
           isActive: false
         });
       } else {
-        // Autre erreur (permissions, etc.)
-        console.error('❌ Erreur lors de la récupération des tokens:', tokensError);
-        console.error('❌ Code:', tokensError.code);
-        console.error('❌ Message:', tokensError.message);
-        console.error('❌ User ID:', actualUserId);
+        // Autre erreur (permissions, etc.) - logger seulement en développement
+        if (process.env.NODE_ENV === 'development') {
+          console.error('❌ Erreur lors de la récupération des tokens:', tokensError);
+          console.error('❌ Code:', tokensError.code);
+          console.error('❌ Message:', tokensError.message);
+          console.error('❌ User ID:', actualUserId);
+        }
         return NextResponse.json({
           tokens: 0,
           tokensRemaining: 0,
@@ -97,11 +98,19 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Erreur API user-tokens GET:', error);
-    return NextResponse.json(
-      { error: 'Erreur interne du serveur' },
-      { status: 500 }
-    );
+    // Logger seulement en développement
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Erreur API user-tokens GET:', error);
+    }
+    // Retourner 0 tokens plutôt qu'une erreur pour éviter de bloquer l'interface
+    return NextResponse.json({
+      tokens: 0,
+      tokensRemaining: 0,
+      packageName: null,
+      purchaseDate: null,
+      isActive: false,
+      error: error instanceof Error ? error.message : 'Erreur interne du serveur'
+    });
   }
 }
 

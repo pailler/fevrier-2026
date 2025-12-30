@@ -52,7 +52,9 @@ export default function CardDetailPage() {
   // Vérifier si c'est le module librespeed pour appliquer un style spécial
   const isLibrespeed = Boolean(card?.title?.toLowerCase().includes('librespeed') || card?.id === 'librespeed');
   // Vérifier si c'est le module code-learning
-  const isCodeLearning = Boolean(card?.title?.toLowerCase().includes('code') || card?.id === 'code-learning');
+  const isCodeLearning = Boolean((card?.title?.toLowerCase().includes('code') && card?.title?.toLowerCase().includes('apprendre')) || card?.id === 'code-learning');
+  // Vérifier si c'est le module apprendre-autrement
+  const isApprendreAutrement = Boolean(card?.title?.toLowerCase().includes('apprendre autrement') || card?.id === 'apprendre-autrement');
   
   // Vérifier si c'est le module metube pour appliquer un style spécial
   const isMetube = Boolean(card?.title?.toLowerCase().includes('metube') || card?.id === 'metube');
@@ -204,8 +206,14 @@ export default function CardDetailPage() {
         'cogstudio': 'https://cogstudio.iahome.fr',
         // Home Assistant : localhost:8123 en dev, homeassistant.iahome.fr en prod
         'home-assistant': isDevelopment ? 'http://localhost:8123' : 'https://homeassistant.iahome.fr',
+        // Générateur de prompts : utiliser directement l'URL de production (via Traefik)
+        'prompt-generator': 'https://prompt-generator.iahome.fr',
+        // Apprendre Autrement : redirection directe vers l'application (racine)
+        'apprendre-autrement': isDevelopment ? 'http://localhost:9001' : 'https://apprendre-autrement.iahome.fr',
         // Administration : page interne
         'administration': '/administration',
+        // Détecteur de Contenu IA : sur le domaine principal
+        'ai-detector': isDevelopment ? 'http://localhost:3000/ai-detector' : 'https://iahome.fr/ai-detector',
       };
 
       const accessUrl = applicationUrls[moduleId];
@@ -216,9 +224,37 @@ export default function CardDetailPage() {
       
       console.log(`🔗 ${moduleTitle}: Accès direct à:`, accessUrl);
       
-      // Pour le module code-learning, toujours ouvrir dans un nouvel onglet
-      if (moduleId === 'code-learning') {
-        window.open(accessUrl, '_blank');
+      // Générer le token d'accès
+      const tokenResponse = await fetch('/api/generate-access-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          userEmail: user.email,
+          moduleId: moduleId
+        })
+      });
+
+      if (!tokenResponse.ok) {
+        throw new Error('Erreur génération token');
+      }
+
+      const tokenData = await tokenResponse.json();
+      
+      // Pour les modules qui doivent s'ouvrir dans un nouvel onglet
+      if (moduleId === 'code-learning' || moduleId === 'apprendre-autrement' || moduleId === 'administration') {
+        // Ajouter le token à l'URL pour apprendre-autrement
+        if (moduleId === 'apprendre-autrement' && tokenData?.token) {
+          const urlWithToken = `${accessUrl}?token=${encodeURIComponent(tokenData.token)}`;
+          window.open(urlWithToken, '_blank', 'noopener,noreferrer');
+        } else if (moduleId === 'code-learning' && tokenData?.token) {
+          const urlWithToken = `${accessUrl}?token=${encodeURIComponent(tokenData.token)}`;
+          window.open(urlWithToken, '_blank', 'noopener,noreferrer');
+        } else {
+          window.open(accessUrl, '_blank', 'noopener,noreferrer');
+        }
       } else if (accessUrl.startsWith('/')) {
         // Pour les autres routes internes (commençant par /), rediriger dans le même onglet
         window.location.href = accessUrl;
@@ -535,12 +571,39 @@ export default function CardDetailPage() {
     return selectedCards.some(card => card.id === cardId);
   };
 
-  if (loading) {
+  // Timeout de sécurité pour éviter un chargement infini
+  useEffect(() => {
+    if (loading) {
+      const timeout = setTimeout(() => {
+        console.warn('⚠️ Timeout de chargement - Arrêt après 10 secondes');
+        setLoading(false);
+      }, 10000); // 10 secondes maximum
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [loading]);
+
+  // Timeout de sécurité pour authLoading
+  useEffect(() => {
+    if (authLoading) {
+      const timeout = setTimeout(() => {
+        console.warn('⚠️ Timeout authLoading - Arrêt après 8 secondes');
+        // Ne pas forcer authLoading à false car c'est géré par useCustomAuth
+        // Mais on peut forcer loading à false pour débloquer la page
+        setLoading(false);
+      }, 8000); // 8 secondes maximum
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [authLoading]);
+
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">chargement</p>
+          <p className="text-gray-600">Chargement...</p>
+          <p className="text-sm text-gray-500 mt-2">Si le chargement prend trop de temps, veuillez rafraîchir la page.</p>
         </div>
       </div>
     );
@@ -989,18 +1052,18 @@ export default function CardDetailPage() {
                     )}
 
 
-                    {/* Bouton d'accès spécial pour Apprendre le Code Informatique */}
+                    {/* Bouton d'accès spécial pour Apprendre le Code aux enfants */}
                     {isCodeLearning && !alreadyActivatedModules.includes(card.id) && (
                       <button
                         onClick={async () => {
                           if (!isAuthenticated || !user) {
-                            console.log('❌ Accès Apprendre le Code Informatique - Utilisateur non connecté');
+                            console.log('❌ Accès Apprendre le Code aux enfants - Utilisateur non connecté');
                             router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
                             return;
                           }
 
                           try {
-                            console.log('🔄 Activation Apprendre le Code Informatique pour:', user.email);
+                            console.log('🔄 Activation Apprendre le Code aux enfants pour:', user.email);
                             
                             const response = await fetch('/api/activate-code-learning', {
                               method: 'POST',
@@ -1016,16 +1079,16 @@ export default function CardDetailPage() {
                             const result = await response.json();
 
                             if (result.success) {
-                              console.log('✅ Apprendre le Code Informatique activé avec succès');
+                              console.log('✅ Apprendre le Code aux enfants activé avec succès');
                               setAlreadyActivatedModules(prev => [...prev, card.id]);
-                              alert('Apprendre le Code Informatique activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation (10 tokens).');
+                              alert('Apprendre le Code aux enfants activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation (10 tokens).');
                               router.push('/encours');
                             } else {
-                              console.error('❌ Erreur activation Apprendre le Code Informatique:', result.error);
+                              console.error('❌ Erreur activation Apprendre le Code aux enfants:', result.error);
                               alert(`Erreur lors de l'activation: ${result.error}`);
                             }
                           } catch (error) {
-                            console.error('❌ Erreur activation Apprendre le Code Informatique:', error);
+                            console.error('❌ Erreur activation Apprendre le Code aux enfants:', error);
                             alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                           }
                         }}
@@ -1033,7 +1096,56 @@ export default function CardDetailPage() {
                       >
                         <span className="text-xl">⚡</span>
                         <span>
-                          {isAuthenticated && user ? `Activer Apprendre le Code Informatique (10 tokens)` : `Connectez-vous pour activer Apprendre le Code Informatique (10 tokens)`}
+                          {isAuthenticated && user ? `Activer Apprendre le Code aux enfants (10 tokens)` : `Connectez-vous pour activer Apprendre le Code aux enfants (10 tokens)`}
+                        </span>
+                      </button>
+                    )}
+
+                    {/* Bouton d'accès spécial pour Apprendre Autrement */}
+                    {isApprendreAutrement && !alreadyActivatedModules.includes(card.id) && (
+                      <button
+                        onClick={async () => {
+                          if (!isAuthenticated || !user) {
+                            console.log('❌ Accès Apprendre Autrement - Utilisateur non connecté');
+                            router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
+                            return;
+                          }
+
+                          try {
+                            console.log('🔄 Activation Apprendre Autrement pour:', user.email);
+                            
+                            const response = await fetch('/api/activate-apprendre-autrement', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({
+                                userId: user.id,
+                                email: user.email
+                              }),
+                            });
+
+                            const result = await response.json();
+
+                            if (result.success) {
+                              console.log('✅ Apprendre Autrement activé avec succès');
+                              setAlreadyActivatedModules(prev => [...prev, card.id]);
+                              alert('Apprendre Autrement activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation (10 tokens).');
+                              router.push('/encours');
+                            } else {
+                              console.error('❌ Erreur activation Apprendre Autrement:', result.error);
+                              alert(`Erreur lors de l'activation: ${result.error}`);
+                            }
+                          } catch (error) {
+                            console.error('❌ Erreur activation Apprendre Autrement:', error);
+                            alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                          }
+                        }}
+                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                      >
+                        <span className="text-xl">🌈</span>
+                        <span>
+                          {isAuthenticated && user ? `Activer Apprendre Autrement (10 tokens)` : `Connectez-vous pour activer Apprendre Autrement (10 tokens)`}
                         </span>
                       </button>
                     )}
@@ -1374,6 +1486,49 @@ export default function CardDetailPage() {
                   </div>
                   <div className="text-sm opacity-90">
                     par utilisation
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Vidéo YouTube générique - pour tous les modules avec youtube_url qui n'ont pas de section vidéo spécifique */}
+      {card?.youtube_url && !isLibrespeed && !isMetube && !isPsitransfer && !isHunyuan3d && (
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {/* Colonne 1 - Vidéo */}
+            <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
+              <iframe
+                className="w-full h-full rounded-2xl"
+                src={card.youtube_url.includes('embed/') ? card.youtube_url : 
+                     card.youtube_url.includes('youtube.com/watch?v=') ? card.youtube_url.replace('youtube.com/watch?v=', 'youtube.com/embed/') :
+                     card.youtube_url.includes('youtu.be/') ? card.youtube_url.replace('youtu.be/', 'youtube.com/embed/') :
+                     `https://www.youtube.com/embed/${card.youtube_url}?autoplay=0&rel=0&modestbranding=1`}
+                title={`Démonstration ${card.title}`}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            
+            {/* Colonne 2 - Informations du module */}
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
+              <div className="text-left mb-8">
+                <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
+                  <div className="text-4xl font-bold mb-1">
+                    {card.price === 0 || card.price === '0' ? 
+                      (isFreeModule ? '10 tokens' : 'Free') : 
+                      card.id === 'qrcodes' ? '100 tokens' :
+                      `${card.price} tokens`
+                    }
+                  </div>
+                  <div className="text-sm opacity-90">
+                    {card.price === 0 || card.price === '0' ? 
+                      (isFreeModule ? 'par utilisation' : 'Gratuit') : 
+                      'par utilisation'
+                    }
                   </div>
                 </div>
               </div>

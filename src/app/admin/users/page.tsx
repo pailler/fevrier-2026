@@ -409,6 +409,29 @@ export default function AdminUsers() {
         </div>
       </div>
 
+      {/* Section Nombre total d'utilisateurs - Stylée comme les tokens */}
+      <div className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 rounded-2xl shadow-2xl border-4 border-white overflow-hidden">
+        <div className="p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
+                <span className="text-4xl">👥</span>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white mb-1">Communauté IAHome</h2>
+                <p className="text-green-100 text-sm">Nombre total d'utilisateurs</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="flex items-baseline space-x-2">
+                <p className="text-5xl font-bold text-white">{users.length.toLocaleString('fr-FR')}</p>
+                <p className="text-lg text-green-100 font-medium">utilisateurs</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Filtres et recherche */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

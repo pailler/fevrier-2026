@@ -73,8 +73,20 @@ export function useCustomAuth() {
   }, [isClient, router]);
 
   useEffect(() => {
-    // Ne pas exécuter côté serveur
-    if (!isClient) return;
+    // Ne pas exécuter côté serveur - mais toujours retourner une fonction de nettoyage à la fin
+    // IMPORTANT: Ne jamais retourner conditionnellement au début - cela change la structure du hook
+    // et cause l'erreur React #310. Toujours exécuter le code et retourner à la fin.
+    
+    let subscription: any = null;
+    let handleStorageChange: ((e: StorageEvent) => void) | null = null;
+    let handleCustomEvent: ((e: CustomEvent) => void) | null = null;
+    let handleOnline: (() => void) | null = null;
+    let handleOffline: (() => void) | null = null;
+    let unhandledRejectionHandler: ((event: PromiseRejectionEvent) => void) | null = null;
+    
+    if (!isClient) {
+      // Ne rien faire côté serveur, mais continuer pour retourner la fonction de nettoyage à la fin
+    } else {
 
     // Fonction pour synchroniser session_start_time depuis la table user_sessions si manquant
     const syncSessionStartTime = async (userId: string) => {
@@ -313,13 +325,13 @@ export function useCustomAuth() {
           }
         }
       }
-    };
+      };
 
-    // Ajouter l'intercepteur d'erreurs global
-    window.addEventListener('error', errorHandlerRef.current);
+      // Ajouter l'intercepteur d'erreurs global
+      window.addEventListener('error', errorHandlerRef.current);
 
-    // Intercepteur pour les promesses rejetées non capturées
-    const unhandledRejectionHandler = (event: PromiseRejectionEvent) => {
+      // Intercepteur pour les promesses rejetées non capturées
+      unhandledRejectionHandler = (event: PromiseRejectionEvent) => {
       const error = event.reason;
       if (isNetworkError(error)) {
         // Vérifier si c'est une erreur liée au rafraîchissement du token Supabase
@@ -363,10 +375,10 @@ export function useCustomAuth() {
       }
     };
 
-    window.addEventListener('unhandledrejection', unhandledRejectionHandler);
+      window.addEventListener('unhandledrejection', unhandledRejectionHandler);
 
-    // Timeout de sécurité pour éviter un chargement infini
-    loadingTimeoutRef.current = setTimeout(() => {
+      // Timeout de sécurité pour éviter un chargement infini
+      loadingTimeoutRef.current = setTimeout(() => {
       // Si après 5 secondes on est toujours en chargement, arrêter
       setAuthState(prevState => {
         if (prevState.loading) {
@@ -405,13 +417,13 @@ export function useCustomAuth() {
         }
         return prevState;
       });
-    }, MAX_LOADING_TIME);
+      }, MAX_LOADING_TIME);
 
-    // Vérifier immédiatement
-    checkAuthState();
+      // Vérifier immédiatement
+      checkAuthState();
 
-    // Écouter les changements d'authentification Supabase
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      // Écouter les changements d'authentification Supabase
+      const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         try {
           // Vérifier si la session est expirée avant de traiter l'événement
@@ -524,98 +536,106 @@ export function useCustomAuth() {
         }
       }
     );
+      
+      subscription = authSubscription;
 
-    // Vérifier périodiquement la session (toutes les 5 minutes pour améliorer les performances)
-    sessionCheckIntervalRef.current = setInterval(() => {
-      checkSessionExpiry();
-    }, 5 * 60 * 1000); // Vérifier toutes les 5 minutes au lieu d'1 minute
+      // Vérifier périodiquement la session (toutes les 5 minutes pour améliorer les performances)
+      sessionCheckIntervalRef.current = setInterval(() => {
+        checkSessionExpiry();
+      }, 5 * 60 * 1000); // Vérifier toutes les 5 minutes au lieu d'1 minute
 
-    // Écouter les changements dans localStorage
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'auth_token' || e.key === 'user_data') {
-        // Changement localStorage détecté
-        checkAuthState();
-      }
-    };
-
-    // Écouter les événements personnalisés
-    const handleCustomEvent = (e: CustomEvent) => {
-      // Événement personnalisé détecté
-      checkAuthState();
-    };
-
-    // Écouter les changements de connectivité réseau
-    const handleOnline = () => {
-      console.log('✅ Connexion réseau rétablie');
-      networkErrorCountRef.current = 0; // Réinitialiser le compteur d'erreurs
-    };
-
-    const handleOffline = () => {
-      console.warn('⚠️ Connexion réseau perdue');
-      // Arrêter immédiatement le chargement si on détecte qu'on est déconnecté
-      setAuthState(prevState => {
-        if (prevState.loading) {
-          // Utiliser les données en cache si disponibles
-          const token = localStorage.getItem('auth_token');
-          const userData = localStorage.getItem('user_data');
-          
-          if (token && userData) {
-            try {
-              const user = JSON.parse(userData);
-              // Forcer le rôle admin si l'email correspond à l'admin
-              if (isAdminUser(user.email)) {
-                user.role = 'admin';
-              }
-              return {
-                user,
-                token,
-                isAuthenticated: true,
-                loading: false
-              };
-            } catch (error) {
-              return {
-                user: null,
-                token: null,
-                isAuthenticated: false,
-                loading: false
-              };
-            }
-          }
-          
-          return {
-            user: null,
-            token: null,
-            isAuthenticated: false,
-            loading: false
-          };
+      // Écouter les changements dans localStorage
+      handleStorageChange = (e: StorageEvent) => {
+        if (e.key === 'auth_token' || e.key === 'user_data') {
+          // Changement localStorage détecté
+          checkAuthState();
         }
-        return prevState;
-      });
-    };
+      };
 
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('userLoggedIn', handleCustomEvent as EventListener);
-    window.addEventListener('userLoggedOut', handleCustomEvent as EventListener);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+      // Écouter les événements personnalisés
+      handleCustomEvent = (e: CustomEvent) => {
+        // Événement personnalisé détecté
+        checkAuthState();
+      };
 
+      // Écouter les changements de connectivité réseau
+      handleOnline = () => {
+        console.log('✅ Connexion réseau rétablie');
+        networkErrorCountRef.current = 0; // Réinitialiser le compteur d'erreurs
+      };
+
+      handleOffline = () => {
+        console.warn('⚠️ Connexion réseau perdue');
+        // Arrêter immédiatement le chargement si on détecte qu'on est déconnecté
+        setAuthState(prevState => {
+          if (prevState.loading) {
+            // Utiliser les données en cache si disponibles
+            const token = localStorage.getItem('auth_token');
+            const userData = localStorage.getItem('user_data');
+            
+            if (token && userData) {
+              try {
+                const user = JSON.parse(userData);
+                // Forcer le rôle admin si l'email correspond à l'admin
+                if (isAdminUser(user.email)) {
+                  user.role = 'admin';
+                }
+                return {
+                  user,
+                  token,
+                  isAuthenticated: true,
+                  loading: false
+                };
+              } catch (error) {
+                return {
+                  user: null,
+                  token: null,
+                  isAuthenticated: false,
+                  loading: false
+                };
+              }
+            }
+            
+            return {
+              user: null,
+              token: null,
+              isAuthenticated: false,
+              loading: false
+            };
+          }
+          return prevState;
+        });
+      };
+
+      window.addEventListener('storage', handleStorageChange);
+      window.addEventListener('userLoggedIn', handleCustomEvent as EventListener);
+      window.addEventListener('userLoggedOut', handleCustomEvent as EventListener);
+      window.addEventListener('online', handleOnline);
+      window.addEventListener('offline', handleOffline);
+    }
+
+    // TOUJOURS retourner une fonction de nettoyage à la fin, même si isClient est false
     return () => {
-      subscription.unsubscribe();
+      if (subscription) {
+        subscription.unsubscribe();
+      }
       if (sessionCheckIntervalRef.current) {
         clearInterval(sessionCheckIntervalRef.current);
       }
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
       }
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('userLoggedIn', handleCustomEvent as EventListener);
-      window.removeEventListener('userLoggedOut', handleCustomEvent as EventListener);
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-      if (errorHandlerRef.current) {
-        window.removeEventListener('error', errorHandlerRef.current);
+      if (isClient && typeof window !== 'undefined') {
+        window.removeEventListener('storage', handleStorageChange);
+        window.removeEventListener('userLoggedIn', handleCustomEvent as EventListener);
+        window.removeEventListener('userLoggedOut', handleCustomEvent as EventListener);
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+        if (errorHandlerRef.current) {
+          window.removeEventListener('error', errorHandlerRef.current);
+        }
+        window.removeEventListener('unhandledrejection', unhandledRejectionHandler);
       }
-      window.removeEventListener('unhandledrejection', unhandledRejectionHandler);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isClient]); // Retirer checkSessionExpiry des dépendances pour éviter les boucles
@@ -787,11 +807,27 @@ export function useCustomAuth() {
     return response;
   }, [getAuthHeaders, signOut]);
 
-  return useMemo(() => ({
-    ...authState,
+  // Retourner un objet stable pour éviter les problèmes de référence
+  return useMemo(() => {
+    return {
+      user: authState.user,
+      token: authState.token,
+      isAuthenticated: authState.isAuthenticated,
+      loading: authState.loading,
+      signIn,
+      signOut,
+      getAuthHeaders,
+      authenticatedFetch,
+    };
+  }, [
+    authState.user?.id,
+    authState.user?.email,
+    authState.token,
+    authState.isAuthenticated,
+    authState.loading,
     signIn,
     signOut,
     getAuthHeaders,
-    authenticatedFetch,
-  }), [authState, signIn, signOut, getAuthHeaders, authenticatedFetch]);
+    authenticatedFetch
+  ]);
 }

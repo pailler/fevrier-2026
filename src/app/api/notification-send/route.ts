@@ -8,8 +8,6 @@ const supabase = createClient(
   getSupabaseServiceRoleKey()
 );
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function GET() {
   return NextResponse.json(
     { status: 'API notification-send is working', message: 'Use POST method to send notifications' },
@@ -39,6 +37,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Vérifier la configuration Resend
+    if (!process.env.RESEND_API_KEY) {
+      console.error('❌ RESEND_API_KEY non configuré');
+      return NextResponse.json(
+        { success: false, error: 'Configuration email non disponible' },
+        { status: 500 }
+      );
+    }
+
+    // Instancier Resend à l'intérieur de la fonction
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
     // Préparer l'email
     const emailData = {
       to: userEmail,
@@ -51,21 +61,33 @@ export async function POST(request: NextRequest) {
     const result = await resend.emails.send(emailData);
 
     if (result.error) {
-      console.error('Erreur envoi email:', result.error);
+      console.error('❌ Erreur envoi email:', result.error);
+      
+      // Gestion d'erreurs spécifiques
+      let errorMessage = result.error.message || 'Erreur lors de l\'envoi de l\'email';
+      if (result.error.message?.includes('domain')) {
+        errorMessage = 'Le domaine d\'expédition n\'est pas vérifié dans Resend';
+      } else if (result.error.message?.includes('unauthorized') || result.error.message?.includes('invalid')) {
+        errorMessage = 'Clé API Resend invalide ou expirée';
+      }
       
       // Enregistrer le log d'erreur
-      await supabase
-        .from('notification_logs')
-        .insert({
-          event_type: eventType,
-          user_email: userEmail,
-          event_data: eventData,
-          email_sent: false,
-          email_error: result.error.message
-        });
+      try {
+        await supabase
+          .from('notification_logs')
+          .insert({
+            event_type: eventType,
+            user_email: userEmail,
+            event_data: eventData,
+            email_sent: false,
+            email_error: errorMessage
+          });
+      } catch (logError) {
+        console.error('❌ Erreur lors de l\'enregistrement du log:', logError);
+      }
 
       return NextResponse.json(
-        { success: false, error: result.error.message },
+        { success: false, error: errorMessage },
         { status: 500 }
       );
     }

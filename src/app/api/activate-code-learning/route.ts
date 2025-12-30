@@ -38,9 +38,9 @@ export async function POST(request: NextRequest) {
       targetUserId = userData.id;
     }
 
-    console.log('🔄 Activation du module Apprendre le Code Informatique pour l\'utilisateur:', targetUserId);
+    console.log('🔄 Activation du module Apprendre le Code aux enfants pour l\'utilisateur:', targetUserId);
 
-    // 1. Vérifier/Créer le module Apprendre le Code Informatique
+    // 1. Vérifier/Créer le module Apprendre le Code aux enfants
     let moduleId = 'code-learning';
     const { data: existingModule, error: moduleError } = await supabase
       .from('modules')
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         .from('modules')
         .insert([{
           id: 'code-learning',
-          title: 'Apprendre le Code Informatique',
+          title: 'Apprendre le Code aux enfants',
           description: 'Des exercices courts et amusants pour découvrir la programmation. Parfait pour les enfants de 8 à 12 ans !',
           subtitle: 'Apprentissage du code pour enfants',
           category: 'ÉDUCATION',
@@ -75,10 +75,10 @@ export async function POST(request: NextRequest) {
       }
 
       moduleId = newModule.id;
-      console.log('✅ Module Apprendre le Code Informatique créé:', moduleId);
+      console.log('✅ Module Apprendre le Code aux enfants créé:', moduleId);
     } else {
       moduleId = existingModule.id;
-      console.log('✅ Module Apprendre le Code Informatique trouvé:', moduleId);
+      console.log('✅ Module Apprendre le Code aux enfants trouvé:', moduleId);
     }
 
     // 2. Vérifier si l'utilisateur a déjà accès
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     if (existingAccess) {
       return NextResponse.json({
         success: true,
-        message: 'Accès Apprendre le Code Informatique déjà activé',
+        message: 'Accès Apprendre le Code aux enfants déjà activé',
         accessId: existingAccess.id,
         usageCount: existingAccess.usage_count,
         maxUsage: existingAccess.max_usage
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       .insert([{
         user_id: targetUserId,
         module_id: moduleId,
-        module_title: 'Apprendre le Code Informatique',
+        module_title: 'Apprendre le Code aux enfants',
         is_active: true,
         access_level: 'premium',
         usage_count: 0,
@@ -129,18 +129,18 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    console.log('✅ Accès Apprendre le Code Informatique créé avec succès:', accessData.id);
+    console.log('✅ Accès Apprendre le Code aux enfants créé avec succès:', accessData.id);
 
     return NextResponse.json({
       success: true,
-      message: 'Apprendre le Code Informatique activé avec succès',
+      message: 'Apprendre le Code aux enfants activé avec succès',
       accessId: accessData.id,
       moduleId: moduleId,
       expiresAt: expiresAt.toISOString()
     });
 
   } catch (error) {
-    console.error('❌ Erreur activation Apprendre le Code Informatique:', error);
+    console.error('❌ Erreur activation Apprendre le Code aux enfants:', error);
     return NextResponse.json({ 
       success: false, 
       error: 'Erreur interne du serveur' 

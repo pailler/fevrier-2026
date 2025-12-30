@@ -36,7 +36,12 @@ interface UserModule {
 
 export default function EncoursPage() {
   const router = useRouter();
-  const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
+  // Extraire les valeurs de useCustomAuth de manière stable - TOUJOURS appeler ce hook en premier
+  const authHookResult = useCustomAuth();
+  // Extraire les valeurs immédiatement pour éviter les problèmes de référence
+  const user = authHookResult?.user ?? null;
+  const isAuthenticated = authHookResult?.isAuthenticated ?? false;
+  const authLoading = authHookResult?.loading ?? true;
   const [role, setRole] = useState<string | null>(null);
   const [userModules, setUserModules] = useState<UserModule[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,146 +55,171 @@ export default function EncoursPage() {
   });
   const [tokenError, setTokenError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [cacheBuster] = useState(() => {
-    try {
-      return Date.now() + Math.random() * 1000;
-    } catch (e) {
-      return Date.now();
-    }
-  });
   const [tokenBalance, setTokenBalance] = useState<number>(0);
   const [tokenHistory, setTokenHistory] = useState<any[]>([]);
   const [loadingTokens, setLoadingTokens] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   // Vérification de l'authentification avec timeout de sécurité
   useEffect(() => {
-    if (authLoading) {
-      // Timeout de sécurité pour éviter un chargement infini
-      const timeout = setTimeout(() => {
-        console.warn('⚠️ Authentification prend trop de temps, arrêt du chargement');
-        setLoading(false);
-      }, 10000); // 10 secondes max
-      
-      return () => clearTimeout(timeout);
+    // JAMAIS de return conditionnel - toujours exécuter et retourner à la fin
+    let timeout: NodeJS.Timeout | null = null;
+    let timer: NodeJS.Timeout | null = null;
+    
+    // Vérifier que nous sommes côté client avant d'exécuter
+    if (typeof window !== 'undefined') {
+      if (authLoading) {
+        // Timeout de sécurité pour éviter un chargement infini
+        timeout = setTimeout(() => {
+          console.warn('⚠️ Authentification prend trop de temps, arrêt du chargement');
+          setLoading(false);
+        }, 10000); // 10 secondes max
+      } else if (!authLoading) {
+        // Ajouter un délai pour s'assurer que l'authentification est bien chargée
+        timer = setTimeout(() => {
+          if (!isAuthenticated || !user) {
+            console.log('❌ Utilisateur non authentifié, redirection vers /login');
+            try {
+              if (router && typeof router.push === 'function') {
+                try {
+                  router.push('/login?redirect=' + encodeURIComponent('/encours'));
+                } catch (err) {
+                  console.error('❌ Erreur router.push:', err);
+                  if (typeof window !== 'undefined') {
+                    window.location.href = '/login?redirect=' + encodeURIComponent('/encours');
+                  }
+                }
+              } else {
+                if (typeof window !== 'undefined') {
+                  window.location.href = '/login?redirect=' + encodeURIComponent('/encours');
+                }
+              }
+            } catch (routerError) {
+              console.error('❌ Erreur lors de la redirection:', routerError);
+              if (typeof window !== 'undefined') {
+                window.location.href = '/login?redirect=' + encodeURIComponent('/encours');
+              }
+            }
+          } else {
+            console.log('✅ Utilisateur authentifié:', user?.email || 'email non disponible');
+          }
+        }, 500);
+      }
     }
     
-    // Ajouter un délai pour s'assurer que l'authentification est bien chargée
-    // Attendre que authLoading soit terminé avant de vérifier l'authentification
-    const timer = setTimeout(() => {
-      // Si l'authentification est encore en cours de chargement, ne rien faire
-      if (authLoading) {
-        console.log('⏳ Authentification en cours de chargement...');
-        return;
-      }
-      
-      if (!isAuthenticated || !user) {
-        console.log('❌ Utilisateur non authentifié, redirection vers /login');
-        // Préserver la page actuelle pour y revenir après connexion
-        try {
-          router.push('/login?redirect=' + encodeURIComponent('/encours'));
-        } catch (routerError) {
-          console.error('❌ Erreur lors de la redirection:', routerError);
-          // Fallback: redirection directe
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login?redirect=' + encodeURIComponent('/encours');
-          }
-        }
-        return;
-      }
-      
-      console.log('✅ Utilisateur authentifié:', user?.email || 'email non disponible');
-    }, 500); // 500ms de délai pour laisser le temps à l'authentification de se charger
-    
-    return () => clearTimeout(timer);
-  }, [isAuthenticated, user, authLoading, router]);
+    // TOUJOURS retourner une fonction de nettoyage à la fin
+    return () => {
+      if (timeout) clearTimeout(timeout);
+      if (timer) clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user?.id, authLoading]);
+
+  // Marquer que nous sommes côté client pour éviter les problèmes d'hydratation
+  useEffect(() => {
+    setIsClient(true);
+    return () => {};
+  }, []);
 
   // Vérifier s'il y a des erreurs de token ou des messages de succès dans l'URL
   useEffect(() => {
-    // Vérifier que nous sommes côté client
-    if (typeof window === 'undefined') return;
+    // JAMAIS de return conditionnel - toujours exécuter et retourner à la fin
+    let messageTimeout: NodeJS.Timeout | null = null;
     
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const errorParam = urlParams.get('error');
-      const messageParam = urlParams.get('message');
-      const balanceParam = urlParams.get('balance');
-      const moduleParam = urlParams.get('module');
-      
-      // Gérer les messages de succès
-      if (messageParam) {
-        setSuccessMessage(decodeURIComponent(messageParam));
-        // Nettoyer l'URL après avoir récupéré le message
-        try {
-          window.history.replaceState({}, document.title, window.location.pathname);
-        } catch (e) {
-          console.warn('Erreur lors du nettoyage de l\'URL:', e);
-        }
-        // Effacer le message après 5 secondes
-        setTimeout(() => {
-          setSuccessMessage(null);
-        }, 5000);
-      }
-      
-      if (errorParam) {
-        switch (errorParam) {
-          case 'invalid_token':
-            setTokenError('Token d\'accès invalide. Veuillez cliquer à nouveau sur "Accéder à l\'application".');
-            break;
-          case 'token_expired':
-            setTokenError('Token d\'accès expiré. Veuillez cliquer à nouveau sur "Accéder à l\'application".');
-            break;
-          case 'token_verification_failed':
-            setTokenError('Erreur de vérification du token. Veuillez réessayer.');
-            break;
-          case 'insufficient_tokens':
-            const moduleName = moduleParam || 'cette application';
-            const balance = balanceParam || '0';
-            setTokenError(`🪙 Tokens insuffisants pour accéder à ${moduleName}. Solde actuel: ${balance} token(s). Veuillez acheter des tokens pour continuer.`);
-            break;
-          case 'token_check_failed':
-            setTokenError('Erreur lors de la vérification des tokens. Veuillez réessayer ou contacter le support.');
-            break;
-          default:
-            setTokenError('Erreur d\'accès à l\'application. Veuillez réessayer.');
+    // Vérifier que nous sommes côté client avant d'exécuter
+    if (typeof window !== 'undefined') {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorParam = urlParams.get('error');
+        const messageParam = urlParams.get('message');
+        const balanceParam = urlParams.get('balance');
+        const moduleParam = urlParams.get('module');
+        
+        // Gérer les messages de succès
+        if (messageParam) {
+          setSuccessMessage(decodeURIComponent(messageParam));
+          try {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          } catch (e) {
+            console.warn('Erreur lors du nettoyage de l\'URL:', e);
+          }
+          // Effacer le message après 5 secondes
+          messageTimeout = setTimeout(() => {
+            setSuccessMessage(null);
+          }, 5000);
         }
         
-        // Nettoyer l'URL
-        try {
-          window.history.replaceState({}, document.title, window.location.pathname);
-        } catch (e) {
-          console.warn('Erreur lors du nettoyage de l\'URL:', e);
+        if (errorParam) {
+          switch (errorParam) {
+            case 'invalid_token':
+              setTokenError('Token d\'accès invalide. Veuillez cliquer à nouveau sur "Accéder à l\'application".');
+              break;
+            case 'token_expired':
+              setTokenError('Token d\'accès expiré. Veuillez cliquer à nouveau sur "Accéder à l\'application".');
+              break;
+            case 'token_verification_failed':
+              setTokenError('Erreur de vérification du token. Veuillez réessayer.');
+              break;
+            case 'insufficient_tokens':
+              const moduleName = moduleParam || 'cette application';
+              const balance = balanceParam || '0';
+              setTokenError(`🪙 Tokens insuffisants pour accéder à ${moduleName}. Solde actuel: ${balance} token(s). Veuillez acheter des tokens pour continuer.`);
+              break;
+            case 'token_check_failed':
+              setTokenError('Erreur lors de la vérification des tokens. Veuillez réessayer ou contacter le support.');
+              break;
+            default:
+              setTokenError('Erreur d\'accès à l\'application. Veuillez réessayer.');
+          }
+          
+          try {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          } catch (e) {
+            console.warn('Erreur lors du nettoyage de l\'URL:', e);
+          }
         }
+      } catch (error) {
+        console.error('Erreur lors de la lecture des paramètres URL:', error);
       }
-    } catch (error) {
-      console.error('Erreur lors de la lecture des paramètres URL:', error);
     }
+    
+    // TOUJOURS retourner une fonction de nettoyage à la fin
+    return () => {
+      if (messageTimeout) clearTimeout(messageTimeout);
+    };
   }, []);
 
   // Récupérer le rôle de l'utilisateur et vérifier si c'est un admin
-  const [isAdmin, setIsAdmin] = useState(false);
-  
   useEffect(() => {
-    try {
-      if (!user) return;
-      
-      // Le rôle est déjà disponible dans l'objet user de notre système d'authentification
-      const userRole = user.role || 'user';
-      setRole(userRole);
-      
-      // Vérifier si c'est un admin (par rôle ou par email)
-      const isAdminByRole = userRole === 'admin';
-      const isAdminByEmail = user.email === 'formateur_tic@hotmail.com';
-      setIsAdmin(isAdminByRole || isAdminByEmail);
-      
-      if (isAdminByRole || isAdminByEmail) {
-        console.log('✅ Utilisateur admin détecté:', user.email);
-      }
-    } catch (error) {
-      console.error('❌ Erreur lors de la récupération du rôle:', error);
-      setRole('user');
+    // Ne jamais retourner conditionnellement - toujours exécuter le code et retourner à la fin
+    if (!user) {
+      setRole(null);
       setIsAdmin(false);
+    } else {
+      try {
+        // Le rôle est déjà disponible dans l'objet user de notre système d'authentification
+        const userRole = user.role || 'user';
+        setRole(userRole);
+        
+        // Vérifier si c'est un admin (par rôle ou par email)
+        const isAdminByRole = userRole === 'admin';
+        const isAdminByEmail = user.email === 'formateur_tic@hotmail.com';
+        setIsAdmin(isAdminByRole || isAdminByEmail);
+        
+        if (isAdminByRole || isAdminByEmail) {
+          console.log('✅ Utilisateur admin détecté:', user.email);
+        }
+      } catch (error) {
+        console.error('❌ Erreur lors de la récupération du rôle:', error);
+        setRole('user');
+        setIsAdmin(false);
+      }
     }
-  }, [user]);
+    
+    // TOUJOURS retourner une fonction de nettoyage à la fin, jamais de return conditionnel
+    return () => {};
+  }, [user?.id, user?.email, user?.role]); // Utiliser des valeurs primitives pour éviter les changements de référence
 
   // Charger les données de tokens
   const fetchTokenData = useCallback(async () => {
@@ -213,7 +243,10 @@ export default function EncoursPage() {
       setTokenHistory(history || []); // ✅ Tableau vide par défaut si null
       
     } catch (error) {
-      console.error('❌ fetchTokenData: Erreur chargement tokens:', error);
+      // Ne logger l'erreur que si ce n'est pas une erreur réseau normale ou un utilisateur sans tokens
+      if (error instanceof Error && !error.message.includes('fetch') && !error.message.includes('network')) {
+        console.error('❌ fetchTokenData: Erreur chargement tokens:', error);
+      }
       // ✅ Mettre à jour avec des valeurs par défaut en cas d'erreur
       setTokenBalance(0);
       setTokenHistory([]);
@@ -224,58 +257,60 @@ export default function EncoursPage() {
 
   // Mise à jour en temps réel de l'historique des utilisations
   useEffect(() => {
-    if (!user?.id) return;
-
-    // Vérifier si WebSocket est disponible
-    const isWebSocketAvailable = typeof window !== 'undefined' && typeof WebSocket !== 'undefined';
-    
-    // WebSocket check silencieux pour améliorer les performances
-
+    // Ne jamais retourner conditionnellement - toujours exécuter le code et retourner à la fin
     let channel: any = null;
+    let pollingInterval: NodeJS.Timeout | null = null;
 
-    // Essayer de créer l'abonnement Realtime seulement si WebSocket est disponible
-    if (isWebSocketAvailable) {
-      try {
-        // S'abonner aux changements de la table user_applications (nouveau système)
-        channel = supabase
-          .channel(`user_applications:${user.id}`)
-          .on(
-            'postgres_changes',
-            {
-              event: 'UPDATE',
-              schema: 'public',
-              table: 'user_applications',
-              filter: `user_id=eq.${user.id}`
-            },
-            (payload) => {
-              // Rafraîchir immédiatement l'historique (sans dépendance pour éviter les boucles)
-              // eslint-disable-next-line react-hooks/exhaustive-deps
-              fetchTokenData().catch(() => {});
-            }
-          )
-          .subscribe(() => {
-            // Abonnement silencieux pour améliorer les performances
-          });
-      } catch (error: any) {
-        console.error('❌ Erreur lors de la configuration Realtime:', error);
-        if (error?.message?.includes('WebSocket') || error?.message?.includes('websocket')) {
-          console.warn('⚠️ WebSocket non disponible, utilisation du polling uniquement');
+    if (user?.id) {
+      // Vérifier si WebSocket est disponible
+      const isWebSocketAvailable = typeof window !== 'undefined' && typeof WebSocket !== 'undefined';
+      
+      // WebSocket check silencieux pour améliorer les performances
+
+      // Essayer de créer l'abonnement Realtime seulement si WebSocket est disponible
+      if (isWebSocketAvailable) {
+        try {
+          // S'abonner aux changements de la table user_applications (nouveau système)
+          channel = supabase
+            .channel(`user_applications:${user.id}`)
+            .on(
+              'postgres_changes',
+              {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'user_applications',
+                filter: `user_id=eq.${user.id}`
+              },
+              (payload) => {
+                // Rafraîchir immédiatement l'historique (sans dépendance pour éviter les boucles)
+                // eslint-disable-next-line react-hooks/exhaustive-deps
+                fetchTokenData().catch(() => {});
+              }
+            )
+            .subscribe(() => {
+              // Abonnement silencieux pour améliorer les performances
+            });
+        } catch (error: any) {
+          console.error('❌ Erreur lors de la configuration Realtime:', error);
+          if (error?.message?.includes('WebSocket') || error?.message?.includes('websocket')) {
+            console.warn('⚠️ WebSocket non disponible, utilisation du polling uniquement');
+          }
+          channel = null;
         }
-        channel = null;
       }
+
+      // Polling de secours toutes les 60 secondes (réduit pour améliorer les performances)
+      pollingInterval = setInterval(() => {
+        // Polling silencieux pour améliorer les performances
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        fetchTokenData().catch(() => {});
+      }, 60000); // Augmenté de 30s à 60s pour réduire la charge
     }
 
-    // Polling de secours toutes les 60 secondes (réduit pour améliorer les performances)
-    const pollingInterval = setInterval(() => {
-      // Polling silencieux pour améliorer les performances
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      fetchTokenData().catch(() => {});
-    }, 60000); // Augmenté de 30s à 60s pour réduire la charge
-
-    // Nettoyer l'abonnement et le polling au démontage
+    // TOUJOURS retourner une fonction de nettoyage à la fin, jamais de return conditionnel
     return () => {
       console.log('🔔 Nettoyage de l\'abonnement en temps réel');
-      clearInterval(pollingInterval);
+      if (pollingInterval) clearInterval(pollingInterval);
       if (channel) {
         try {
           supabase.removeChannel(channel);
@@ -287,10 +322,31 @@ export default function EncoursPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]); // ✅ Retiré fetchTokenData pour éviter les dépendances circulaires
 
+  // Timeout de sécurité pour authLoading (déplacé avant les returns conditionnels)
+  useEffect(() => {
+    let timeout: NodeJS.Timeout | null = null;
+    
+    if (authLoading) {
+      timeout = setTimeout(() => {
+        console.warn('⚠️ Timeout authLoading - Arrêt après 8 secondes');
+        // Le hook useCustomAuth gère son propre timeout, mais on peut forcer l'affichage
+      }, 8000);
+    }
+    
+    // Toujours retourner une fonction de nettoyage pour éviter l'erreur React #310
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [authLoading]);
+
   // Charger les modules souscrits par l'utilisateur et les tokens d'accès
   useEffect(() => {
+    // JAMAIS de return conditionnel - toujours exécuter et retourner à la fin
+    let timeoutId: NodeJS.Timeout | null = null;
+    let isMounted = true;
+    
     const fetchUserModules = async () => {
-      if (!user?.id) {
+      if (!user?.id || !isMounted) {
         setLoading(false);
         return;
       }
@@ -658,47 +714,69 @@ export default function EncoursPage() {
         if (allModules.length > 0) {
           console.log('✅ fetchUserModules: Premier module:', allModules[0].module_title);
         }
-        setUserModules(allModules);
-        setError(null);
+        if (isMounted) {
+          setUserModules(allModules);
+          setError(null);
+        }
         
       } catch (error) {
-        console.error('❌ fetchUserModules: Erreur:', error);
-        setError(`Erreur lors du chargement des modules: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
-        setUserModules([]);
+        if (isMounted) {
+          console.error('❌ fetchUserModules: Erreur:', error);
+          setError(`Erreur lors du chargement des modules: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+          setUserModules([]);
+        }
       } finally {
-        setLoading(false); // ✅ Toujours arrêter le chargement, même en cas d'erreur
+        if (isMounted) {
+          setLoading(false); // ✅ Toujours arrêter le chargement, même en cas d'erreur
+        }
       }
     };
 
     if (user?.id) {
       // Ajouter un timeout de sécurité pour éviter un chargement infini
-      const timeoutId = setTimeout(() => {
-        console.warn('⏱️ Timeout de sécurité: arrêt du chargement après 15 secondes');
-        setLoading(false);
+      timeoutId = setTimeout(() => {
+        if (isMounted) {
+          console.warn('⏱️ Timeout de sécurité: arrêt du chargement après 15 secondes');
+          setLoading(false);
+        }
       }, 15000); // 15 secondes max
       
       fetchUserModules()
         .catch(err => {
-          console.error('❌ Erreur non gérée dans fetchUserModules:', err);
-          setError('Erreur lors du chargement. Veuillez réessayer.');
-          setLoading(false);
+          if (isMounted) {
+            console.error('❌ Erreur non gérée dans fetchUserModules:', err);
+            setError('Erreur lors du chargement. Veuillez réessayer.');
+            setLoading(false);
+          }
         })
         .finally(() => {
-          clearTimeout(timeoutId);
+          if (timeoutId) clearTimeout(timeoutId);
         });
       
       // Charger les tokens séparément pour ne pas bloquer le rendu
+      // Utiliser fetchTokenData directement sans l'ajouter aux dépendances pour éviter les boucles
       fetchTokenData().catch(err => {
-        console.error('❌ Erreur non gérée dans fetchTokenData:', err);
-        // Ne pas bloquer le rendu si les tokens échouent
-        setTokenBalance(0);
-        setTokenHistory([]);
+        if (isMounted) {
+          console.error('❌ Erreur non gérée dans fetchTokenData:', err);
+          // Ne pas bloquer le rendu si les tokens échouent
+          setTokenBalance(0);
+          setTokenHistory([]);
+        }
       });
     } else {
       // Si pas d'utilisateur, arrêter le chargement immédiatement
-      setLoading(false);
+      if (isMounted) {
+        setLoading(false);
+      }
     }
-  }, [user?.id]); // ✅ Utiliser user?.id au lieu de user pour éviter les re-renders inutiles
+    
+    // TOUJOURS retourner une fonction de nettoyage pour éviter l'erreur React #310
+    return () => {
+      isMounted = false;
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]); // fetchTokenData est stable grâce à useCallback avec user?.id
 
   // Mapping des modules vers leurs URLs directes (sécurisées via tokens)
   const getModuleUrl = (moduleId: string): string => {
@@ -718,7 +796,9 @@ export default function EncoursPage() {
       'qrcodes-statiques': 'qrcodes-statiques', // QR Codes Statiques
       'hunyuan3d': 'hunyuan3d', // Hunyuan 3D -> hunyuan3d
       'administration': 'administration', // Administration -> administration
-      'prompt-generator': 'prompt-generator', // Générateur de Prompts IA -> prompt-generator
+      'prompt-generator': 'prompt-generator', // Générateur de prompts -> prompt-generator
+      'apprendre-autrement': 'apprendre-autrement', // Apprendre Autrement -> apprendre-autrement
+      'ai-detector': 'ai-detector', // Détecteur de Contenu IA -> ai-detector
     };
 
     // Mapping des slugs vers les URLs directes des applications
@@ -748,10 +828,16 @@ export default function EncoursPage() {
         : 'https://homeassistant.iahome.fr',
       // Administration : page de liens vers les services administratifs
       'administration': '/administration',
-      // Générateur de Prompts IA : localhost:9001 en dev
-      'prompt-generator': (typeof window !== 'undefined' && window.location.hostname === 'localhost') 
-        ? 'http://localhost:9001/prompt-generator' 
-        : 'https://prompt-generator.iahome.fr',
+      // Apprendre Autrement : redirection directe vers l'application (racine)
+      'apprendre-autrement': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+        ? 'http://localhost:9001'
+        : 'https://apprendre-autrement.iahome.fr',
+      // Générateur de prompts : utiliser directement l'URL de production (via Traefik)
+      'prompt-generator': 'https://prompt-generator.iahome.fr',
+      // Détecteur de Contenu IA : sur le domaine principal
+      'ai-detector': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+        ? 'http://localhost:3000/ai-detector'
+        : 'https://iahome.fr/ai-detector',
     };
     
     // Convertir module_id numérique en slug si nécessaire
@@ -772,6 +858,7 @@ export default function EncoursPage() {
       'comfyui': 100,
       'hunyuan3d': 100,
       'prompt-generator': 100,
+      'ai-detector': 100, // Détecteur de Contenu IA -> 100 tokens
       
       // Applications essentielles (10 tokens)
       'librespeed': 10,
@@ -782,6 +869,7 @@ export default function EncoursPage() {
       'cogstudio': 10,
       'home-assistant': 100,
       'administration': 10,
+      'apprendre-autrement': 10, // Apprendre Autrement -> 10 tokens
       
       // Applications premium (100 tokens)
       'qrcodes': 100,
@@ -926,6 +1014,10 @@ export default function EncoursPage() {
 
   // Fonctions utilitaires
   const formatDate = (dateString: string) => {
+    if (!isClient) {
+      // Pendant l'hydratation, retourner une version simple
+      return new Date(dateString).toISOString().split('T')[0];
+    }
     return new Date(dateString).toLocaleDateString('fr-FR', {
       year: 'numeric',
       month: 'long',
@@ -1038,6 +1130,7 @@ export default function EncoursPage() {
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-gray-600">Vérification de l'authentification...</p>
+            <p className="text-sm text-gray-500 mt-2">Si le chargement prend trop de temps, veuillez rafraîchir la page.</p>
           </div>
         </div>
       </div>
@@ -1606,7 +1699,7 @@ export default function EncoursPage() {
                         }
                         
                         // Applications essentielles (10 tokens) - sans LibreSpeed (qui a son propre bouton)
-                        if (['metube', 'psitransfer', 'pdf', 'cogstudio', 'code-learning', 'administration'].includes(moduleId)) {
+                        if (['metube', 'psitransfer', 'pdf', 'cogstudio', 'code-learning', 'administration', 'apprendre-autrement'].includes(moduleId)) {
                           if (!user) {
                             console.error('❌ user is null in EssentialAccessButton');
                             return null;
@@ -1696,9 +1789,44 @@ export default function EncoursPage() {
                   <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-6 shadow-lg border border-gray-200">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {tokenHistory.slice(0, 12).map((usage, index) => {
+                        if (!isClient) {
+                          // Pendant l'hydratation, retourner une version simple sans calculs de date
+                          return (
+                            <div key={usage.id || index} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex items-center space-x-2">
+                                  <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1"></div>
+                                  <h4 className="text-sm font-bold text-gray-900 truncate">
+                                    {usage.module_name || usage.module_id || 'Module inconnu'}
+                                  </h4>
+                                </div>
+                                <div className="flex items-center space-x-1">
+                                  <span className="text-red-500 font-bold text-base">
+                                    -{usage.tokens_consumed || 0}
+                                  </span>
+                                  <span className="text-xs text-gray-400 font-medium">tokens</span>
+                                </div>
+                              </div>
+                              <div className="border-t border-gray-100 pt-3">
+                                <p className="text-xs font-medium text-gray-600">
+                                  {usage.action_type || 'Accès'}
+                                </p>
+                                <p className="text-xs font-semibold text-gray-500 mt-1">
+                                  {usage.usage_date ? new Date(usage.usage_date).toLocaleDateString('fr-FR') : 'Date inconnue'}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        }
                         const usageDate = new Date(usage.usage_date);
-                        const isToday = usageDate.toDateString() === new Date().toDateString();
-                        const isYesterday = usageDate.toDateString() === new Date(Date.now() - 86400000).toDateString();
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const yesterday = new Date(today);
+                        yesterday.setDate(yesterday.getDate() - 1);
+                        const usageDateOnly = new Date(usageDate);
+                        usageDateOnly.setHours(0, 0, 0, 0);
+                        const isToday = usageDateOnly.getTime() === today.getTime();
+                        const isYesterday = usageDateOnly.getTime() === yesterday.getTime();
                         
                         return (
                           <div key={usage.id || index} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 hover:-translate-y-1">

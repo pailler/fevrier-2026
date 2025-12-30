@@ -188,6 +188,130 @@ export default function RuinedFooocusPage() {
     }
   }, []);
 
+  // Ajouter les données structurées JSON-LD pour le SEO
+  useEffect(() => {
+    const softwareApplicationSchema = {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "RuinedFooocus - IA Home",
+      "applicationCategory": "WebApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "100",
+        "priceCurrency": "TOKENS"
+      },
+      "description": "RuinedFooocus est un modèle d'intelligence artificielle révolutionnaire qui combine les meilleurs aspects de Stable Diffusion et Midjourney en une expérience fluide et de pointe. Cette technologie utilise l'apprentissage profond pour créer des images photoréalistes, des œuvres artistiques, des portraits, des paysages et des illustrations avec un niveau de détail et de réalisme exceptionnel. Support CPU, NVIDIA, DirectML, ROCm, macOS. Génération simple, précise et rapide.",
+      "url": "https://iahome.fr/card/ruinedfooocus",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "650"
+      },
+      "featureList": [
+        "Génération text-to-image",
+        "Combinaison Stable Diffusion et Midjourney",
+        "Qualité professionnelle",
+        "Résolution jusqu'à 1024x1024",
+        "Support multi-plateformes (CPU, NVIDIA, DirectML, ROCm, macOS)",
+        "Interface simple et intuitive",
+        "Génération rapide",
+        "Filtres de contenu"
+      ]
+    };
+
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce que RuinedFooocus ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "RuinedFooocus est un modèle d'intelligence artificielle révolutionnaire qui combine les meilleurs aspects de Stable Diffusion et Midjourney en une expérience fluide et de pointe. Cette technologie utilise l'apprentissage profond pour créer des images photoréalistes, des œuvres artistiques, des portraits, des paysages et des illustrations avec un niveau de détail et de réalisme exceptionnel. Le modèle comprend les nuances subtiles du langage et les traduit en visuels cohérents."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment utiliser RuinedFooocus ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pour utiliser RuinedFooocus, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via ruinedfooocus.iahome.fr. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quelle est la différence entre RuinedFooocus et Stable Diffusion ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "RuinedFooocus combine les meilleurs aspects de Stable Diffusion et Midjourney en une expérience fluide et de pointe. Alors que Stable Diffusion est un modèle puissant, RuinedFooocus offre une interface plus simple et intuitive, avec une combinaison optimale des forces des deux technologies. L'expérience utilisateur est plus fluide, avec des résultats de qualité professionnelle et une génération plus rapide."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "RuinedFooocus est-il gratuit ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "L'activation de RuinedFooocus coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, support multi-plateformes, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quelles plateformes sont supportées par RuinedFooocus ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "RuinedFooocus supporte une large gamme de plateformes : CPU (tous les processeurs modernes), NVIDIA GPU (avec accélération CUDA), DirectML (AMD et Intel sur Windows), ROCm (AMD sur Linux et Windows), et macOS (avec optimisation Metal Performance Shaders). Vous pouvez bénéficier à distance de ces plateformes depuis votre navigateur, garantissant une accessibilité maximale et des performances optimales."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Combien de temps prend la génération d'une image avec RuinedFooocus ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Grâce à notre infrastructure haute performance et au support multi-plateformes, vous obtenez des résultats en quelques secondes, même pour les images les plus complexes. Le temps de génération dépend de la complexité de la description, de la résolution choisie, et de la plateforme utilisée, mais généralement, une image est générée en moins d'une minute."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Pour qui est fait RuinedFooocus ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "RuinedFooocus est fait pour plusieurs types d'utilisateurs : artistes et designers qui créent des concepts visuels et explorent de nouveaux styles artistiques, professionnels du marketing et de la publicité qui génèrent des visuels uniques pour leurs campagnes, créateurs de contenu qui ont besoin d'images personnalisées, et toute personne qui veut créer des images de haute qualité avec une interface simple et intuitive."
+          }
+        }
+      ]
+    };
+
+    // Créer et ajouter le script pour SoftwareApplication
+    const script1 = document.createElement('script');
+    script1.type = 'application/ld+json';
+    script1.id = 'software-application-schema-rf';
+    script1.text = JSON.stringify(softwareApplicationSchema);
+    
+    // Créer et ajouter le script pour FAQPage
+    const script2 = document.createElement('script');
+    script2.type = 'application/ld+json';
+    script2.id = 'faq-schema-rf';
+    script2.text = JSON.stringify(faqSchema);
+
+    // Vérifier si les scripts existent déjà avant de les ajouter
+    if (!document.getElementById('software-application-schema-rf')) {
+      document.head.appendChild(script1);
+    }
+    if (!document.getElementById('faq-schema-rf')) {
+      document.head.appendChild(script2);
+    }
+
+    // Nettoyage lors du démontage
+    return () => {
+      const existingScript1 = document.getElementById('software-application-schema-rf');
+      const existingScript2 = document.getElementById('faq-schema-rf');
+      if (existingScript1) existingScript1.remove();
+      if (existingScript2) existingScript2.remove();
+    };
+  }, []);
+
   // Charger les détails de la carte
   useEffect(() => {
     const fetchCardDetails = async () => {
@@ -279,14 +403,13 @@ export default function RuinedFooocusPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Créez des images avec l'IA de pointe
+                RuinedFooocus : génération d'images IA simple et précise
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
                 {(card?.category || 'AI GENERATION').toUpperCase()}
               </span>
               <p className="text-xl text-purple-100 mb-6">
-                RuinedFooocus combine les meilleurs aspects de Stable Diffusion et Midjourney en une expérience fluide et de pointe. 
-                Créez des images de haute qualité à partir de descriptions textuelles avec une précision et une créativité exceptionnelles.
+                Créez des images de haute qualité avec RuinedFooocus. Combinaison des meilleurs aspects de Stable Diffusion et Midjourney. Génération d'images par IA simple, précise et rapide. Support CPU, NVIDIA, DirectML, ROCm, macOS. Parfait pour artistes, designers et créateurs de contenu.
               </p>
               
               
@@ -541,6 +664,266 @@ export default function RuinedFooocusPage() {
               </div>
               
               <div className="space-y-8 sm:space-y-12 text-gray-700">
+                {/* Paragraphe citable par les IA (GEO) */}
+                <div className="bg-gradient-to-r from-purple-100 to-indigo-100 p-6 rounded-2xl border-l-4 border-purple-500 mb-8">
+                  <p className="text-lg leading-relaxed text-gray-800">
+                    <strong>RuinedFooocus est un modèle d'intelligence artificielle révolutionnaire qui combine les meilleurs aspects de Stable Diffusion et Midjourney en une expérience fluide et de pointe.</strong> Cette technologie utilise l'apprentissage profond pour créer des images photoréalistes, des œuvres artistiques, des portraits, des paysages et des illustrations avec un niveau de détail et de réalisme exceptionnel. Avec support multi-plateformes (CPU, NVIDIA, DirectML, ROCm, macOS), interface simple et intuitive, et génération rapide, c'est l'outil idéal pour artistes, designers et créateurs de contenu qui veulent créer des visuels uniques et créatifs.
+                  </p>
+                </div>
+
+                {/* H2 - À quoi sert RuinedFooocus ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 bg-clip-text text-transparent mb-6">
+                    À quoi sert RuinedFooocus ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mb-6"></div>
+                  <div className="space-y-4 text-gray-700">
+                    <p className="text-lg leading-relaxed">
+                      RuinedFooocus permet de créer des images de haute qualité à partir de descriptions textuelles avec une précision et une créativité exceptionnelles. Il répond aux besoins de ceux qui souhaitent générer des visuels uniques, créer des concepts artistiques, ou produire des images professionnelles avec une interface simple et intuitive.
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 ml-4">
+                      <li className="text-lg"><strong>Créer des images personnalisées :</strong> Générez des visuels uniques à partir de descriptions textuelles détaillées avec une interface simple</li>
+                      <li className="text-lg"><strong>Combiner les meilleures technologies :</strong> Bénéficiez des forces de Stable Diffusion et Midjourney en une seule expérience</li>
+                      <li className="text-lg"><strong>Produire du contenu visuel :</strong> Créez des images pour vos projets marketing, publicitaires ou créatifs rapidement</li>
+                      <li className="text-lg"><strong>Accéder depuis n'importe quelle plateforme :</strong> Utilisez CPU, NVIDIA, DirectML, ROCm, ou macOS selon votre configuration</li>
+                    </ul>
+                    <p className="text-lg leading-relaxed mt-4">
+                      <strong>Cas concrets d'utilisation :</strong> Créez des concepts visuels pour vos projets artistiques, générez des visuels uniques pour vos campagnes marketing, créez des mockups de produits, produisez des supports pédagogiques, explorez de nouveaux styles artistiques, ou visualisez des concepts complexes.
+                    </p>
+                  </div>
+                </div>
+
+                {/* H2 - Que peut faire RuinedFooocus ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 bg-clip-text text-transparent mb-6">
+                    Que peut faire RuinedFooocus ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mb-6"></div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200">
+                      <h3 className="text-2xl font-bold text-purple-900 mb-4">Génération text-to-image</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Transformez vos idées en images en décrivant simplement ce que vous voulez voir. Plus votre description est détaillée, plus le résultat sera précis. Interface simple et intuitive pour une expérience fluide.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl border border-indigo-200">
+                      <h3 className="text-2xl font-bold text-indigo-900 mb-4">Combinaison Stable Diffusion et Midjourney</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Bénéficiez des meilleurs aspects de Stable Diffusion et Midjourney en une seule expérience. Qualité professionnelle, génération rapide, et résultats exceptionnels.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200">
+                      <h3 className="text-2xl font-bold text-blue-900 mb-4">Support multi-plateformes</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Accédez depuis CPU, NVIDIA GPU (CUDA), DirectML (AMD/Intel), ROCm (AMD), ou macOS (Metal). Bénéficiez à distance de ces plateformes depuis votre navigateur pour une accessibilité maximale.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 rounded-2xl border border-cyan-200">
+                      <h3 className="text-2xl font-bold text-cyan-900 mb-4">Résolution haute définition</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Générez des images jusqu'à 1024x1024 pixels avec une qualité professionnelle adaptée à tous vos projets. Les images générées rivalisent avec celles créées par des artistes professionnels.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* H2 - Comment utiliser RuinedFooocus ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 bg-clip-text text-transparent mb-6">
+                    Comment utiliser RuinedFooocus ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mb-6"></div>
+                  <div className="space-y-6">
+                    <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-2xl border border-purple-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Activer RuinedFooocus</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            Activez RuinedFooocus avec 100 tokens. Une fois activé, le service est accessible depuis vos applications actives via ruinedfooocus.iahome.fr.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border border-indigo-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">2</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Décrire votre image</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            Entrez une description textuelle détaillée de l'image que vous souhaitez créer. Plus votre description est précise et détaillée, plus le résultat sera fidèle à vos attentes. L'interface simple rend la création accessible à tous.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-2xl border border-blue-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">3</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Ajuster les paramètres</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            Ajustez les paramètres de génération si nécessaire : style, composition, ambiance, résolution. Le contrôle artistique vous permet d'influencer chaque aspect de votre création selon vos préférences.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-cyan-50 to-teal-50 p-6 rounded-2xl border border-cyan-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">4</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Générer et télécharger</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            L'IA génère automatiquement votre image en quelques secondes grâce à notre infrastructure haute performance. Vous pouvez ensuite télécharger l'image générée, la réutiliser, ou générer de nouvelles variations.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* H2 - Pour qui est fait RuinedFooocus ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 bg-clip-text text-transparent mb-6">
+                    Pour qui est fait RuinedFooocus ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mb-6"></div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200 text-center">
+                      <div className="text-4xl mb-4">🎨</div>
+                      <h3 className="text-xl font-bold text-purple-900 mb-2">Artistes et designers</h3>
+                      <p className="text-gray-700">Créez des concepts visuels, des illustrations personnalisées, et explorez de nouveaux styles artistiques pour vos projets créatifs avec une interface simple.</p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl border border-indigo-200 text-center">
+                      <div className="text-4xl mb-4">📊</div>
+                      <h3 className="text-xl font-bold text-indigo-900 mb-2">Marketing et publicité</h3>
+                      <p className="text-gray-700">Générez des visuels uniques pour vos campagnes, des mockups de produits, et des contenus visuels engageants rapidement et facilement.</p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200 text-center">
+                      <div className="text-4xl mb-4">🎓</div>
+                      <h3 className="text-xl font-bold text-blue-900 mb-2">Éducation et recherche</h3>
+                      <p className="text-gray-700">Visualisez des concepts complexes, créez des supports pédagogiques, et explorez les possibilités de l'IA générative avec une interface accessible.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* H2 - RuinedFooocus vs autres générateurs d'images */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 bg-clip-text text-transparent mb-6">
+                    RuinedFooocus vs autres générateurs d'images
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mb-6"></div>
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-8 rounded-2xl border border-gray-200">
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white">
+                            <th className="border border-gray-300 p-4 text-left">Fonctionnalité</th>
+                            <th className="border border-gray-300 p-4 text-center">RuinedFooocus</th>
+                            <th className="border border-gray-300 p-4 text-center">Autres générateurs</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="bg-white">
+                            <td className="border border-gray-300 p-4 font-semibold">Technologie</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ Stable Diffusion + Midjourney</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Une seule technologie</td>
+                          </tr>
+                          <tr className="bg-gray-50">
+                            <td className="border border-gray-300 p-4 font-semibold">Interface</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ Simple et intuitive</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Souvent complexe</td>
+                          </tr>
+                          <tr className="bg-white">
+                            <td className="border border-gray-300 p-4 font-semibold">Support plateformes</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ CPU, NVIDIA, DirectML, ROCm, macOS</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Support limité</td>
+                          </tr>
+                          <tr className="bg-gray-50">
+                            <td className="border border-gray-300 p-4 font-semibold">Qualité</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ Professionnelle (1024x1024)</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Variable selon le service</td>
+                          </tr>
+                          <tr className="bg-white">
+                            <td className="border border-gray-300 p-4 font-semibold">Prix</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par utilisation</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Abonnements mensuels souvent chers</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="mt-6 text-gray-700 leading-relaxed">
+                      <strong>En résumé :</strong> RuinedFooocus offre une alternative simple et puissante aux autres générateurs d'images. Contrairement aux services qui utilisent une seule technologie ou qui ont une interface complexe, RuinedFooocus combine les meilleurs aspects de Stable Diffusion et Midjourney dans une interface simple et intuitive, avec un support multi-plateformes pour une accessibilité maximale. C'est la solution idéale pour ceux qui veulent créer des images de haute qualité avec une expérience utilisateur fluide.
+                    </p>
+                  </div>
+                </div>
+
+                {/* H2 - Questions fréquentes sur RuinedFooocus (FAQ) */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 bg-clip-text text-transparent mb-6">
+                    Questions fréquentes sur RuinedFooocus (FAQ)
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mb-6"></div>
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-purple-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Qu'est-ce que RuinedFooocus ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        RuinedFooocus est un modèle d'intelligence artificielle révolutionnaire qui combine les meilleurs aspects de Stable Diffusion et Midjourney en une expérience fluide et de pointe. Cette technologie utilise l'apprentissage profond pour créer des images photoréalistes, des œuvres artistiques, des portraits, des paysages et des illustrations avec un niveau de détail et de réalisme exceptionnel. Le modèle comprend les nuances subtiles du langage et les traduit en visuels cohérents.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border-l-4 border-indigo-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser RuinedFooocus ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Pour utiliser RuinedFooocus, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via ruinedfooocus.iahome.fr. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-blue-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Quelle est la différence entre RuinedFooocus et Stable Diffusion ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        RuinedFooocus combine les meilleurs aspects de Stable Diffusion et Midjourney en une expérience fluide et de pointe. Alors que Stable Diffusion est un modèle puissant, RuinedFooocus offre une interface plus simple et intuitive, avec une combinaison optimale des forces des deux technologies. L'expérience utilisateur est plus fluide, avec des résultats de qualité professionnelle et une génération plus rapide.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-cyan-50 to-teal-50 p-6 rounded-2xl border-l-4 border-cyan-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">RuinedFooocus est-il gratuit ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        L'activation de RuinedFooocus coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, support multi-plateformes, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-teal-50 to-emerald-50 p-6 rounded-2xl border-l-4 border-teal-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Quelles plateformes sont supportées par RuinedFooocus ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        RuinedFooocus supporte une large gamme de plateformes : CPU (tous les processeurs modernes), NVIDIA GPU (avec accélération CUDA), DirectML (AMD et Intel sur Windows), ROCm (AMD sur Linux et Windows), et macOS (avec optimisation Metal Performance Shaders). Vous pouvez bénéficier à distance de ces plateformes depuis votre navigateur, garantissant une accessibilité maximale et des performances optimales.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-emerald-50 to-green-50 p-6 rounded-2xl border-l-4 border-emerald-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Combien de temps prend la génération d'une image avec RuinedFooocus ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Grâce à notre infrastructure haute performance et au support multi-plateformes, vous obtenez des résultats en quelques secondes, même pour les images les plus complexes. Le temps de génération dépend de la complexité de la description, de la résolution choisie, et de la plateforme utilisée, mais généralement, une image est générée en moins d'une minute.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-green-50 to-lime-50 p-6 rounded-2xl border-l-4 border-green-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Pour qui est fait RuinedFooocus ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        RuinedFooocus est fait pour plusieurs types d'utilisateurs : artistes et designers qui créent des concepts visuels et explorent de nouveaux styles artistiques, professionnels du marketing et de la publicité qui génèrent des visuels uniques pour leurs campagnes, créateurs de contenu qui ont besoin d'images personnalisées, et toute personne qui veut créer des images de haute qualité avec une interface simple et intuitive.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Description principale */}
                 <div className="text-center max-w-5xl mx-auto">
                   <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">

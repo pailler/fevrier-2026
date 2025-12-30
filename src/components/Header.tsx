@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import DynamicNavigation from './DynamicNavigation';
-import TokenBalance from './TokenBalance';
+import { useTokenContext } from '../contexts/TokenContext';
 import { NotificationServiceClient } from '../utils/notificationServiceClient';
 import { useIframeDetection } from '../utils/useIframeDetection';
 
@@ -17,15 +17,35 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const { user, isAuthenticated, loading, signOut } = useCustomAuth();
+  const { tokens, isLoading: tokensLoading } = useTokenContext();
   const [role, setRole] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isInIframe = useIframeDetection();
 
+  // Pages où le Header ne doit pas être affiché
+  const PAGES_WITHOUT_HEADER = ['/code-learning', '/administration'];
+  
+  // Vérifier si le Header doit être masqué
+  const shouldHideHeader = pathname && PAGES_WITHOUT_HEADER.some(page => 
+    pathname === page || pathname.startsWith(`${page}/`)
+  );
+
+  // Masquer le Header sur les pages spécifiées
+  if (shouldHideHeader) {
+    return null;
+  }
+
   // Fonction mémorisée pour fermer le menu
   const closeMobileMenu = useCallback((e?: React.MouseEvent) => {
+    // Ne pas empêcher le comportement par défaut si c'est un lien
     if (e) {
-      e.preventDefault();
-      e.stopPropagation();
+      const target = e.target as HTMLElement;
+      const linkElement = target.closest('a');
+      if (!linkElement) {
+        // Seulement empêcher le comportement par défaut si ce n'est pas un lien
+        e.preventDefault();
+        e.stopPropagation();
+      }
     }
     setIsMobileMenuOpen(false);
   }, []);
@@ -127,24 +147,37 @@ export default function Header() {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       // Éviter les appels multiples simultanés
       if (isHandling) return;
-      isHandling = true;
       
-      setTimeout(() => {
-        isHandling = false;
-      }, 100);
-
       try {
         const target = event.target as HTMLElement;
         if (!target) return;
         
+        // Si le clic est sur un lien dans le menu mobile, ne rien faire - laisser le lien fonctionner
+        const linkElement = target.closest('a');
+        const menuElement = document.getElementById('mobile-menu');
+        if (linkElement && menuElement && menuElement.contains(linkElement)) {
+          // C'est un lien dans le menu mobile - laisser le lien fonctionner normalement
+          // Le menu sera fermé par le onClick du lien lui-même
+          return;
+        }
+        
+        // Si le clic est sur un autre lien, fermer le menu et laisser le lien fonctionner
+        if (linkElement) {
+          setIsMobileMenuOpen(false);
+          return;
+        }
+        
         // Vérifier si le clic est sur le bouton menu ou dans le menu
         const menuButton = target.closest('#mobile-menu-button');
         const menuContainer = target.closest('.mobile-menu-container');
-        const menuElement = document.getElementById('mobile-menu');
         
         // Ne fermer que si on clique vraiment en dehors
         if (!menuContainer && !menuButton && !menuElement?.contains(target)) {
-          setIsMobileMenuOpen(false);
+          isHandling = true;
+          setTimeout(() => {
+            setIsMobileMenuOpen(false);
+            isHandling = false;
+          }, 50);
         }
       } catch (error) {
         // Ignorer silencieusement pour éviter les boucles
@@ -153,14 +186,12 @@ export default function Header() {
 
     // Utiliser un délai court pour éviter les conflits avec le clic sur le bouton
     const timeoutId = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside, { passive: true, capture: false });
-      document.addEventListener('touchstart', handleClickOutside, { passive: true, capture: false });
+      document.addEventListener('click', handleClickOutside, { passive: true, capture: false });
     }, 100);
 
     return () => {
       clearTimeout(timeoutId);
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('click', handleClickOutside);
       document.body.style.overflow = '';
     };
   }, [isMobileMenuOpen]);
@@ -262,12 +293,15 @@ export default function Header() {
         </div>
 
         {/* Section principale - Navigation et utilisateur */}
-        <div className="flex items-center justify-between h-16 w-full relative overflow-x-hidden">
-          <div className="flex items-center space-x-2 md:space-x-6 flex-1 min-w-0 w-full overflow-x-hidden">
+        <div className="flex items-center justify-between h-16 w-full relative">
+          <div className="flex items-center space-x-2 md:space-x-6 flex-1 min-w-0 overflow-hidden">
             <Link 
               href="/" 
-              className="flex items-center space-x-2 hover:opacity-90 transition-opacity flex-shrink-0 cursor-pointer" 
+              className="flex items-center space-x-2 hover:opacity-90 transition-opacity flex-shrink-0 cursor-pointer relative z-20" 
               aria-label="Accueil IAhome"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
             >
               <div className="relative h-8 w-auto md:h-9 lg:h-10">
                 <Image
@@ -284,13 +318,16 @@ export default function Header() {
             
             {/* Bouton "Mes applis activées" avec tokens - Desktop et Mobile - VERSION 4.0.0 */}
             {isAuthenticated && user && (
-              <div className="flex items-center space-x-2 md:space-x-3 flex-shrink-0" data-button-version="4.0.0" style={{ display: 'flex', visibility: 'visible', zIndex: 50 }}>
+              <div className="flex items-center space-x-1 md:space-x-3 flex-shrink-0 relative z-0 mr-3 md:mr-0" data-button-version="4.0.0">
                 <Link
                   href="/encours" 
                   data-active={pathname === '/encours' || pathname?.startsWith('/encours/') ? 'true' : 'false'}
                   data-button-type="mes-applis-actives"
-                  className="group relative bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 text-white font-bold px-3 py-2.5 md:px-5 md:py-3 rounded-lg md:rounded-2xl text-sm md:text-base hover:from-green-600 hover:via-emerald-600 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 flex items-center space-x-1.5 md:space-x-3 border-2 border-white/20 hover:border-white/40 animate-pulse-subtle whitespace-nowrap z-50"
+                  className="group relative bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 text-white font-bold px-2.5 py-2 md:px-5 md:py-3 rounded-lg md:rounded-2xl text-sm md:text-base hover:from-green-600 hover:via-emerald-600 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 flex items-center space-x-1 md:space-x-3 border-2 border-white/20 hover:border-white/40 animate-pulse-subtle"
                   title="Cliquez pour accéder à vos applications activées"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
                   style={{ 
                     WebkitTapHighlightColor: 'transparent',
                     WebkitTouchCallout: 'none',
@@ -298,30 +335,48 @@ export default function Header() {
                     backgroundColor: 'rgb(34, 197, 94)',
                     backgroundImage: 'linear-gradient(to right, rgb(34, 197, 94), rgb(16, 185, 129), rgb(22, 163, 74))',
                     display: 'flex',
-                    visibility: 'visible',
-                    opacity: '1',
-                    zIndex: 50,
-                    position: 'relative'
+                    position: 'relative',
+                    zIndex: 0,
+                    maxWidth: 'fit-content'
                   }}
                 >
                   {/* Effet de brillance animé */}
-                  <div className="absolute inset-0 rounded-lg md:rounded-2xl bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                  <div className="absolute inset-0 rounded-lg md:rounded-2xl bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
                   
                   <span className="text-base md:text-xl relative z-10">📱</span>
                   <span className="relative z-10 text-sm md:text-base font-semibold">Mes applis activées</span>
-                  <svg className="w-4 h-4 md:w-5 md:h-5 relative z-10 group-hover:translate-x-1 transition-transform hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 md:w-5 md:h-5 relative z-10 group-hover:translate-x-1 transition-transform hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </Link>
-                <div className="relative flex-shrink-0 z-50">
-                  <TokenBalance 
-                    className="text-yellow-300 md:text-yellow-200 font-bold text-base md:text-xl bg-yellow-400/20 md:bg-white/10 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl backdrop-blur-sm border-2 border-yellow-300/50 md:border-yellow-300/30 shadow-lg md:shadow-md" 
-                    showIcon={true}
-                    linkToPricing={true}
-                  />
-                </div>
               </div>
             )}
+            
+            {/* Boutons Applis essentielles et Applis IA - Toujours visibles */}
+            <div className="flex items-center space-x-1 md:space-x-3 flex-shrink-0 relative z-30 mr-3 md:mr-0">
+              <Link 
+                href="/essentiels" 
+                data-nav-path="/essentiels"
+                className="font-medium text-white hover:text-blue-100 transition-colors px-2 py-1 md:px-3 md:py-2 rounded-lg border-2 border-yellow-300/50 md:border-yellow-300/30 relative text-xs md:text-base"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                style={{ zIndex: 30, position: 'relative' }}
+              >
+                ⭐ <span className="hidden sm:inline">Applis essentielles</span><span className="sm:hidden">Essentielles</span>
+              </Link>
+              <Link 
+                href="/applications" 
+                data-nav-path="/applications"
+                className="font-medium text-white hover:text-blue-100 transition-colors px-2 py-1 md:px-3 md:py-2 rounded-lg border-2 border-yellow-300/50 md:border-yellow-300/30 relative text-xs md:text-base"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                style={{ zIndex: 30, position: 'relative' }}
+              >
+                ⭐ <span className="hidden sm:inline">Applis IA</span><span className="sm:hidden">IA</span>
+              </Link>
+            </div>
 
             {/* Navigation statique */}
             <nav className="hidden md:flex items-center space-x-6" id="main-nav">
@@ -358,40 +413,25 @@ export default function Header() {
               >
                 Blog
               </Link>
-              <Link 
-                href="/essentiels" 
-                data-nav-path="/essentiels"
-                className={`font-semibold transition-all duration-300 px-4 py-2 rounded-lg ${
-                  pathname === '/essentiels' || pathname?.startsWith('/essentiels/')
-                    ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg shadow-yellow-500/50'
-                    : 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-white hover:from-yellow-500/30 hover:to-orange-500/30 hover:shadow-md hover:shadow-yellow-500/30'
-                }`}
-              >
-                ⭐ Applis essentielles
-              </Link>
-              <Link 
-                href="/applications" 
-                data-nav-path="/applications"
-                className={`font-semibold transition-all duration-300 px-4 py-2 rounded-lg ${
-                  pathname === '/applications' || pathname?.startsWith('/applications/')
-                    ? 'bg-gradient-to-r from-green-400 to-blue-500 text-white shadow-lg shadow-green-500/50'
-                    : 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white hover:from-green-500/30 hover:to-blue-500/30 hover:shadow-md hover:shadow-green-500/30'
-                }`}
-              >
-                🤖 Applis IA
-              </Link>
+              {/* Affichage des tokens après Blog */}
+              {isAuthenticated && user && !tokensLoading && (
+                <div className="flex items-center space-x-1 px-2 py-1 rounded-md bg-white/10 border border-white/20">
+                  <span className="text-sm">🪙</span>
+                  <span className="text-sm font-bold">{tokens !== null ? tokens : 0}</span>
+                </div>
+              )}
               <Link 
                 href="/pricing" 
-                className="flex items-center space-x-2 bg-purple-100 hover:bg-purple-200 text-purple-800 px-4 py-2 rounded-full font-semibold transition-all shadow-sm hover:shadow-md"
+                className="flex items-center space-x-1 bg-purple-100 hover:bg-purple-200 text-purple-800 px-2 py-1.5 rounded-full font-semibold transition-all shadow-sm hover:shadow-md text-sm"
               >
                 <svg 
-                  className="w-5 h-5 text-purple-700" 
+                  className="w-3 h-3 text-purple-700" 
                   fill="currentColor" 
                   viewBox="0 0 20 20"
                 >
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
-                <span className="text-purple-800 font-bold">Obtenir Plus</span>
+                <span className="text-purple-800 font-bold">Obtenir +</span>
               </Link>
             </nav>
           </div>
@@ -414,7 +454,7 @@ export default function Header() {
           </div>
 
           {/* Menu mobile */}
-          <div className="md:hidden">
+          <div className="md:hidden flex-shrink-0 ml-2">
             <button 
               type="button"
               onClick={toggleMobileMenu}
@@ -422,6 +462,7 @@ export default function Header() {
               aria-expanded={isMobileMenuOpen}
               aria-label="Menu mobile"
               id="mobile-menu-button"
+              style={{ zIndex: 50, position: 'relative' }}
             >
               {isMobileMenuOpen ? (
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -452,7 +493,13 @@ export default function Header() {
               right: 0
             }}
             onClick={(e) => {
-              // Empêcher la propagation pour éviter la fermeture accidentelle
+              // Ne pas bloquer les clics sur les liens
+              const target = e.target as HTMLElement;
+              if (target.tagName === 'A' || target.closest('a')) {
+                // Laisser les liens fonctionner normalement - ne rien faire
+                return;
+              }
+              // Empêcher la propagation seulement pour les autres éléments
               e.stopPropagation();
             }}
           >
@@ -467,7 +514,12 @@ export default function Header() {
                       ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
                       : 'text-white hover:bg-blue-500'
                   }`}
-                  onClick={closeMobileMenu}
+                  onClick={(e) => {
+                    // Fermer le menu après un court délai pour permettre la navigation
+                    setTimeout(() => {
+                      setIsMobileMenuOpen(false);
+                    }, 100);
+                  }}
                 >
                   Découvrir
                 </Link>
@@ -478,7 +530,12 @@ export default function Header() {
                       ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
                       : 'text-white hover:bg-blue-500'
                   }`}
-                  onClick={closeMobileMenu}
+                  onClick={(e) => {
+                    // Fermer le menu après un court délai pour permettre la navigation
+                    setTimeout(() => {
+                      setIsMobileMenuOpen(false);
+                    }, 100);
+                  }}
                 >
                   Formation
                 </Link>
@@ -489,31 +546,56 @@ export default function Header() {
                       ? 'text-yellow-300 underline decoration-yellow-300 decoration-2 underline-offset-2 bg-blue-600'
                       : 'text-white hover:bg-blue-500'
                   }`}
-                  onClick={closeMobileMenu}
+                  onClick={(e) => {
+                    // Fermer le menu après un court délai pour permettre la navigation
+                    setTimeout(() => {
+                      setIsMobileMenuOpen(false);
+                    }, 100);
+                  }}
                 >
                   Blog
                 </Link>
+                {/* Affichage des tokens après Blog (mobile menu) */}
+                {isAuthenticated && user && !tokensLoading && (
+                  <div className="px-4 py-2 flex items-center space-x-2 text-white">
+                    <span className="text-base">🪙</span>
+                    <span className="text-base font-bold">{tokens !== null ? tokens : 0}</span>
+                  </div>
+                )}
+                {/* Boutons Applis essentielles et Applis IA - Toujours visibles (mobile menu) */}
                 <Link
                   href="/essentiels"
-                  className={`block px-4 py-3 transition-all duration-300 rounded-lg font-semibold ${
+                  className={`relative block px-4 py-3 transition-all duration-300 rounded-lg font-semibold border-2 ${
                     pathname === '/essentiels' || pathname?.startsWith('/essentiels/')
-                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg shadow-yellow-500/50'
-                      : 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-white hover:from-yellow-500/30 hover:to-orange-500/30 hover:shadow-md'
+                      ? 'border-yellow-400 bg-yellow-400/10 text-yellow-300 shadow-[0_0_15px_rgba(250,204,21,0.5)]'
+                      : 'border-yellow-500/40 bg-yellow-500/5 text-white hover:border-yellow-400 hover:bg-yellow-400/10 hover:text-yellow-300 hover:shadow-[0_0_10px_rgba(250,204,21,0.3)]'
                   }`}
-                  onClick={closeMobileMenu}
+                  onClick={(e) => {
+                    // Fermer le menu après un court délai pour permettre la navigation
+                    setTimeout(() => {
+                      setIsMobileMenuOpen(false);
+                    }, 100);
+                  }}
                 >
-                  ⭐ Applis essentielles
+                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></span>
+                  <span className="relative z-10">⭐ Applis essentielles</span>
                 </Link>
                 <Link
                   href="/applications"
-                  className={`block px-4 py-3 transition-all duration-300 rounded-lg font-semibold ${
+                  className={`relative block px-4 py-3 transition-all duration-300 rounded-lg font-semibold border-2 ${
                     pathname === '/applications' || pathname?.startsWith('/applications/')
-                      ? 'bg-gradient-to-r from-green-400 to-blue-500 text-white shadow-lg shadow-green-500/50'
-                      : 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white hover:from-green-500/30 hover:to-blue-500/30 hover:shadow-md'
+                      ? 'border-cyan-400 bg-cyan-400/10 text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.5)]'
+                      : 'border-cyan-500/40 bg-cyan-500/5 text-white hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-300 hover:shadow-[0_0_10px_rgba(34,211,238,0.3)]'
                   }`}
-                  onClick={closeMobileMenu}
+                  onClick={(e) => {
+                    // Fermer le menu après un court délai pour permettre la navigation
+                    setTimeout(() => {
+                      setIsMobileMenuOpen(false);
+                    }, 100);
+                  }}
                 >
-                  🤖 Applis IA
+                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></span>
+                  <span className="relative z-10">⭐ Applis IA</span>
                 </Link>
               </div>
 
@@ -552,17 +634,17 @@ export default function Header() {
               <div className="px-2 sm:px-4 py-3 border-b border-blue-500 w-full">
                 <Link
                   href="/pricing"
-                  className="flex items-center justify-center space-x-2 bg-purple-100 hover:bg-purple-200 text-purple-800 px-4 py-3 rounded-full font-semibold transition-all shadow-sm hover:shadow-md w-full"
+                  className="flex items-center justify-center space-x-1 bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-2 rounded-full font-semibold transition-all shadow-sm hover:shadow-md w-full text-sm"
                   onClick={closeMobileMenu}
                 >
                   <svg 
-                    className="w-5 h-5 text-purple-700" 
+                    className="w-4 h-4 text-purple-700" 
                     fill="currentColor" 
                     viewBox="0 0 20 20"
                   >
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
-                  <span className="text-purple-800 font-bold">Obtenir Plus</span>
+                  <span className="text-purple-800 font-bold">Obtenir +</span>
                 </Link>
               </div>
 

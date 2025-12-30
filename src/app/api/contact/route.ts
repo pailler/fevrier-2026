@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -33,6 +31,9 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Instancier Resend à l'intérieur de la fonction pour éviter les problèmes de chargement
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     // Préparation du contenu de l'email
     const emailSubject = subject ? `[Contact IA Home] ${subject}` : '[Contact IA Home] Nouveau message';
@@ -67,8 +68,19 @@ Ce message a été envoyé automatiquement depuis le formulaire de contact de ht
 
     if (error) {
       console.error('❌ Erreur Resend:', error);
+      
+      // Gestion d'erreurs spécifiques
+      let errorMessage = 'Erreur lors de l\'envoi de l\'email';
+      if (error.message?.includes('domain')) {
+        errorMessage = 'Le domaine d\'expédition n\'est pas vérifié dans Resend. Veuillez contacter l\'administrateur.';
+      } else if (error.message?.includes('unauthorized') || error.message?.includes('invalid')) {
+        errorMessage = 'Clé API Resend invalide. Veuillez contacter l\'administrateur.';
+      } else if (error.message) {
+        errorMessage = `Erreur: ${error.message}`;
+      }
+      
       return NextResponse.json(
-        { error: 'Erreur lors de l\'envoi de l\'email' },
+        { error: errorMessage },
         { status: 500 }
       );
     }

@@ -29,6 +29,7 @@ export default function Essentiels() {
     'qrcodes',
     'pdf',
     'code-learning',
+    'apprendre-autrement',
     'home-assistant',
     'administration'
   ];
@@ -84,18 +85,43 @@ export default function Essentiels() {
 
   // Récupérer les modules depuis la base de données
   useEffect(() => {
+    // Protection contre un chargement infini : forcer l'arrêt après 15 secondes
+    const globalTimeout = setTimeout(() => {
+      console.warn('⏱️ Timeout global: arrêt forcé du chargement après 15 secondes');
+      setLoading(false);
+      setError('Le chargement a pris trop de temps. Veuillez rafraîchir la page.');
+    }, 15000);
+
     const fetchModules = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
+        setError(null);
+        
+        // Wrapper la requête dans un Promise.race avec timeout pour éviter les blocages
+        const supabaseQuery = supabase
           .from('modules')
           .select('*')
           .order('title');
+        
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout: La requête Supabase a pris plus de 10 secondes')), 10000)
+        );
+        
+        let result: any;
+        try {
+          result = await Promise.race([supabaseQuery, timeoutPromise]);
+        } catch (error) {
+          console.error('❌ Erreur lors de la requête Supabase (timeout ou erreur):', error);
+          result = { data: null, error: error };
+        }
+        
+        const { data, error } = result || { data: null, error: new Error('Résultat Supabase indéfini') };
 
         if (error) {
           console.error('Erreur lors de la récupération des modules:', error);
           setError('Erreur lors du chargement des modules');
-          return;
+          setModules([]); // Initialiser avec un tableau vide
+          return; // Le finally sera quand même exécuté
         }
 
         // Filtrer pour ne garder que les modules essentiels (exclure whisper)
@@ -119,12 +145,19 @@ export default function Essentiels() {
       } catch (err) {
         console.error('Erreur lors de la récupération des modules:', err);
         setError('Erreur lors du chargement des modules');
+        setModules([]); // Initialiser avec un tableau vide en cas d'erreur
       } finally {
-        setLoading(false);
+        clearTimeout(globalTimeout);
+        setLoading(false); // ✅ Toujours arrêter le chargement, même en cas d'erreur
       }
     };
 
     fetchModules();
+    
+    // Cleanup function
+    return () => {
+      clearTimeout(globalTimeout);
+    };
   }, []);
 
   // Gestion du scroll vers le haut
@@ -167,11 +200,12 @@ export default function Essentiels() {
       'comfyui': 'comfyui',
       'cogstudio': 'cogstudio',
       'code-learning': 'code-learning',
+      'apprendre-autrement': 'apprendre-autrement',
       'meeting-reports': 'meeting-reports',
       'hunyuan3d': 'hunyuan3d',
       'whisper': 'whisper',
       'home-assistant': 'home-assistant',
-      'administration': 'administration',
+      'administration': 'administration'
     };
 
     // Vérifier d'abord le mapping direct
@@ -198,6 +232,9 @@ export default function Essentiels() {
     }
     if (titleLower.includes('code learning') || titleLower.includes('code-learning')) {
       return 'code-learning';
+    }
+    if (titleLower.includes('apprendre autrement') || titleLower.includes('apprendre-autrement')) {
+      return 'apprendre-autrement';
     }
     if (titleLower.includes('stable diffusion')) {
       return 'stablediffusion';
@@ -299,7 +336,7 @@ export default function Essentiels() {
                 Outils essentiels IAHome
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Les outils indispensables pour votre productivité : téléchargement, transfert, conversion et test de vitesse. Sans téléchargement.
+                Les outils indispensables pour votre productivité : téléchargement de vidéos, transfert de fichiers, conversion PDF, test de vitesse internet, QR codes dynamiques, apprentissage du code, domotique et services administratifs. Tous accessibles directement depuis votre navigateur, sans téléchargement ni installation.
               </p>
               
               {/* Barre de recherche et bouton Mes applis */}

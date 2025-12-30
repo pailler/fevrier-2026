@@ -45,6 +45,14 @@ export default function EssentialAccessButton({
     'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
     'cogstudio': 'https://cogstudio.iahome.fr',
     'administration': '/administration',
+    // Apprendre Autrement : redirection directe vers l'application (port 9001 en dev, sous-domaine en prod)
+    'apprendre-autrement': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+      ? 'http://localhost:9001'
+      : 'https://apprendre-autrement.iahome.fr',
+    // Détecteur de Contenu IA : sur le domaine principal
+    'ai-detector': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+      ? 'http://localhost:3000/ai-detector'
+      : 'https://iahome.fr/ai-detector',
   };
 
   const handleAccess = async () => {
@@ -111,7 +119,14 @@ export default function EssentialAccessButton({
         console.warn(`⚠️ ${moduleTitle}: Erreur incrémentation compteur:`, incrementError);
       }
 
-      // Générer un token d'accès
+      // Obtenir l'URL du sous-domaine pour ce module
+      const moduleUrl = moduleSubdomains[moduleId];
+      
+      if (!moduleUrl) {
+        throw new Error(`Module ${moduleId} non trouvé`);
+      }
+      
+      // Générer un token d'accès pour tous les modules (y compris les routes internes avec token)
       const tokenResponse = await fetch('/api/generate-access-token', {
         method: 'POST',
         headers: {
@@ -125,39 +140,50 @@ export default function EssentialAccessButton({
       });
 
       if (!tokenResponse.ok) {
-        throw new Error('Erreur génération token');
+        let errorMessage = 'Erreur génération token';
+        try {
+          const errorData = await tokenResponse.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          const errorText = await tokenResponse.text();
+          console.error(`❌ ${moduleTitle}: Erreur génération token:`, errorText);
+        }
+        throw new Error(errorMessage);
       }
 
       const tokenData = await tokenResponse.json();
       
-      // Obtenir l'URL du sous-domaine pour ce module
-      const moduleUrl = moduleSubdomains[moduleId];
-      
-      if (!moduleUrl) {
-        throw new Error(`Module ${moduleId} non trouvé`);
+      if (!tokenData.token) {
+        throw new Error('Token non généré par le serveur');
       }
       
-      // Pour les routes internes (commençant par /), rediriger directement
-      // Exception : code-learning s'ouvre toujours dans un nouvel onglet
+      // Pour les routes internes (commençant par /), ajouter le token à l'URL
       if (moduleUrl.startsWith('/')) {
-        console.log(`🔗 ${moduleTitle}: Accès route interne:`, moduleUrl);
-        if (moduleId === 'code-learning') {
-          window.open(moduleUrl, '_blank');
+        // Construire l'URL complète avec le domaine pour window.open
+        const fullUrl = typeof window !== 'undefined' 
+          ? `${window.location.origin}${moduleUrl}?token=${encodeURIComponent(tokenData.token)}`
+          : `${moduleUrl}?token=${encodeURIComponent(tokenData.token)}`;
+        console.log(`🔗 ${moduleTitle}: Accès route interne avec token:`, fullUrl);
+        if (moduleId === 'code-learning' || moduleId === 'administration') {
+          // Ouvrir dans un nouvel onglet avec l'URL complète
+          window.open(fullUrl, '_blank', 'noopener,noreferrer');
+          onAccessGranted?.(fullUrl);
         } else {
-          window.location.href = moduleUrl;
+          window.location.href = fullUrl;
+          onAccessGranted?.(fullUrl);
         }
-        onAccessGranted?.(moduleUrl);
       } else {
-        // Pour les sous-domaines externes, ajouter le token
+        // Pour les sous-domaines externes (y compris apprendre-autrement), ajouter le token à l'URL
         const directUrl = `${moduleUrl}?token=${encodeURIComponent(tokenData.token)}`;
-        console.log(`🔗 ${moduleTitle}: Accès direct au sous-domaine avec token:`, directUrl);
-        window.open(directUrl, '_blank');
+        console.log(`🔗 ${moduleTitle}: Accès direct à l'application avec token:`, directUrl);
+        window.open(directUrl, '_blank', 'noopener,noreferrer');
         onAccessGranted?.(directUrl);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(`❌ ${moduleTitle}: Erreur inattendue:`, err);
-      setError('Une erreur inattendue est survenue.');
-      onAccessDenied?.('Erreur inattendue');
+      const errorMessage = err?.message || 'Une erreur inattendue est survenue.';
+      setError(errorMessage);
+      onAccessDenied?.(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -173,6 +199,10 @@ export default function EssentialAccessButton({
             ? 'bg-gray-400 cursor-not-allowed'
             : moduleId === 'administration'
             ? 'bg-green-600 hover:bg-green-700 shadow-lg hover:shadow-xl'
+            : moduleId === 'apprendre-autrement'
+            ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl'
+            : moduleId === 'code-learning'
+            ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-lg hover:shadow-xl'
             : 'bg-blue-600 hover:bg-blue-700'
           }`}
       >
@@ -185,6 +215,17 @@ export default function EssentialAccessButton({
           <>
             <span>🏛️</span>
             <span>Accéder aux services administratifs (10 tokens)</span>
+          </>
+        ) : moduleId === 'apprendre-autrement' ? (
+          <>
+            <span>🌈</span>
+            <span>Accéder à Apprendre Autrement</span>
+            <span className="text-xs opacity-90">(10 tokens)</span>
+          </>
+        ) : moduleId === 'code-learning' ? (
+          <>
+            <span>💻</span>
+            <span>Accéder à Apprendre le Code (10 tokens)</span>
           </>
         ) : (
           <>

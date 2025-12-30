@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       };
 
       // Déterminer la durée selon le type de module
-      const aiModules = ['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui'];
+      const aiModules = ['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui', 'hunyuan3d', 'prompt-generator'];
       const isAIModule = aiModules.includes(moduleId);
       const expirationDays = isAIModule ? 30 : 90; // Modules IA : 30 jours, essentiels : 90 jours
       

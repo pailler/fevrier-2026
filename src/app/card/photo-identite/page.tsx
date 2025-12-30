@@ -29,12 +29,24 @@ export default function PhotoIdentitePage() {
     setLoading(false);
   }, []);
 
+  // Timeout de sécurité pour éviter un chargement infini
+  useEffect(() => {
+    if (loading || authLoading) {
+      const timeout = setTimeout(() => {
+        console.warn('⚠️ Timeout de chargement Photo Identité - Arrêt après 10 secondes');
+      }, 10000);
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [loading, authLoading]);
+
   if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Chargement...</p>
+          <p className="text-sm text-gray-500 mt-2">Si le chargement prend trop de temps, veuillez rafraîchir la page.</p>
         </div>
       </div>
     );

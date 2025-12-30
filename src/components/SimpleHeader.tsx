@@ -7,11 +7,13 @@ import Image from 'next/image';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import TokenBalance from './TokenBalance';
 import TokenBalanceLink from './TokenBalanceLink';
+import { useTokenContext } from '../contexts/TokenContext';
 
 export default function SimpleHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const { user, isAuthenticated, signOut } = useCustomAuth();
+  const { tokens, isLoading: tokensLoading } = useTokenContext();
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -20,8 +22,15 @@ export default function SimpleHeader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section unique - Navigation et utilisateur */}
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-6">
-            <Link href="/" className="flex items-center space-x-2 hover:opacity-90 transition-opacity" aria-label="Accueil IAhome">
+          <div className="flex items-center space-x-3 md:space-x-6">
+            <Link 
+              href="/" 
+              className="flex items-center space-x-2 hover:opacity-90 transition-opacity relative z-20" 
+              aria-label="Accueil IAhome"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
               <div className="relative h-8 w-auto md:h-9 lg:h-10">
                 <Image
                   src="/iahome-logo.svg"
@@ -32,27 +41,55 @@ export default function SimpleHeader() {
                   className="h-8 md:h-9 lg:h-10 w-auto"
                 />
               </div>
-              <span className="text-xl font-bold text-white hidden sm:inline">IAhome</span>
+              <span className="text-lg font-bold text-white">IAhome</span>
             </Link>
             
             {/* Bouton "Mes applis activées" avec tokens pour mobile - VERSION 4.0.0 */}
             {isAuthenticated && user && (
-              <div className="flex md:hidden items-center space-x-3" data-button-version="4.0.0">
+              <div className="flex md:hidden items-center space-x-1 relative z-0 mr-3" data-button-version="4.0.0">
                 <Link
                   href="/encours"
                   data-button-type="mes-applis-actives"
-                  className="bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 text-white font-bold px-4 py-2.5 rounded-lg text-lg hover:from-green-600 hover:via-emerald-600 hover:to-green-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2"
+                  className="bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 text-white font-bold px-2.5 py-2 rounded-lg text-sm hover:from-green-600 hover:via-emerald-600 hover:to-green-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-1 relative"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
                   style={{
                     backgroundColor: 'rgb(34, 197, 94)',
-                    backgroundImage: 'linear-gradient(to right, rgb(34, 197, 94), rgb(16, 185, 129), rgb(22, 163, 74))'
+                    backgroundImage: 'linear-gradient(to right, rgb(34, 197, 94), rgb(16, 185, 129), rgb(22, 163, 74))',
+                    zIndex: 0,
+                    maxWidth: 'fit-content'
                   }}
                 >
-                  <span className="text-xl">📱</span>
-                  <span>Mes applis activées</span>
+                  <span className="text-base">📱</span>
+                  <span className="text-sm">Mes applis activées</span>
                 </Link>
-                <TokenBalance className="text-yellow-300 font-bold text-xl" showIcon={true} />
               </div>
             )}
+            
+            {/* Boutons Applis essentielles et Applis IA - Toujours visibles (mobile) */}
+            <div className="flex md:hidden items-center space-x-1 relative z-30 mr-3">
+              <Link 
+                href="/essentiels" 
+                className="font-medium text-white hover:text-blue-100 transition-colors px-1.5 py-1 rounded-lg border-2 border-yellow-300/50 text-xs relative"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                style={{ zIndex: 30, position: 'relative' }}
+              >
+                ⭐ Essentielles
+              </Link>
+              <Link 
+                href="/applications" 
+                className="font-medium text-white hover:text-blue-100 transition-colors px-1.5 py-1 rounded-lg border-2 border-yellow-300/50 text-xs relative"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                style={{ zIndex: 30, position: 'relative' }}
+              >
+                ⭐ IA
+              </Link>
+            </div>
 
             {/* Navigation principale - TOUJOURS VISIBLE */}
             <nav className="hidden md:flex items-center space-x-6">
@@ -104,38 +141,25 @@ export default function SimpleHeader() {
               >
                 Blog
               </Link>
-              <Link 
-                href="/essentiels" 
-                className={`font-semibold transition-all duration-300 px-4 py-2 rounded-lg ${
-                  pathname === '/essentiels' || pathname?.startsWith('/essentiels/')
-                    ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg shadow-yellow-500/50'
-                    : 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-white hover:from-yellow-500/30 hover:to-orange-500/30 hover:shadow-md hover:shadow-yellow-500/30'
-                }`}
-              >
-                ⭐ Applis essentielles
-              </Link>
-              <Link 
-                href="/applications" 
-                className={`font-semibold transition-all duration-300 px-4 py-2 rounded-lg ${
-                  pathname === '/applications' || pathname?.startsWith('/applications/')
-                    ? 'bg-gradient-to-r from-green-400 to-blue-500 text-white shadow-lg shadow-green-500/50'
-                    : 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white hover:from-green-500/30 hover:to-blue-500/30 hover:shadow-md hover:shadow-green-500/30'
-                }`}
-              >
-                🤖 Applis IA
-              </Link>
+              {/* Affichage des tokens après Blog */}
+              {isAuthenticated && user && !tokensLoading && (
+                <div className="flex items-center space-x-1 px-2 py-1 rounded-md bg-white/10 border border-white/20">
+                  <span className="text-sm">🪙</span>
+                  <span className="text-sm font-bold">{tokens !== null ? tokens : 0}</span>
+                </div>
+              )}
               <Link 
                 href="/pricing" 
-                className="flex items-center space-x-2 bg-purple-100 hover:bg-purple-200 px-4 py-2 rounded-full font-medium transition-colors group"
+                className="flex items-center space-x-1 bg-purple-100 hover:bg-purple-200 px-2 py-1.5 rounded-full font-medium transition-colors group text-sm"
               >
                 <svg 
-                  className="w-4 h-4 text-indigo-600" 
+                  className="w-3 h-3 text-indigo-600" 
                   fill="currentColor" 
                   viewBox="0 0 20 20"
                 >
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
-                <span className="text-indigo-600">Obtenir Plus</span>
+                <span className="text-indigo-600">Obtenir +</span>
               </Link>
             </nav>
           </div>
@@ -151,16 +175,33 @@ export default function SimpleHeader() {
                   <span>📱</span>
                   <span>Mes applis</span>
                 </Link>
-                <button
-                  onClick={() => {
-                    signOut();
-                    router.push('/');
-                  }}
-                  className="text-white hover:text-blue-100 transition-colors px-3 py-1 rounded-lg hover:bg-blue-500 cursor-pointer text-sm"
-                >
-                  Se déconnecter
-                </button>
               </>
+            ) : null}
+            
+            {/* Boutons Applis essentielles et Applis IA - Toujours visibles (desktop) */}
+            <Link 
+              href="/essentiels" 
+              className="font-medium text-white hover:text-blue-100 transition-colors px-3 py-2 rounded-lg border-2 border-yellow-300/50"
+            >
+              ⭐ Applis essentielles
+            </Link>
+            <Link 
+              href="/applications" 
+              className="font-medium text-white hover:text-blue-100 transition-colors px-3 py-2 rounded-lg border-2 border-yellow-300/50"
+            >
+              ⭐ Applis IA
+            </Link>
+            
+            {isAuthenticated && user ? (
+              <button
+                onClick={() => {
+                  signOut();
+                  router.push('/');
+                }}
+                className="text-white hover:text-blue-100 transition-colors px-3 py-1 rounded-lg hover:bg-blue-500 cursor-pointer text-sm"
+              >
+                Se déconnecter
+              </button>
             ) : (
               <div className="flex items-center space-x-3">
                 <Link 
@@ -211,7 +252,14 @@ export default function SimpleHeader() {
 
         {/* Menu mobile déroulant */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-blue-500 py-4">
+          <div className="md:hidden border-t border-blue-500 py-4" onClick={(e) => {
+            // Ne pas bloquer les clics sur les liens
+            const target = e.target as HTMLElement;
+            if (target.tagName === 'A' || target.closest('a')) {
+              setIsMobileMenuOpen(false);
+              return;
+            }
+          }}>
             <div className="space-y-2">
               {/* Navigation principale */}
               <div className="px-4 py-2 border-b border-blue-500">
@@ -249,27 +297,30 @@ export default function SimpleHeader() {
                 >
                   Blog
                 </Link>
+                {/* Boutons Applis essentielles et Applis IA - Toujours visibles (mobile menu) */}
                 <Link
                   href="/essentiels"
-                  className={`block px-4 py-3 transition-all duration-300 rounded-lg font-semibold ${
+                  className={`relative block px-4 py-3 transition-all duration-300 rounded-lg font-semibold border-2 ${
                     pathname === '/essentiels' || pathname?.startsWith('/essentiels/')
-                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg shadow-yellow-500/50'
-                      : 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-white hover:from-yellow-500/30 hover:to-orange-500/30 hover:shadow-md'
+                      ? 'border-yellow-400 bg-yellow-400/10 text-yellow-300 shadow-[0_0_15px_rgba(250,204,21,0.5)]'
+                      : 'border-yellow-500/40 bg-yellow-500/5 text-white hover:border-yellow-400 hover:bg-yellow-400/10 hover:text-yellow-300 hover:shadow-[0_0_10px_rgba(250,204,21,0.3)]'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  ⭐ Applis essentielles
+                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></span>
+                  <span className="relative z-10">⭐ Applis essentielles</span>
                 </Link>
                 <Link
                   href="/applications"
-                  className={`block px-4 py-3 transition-all duration-300 rounded-lg font-semibold ${
+                  className={`relative block px-4 py-3 transition-all duration-300 rounded-lg font-semibold border-2 ${
                     pathname === '/applications' || pathname?.startsWith('/applications/')
-                      ? 'bg-gradient-to-r from-green-400 to-blue-500 text-white shadow-lg shadow-green-500/50'
-                      : 'bg-gradient-to-r from-green-500/20 to-blue-500/20 text-white hover:from-green-500/30 hover:to-blue-500/30 hover:shadow-md'
+                      ? 'border-cyan-400 bg-cyan-400/10 text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.5)]'
+                      : 'border-cyan-500/40 bg-cyan-500/5 text-white hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-300 hover:shadow-[0_0_10px_rgba(34,211,238,0.3)]'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  🤖 Applis IA
+                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></span>
+                  <span className="relative z-10">⭐ Applis IA</span>
                 </Link>
               </div>
               
@@ -288,7 +339,7 @@ export default function SimpleHeader() {
                   >
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
-                  <span className="text-white font-bold">Obtenir Plus</span>
+                  <span className="text-white font-bold">Obtenir +</span>
                 </Link>
               </div>
 

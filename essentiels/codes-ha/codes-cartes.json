@@ -2529,6 +2529,574 @@
           "code": "type: custom:button-card\nentity: sensor.temperature_salon\nname: Température\nicon: mdi:thermometer\ncard_mod:\n  style: |\n    ha-card {\n      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;\n      border-radius: 20px !important;\n      position: relative !important;\n      overflow: hidden !important;\n      color: white !important;\n      padding: 20px !important;\n    }\n    ha-card::before,\n    ha-card::after {\n      content: '✦' !important;\n      position: absolute !important;\n      font-size: 2rem !important;\n      color: rgba(255, 255, 255, 0.3) !important;\n      animation: float 6s ease-in-out infinite !important;\n    }\n    ha-card::before {\n      top: 20% !important;\n      left: 10% !important;\n      animation-delay: 0s !important;\n    }\n    ha-card::after {\n      bottom: 20% !important;\n      right: 10% !important;\n      animation-delay: 3s !important;\n    }\n    @keyframes float {\n      0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }\n      50% { transform: translateY(-20px) rotate(180deg); opacity: 0.7; }\n    }"
         }
       ]
+    },
+    {
+      "description": "Cartes du projet Abode-Dashboard - Dashboard moderne et professionnel pour Home Assistant avec design glassmorphism. Projet GitHub: https://github.com/djmalaka/Abode-Dashboard - Contient 8 cartes avancées : Clock Weather, Energy, Media Centre, Rooms, Location & Security, Surveillance, Housekeepers et Quickfire.",
+      "name": "Projet Abode-Dashboard",
+      "id": "abode-dashboard",
+      "codes": [
+        {
+          "tags": [
+            "abode-dashboard",
+            "horloge",
+            "météo",
+            "temps",
+            "moderne"
+          ],
+          "code": "type: custom:mod-card\ntheme: abode\ncard:\n  type: vertical-stack\n  cards:\n    - type: custom:mod-card\n      card:\n        type: custom:clock-weather-card\n        entity: weather.home\n        name: Home\n        show_forecast: true\n      card_mod:\n        style: |\n          ha-card {\n            background: rgba(255, 255, 255, 0.1) !important;\n            backdrop-filter: blur(10px) !important;\n            border-radius: 20px !important;\n            border: 1px solid rgba(255, 255, 255, 0.2) !important;\n          }",
+          "id": "abode-clock-weather",
+          "description": "Carte horloge et météo avec design glassmorphism moderne. Affiche l'heure, la date et les conditions météorologiques avec un style élégant et des effets de flou d'arrière-plan. Source: https://github.com/djmalaka/Abode-Dashboard/tree/main/1%20-%20Clock%20Weather%20Card",
+          "name": "Clock Weather Card"
+        },
+        {
+          "tags": [
+            "abode-dashboard",
+            "énergie",
+            "électricité",
+            "graphique",
+            "statistiques"
+          ],
+          "code": "type: custom:mod-card\ntheme: abode\ncard:\n  type: custom:energy-distribution-card\n  card_mod:\n    style: |\n      ha-card {\n        background: rgba(255, 255, 255, 0.1) !important;\n        backdrop-filter: blur(10px) !important;\n        border-radius: 20px !important;\n        border: 1px solid rgba(255, 255, 255, 0.2) !important;\n      }\nentities:\n  - entity: sensor.energy_consumption\n  - entity: sensor.energy_cost\n  - entity: sensor.solar_production",
+          "id": "abode-energy",
+          "description": "Carte de suivi de l'énergie avec graphiques et statistiques détaillées. Affiche la consommation électrique, les coûts, la production solaire et les tendances avec visualisations avancées. Source: https://github.com/djmalaka/Abode-Dashboard/tree/main/2%20-%20Energy%20Card",
+          "name": "Energy Card"
+        },
+        {
+          "tags": [
+            "abode-dashboard",
+            "média",
+            "musique",
+            "lecteur",
+            "contrôle"
+          ],
+          "code": "type: custom:mod-card\ntheme: abode\ncard:\n  type: custom:media-control-card\n  entity: media_player.living_room\n  card_mod:\n    style: |\n      ha-card {\n        background: rgba(255, 255, 255, 0.1) !important;\n        backdrop-filter: blur(10px) !important;\n        border-radius: 20px !important;\n        border: 1px solid rgba(255, 255, 255, 0.2) !important;\n      }\n  features:\n    - type: media-play-pause\n    - type: media-volume\n    - type: media-browse\n    - type: media-title",
+          "id": "abode-media-centre",
+          "description": "Carte de contrôle média avec lecteur intégré et interface moderne. Permet de contrôler la musique, les vidéos et les médias de votre maison avec des contrôles intuitifs. Source: https://github.com/djmalaka/Abode-Dashboard/tree/main/3%20-%20Media%20Centre%20Card",
+          "name": "Media Centre Card"
+        },
+        {
+          "tags": [
+            "abode-dashboard",
+            "pièces",
+            "navigation",
+            "maison",
+            "contrôles"
+          ],
+          "code": "type: custom:mod-card\ntheme: abode\ncard:\n  type: grid\n  columns: 2\n  square: false\n  card_mod:\n    style: |\n      ha-card {\n        background: rgba(255, 255, 255, 0.1) !important;\n        backdrop-filter: blur(10px) !important;\n        border-radius: 20px !important;\n        border: 1px solid rgba(255, 255, 255, 0.2) !important;\n      }\ncards:\n  - type: custom:button-card\n    entity: light.living_room\n    name: Salon\n    icon: mdi:sofa\n    tap_action:\n      action: navigate\n      navigation_path: /lovelace/living-room\n  - type: custom:button-card\n    entity: light.bedroom\n    name: Chambre\n    icon: mdi:bed\n    tap_action:\n      action: navigate\n      navigation_path: /lovelace/bedroom",
+          "id": "abode-rooms",
+          "description": "Carte de navigation par pièces avec accès rapide. Permet d'accéder rapidement aux différentes pièces de votre maison avec des contrôles rapides et une navigation fluide. Source: https://github.com/djmalaka/Abode-Dashboard/tree/main/4%20-%20Rooms%20Card",
+          "name": "Rooms Card"
+        },
+        {
+          "tags": [
+            "abode-dashboard",
+            "sécurité",
+            "localisation",
+            "GPS",
+            "alarme"
+          ],
+          "code": "type: custom:mod-card\ntheme: abode\ncard:\n  type: vertical-stack\n  cards:\n    - type: custom:mod-card\n      card:\n        type: map\n        entities:\n          - device_tracker.person1\n          - device_tracker.person2\n      card_mod:\n        style: |\n          ha-card {\n            background: rgba(255, 255, 255, 0.1) !important;\n            backdrop-filter: blur(10px) !important;\n            border-radius: 20px !important;\n            border: 1px solid rgba(255, 255, 255, 0.2) !important;\n          }\n    - type: custom:mod-card\n      card:\n        type: entities\n        title: Sécurité\n        entities:\n          - entity: alarm_control_panel.home\n          - entity: binary_sensor.door_front\n          - entity: binary_sensor.window_living_room\n      card_mod:\n        style: |\n          ha-card {\n            background: rgba(255, 255, 255, 0.1) !important;\n            backdrop-filter: blur(10px) !important;\n            border-radius: 20px !important;\n            border: 1px solid rgba(255, 255, 255, 0.2) !important;\n          }",
+          "id": "abode-location-security",
+          "description": "Carte de localisation et sécurité combinée. Affiche la position des membres de la famille sur une carte et l'état du système de sécurité avec alarmes et capteurs. Source: https://github.com/djmalaka/Abode-Dashboard/tree/main/5%20-%20Location%20%26%20Security%20Card",
+          "name": "Location & Security Card"
+        },
+        {
+          "tags": [
+            "abode-dashboard",
+            "surveillance",
+            "caméra",
+            "vidéo",
+            "sécurité"
+          ],
+          "code": "type: custom:mod-card\ntheme: abode\ncard:\n  type: grid\n  columns: 2\n  square: false\n  card_mod:\n    style: |\n      ha-card {\n        background: rgba(255, 255, 255, 0.1) !important;\n        backdrop-filter: blur(10px) !important;\n        border-radius: 20px !important;\n        border: 1px solid rgba(255, 255, 255, 0.2) !important;\n      }\ncards:\n  - type: custom:mod-card\n    card:\n      type: picture-entity\n      entity: camera.front_door\n      name: Porte d'entrée\n    card_mod:\n      style: |\n        ha-card {\n          border-radius: 15px !important;\n          overflow: hidden !important;\n        }\n  - type: custom:mod-card\n    card:\n      type: picture-entity\n      entity: camera.backyard\n      name: Jardin\n    card_mod:\n      style: |\n        ha-card {\n          border-radius: 15px !important;\n          overflow: hidden !important;\n        }",
+          "id": "abode-surveillance",
+          "description": "Carte de surveillance avec grille de caméras. Affiche les flux vidéo de vos caméras de sécurité avec contrôles et vue en grille. Source: https://github.com/djmalaka/Abode-Dashboard/tree/main/6%20-%20Surveillance%20Card",
+          "name": "Surveillance Card"
+        },
+        {
+          "tags": [
+            "abode-dashboard",
+            "ménage",
+            "tâches",
+            "entretien",
+            "maintenance"
+          ],
+          "code": "type: custom:mod-card\ntheme: abode\ncard:\n  type: entities\n  title: Tâches Ménagères\n  card_mod:\n    style: |\n      ha-card {\n        background: rgba(255, 255, 255, 0.1) !important;\n        backdrop-filter: blur(10px) !important;\n        border-radius: 20px !important;\n        border: 1px solid rgba(255, 255, 255, 0.2) !important;\n      }\nentities:\n  - entity: input_boolean.vacuum_living_room\n    name: Aspirateur Salon\n    icon: mdi:vacuum\n  - entity: input_boolean.dishwasher\n    name: Lave-vaisselle\n    icon: mdi:dishwasher\n  - entity: input_boolean.washing_machine\n    name: Machine à laver\n    icon: mdi:washing-machine\n  - entity: sensor.filter_change_date\n    name: Filtre à changer\n    icon: mdi:air-filter",
+          "id": "abode-housekeepers",
+          "description": "Carte des tâches ménagères et entretien. Aide à suivre les tâches de maintenance, nettoyage et entretien de la maison avec suivi des appareils. Source: https://github.com/djmalaka/Abode-Dashboard/tree/main/7%20-%20Housekeepers%20Card",
+          "name": "Housekeepers Card"
+        },
+        {
+          "tags": [
+            "abode-dashboard",
+            "quickfire",
+            "contrôles rapides",
+            "popup",
+            "automatisation"
+          ],
+          "code": "type: custom:mod-card\ntheme: abode\ncard:\n  type: custom:mod-card\n  card:\n    type: grid\n    columns: 4\n    square: false\n    card_mod:\n      style: |\n        ha-card {\n          background: rgba(255, 255, 255, 0.1) !important;\n          backdrop-filter: blur(10px) !important;\n          border-radius: 20px !important;\n          border: 1px solid rgba(255, 255, 255, 0.2) !important;\n        }\n    cards:\n      - type: custom:button-card\n        entity: sensor.on_lights_count\n        name: Lumières\n        icon: /local/Quickfire/lighton.png\n        tap_action:\n          action: call-service\n          service: browser_mod.popup\n          service_data:\n            title: Contrôle des Lumières\n            card:\n              type: custom:mod-card\n              card:\n                type: vertical-stack\n                cards:\n                  - type: markdown\n                    content: |\n                      ## Contrôle des Lumières\n                      [[[ return states['sensor.on_lights_count'].state > 0 ? 'Éteindre toutes les lumières ?' : 'Toutes les lumières sont éteintes' ]]]\n                  - type: custom:button-card\n                    entity: script.smart_lights_control\n                    name: Éteindre\n                    tap_action:\n                      action: call-service\n                      service: script.smart_lights_control\n                      service_data:\n                        command: save_and_off\n      - type: custom:button-card\n        entity: sensor.house_temperature_weighted\n        name: Chauffage\n        icon: /local/Quickfire/thermostaton.png\n        tap_action:\n          action: call-service\n          service: browser_mod.popup\n          service_data:\n            title: Contrôle du Chauffage\n            card:\n              type: custom:mod-card\n              card:\n                type: vertical-stack\n                cards:\n                  - type: entity\n                    entity: climate.downstairs_heating\n                    name: Rez-de-chaussée\n                  - type: entity\n                    entity: climate.upstairs_heating\n                    name: Étage\n                  - type: entity\n                    entity: climate.whole_house_heating\n                    name: Toute la maison\n      - type: custom:button-card\n        entity: input_select.lounge_blinds_last_command\n        name: Stores\n        icon: /local/Quickfire/blinds.png\n        tap_action:\n          action: call-service\n          service: browser_mod.popup\n          service_data:\n            title: Contrôle des Stores\n            card:\n              type: custom:mod-card\n              card:\n                type: grid\n                columns: 2\n                cards:\n                  - type: custom:button-card\n                    name: Ouvrir\n                    tap_action:\n                      action: call-service\n                      service: script.control_blinds\n                      service_data:\n                        cover_entity: all\n                        command: open\n                  - type: custom:button-card\n                    name: Fermer\n                    tap_action:\n                      action: call-service\n                      service: script.control_blinds\n                      service_data:\n                        cover_entity: all\n                        command: close\n      - type: custom:button-card\n        entity: sensor.enabled_automations_count\n        name: Automatisations\n        icon: /local/Quickfire/automationon.png\n        tap_action:\n          action: call-service\n          service: browser_mod.popup\n          service_data:\n            title: Contrôle des Automatisations\n            card:\n              type: custom:mod-card\n              card:\n                type: vertical-stack\n                cards:\n                  - type: markdown\n                    content: |\n                      ## Automatisations Actives\n                      [[[ return 'Nombre: ' + states['sensor.enabled_automations_count'].state ]]]\n                  - type: custom:button-card\n                    name: Désactiver toutes\n                    tap_action:\n                      action: call-service\n                      service: script.automations_toggle_banner\n                      service_data:\n                        code: '1234'\n                        skip_pin: false",
+          "id": "abode-quickfire",
+          "description": "Carte Quickfire avec contrôles rapides avancés. Contrôle rapide des lumières (avec snapshot), chauffage (3 thermostats), stores (commandes globales) et automatisations (avec PIN de sécurité) via des popups intelligents. Source: https://github.com/djmalaka/Abode-Dashboard/tree/main/8%20-%20Quickfire%20Card",
+          "name": "Quickfire Card"
+        }
+      ]
+    },
+    {
+      "name": "Projet Maxi Media Player",
+      "description": "Cartes du projet Maxi Media Player - Carte média avancée pour Home Assistant avec gestion de multiples lecteurs média, groupement d'enceintes, favoris et contrôles avancés. Projet GitHub: https://github.com/punxaphil/maxi-media-player",
+      "codes": [
+        {
+          "description": "Configuration de base pour un lecteur media unique avec toutes les sections. Source: https://github.com/punxaphil/maxi-media-player",
+          "id": "maxi-media-basic",
+          "name": "Maxi Media Player - Configuration de base",
+          "code": "type: custom:maxi-media-player\nentity: media_player.living_room\nname: Lecteur Principal\nartworkAsBackground: true\nheightPercentage: 50\nsections:\n  - player\n  - groups\n  - favorites\n  - grouping",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "lecteur",
+            "base",
+            "configuration"
+          ]
+        },
+        {
+          "description": "Configuration pour gerer plusieurs lecteurs media avec groupement. Permet de controler plusieurs enceintes simultanement. Source: https://github.com/punxaphil/maxi-media-player",
+          "id": "maxi-media-multiple",
+          "name": "Maxi Media Player - Multiples lecteurs",
+          "code": "type: custom:maxi-media-player\nentities:\n  - media_player.sonos_kitchen\n  - media_player.sonos_living_room\n  - media_player.sonos_bedroom\n  - media_player.sonos_hallway\nname: Tous les Lecteurs\nartworkAsBackground: true\nheightPercentage: 60\nsections:\n  - player\n  - groups\n  - favorites\n  - grouping",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "multiples",
+            "groupement",
+            "enceintes"
+          ]
+        },
+        {
+          "description": "Affiche uniquement la section player avec controles de lecture. Parfait pour un affichage compact. Source: https://github.com/punxaphil/maxi-media-player",
+          "id": "maxi-media-player-only",
+          "name": "Maxi Media Player - Section Player uniquement",
+          "code": "type: custom:maxi-media-player\nentity: media_player.living_room\nname: Lecteur\nheightPercentage: auto\nsections:\n  - player\nartworkAsBackground: true",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "player",
+            "compact",
+            "section"
+          ]
+        },
+        {
+          "description": "Affiche uniquement la section favoris pour acces rapide aux playlists et medias favoris. Source: https://github.com/punxaphil/maxi-media-player",
+          "id": "maxi-media-favorites",
+          "name": "Maxi Media Player - Section Favoris",
+          "code": "type: custom:maxi-media-player\nentity: media_player.living_room\nname: Favoris\nsections:\n  - favorites",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "favoris",
+            "playlist",
+            "section"
+          ]
+        },
+        {
+          "description": "Configuration pour grouper et degrouper des enceintes. Permet de synchroniser plusieurs lecteurs pour une experience audio multi-pieces. Source: https://github.com/punxaphil/maxi-media-player",
+          "id": "maxi-media-grouping",
+          "name": "Maxi Media Player - Groupement d'enceintes",
+          "code": "type: custom:maxi-media-player\nentities:\n  - media_player.sonos_kitchen\n  - media_player.sonos_living_room\n  - media_player.sonos_bedroom\nname: Groupement\nsections:\n  - grouping\n  - groups",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "groupement",
+            "enceintes",
+            "synchronisation"
+          ]
+        },
+        {
+          "description": "Configuration avec style personnalise utilisant card_mod pour un design moderne avec glassmorphism. Source: https://github.com/punxaphil/maxi-media-player",
+          "id": "maxi-media-styled",
+          "name": "Maxi Media Player - Style personnalise",
+          "code": "type: custom:maxi-media-player\nentity: media_player.living_room\nname: Lecteur Stylise\nartworkAsBackground: true\nheightPercentage: 50\ncard_mod:\n  style: |\n    ha-card {\n      color: white !important;\n      background: rgba(0, 0, 0, 0.3) !important;\n      backdrop-filter: blur(15px) !important;\n      border-radius: 25px !important;\n      border: 1px solid rgba(255, 255, 255, 0.2) !important;\n      --accent-color: #ff6b6b;\n      --primary-color: white;\n      --secondary-text-color: rgba(255, 255, 255, 0.8);\n    }",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "style",
+            "card_mod",
+            "glassmorphism"
+          ]
+        },
+        {
+          "description": "Configuration compacte sans artwork, affichant uniquement les informations de lecture et les controles. Source: https://github.com/punxaphil/maxi-media-player",
+          "id": "maxi-media-compact",
+          "name": "Maxi Media Player - Mode compact",
+          "code": "type: custom:maxi-media-player\nentity: media_player.living_room\nname: Lecteur Compact\nheightPercentage: auto\nsections:\n  - player\ncard_mod:\n  style: |\n    ha-card {\n      background: rgba(255, 255, 255, 0.1) !important;\n      backdrop-filter: blur(10px) !important;\n      border-radius: 20px !important;\n    }",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "compact",
+            "minimal",
+            "sans artwork"
+          ]
+        },
+        {
+          "description": "Configuration avancee avec toutes les fonctionnalites : groupement, favoris, volume individuel, shuffle, repeat et artwork en arriere-plan. Source: https://github.com/punxaphil/maxi-media-player",
+          "id": "maxi-media-advanced",
+          "name": "Maxi Media Player - Configuration avancee",
+          "code": "type: custom:maxi-media-player\nentities:\n  - media_player.sonos_kitchen\n  - media_player.sonos_living_room\n  - media_player.sonos_bedroom\n  - media_player.sonos_hallway\nname: Controle Media Complet\nartworkAsBackground: true\nheightPercentage: 70\nwidthPercentage: 100\nsections:\n  - player\n  - groups\n  - favorites\n  - grouping",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "avance",
+            "complet",
+            "toutes fonctionnalites"
+          ]
+        },
+        {
+          "name": "Maxi Media Player - Card Mod Exemple 1",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "card_mod",
+            "style",
+            "groupement"
+          ],
+          "code": "type: custom:maxi-media-player\nentity: media_player.living_room\nname: Lecteur\nsections:\n  - grouping\n  - groups\ncard_mod:\n  style:\n    mxmp-groups$ mxmp-group$: |\n      mwc-list-item {\n        margin: 5px !important;\n      }\n      .row {\n        margin: 0 !important;\n      }",
+          "id": "maxi-media-cardmod-example1",
+          "description": "Exemple de style card_mod : reduire les marges pour les elements de groupement. Source: https://github.com/punxaphil/maxi-media-player"
+        },
+        {
+          "name": "Maxi Media Player - Card Mod Exemple 2",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "card_mod",
+            "style",
+            "volume",
+            "icones"
+          ],
+          "code": "type: custom:maxi-media-player\nentity: media_player.living_room\nname: Lecteur\nsections:\n  - player\ncard_mod:\n  style:\n    .: |\n    mxmp-player$ mxmp-player-controls$ mxmp-volume$: |\n      ha-control-slider {\n        height: 10px;\n      }\n      ha-icon-button {\n        --mdc-icon-button-size: 2rem !important;\n        --mdc-icon-size: 1.5rem !important;\n      }",
+          "id": "maxi-media-cardmod-example2",
+          "description": "Exemple de style card_mod : redimensionner le volume et les icones. Source: https://github.com/punxaphil/maxi-media-player"
+        },
+        {
+          "name": "Maxi Media Player - Card Mod Exemple 3",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "card_mod",
+            "style",
+            "bouton",
+            "groupement"
+          ],
+          "code": "type: custom:maxi-media-player\nentity: media_player.living_room\nname: Lecteur\nsections:\n  - grouping\ncard_mod:\n  style:\n    mxmp-grouping$: |\n      mxmp-grouping-button {\n        --accent-color: black;\n        font-size: 30px;\n      }",
+          "id": "maxi-media-cardmod-example3",
+          "description": "Exemple de style card_mod : changer la couleur et la taille de la police du bouton de groupement. Source: https://github.com/punxaphil/maxi-media-player"
+        },
+        {
+          "name": "Maxi Media Player - Card Mod Exemple 4",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "card_mod",
+            "style",
+            "controles",
+            "player"
+          ],
+          "code": "type: custom:maxi-media-player\nentity: media_player.living_room\nname: Lecteur\nsections:\n  - player\ncard_mod:\n  style:\n    mxmp-player$: |\n      .controls {\n        margin: 0 3rem !important;\n      }",
+          "id": "maxi-media-cardmod-example4",
+          "description": "Exemple de style card_mod : redimensionner la zone de controles dans la section player. Source: https://github.com/punxaphil/maxi-media-player"
+        },
+        {
+          "name": "Maxi Media Player - Card Mod Exemple 5",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "card_mod",
+            "style",
+            "masquer",
+            "entite"
+          ],
+          "code": "type: custom:maxi-media-player\nentity: media_player.living_room\nname: Lecteur\nsections:\n  - player\ncard_mod:\n  style:\n    mxmp-player$ mxmp-player-header$: |\n      .entity,.artist-album {\n        display: none;\n      }",
+          "id": "maxi-media-cardmod-example5",
+          "description": "Exemple de style card_mod : masquer le nom de l'entite et le nom de l'album. Source: https://github.com/punxaphil/maxi-media-player"
+        },
+        {
+          "name": "Maxi Media Player - Card Mod Exemple 6",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "card_mod",
+            "style",
+            "transparence",
+            "artwork"
+          ],
+          "code": "type: custom:maxi-media-player\nentity: media_player.living_room\nname: Lecteur\nartworkAsBackground: true\nsections:\n  - player\ncard_mod:\n  style:\n    .: ''\n    mxmp-player$: |\n      .controls {\n        background-color: rgba(var(--rgb-card-background-color), 0.4) !important;\n      }\n      mxmp-player-header {\n        background-color: rgba(var(--rgb-card-background-color), 0.4) !important;\n      }",
+          "id": "maxi-media-cardmod-example6",
+          "description": "Exemple de style card_mod : titre de piste et volume slider plus transparents avec artwork en arriere-plan. Source: https://github.com/punxaphil/maxi-media-player"
+        },
+        {
+          "name": "Maxi Media Player - Card Mod Exemple 7",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "card_mod",
+            "style",
+            "favoris",
+            "padding"
+          ],
+          "code": "type: custom:maxi-media-player\nentity: media_player.living_room\nname: Lecteur\nsections:\n  - favorites\ncard_mod:\n  style:\n    mxmp-media-browser$ mxmp-media-browser-icons$: |\n      ha-control-button {\n        --control-button-padding: 4px;\n      }",
+          "id": "maxi-media-cardmod-example7",
+          "description": "Exemple de style card_mod : reduire le padding autour de l'artwork des miniatures dans la section favoris. Source: https://github.com/punxaphil/maxi-media-player"
+        },
+        {
+          "name": "Maxi Media Player - Card Mod Exemple 8",
+          "tags": [
+            "maxi-media-player",
+            "media",
+            "card_mod",
+            "style",
+            "masquer",
+            "artwork"
+          ],
+          "code": "type: custom:maxi-media-player\nentity: media_player.living_room\nname: Lecteur\nsections:\n  - player\ncard_mod:\n  style:\n    mxmp-player$: |\n      .artwork {\n        display: none !important;\n      }",
+          "id": "maxi-media-cardmod-example8",
+          "description": "Exemple de style card_mod : masquer l'artwork dans la section player. Source: https://github.com/punxaphil/maxi-media-player"
+        }
+      ],
+      "id": "maxi-media-player"
+    },
+    {
+      "name": "Projet Big Temperature Card",
+      "id": "big-temperature-card",
+      "description": "Cartes du projet Big Temperature Card - Carte de temperature a grands chiffres pour Home Assistant, concue pour etre lisible depuis l'autre cote de la piece sur une tablette murale. Supporte les couleurs de fond pour le confort et l'auto-redimensionnement. Projet GitHub: https://github.com/OmenWild/big-temperature-card",
+      "codes": [
+        {
+          "id": "big-temp-basic",
+          "tags": [
+            "big-temperature-card",
+            "temperature",
+            "grands chiffres",
+            "tablette",
+            "base"
+          ],
+          "code": "type: custom:big-temperature-card\ncurrent: sensor.temperature_salon\nlow: sensor.temperature_min_jour\nhigh: sensor.temperature_max_jour\ncold: 10\nhot: 30\ncolor_current: true\nround_to: 1",
+          "name": "Big Temperature Card - Configuration de base",
+          "description": "Configuration de base avec temperature actuelle, basse et haute. Affiche de grands chiffres lisibles a distance. Source: https://github.com/OmenWild/big-temperature-card"
+        },
+        {
+          "id": "big-temp-with-trend",
+          "tags": [
+            "big-temperature-card",
+            "temperature",
+            "tendance",
+            "evolution",
+            "trend"
+          ],
+          "code": "type: custom:big-temperature-card\ncurrent: sensor.temperature_salon\nlow: sensor.temperature_min_jour\nhigh: sensor.temperature_max_jour\ntrend: sensor.temperature_trend_change\ncold: 10\nhot: 30\ntrend_cold: -5\ntrend_hot: 5\ncolor_current: true\ncolor_trend: true\nround_to: 0\nshow_unit: true",
+          "name": "Big Temperature Card - Avec tendance",
+          "description": "Configuration avec tendance de temperature par heure. Affiche l'evolution de la temperature avec indicateur de tendance. Source: https://github.com/OmenWild/big-temperature-card"
+        },
+        {
+          "id": "big-temp-with-titles",
+          "tags": [
+            "big-temperature-card",
+            "temperature",
+            "titres",
+            "labels",
+            "personnalise"
+          ],
+          "code": "type: custom:big-temperature-card\ncurrent: sensor.temperature_salon\nlow: sensor.temperature_min_jour\nhigh: sensor.temperature_max_jour\ntitle_current: Actuelle\ntitle_low: Minimum\ntitle_high: Maximum\ncold: 10\nhot: 30\ncolor_current: true\nround_to: 0",
+          "name": "Big Temperature Card - Avec titres",
+          "description": "Configuration avec titres personnalises pour chaque colonne. Permet d'ajouter des labels explicites. Source: https://github.com/OmenWild/big-temperature-card"
+        },
+        {
+          "id": "big-temp-masonry",
+          "tags": [
+            "big-temperature-card",
+            "temperature",
+            "masonry",
+            "layout",
+            "hauteur"
+          ],
+          "code": "type: custom:big-temperature-card\ncurrent: sensor.temperature_salon\nlow: sensor.temperature_min_jour\nhigh: sensor.temperature_max_jour\ntrend: sensor.temperature_trend_change\ncold: 10\nhot: 30\ncolor_current: true\ncolor_trend: true\nvertical_height: 200px\nround_to: 0",
+          "name": "Big Temperature Card - Mode Masonry",
+          "description": "Configuration pour le mode Masonry avec hauteur verticale specifiee. Parfait pour les layouts Masonry. Source: https://github.com/OmenWild/big-temperature-card"
+        },
+        {
+          "id": "big-temp-no-colors",
+          "tags": [
+            "big-temperature-card",
+            "temperature",
+            "neutre",
+            "sans couleurs",
+            "simple"
+          ],
+          "code": "type: custom:big-temperature-card\ncurrent: sensor.temperature_salon\nlow: sensor.temperature_min_jour\nhigh: sensor.temperature_max_jour\ncold: 10\nhot: 30\ncolor_current: false\ncolor_trend: false\nround_to: 1",
+          "name": "Big Temperature Card - Sans couleurs",
+          "description": "Configuration sans couleurs de fond pour un affichage neutre. Les chiffres restent grands et lisibles. Source: https://github.com/OmenWild/big-temperature-card"
+        },
+        {
+          "id": "big-temp-custom-thresholds",
+          "tags": [
+            "big-temperature-card",
+            "temperature",
+            "seuils",
+            "personnalise",
+            "confort"
+          ],
+          "code": "type: custom:big-temperature-card\ncurrent: sensor.temperature_salon\nlow: sensor.temperature_min_jour\nhigh: sensor.temperature_max_jour\ntrend: sensor.temperature_trend_change\ncold: 15\nhot: 25\ntrend_cold: -3\ntrend_hot: 3\ncolor_current: true\ncolor_trend: true\nround_to: 0\nshow_unit: '°C'",
+          "name": "Big Temperature Card - Seuils personnalises",
+          "description": "Configuration avec seuils personnalises pour le froid et le chaud. Adaptez les valeurs selon votre confort. Source: https://github.com/OmenWild/big-temperature-card"
+        },
+        {
+          "id": "big-temp-exterior",
+          "tags": [
+            "big-temperature-card",
+            "temperature",
+            "exterieure",
+            "exterieur",
+            "mural"
+          ],
+          "code": "type: custom:big-temperature-card\ncurrent: sensor.temperature_exterieure\nlow: sensor.temperature_min_jour\nhigh: sensor.temperature_max_jour\ntrend: sensor.temperature_exterieure_trend\ntitle_current: Exterieur\ntitle_low: Min\ntitle_high: Max\ncold: 0\nhot: 30\ntrend_cold: -5\ntrend_hot: 5\ncolor_current: true\ncolor_trend: true\nround_to: 0\nshow_unit: true",
+          "name": "Big Temperature Card - Temperature exterieure",
+          "description": "Configuration pour afficher la temperature exterieure avec tendance. Parfait pour un affichage mural exterieur. Source: https://github.com/OmenWild/big-temperature-card"
+        },
+        {
+          "id": "big-temp-complete",
+          "tags": [
+            "big-temperature-card",
+            "temperature",
+            "complet",
+            "toutes options",
+            "avance"
+          ],
+          "code": "type: custom:big-temperature-card\ncurrent: sensor.temperature_salon\nlow: sensor.temperature_min_jour\nhigh: sensor.temperature_max_jour\ntrend: sensor.temperature_trend_change\ntitle_current: Actuelle\ntitle_low: Minimum\ntitle_high: Maximum\ncold: 10\nhot: 30\ntrend_cold: -5\ntrend_hot: 5\ncolor_current: true\ncolor_trend: true\nround_to: 0\nshow_unit: true\nvertical_height: 200px",
+          "name": "Big Temperature Card - Configuration complete",
+          "description": "Configuration complete avec toutes les options : temperature actuelle, min, max, tendance, titres et couleurs. Source: https://github.com/OmenWild/big-temperature-card"
+        }
+      ]
+    },
+    {
+      "id": "lawn-mower-card",
+      "description": "Cartes du projet Lawn Mower Card - Carte pour controler les tondeuses robotisees dans Home Assistant Lovelace UI. Supporte plusieurs modeles (EcoVacs, Tuya, OpenMower, Dreame, Robonect, Mammotion) avec animations et personnalisation. Projet GitHub: https://github.com/cociweb/lawn-mower-card",
+      "codes": [
+        {
+          "code": "type: custom:lawn-mower-card\nentity: lawn_mower.tondeuse\nname: Tondeuse Robot",
+          "description": "Configuration de base pour controler une tondeuse robotisee avec tous les controles essentiels. Source: https://github.com/cociweb/lawn-mower-card",
+          "id": "lawn-mower-basic",
+          "name": "Lawn Mower Card - Configuration de base",
+          "tags": [
+            "lawn-mower-card",
+            "tondeuse",
+            "robot",
+            "base",
+            "controle"
+          ]
+        },
+        {
+          "code": "type: custom:lawn-mower-card\nentity: lawn_mower.tondeuse\nname: Tondeuse Robot\nimage: /local/images/tondeuse.png\nshow_status: true\nshow_toolbar: true",
+          "description": "Configuration avec image personnalisee de la tondeuse. L'image change automatiquement selon l'etat (tonte, retour a la base). Source: https://github.com/cociweb/lawn-mower-card",
+          "id": "lawn-mower-with-image",
+          "name": "Lawn Mower Card - Avec image",
+          "tags": [
+            "lawn-mower-card",
+            "tondeuse",
+            "image",
+            "animation",
+            "etat"
+          ]
+        },
+        {
+          "code": "type: custom:lawn-mower-card\nentity: lawn_mower.tondeuse\nname: Tondeuse\nshow_toolbar: false\ncompact_view: true",
+          "description": "Configuration compacte sans barre d'outils pour un affichage minimaliste. Source: https://github.com/cociweb/lawn-mower-card",
+          "id": "lawn-mower-compact",
+          "name": "Lawn Mower Card - Mode compact",
+          "tags": [
+            "lawn-mower-card",
+            "tondeuse",
+            "compact",
+            "minimal",
+            "sans toolbar"
+          ]
+        },
+        {
+          "code": "type: custom:lawn-mower-card\nentity: lawn_mower.tondeuse\nname: Tondeuse Robot\nshow_status: true\nstats:\n  default:\n    - attribute: battery_level\n      unit: '%'\n      subtitle: Batterie\n    - attribute: mowing_time\n      unit: 'min'\n      subtitle: Temps de tonte\n    - attribute: area_mowed\n      unit: 'm²'\n      subtitle: Surface",
+          "description": "Configuration avec affichage des statistiques detaillees (batterie, temps de tonte, surface, etc.). Source: https://github.com/cociweb/lawn-mower-card",
+          "id": "lawn-mower-stats",
+          "name": "Lawn Mower Card - Avec statistiques",
+          "tags": [
+            "lawn-mower-card",
+            "tondeuse",
+            "statistiques",
+            "batterie",
+            "details"
+          ]
+        },
+        {
+          "code": "type: custom:lawn-mower-card\nentity: lawn_mower.tondeuse\nname: Tondeuse Robot\nstyle: |\n  ha-card {\n    --vc-background: #17A8F4;\n    --vc-spacing: 10px;\n    --vc-primary-text-color: white;\n    --vc-secondary-text-color: rgba(255, 255, 255, 0.8);\n    --vc-icon-color: white;\n  }",
+          "description": "Configuration avec style personnalise utilisant les variables CSS pour un design moderne. Source: https://github.com/cociweb/lawn-mower-card",
+          "id": "lawn-mower-styled",
+          "name": "Lawn Mower Card - Style personnalise",
+          "tags": [
+            "lawn-mower-card",
+            "tondeuse",
+            "style",
+            "css",
+            "personnalise"
+          ]
+        },
+        {
+          "code": "type: custom:lawn-mower-card\nentity: lawn_mower.ecovacs_goat\nname: EcoVacs GOAT\nimage: /local/images/ecovacs-goat.png\nshow_status: true\nshow_toolbar: true\nstats:\n  default:\n    - attribute: battery_level\n      unit: '%'\n      subtitle: Batterie",
+          "description": "Configuration specifique pour les tondeuses EcoVacs (GOAT G1, GOAT G1-800, GOAT G1-2000, GOAT GX-600). Source: https://github.com/cociweb/lawn-mower-card",
+          "id": "lawn-mower-ecovacs",
+          "name": "Lawn Mower Card - EcoVacs",
+          "tags": [
+            "lawn-mower-card",
+            "tondeuse",
+            "ecovacs",
+            "goat",
+            "modele"
+          ]
+        },
+        {
+          "code": "type: custom:lawn-mower-card\nentity: lawn_mower.tuya_tondeuse\nname: Tondeuse Tuya\nshow_status: true\nshow_toolbar: true",
+          "description": "Configuration pour les tondeuses Tuya (avec tuya-local ou localtuya). Source: https://github.com/cociweb/lawn-mower-card",
+          "id": "lawn-mower-tuya",
+          "name": "Lawn Mower Card - Tuya",
+          "tags": [
+            "lawn-mower-card",
+            "tondeuse",
+            "tuya",
+            "localtuya",
+            "modele"
+          ]
+        },
+        {
+          "code": "type: custom:lawn-mower-card\nentity: lawn_mower.openmower\nname: OpenMower\nshow_status: true\nshow_toolbar: true\nstats:\n  default:\n    - attribute: battery_level\n      unit: '%'\n      subtitle: Batterie\n    - attribute: mowing_time\n      unit: 'min'\n      subtitle: Temps",
+          "description": "Configuration pour les tondeuses OpenMower (projet open source). Source: https://github.com/cociweb/lawn-mower-card",
+          "id": "lawn-mower-openmower",
+          "name": "Lawn Mower Card - OpenMower",
+          "tags": [
+            "lawn-mower-card",
+            "tondeuse",
+            "openmower",
+            "opensource",
+            "modele"
+          ]
+        },
+        {
+          "code": "type: custom:lawn-mower-card\nentity: lawn_mower.tondeuse\nname: Tondeuse Robot\nimage: /local/images/tondeuse.png\nshow_status: true\nshow_toolbar: true\nstats:\n  default:\n    - attribute: battery_level\n      unit: '%'\n      subtitle: Batterie\n    - attribute: mowing_time\n      unit: 'min'\n      subtitle: Temps de tonte\n    - attribute: area_mowed\n      unit: 'm²'\n      subtitle: Surface\n    - attribute: error_code\n      subtitle: Code erreur\nstyle: |\n  ha-card {\n    --vc-background: rgba(23, 168, 244, 0.1);\n    --vc-spacing: 15px;\n    --vc-primary-text-color: var(--primary-text-color);\n    --vc-secondary-text-color: var(--secondary-text-color);\n    --vc-icon-color: var(--accent-color);\n    border-radius: 20px;\n    backdrop-filter: blur(10px);\n  }",
+          "description": "Configuration complete avec toutes les fonctionnalites : image, statistiques, style personnalise et animations. Source: https://github.com/cociweb/lawn-mower-card",
+          "id": "lawn-mower-complete",
+          "name": "Lawn Mower Card - Configuration complete",
+          "tags": [
+            "lawn-mower-card",
+            "tondeuse",
+            "complet",
+            "toutes options",
+            "avance"
+          ]
+        }
+      ],
+      "name": "Projet Lawn Mower Card"
     }
   ]
 }

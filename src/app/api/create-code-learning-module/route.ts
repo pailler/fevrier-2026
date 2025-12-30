@@ -9,7 +9,7 @@ const supabase = createClient(
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔄 Création du module Apprendre le Code Informatique dans Supabase...');
+    console.log('🔄 Création du module Apprendre le Code aux enfants dans Supabase...');
 
     // Vérifier si le module existe déjà
     const { data: existingModule, error: checkError } = await supabase
@@ -19,10 +19,10 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingModule) {
-      console.log('✅ Module Apprendre le Code Informatique existe déjà:', existingModule.id);
+      console.log('✅ Module Apprendre le Code aux enfants existe déjà:', existingModule.id);
       return NextResponse.json({
         success: true,
-        message: 'Module Apprendre le Code Informatique existe déjà',
+        message: 'Module Apprendre le Code aux enfants existe déjà',
         moduleId: existingModule.id
       });
     }
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       .from('modules')
       .insert([{
         id: 'code-learning',
-        title: 'Apprendre le Code Informatique',
+        title: 'Apprendre le Code aux enfants',
         description: 'Des exercices courts et amusants pour découvrir la programmation. Parfait pour les enfants de 8 à 12 ans !',
         subtitle: 'Apprentissage du code pour enfants',
         category: 'ÉDUCATION',
@@ -54,17 +54,17 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    console.log('✅ Module Apprendre le Code Informatique créé avec succès:', newModule.id);
+    console.log('✅ Module Apprendre le Code aux enfants créé avec succès:', newModule.id);
 
     return NextResponse.json({
       success: true,
-      message: 'Module Apprendre le Code Informatique créé avec succès',
+      message: 'Module Apprendre le Code aux enfants créé avec succès',
       moduleId: newModule.id,
       module: newModule
     });
 
   } catch (error) {
-    console.error('❌ Erreur création module Apprendre le Code Informatique:', error);
+    console.error('❌ Erreur création module Apprendre le Code aux enfants:', error);
     return NextResponse.json({ 
       success: false, 
       error: 'Erreur interne du serveur',
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
     if (error || !module) {
       return NextResponse.json({
         exists: false,
-        message: 'Module Apprendre le Code Informatique non trouvé'
+        message: 'Module Apprendre le Code aux enfants non trouvé'
       });
     }
 

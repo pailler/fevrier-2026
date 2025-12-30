@@ -53,7 +53,6 @@ export async function POST(request: NextRequest) {
             <h2 style="color: #2563eb;">Bienvenue sur IAHome !</h2>
             <p>Bonjour {{user_name}},</p>
             <p>Votre compte a été créé avec succès. Vous pouvez maintenant accéder à tous nos modules.</p>
-            <p>Vous disposez maintenant de <strong>400 tokens</strong> gratuits pour découvrir nos modules d'intelligence artificielle.</p>
             <p>Merci de nous faire confiance !</p>
             <hr>
             <p style="color: #666; font-size: 12px;">
@@ -182,7 +181,7 @@ export async function POST(request: NextRequest) {
               </div>
               
               <h2 style="color: #1f2937; font-size: 20px; margin-top: 32px; margin-bottom: 16px;">
-                📚 Comment activer votre premier module ? (4 étapes simples)
+                📚 Comment activer votre premier module ? (3 étapes simples)
               </h2>
               
               <div style="margin: 24px 0;">
@@ -229,22 +228,6 @@ export async function POST(request: NextRequest) {
                       </p>
                       <p style="color: #6b7280; margin: 0; font-size: 14px;">
                         Choisissez le module qui vous intéresse et cliquez sur le bouton d'activation. Les tokens nécessaires seront automatiquement débités de votre compte.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                  <div style="display: flex; align-items: flex-start;">
-                    <div style="background-color: #2563eb; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; margin-right: 12px;">
-                      4
-                    </div>
-                    <div>
-                      <p style="color: #1f2937; font-weight: 600; margin: 0 0 4px 0; font-size: 16px;">
-                        Cliquez sur "Mes applis" dans la bannière
-                      </p>
-                      <p style="color: #6b7280; margin: 0; font-size: 14px;">
-                        Une fois le module activé, cliquez sur "Mes applis" dans la bannière en haut de la page pour accéder à toutes vos applications activées.
                       </p>
                     </div>
                   </div>

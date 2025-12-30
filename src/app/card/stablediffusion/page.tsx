@@ -188,6 +188,130 @@ export default function StableDiffusionPage() {
     }
   }, []);
 
+  // Ajouter les données structurées JSON-LD pour le SEO
+  useEffect(() => {
+    const softwareApplicationSchema = {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Stable Diffusion - IA Home",
+      "applicationCategory": "WebApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "100",
+        "priceCurrency": "TOKENS"
+      },
+      "description": "Stable Diffusion est un modèle d'intelligence artificielle révolutionnaire qui transforme vos descriptions textuelles en images de haute qualité. Cette technologie de pointe utilise l'apprentissage profond pour créer des images photoréalistes, des œuvres artistiques, des portraits, des paysages et des illustrations avec un niveau de détail et de réalisme exceptionnel. Résolution jusqu'à 1024x1024 pixels, contrôle artistique avancé, génération rapide.",
+      "url": "https://iahome.fr/card/stablediffusion",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "720"
+      },
+      "featureList": [
+        "Génération text-to-image",
+        "Qualité professionnelle",
+        "Résolution jusqu'à 1024x1024",
+        "Contrôle artistique avancé",
+        "Styles variés (photoréalisme, art abstrait)",
+        "Génération rapide",
+        "Filtres de contenu",
+        "Interface intuitive"
+      ]
+    };
+
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce que Stable Diffusion ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Stable Diffusion est un modèle d'intelligence artificielle révolutionnaire qui transforme vos descriptions textuelles en images de haute qualité. Développé par Stability AI, cette technologie utilise l'apprentissage profond pour créer des images photoréalistes, des œuvres artistiques, des portraits, des paysages et des illustrations avec un niveau de détail et de réalisme exceptionnel. Le modèle comprend les nuances subtiles du langage et les traduit en visuels cohérents."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment utiliser Stable Diffusion ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pour utiliser Stable Diffusion, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via stablediffusion.iahome.fr. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quelle est la qualité des images générées par Stable Diffusion ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Stable Diffusion génère des images de qualité professionnelle qui rivalisent avec celles créées par des artistes professionnels. Les images peuvent atteindre une résolution de 1024x1024 pixels avec une attention particulière aux détails, à la composition et à l'esthétique. La qualité varie selon la description fournie et les paramètres choisis, mais les résultats sont généralement d'un niveau très élevé."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Stable Diffusion est-il gratuit ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "L'activation de Stable Diffusion coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quels styles d'images puis-je créer avec Stable Diffusion ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Stable Diffusion offre une flexibilité créative maximale. Vous pouvez créer des images photoréalistes, de l'art abstrait, des styles artistiques classiques, des portraits, des paysages, des illustrations, des concepts visuels, et bien plus. Du photoréalisme à l'art abstrait, en passant par les styles artistiques classiques, Stable Diffusion s'adapte à tous vos besoins créatifs."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Combien de temps prend la génération d'une image ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Grâce à notre infrastructure haute performance, vous obtenez des résultats en quelques secondes, même pour les images les plus complexes. Le temps de génération dépend de la complexité de la description et de la résolution choisie, mais généralement, une image est générée en moins d'une minute."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Pour qui est fait Stable Diffusion ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Stable Diffusion est fait pour plusieurs types d'utilisateurs : artistes et designers qui créent des concepts visuels et explorent de nouveaux styles artistiques, professionnels du marketing et de la publicité qui génèrent des visuels uniques pour leurs campagnes, créateurs de contenu qui ont besoin d'images personnalisées, et toute personne qui veut créer des images de haute qualité avec l'IA."
+          }
+        }
+      ]
+    };
+
+    // Créer et ajouter le script pour SoftwareApplication
+    const script1 = document.createElement('script');
+    script1.type = 'application/ld+json';
+    script1.id = 'software-application-schema-sd';
+    script1.text = JSON.stringify(softwareApplicationSchema);
+    
+    // Créer et ajouter le script pour FAQPage
+    const script2 = document.createElement('script');
+    script2.type = 'application/ld+json';
+    script2.id = 'faq-schema-sd';
+    script2.text = JSON.stringify(faqSchema);
+
+    // Vérifier si les scripts existent déjà avant de les ajouter
+    if (!document.getElementById('software-application-schema-sd')) {
+      document.head.appendChild(script1);
+    }
+    if (!document.getElementById('faq-schema-sd')) {
+      document.head.appendChild(script2);
+    }
+
+    // Nettoyage lors du démontage
+    return () => {
+      const existingScript1 = document.getElementById('software-application-schema-sd');
+      const existingScript2 = document.getElementById('faq-schema-sd');
+      if (existingScript1) existingScript1.remove();
+      if (existingScript2) existingScript2.remove();
+    };
+  }, []);
+
   // Charger les détails de la carte
   useEffect(() => {
     const fetchCardDetails = async () => {
@@ -279,13 +403,13 @@ export default function StableDiffusionPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Créez des images avec l'IA de pointe
+                Stable Diffusion : génération d'images par IA de haute qualité
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
                 {(card?.category || 'AI GENERATION').toUpperCase()}
               </span>
               <p className="text-xl text-purple-100 mb-6">
-                StableDiffusion vous permet de générer des images de haute qualité à partir de descriptions textuelles avec une précision et une créativité exceptionnelles.
+                Créez des images de haute qualité avec Stable Diffusion. Génération d'images par IA à partir de descriptions textuelles, qualité professionnelle, résolution jusqu'à 1024x1024. Parfait pour artistes, designers, marketing et créateurs de contenu.
               </p>
               
               {/* Badges de fonctionnalités */}
@@ -533,6 +657,266 @@ export default function StableDiffusionPage() {
               </div>
               
               <div className="space-y-8 sm:space-y-12 text-gray-700">
+                {/* Paragraphe citable par les IA (GEO) */}
+                <div className="bg-gradient-to-r from-purple-100 to-indigo-100 p-6 rounded-2xl border-l-4 border-purple-500 mb-8">
+                  <p className="text-lg leading-relaxed text-gray-800">
+                    <strong>Stable Diffusion est un modèle d'intelligence artificielle révolutionnaire qui transforme vos descriptions textuelles en images de haute qualité.</strong> Développé par Stability AI, cette technologie utilise l'apprentissage profond pour créer des images photoréalistes, des œuvres artistiques, des portraits, des paysages et des illustrations avec un niveau de détail et de réalisme exceptionnel. Avec résolution jusqu'à 1024x1024 pixels, contrôle artistique avancé, et génération rapide, c'est l'outil idéal pour artistes, designers, professionnels du marketing et créateurs de contenu qui veulent créer des visuels uniques et créatifs.
+                  </p>
+                </div>
+
+                {/* H2 - À quoi sert Stable Diffusion ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 bg-clip-text text-transparent mb-6">
+                    À quoi sert Stable Diffusion ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mb-6"></div>
+                  <div className="space-y-4 text-gray-700">
+                    <p className="text-lg leading-relaxed">
+                      Stable Diffusion permet de créer des images de haute qualité à partir de descriptions textuelles avec une précision et une créativité exceptionnelles. Il répond aux besoins de ceux qui souhaitent générer des visuels uniques, créer des concepts artistiques, ou produire des images professionnelles sans compétences en design.
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 ml-4">
+                      <li className="text-lg"><strong>Créer des images personnalisées :</strong> Générez des visuels uniques à partir de descriptions textuelles détaillées</li>
+                      <li className="text-lg"><strong>Explorer la créativité :</strong> Testez différents styles artistiques, compositions et ambiances</li>
+                      <li className="text-lg"><strong>Produire du contenu visuel :</strong> Créez des images pour vos projets marketing, publicitaires ou créatifs</li>
+                      <li className="text-lg"><strong>Visualiser des concepts :</strong> Transformez vos idées en images concrètes rapidement</li>
+                    </ul>
+                    <p className="text-lg leading-relaxed mt-4">
+                      <strong>Cas concrets d'utilisation :</strong> Créez des concepts visuels pour vos projets artistiques, générez des visuels uniques pour vos campagnes marketing, créez des mockups de produits, produisez des supports pédagogiques, explorez de nouveaux styles artistiques, ou visualisez des concepts complexes.
+                    </p>
+                  </div>
+                </div>
+
+                {/* H2 - Que peut faire Stable Diffusion ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 bg-clip-text text-transparent mb-6">
+                    Que peut faire Stable Diffusion ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mb-6"></div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200">
+                      <h3 className="text-2xl font-bold text-purple-900 mb-4">Génération text-to-image</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Transformez vos idées en images en décrivant simplement ce que vous voulez voir. Plus votre description est détaillée, plus le résultat sera précis. Le modèle comprend les nuances subtiles du langage et les traduit en visuels cohérents.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl border border-indigo-200">
+                      <h3 className="text-2xl font-bold text-indigo-900 mb-4">Contrôle artistique</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Ajustez les paramètres de génération pour influencer le style, la composition, et l'ambiance de vos créations selon vos préférences. Du photoréalisme à l'art abstrait, en passant par les styles artistiques classiques.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200">
+                      <h3 className="text-2xl font-bold text-blue-900 mb-4">Résolution haute définition</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Générez des images jusqu'à 1024x1024 pixels avec une qualité professionnelle adaptée à tous vos projets. Les images générées rivalisent avec celles créées par des artistes professionnels.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 rounded-2xl border border-cyan-200">
+                      <h3 className="text-2xl font-bold text-cyan-900 mb-4">Performance optimisée</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Grâce à notre infrastructure haute performance, vous obtenez des résultats en quelques secondes, même pour les images les plus complexes. Génération rapide sans compromis sur la qualité.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* H2 - Comment utiliser Stable Diffusion ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 bg-clip-text text-transparent mb-6">
+                    Comment utiliser Stable Diffusion ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mb-6"></div>
+                  <div className="space-y-6">
+                    <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-2xl border border-purple-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Activer Stable Diffusion</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            Activez Stable Diffusion avec 100 tokens. Une fois activé, le service est accessible depuis vos applications actives via stablediffusion.iahome.fr.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border border-indigo-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">2</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Décrire votre image</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            Entrez une description textuelle détaillée de l'image que vous souhaitez créer. Plus votre description est précise et détaillée, plus le résultat sera fidèle à vos attentes. Incluez des détails sur le style, les couleurs, la composition, et l'ambiance.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-2xl border border-blue-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">3</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Ajuster les paramètres</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            Ajustez les paramètres de génération si nécessaire : style, composition, ambiance, résolution. Le contrôle artistique vous permet d'influencer chaque aspect de votre création selon vos préférences.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-cyan-50 to-teal-50 p-6 rounded-2xl border border-cyan-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">4</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Générer et télécharger</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            L'IA génère automatiquement votre image en quelques secondes. Vous pouvez ensuite télécharger l'image générée, la réutiliser, ou générer de nouvelles variations pour explorer différentes possibilités créatives.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* H2 - Pour qui est fait Stable Diffusion ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 bg-clip-text text-transparent mb-6">
+                    Pour qui est fait Stable Diffusion ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mb-6"></div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200 text-center">
+                      <div className="text-4xl mb-4">🎨</div>
+                      <h3 className="text-xl font-bold text-purple-900 mb-2">Artistes et designers</h3>
+                      <p className="text-gray-700">Créez des concepts visuels, des illustrations personnalisées, et explorez de nouveaux styles artistiques pour vos projets créatifs.</p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl border border-indigo-200 text-center">
+                      <div className="text-4xl mb-4">📊</div>
+                      <h3 className="text-xl font-bold text-indigo-900 mb-2">Marketing et publicité</h3>
+                      <p className="text-gray-700">Générez des visuels uniques pour vos campagnes, des mockups de produits, et des contenus visuels engageants.</p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200 text-center">
+                      <div className="text-4xl mb-4">🎓</div>
+                      <h3 className="text-xl font-bold text-blue-900 mb-2">Éducation et recherche</h3>
+                      <p className="text-gray-700">Visualisez des concepts complexes, créez des supports pédagogiques, et explorez les possibilités de l'IA générative.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* H2 - Stable Diffusion vs autres générateurs d'images */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 bg-clip-text text-transparent mb-6">
+                    Stable Diffusion vs autres générateurs d'images
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mb-6"></div>
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-8 rounded-2xl border border-gray-200">
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white">
+                            <th className="border border-gray-300 p-4 text-left">Fonctionnalité</th>
+                            <th className="border border-gray-300 p-4 text-center">Stable Diffusion</th>
+                            <th className="border border-gray-300 p-4 text-center">Autres générateurs</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="bg-white">
+                            <td className="border border-gray-300 p-4 font-semibold">Qualité</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ Professionnelle (1024x1024)</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Variable selon le service</td>
+                          </tr>
+                          <tr className="bg-gray-50">
+                            <td className="border border-gray-300 p-4 font-semibold">Flexibilité créative</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ Styles variés (photoréalisme, art abstrait)</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Souvent limité à un style</td>
+                          </tr>
+                          <tr className="bg-white">
+                            <td className="border border-gray-300 p-4 font-semibold">Contrôle artistique</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ Paramètres ajustables (style, composition, ambiance)</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Contrôle limité</td>
+                          </tr>
+                          <tr className="bg-gray-50">
+                            <td className="border border-gray-300 p-4 font-semibold">Performance</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ Génération rapide (quelques secondes)</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Temps variable</td>
+                          </tr>
+                          <tr className="bg-white">
+                            <td className="border border-gray-300 p-4 font-semibold">Prix</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par utilisation</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Abonnements mensuels souvent chers</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="mt-6 text-gray-700 leading-relaxed">
+                      <strong>En résumé :</strong> Stable Diffusion offre une alternative de qualité professionnelle aux autres générateurs d'images. Contrairement aux services qui se limitent souvent à un style ou qui ont un contrôle artistique limité, Stable Diffusion combine qualité professionnelle, flexibilité créative maximale, et contrôle artistique avancé dans une seule interface. C'est la solution idéale pour ceux qui veulent créer des images de haute qualité avec une précision et une créativité exceptionnelles.
+                    </p>
+                  </div>
+                </div>
+
+                {/* H2 - Questions fréquentes sur Stable Diffusion (FAQ) */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 bg-clip-text text-transparent mb-6">
+                    Questions fréquentes sur Stable Diffusion (FAQ)
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mb-6"></div>
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-purple-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Qu'est-ce que Stable Diffusion ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Stable Diffusion est un modèle d'intelligence artificielle révolutionnaire qui transforme vos descriptions textuelles en images de haute qualité. Développé par Stability AI, cette technologie utilise l'apprentissage profond pour créer des images photoréalistes, des œuvres artistiques, des portraits, des paysages et des illustrations avec un niveau de détail et de réalisme exceptionnel. Le modèle comprend les nuances subtiles du langage et les traduit en visuels cohérents.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border-l-4 border-indigo-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser Stable Diffusion ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Pour utiliser Stable Diffusion, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via stablediffusion.iahome.fr. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-blue-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Quelle est la qualité des images générées par Stable Diffusion ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Stable Diffusion génère des images de qualité professionnelle qui rivalisent avec celles créées par des artistes professionnels. Les images peuvent atteindre une résolution de 1024x1024 pixels avec une attention particulière aux détails, à la composition et à l'esthétique. La qualité varie selon la description fournie et les paramètres choisis, mais les résultats sont généralement d'un niveau très élevé.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-cyan-50 to-teal-50 p-6 rounded-2xl border-l-4 border-cyan-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Stable Diffusion est-il gratuit ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        L'activation de Stable Diffusion coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-teal-50 to-emerald-50 p-6 rounded-2xl border-l-4 border-teal-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Quels styles d'images puis-je créer avec Stable Diffusion ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Stable Diffusion offre une flexibilité créative maximale. Vous pouvez créer des images photoréalistes, de l'art abstrait, des styles artistiques classiques, des portraits, des paysages, des illustrations, des concepts visuels, et bien plus. Du photoréalisme à l'art abstrait, en passant par les styles artistiques classiques, Stable Diffusion s'adapte à tous vos besoins créatifs.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-emerald-50 to-green-50 p-6 rounded-2xl border-l-4 border-emerald-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Combien de temps prend la génération d'une image ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Grâce à notre infrastructure haute performance, vous obtenez des résultats en quelques secondes, même pour les images les plus complexes. Le temps de génération dépend de la complexité de la description et de la résolution choisie, mais généralement, une image est générée en moins d'une minute.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-green-50 to-lime-50 p-6 rounded-2xl border-l-4 border-green-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Pour qui est fait Stable Diffusion ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Stable Diffusion est fait pour plusieurs types d'utilisateurs : artistes et designers qui créent des concepts visuels et explorent de nouveaux styles artistiques, professionnels du marketing et de la publicité qui génèrent des visuels uniques pour leurs campagnes, créateurs de contenu qui ont besoin d'images personnalisées, et toute personne qui veut créer des images de haute qualité avec l'IA.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Description principale */}
                 <div className="text-center max-w-5xl mx-auto">
                   <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">

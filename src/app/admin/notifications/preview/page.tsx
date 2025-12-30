@@ -238,7 +238,7 @@ export default function EmailPreviewPage() {
                   type="text"
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Jean Dupont"
                 />
               </div>
@@ -251,7 +251,7 @@ export default function EmailPreviewPage() {
                   type="text"
                   value={signupDate}
                   onChange={(e) => setSignupDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="21/11/2025"
                 />
               </div>

@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { getSupabaseClient } from '../../../utils/supabaseService';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(request: NextRequest) {
   try {
     const { eventType, email, subject, body, eventData } = await request.json();
@@ -14,6 +12,18 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Vérifier la configuration Resend
+    if (!process.env.RESEND_API_KEY) {
+      console.error('❌ RESEND_API_KEY non configuré');
+      return NextResponse.json(
+        { success: false, error: 'Configuration email non disponible' },
+        { status: 500 }
+      );
+    }
+
+    // Instancier Resend à l'intérieur de la fonction
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     console.log(`🧪 Test de notification: ${eventType} vers ${email}`);
 

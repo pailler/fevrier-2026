@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     // Créer une entrée dans user_applications pour l'accès standard
     // Déterminer la durée d'expiration selon le type de module
     const expiresAt = new Date();
-    const aiModules = ['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui'];
+    const aiModules = ['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui', 'hunyuan3d', 'prompt-generator'];
     const isAIModule = aiModules.some(id => module.title.toLowerCase().includes(id));
     
     // Modules IA : 30 jours (1 mois), Modules essentiels : 90 jours (3 mois)

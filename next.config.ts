@@ -42,6 +42,9 @@ const nextConfig: NextConfig = {
     pagesBufferLength: 2,
   },
   
+  // Configuration pour améliorer la stabilité des chunks
+  productionBrowserSourceMaps: process.env.NODE_ENV === 'production' ? false : true,
+  
   // Désactiver ESLint temporairement pour le déploiement
   eslint: {
     ignoreDuringBuilds: true,
@@ -118,6 +121,101 @@ const nextConfig: NextConfig = {
   // Configuration pour le domaine avec optimisations de cache
   async headers() {
     return [
+      // RÈGLES SPÉCIFIQUES POUR LES FICHIERS STATIQUES NEXT.JS - DOIVENT VENIR EN PREMIER
+      {
+        source: '/_next/static/css/(.*)',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'text/css; charset=utf-8'
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          }
+        ]
+      },
+      {
+        source: '/_next/static/chunks/(.*)\\.js',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/javascript; charset=utf-8'
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          }
+        ]
+      },
+      {
+        source: '/_next/static/chunks/default-(.*)',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/javascript; charset=utf-8'
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          }
+        ]
+      },
+      {
+        source: '/_next/static/chunks/(.*)',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/javascript; charset=utf-8'
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          }
+        ]
+      },
+      {
+        source: '/_next/static/js/(.*)',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/javascript; charset=utf-8'
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          }
+        ]
+      },
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ]
+      },
       {
         source: '/services',
         headers: [
@@ -166,7 +264,7 @@ const nextConfig: NextConfig = {
           // CORS headers retirés - gérés par les routes API individuelles
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self' https://iahome.fr https://*.iahome.fr; connect-src 'self' https://iahome.fr https://*.iahome.fr http://localhost:8003 http://localhost:7960 https://hunyuan3d.iahome.fr https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io wss://*.supabase.co wss://*.supabase.io https://*.cloudflareaccess.com https://cloudflare.com https://*.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://iahome.fr https://*.iahome.fr https://iahome.fr/_next/static/ https://*.iahome.fr/_next/static/ https://iahome.fr/cdn-cgi/ https://*.cloudflareaccess.com https://*.cloudflare.com; style-src 'self' 'unsafe-inline' https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; img-src 'self' data: https://iahome.fr https://*.iahome.fr https:; font-src 'self' data: https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; worker-src 'self' blob: https://iahome.fr https://*.iahome.fr; frame-src 'self' https: https://*.cloudflareaccess.com https://hunyuan3d.iahome.fr; frame-ancestors 'self'; report-uri /api/csp-report;"
+            value: "default-src 'self' https://iahome.fr https://*.iahome.fr; connect-src 'self' https://iahome.fr https://*.iahome.fr http://localhost:8003 http://localhost:7960 https://hunyuan3d.iahome.fr https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io wss://*.supabase.co wss://*.supabase.io https://*.cloudflareaccess.com https://cloudflare.com https://*.cloudflare.com https://www.youtube.com https://youtube.com https://*.youtube.com https://*.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://iahome.fr https://*.iahome.fr https://iahome.fr/_next/static/ https://*.iahome.fr/_next/static/ https://iahome.fr/cdn-cgi/ https://*.cloudflareaccess.com https://*.cloudflare.com https://www.youtube.com https://youtube.com https://*.youtube.com https://*.googleapis.com; style-src 'self' 'unsafe-inline' https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com https://www.youtube.com https://youtube.com https://*.youtube.com; img-src 'self' data: https://iahome.fr https://*.iahome.fr https: https://www.youtube.com https://youtube.com https://*.youtube.com https://*.googleapis.com; font-src 'self' data: https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com https://www.youtube.com https://youtube.com https://*.youtube.com; worker-src 'self' blob: https://iahome.fr https://*.iahome.fr; frame-src 'self' https: https://*.cloudflareaccess.com https://hunyuan3d.iahome.fr https://www.youtube.com https://youtube.com https://*.youtube.com https://*.youtube-nocookie.com; frame-ancestors 'self'; report-uri /api/csp-report;"
           },
           {
             key: 'Cache-Control',
@@ -175,113 +273,10 @@ const nextConfig: NextConfig = {
           {
             key: 'X-DNS-Prefetch-Control',
             value: 'on'
-          },
-          {
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'require-corp'
-          },
-          {
-            key: 'Cross-Origin-Opener-Policy',
-            value: 'same-origin'
           }
-        ]
-      },
-      {
-        source: '/_next/static/css/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
-          },
-          {
-            key: 'Content-Type',
-            value: 'text/css'
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          }
-        ]
-      },
-      {
-        source: '/_next/static/js/(.*)\\.js',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/javascript; charset=utf-8'
-          },
-          {
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          }
-        ]
-      },
-      {
-        source: '/_next/static/js/(.*)',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/javascript; charset=utf-8'
-          },
-          {
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          }
-        ]
-      },
-      {
-        source: '/_next/static/chunks/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
-          },
-          {
-            key: 'Content-Type',
-            value: 'application/javascript; charset=utf-8'
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          }
-        ]
-      },
-      {
-        source: '/_next/static/chunks/default-(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
-          },
-          {
-            key: 'Content-Type',
-            value: 'application/javascript; charset=utf-8'
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          }
-        ]
-      },
-      {
-        source: '/_next/static/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          }
+          // COEP et COOP retirés pour permettre l'intégration des iframes YouTube
+          // Cross-Origin-Embedder-Policy: require-corp bloque les iframes YouTube
+          // Cross-Origin-Opener-Policy: same-origin peut aussi causer des problèmes
         ]
       },
       {
@@ -357,6 +352,35 @@ const nextConfig: NextConfig = {
             value: 'no-cache, no-store, must-revalidate'
           }
           // Pas d'en-têtes CORS ici - gérés par la route API
+        ]
+      },
+      {
+        source: '/api/validate-internal-token',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*'
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, OPTIONS'
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, Authorization, Origin, X-Requested-With'
+          },
+          {
+            key: 'Access-Control-Allow-Credentials',
+            value: 'false'
+          },
+          {
+            key: 'Access-Control-Max-Age',
+            value: '86400'
+          },
+          {
+            key: 'Vary',
+            value: 'Origin'
+          }
         ]
       }
     ];

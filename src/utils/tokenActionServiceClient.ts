@@ -82,6 +82,8 @@ export class TokenActionServiceClient {
       'comfyui': 100,
       'hunyuan3d': 100,
       'prompt-generator': 100,
+      'ai-detector': 100,
+      'ia-generator': 100, // Alias pour ai-detector
       
       // Applications essentielles (10 tokens)
       'metube': 10,
@@ -91,6 +93,7 @@ export class TokenActionServiceClient {
       'meeting-reports': 100,
       'cogstudio': 10,
       'code-learning': 10,
+      'apprendre-autrement': 10,
       'administration': 10,
       
       // Applications premium (100 tokens)
@@ -112,14 +115,22 @@ export class TokenActionServiceClient {
       });
 
       if (!response.ok) {
-        console.error('Erreur lors de la récupération du solde de tokens');
+        // Ne pas logger d'erreur si c'est juste un utilisateur sans tokens (404) - c'est normal
+        if (response.status !== 404) {
+          console.error('Erreur lors de la récupération du solde de tokens:', response.status, response.statusText);
+        }
         return 0;
       }
 
       const data = await response.json();
-      return data.tokensRemaining || 0;
+      return data.tokensRemaining || data.tokens || 0;
 
     } catch (error) {
+      // Ne pas logger d'erreur pour les erreurs réseau normales
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        // Erreur réseau silencieuse
+        return 0;
+      }
       console.error('Erreur getUserTokenBalance:', error);
       return 0;
     }

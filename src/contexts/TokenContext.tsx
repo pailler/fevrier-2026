@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 interface TokenContextType {
   tokens: number;
@@ -16,7 +16,7 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const refreshTokens = async () => {
+  const refreshTokens = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -82,11 +82,11 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     refreshTokens();
-  }, []);
+  }, [refreshTokens]); // refreshTokens est maintenant stable grâce à useCallback
 
   // Écouter les événements de connexion/déconnexion
   useEffect(() => {
@@ -108,7 +108,7 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('userLoggedIn', handleUserLogin);
       window.removeEventListener('userLoggedOut', handleUserLogout);
     };
-  }, []);
+  }, [refreshTokens]); // refreshTokens est maintenant stable grâce à useCallback
 
   return (
     <TokenContext.Provider value={{ tokens, refreshTokens, isLoading, error }}>

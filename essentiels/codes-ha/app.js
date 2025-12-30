@@ -794,6 +794,11 @@ const cardTypeSources = {
         name: 'Tile Card',
         url: 'https://www.home-assistant.io/dashboards/tile/',
         official: true
+    },
+    'custom:big-temperature-card': {
+        name: 'Big Temperature Card',
+        url: 'https://github.com/OmenWild/big-temperature-card',
+        hacs: 'big-temperature-card'
     }
 };
 

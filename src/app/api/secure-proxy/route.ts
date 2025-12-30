@@ -17,6 +17,7 @@ const APPLICATION_PORTS: { [key: string]: number } = {
   'ruinedfooocus': 7870,
   'cogstudio': 8080,
   'hunyuan3d': 8888,
+  'apprendre-autrement': 9001,
 };
 
 // Mapping des modules vers leurs hôtes locaux (si différent de localhost)
@@ -71,7 +72,9 @@ export async function GET(request: Request) {
       
       if (port) {
         // Faire un proxy vers l'application locale
-        const localUrl = `http://${host}:${port}`;
+        // Pour apprendre-autrement, inclure le chemin /apprendre-autrement
+        const path = moduleId === 'apprendre-autrement' ? '/apprendre-autrement' : '';
+        const localUrl = `http://${host}:${port}${path}`;
         
         try {
           const response = await fetch(localUrl, {

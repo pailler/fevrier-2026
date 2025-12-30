@@ -274,7 +274,7 @@ export const subdomainsConfig: SubdomainInfo[] = [
   {
     subdomain: 'code-learning.iahome.fr',
     url: 'https://iahome.fr/code-learning',
-    title: 'Apprendre le Code Informatique - Initiation à la Programmation | IA Home',
+    title: 'Apprendre le Code aux enfants - Initiation à la Programmation | IA Home',
     description: 'Des exercices courts et amusants pour découvrir la programmation. Parfait pour les enfants de 8 à 12 ans ! Apprenez les bases du code de manière ludique et interactive.',
     keywords: ['apprendre code', 'programmation enfants', 'initiation code', 'apprendre programmation', 'code learning', 'éducation code', 'programmation ludique'],
     category: 'formation',
@@ -287,10 +287,54 @@ export const subdomainsConfig: SubdomainInfo[] = [
       'Exercices pratiques variés'
     ],
     useCases: [
-      'Initier les enfants à la programmation',
-      'Apprendre les bases du code de manière ludique',
-      'Développer la logique et la résolution de problèmes',
-      'Découvrir la programmation étape par étape'
+      'Découvrir la programmation de manière ludique',
+      'Apprendre les concepts de base du code',
+      'Développer la logique et la créativité',
+      'S\'initier à la programmation dès le plus jeune âge'
+    ]
+  },
+  {
+    subdomain: 'apprendre-autrement.iahome.fr',
+    url: 'https://iahome.fr/apprendre-autrement',
+    title: 'Apprendre Autrement - Éducation Adaptée | IA Home',
+    description: 'Des activités super amusantes pour apprendre au rythme de chacun ! Parfait pour les enfants avec des besoins spécifiques. Système de points, badges et encouragement vocal personnalisé.',
+    keywords: ['apprendre autrement', 'éducation adaptée', 'apprentissage différencié', 'activités enfants', 'besoins spécifiques', 'système de points', 'badges éducatifs'],
+    category: 'formation',
+    icon: '🌈',
+    features: [
+      '15 activités progressives',
+      'Interface colorée et ludique',
+      'Système de progression avec récompenses',
+      'Encouragement vocal personnalisé',
+      'Paramètres d\'accessibilité adaptables'
+    ],
+    useCases: [
+      'Apprendre différemment avec des activités adaptées',
+      'Développer les compétences au rythme de chacun',
+      'Encourager l\'apprentissage avec des récompenses',
+      'Personnaliser l\'expérience d\'apprentissage'
+    ]
+  },
+  {
+    subdomain: 'prompt-generator.iahome.fr',
+    url: 'https://prompt-generator.iahome.fr',
+    title: 'Générateur de prompts - Prompt Engineering | IA Home',
+    description: 'Créez des prompts optimisés pour ChatGPT et autres modèles de langage en utilisant les meilleures pratiques du prompt engineering. Techniques avancées : Zero-shot, Few-shot, Chain-of-Thought, ReAct.',
+    keywords: ['générateur prompts', 'prompt engineering', 'chatgpt prompts', 'optimisation prompts', 'prompting guide', 'techniques prompting', 'few-shot', 'chain-of-thought'],
+    category: 'ai',
+    icon: '📝',
+    features: [
+      'Formulaire intuitif pour définir tous les paramètres',
+      'Techniques avancées : Zero-shot, Few-shot, Chain-of-Thought, ReAct',
+      'Multi-langues : Français, Anglais, Espagnol, Allemand, Italien',
+      'Personnalisation : Ton, créativité, longueur de réponse',
+      'Génération avec OpenAI GPT-4o-mini'
+    ],
+    useCases: [
+      'Créer des prompts optimisés pour ChatGPT',
+      'Générer du contenu marketing avec IA',
+      'Résoudre des problèmes mathématiques avec raisonnement',
+      'Classifier des sentiments et analyser des données'
     ]
   }
 ];

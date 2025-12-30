@@ -1,0 +1,59 @@
+# Configuration Traefik pour Prompt Generator
+# Route prompt-generator.iahome.fr vers prompt-generator:3002
+
+http:
+  routers:
+    # Route pour les challenges Let's Encrypt (si nécessaire)
+    prompt-generator-acme:
+      rule: "Host(`prompt-generator.iahome.fr`) && PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["web"]
+      service: prompt-generator-direct
+      priority: 1000
+
+    # Route principale HTTP (Cloudflare SSL - HTTP vers Traefik)
+    # Gère les requêtes avec ou sans token
+    prompt-generator-main:
+      rule: "Host(`prompt-generator.iahome.fr`)"
+      entryPoints: ["web"]
+      service: prompt-generator-service
+      middlewares: ["security-headers@file", "compress@file", "prompt-generator-proxy-headers@file"]
+      priority: 10
+
+    # Route HTTPS (si SSL direct sans Cloudflare)
+    prompt-generator-https:
+      rule: "Host(`prompt-generator.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: prompt-generator-service
+      tls:
+        certResolver: letsencrypt
+      middlewares: ["security-headers@file", "compress@file", "prompt-generator-proxy-headers@file"]
+      priority: 10
+
+  services:
+    # Service pour les challenges Let's Encrypt
+    prompt-generator-direct:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:3002"
+        passHostHeader: true
+
+    # Service principal pour Prompt Generator
+    prompt-generator-service:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:3002"
+        passHostHeader: true
+
+  middlewares:
+    # Headers proxy pour Prompt Generator
+    prompt-generator-proxy-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-For: ""
+          X-Real-IP: ""
+        customResponseHeaders:
+          X-Frame-Options: "SAMEORIGIN"
+          X-Content-Type-Options: "nosniff"
+          Referrer-Policy: "strict-origin-when-cross-origin"
+

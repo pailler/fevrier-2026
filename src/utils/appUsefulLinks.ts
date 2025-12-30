@@ -58,6 +58,10 @@ export const appUsefulLinks: AppLinks = {
     { label: 'GitHub', url: 'https://github.com/librespeed/speedtest', icon: '🔗' },
     { label: 'Site officiel', url: 'https://librespeed.org', icon: '🌐' },
   ],
+  'prompt-generator': [
+    { label: 'Prompt Engineering Guide', url: 'https://www.promptingguide.ai/fr', icon: '📖' },
+    { label: 'OpenAI Best Practices', url: 'https://platform.openai.com/docs/guides/prompt-engineering', icon: '🤖' },
+  ],
 };
 
 // Fonction helper pour obtenir les liens d'une application

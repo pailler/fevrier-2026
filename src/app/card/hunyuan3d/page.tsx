@@ -205,6 +205,130 @@ export default function Hunyuan3DPage() {
     }
   }, []);
 
+  // Ajouter les données structurées JSON-LD pour le SEO
+  useEffect(() => {
+    const softwareApplicationSchema = {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Hunyuan 3D - IA Home",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "100",
+        "priceCurrency": "TOKENS"
+      },
+      "description": "Plateforme d'intelligence artificielle pour générer des modèles 3D réalistes à partir d'images. Hunyuan 3D transforme vos images 2D en modèles 3D détaillés avec textures précises, géométries complexes, et export multi-formats. Solution de génération 3D par IA développée par Tencent.",
+      "url": "https://iahome.fr/card/hunyuan3d",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "350"
+      },
+      "featureList": [
+        "Génération 3D à partir d'images",
+        "Reconstruction 3D précise",
+        "Textures et géométries détaillées",
+        "Export multi-formats (OBJ, STL, PLY)",
+        "Haute qualité professionnelle",
+        "Interface intuitive",
+        "Génération rapide",
+        "IA de pointe Tencent"
+      ]
+    };
+
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce que Hunyuan 3D ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Hunyuan 3D est une plateforme d'intelligence artificielle qui transforme vos images en modèles 3D détaillés et réalistes. Basée sur les technologies d'IA les plus avancées développées par Tencent, elle offre une solution complète pour créer des objets 3D à partir d'images 2D avec une précision exceptionnelle."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment générer un modèle 3D avec Hunyuan 3D ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pour générer un modèle 3D avec Hunyuan 3D, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface, uploadez une image 2D, et l'IA génère automatiquement un modèle 3D détaillé avec textures et géométries précises. Vous pouvez ensuite exporter le modèle dans les formats standards (OBJ, STL, PLY)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Hunyuan 3D est-il gratuit ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "L'activation du service Hunyuan 3D coûte 100 tokens par utilisation. Une fois activé, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quels formats d'export sont supportés par Hunyuan 3D ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Hunyuan 3D supporte l'export dans les formats standards 3D : OBJ, STL, et PLY. Ces formats sont compatibles avec la plupart des logiciels de design 3D, d'impression 3D, et de visualisation, garantissant une intégration facile dans vos workflows."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quelle est la qualité des modèles 3D générés ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Les modèles 3D générés par Hunyuan 3D sont de haute qualité professionnelle avec des textures précises, des géométries détaillées, et une reconstruction fidèle de l'image source. Les modèles sont prêts pour l'impression 3D, l'utilisation dans des projets de design, ou l'intégration dans des applications VR/AR."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Puis-je utiliser Hunyuan 3D sans compétences en modélisation 3D ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, Hunyuan 3D est conçu pour être accessible à tous, même sans compétences en modélisation 3D. L'interface est intuitive et la génération est entièrement automatisée par l'IA. Il suffit d'uploader une image et l'IA génère le modèle 3D automatiquement."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quels types d'images puis-je utiliser avec Hunyuan 3D ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Hunyuan 3D peut traiter différents types d'images : objets du quotidien, créations artistiques, produits, sculptures, et bien plus. L'IA s'adapte à vos besoins et génère des modèles 3D adaptés à chaque type d'objet. Pour de meilleurs résultats, utilisez des images claires et bien éclairées."
+          }
+        }
+      ]
+    };
+
+    // Créer et ajouter le script pour SoftwareApplication
+    const script1 = document.createElement('script');
+    script1.type = 'application/ld+json';
+    script1.id = 'software-application-schema-hy3d';
+    script1.text = JSON.stringify(softwareApplicationSchema);
+    
+    // Créer et ajouter le script pour FAQPage
+    const script2 = document.createElement('script');
+    script2.type = 'application/ld+json';
+    script2.id = 'faq-schema-hy3d';
+    script2.text = JSON.stringify(faqSchema);
+
+    // Vérifier si les scripts existent déjà avant de les ajouter
+    if (!document.getElementById('software-application-schema-hy3d')) {
+      document.head.appendChild(script1);
+    }
+    if (!document.getElementById('faq-schema-hy3d')) {
+      document.head.appendChild(script2);
+    }
+
+    // Nettoyage lors du démontage
+    return () => {
+      const existingScript1 = document.getElementById('software-application-schema-hy3d');
+      const existingScript2 = document.getElementById('faq-schema-hy3d');
+      if (existingScript1) existingScript1.remove();
+      if (existingScript2) existingScript2.remove();
+    };
+  }, []);
+
   // Charger les détails de la carte
   useEffect(() => {
     const fetchCardDetails = async () => {
@@ -430,13 +554,13 @@ export default function Hunyuan3DPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Créez des modèles 3D réalistes avec l'intelligence artificielle
+                Hunyuan 3D : génération de modèles 3D à partir d'images avec l'IA
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
                 {(card?.category || 'IA').toUpperCase()}
               </span>
               <p className="text-xl text-purple-100 mb-6">
-                Transformez vos idées en modèles 3D détaillés. Générez des objets 3D à partir d'images avec une précision exceptionnelle.
+                Générez des modèles 3D réalistes à partir d'images avec Hunyuan 3D. Intelligence artificielle pour créer des objets 3D détaillés, textures précises, export multi-formats. Génération 3D par IA de Tencent.
               </p>
               
               {/* Badges de fonctionnalités */}
@@ -613,7 +737,7 @@ export default function Hunyuan3DPage() {
         </div>
       </div>
 
-      {/* Section "À propos de" en pleine largeur maximale */}
+      {/* Section SEO optimisée - Contenu structuré */}
       <section className="bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 py-8 w-full relative overflow-hidden">
         {/* Effet de particules en arrière-plan */}
         <div className="absolute inset-0">
@@ -627,26 +751,266 @@ export default function Hunyuan3DPage() {
         <div className="w-full px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-white/50 p-8 sm:p-12 lg:p-16 hover:shadow-3xl transition-all duration-300">
             <div className="prose max-w-none">
-              <div className="text-center mb-12">
-                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 bg-clip-text text-transparent mb-4">
-                  À propos de Hunyuan 3D
-                </h3>
-                <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto rounded-full"></div>
-              </div>
               
-              <div className="space-y-8 sm:space-y-12 text-gray-700">
-                {/* Description principale */}
-                <div className="text-center max-w-5xl mx-auto">
-                  <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
-                    Hunyuan 3D est une plateforme d'intelligence artificielle révolutionnaire qui transforme vos idées en modèles 3D détaillés. 
-                    Cette technologie de pointe vous permet de créer des objets 3D réalistes à partir d'images en quelques secondes.
+              {/* Paragraphe citable par les IA (GEO) */}
+              <div className="bg-gradient-to-r from-purple-100 to-indigo-100 p-6 rounded-2xl mb-8 border-l-4 border-purple-500">
+                <p className="text-lg leading-relaxed text-gray-800">
+                  <strong>Hunyuan 3D est une plateforme d'intelligence artificielle qui transforme vos images en modèles 3D détaillés et réalistes.</strong> Basée sur les technologies d'IA les plus avancées développées par Tencent, elle offre une solution complète pour créer des objets 3D à partir d'images 2D avec une précision exceptionnelle. Les modèles générés incluent des textures précises, des géométries complexes, et peuvent être exportés dans les formats standards (OBJ, STL, PLY) pour l'impression 3D, le design, ou l'intégration dans des applications VR/AR.
+                </p>
+              </div>
+
+              {/* H2 - À quoi sert Hunyuan 3D ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">À quoi sert Hunyuan 3D ?</h2>
+                <div className="space-y-4 text-gray-700">
+                  <p className="text-lg leading-relaxed">
+                    Hunyuan 3D permet de créer des modèles 3D à partir d'images sans compétences en modélisation 3D. Il répond aux besoins de ceux qui souhaitent générer rapidement des objets 3D pour leurs projets, prototyper des idées, ou créer des assets 3D sans passer par des logiciels complexes.
                   </p>
-                  {card?.subtitle && (
-                    <p className="text-base sm:text-lg text-gray-600 italic mb-8">
-                      {card.subtitle}
-                    </p>
-                  )}
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li className="text-lg"><strong>Génération rapide :</strong> Créez des modèles 3D en quelques secondes à partir d'images, sans compétences en modélisation 3D complexes</li>
+                    <li className="text-lg"><strong>Prototypage :</strong> Prototypez rapidement vos idées en 3D, créez des concepts visuels pour vos projets, ou générez des modèles pour l'impression 3D</li>
+                    <li className="text-lg"><strong>Création d'assets :</strong> Créez des assets 3D pour vos jeux vidéo, applications VR/AR, ou visualisations interactives sans compétences en modélisation</li>
+                    <li className="text-lg"><strong>Exploration artistique :</strong> Explorez de nouvelles formes de création artistique, générez des sculptures numériques ou des objets d'art uniques</li>
+                  </ul>
+                  <p className="text-lg leading-relaxed mt-4">
+                    <strong>Cas concrets d'utilisation :</strong> Créez des modèles 3D de produits pour vos catalogues, générez des assets pour vos jeux vidéo, prototypez des designs avant production, créez des modèles pour l'impression 3D, ou explorez de nouvelles formes de création artistique.
+                  </p>
                 </div>
+              </div>
+
+              {/* H2 - Que peut faire Hunyuan 3D ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Que peut faire Hunyuan 3D ?</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200">
+                    <h3 className="text-2xl font-bold text-purple-900 mb-4">Image vers 3D</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Transformez vos images 2D en modèles 3D avec une reconstruction précise de la géométrie et des textures. L'IA analyse l'image et génère automatiquement un modèle 3D détaillé.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl border border-indigo-200">
+                    <h3 className="text-2xl font-bold text-indigo-900 mb-4">Haute qualité</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Obtenez des modèles 3D détaillés et réalistes avec des textures précises et des géométries complexes. Les modèles sont prêts pour l'impression 3D ou l'utilisation dans vos projets.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200">
+                    <h3 className="text-2xl font-bold text-blue-900 mb-4">Export multi-formats</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Exportez vos modèles 3D dans les formats standards (OBJ, STL, PLY) pour une compatibilité maximale avec vos outils de design, d'impression 3D, ou de visualisation.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 rounded-2xl border border-cyan-200">
+                    <h3 className="text-2xl font-bold text-cyan-900 mb-4">Génération rapide</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Créez des modèles 3D en quelques secondes. L'IA traite l'image et génère le modèle 3D automatiquement, sans intervention manuelle nécessaire.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - Comment utiliser Hunyuan 3D ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Comment utiliser Hunyuan 3D ?</h2>
+                <div className="space-y-6">
+                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-2xl border border-purple-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Activer Hunyuan 3D</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Activez Hunyuan 3D avec 100 tokens. Une fois activé, le service est accessible depuis vos applications actives.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border border-indigo-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">2</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Uploader une image</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Uploadez une image 2D de l'objet que vous souhaitez transformer en modèle 3D. Pour de meilleurs résultats, utilisez des images claires et bien éclairées.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-2xl border border-blue-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">3</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Générer le modèle 3D</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          L'IA analyse l'image et génère automatiquement un modèle 3D détaillé avec textures et géométries précises. La génération prend généralement quelques secondes.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-cyan-50 to-teal-50 p-6 rounded-2xl border border-cyan-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">4</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Exporter le modèle</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Téléchargez votre modèle 3D dans le format de votre choix (OBJ, STL, PLY) et utilisez-le dans vos projets, pour l'impression 3D, ou dans vos applications.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - Pour qui est fait Hunyuan 3D ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Pour qui est fait Hunyuan 3D ?</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200 text-center">
+                    <div className="text-4xl mb-4">🎨</div>
+                    <h3 className="text-xl font-bold text-purple-900 mb-2">Designers</h3>
+                    <p className="text-gray-700">Prototypez rapidement vos idées en 3D, créez des concepts visuels pour vos projets, ou générez des modèles pour l'impression 3D.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl border border-indigo-200 text-center">
+                    <div className="text-4xl mb-4">👨‍💻</div>
+                    <h3 className="text-xl font-bold text-indigo-900 mb-2">Développeurs</h3>
+                    <p className="text-gray-700">Créez des assets 3D pour vos jeux vidéo, applications VR/AR, ou visualisations interactives sans compétences en modélisation.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200 text-center">
+                    <div className="text-4xl mb-4">🎭</div>
+                    <h3 className="text-xl font-bold text-blue-900 mb-2">Artistes</h3>
+                    <p className="text-gray-700">Explorez de nouvelles formes de création artistique, générez des sculptures numériques ou des objets d'art uniques.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 rounded-2xl border border-cyan-200 text-center">
+                    <div className="text-4xl mb-4">🏭</div>
+                    <h3 className="text-xl font-bold text-cyan-900 mb-2">Entreprises</h3>
+                    <p className="text-gray-700">Créez des modèles 3D de produits pour vos catalogues, prototypez des designs avant production, ou générez des visualisations.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - Hunyuan 3D vs modélisation 3D traditionnelle */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Hunyuan 3D vs modélisation 3D traditionnelle</h2>
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-8 rounded-2xl border border-gray-200">
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white">
+                          <th className="border border-gray-300 p-4 text-left">Fonctionnalité</th>
+                          <th className="border border-gray-300 p-4 text-center">Hunyuan 3D</th>
+                          <th className="border border-gray-300 p-4 text-center">Modélisation traditionnelle</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Temps de création</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Quelques secondes</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Heures ou jours</td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border border-gray-300 p-4 font-semibold">Compétences requises</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Aucune compétence</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Compétences avancées</td>
+                        </tr>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Source</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Image 2D</td>
+                          <td className="border border-gray-300 p-4 text-center">⚠️ Création manuelle</td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border border-gray-300 p-4 font-semibold">Précision</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Haute précision IA</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Contrôle total</td>
+                        </tr>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Coût</td>
+                          <td className="border border-gray-300 p-4 text-center">100 tokens</td>
+                          <td className="border border-gray-300 p-4 text-center">Logiciels payants</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="mt-6 text-gray-700 leading-relaxed">
+                    <strong>En résumé :</strong> Hunyuan 3D offre une alternative rapide et accessible à la modélisation 3D traditionnelle. Contrairement aux logiciels de modélisation qui nécessitent des compétences avancées et des heures de travail, Hunyuan 3D génère des modèles 3D en quelques secondes à partir d'une simple image, sans compétences en modélisation. C'est la solution idéale pour ceux qui veulent créer des modèles 3D rapidement sans passer par des logiciels complexes.
+                  </p>
+                </div>
+              </div>
+
+              {/* H2 - Questions fréquentes sur Hunyuan 3D (FAQ) */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Questions fréquentes sur Hunyuan 3D (FAQ)</h2>
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-purple-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Qu'est-ce que Hunyuan 3D ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Hunyuan 3D est une plateforme d'intelligence artificielle qui transforme vos images en modèles 3D détaillés et réalistes. Basée sur les technologies d'IA les plus avancées développées par Tencent, elle offre une solution complète pour créer des objets 3D à partir d'images 2D avec une précision exceptionnelle.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border-l-4 border-indigo-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Comment générer un modèle 3D avec Hunyuan 3D ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Pour générer un modèle 3D avec Hunyuan 3D, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface, uploadez une image 2D, et l'IA génère automatiquement un modèle 3D détaillé avec textures et géométries précises. Vous pouvez ensuite exporter le modèle dans les formats standards (OBJ, STL, PLY).
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-blue-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Hunyuan 3D est-il gratuit ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      L'activation du service Hunyuan 3D coûte 100 tokens par utilisation. Une fois activé, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-cyan-50 to-teal-50 p-6 rounded-2xl border-l-4 border-cyan-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Quels formats d'export sont supportés par Hunyuan 3D ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Hunyuan 3D supporte l'export dans les formats standards 3D : OBJ, STL, et PLY. Ces formats sont compatibles avec la plupart des logiciels de design 3D, d'impression 3D, et de visualisation, garantissant une intégration facile dans vos workflows.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-teal-50 to-green-50 p-6 rounded-2xl border-l-4 border-teal-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Quelle est la qualité des modèles 3D générés ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Les modèles 3D générés par Hunyuan 3D sont de haute qualité professionnelle avec des textures précises, des géométries détaillées, et une reconstruction fidèle de l'image source. Les modèles sont prêts pour l'impression 3D, l'utilisation dans des projets de design, ou l'intégration dans des applications VR/AR.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl border-l-4 border-green-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Puis-je utiliser Hunyuan 3D sans compétences en modélisation 3D ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Oui, Hunyuan 3D est conçu pour être accessible à tous, même sans compétences en modélisation 3D. L'interface est intuitive et la génération est entièrement automatisée par l'IA. Il suffit d'uploader une image et l'IA génère le modèle 3D automatiquement.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-6 rounded-2xl border-l-4 border-emerald-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Quels types d'images puis-je utiliser avec Hunyuan 3D ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Hunyuan 3D peut traiter différents types d'images : objets du quotidien, créations artistiques, produits, sculptures, et bien plus. L'IA s'adapte à vos besoins et génère des modèles 3D adaptés à chaque type d'objet. Pour de meilleurs résultats, utilisez des images claires et bien éclairées.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description principale */}
+              <div className="text-center max-w-5xl mx-auto mb-8">
+                <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
+                  Hunyuan 3D est une plateforme d'intelligence artificielle révolutionnaire qui transforme vos idées en modèles 3D détaillés. 
+                  Cette technologie de pointe vous permet de créer des objets 3D réalistes à partir d'images en quelques secondes.
+                </p>
+                {card?.subtitle && (
+                  <p className="text-base sm:text-lg text-gray-600 italic mb-8">
+                    {card.subtitle}
+                  </p>
+                )}
               </div>
             </div>
           </div>

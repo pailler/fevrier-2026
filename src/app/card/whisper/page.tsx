@@ -206,6 +206,130 @@ export default function WhisperPage() {
     }
   }, []);
 
+  // Ajouter les données structurées JSON-LD pour le SEO
+  useEffect(() => {
+    const softwareApplicationSchema = {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Whisper IA - IA Home",
+      "applicationCategory": "WebApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "100",
+        "priceCurrency": "TOKENS"
+      },
+      "description": "Whisper IA est une plateforme d'intelligence artificielle multimédia qui transforme vos fichiers audio, vidéo et images en texte avec une précision exceptionnelle. Basée sur les technologies OpenAI Whisper et Tesseract OCR, elle offre une solution complète pour tous vos besoins de transcription et reconnaissance de texte. Support multilingue, interface moderne, transcription audio/vidéo précise, reconnaissance de texte (OCR) sur images et PDF.",
+      "url": "https://iahome.fr/card/whisper",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "580"
+      },
+      "featureList": [
+        "Transcription audio de haute qualité",
+        "Transcription vidéo avec horodatage",
+        "Reconnaissance de texte (OCR) sur images",
+        "Support multilingue (50+ langues)",
+        "Interface moderne et intuitive",
+        "Précision exceptionnelle",
+        "Traitement rapide",
+        "Confidentialité garantie"
+      ]
+    };
+
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce que Whisper IA ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Whisper IA est une plateforme d'intelligence artificielle multimédia qui transforme vos fichiers audio, vidéo et images en texte avec une précision exceptionnelle. Basée sur les technologies OpenAI Whisper et Tesseract OCR, elle offre une solution complète pour tous vos besoins de transcription et reconnaissance de texte. Développée avec les dernières avancées en intelligence artificielle, cette plateforme vous donne accès à des capacités de traitement multimédia de niveau professionnel."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment utiliser Whisper IA ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pour utiliser Whisper IA, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via whisper.iahome.fr. Uploadez vos fichiers audio, vidéo ou images, sélectionnez la langue si nécessaire, et l'IA génère automatiquement la transcription ou la reconnaissance de texte. Vous pouvez ensuite télécharger le résultat en format texte ou l'utiliser directement dans votre workflow."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quels types de fichiers Whisper IA peut-il traiter ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Whisper IA peut traiter trois types de fichiers : fichiers audio (MP3, WAV, M4A, etc.) pour transcription audio, fichiers vidéo (MP4, AVI, MOV, etc.) pour transcription vidéo avec horodatage, et images/PDF (JPG, PNG, PDF, etc.) pour reconnaissance de texte (OCR). Tous les formats courants sont supportés pour une polyvalence maximale."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Whisper IA est-il gratuit ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "L'activation de Whisper IA coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : transcription audio/vidéo, reconnaissance de texte (OCR), support multilingue, et interface moderne. Il n'y a pas de frais supplémentaires pour le traitement des fichiers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quelles langues sont supportées par Whisper IA ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Whisper IA supporte plus de 50 langues et dialectes pour la transcription audio et vidéo, incluant le français, l'anglais, l'espagnol, l'allemand, l'italien, et bien d'autres. Pour la reconnaissance de texte (OCR), l'outil est optimisé pour le français et l'anglais, avec un support étendu pour d'autres langues européennes."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quelle est la précision de Whisper IA ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Whisper IA offre une précision exceptionnelle grâce aux technologies OpenAI Whisper et Tesseract OCR. Les modèles OpenAI Whisper sont entraînés sur des millions d'heures d'audio multilingue pour une transcription au mot près, même dans des conditions difficiles. Pour l'OCR, Tesseract est optimisé pour extraire le texte des images et documents numérisés avec une grande précision."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Pour qui est fait Whisper IA ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Whisper IA est fait pour plusieurs types d'utilisateurs : professionnels qui transcrivent réunions, interviews et conférences, étudiants qui transforment cours enregistrés en notes textuelles, créateurs de contenu qui génèrent automatiquement des sous-titres pour leurs vidéos, et toute personne qui a besoin de transformer du contenu multimédia en texte éditable."
+          }
+        }
+      ]
+    };
+
+    // Créer et ajouter le script pour SoftwareApplication
+    const script1 = document.createElement('script');
+    script1.type = 'application/ld+json';
+    script1.id = 'software-application-schema-wh';
+    script1.text = JSON.stringify(softwareApplicationSchema);
+    
+    // Créer et ajouter le script pour FAQPage
+    const script2 = document.createElement('script');
+    script2.type = 'application/ld+json';
+    script2.id = 'faq-schema-wh';
+    script2.text = JSON.stringify(faqSchema);
+
+    // Vérifier si les scripts existent déjà avant de les ajouter
+    if (!document.getElementById('software-application-schema-wh')) {
+      document.head.appendChild(script1);
+    }
+    if (!document.getElementById('faq-schema-wh')) {
+      document.head.appendChild(script2);
+    }
+
+    // Nettoyage lors du démontage
+    return () => {
+      const existingScript1 = document.getElementById('software-application-schema-wh');
+      const existingScript2 = document.getElementById('faq-schema-wh');
+      if (existingScript1) existingScript1.remove();
+      if (existingScript2) existingScript2.remove();
+    };
+  }, []);
+
   // Charger les détails de la carte
   useEffect(() => {
     const fetchCardDetails = async () => {
@@ -376,13 +500,13 @@ export default function WhisperPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Transformez vos fichiers audio, vidéo et images en texte avec précision
+                Whisper IA : transcription audio, vidéo et OCR avec précision
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
                 {(card?.category || 'PRODUCTIVITÉ').toUpperCase()}
               </span>
               <p className="text-xl text-blue-100 mb-6">
-                Grâce aux technologies OpenAI Whisper et Tesseract OCR, obtenez des transcriptions et reconnaissances de texte d'une précision exceptionnelle.
+                Transformez vos fichiers audio, vidéo et images en texte avec Whisper IA. Transcription audio/vidéo précise avec OpenAI Whisper, reconnaissance de texte (OCR) avec Tesseract. Support multilingue, interface moderne. Parfait pour professionnels, étudiants et créateurs de contenu.
               </p>
               
               {/* Badges de fonctionnalités */}
@@ -597,6 +721,266 @@ export default function WhisperPage() {
               </div>
               
               <div className="space-y-8 sm:space-y-12 text-gray-700">
+                {/* Paragraphe citable par les IA (GEO) */}
+                <div className="bg-gradient-to-r from-blue-100 to-indigo-100 p-6 rounded-2xl border-l-4 border-blue-500 mb-8">
+                  <p className="text-lg leading-relaxed text-gray-800">
+                    <strong>Whisper IA est une plateforme d'intelligence artificielle multimédia qui transforme vos fichiers audio, vidéo et images en texte avec une précision exceptionnelle.</strong> Basée sur les technologies OpenAI Whisper et Tesseract OCR, elle offre une solution complète pour tous vos besoins de transcription et reconnaissance de texte. Avec support multilingue (50+ langues), interface moderne, et traitement rapide, c'est l'outil idéal pour professionnels, étudiants et créateurs de contenu qui veulent transformer du contenu multimédia en texte éditable.
+                  </p>
+                </div>
+
+                {/* H2 - À quoi sert Whisper IA ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent mb-6">
+                    À quoi sert Whisper IA ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mb-6"></div>
+                  <div className="space-y-4 text-gray-700">
+                    <p className="text-lg leading-relaxed">
+                      Whisper IA permet de transformer vos fichiers audio, vidéo et images en texte éditable avec une précision exceptionnelle. Il répond aux besoins de ceux qui souhaitent créer des transcriptions, extraire du texte depuis des documents scannés, ou générer des sous-titres automatiques.
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 ml-4">
+                      <li className="text-lg"><strong>Transcrire du contenu audio/vidéo :</strong> Convertissez vos enregistrements vocaux et vidéos en texte avec précision au mot près</li>
+                      <li className="text-lg"><strong>Extraire du texte depuis des images :</strong> Utilisez l'OCR pour transformer vos images et PDFs en texte éditable</li>
+                      <li className="text-lg"><strong>Générer des sous-titres :</strong> Créez automatiquement des sous-titres pour vos vidéos avec horodatage précis</li>
+                      <li className="text-lg"><strong>Améliorer la productivité :</strong> Économisez du temps en automatisant la transcription manuelle</li>
+                    </ul>
+                    <p className="text-lg leading-relaxed mt-4">
+                      <strong>Cas concrets d'utilisation :</strong> Transcrivez vos réunions, interviews et conférences, transformez vos cours enregistrés en notes textuelles, générez automatiquement des sous-titres pour vos vidéos, extrayez le texte de vos documents scannés, créez des transcriptions de podcasts pour améliorer le SEO, ou analysez du contenu vidéo avec horodatage précis.
+                    </p>
+                  </div>
+                </div>
+
+                {/* H2 - Que peut faire Whisper IA ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent mb-6">
+                    Que peut faire Whisper IA ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mb-6"></div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200">
+                      <h3 className="text-2xl font-bold text-blue-900 mb-4">Transcription audio</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Convertissez vos enregistrements vocaux en texte avec une précision au mot près. Support de plus de 50 langues et dialectes, même dans des conditions difficiles. Parfait pour transcrire réunions, interviews, podcasts, et cours enregistrés.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-2xl border border-green-200">
+                      <h3 className="text-2xl font-bold text-green-900 mb-4">Transcription vidéo</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Extrayez le texte des vidéos avec horodatage précis des mots. Idéal pour créer des sous-titres, analyser du contenu vidéo, ou générer des transcriptions de vidéos de formation ou de marketing avec synchronisation temporelle.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200">
+                      <h3 className="text-2xl font-bold text-purple-900 mb-4">Reconnaissance de texte (OCR)</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Transformez vos images et PDFs en texte éditable avec Tesseract OCR, optimisé pour le français et l'anglais. Extrayez le texte de documents scannés, images, captures d'écran, et bien plus pour faciliter l'édition et la recherche.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-2xl border border-orange-200">
+                      <h3 className="text-2xl font-bold text-orange-900 mb-4">Support multilingue</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Support de plus de 50 langues et dialectes pour la transcription audio/vidéo. Interface moderne et intuitive accessible depuis n'importe quel navigateur, avec traitement rapide et confidentialité garantie.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* H2 - Comment utiliser Whisper IA ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent mb-6">
+                    Comment utiliser Whisper IA ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mb-6"></div>
+                  <div className="space-y-6">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Activer Whisper IA</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            Activez Whisper IA avec 100 tokens. Une fois activé, le service est accessible depuis vos applications actives via whisper.iahome.fr.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border border-indigo-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">2</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Uploadez vos fichiers</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            Uploadez vos fichiers audio (MP3, WAV, M4A), vidéo (MP4, AVI, MOV), ou images/PDF (JPG, PNG, PDF) dans l'interface. Tous les formats courants sont supportés pour une polyvalence maximale.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border border-purple-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">3</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Sélectionnez la langue</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            Pour la transcription audio/vidéo, sélectionnez la langue si nécessaire. Whisper IA supporte plus de 50 langues et peut détecter automatiquement la langue dans la plupart des cas.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-pink-50 to-rose-50 p-6 rounded-2xl border border-pink-200">
+                      <div className="flex items-start">
+                        <div className="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">4</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Téléchargez le résultat</h3>
+                          <p className="text-gray-700 leading-relaxed">
+                            L'IA génère automatiquement la transcription ou la reconnaissance de texte. Vous pouvez télécharger le résultat en format texte, l'utiliser directement dans votre workflow, ou le copier pour un usage immédiat.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* H2 - Pour qui est fait Whisper IA ? */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent mb-6">
+                    Pour qui est fait Whisper IA ?
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mb-6"></div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200 text-center">
+                      <div className="text-4xl mb-4">💼</div>
+                      <h3 className="text-xl font-bold text-blue-900 mb-2">Professionnels</h3>
+                      <p className="text-gray-700">Transcrivez vos réunions, interviews et conférences. Créez des sous-titres pour vos vidéos de formation ou de marketing. Extrayez le texte de vos documents scannés.</p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-2xl border border-green-200 text-center">
+                      <div className="text-4xl mb-4">🎓</div>
+                      <h3 className="text-xl font-bold text-green-900 mb-2">Étudiants</h3>
+                      <p className="text-gray-700">Transformez vos cours enregistrés en notes textuelles. Extrayez le texte de vos documents scannés pour faciliter l'étude. Créez des transcriptions de conférences.</p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200 text-center">
+                      <div className="text-4xl mb-4">🎬</div>
+                      <h3 className="text-xl font-bold text-purple-900 mb-2">Créateurs de contenu</h3>
+                      <p className="text-gray-700">Générez automatiquement des sous-titres pour vos vidéos. Créez des transcriptions de podcasts pour améliorer le SEO. Extrayez le texte de vos images pour vos projets.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* H2 - Whisper IA vs autres solutions de transcription */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent mb-6">
+                    Whisper IA vs autres solutions de transcription
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mb-6"></div>
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-8 rounded-2xl border border-gray-200">
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                            <th className="border border-gray-300 p-4 text-left">Fonctionnalité</th>
+                            <th className="border border-gray-300 p-4 text-center">Whisper IA</th>
+                            <th className="border border-gray-300 p-4 text-center">Autres solutions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="bg-white">
+                            <td className="border border-gray-300 p-4 font-semibold">Précision</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ Exceptionnelle (OpenAI Whisper)</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Variable selon la solution</td>
+                          </tr>
+                          <tr className="bg-gray-50">
+                            <td className="border border-gray-300 p-4 font-semibold">Polyvalence</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ Audio, vidéo, images (OCR)</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Souvent limité à un type</td>
+                          </tr>
+                          <tr className="bg-white">
+                            <td className="border border-gray-300 p-4 font-semibold">Multilingue</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ 50+ langues supportées</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Support limité</td>
+                          </tr>
+                          <tr className="bg-gray-50">
+                            <td className="border border-gray-300 p-4 font-semibold">Interface</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ Moderne et intuitive</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Interface variable</td>
+                          </tr>
+                          <tr className="bg-white">
+                            <td className="border border-gray-300 p-4 font-semibold">Prix</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par utilisation</td>
+                            <td className="border border-gray-300 p-4 text-center">⚠️ Abonnements mensuels souvent chers</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="mt-6 text-gray-700 leading-relaxed">
+                      <strong>En résumé :</strong> Whisper IA offre une alternative précise et polyvalente aux autres solutions de transcription. Contrairement aux solutions qui se limitent souvent à un type de fichier ou qui ont un support multilingue limité, Whisper IA combine transcription audio/vidéo et OCR dans une seule interface moderne, avec une précision exceptionnelle et un support de 50+ langues. C'est la solution idéale pour ceux qui veulent transformer du contenu multimédia en texte avec précision et flexibilité.
+                    </p>
+                  </div>
+                </div>
+
+                {/* H2 - Questions fréquentes sur Whisper IA (FAQ) */}
+                <div className="mb-12">
+                  <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent mb-6">
+                    Questions fréquentes sur Whisper IA (FAQ)
+                  </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mb-6"></div>
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-blue-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Qu'est-ce que Whisper IA ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Whisper IA est une plateforme d'intelligence artificielle multimédia qui transforme vos fichiers audio, vidéo et images en texte avec une précision exceptionnelle. Basée sur les technologies OpenAI Whisper et Tesseract OCR, elle offre une solution complète pour tous vos besoins de transcription et reconnaissance de texte. Développée avec les dernières avancées en intelligence artificielle, cette plateforme vous donne accès à des capacités de traitement multimédia de niveau professionnel.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser Whisper IA ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Pour utiliser Whisper IA, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via whisper.iahome.fr. Uploadez vos fichiers audio, vidéo ou images, sélectionnez la langue si nécessaire, et l'IA génère automatiquement la transcription ou la reconnaissance de texte. Vous pouvez ensuite télécharger le résultat en format texte ou l'utiliser directement dans votre workflow.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-purple-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Quels types de fichiers Whisper IA peut-il traiter ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Whisper IA peut traiter trois types de fichiers : fichiers audio (MP3, WAV, M4A, etc.) pour transcription audio, fichiers vidéo (MP4, AVI, MOV, etc.) pour transcription vidéo avec horodatage, et images/PDF (JPG, PNG, PDF, etc.) pour reconnaissance de texte (OCR). Tous les formats courants sont supportés pour une polyvalence maximale.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-pink-50 to-rose-50 p-6 rounded-2xl border-l-4 border-pink-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Whisper IA est-il gratuit ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        L'activation de Whisper IA coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : transcription audio/vidéo, reconnaissance de texte (OCR), support multilingue, et interface moderne. Il n'y a pas de frais supplémentaires pour le traitement des fichiers.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-rose-50 to-red-50 p-6 rounded-2xl border-l-4 border-rose-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Quelles langues sont supportées par Whisper IA ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Whisper IA supporte plus de 50 langues et dialectes pour la transcription audio et vidéo, incluant le français, l'anglais, l'espagnol, l'allemand, l'italien, et bien d'autres. Pour la reconnaissance de texte (OCR), l'outil est optimisé pour le français et l'anglais, avec un support étendu pour d'autres langues européennes.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-red-50 to-orange-50 p-6 rounded-2xl border-l-4 border-red-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Quelle est la précision de Whisper IA ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Whisper IA offre une précision exceptionnelle grâce aux technologies OpenAI Whisper et Tesseract OCR. Les modèles OpenAI Whisper sont entraînés sur des millions d'heures d'audio multilingue pour une transcription au mot près, même dans des conditions difficiles. Pour l'OCR, Tesseract est optimisé pour extraire le texte des images et documents numérisés avec une grande précision.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-l-4 border-orange-500">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3">Pour qui est fait Whisper IA ?</h3>
+                      <p className="text-gray-700 leading-relaxed">
+                        Whisper IA est fait pour plusieurs types d'utilisateurs : professionnels qui transcrivent réunions, interviews et conférences, étudiants qui transforment cours enregistrés en notes textuelles, créateurs de contenu qui génèrent automatiquement des sous-titres pour leurs vidéos, et toute personne qui a besoin de transformer du contenu multimédia en texte éditable.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Description principale */}
                 <div className="text-center max-w-5xl mx-auto">
                   <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">

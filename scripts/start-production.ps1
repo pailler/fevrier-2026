@@ -177,7 +177,7 @@ if ($cloudflareProcess -or $startCloudflare -eq "O" -or $startCloudflare -eq "o"
 Write-Host "`n🌐 URLs de production:" -ForegroundColor Cyan
 Write-Host "   - Local: http://localhost:3000" -ForegroundColor Gray
 Write-Host "   - Production: https://iahome.fr" -ForegroundColor Gray
-Write-Host "`n💡 Pour arrêter Next.js en production, fermez la fenêtre PowerShell ou utilisez:" -ForegroundColor Yellow
+Write-Host "`n💡 Pour arreter Next.js en production, fermez la fenetre PowerShell ou utilisez:" -ForegroundColor Yellow
 Write-Host "   Get-Process -Name node | Stop-Process -Force" -ForegroundColor Gray
 Write-Host ""
 

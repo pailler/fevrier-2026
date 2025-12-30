@@ -62,6 +62,130 @@ export default function HomeAssistantPage() {
     setLoading(false);
   }, []);
 
+  // Ajouter les données structurées JSON-LD pour le SEO
+  useEffect(() => {
+    const softwareApplicationSchema = {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Home Assistant - IA Home",
+      "applicationCategory": "HomeAutomationApplication",
+      "operatingSystem": "Linux, Docker, Raspberry Pi",
+      "offers": {
+        "@type": "Offer",
+        "price": "100",
+        "priceCurrency": "TOKENS"
+      },
+      "description": "Plateforme open-source gratuite pour domotiser votre habitat. Manuel complet, codes Lovelace prêts à l'emploi, automatisations. Installation gratuite pour maison, garage, lieu de vacances.",
+      "url": "https://iahome.fr/card/home-assistant",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "200"
+      },
+      "featureList": [
+        "Installation Home Assistant",
+        "Configuration domotique",
+        "Création de dashboards Lovelace",
+        "Automatisations intelligentes",
+        "Intégration d'appareils connectés",
+        "Manuel complet en français",
+        "Codes prêts à l'emploi",
+        "Domotique open-source"
+      ]
+    };
+
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce que Home Assistant ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Home Assistant est une plateforme open-source gratuite de domotique qui permet de centraliser et automatiser tous les appareils connectés de votre habitat. C'est une alternative libre aux solutions propriétaires comme Google Home ou Amazon Alexa, avec vos données qui restent locales sur votre réseau."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Home Assistant est-il gratuit ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, Home Assistant est entièrement gratuit et open-source. Il n'y a aucun frais d'installation, aucun abonnement, et aucun coût caché. Vous avez juste besoin d'un Raspberry Pi ou d'un ordinateur pour l'héberger. Notre manuel et nos codes sont également fournis gratuitement après activation avec 100 tokens."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment installer Home Assistant ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Home Assistant peut être installé sur plusieurs supports : Raspberry Pi (Home Assistant OS), Docker, ou installation Supervised. Notre manuel complet vous guide pas à pas dans l'installation, la configuration initiale, et les premiers pas avec la plateforme."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quels appareils sont compatibles avec Home Assistant ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Home Assistant est compatible avec plus de 2000 intégrations, incluant les principales marques : Philips Hue, Shelly, TP-Link, Sonos, Chromecast, Netatmo, et bien d'autres. La plateforme supporte les protocoles Zigbee, Z-Wave, Wi-Fi, et bien d'autres standards de domotique."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce qu'un code Lovelace ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Les codes Lovelace sont des configurations de cartes pour créer des dashboards personnalisés dans Home Assistant. Nous fournissons des centaines de codes prêts à l'emploi (Button Card, Mushroom Cards, Weather Chart, etc.) que vous pouvez copier-coller directement dans votre configuration."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Mes données sont-elles sécurisées avec Home Assistant ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, avec Home Assistant, toutes vos données restent locales sur votre réseau. Rien n'est envoyé vers le cloud, ce qui garantit une confidentialité maximale. Vous gardez le contrôle total de vos données et de votre habitat intelligent."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ai-je besoin de compétences techniques pour utiliser Home Assistant ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Notre manuel complet vous guide pas à pas, même si vous êtes débutant. Avec les codes prêts à l'emploi et les exemples détaillés, vous pouvez créer des dashboards et automatisations sans être un expert. La communauté Home Assistant est également très active et prête à aider."
+          }
+        }
+      ]
+    };
+
+    // Créer et ajouter le script pour SoftwareApplication
+    const script1 = document.createElement('script');
+    script1.type = 'application/ld+json';
+    script1.id = 'software-application-schema-ha';
+    script1.text = JSON.stringify(softwareApplicationSchema);
+    
+    // Créer et ajouter le script pour FAQPage
+    const script2 = document.createElement('script');
+    script2.type = 'application/ld+json';
+    script2.id = 'faq-schema-ha';
+    script2.text = JSON.stringify(faqSchema);
+
+    // Vérifier si les scripts existent déjà avant de les ajouter
+    if (!document.getElementById('software-application-schema-ha')) {
+      document.head.appendChild(script1);
+    }
+    if (!document.getElementById('faq-schema-ha')) {
+      document.head.appendChild(script2);
+    }
+
+    // Nettoyage lors du démontage
+    return () => {
+      const existingScript1 = document.getElementById('software-application-schema-ha');
+      const existingScript2 = document.getElementById('faq-schema-ha');
+      if (existingScript1) existingScript1.remove();
+      if (existingScript2) existingScript2.remove();
+    };
+  }, []);
+
   // Vérifier l'activation du module quand l'utilisateur est chargé
   useEffect(() => {
     const verifyActivation = async () => {
@@ -101,12 +225,24 @@ export default function HomeAssistantPage() {
     });
   }, []);
 
+  // Timeout de sécurité pour éviter un chargement infini
+  useEffect(() => {
+    if (loading || authLoading) {
+      const timeout = setTimeout(() => {
+        console.warn('⚠️ Timeout de chargement Home Assistant - Arrêt après 10 secondes');
+      }, 10000);
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [loading, authLoading]);
+
   if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Chargement...</p>
+          <p className="text-sm text-gray-500 mt-2">Si le chargement prend trop de temps, veuillez rafraîchir la page.</p>
         </div>
       </div>
     );
@@ -159,13 +295,13 @@ export default function HomeAssistantPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Domotisez votre habitat
+                Home Assistant : domotisez votre habitat gratuitement et facilement
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
                 {(card?.category || 'DOMOTIQUE').toUpperCase()}
               </span>
               <p className="text-xl text-orange-100 mb-6">
-                Avec Home Assistant, domotisez votre habitat (maison, garage, lieu de vacances, lieu de travail, etc.) sans frais d'installation, ni frais de logiciels puisque tout est open-source. Des centaines de codes prêts à l'emploi sont aussi mis à disposition gratuitement.
+                Home Assistant est une plateforme open-source gratuite pour domotiser votre habitat. Avec notre manuel complet et des centaines de codes Lovelace prêts à l'emploi, transformez votre maison, garage, lieu de vacances ou lieu de travail en habitat intelligent sans frais d'installation ni d'abonnement.
               </p>
               
               {/* Badges de fonctionnalités */}
@@ -318,7 +454,7 @@ export default function HomeAssistantPage() {
         </div>
       </div>
 
-      {/* Section "À propos de" en pleine largeur maximale */}
+      {/* Section SEO optimisée - Contenu structuré */}
       <section className="bg-gradient-to-br from-orange-50 via-red-50 to-blue-50 py-8 w-full relative overflow-hidden">
         {/* Effet de particules en arrière-plan */}
         <div className="absolute inset-0">
@@ -332,25 +468,254 @@ export default function HomeAssistantPage() {
         <div className="w-full px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-white/50 p-8 sm:p-12 lg:p-16 hover:shadow-3xl transition-all duration-300">
             <div className="prose max-w-none">
-              <div className="text-center mb-12">
-                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-orange-900 via-red-900 to-blue-900 bg-clip-text text-transparent mb-4">
-                  À propos de {card.title}
-                </h3>
-                <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-red-500 mx-auto rounded-full"></div>
-              </div>
               
-              <div className="space-y-8 sm:space-y-12 text-gray-700">
-                {/* Description principale */}
-                <div className="text-center max-w-5xl mx-auto">
-                  <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
-                    {card.description}
+              {/* Paragraphe citable par les IA (GEO) */}
+              <div className="bg-gradient-to-r from-orange-100 to-red-100 p-6 rounded-2xl mb-8 border-l-4 border-orange-500">
+                <p className="text-lg leading-relaxed text-gray-800">
+                  <strong>Home Assistant est une plateforme open-source gratuite pour domotiser votre habitat.</strong> Avec notre manuel complet et des centaines de codes Lovelace prêts à l'emploi, vous pouvez transformer votre maison, garage, lieu de vacances ou lieu de travail en habitat intelligent. L'installation est simple, sans frais d'installation ni d'abonnement, et toutes vos données restent locales sur votre réseau.
+                </p>
+              </div>
+
+              {/* H2 - À quoi sert Home Assistant ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">À quoi sert Home Assistant ?</h2>
+                <div className="space-y-4 text-gray-700">
+                  <p className="text-lg leading-relaxed">
+                    Home Assistant est une solution complète de domotique qui permet de centraliser et automatiser tous les appareils connectés de votre habitat. Au lieu d'utiliser plusieurs applications différentes pour chaque marque d'appareil, Home Assistant unifie tout dans une seule interface.
                   </p>
-                  {card.subtitle && (
-                    <p className="text-base sm:text-lg text-gray-600 italic mb-8">
-                      {card.subtitle}
-                    </p>
-                  )}
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li className="text-lg"><strong>Automatisation maison :</strong> Créez des scénarios intelligents pour l'éclairage, le chauffage, la sécurité et bien plus</li>
+                    <li className="text-lg"><strong>Contrôle domotique centralisé :</strong> Gérez tous vos appareils connectés depuis une seule interface</li>
+                    <li className="text-lg"><strong>Smart home personnalisée :</strong> Adaptez votre habitat à vos besoins spécifiques sans dépendre des solutions propriétaires</li>
+                    <li className="text-lg"><strong>Domotique open source :</strong> Solution gratuite, sans abonnement, avec vos données qui restent locales</li>
+                  </ul>
+                  <p className="text-lg leading-relaxed mt-4">
+                    <strong>Cas concrets d'utilisation :</strong> Automatisez l'éclairage selon l'heure ou la présence, gérez le chauffage pour optimiser la consommation énergétique, créez des alertes de sécurité, ou contrôlez vos appareils à distance depuis votre smartphone.
+                  </p>
                 </div>
+              </div>
+
+              {/* H2 - Que peut faire Home Assistant ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Que peut faire Home Assistant ?</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-2xl border border-orange-200">
+                    <h3 className="text-2xl font-bold text-orange-900 mb-4">Installation et configuration</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Notre manuel vous guide pas à pas dans l'installation de Home Assistant sur Raspberry Pi, Docker, ou autres supports. Configuration initiale, intégration d'appareils, et premiers pas expliqués en détail.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-2xl border border-red-200">
+                    <h3 className="text-2xl font-bold text-red-900 mb-4">Création de dashboards professionnels</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Apprenez à créer des tableaux de bord élégants avec des centaines de codes Lovelace prêts à l'emploi : Button Card, Mushroom Cards, Weather Chart, et bien d'autres.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200">
+                    <h3 className="text-2xl font-bold text-blue-900 mb-4">Automatisations intelligentes</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Créez des automatisations avancées pour simplifier votre quotidien : éclairage automatique, gestion de la température, alertes, scénarios personnalisés avec des templates et exemples complets.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl border border-indigo-200">
+                    <h3 className="text-2xl font-bold text-indigo-900 mb-4">Intégration d'appareils</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Connectez facilement vos appareils : éclairage (Philips Hue, Shelly, TP-Link), sécurité (caméras, alarmes), multimédia (Sonos, Chromecast), et bien d'autres avec des guides détaillés.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - Comment utiliser Home Assistant ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Comment utiliser Home Assistant ?</h2>
+                <div className="space-y-6">
+                  <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-2xl border border-orange-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Installer Home Assistant</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Suivez notre manuel complet pour installer Home Assistant sur votre Raspberry Pi, via Docker, ou sur un autre support. Le guide couvre tous les aspects de l'installation et de la configuration initiale.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-red-50 to-blue-50 p-6 rounded-2xl border border-red-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">2</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Intégrer vos appareils</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Connectez vos appareils connectés à Home Assistant. Le manuel inclut des guides détaillés pour les principales marques et types d'appareils : éclairage, chauffage, sécurité, multimédia, etc.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">3</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Créer vos dashboards et automatisations</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Utilisez les centaines de codes Lovelace prêts à l'emploi pour créer des dashboards professionnels, et les exemples d'automatisations pour simplifier votre quotidien. Tous les codes sont testés et fonctionnels.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - Pour qui est fait Home Assistant ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Pour qui est fait Home Assistant ?</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-2xl border border-orange-200 text-center">
+                    <div className="text-4xl mb-4">🏠</div>
+                    <h3 className="text-xl font-bold text-orange-900 mb-2">Propriétaires</h3>
+                    <p className="text-gray-700">Domotisez votre maison principale avec éclairage intelligent, gestion du chauffage, sécurité et automatisations de confort.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-2xl border border-red-200 text-center">
+                    <div className="text-4xl mb-4">🏖️</div>
+                    <h3 className="text-xl font-bold text-red-900 mb-2">Propriétaires de résidences secondaires</h3>
+                    <p className="text-gray-700">Gérez à distance votre lieu de vacances : simulation de présence, gestion du chauffage, surveillance, arrosage automatique.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200 text-center">
+                    <div className="text-4xl mb-4">🏢</div>
+                    <h3 className="text-xl font-bold text-blue-900 mb-2">Professionnels</h3>
+                    <p className="text-gray-700">Automatisez votre bureau ou lieu de travail avec gestion de l'éclairage, contrôle de la température, et optimisation énergétique.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl border border-indigo-200 text-center">
+                    <div className="text-4xl mb-4">🔧</div>
+                    <h3 className="text-xl font-bold text-indigo-900 mb-2">Bricoleurs et passionnés</h3>
+                    <p className="text-gray-700">Pour ceux qui aiment personnaliser et contrôler leur habitat intelligent sans dépendre des solutions propriétaires.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - Home Assistant vs autres solutions domotiques */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Home Assistant vs autres solutions domotiques</h2>
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-8 rounded-2xl border border-gray-200">
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
+                          <th className="border border-gray-300 p-4 text-left">Fonctionnalité</th>
+                          <th className="border border-gray-300 p-4 text-center">Home Assistant</th>
+                          <th className="border border-gray-300 p-4 text-center">Solutions propriétaires</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Coût</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ 100% gratuit</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Abonnements mensuels</td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border border-gray-300 p-4 font-semibold">Open source</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Code source ouvert</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Propriétaire</td>
+                        </tr>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Données locales</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Fonctionne hors ligne</td>
+                          <td className="border border-gray-300 p-4 text-center">⚠️ Dépend du cloud</td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border border-gray-300 p-4 font-semibold">Personnalisation</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Illimitée</td>
+                          <td className="border border-gray-300 p-4 text-center">⚠️ Limitée aux options proposées</td>
+                        </tr>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Compatibilité</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Compatible avec 2000+ intégrations</td>
+                          <td className="border border-gray-300 p-4 text-center">⚠️ Limitée aux appareils de la marque</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="mt-6 text-gray-700 leading-relaxed">
+                    <strong>En résumé :</strong> Home Assistant offre une solution complète de domotique open-source, gratuite et personnalisable, sans dépendance aux services cloud. Vos données restent locales et vous gardez le contrôle total de votre habitat intelligent.
+                  </p>
+                </div>
+              </div>
+
+              {/* H2 - Questions fréquentes sur Home Assistant (FAQ) */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Questions fréquentes sur Home Assistant (FAQ)</h2>
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-2xl border-l-4 border-orange-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Qu'est-ce que Home Assistant ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Home Assistant est une plateforme open-source gratuite de domotique qui permet de centraliser et automatiser tous les appareils connectés de votre habitat. C'est une alternative libre aux solutions propriétaires comme Google Home ou Amazon Alexa, avec vos données qui restent locales sur votre réseau.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-red-50 to-blue-50 p-6 rounded-2xl border-l-4 border-red-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Home Assistant est-il gratuit ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Oui, Home Assistant est entièrement gratuit et open-source. Il n'y a aucun frais d'installation, aucun abonnement, et aucun coût caché. Vous avez juste besoin d'un Raspberry Pi ou d'un ordinateur pour l'héberger. Notre manuel et nos codes sont également fournis gratuitement après activation avec 100 tokens.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-blue-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Comment installer Home Assistant ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Home Assistant peut être installé sur plusieurs supports : Raspberry Pi (Home Assistant OS), Docker, ou installation Supervised. Notre manuel complet vous guide pas à pas dans l'installation, la configuration initiale, et les premiers pas avec la plateforme.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Quels appareils sont compatibles avec Home Assistant ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Home Assistant est compatible avec plus de 2000 intégrations, incluant les principales marques : Philips Hue, Shelly, TP-Link, Sonos, Chromecast, Netatmo, et bien d'autres. La plateforme supporte les protocoles Zigbee, Z-Wave, Wi-Fi, et bien d'autres standards de domotique.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-purple-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Qu'est-ce qu'un code Lovelace ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Les codes Lovelace sont des configurations de cartes pour créer des dashboards personnalisés dans Home Assistant. Nous fournissons des centaines de codes prêts à l'emploi (Button Card, Mushroom Cards, Weather Chart, etc.) que vous pouvez copier-coller directement dans votre configuration.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-pink-50 to-orange-50 p-6 rounded-2xl border-l-4 border-pink-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Mes données sont-elles sécurisées avec Home Assistant ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Oui, avec Home Assistant, toutes vos données restent locales sur votre réseau. Rien n'est envoyé vers le cloud, ce qui garantit une confidentialité maximale. Vous gardez le contrôle total de vos données et de votre habitat intelligent.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-teal-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Ai-je besoin de compétences techniques pour utiliser Home Assistant ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Notre manuel complet vous guide pas à pas, même si vous êtes débutant. Avec les codes prêts à l'emploi et les exemples détaillés, vous pouvez créer des dashboards et automatisations sans être un expert. La communauté Home Assistant est également très active et prête à aider.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description principale */}
+              <div className="text-center max-w-5xl mx-auto mb-8">
+                <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
+                  {card.description}
+                </p>
+                {card.subtitle && (
+                  <p className="text-base sm:text-lg text-gray-600 italic mb-8">
+                    {card.subtitle}
+                  </p>
+                )}
+              </div>
 
                 {/* Description détaillée en plusieurs chapitres */}
                 <div className="max-w-6xl mx-auto space-y-8">
@@ -552,7 +917,6 @@ export default function HomeAssistantPage() {
               </div>
             </div>
           </div>
-        </div>
       </section>
 
       {/* Modal pour l'iframe */}

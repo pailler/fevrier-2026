@@ -15,15 +15,31 @@ export async function POST(request: Request) {
 
   try {
     // 1. Vérifier si l'utilisateur a déjà accès au module
-    const { data: existingAccess, error: fetchAccessError } = await supabase
+    const { data: existingAccessList, error: fetchAccessError } = await supabase
       .from('user_applications')
       .select('*')
       .eq('user_id', userId)
       .eq('module_id', moduleId)
-      .single();
+      .eq('is_active', true);
+
+    // Vérifier aussi avec le titre pour être sûr
+    const { data: existingAccessByTitle, error: fetchAccessByTitleError } = await supabase
+      .from('user_applications')
+      .select('*')
+      .eq('user_id', userId)
+      .ilike('module_title', '%QR Codes%')
+      .eq('is_active', true);
+
+    const existingAccess = existingAccessList?.[0] || existingAccessByTitle?.[0];
 
     if (existingAccess) {
-      return NextResponse.json({ success: true, message: 'QR Codes déjà activé pour cet utilisateur.' });
+      console.log('✅ QR Codes déjà activé pour cet utilisateur:', existingAccess.id);
+      return NextResponse.json({ 
+        success: true, 
+        message: 'QR Codes déjà activé pour cet utilisateur.',
+        accessId: existingAccess.id,
+        alreadyActivated: true
+      });
     }
 
     // 2. Créer l'accès sans consommation de tokens (activation gratuite)
@@ -57,13 +73,24 @@ export async function POST(request: Request) {
     }
 
     console.log('✅ Accès QR Codes créé avec succès:', accessData.id);
+    console.log('📋 Détails de l\'accès créé:', {
+      id: accessData.id,
+      user_id: accessData.user_id,
+      module_id: accessData.module_id,
+      module_title: accessData.module_title,
+      is_active: accessData.is_active,
+      expires_at: accessData.expires_at,
+      created_at: accessData.created_at
+    });
 
     return NextResponse.json({
       success: true,
       message: 'QR Codes activé avec succès',
       accessId: accessData.id,
       moduleId: moduleId,
-      expiresAt: expiresAt.toISOString()
+      moduleTitle: moduleTitle,
+      expiresAt: expiresAt.toISOString(),
+      accessData: accessData
     });
 
   } catch (error) {

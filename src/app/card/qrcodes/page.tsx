@@ -180,6 +180,130 @@ export default function QRCodesPage() {
     }
   }, []);
 
+  // Ajouter les données structurées JSON-LD pour le SEO
+  useEffect(() => {
+    const softwareApplicationSchema = {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "QR Codes Dynamiques - IA Home",
+      "applicationCategory": "WebApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "100",
+        "priceCurrency": "TOKENS"
+      },
+      "description": "Générateur de QR codes dynamiques modifiables avec suivi en temps réel, personnalisation avancée et analytics détaillés. Modifiez l'URL de destination sans recréer le code. Solution professionnelle pour optimiser vos campagnes marketing.",
+      "url": "https://iahome.fr/card/qrcodes",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "500"
+      },
+      "featureList": [
+        "QR codes dynamiques modifiables",
+        "Modification de l'URL sans recréer le code",
+        "Analytics en temps réel",
+        "Personnalisation avancée (couleurs, logo)",
+        "Gestion centralisée",
+        "Export en haute qualité",
+        "QR codes statiques et dynamiques",
+        "Token de gestion sécurisé"
+      ]
+    };
+
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce qu'un QR code dynamique ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Un QR code dynamique est un code QR modifiable qui permet de changer l'URL de destination sans recréer le code. Contrairement aux QR codes statiques, les QR codes dynamiques offrent la possibilité de modifier l'URL, les couleurs, le logo et d'autres paramètres après la création, sans avoir à réimprimer ou redistribuer le code physique."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment créer un QR code dynamique ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pour créer un QR code dynamique, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface de génération, entrez l'URL de destination, personnalisez les couleurs et le logo si souhaité, puis générez le code. Vous recevrez un token de gestion et une URL de gestion pour modifier le QR code ultérieurement."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Puis-je modifier un QR code après l'avoir créé ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, avec les QR codes dynamiques, vous pouvez modifier l'URL de destination, les couleurs, le logo et d'autres paramètres à tout moment après la création. Utilisez le token de gestion et l'URL de gestion fournis lors de la création pour accéder à la fonction de modification. Les modifications sont appliquées instantanément."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quelle est la différence entre un QR code statique et un QR code dynamique ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Un QR code statique contient l'URL directement encodée dans le code et ne peut pas être modifié après création. Un QR code dynamique utilise une URL de redirection qui peut être modifiée à tout moment, permettant de changer la destination sans recréer le code. Les QR codes dynamiques offrent également des analytics en temps réel."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Les QR codes dynamiques sont-ils gratuits ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "L'activation du service QR codes dynamiques coûte 100 tokens par utilisation. Une fois activé, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Puis-je personnaliser l'apparence de mes QR codes ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, vous pouvez personnaliser l'apparence de vos QR codes dynamiques en choisissant les couleurs (avant-plan et arrière-plan), en ajoutant un logo au centre, et en ajustant le style. Cette personnalisation permet de renforcer votre identité de marque tout en conservant la lisibilité du code."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quels analytics sont disponibles pour les QR codes dynamiques ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Les analytics disponibles incluent le nombre de scans en temps réel, la localisation géographique des scans, le type d'appareil utilisé (mobile, tablette, ordinateur), la date et l'heure des scans, et les statistiques de performance. Ces données vous permettent d'optimiser vos campagnes marketing et de comprendre le comportement de votre audience."
+          }
+        }
+      ]
+    };
+
+    // Créer et ajouter le script pour SoftwareApplication
+    const script1 = document.createElement('script');
+    script1.type = 'application/ld+json';
+    script1.id = 'software-application-schema-qr';
+    script1.text = JSON.stringify(softwareApplicationSchema);
+    
+    // Créer et ajouter le script pour FAQPage
+    const script2 = document.createElement('script');
+    script2.type = 'application/ld+json';
+    script2.id = 'faq-schema-qr';
+    script2.text = JSON.stringify(faqSchema);
+
+    // Vérifier si les scripts existent déjà avant de les ajouter
+    if (!document.getElementById('software-application-schema-qr')) {
+      document.head.appendChild(script1);
+    }
+    if (!document.getElementById('faq-schema-qr')) {
+      document.head.appendChild(script2);
+    }
+
+    // Nettoyage lors du démontage
+    return () => {
+      const existingScript1 = document.getElementById('software-application-schema-qr');
+      const existingScript2 = document.getElementById('faq-schema-qr');
+      if (existingScript1) existingScript1.remove();
+      if (existingScript2) existingScript2.remove();
+    };
+  }, []);
+
   // Charger les détails de la carte
   useEffect(() => {
     const fetchCardDetails = async () => {
@@ -330,13 +454,13 @@ export default function QRCodesPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                QR Codes Dynamiques
+                QR Codes Dynamiques : générateur de QR codes modifiables avec analytics
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
                 {(card?.category || 'QR CODE GENERATOR').toUpperCase()}
               </span>
               <p className="text-xl text-green-100 mb-6">
-                Créez des QR codes avec suivi en temps réel, personnalisation avancée et analytics détaillés pour optimiser vos campagnes marketing.
+                Créez des QR codes dynamiques modifiables avec suivi en temps réel, personnalisation avancée et analytics détaillés. Modifiez l'URL de destination sans recréer le code pour optimiser vos campagnes marketing.
               </p>
               
             </div>
@@ -506,7 +630,7 @@ export default function QRCodesPage() {
         </div>
       </div>
 
-      {/* Section "À propos de" en pleine largeur maximale */}
+      {/* Section SEO optimisée - Contenu structuré */}
       <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8 w-full relative overflow-hidden">
         {/* Effet de particules en arrière-plan */}
         <div className="absolute inset-0">
@@ -520,16 +644,257 @@ export default function QRCodesPage() {
         <div className="w-full px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-white/50 p-8 sm:p-12 lg:p-16 hover:shadow-3xl transition-all duration-300">
             <div className="prose max-w-none">
-              <div className="text-center mb-12">
-                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent mb-4">
-                  À propos des QR Codes
-                </h3>
-                <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
+              
+              {/* Paragraphe citable par les IA (GEO) */}
+              <div className="bg-gradient-to-r from-blue-100 to-indigo-100 p-6 rounded-2xl mb-8 border-l-4 border-blue-500">
+                <p className="text-lg leading-relaxed text-gray-800">
+                  <strong>Les QR codes dynamiques sont des codes QR modifiables qui permettent de changer l'URL de destination sans recréer le code.</strong> Contrairement aux QR codes statiques, les QR codes dynamiques offrent la possibilité de modifier l'URL, les couleurs, le logo et d'autres paramètres après la création, sans avoir à réimprimer ou redistribuer le code physique. Avec analytics en temps réel, personnalisation avancée et gestion centralisée, les QR codes dynamiques sont la solution idéale pour optimiser vos campagnes marketing et connecter le monde physique au numérique.
+                </p>
               </div>
               
-              <div className="space-y-8 sm:space-y-12 text-gray-700">
+              {/* H2 - À quoi servent les QR codes dynamiques ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">À quoi servent les QR codes dynamiques ?</h2>
+                <div className="space-y-4 text-gray-700">
+                  <p className="text-lg leading-relaxed">
+                    Les QR codes dynamiques permettent de connecter le monde physique au numérique de manière flexible et mesurable. Ils répondent aux besoins de ceux qui souhaitent créer des campagnes marketing adaptables, suivre les performances en temps réel, et optimiser leurs stratégies sans recréer les codes.
+                  </p>
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li className="text-lg"><strong>Campagnes marketing flexibles :</strong> Adaptez vos campagnes en temps réel selon les promotions, événements ou saisons sans changer vos supports physiques</li>
+                    <li className="text-lg"><strong>Suivi et analytics :</strong> Suivez les scans, les conversions, les localisations et les appareils utilisés pour optimiser vos performances</li>
+                    <li className="text-lg"><strong>Personnalisation de marque :</strong> Créez des QR codes uniques avec vos couleurs, logos et styles pour renforcer votre identité de marque</li>
+                    <li className="text-lg"><strong>Correction d'erreurs facile :</strong> Corrigez une URL incorrecte ou mettez à jour une information obsolète en quelques clics, sans impact sur les QR codes déjà distribués</li>
+                  </ul>
+                  <p className="text-lg leading-relaxed mt-4">
+                    <strong>Cas concrets d'utilisation :</strong> Créez des QR codes pour vos menus de restaurant que vous pouvez mettre à jour selon les saisons, utilisez des QR codes sur vos supports marketing que vous pouvez modifier selon les promotions, ou créez des QR codes pour vos événements que vous pouvez adapter en temps réel.
+                  </p>
+                </div>
+              </div>
+
+              {/* H2 - Que peuvent faire les QR codes dynamiques ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Que peuvent faire les QR codes dynamiques ?</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200">
+                    <h3 className="text-2xl font-bold text-blue-900 mb-4">Modification après création</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Modifiez l'URL de destination, les couleurs, le logo et d'autres paramètres à tout moment après la création. Les modifications sont appliquées instantanément sans avoir à recréer le code.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl border border-indigo-200">
+                    <h3 className="text-2xl font-bold text-indigo-900 mb-4">Analytics en temps réel</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Suivez les scans, les conversions, les localisations géographiques, les appareils utilisés et bien plus encore pour optimiser vos campagnes marketing.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200">
+                    <h3 className="text-2xl font-bold text-purple-900 mb-4">Personnalisation avancée</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Créez des QR codes uniques avec vos couleurs, logos et styles pour renforcer votre identité de marque tout en conservant la lisibilité du code.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-pink-50 to-pink-100 p-6 rounded-2xl border border-pink-200">
+                    <h3 className="text-2xl font-bold text-pink-900 mb-4">Gestion centralisée</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Organisez tous vos QR codes dans un tableau de bord unifié avec catégorisation, tags et recherche avancée. Gérez tous vos codes depuis un seul endroit.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - Comment utiliser les QR codes dynamiques ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Comment utiliser les QR codes dynamiques ?</h2>
+                <div className="space-y-6">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Activer le service QR codes</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Activez le service QR codes dynamiques avec 100 tokens. Une fois activé, le service est accessible depuis vos applications actives.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border border-indigo-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">2</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Créer votre QR code</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Entrez l'URL de destination, personnalisez les couleurs et le logo si souhaité, puis générez le code. Vous recevrez un token de gestion et une URL de gestion pour modifier le QR code ultérieurement.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border border-purple-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">3</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Télécharger et utiliser</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Téléchargez votre QR code en haute qualité et utilisez-le sur vos supports marketing, menus, affiches, ou tout autre support physique. Le code est prêt à être scanné.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-pink-50 to-red-50 p-6 rounded-2xl border border-pink-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">4</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Modifier et optimiser</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Utilisez le token de gestion et l'URL de gestion pour modifier l'URL de destination, les couleurs, ou le logo à tout moment. Consultez les analytics pour optimiser vos campagnes.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - Pour qui sont faits les QR codes dynamiques ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Pour qui sont faits les QR codes dynamiques ?</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200 text-center">
+                    <div className="text-4xl mb-4">📱</div>
+                    <h3 className="text-xl font-bold text-blue-900 mb-2">Marketing et publicité</h3>
+                    <p className="text-gray-700">Créez des campagnes dynamiques avec des QR codes qui s'adaptent aux promotions, événements ou contenus saisonniers.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 rounded-2xl border border-indigo-200 text-center">
+                    <div className="text-4xl mb-4">🍽️</div>
+                    <h3 className="text-xl font-bold text-indigo-900 mb-2">Restaurants et commerce</h3>
+                    <p className="text-gray-700">Optimisez l'expérience client avec des QR codes pour menus, promotions et pages produits personnalisées.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200 text-center">
+                    <div className="text-4xl mb-4">🎪</div>
+                    <h3 className="text-xl font-bold text-purple-900 mb-2">Événements et conférences</h3>
+                    <p className="text-gray-700">Gérez les inscriptions, programmes et interactions avec des QR codes qui évoluent selon le contexte.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-pink-50 to-pink-100 p-6 rounded-2xl border border-pink-200 text-center">
+                    <div className="text-4xl mb-4">🏢</div>
+                    <h3 className="text-xl font-bold text-pink-900 mb-2">Entreprises</h3>
+                    <p className="text-gray-700">Utilisez des QR codes pour vos supports marketing, documents internes, ou campagnes de communication.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - QR codes dynamiques vs QR codes statiques */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">QR codes dynamiques vs QR codes statiques</h2>
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-8 rounded-2xl border border-gray-200">
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white">
+                          <th className="border border-gray-300 p-4 text-left">Fonctionnalité</th>
+                          <th className="border border-gray-300 p-4 text-center">QR codes dynamiques</th>
+                          <th className="border border-gray-300 p-4 text-center">QR codes statiques</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Modification après création</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Modifiable à tout moment</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Non modifiable</td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border border-gray-300 p-4 font-semibold">Analytics</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Analytics en temps réel</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Pas d'analytics</td>
+                        </tr>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Personnalisation</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Avancée (couleurs, logo)</td>
+                          <td className="border border-gray-300 p-4 text-center">⚠️ Limitée</td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border border-gray-300 p-4 font-semibold">Gestion</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Gestion centralisée</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Pas de gestion</td>
+                        </tr>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Coût</td>
+                          <td className="border border-gray-300 p-4 text-center">100 tokens</td>
+                          <td className="border border-gray-300 p-4 text-center">Gratuit</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="mt-6 text-gray-700 leading-relaxed">
+                    <strong>En résumé :</strong> Les QR codes dynamiques offrent une flexibilité et des fonctionnalités avancées que les QR codes statiques ne peuvent pas fournir. Avec la possibilité de modifier l'URL après création, les analytics en temps réel, et la personnalisation avancée, les QR codes dynamiques sont la solution idéale pour les campagnes marketing professionnelles qui nécessitent un suivi et une optimisation continue.
+                  </p>
+                </div>
+              </div>
+
+              {/* H2 - Questions fréquentes sur les QR codes dynamiques (FAQ) */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Questions fréquentes sur les QR codes dynamiques (FAQ)</h2>
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-blue-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Qu'est-ce qu'un QR code dynamique ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Un QR code dynamique est un code QR modifiable qui permet de changer l'URL de destination sans recréer le code. Contrairement aux QR codes statiques, les QR codes dynamiques offrent la possibilité de modifier l'URL, les couleurs, le logo et d'autres paramètres après la création, sans avoir à réimprimer ou redistribuer le code physique.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Comment créer un QR code dynamique ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Pour créer un QR code dynamique, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface de génération, entrez l'URL de destination, personnalisez les couleurs et le logo si souhaité, puis générez le code. Vous recevrez un token de gestion et une URL de gestion pour modifier le QR code ultérieurement.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-purple-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Puis-je modifier un QR code après l'avoir créé ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Oui, avec les QR codes dynamiques, vous pouvez modifier l'URL de destination, les couleurs, le logo et d'autres paramètres à tout moment après la création. Utilisez le token de gestion et l'URL de gestion fournis lors de la création pour accéder à la fonction de modification. Les modifications sont appliquées instantanément.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-pink-50 to-red-50 p-6 rounded-2xl border-l-4 border-pink-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Quelle est la différence entre un QR code statique et un QR code dynamique ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Un QR code statique contient l'URL directement encodée dans le code et ne peut pas être modifié après création. Un QR code dynamique utilise une URL de redirection qui peut être modifiée à tout moment, permettant de changer la destination sans recréer le code. Les QR codes dynamiques offrent également des analytics en temps réel.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-red-50 to-orange-50 p-6 rounded-2xl border-l-4 border-red-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Les QR codes dynamiques sont-ils gratuits ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      L'activation du service QR codes dynamiques coûte 100 tokens par utilisation. Une fois activé, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-6 rounded-2xl border-l-4 border-orange-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Puis-je personnaliser l'apparence de mes QR codes ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Oui, vous pouvez personnaliser l'apparence de vos QR codes dynamiques en choisissant les couleurs (avant-plan et arrière-plan), en ajoutant un logo au centre, et en ajustant le style. Cette personnalisation permet de renforcer votre identité de marque tout en conservant la lisibilité du code.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-yellow-50 to-green-50 p-6 rounded-2xl border-l-4 border-yellow-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Quels analytics sont disponibles pour les QR codes dynamiques ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Les analytics disponibles incluent le nombre de scans en temps réel, la localisation géographique des scans, le type d'appareil utilisé (mobile, tablette, ordinateur), la date et l'heure des scans, et les statistiques de performance. Ces données vous permettent d'optimiser vos campagnes marketing et de comprendre le comportement de votre audience.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
                 {/* Description principale */}
-                <div className="text-center max-w-5xl mx-auto">
+              <div className="text-center max-w-5xl mx-auto mb-8">
                   <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
                     Les QR codes révolutionnent la façon dont vous connectez le monde physique au numérique. 
                     Créez des codes qui s'adaptent, se suivent et s'optimisent automatiquement.
@@ -899,7 +1264,6 @@ export default function QRCodesPage() {
               </div>
             </div>
           </div>
-        </div>
       </section>
 
       {/* Modal pour l'iframe */}

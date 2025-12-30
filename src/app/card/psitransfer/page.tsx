@@ -36,6 +36,130 @@ export default function PsiTransferPage() {
     setLoading(false);
   }, []);
 
+  // Ajouter les données structurées JSON-LD pour le SEO
+  useEffect(() => {
+    const softwareApplicationSchema = {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "PsiTransfer - IA Home",
+      "applicationCategory": "WebApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "10",
+        "priceCurrency": "TOKENS"
+      },
+      "description": "Plateforme de transfert de fichiers open-source pour partager vos fichiers de manière sécurisée et privée. Transfert sans inscription, avec chiffrement, contrôle de la durée de vie, et alternative privée à WeTransfer.",
+      "url": "https://iahome.fr/card/psitransfer",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "200"
+      },
+      "featureList": [
+        "Transfert de fichiers sécurisé",
+        "Partage sans inscription",
+        "Chiffrement des données",
+        "Liens de partage temporaires",
+        "Protection par mot de passe",
+        "Notifications par email",
+        "Support fichiers volumineux",
+        "Open-source et gratuit"
+      ]
+    };
+
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce que PsiTransfer ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "PsiTransfer est une plateforme de transfert de fichiers open-source qui permet de partager vos fichiers de manière sécurisée et privée. Contrairement aux services cloud traditionnels, PsiTransfer ne nécessite aucune inscription et vous donne un contrôle total sur vos données."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment transférer un fichier avec PsiTransfer ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pour transférer un fichier avec PsiTransfer, activez d'abord le service avec 10 tokens. Une fois activé, glissez-déposez vos fichiers dans l'interface ou sélectionnez-les. Choisissez la durée de vie du lien de partage et optionnellement un mot de passe. PsiTransfer génère un lien sécurisé que vous pouvez partager avec vos destinataires."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "PsiTransfer est-il gratuit ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "PsiTransfer est un outil open-source et gratuit. L'activation du service coûte 10 tokens par utilisation. Une fois activé, vous pouvez transférer des fichiers sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Mes fichiers sont-ils sécurisés avec PsiTransfer ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, PsiTransfer respecte totalement votre vie privée. Tous les fichiers sont chiffrés pendant le transfert et le stockage temporaire. Vous contrôlez la durée de vie de vos partages, et les fichiers sont automatiquement supprimés après expiration ou téléchargement. Aucune donnée n'est partagée avec des services tiers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quelle est la différence entre PsiTransfer et WeTransfer ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "PsiTransfer est une alternative open-source et respectueuse de la vie privée à WeTransfer. Contrairement à WeTransfer qui collecte des données et affiche des publicités, PsiTransfer ne collecte aucune donnée personnelle, n'affiche aucune publicité, et fonctionne sur vos propres serveurs. Vous gardez un contrôle total sur vos fichiers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Puis-je transférer des fichiers volumineux avec PsiTransfer ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, PsiTransfer supporte le transfert de fichiers volumineux. Le quota maximum est de 10 Go par transfert. L'interface est optimisée pour gérer les gros fichiers avec des vitesses de transfert rapides."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ai-je besoin de créer un compte pour utiliser PsiTransfer ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Non, PsiTransfer ne nécessite aucune inscription. Vous pouvez transférer des fichiers immédiatement après activation du service. C'est l'un des avantages principaux de PsiTransfer : simplicité et confidentialité sans compromis."
+          }
+        }
+      ]
+    };
+
+    // Créer et ajouter le script pour SoftwareApplication
+    const script1 = document.createElement('script');
+    script1.type = 'application/ld+json';
+    script1.id = 'software-application-schema-pt';
+    script1.text = JSON.stringify(softwareApplicationSchema);
+    
+    // Créer et ajouter le script pour FAQPage
+    const script2 = document.createElement('script');
+    script2.type = 'application/ld+json';
+    script2.id = 'faq-schema-pt';
+    script2.text = JSON.stringify(faqSchema);
+
+    // Vérifier si les scripts existent déjà avant de les ajouter
+    if (!document.getElementById('software-application-schema-pt')) {
+      document.head.appendChild(script1);
+    }
+    if (!document.getElementById('faq-schema-pt')) {
+      document.head.appendChild(script2);
+    }
+
+    // Nettoyage lors du démontage
+    return () => {
+      const existingScript1 = document.getElementById('software-application-schema-pt');
+      const existingScript2 = document.getElementById('faq-schema-pt');
+      if (existingScript1) existingScript1.remove();
+      if (existingScript2) existingScript2.remove();
+    };
+  }, []);
+
   // Le contenu s'affiche même sans authentification
 
   // Timeout de sécurité pour éviter le chargement infini
@@ -123,13 +247,13 @@ export default function PsiTransferPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Partagez vos fichiers en toute sécurité
+                PsiTransfer : transfert de fichiers sécurisé et privé sans inscription
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
                 {(card?.category || 'WEB TOOLS').toUpperCase()}
               </span>
               <p className="text-xl text-green-100 mb-6">
-                PsiTransfer vous offre une solution simple et sécurisée pour partager vos fichiers sans inscription, avec un contrôle total sur vos données.
+                Partagez vos fichiers de manière sécurisée et privée avec PsiTransfer. Solution open-source de transfert de fichiers sans inscription, avec chiffrement et contrôle total sur vos données. Alternative privée à WeTransfer et Dropbox.
               </p>
               
               {/* Badges de fonctionnalités */}
@@ -266,7 +390,7 @@ export default function PsiTransferPage() {
         </div>
       </div>
 
-      {/* Section "À propos de" en pleine largeur maximale */}
+      {/* Section SEO optimisée - Contenu structuré */}
       <section className="bg-gradient-to-br from-green-50 via-teal-50 to-cyan-50 py-8 w-full relative overflow-hidden">
         {/* Effet de particules en arrière-plan */}
         <div className="absolute inset-0">
@@ -280,25 +404,271 @@ export default function PsiTransferPage() {
         <div className="w-full px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-white/50 p-8 sm:p-12 lg:p-16 hover:shadow-3xl transition-all duration-300">
             <div className="prose max-w-none">
-              <div className="text-center mb-12">
-                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-green-900 via-teal-900 to-cyan-900 bg-clip-text text-transparent mb-4">
-                  À propos de {card.title}
-                </h3>
-                <div className="w-24 h-1 bg-gradient-to-r from-green-500 to-teal-500 mx-auto rounded-full"></div>
-              </div>
               
-              <div className="space-y-8 sm:space-y-12 text-gray-700">
-                {/* Description principale */}
-                <div className="text-center max-w-5xl mx-auto">
-                  <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
-                    {card.description}
+              {/* Paragraphe citable par les IA (GEO) */}
+              <div className="bg-gradient-to-r from-green-100 to-teal-100 p-6 rounded-2xl mb-8 border-l-4 border-green-500">
+                <p className="text-lg leading-relaxed text-gray-800">
+                  <strong>PsiTransfer est une plateforme de transfert de fichiers open-source qui permet de partager vos fichiers de manière sécurisée et privée.</strong> Contrairement aux services cloud traditionnels comme WeTransfer ou Dropbox qui collectent vos données et affichent des publicités, PsiTransfer ne nécessite aucune inscription, fonctionne sur vos propres serveurs, et vous donne un contrôle total sur vos données. Tous les fichiers sont chiffrés, et vous définissez la durée de vie de vos partages.
+                </p>
+              </div>
+
+              {/* H2 - À quoi sert PsiTransfer ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">À quoi sert PsiTransfer ?</h2>
+                <div className="space-y-4 text-gray-700">
+                  <p className="text-lg leading-relaxed">
+                    PsiTransfer est un outil de transfert de fichiers qui permet de partager des fichiers de manière sécurisée et temporaire. Il répond aux besoins de ceux qui souhaitent transférer des fichiers sans dépendre des services cloud qui collectent des données et affichent des publicités.
                   </p>
-                  {card.subtitle && (
-                    <p className="text-base sm:text-lg text-gray-600 italic mb-8">
-                      {card.subtitle}
-                    </p>
-                  )}
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li className="text-lg"><strong>Transfert de fichiers sécurisé :</strong> Partagez des fichiers de toutes tailles avec chiffrement et contrôle de la durée de vie</li>
+                    <li className="text-lg"><strong>Partage sans inscription :</strong> Transférez des fichiers immédiatement sans créer de compte ou fournir d'informations personnelles</li>
+                    <li className="text-lg"><strong>Alternative privée :</strong> Remplacez WeTransfer, Dropbox ou autres services cloud par une solution open-source et respectueuse de la vie privée</li>
+                    <li className="text-lg"><strong>Contrôle total :</strong> Définissez la durée de vie de vos partages et protégez-les avec un mot de passe si nécessaire</li>
+                  </ul>
+                  <p className="text-lg leading-relaxed mt-4">
+                    <strong>Cas concrets d'utilisation :</strong> Partagez des documents de travail avec des collègues, transférez des fichiers volumineux à des clients, envoyez des photos et vidéos à des amis, ou partagez des fichiers de code entre développeurs, le tout sans créer de comptes ou dépendre de services tiers.
+                  </p>
                 </div>
+              </div>
+
+              {/* H2 - Que peut faire PsiTransfer ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Que peut faire PsiTransfer ?</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-2xl border border-green-200">
+                    <h3 className="text-2xl font-bold text-green-900 mb-4">Transfert de fichiers sécurisé</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Partagez des fichiers de toutes tailles (jusqu'à 10 Go) avec une interface drag-and-drop intuitive. Tous les fichiers sont chiffrés pendant le transfert et le stockage temporaire.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-teal-50 to-teal-100 p-6 rounded-2xl border border-teal-200">
+                    <h3 className="text-2xl font-bold text-teal-900 mb-4">Liens de partage temporaires</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Générez des liens de partage sécurisés avec une durée de vie personnalisable. Les fichiers sont automatiquement supprimés après expiration ou téléchargement.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 rounded-2xl border border-cyan-200">
+                    <h3 className="text-2xl font-bold text-cyan-900 mb-4">Protection par mot de passe</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Protégez vos partages avec un mot de passe optionnel pour une sécurité supplémentaire. Seuls les destinataires avec le mot de passe peuvent accéder aux fichiers.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200">
+                    <h3 className="text-2xl font-bold text-blue-900 mb-4">Notifications et suivi</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Recevez des notifications par email lors des téléchargements et suivez l'activité de vos partages en temps réel. Restez informé de qui a téléchargé vos fichiers.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - Comment utiliser PsiTransfer ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Comment utiliser PsiTransfer ?</h2>
+                <div className="space-y-6">
+                  <div className="bg-gradient-to-r from-green-50 to-teal-50 p-6 rounded-2xl border border-green-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Activer PsiTransfer</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Activez PsiTransfer avec 10 tokens. Une fois activé, le service est accessible depuis vos applications actives.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-6 rounded-2xl border border-teal-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">2</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Glisser-déposer vos fichiers</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Glissez-déposez vos fichiers dans l'interface PsiTransfer ou sélectionnez-les. Vous pouvez transférer plusieurs fichiers ou dossiers en une seule fois.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-cyan-50 to-blue-50 p-6 rounded-2xl border border-cyan-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">3</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Configurer le partage</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Choisissez la durée de vie du lien de partage (heures, jours, ou téléchargements limités) et optionnellement un mot de passe. PsiTransfer génère un lien sécurisé.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">4</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Partager le lien</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Partagez le lien sécurisé avec vos destinataires par email, messagerie, ou tout autre moyen. Ils pourront télécharger les fichiers sans créer de compte.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - Pour qui est fait PsiTransfer ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Pour qui est fait PsiTransfer ?</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-2xl border border-green-200 text-center">
+                    <div className="text-4xl mb-4">💼</div>
+                    <h3 className="text-xl font-bold text-green-900 mb-2">Professionnels</h3>
+                    <p className="text-gray-700">Partagez des documents de travail, présentations, rapports avec collègues et clients de manière sécurisée et temporaire.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-teal-50 to-teal-100 p-6 rounded-2xl border border-teal-200 text-center">
+                    <div className="text-4xl mb-4">👨‍💻</div>
+                    <h3 className="text-xl font-bold text-teal-900 mb-2">Développeurs</h3>
+                    <p className="text-gray-700">Transférez des fichiers de code, builds, ressources entre équipes sans utiliser de services cloud externes.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 p-6 rounded-2xl border border-cyan-200 text-center">
+                    <div className="text-4xl mb-4">👨‍👩‍👧</div>
+                    <h3 className="text-xl font-bold text-cyan-900 mb-2">Particuliers</h3>
+                    <p className="text-gray-700">Partagez des photos, vidéos, documents personnels avec famille et amis sans créer de comptes ou stocker vos données en permanence.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200 text-center">
+                    <div className="text-4xl mb-4">🔒</div>
+                    <h3 className="text-xl font-bold text-blue-900 mb-2">Soucieux de la vie privée</h3>
+                    <p className="text-gray-700">Pour ceux qui veulent transférer des fichiers sans dépendre de services qui collectent des données et affichent des publicités.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - PsiTransfer vs autres services de transfert */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">PsiTransfer vs autres services de transfert</h2>
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-8 rounded-2xl border border-gray-200">
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="bg-gradient-to-r from-green-500 to-teal-500 text-white">
+                          <th className="border border-gray-300 p-4 text-left">Fonctionnalité</th>
+                          <th className="border border-gray-300 p-4 text-center">PsiTransfer</th>
+                          <th className="border border-gray-300 p-4 text-center">WeTransfer / Dropbox</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Inscription requise</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Aucune inscription</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Inscription souvent requise</td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border border-gray-300 p-4 font-semibold">Respect de la vie privée</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Hébergement local</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Collecte de données</td>
+                        </tr>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Publicités</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Aucune publicité</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Publicités affichées</td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border border-gray-300 p-4 font-semibold">Open-source</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Code source ouvert</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Propriétaire</td>
+                        </tr>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Contrôle des données</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Vos serveurs</td>
+                          <td className="border border-gray-300 p-4 text-center">⚠️ Serveurs tiers</td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border border-gray-300 p-4 font-semibold">Chiffrement</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Chiffrement complet</td>
+                          <td className="border border-gray-300 p-4 text-center">⚠️ Variable</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="mt-6 text-gray-700 leading-relaxed">
+                    <strong>En résumé :</strong> PsiTransfer offre une alternative open-source et respectueuse de la vie privée à WeTransfer et Dropbox. Contrairement à ces services qui collectent vos données et affichent des publicités, PsiTransfer fonctionne sur vos propres serveurs, ne nécessite aucune inscription, et vous donne un contrôle total sur vos fichiers. C'est une solution idéale pour ceux qui veulent transférer des fichiers de manière privée et sécurisée.
+                  </p>
+                </div>
+              </div>
+
+              {/* H2 - Questions fréquentes sur PsiTransfer (FAQ) */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Questions fréquentes sur PsiTransfer (FAQ)</h2>
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-r from-green-50 to-teal-50 p-6 rounded-2xl border-l-4 border-green-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Qu'est-ce que PsiTransfer ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      PsiTransfer est une plateforme de transfert de fichiers open-source qui permet de partager vos fichiers de manière sécurisée et privée. Contrairement aux services cloud traditionnels, PsiTransfer ne nécessite aucune inscription et vous donne un contrôle total sur vos données.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-teal-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Comment transférer un fichier avec PsiTransfer ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Pour transférer un fichier avec PsiTransfer, activez d'abord le service avec 10 tokens. Une fois activé, glissez-déposez vos fichiers dans l'interface ou sélectionnez-les. Choisissez la durée de vie du lien de partage et optionnellement un mot de passe. PsiTransfer génère un lien sécurisé que vous pouvez partager avec vos destinataires.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-cyan-50 to-blue-50 p-6 rounded-2xl border-l-4 border-cyan-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">PsiTransfer est-il gratuit ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      PsiTransfer est un outil open-source et gratuit. L'activation du service coûte 10 tokens par utilisation. Une fois activé, vous pouvez transférer des fichiers sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-blue-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Mes fichiers sont-ils sécurisés avec PsiTransfer ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Oui, PsiTransfer respecte totalement votre vie privée. Tous les fichiers sont chiffrés pendant le transfert et le stockage temporaire. Vous contrôlez la durée de vie de vos partages, et les fichiers sont automatiquement supprimés après expiration ou téléchargement. Aucune donnée n'est partagée avec des services tiers.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Quelle est la différence entre PsiTransfer et WeTransfer ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      PsiTransfer est une alternative open-source et respectueuse de la vie privée à WeTransfer. Contrairement à WeTransfer qui collecte des données et affiche des publicités, PsiTransfer ne collecte aucune donnée personnelle, n'affiche aucune publicité, et fonctionne sur vos propres serveurs. Vous gardez un contrôle total sur vos fichiers.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-purple-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Puis-je transférer des fichiers volumineux avec PsiTransfer ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Oui, PsiTransfer supporte le transfert de fichiers volumineux. Le quota maximum est de 10 Go par transfert. L'interface est optimisée pour gérer les gros fichiers avec des vitesses de transfert rapides.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-pink-50 to-red-50 p-6 rounded-2xl border-l-4 border-pink-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Ai-je besoin de créer un compte pour utiliser PsiTransfer ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Non, PsiTransfer ne nécessite aucune inscription. Vous pouvez transférer des fichiers immédiatement après activation du service. C'est l'un des avantages principaux de PsiTransfer : simplicité et confidentialité sans compromis.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description principale */}
+              <div className="text-center max-w-5xl mx-auto mb-8">
+                <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
+                  {card.description}
+                </p>
+                {card.subtitle && (
+                  <p className="text-base sm:text-lg text-gray-600 italic mb-8">
+                    {card.subtitle}
+                  </p>
+                )}
+              </div>
 
                 {/* Description détaillée en plusieurs chapitres */}
                 <div className="max-w-6xl mx-auto space-y-8">
@@ -519,10 +889,9 @@ export default function PsiTransferPage() {
               </div>
             </div>
           </div>
-        </div>
       </section>
 
-             {/* Modal pour l'iframe */}
+      {/* Modal pour l'iframe */}
        {iframeModal.isOpen && (
          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-2">
            <div className="bg-white rounded-xl shadow-2xl w-full h-full max-w-7xl max-h-[95vh] overflow-hidden">

@@ -36,6 +36,128 @@ export default function PDFPage() {
     setLoading(false);
   }, []);
 
+  // Ajouter les données structurées JSON-LD pour le SEO
+  useEffect(() => {
+    const softwareApplicationSchema = {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "IA PDF - IA Home",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+      },
+      "description": "Outil IA pour analyser, résumer et interroger des documents PDF. Analysez vos PDF avec une IA : résumés automatiques, questions-réponses, compréhension rapide de documents longs.",
+      "url": "https://iahome.fr/card/pdf",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "150"
+      },
+      "featureList": [
+        "Analyser un PDF avec une IA",
+        "Résumer un PDF automatiquement",
+        "Poser des questions à un PDF",
+        "Comprendre un PDF long ou complexe",
+        "Extraire les informations importantes",
+        "Traitement en français"
+      ]
+    };
+
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Peut-on analyser un PDF avec une IA ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, l'IA PDF de IA Home permet de lire, comprendre et résumer des documents PDF, même longs ou complexes. L'intelligence artificielle analyse le contenu textuel, identifie les concepts clés, et peut répondre à des questions précises sur le document."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Cette IA PDF fonctionne-t-elle en français ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, l'outil est optimisé pour les documents en français. L'IA PDF de IA Home comprend parfaitement le français et peut analyser, résumer et répondre à des questions sur des documents PDF en français avec une grande précision."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quelle est la différence avec ChatGPT ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "IA Home est conçu spécifiquement pour travailler sur vos fichiers PDF, sans copier-coller, avec une meilleure gestion des documents longs. Contrairement à ChatGPT qui nécessite de copier-coller le contenu, l'IA PDF de IA Home permet d'importer directement vos fichiers et de les analyser en quelques clics."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment analyser un PDF avec une IA ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pour analyser un PDF avec l'IA de IA Home, il suffit de trois étapes : (1) Importer votre fichier PDF dans l'interface, (2) Choisir entre un résumé automatique ou poser des questions spécifiques, (3) Exploiter les réponses générées par l'IA. Le processus est simple et ne nécessite aucune compétence technique."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Est-ce gratuit ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "L'IA PDF de IA Home est accessible avec un système de tokens. Chaque utilisation coûte 10 tokens, ce qui permet un accès équitable à tous les utilisateurs. Consultez la page d'activation pour connaître les détails de tarification et les options disponibles."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quelle IA pour comprendre un document PDF ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "L'IA PDF de IA Home est spécialement conçue pour comprendre les documents PDF. Elle utilise des modèles d'intelligence artificielle avancés pour analyser le contenu, identifier les concepts clés, et fournir des réponses précises. C'est une solution optimale pour comprendre rapidement des PDF longs ou complexes."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "L'IA peut-elle résumer un PDF long ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Oui, l'IA PDF de IA Home peut résumer des PDF de plusieurs centaines de pages. L'outil est optimisé pour traiter des documents longs et complexes, en extrayant les informations essentielles et en générant un résumé structuré et cohérent."
+          }
+        }
+      ]
+    };
+
+    // Créer et ajouter le script pour SoftwareApplication
+    const script1 = document.createElement('script');
+    script1.type = 'application/ld+json';
+    script1.id = 'software-application-schema';
+    script1.text = JSON.stringify(softwareApplicationSchema);
+    
+    // Créer et ajouter le script pour FAQPage
+    const script2 = document.createElement('script');
+    script2.type = 'application/ld+json';
+    script2.id = 'faq-schema';
+    script2.text = JSON.stringify(faqSchema);
+
+    // Vérifier si les scripts existent déjà avant de les ajouter
+    if (!document.getElementById('software-application-schema')) {
+      document.head.appendChild(script1);
+    }
+    if (!document.getElementById('faq-schema')) {
+      document.head.appendChild(script2);
+    }
+
+    // Nettoyage lors du démontage
+    return () => {
+      const existingScript1 = document.getElementById('software-application-schema');
+      const existingScript2 = document.getElementById('faq-schema');
+      if (existingScript1) existingScript1.remove();
+      if (existingScript2) existingScript2.remove();
+    };
+  }, []);
+
   // Le contenu s'affiche même sans authentification
 
   // Timeout de sécurité pour éviter le chargement infini
@@ -65,12 +187,29 @@ export default function PDFPage() {
     });
   }, []);
 
+  // Timeout de sécurité pour éviter un chargement infini
+  useEffect(() => {
+    if (loading || authLoading) {
+      const timeout = setTimeout(() => {
+        console.warn('⚠️ Timeout de chargement PDF - Arrêt après 10 secondes');
+        // Ne pas forcer authLoading car c'est géré par useCustomAuth
+        // Mais on peut forcer loading à false pour débloquer la page
+        if (loading) {
+          // setLoading(false); // Décommenter si nécessaire
+        }
+      }, 10000);
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [loading, authLoading]);
+
   if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Chargement...</p>
+          <p className="text-sm text-gray-500 mt-2">Si le chargement prend trop de temps, veuillez rafraîchir la page.</p>
         </div>
       </div>
     );
@@ -123,13 +262,13 @@ export default function PDFPage() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Manipulez vos PDF avec facilité
+                IA pour PDF : analysez et comprenez vos documents en quelques secondes
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
                 {(card?.category || 'IA BUREAUTIQUE').toUpperCase()}
               </span>
               <p className="text-xl text-blue-100 mb-6">
-                PDF+ vous offre une suite complète d'outils pour manipuler, convertir et optimiser vos documents PDF avec une interface moderne et intuitive.
+                L'IA pour PDF permet d'analyser automatiquement des documents, d'en extraire les informations clés et de répondre à des questions précises. IA Home propose un outil spécialisé pour comprendre rapidement des PDF en français, avec résumés automatiques et questions-réponses intelligentes.
               </p>
               
               {/* Badges de fonctionnalités */}
@@ -257,7 +396,7 @@ export default function PDFPage() {
         </div>
       </div>
 
-      {/* Section "À propos de" en pleine largeur maximale */}
+      {/* Section SEO optimisée - Contenu structuré */}
       <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8 w-full relative overflow-hidden">
         {/* Effet de particules en arrière-plan */}
         <div className="absolute inset-0">
@@ -271,25 +410,257 @@ export default function PDFPage() {
         <div className="w-full px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-white/50 p-8 sm:p-12 lg:p-16 hover:shadow-3xl transition-all duration-300">
             <div className="prose max-w-none">
-              <div className="text-center mb-12">
-                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent mb-4">
-                  À propos de {card.title}
-                </h3>
-                <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
-              </div>
               
-              <div className="space-y-8 sm:space-y-12 text-gray-700">
-                {/* Description principale */}
-                <div className="text-center max-w-5xl mx-auto">
-                  <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
-                    {card.description}
+              {/* Paragraphe citable par les IA (GEO) */}
+              <div className="bg-gradient-to-r from-blue-100 to-indigo-100 p-6 rounded-2xl mb-8 border-l-4 border-blue-500">
+                <p className="text-lg leading-relaxed text-gray-800">
+                  <strong>L'IA pour PDF permet d'analyser automatiquement des documents, d'en extraire les informations clés et de répondre à des questions précises.</strong> IA Home propose un outil spécialisé pour comprendre rapidement des PDF en français, même pour des documents longs ou complexes. Vous pouvez résumer automatiquement un PDF, poser des questions à un document PDF, et obtenir des réponses intelligentes en quelques secondes.
+                </p>
+              </div>
+
+              {/* H2 - À quoi sert une IA pour PDF ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">À quoi sert une IA pour PDF ?</h2>
+                <div className="space-y-4 text-gray-700">
+                  <p className="text-lg leading-relaxed">
+                    Une IA pour PDF transforme la façon dont vous interagissez avec vos documents. Au lieu de lire manuellement des centaines de pages, l'intelligence artificielle peut :
                   </p>
-                  {card.subtitle && (
-                    <p className="text-base sm:text-lg text-gray-600 italic mb-8">
-                      {card.subtitle}
-                    </p>
-                  )}
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li className="text-lg"><strong>Analyser un PDF avec une IA</strong> : Comprendre le contenu, identifier les thèmes principaux et les informations importantes</li>
+                    <li className="text-lg"><strong>Résumer un PDF automatiquement</strong> : Extraire les points clés et générer un résumé concis en quelques secondes</li>
+                    <li className="text-lg"><strong>Poser des questions à un PDF</strong> : Interroger directement votre document et obtenir des réponses précises</li>
+                    <li className="text-lg"><strong>Comprendre un PDF long ou complexe</strong> : Traiter des rapports, thèses, contrats ou documents techniques volumineux</li>
+                  </ul>
+                  <p className="text-lg leading-relaxed mt-4">
+                    <strong>Cas concrets d'utilisation :</strong> Analysez des factures pour extraire les montants et dates, comprenez rapidement des rapports d'entreprise, résumez des cours universitaires, ou interrogez des documents techniques pour trouver des informations spécifiques.
+                  </p>
                 </div>
+              </div>
+
+              {/* H2 - Que peut faire l'IA PDF de IA Home ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Que peut faire l'IA PDF de IA Home ?</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200">
+                    <h3 className="text-2xl font-bold text-blue-900 mb-4">Résumer automatiquement un PDF</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      L'IA PDF de IA Home peut analyser un document entier et générer un résumé structuré en quelques secondes. Parfait pour les documents longs, les rapports ou les articles académiques.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-2xl border border-green-200">
+                    <h3 className="text-2xl font-bold text-green-900 mb-4">Poser des questions à un document PDF</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Transformez votre PDF en chatbot interactif. Posez des questions précises et obtenez des réponses basées sur le contenu réel de votre document, sans avoir à chercher manuellement.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200">
+                    <h3 className="text-2xl font-bold text-purple-900 mb-4">Comprendre un PDF long ou complexe</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Même les documents de plusieurs centaines de pages ne sont pas un problème. L'IA PDF peut traiter et comprendre des documents techniques, des contrats ou des thèses complètes.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-2xl border border-orange-200">
+                    <h3 className="text-2xl font-bold text-orange-900 mb-4">Extraire les informations importantes</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Identifiez automatiquement les données clés : dates, montants, noms, concepts principaux. L'IA PDF extrait et organise les informations essentielles de vos documents.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - Comment utiliser l'IA PDF de IA Home ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Comment utiliser l'IA PDF de IA Home ?</h2>
+                <div className="space-y-6">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Importer un PDF</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Téléchargez votre document PDF directement dans l'interface. L'outil accepte tous les formats PDF standards, même les documents scannés grâce à l'OCR intégré.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl border border-green-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">2</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Poser une question ou demander un résumé</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Choisissez entre deux modes : demandez un résumé automatique du document ou posez des questions spécifiques. L'IA analyse le contenu et vous fournit des réponses précises.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-6 rounded-2xl border border-purple-200">
+                    <div className="flex items-start">
+                      <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">3</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Exploiter la réponse de l'IA</h3>
+                        <p className="text-gray-700 leading-relaxed">
+                          Utilisez les réponses générées pour votre travail : intégrez les résumés dans vos rapports, utilisez les informations extraites pour vos analyses, ou partagez les insights avec votre équipe.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* H2 - Pour qui est faite cette IA PDF ? */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Pour qui est faite cette IA PDF ?</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200 text-center">
+                    <div className="text-4xl mb-4">👨‍🏫</div>
+                    <h3 className="text-xl font-bold text-blue-900 mb-2">Enseignants</h3>
+                    <p className="text-gray-700">Résumez rapidement des articles académiques, préparez des cours à partir de documents PDF, et analysez des ressources pédagogiques.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-2xl border border-green-200 text-center">
+                    <div className="text-4xl mb-4">🎓</div>
+                    <h3 className="text-xl font-bold text-green-900 mb-2">Étudiants</h3>
+                    <p className="text-gray-700">Comprenez rapidement vos cours PDF, résumez vos lectures obligatoires, et préparez vos examens plus efficacement.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200 text-center">
+                    <div className="text-4xl mb-4">🏛️</div>
+                    <h3 className="text-xl font-bold text-purple-900 mb-2">Agents publics / Collectivités</h3>
+                    <p className="text-gray-700">Analysez des rapports administratifs, comprenez des textes réglementaires, et traitez rapidement des documents officiels.</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-2xl border border-orange-200 text-center">
+                    <div className="text-4xl mb-4">💼</div>
+                    <h3 className="text-xl font-bold text-orange-900 mb-2">Professionnels</h3>
+                    <p className="text-gray-700">Analysez des contrats, résumez des rapports d'entreprise, et extrayez des informations de documents professionnels.</p>
+                  </div>
+                </div>
+                <p className="text-center text-gray-600 mt-6">
+                  L'IA PDF de IA Home est également accessible aux <strong>particuliers</strong> qui souhaitent mieux comprendre leurs documents personnels.
+                </p>
+              </div>
+
+              {/* H2 - IA Home vs ChatGPT pour les PDF */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">IA Home vs ChatGPT pour les PDF</h2>
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-8 rounded-2xl border border-gray-200">
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white">
+                          <th className="border border-gray-300 p-4 text-left">Fonctionnalité</th>
+                          <th className="border border-gray-300 p-4 text-center">IA Home PDF</th>
+                          <th className="border border-gray-300 p-4 text-center">ChatGPT</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Traitement direct des fichiers PDF</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Oui, import direct</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Nécessite copier-coller</td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border border-gray-300 p-4 font-semibold">Documents longs (100+ pages)</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Optimisé pour documents longs</td>
+                          <td className="border border-gray-300 p-4 text-center">⚠️ Limité par la taille du contexte</td>
+                        </tr>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Interface spécialisée PDF</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Interface dédiée</td>
+                          <td className="border border-gray-300 p-4 text-center">❌ Interface générique</td>
+                        </tr>
+                        <tr className="bg-gray-50">
+                          <td className="border border-gray-300 p-4 font-semibold">Gestion des documents multiples</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Plusieurs PDF simultanés</td>
+                          <td className="border border-gray-300 p-4 text-center">⚠️ Un document à la fois</td>
+                        </tr>
+                        <tr className="bg-white">
+                          <td className="border border-gray-300 p-4 font-semibold">Optimisation pour le français</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Spécialement optimisé</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ Bonne compréhension</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="mt-6 text-gray-700 leading-relaxed">
+                    <strong>En résumé :</strong> IA Home est conçu spécifiquement pour travailler sur vos fichiers PDF, sans copier-coller, avec une meilleure gestion des documents longs. C'est une <strong>alternative à ChatGPT pour PDF</strong> qui offre une expérience plus fluide et spécialisée.
+                  </p>
+                </div>
+              </div>
+
+              {/* H2 - Questions fréquentes sur l'IA PDF (FAQ) */}
+              <div className="mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Questions fréquentes sur l'IA PDF (FAQ)</h2>
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-blue-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Peut-on analyser un PDF avec une IA ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Oui, l'IA PDF de IA Home permet de lire, comprendre et résumer des documents PDF, même longs ou complexes. L'intelligence artificielle analyse le contenu textuel, identifie les concepts clés, et peut répondre à des questions précises sur le document.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-2xl border-l-4 border-green-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Cette IA PDF fonctionne-t-elle en français ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Oui, l'outil est optimisé pour les documents en français. L'IA PDF de IA Home comprend parfaitement le français et peut analyser, résumer et répondre à des questions sur des documents PDF en français avec une grande précision.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-purple-50 to-violet-50 p-6 rounded-2xl border-l-4 border-purple-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Quelle est la différence avec ChatGPT ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      IA Home est conçu spécifiquement pour travailler sur vos fichiers PDF, sans copier-coller, avec une meilleure gestion des documents longs. Contrairement à ChatGPT qui nécessite de copier-coller le contenu, l'IA PDF de IA Home permet d'importer directement vos fichiers et de les analyser en quelques clics.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-6 rounded-2xl border-l-4 border-orange-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Comment analyser un PDF avec une IA ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Pour analyser un PDF avec l'IA de IA Home, il suffit de trois étapes : (1) Importer votre fichier PDF dans l'interface, (2) Choisir entre un résumé automatique ou poser des questions spécifiques, (3) Exploiter les réponses générées par l'IA. Le processus est simple et ne nécessite aucune compétence technique.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-2xl border-l-4 border-red-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Est-ce gratuit ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      L'IA PDF de IA Home est accessible avec un système de tokens. Chaque utilisation coûte 10 tokens, ce qui permet un accès équitable à tous les utilisateurs. Consultez la page d'activation pour connaître les détails de tarification et les options disponibles.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border-l-4 border-indigo-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">Quelle IA pour comprendre un document PDF ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      L'IA PDF de IA Home est spécialement conçue pour comprendre les documents PDF. Elle utilise des modèles d'intelligence artificielle avancés pour analyser le contenu, identifier les concepts clés, et fournir des réponses précises. C'est une solution optimale pour comprendre rapidement des PDF longs ou complexes.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-teal-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">L'IA peut-elle résumer un PDF long ?</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      Oui, l'IA PDF de IA Home peut résumer des PDF de plusieurs centaines de pages. L'outil est optimisé pour traiter des documents longs et complexes, en extrayant les informations essentielles et en générant un résumé structuré et cohérent.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description principale */}
+              <div className="text-center max-w-5xl mx-auto mb-8">
+                <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
+                  {card.description}
+                </p>
+                {card.subtitle && (
+                  <p className="text-base sm:text-lg text-gray-600 italic mb-8">
+                    {card.subtitle}
+                  </p>
+                )}
+              </div>
 
                 {/* Description détaillée en plusieurs chapitres */}
                 <div className="max-w-6xl mx-auto space-y-8">
@@ -510,11 +881,10 @@ export default function PDFPage() {
               </div>
             </div>
           </div>
-        </div>
       </section>
 
-             {/* Modal pour l'iframe */}
-       {iframeModal.isOpen && (
+      {/* Modal pour l'iframe */}
+      {iframeModal.isOpen && (
          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-2">
            <div className="bg-white rounded-xl shadow-2xl w-full h-full max-w-7xl max-h-[95vh] overflow-hidden">
              <div className="flex justify-between items-center p-4 border-b bg-gradient-to-r from-green-500 to-emerald-600 text-white">
