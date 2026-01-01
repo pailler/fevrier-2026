@@ -70,6 +70,17 @@ interface UrlCheck {
   service?: Service;
 }
 
+interface ApplicationHealthCheck {
+  module_id: string;
+  module_name: string;
+  url: string | null;
+  isValid: boolean;
+  statusCode?: number;
+  errorMessage?: string;
+  responseTime?: number;
+  isCloudflareError?: boolean;
+}
+
 export default function AdminApplications() {
   const { user, isAuthenticated } = useCustomAuth();
   const [activeMainTab, setActiveMainTab] = useState<'applications' | 'services-admin'>('applications');
@@ -90,6 +101,8 @@ export default function AdminApplications() {
   // Applications state
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const [healthChecks, setHealthChecks] = useState<Record<string, ApplicationHealthCheck>>({});
+  const [checkingHealth, setCheckingHealth] = useState(false);
   
   // Services admin state
   const [activeTab, setActiveTab] = useState<'categories' | 'services' | 'url-checks'>('categories');
@@ -567,6 +580,66 @@ export default function AdminApplications() {
     }
   };
 
+  const handleCheckApplicationsHealth = async (moduleId?: string) => {
+    setCheckingHealth(true);
+    try {
+      // Vérifier que l'utilisateur est connecté
+      if (!user || !isAuthenticated) {
+        alert('Vous devez être connecté pour effectuer cette action');
+        setCheckingHealth(false);
+        return;
+      }
+
+      // Les cookies de session seront automatiquement envoyés avec la requête
+      const res = await fetch('/api/admin/applications/check-health', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include', // Inclure les cookies
+        body: JSON.stringify({
+          module_id: moduleId,
+          check_all: !moduleId
+        })
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        if (data.results) {
+          // Mettre à jour les résultats de santé pour toutes les applications
+          const healthMap: Record<string, ApplicationHealthCheck> = {};
+          data.results.forEach((result: ApplicationHealthCheck) => {
+            healthMap[result.module_id] = result;
+          });
+          setHealthChecks(healthMap);
+        } else {
+          // Résultat pour une seule application
+          setHealthChecks(prev => ({
+            ...prev,
+            [data.module_id]: {
+              module_id: data.module_id,
+              module_name: data.module_name,
+              url: data.url,
+              isValid: data.isValid,
+              statusCode: data.statusCode,
+              errorMessage: data.errorMessage,
+              responseTime: data.responseTime,
+              isCloudflareError: data.isCloudflareError
+            }
+          }));
+        }
+      } else {
+        alert('Erreur: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('Erreur lors de la vérification de la santé des applications');
+    } finally {
+      setCheckingHealth(false);
+    }
+  };
+
   const startEditCategory = (category: Category) => {
     setEditingCategory(category);
     setCategoryForm({
@@ -630,6 +703,8 @@ export default function AdminApplications() {
       return '🏠';
     } else if (appName.includes('administration')) {
       return '🏛️';
+    } else if (appName.includes('voice') || appName.includes('isolation') || appName.includes('vocale')) {
+      return '🎤';
     }
     return '📱';
   };
@@ -688,6 +763,56 @@ export default function AdminApplications() {
           {/* Onglet Applications disponibles */}
           {activeMainTab === 'applications' && (
             <>
+              {/* Section de vérification de santé */}
+              <div className="mb-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200 p-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      🔍 Vérification de santé des applications
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Vérifiez si toutes les applications sont opérationnelles et ne contiennent pas d'erreurs (404, 502, Cloudflare, etc.)
+                    </p>
+                    {Object.keys(healthChecks).length > 0 && (
+                      <div className="flex items-center gap-4 text-sm mt-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-600 font-medium">
+                            ✅ {Object.values(healthChecks).filter(h => h.isValid).length} opérationnelles
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-red-600 font-medium">
+                            ❌ {Object.values(healthChecks).filter(h => !h.isValid).length} en erreur
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-600">
+                            Total: {Object.keys(healthChecks).length} vérifiées
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleCheckApplicationsHealth()}
+                    disabled={checkingHealth}
+                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium shadow-md hover:shadow-lg transition-all"
+                  >
+                    {checkingHealth ? (
+                      <>
+                        <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Vérification en cours...
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-xl">🔍</span>
+                        Vérifier toutes les applications
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
               {/* Statistiques des applications */}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -814,6 +939,77 @@ export default function AdminApplications() {
                               {application.lastUsedAt ? `Utilisé le ${new Date(application.lastUsedAt).toLocaleDateString('fr-FR')}` : 'Jamais utilisé'}
                             </div>
                           </div>
+
+                          {/* Affichage de l'état de santé */}
+                          {healthChecks[application.id] && (
+                            <div className={`mt-3 p-3 rounded-lg border ${
+                              healthChecks[application.id].isValid
+                                ? 'bg-green-50 border-green-200'
+                                : 'bg-red-50 border-red-200'
+                            }`}>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xl">
+                                    {healthChecks[application.id].isValid ? '✅' : '❌'}
+                                  </span>
+                                  <div>
+                                    <p className="font-medium text-sm">
+                                      {healthChecks[application.id].isValid 
+                                        ? 'Application opérationnelle' 
+                                        : 'Application en erreur'}
+                                    </p>
+                                    {healthChecks[application.id].url && (
+                                      <p className="text-xs text-gray-600 mt-1">
+                                        URL: {healthChecks[application.id].url}
+                                      </p>
+                                    )}
+                                    {healthChecks[application.id].statusCode && (
+                                      <p className="text-xs text-gray-600">
+                                        Status: {healthChecks[application.id].statusCode}
+                                      </p>
+                                    )}
+                                    {healthChecks[application.id].errorMessage && (
+                                      <p className="text-xs text-red-600 mt-1">
+                                        {healthChecks[application.id].errorMessage}
+                                      </p>
+                                    )}
+                                    {healthChecks[application.id].responseTime && (
+                                      <p className="text-xs text-gray-500 mt-1">
+                                        Temps de réponse: {healthChecks[application.id].responseTime}ms
+                                      </p>
+                                    )}
+                                    {healthChecks[application.id].isCloudflareError && (
+                                      <p className="text-xs text-orange-600 mt-1 font-medium">
+                                        ⚠️ Erreur Cloudflare détectée
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={() => handleCheckApplicationsHealth(application.id)}
+                                  disabled={checkingHealth}
+                                  className="text-blue-600 hover:text-blue-800 disabled:opacity-50"
+                                  title="Revérifier cette application"
+                                >
+                                  🔄
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Bouton pour vérifier la santé si pas encore vérifiée */}
+                          {!healthChecks[application.id] && (
+                            <div className="mt-3">
+                              <button
+                                onClick={() => handleCheckApplicationsHealth(application.id)}
+                                disabled={checkingHealth}
+                                className="text-sm text-blue-600 hover:text-blue-800 disabled:opacity-50 flex items-center gap-1"
+                              >
+                                <span>🔍</span>
+                                Vérifier la santé de cette application
+                              </button>
+                            </div>
+                          )}
 
                           {application.activeUsers && application.activeUsers.length > 0 && (
                             <div className="mt-4">

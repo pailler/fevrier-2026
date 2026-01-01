@@ -13,6 +13,7 @@ import QRCodeAccessButton from '../../components/QRCodeAccessButton';
 import PDFAccessButton from '../../components/PDFAccessButton';
 import PsiTransferAccessButton from '../../components/PsiTransferAccessButton';
 import MeetingReportsAccessButton from '../../components/MeetingReportsAccessButton';
+import VoiceIsolationAccessButton from '../../components/VoiceIsolationAccessButton';
 import { TokenActionServiceClient } from '../../utils/tokenActionServiceClient';
 
 interface UserModule {
@@ -799,6 +800,7 @@ export default function EncoursPage() {
       'prompt-generator': 'prompt-generator', // Générateur de prompts -> prompt-generator
       'apprendre-autrement': 'apprendre-autrement', // Apprendre Autrement -> apprendre-autrement
       'ai-detector': 'ai-detector', // Détecteur de Contenu IA -> ai-detector
+      'voice-isolation': 'voice-isolation', // Isolation Vocale -> voice-isolation
     };
 
     // Mapping des slugs vers les URLs directes des applications
@@ -838,6 +840,10 @@ export default function EncoursPage() {
       'ai-detector': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
         ? 'http://localhost:3000/ai-detector'
         : 'https://iahome.fr/ai-detector',
+      // Isolation Vocale : localhost:8100 en dev, voice-isolation.iahome.fr en prod (ou via proxy)
+      'voice-isolation': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+        ? 'http://localhost:8100'
+        : 'https://iahome.fr/voice-isolation',
     };
     
     // Convertir module_id numérique en slug si nécessaire
@@ -859,6 +865,7 @@ export default function EncoursPage() {
       'hunyuan3d': 100,
       'prompt-generator': 100,
       'ai-detector': 100, // Détecteur de Contenu IA -> 100 tokens
+      'voice-isolation': 100, // Isolation Vocale -> 100 tokens
       
       // Applications essentielles (10 tokens)
       'librespeed': 10,
@@ -1597,6 +1604,30 @@ export default function EncoursPage() {
                       {(() => {
                         const moduleId = module.module_id;
                         const moduleTitle = module.module_title;
+                        
+                        // Voice Isolation - application spéciale avec son propre bouton
+                        if (moduleId === 'voice-isolation') {
+                          if (!user) {
+                            console.error('❌ user is null in VoiceIsolationAccessButton');
+                            return null;
+                          }
+                          return (
+                            <VoiceIsolationAccessButton
+                              user={user}
+                              onAccessGranted={(url) => {
+                                console.log(`🔗 ${moduleTitle}: Accès autorisé:`, url);
+                                // Rafraîchir l'historique des tokens après utilisation (une seule fois après 1s)
+                                setTimeout(() => {
+                                  fetchTokenData().catch(() => {});
+                                }, 1000);
+                              }}
+                              onAccessDenied={(reason) => {
+                                console.log(`❌ ${moduleTitle}: Accès refusé:`, reason);
+                                alert(`Accès refusé: ${reason}`);
+                              }}
+                            />
+                          );
+                        }
                         
                         // Applications IA (100 tokens)
                         if (['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui', 'hunyuan3d', 'prompt-generator'].includes(moduleId)) {

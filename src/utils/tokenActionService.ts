@@ -23,7 +23,8 @@ export const TOKEN_COSTS = {
   
   // Applications premium (100 tokens)
   'qrcodes': 100,
-  'home-assistant': 100
+  'home-assistant': 100,
+  'voice-isolation': 100
 } as const;
 
 export type ModuleId = keyof typeof TOKEN_COSTS;

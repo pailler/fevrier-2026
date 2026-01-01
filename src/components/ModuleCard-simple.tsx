@@ -106,7 +106,9 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       return '/images/cogstudio.jpg';
     }
     
-    
+    if (titleLower.includes('voice') || titleLower.includes('isolation') || titleLower.includes('vocale') || titleLower.includes('demucs')) {
+      return '/images/voice-isolation.jpg';
+    }
     
     // Image par défaut
     return imageUrl || '/images/module-visuals/generic-module.svg';
@@ -135,6 +137,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       'whisper': { displayTitle: 'l\'IA transcrit vos fichiers en texte', appName: 'Whisper IA' },
       'ruinedfooocus': { displayTitle: 'Création d\'images IA, simple et précise', appName: 'Ruinedfooocus' },
       'cogstudio': { displayTitle: 'Générez des vidéos IA uniques', appName: 'Cogstudio IA' },
+      'voice-isolation': { displayTitle: 'Séparez les sources audio avec l\'IA', appName: 'Isolation Vocale', description: 'Voix, batterie, basse et autres instruments' },
     };
     
     if (moduleMappings[moduleId]) {
