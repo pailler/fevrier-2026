@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Breadcrumb from '../../../components/Breadcrumb';
 import ModuleActivationButton from '../../../components/ModuleActivationButton';
+import YouTubeEmbed from '../../../components/YouTubeEmbed';
 
 interface Card {
   id: string;
@@ -478,16 +479,11 @@ export default function ComfyUIPage() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Colonne 1 - Vidéo */}
-          <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
-            <iframe
-              className="w-full h-full rounded-2xl"
-              src="https://www.youtube.com/embed/fw_FURLT72M?autoplay=0&rel=0&modestbranding=1"
-              title="Démonstration ComfyUI"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          </div>
+          <YouTubeEmbed
+            videoId="fw_FURLT72M"
+            title="Démonstration ComfyUI"
+            origin="https://iahome.fr"
+          />
           
           {/* Colonne 2 - Système de boutons */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">

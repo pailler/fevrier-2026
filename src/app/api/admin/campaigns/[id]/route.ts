@@ -4,15 +4,16 @@ import { getSupabaseClient } from '@/utils/supabaseService';
 // GET - Récupérer une campagne spécifique
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = getSupabaseClient();
+    const { id } = await params;
     
     const { data: campaign, error } = await supabase
       .from('advertising_campaigns')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (error) {
@@ -36,10 +37,11 @@ export async function GET(
 // PUT - Mettre à jour une campagne
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = getSupabaseClient();
+    const { id } = await params;
     const body = await request.json();
     
     const { data: campaign, error } = await supabase
@@ -48,7 +50,7 @@ export async function PUT(
         ...body,
         updated_at: new Date().toISOString()
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -73,15 +75,16 @@ export async function PUT(
 // DELETE - Supprimer une campagne
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = getSupabaseClient();
+    const { id } = await params;
     
     const { error } = await supabase
       .from('advertising_campaigns')
       .delete()
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) {
       console.error('❌ Erreur suppression campagne:', error);

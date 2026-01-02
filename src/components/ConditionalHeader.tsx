@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import ClientHeader from './ClientHeader';
 
 // Pages où le Header ne doit pas être affiché
-const PAGES_WITHOUT_HEADER = ['/code-learning', '/administration'];
+const PAGES_WITHOUT_HEADER = ['/code-learning', '/administration', '/ai-detector'];
 
 export default function ConditionalHeader() {
   const pathname = usePathname();

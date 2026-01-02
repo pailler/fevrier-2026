@@ -48,6 +48,9 @@ node_modules/
 dist/
 build/
 
+# Cache centralisé des modèles IA (volumineux)
+ai-models-cache/
+
 # Fichiers d'environnement
 .env.local
 .env.production.local

@@ -526,12 +526,16 @@ export default function ApprendreAutrementPage() {
               <p className="text-lg">
                 Cette application propose des activités interactives et amusantes pour apprendre 
                 différemment. Chaque activité est conçue pour être courte, concrète 
-                et adaptée aux enfants avec des besoins spécifiques.
+                et adaptée aux enfants avec des besoins spécifiques. Découvrez plus de 16 activités 
+                éducatives incluant le vocabulaire en images avec synthèse vocale pour enrichir 
+                le langage de votre enfant.
               </p>
               <div className="bg-purple-50 border-l-4 border-purple-500 p-4 rounded">
                 <p className="font-semibold text-purple-900 mb-2">✨ Fonctionnalités :</p>
                 <ul className="list-disc list-inside text-purple-800 space-y-1">
-                  <li>15 activités progressives</li>
+                  <li>16+ activités progressives et variées</li>
+                  <li>Vocabulaire en images avec 100 mots essentiels (5 ans)</li>
+                  <li>Synthèse vocale pour apprendre la prononciation</li>
                   <li>Interface colorée et ludique</li>
                   <li>Système de progression avec récompenses</li>
                   <li>Encouragement vocal personnalisé</li>

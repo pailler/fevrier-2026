@@ -73,7 +73,7 @@ export default function ApprendreAutrementCardPage() {
         "price": "10",
         "priceCurrency": "TOKENS"
       },
-      "description": "Application éducative interactive pour enfants avec besoins spécifiques. 15 activités progressives, système de récompenses, encouragement vocal personnalisé, paramètres d'accessibilité adaptables.",
+      "description": "Application éducative interactive pour enfants avec besoins spécifiques. Activités progressives, système de récompenses, encouragement vocal personnalisé, paramètres d'accessibilité adaptables.",
       "url": "https://iahome.fr/card/apprendre-autrement",
       "aggregateRating": {
         "@type": "AggregateRating",
@@ -81,7 +81,7 @@ export default function ApprendreAutrementCardPage() {
         "ratingCount": "100"
       },
       "featureList": [
-        "15 activités progressives",
+        "Activités progressives",
         "Système de récompenses avec badges et niveaux",
         "Encouragement vocal personnalisé",
         "Paramètres d'accessibilité adaptables",
@@ -100,7 +100,7 @@ export default function ApprendreAutrementCardPage() {
           "name": "Qu'est-ce qu'Apprendre Autrement ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Apprendre Autrement est une application éducative interactive conçue pour les enfants avec des besoins spécifiques. Elle propose 15 activités progressives, un système de récompenses avec badges et niveaux, et des paramètres d'accessibilité adaptables pour permettre à chaque enfant d'apprendre à son rythme de manière ludique et motivante."
+            "text": "Apprendre Autrement est une application éducative interactive conçue pour les enfants avec des besoins spécifiques. Elle propose des activités progressives, un système de récompenses avec badges et niveaux, et des paramètres d'accessibilité adaptables pour permettre à chaque enfant d'apprendre à son rythme de manière ludique et motivante."
           }
         },
         {
@@ -239,7 +239,7 @@ export default function ApprendreAutrementCardPage() {
                 ÉDUCATION ADAPTÉE
               </span>
               <p className="text-xl text-white/90 mb-6">
-                Apprendre Autrement est une application éducative interactive conçue pour les enfants avec des besoins spécifiques. Avec 15 activités progressives, un système de récompenses, et des paramètres d'accessibilité adaptables, chaque enfant peut apprendre à son rythme de manière ludique et motivante.
+                Apprendre Autrement est une application éducative interactive conçue pour les enfants avec des besoins spécifiques. Avec des activités progressives, un système de récompenses, et des paramètres d'accessibilité adaptables, chaque enfant peut apprendre à son rythme de manière ludique et motivante.
               </p>
               
               <div className="flex flex-wrap gap-3 mb-6">
@@ -277,6 +277,143 @@ export default function ApprendreAutrementCardPage() {
         </div>
       </section>
 
+      {/* Section principale - Description (en haut de page) */}
+      <section className="max-w-7xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+          {/* Colonne 1 - Description */}
+          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">
+              À propos de l'application
+            </h2>
+            <div className="space-y-4 text-gray-700">
+              <p className="text-lg">
+                Cette application propose des activités interactives et amusantes pour apprendre 
+                différemment. Chaque activité est conçue pour être courte, concrète 
+                et adaptée aux enfants avec des besoins spécifiques.
+              </p>
+              <div className="bg-purple-50 border-l-4 border-purple-500 p-4 rounded">
+                <p className="font-semibold text-purple-900 mb-2">✨ Fonctionnalités :</p>
+                <ul className="list-disc list-inside text-purple-800 space-y-1">
+                  <li>Activités progressives</li>
+                  <li>Interface colorée et ludique</li>
+                  <li>Système de progression avec récompenses</li>
+                  <li>Encouragement vocal personnalisé</li>
+                  <li>Paramètres d'accessibilité adaptables</li>
+                  <li>10 tokens par accès</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+    
+          {/* Colonne 2 - Accès */}
+          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8">
+            <div className="text-center mb-8">
+              <div className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
+                <div className="text-4xl font-bold mb-1">
+                  10 tokens
+                </div>
+                <div className="text-sm opacity-90">
+                  par accès
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              {isModuleActivated && (
+                <div className="w-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
+                  <div className="flex items-center justify-center space-x-3 text-green-800 mb-4">
+                    <span className="text-2xl">✅</span>
+                    <div className="text-center">
+                      <p className="font-semibold">Service déjà activé !</p>
+                      <p className="text-sm opacity-80">Pour y accéder, cliquez sur Mes Applis activées</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-center">
+                    <Link
+                      href="/encours"
+                      className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
+                    >
+                      <span className="mr-2">📱</span>
+                      Aller à Mes Applications
+                    </Link>
+                  </div>
+                </div>
+              )}
+
+              {!isModuleActivated && (
+                <div className="w-full">
+                  <button
+                    onClick={async () => {
+                      if (isAuthenticated && user) {
+                        // Utilisateur connecté : activer apprendre-autrement via API
+                        try {
+                          setLoading(true);
+                          const response = await fetch('/api/activate-apprendre-autrement', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              userId: user.id,
+                              email: user.email
+                            }),
+                          });
+
+                          if (response.ok) {
+                            const data = await response.json();
+                            if (data.success) {
+                              console.log('✅ Apprendre Autrement activé avec succès');
+                              setAlreadyActivatedModules(prev => [...prev, moduleId]);
+                              router.push('/encours'); // Redirect to /encours
+                            } else {
+                              console.error('❌ Erreur activation Apprendre Autrement:', data.error);
+                              alert('Erreur lors de l\'activation: ' + (data.error || 'Erreur inconnue'));
+                            }
+                          } else {
+                            const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
+                            console.error('❌ Erreur réponse API:', response.status, errorData);
+                            alert('Erreur lors de l\'activation: ' + (errorData.error || 'Erreur inconnue'));
+                          }
+                        } catch (error) {
+                          console.error('❌ Erreur lors de l\'activation de Apprendre Autrement:', error);
+                          alert('Erreur lors de l\'activation');
+                        } finally {
+                          setLoading(false);
+                        }
+                      } else {
+                        // Utilisateur non connecté : aller à la page de connexion puis retour à la page actuelle
+                        console.log('🔒 Accès Apprendre Autrement - Redirection vers connexion');
+                        router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}`)}`);
+                      }
+                    }}
+                    disabled={loading || checkingActivation}
+                    className={`w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3
+                      ${loading || checkingActivation
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1'
+                      }`}
+                  >
+                    {loading || checkingActivation ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                        <span>Activation en cours...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-xl">🌈</span>
+                        <span>
+                          {isAuthenticated && user ? 'Activez Apprendre Autrement (10 tokens)' : 'Connectez-vous pour activer (10 tokens)'}
+                        </span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Section SEO optimisée - Contenu structuré */}
       <section className="bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 py-8 w-full relative overflow-hidden">
         <div className="w-full px-4 sm:px-6 lg:px-8 relative z-10">
@@ -286,7 +423,7 @@ export default function ApprendreAutrementCardPage() {
               {/* Paragraphe citable par les IA (GEO) */}
               <div className="bg-gradient-to-r from-purple-100 to-pink-100 p-6 rounded-2xl mb-8 border-l-4 border-purple-500">
                 <p className="text-lg leading-relaxed text-gray-800">
-                  <strong>Apprendre Autrement est une application éducative interactive conçue pour les enfants avec des besoins spécifiques.</strong> Avec 15 activités progressives, un système de récompenses avec badges et niveaux, et des paramètres d'accessibilité adaptables, chaque enfant peut apprendre à son rythme de manière ludique et motivante. L'application propose des activités multi-sensorielles avec encouragement vocal personnalisé, parfaite pour les enfants avec troubles d'apprentissage, autisme, TDAH, ou dyslexie.
+                  <strong>Apprendre Autrement est une application éducative interactive conçue pour les enfants avec des besoins spécifiques.</strong> Avec des activités progressives, un système de récompenses avec badges et niveaux, et des paramètres d'accessibilité adaptables, chaque enfant peut apprendre à son rythme de manière ludique et motivante. L'application propose des activités multi-sensorielles avec encouragement vocal personnalisé, parfaite pour les enfants avec troubles d'apprentissage, autisme, TDAH, ou dyslexie.
                 </p>
               </div>
 
@@ -315,7 +452,7 @@ export default function ApprendreAutrementCardPage() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                   <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200">
-                    <h3 className="text-2xl font-bold text-purple-900 mb-4">15 activités progressives</h3>
+                    <h3 className="text-2xl font-bold text-purple-900 mb-4">Activités progressives</h3>
                     <p className="text-gray-700 leading-relaxed">
                       Des activités éducatives interactives conçues pour être courtes, concrètes et adaptées. Chaque activité est progressive et permet à l'enfant de développer ses compétences étape par étape.
                     </p>
@@ -471,7 +608,7 @@ export default function ApprendreAutrementCardPage() {
                   <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-purple-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Qu'est-ce qu'Apprendre Autrement ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Apprendre Autrement est une application éducative interactive conçue pour les enfants avec des besoins spécifiques. Elle propose 15 activités progressives, un système de récompenses avec badges et niveaux, et des paramètres d'accessibilité adaptables pour permettre à chaque enfant d'apprendre à son rythme de manière ludique et motivante.
+                      Apprendre Autrement est une application éducative interactive conçue pour les enfants avec des besoins spécifiques. Elle propose des activités progressives, un système de récompenses avec badges et niveaux, et des paramètres d'accessibilité adaptables pour permettre à chaque enfant d'apprendre à son rythme de manière ludique et motivante.
                     </p>
                   </div>
                   
@@ -519,142 +656,6 @@ export default function ApprendreAutrementCardPage() {
                 </div>
               </div>
 
-              {/* Section principale - Description */}
-              <div className="max-w-7xl mx-auto px-6 py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                  {/* Colonne 1 - Description */}
-                  <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                      À propos de l'application
-                    </h2>
-                    <div className="space-y-4 text-gray-700">
-                      <p className="text-lg">
-                        Cette application propose des activités interactives et amusantes pour apprendre 
-                        différemment. Chaque activité est conçue pour être courte, concrète 
-                        et adaptée aux enfants avec des besoins spécifiques.
-                      </p>
-                      <div className="bg-purple-50 border-l-4 border-purple-500 p-4 rounded">
-                        <p className="font-semibold text-purple-900 mb-2">✨ Fonctionnalités :</p>
-                        <ul className="list-disc list-inside text-purple-800 space-y-1">
-                          <li>15 activités progressives</li>
-                          <li>Interface colorée et ludique</li>
-                          <li>Système de progression avec récompenses</li>
-                          <li>Encouragement vocal personnalisé</li>
-                          <li>Paramètres d'accessibilité adaptables</li>
-                          <li>10 tokens par accès</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-          
-          {/* Colonne 2 - Accès */}
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8">
-            <div className="text-center mb-8">
-              <div className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                <div className="text-4xl font-bold mb-1">
-                  10 tokens
-                </div>
-                <div className="text-sm opacity-90">
-                  par accès
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              {isModuleActivated && (
-                <div className="w-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
-                  <div className="flex items-center justify-center space-x-3 text-green-800 mb-4">
-                    <span className="text-2xl">✅</span>
-                    <div className="text-center">
-                      <p className="font-semibold">Service déjà activé !</p>
-                      <p className="text-sm opacity-80">Pour y accéder, cliquez sur Mes Applis activées</p>
-                    </div>
-                  </div>
-                  <div className="mt-3 text-center">
-                    <Link
-                      href="/encours"
-                      className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
-                    >
-                      <span className="mr-2">📱</span>
-                      Aller à Mes Applications
-                    </Link>
-                  </div>
-                </div>
-              )}
-
-              {!isModuleActivated && (
-                <div className="w-full">
-                  <button
-                    onClick={async () => {
-                      if (isAuthenticated && user) {
-                        // Utilisateur connecté : activer apprendre-autrement via API
-                        try {
-                          setLoading(true);
-                          const response = await fetch('/api/activate-apprendre-autrement', {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                              userId: user.id,
-                              email: user.email
-                            }),
-                          });
-
-                          if (response.ok) {
-                            const data = await response.json();
-                            if (data.success) {
-                              console.log('✅ Apprendre Autrement activé avec succès');
-                              setAlreadyActivatedModules(prev => [...prev, moduleId]);
-                              router.push('/encours'); // Redirect to /encours
-                            } else {
-                              console.error('❌ Erreur activation Apprendre Autrement:', data.error);
-                              alert('Erreur lors de l\'activation: ' + (data.error || 'Erreur inconnue'));
-                            }
-                          } else {
-                            const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
-                            console.error('❌ Erreur réponse API:', response.status, errorData);
-                            alert('Erreur lors de l\'activation: ' + (errorData.error || 'Erreur inconnue'));
-                          }
-                        } catch (error) {
-                          console.error('❌ Erreur lors de l\'activation de Apprendre Autrement:', error);
-                          alert('Erreur lors de l\'activation');
-                        } finally {
-                          setLoading(false);
-                        }
-                      } else {
-                        // Utilisateur non connecté : aller à la page de connexion puis retour à la page actuelle
-                        console.log('🔒 Accès Apprendre Autrement - Redirection vers connexion');
-                        router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}`)}`);
-                      }
-                    }}
-                    disabled={loading || checkingActivation}
-                    className={`w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3
-                      ${loading || checkingActivation
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1'
-                      }`}
-                  >
-                    {loading || checkingActivation ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                        <span>Activation en cours...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-xl">🌈</span>
-                        <span>
-                          {isAuthenticated && user ? 'Activez Apprendre Autrement (10 tokens)' : 'Connectez-vous pour activer (10 tokens)'}
-                        </span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

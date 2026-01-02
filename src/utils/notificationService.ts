@@ -94,6 +94,16 @@ export class NotificationService {
   }
 
   /**
+   * Envoyer une notification de fin de maintenance
+   */
+  async sendMaintenanceCompletedNotification(userEmail: string, userName: string): Promise<boolean> {
+    return this.emailService.sendNotificationEmail('maintenance_completed', userEmail, {
+      user_name: userName,
+      completion_date: new Date().toLocaleString('fr-FR')
+    });
+  }
+
+  /**
    * Vérifier si le service de notifications est configuré
    */
   isConfigured(): boolean {

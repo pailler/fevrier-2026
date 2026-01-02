@@ -23,7 +23,7 @@ export default function Header() {
   const isInIframe = useIframeDetection();
 
   // Pages où le Header ne doit pas être affiché
-  const PAGES_WITHOUT_HEADER = ['/code-learning', '/administration'];
+  const PAGES_WITHOUT_HEADER = ['/code-learning', '/administration', '/ai-detector'];
   
   // Vérifier si le Header doit être masqué
   const shouldHideHeader = pathname && PAGES_WITHOUT_HEADER.some(page => 

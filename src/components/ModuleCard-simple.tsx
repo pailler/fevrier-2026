@@ -160,7 +160,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       
       {/* Image du module - Cliquable */}
       <Link href={`/card/${module.id}`} className="block">
-        <div className="relative h-48 bg-gradient-to-br from-blue-50 to-indigo-100 cursor-pointer group overflow-hidden">
+        <div className={`relative h-48 cursor-pointer group overflow-hidden ${
+          module.id === 'voice-isolation' || module.title?.toLowerCase().includes('isolation vocale') || module.title?.toLowerCase().includes('voice isolation')
+            ? 'bg-gradient-to-br from-purple-100 via-pink-100 to-indigo-100'
+            : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+        }`}>
           {module.youtube_url && (
             <div className="absolute inset-0 flex items-center justify-center z-10">
               <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
@@ -171,19 +175,35 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             </div>
           )}
           
-          {/* Image simple */}
-          <img 
-            src={imageUrl} 
-            alt={module.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-          />
+          {/* Style spécial pour Voice Isolation : cercle blanc avec symbole microphone */}
+          {(module.id === 'voice-isolation' || module.title?.toLowerCase().includes('isolation vocale') || module.title?.toLowerCase().includes('voice isolation')) && !module.youtube_url ? (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-16 h-16 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                  <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                </svg>
+              </div>
+            </div>
+          ) : (
+            /* Image simple pour les autres modules */
+            <img 
+              src={imageUrl} 
+              alt={module.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
+          )}
           
           {/* Nom de l'application et prix en haut à droite */}
           <div className="absolute top-3 right-3 flex flex-col gap-2 z-20">
             {/* Nom de l'application */}
             {moduleInfo?.appName && (
-              <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+              <span className={`text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg ${
+                module.id === 'voice-isolation' || module.title?.toLowerCase().includes('isolation vocale') || module.title?.toLowerCase().includes('voice isolation')
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-600'
+                  : 'bg-gradient-to-r from-blue-500 to-purple-600'
+              }`}>
                 {moduleInfo.appName}
               </span>
             )}

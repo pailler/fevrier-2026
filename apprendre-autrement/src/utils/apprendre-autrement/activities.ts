@@ -251,6 +251,34 @@ export const activities: Activity[] = [
     categoryColor: 'bg-amber-100 text-amber-800',
     difficulty: 'facile',
     objectives: ['Reconnaître les cris d\'animaux', 'Associer son et image', 'Développer l\'écoute']
+  },
+  {
+    id: 'vocabulaire-images',
+    title: 'Vocabulaire en Images',
+    description: 'Clique sur les images pour entendre les 100 mots les plus utilisés par les enfants de 5 ans',
+    category: 'Vocabulaire',
+    skill: 'Langage',
+    icon: '🖼️',
+    duration: '10 min',
+    type: 'visual',
+    colorGradient: 'from-violet-400 to-fuchsia-500',
+    categoryColor: 'bg-violet-100 text-violet-800',
+    difficulty: 'facile',
+    objectives: ['Enrichir le vocabulaire', 'Associer image et mot', 'Développer la prononciation', 'Apprendre les 100 mots essentiels']
+  },
+  {
+    id: 'puzzle',
+    title: 'Puzzle',
+    description: 'Assemble les pièces du puzzle pour reconstituer l\'image complète',
+    category: 'Logique',
+    skill: 'Observation',
+    icon: '🧩',
+    duration: '8 min',
+    type: 'puzzle',
+    colorGradient: 'from-cyan-400 to-blue-500',
+    categoryColor: 'bg-cyan-100 text-cyan-800',
+    difficulty: 'moyen',
+    objectives: ['Développer la logique spatiale', 'Améliorer la concentration', 'Reconnaître les formes', 'Assembler des pièces']
   }
 ];
 

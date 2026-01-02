@@ -112,7 +112,8 @@ export default function AdminUsers() {
             status = 'suspended';
           } else if (!isAdmin && daysSinceLastLogin && daysSinceLastLogin > 60) {
             // Les admins sont toujours considérés comme actifs s'ils ont is_active: true
-            // Seuls les utilisateurs normaux sont marqués inactifs après 60 jours
+            // Seuls les utilisateurs normaux sont marqués inactifs après 2 mois (60 jours)
+            // Note: La désactivation automatique se fait après 2 mois exactement via l'API
             status = 'inactive';
           } else {
             status = 'active';
@@ -409,24 +410,66 @@ export default function AdminUsers() {
         </div>
       </div>
 
-      {/* Section Nombre total d'utilisateurs - Stylée comme les tokens */}
-      <div className="bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 rounded-2xl shadow-2xl border-4 border-white overflow-hidden">
-        <div className="p-6">
+      {/* Statistiques */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
-                <span className="text-4xl">👥</span>
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-white mb-1">Communauté IAHome</h2>
-                <p className="text-green-100 text-sm">Nombre total d'utilisateurs</p>
-              </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">Total utilisateurs</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{users.length}</p>
             </div>
-            <div className="text-right">
-              <div className="flex items-baseline space-x-2">
-                <p className="text-5xl font-bold text-white">{users.length.toLocaleString('fr-FR')}</p>
-                <p className="text-lg text-green-100 font-medium">utilisateurs</p>
-              </div>
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Utilisateurs actifs</p>
+              <p className="text-3xl font-bold text-green-600 mt-2">
+                {users.filter(u => u.status === 'active').length}
+              </p>
+            </div>
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Sans modules activés</p>
+              <p className="text-3xl font-bold text-orange-600 mt-2">
+                {users.filter(u => u.modules.length === 0).length}
+              </p>
+            </div>
+            <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Au moins 2 modules activés</p>
+              <p className="text-3xl font-bold text-purple-600 mt-2">
+                {users.filter(u => u.modules.length >= 2).length}
+              </p>
+            </div>
+            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
             </div>
           </div>
         </div>
@@ -444,7 +487,7 @@ export default function AdminUsers() {
               placeholder="Rechercher par nom ou email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900"
             />
           </div>
           
@@ -455,7 +498,7 @@ export default function AdminUsers() {
             <select
               value={filterRole}
               onChange={(e) => setFilterRole(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900"
             >
               <option value="all">Tous les rôles</option>
               <option value="admin">Administrateur</option>
@@ -470,7 +513,7 @@ export default function AdminUsers() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900"
             >
               <option value="all">Tous les statuts</option>
               <option value="active">Actif</option>
@@ -539,10 +582,9 @@ export default function AdminUsers() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-wrap gap-1">
                       {user.modules.length > 0 ? (
-                        // Dédupliquer les modules et utiliser une clé unique
-                        Array.from(new Set(user.modules)).map((module, index) => (
+                        user.modules.map((module) => (
                           <span
-                            key={`${user.id}-${module}-${index}`}
+                            key={module}
                             className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
                           >
                             {module}

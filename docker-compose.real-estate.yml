@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  real-estate-app:
+    build:
+      context: ./immo
+      dockerfile: Dockerfile
+    container_name: real-estate-app
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - HOSTNAME=0.0.0.0
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-https://xemtoyzcihmncbrlsmhr.supabase.co}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - CRON_SECRET=${CRON_SECRET}
+    env_file:
+      - ./immo/env.production.local
+    # Ne pas exposer le port publiquement, seulement via Traefik
+    expose:
+      - "3001"
+    volumes:
+      - ./immo/logs:/app/logs
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - iahome-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3001/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.real-estate.rule=Host(`immo.regispailler.fr`)"
+      - "traefik.http.routers.real-estate.entrypoints=websecure,web"
+      - "traefik.http.routers.real-estate.tls=true"
+      - "traefik.http.routers.real-estate.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.real-estate.middlewares=real-estate-headers,real-estate-compress"
+      - "traefik.http.services.real-estate.loadbalancer.server.port=3001"
+      - "traefik.http.routers.real-estate-http.rule=Host(`immo.regispailler.fr`)"
+      - "traefik.http.routers.real-estate-http.entrypoints=web"
+      - "traefik.http.routers.real-estate-http.middlewares=real-estate-redirect"
+      - "traefik.http.middlewares.real-estate-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.real-estate-redirect.redirectscheme.permanent=true"
+      - "traefik.http.middlewares.real-estate-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.real-estate-compress.compress=true"
+
+networks:
+  iahome-network:
+    external: true

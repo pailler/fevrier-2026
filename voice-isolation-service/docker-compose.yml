@@ -1,0 +1,30 @@
+services:
+  voice-isolation:
+    build: .
+    container_name: voice-isolation-service
+    restart: unless-stopped
+    ports:
+      - "8100:7860"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+      - ../ai-models-cache/torch:/root/.cache/torch
+    environment:
+      - CUDA_VISIBLE_DEVICES=0  # Utiliser GPU si disponible, sinon CPU
+      - GRADIO_SERVER_NAME=0.0.0.0
+      - GRADIO_SERVER_PORT=7860
+    networks:
+      - whisper-network
+      - iahome-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+networks:
+  whisper-network:
+    external: true
+  iahome-network:
+    external: true

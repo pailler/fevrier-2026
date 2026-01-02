@@ -1,0 +1,116 @@
+# Configuration Traefik pour l'application de recherche immobilière
+# Sous-domaine: immo.regispailler.fr
+# Port interne: 3001
+
+http:
+  routers:
+    # Route principale HTTPS
+    real-estate:
+      rule: "Host(`immo.regispailler.fr`)"
+      service: real-estate-service
+      entryPoints:
+        - websecure
+      priority: 10
+      middlewares:
+        - real-estate-headers
+        - real-estate-compress
+        - real-estate-security
+      tls:
+        certResolver: letsencrypt
+        options: modern
+
+    # Route HTTP avec redirection HTTPS
+    real-estate-http-redirect:
+      rule: "Host(`immo.regispailler.fr`)"
+      service: real-estate-service
+      entryPoints:
+        - web
+      priority: 5
+      middlewares:
+        - real-estate-redirect-https
+
+    # Route pour l'API
+    real-estate-api:
+      rule: "Host(`immo.regispailler.fr`) && PathPrefix(`/api/`)"
+      service: real-estate-service
+      entryPoints:
+        - websecure
+      priority: 100
+      middlewares:
+        - real-estate-headers
+        - real-estate-cors
+        - real-estate-rate-limit
+      tls:
+        certResolver: letsencrypt
+
+  services:
+    # Service principal
+    real-estate-service:
+      loadBalancer:
+        servers:
+          - url: "http://real-estate-app:3001"
+        passHostHeader: true
+        healthCheck:
+          path: "/"
+          interval: "30s"
+          timeout: "10s"
+
+  middlewares:
+    # Headers de sécurité
+    real-estate-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+        customResponseHeaders:
+          X-Content-Type-Options: "nosniff"
+          X-Frame-Options: "DENY"
+          X-XSS-Protection: "1; mode=block"
+          Referrer-Policy: "strict-origin-when-cross-origin"
+        sslRedirect: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 31536000
+
+    # Compression
+    real-estate-compress:
+      compress:
+        excludedContentTypes:
+          - "text/event-stream"
+          - "application/octet-stream"
+
+    # Sécurité renforcée
+    real-estate-security:
+      headers:
+        customResponseHeaders:
+          Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' data: https://cdnjs.cloudflare.com; connect-src 'self' https://api.openai.com https://nominatim.openstreetmap.org https://*.supabase.co wss://*.supabase.co;"
+          Permissions-Policy: "geolocation=(), microphone=(), camera=()"
+
+    # CORS pour l'API
+    real-estate-cors:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        accessControlAllowOriginList:
+          - "https://immo.regispailler.fr"
+          - "http://localhost:3001"
+        accessControlMaxAge: 100
+        addVaryHeader: true
+
+    # Rate limiting pour l'API
+    real-estate-rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+        period: 1m
+
+    # Redirection HTTP vers HTTPS
+    real-estate-redirect-https:
+      redirectScheme:
+        scheme: https
+        permanent: true

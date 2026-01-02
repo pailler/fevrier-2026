@@ -831,10 +831,10 @@ export default function AIDetectorPage() {
                   >
                     📄 TXT
                   </button>
-                </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
         </div>
       </div>
     </div>

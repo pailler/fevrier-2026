@@ -7,6 +7,7 @@ import { activities } from '../../../../utils/apprendre-autrement/activities';
 import { getAccessibilitySettings, AccessibilitySettings } from '../../../../utils/apprendre-autrement/accessibility';
 import { useVoiceEncouragement } from '../../../../hooks/useVoiceEncouragement';
 import { getChildName } from '../../../../utils/apprendre-autrement/childName';
+import { vocabularyWords, VocabularyWord, getWordsByCategory, getCategories } from '../../../../utils/apprendre-autrement/vocabularyWords';
 
 // Composant spécifique pour l'activité Mon Arbre Généalogique
 function FamilyTreeActivity({ 
@@ -3300,6 +3301,488 @@ function FoodExplorerActivity({
   );
 }
 
+// Composant spécifique pour l'activité Puzzle
+function PuzzleActivity({ 
+  activity, 
+  accessibilitySettings,
+  onComplete 
+}: { 
+  activity: typeof activities[0];
+  accessibilitySettings: AccessibilitySettings;
+  onComplete: (result: { accuracy: number; timeSpent: number; isPerfect: boolean; isFast: boolean }) => void;
+}) {
+  const [currentPuzzle, setCurrentPuzzle] = useState(0);
+  const [pieces, setPieces] = useState<Array<{id: number; emoji: string; position: {x: number; y: number}; correctPosition: {x: number; y: number}; isPlaced: boolean}>>([]);
+  const [selectedPiece, setSelectedPiece] = useState<number | null>(null);
+  const [placedPieces, setPlacedPieces] = useState<Set<number>>(new Set());
+  const [score, setScore] = useState(0);
+  const [attempts, setAttempts] = useState(0);
+  const [startTime] = useState(Date.now());
+  const [showSuccess, setShowSuccess] = useState(false);
+  const { encourage } = useVoiceEncouragement({ 
+    enabled: accessibilitySettings.soundEnabled,
+    volume: accessibilitySettings.voiceVolume || 1.0,
+    rate: accessibilitySettings.voiceRate || 0.9
+  });
+
+  // Puzzles avec différents niveaux de difficulté
+  const puzzles = [
+    {
+      id: 0,
+      title: 'Puzzle Simple - 4 pièces',
+      emoji: '🐱',
+      gridSize: 2,
+      pieces: [
+        { id: 0, emoji: '🐱', correctPosition: { x: 0, y: 0 } },
+        { id: 1, emoji: '🐱', correctPosition: { x: 1, y: 0 } },
+        { id: 2, emoji: '🐱', correctPosition: { x: 0, y: 1 } },
+        { id: 3, emoji: '🐱', correctPosition: { x: 1, y: 1 } },
+      ]
+    },
+    {
+      id: 1,
+      title: 'Puzzle Moyen - 6 pièces',
+      emoji: '🌟',
+      gridSize: 3,
+      pieces: [
+        { id: 0, emoji: '🌟', correctPosition: { x: 0, y: 0 } },
+        { id: 1, emoji: '🌟', correctPosition: { x: 1, y: 0 } },
+        { id: 2, emoji: '🌟', correctPosition: { x: 2, y: 0 } },
+        { id: 3, emoji: '🌟', correctPosition: { x: 0, y: 1 } },
+        { id: 4, emoji: '🌟', correctPosition: { x: 1, y: 1 } },
+        { id: 5, emoji: '🌟', correctPosition: { x: 2, y: 1 } },
+      ]
+    },
+    {
+      id: 2,
+      title: 'Puzzle Avancé - 9 pièces',
+      emoji: '🌈',
+      gridSize: 3,
+      pieces: [
+        { id: 0, emoji: '🌈', correctPosition: { x: 0, y: 0 } },
+        { id: 1, emoji: '🌈', correctPosition: { x: 1, y: 0 } },
+        { id: 2, emoji: '🌈', correctPosition: { x: 2, y: 0 } },
+        { id: 3, emoji: '🌈', correctPosition: { x: 0, y: 1 } },
+        { id: 4, emoji: '🌈', correctPosition: { x: 1, y: 1 } },
+        { id: 5, emoji: '🌈', correctPosition: { x: 2, y: 1 } },
+        { id: 6, emoji: '🌈', correctPosition: { x: 0, y: 2 } },
+        { id: 7, emoji: '🌈', correctPosition: { x: 1, y: 2 } },
+        { id: 8, emoji: '🌈', correctPosition: { x: 2, y: 2 } },
+      ]
+    }
+  ];
+
+  // Initialiser les pièces du puzzle actuel
+  useEffect(() => {
+    const puzzle = puzzles[currentPuzzle];
+    const shuffledPieces = puzzle.pieces.map(piece => ({
+      ...piece,
+      position: { 
+        x: Math.random() * 300 + 50, 
+        y: Math.random() * 300 + 400 
+      },
+      isPlaced: false
+    }));
+    setPieces(shuffledPieces);
+    setPlacedPieces(new Set());
+    setSelectedPiece(null);
+    setShowSuccess(false);
+  }, [currentPuzzle]);
+
+  useEffect(() => {
+    if (accessibilitySettings.soundEnabled) {
+      setTimeout(() => {
+        encourage.activityStart();
+      }, 500);
+    }
+  }, []);
+
+  const handlePieceClick = (pieceId: number) => {
+    if (placedPieces.has(pieceId)) return;
+    
+    setSelectedPiece(pieceId === selectedPiece ? null : pieceId);
+  };
+
+  const handleGridCellClick = (x: number, y: number) => {
+    if (selectedPiece === null) return;
+    
+    const piece = pieces.find(p => p.id === selectedPiece);
+    if (!piece) return;
+
+    setAttempts(attempts + 1);
+    
+    // Vérifier si la position est correcte
+    const isCorrect = piece.correctPosition.x === x && piece.correctPosition.y === y;
+    
+    if (isCorrect) {
+      // Placer la pièce
+      const updatedPieces = pieces.map(p => 
+        p.id === selectedPiece 
+          ? { ...p, position: { x: x * 100 + 50, y: y * 100 + 50 }, isPlaced: true }
+          : p
+      );
+      setPieces(updatedPieces);
+      setPlacedPieces(new Set([...placedPieces, selectedPiece]));
+      setScore(score + 1);
+      setSelectedPiece(null);
+      
+      if (accessibilitySettings.soundEnabled) {
+        encourage.correct();
+      }
+      
+      // Vérifier si le puzzle est terminé
+      if (placedPieces.size + 1 === puzzles[currentPuzzle].pieces.length) {
+        setShowSuccess(true);
+        if (accessibilitySettings.soundEnabled) {
+          setTimeout(() => {
+            encourage.welcome();
+          }, 500);
+        }
+        
+        // Passer au puzzle suivant après 2 secondes
+        setTimeout(() => {
+          if (currentPuzzle < puzzles.length - 1) {
+            setCurrentPuzzle(currentPuzzle + 1);
+            setShowSuccess(false);
+          } else {
+            // Tous les puzzles terminés
+            const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+            const totalPieces = puzzles.reduce((sum, p) => sum + p.pieces.length, 0);
+            const accuracy = (score / totalPieces) * 100;
+            const isPerfect = attempts === totalPieces;
+            const isFast = timeSpent < 300; // Moins de 5 minutes
+            
+            setTimeout(() => {
+              onComplete({
+                accuracy,
+                timeSpent,
+                isPerfect,
+                isFast
+              });
+            }, 1000);
+          }
+        }, 2000);
+      }
+    } else {
+      if (accessibilitySettings.soundEnabled) {
+        encourage.incorrect();
+      }
+      setSelectedPiece(null);
+    }
+  };
+
+  const puzzle = puzzles[currentPuzzle];
+  const isComplete = placedPieces.size === puzzle.pieces.length;
+
+  return (
+    <div className="space-y-8">
+      {/* En-tête du puzzle */}
+      <div className={`text-center p-6 rounded-2xl ${
+        accessibilitySettings.colorScheme === 'dark' 
+          ? 'bg-gray-800 text-white' 
+          : 'bg-gradient-to-r from-cyan-100 to-blue-100 border-2 border-cyan-300'
+      }`}>
+        <h3 className="text-2xl font-bold mb-2">
+          Puzzle {currentPuzzle + 1} sur {puzzles.length}
+        </h3>
+        <p className="text-lg mb-4">
+          {puzzle.title}
+        </p>
+        <p className="text-sm opacity-80">
+          Pièces placées : {placedPieces.size} / {puzzle.pieces.length}
+        </p>
+      </div>
+
+      {/* Zone de jeu */}
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Grille du puzzle */}
+        <div className="flex-1">
+          <h4 className={`text-xl font-bold mb-4 ${
+            accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-gray-800'
+          }`}>
+            Zone d'assemblage :
+          </h4>
+          <div 
+            className={`relative border-4 border-dashed rounded-2xl p-4 ${
+              accessibilitySettings.colorScheme === 'dark' 
+                ? 'bg-gray-700 border-gray-600' 
+                : 'bg-gray-100 border-gray-300'
+            }`}
+            style={{ 
+              width: `${puzzle.gridSize * 100 + 100}px`, 
+              height: `${puzzle.gridSize * 100 + 100}px`,
+              minHeight: `${puzzle.gridSize * 100 + 100}px`
+            }}
+          >
+            {/* Grille */}
+            <div className="grid gap-2" style={{ 
+              gridTemplateColumns: `repeat(${puzzle.gridSize}, 1fr)`,
+              width: `${puzzle.gridSize * 100}px`,
+              height: `${puzzle.gridSize * 100}px`
+            }}>
+              {Array.from({ length: puzzle.gridSize * puzzle.gridSize }).map((_, index) => {
+                const x = index % puzzle.gridSize;
+                const y = Math.floor(index / puzzle.gridSize);
+                const pieceAtPosition = pieces.find(p => 
+                  p.isPlaced && 
+                  Math.abs(p.position.x - (x * 100 + 50)) < 50 && 
+                  Math.abs(p.position.y - (y * 100 + 50)) < 50
+                );
+                
+                return (
+                  <button
+                    key={index}
+                    onClick={() => handleGridCellClick(x, y)}
+                    disabled={!!pieceAtPosition}
+                    className={`
+                      w-24 h-24 rounded-xl transition-all transform
+                      ${pieceAtPosition
+                        ? 'bg-green-200 border-4 border-green-500 cursor-not-allowed'
+                        : selectedPiece
+                        ? 'bg-blue-200 border-4 border-blue-500 hover:bg-blue-300'
+                        : 'bg-white border-2 border-gray-300 hover:bg-gray-50 hover:scale-105'
+                      }
+                      ${accessibilitySettings.colorScheme === 'dark' && !pieceAtPosition && !selectedPiece
+                        ? 'bg-gray-600 border-gray-500'
+                        : ''
+                      }
+                    `}
+                    style={{
+                      pointerEvents: pieceAtPosition ? 'none' : 'auto'
+                    }}
+                  >
+                    {pieceAtPosition && (
+                      <div className="text-4xl">{pieceAtPosition.emoji}</div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Pièces disponibles */}
+        <div className="flex-1">
+          <h4 className={`text-xl font-bold mb-4 ${
+            accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-gray-800'
+          }`}>
+            Pièces à placer :
+          </h4>
+          <div className="flex flex-wrap gap-4">
+            {pieces
+              .filter(p => !p.isPlaced)
+              .map((piece) => (
+                <button
+                  key={piece.id}
+                  onClick={() => handlePieceClick(piece.id)}
+                  className={`
+                    w-24 h-24 rounded-xl transition-all transform text-4xl
+                    ${selectedPiece === piece.id
+                      ? 'bg-yellow-200 border-4 border-yellow-500 scale-110 ring-4 ring-yellow-300'
+                      : 'bg-white border-2 border-gray-300 hover:bg-gray-50 hover:scale-105 active:scale-95 shadow-lg'
+                    }
+                    ${accessibilitySettings.colorScheme === 'dark' && selectedPiece !== piece.id
+                      ? 'bg-gray-700 border-gray-600'
+                      : ''
+                    }
+                  `}
+                >
+                  {piece.emoji}
+                </button>
+              ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Message de succès */}
+      {showSuccess && (
+        <div className="text-center py-8">
+          <div className="text-6xl mb-4 animate-bounce">🎉</div>
+          <p className="text-2xl font-bold text-green-600">
+            Bravo ! Puzzle terminé !
+          </p>
+        </div>
+      )}
+
+      {/* Score */}
+      <div className={`text-center p-4 rounded-xl ${
+        accessibilitySettings.colorScheme === 'dark' 
+          ? 'bg-gray-800 text-white' 
+          : 'bg-cyan-50'
+      }`}>
+        <p className="text-lg font-semibold">
+          Score : {score} / {puzzles.reduce((sum, p) => sum + p.pieces.length, 0)} ✅
+        </p>
+        <p className="text-sm text-gray-600 mt-2">
+          Tentatives : {attempts}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// Composant spécifique pour l'activité Vocabulaire en Images
+function ImageVocabularyActivity({ 
+  activity, 
+  accessibilitySettings,
+  onComplete 
+}: { 
+  activity: typeof activities[0];
+  accessibilitySettings: AccessibilitySettings;
+  onComplete: (result: { accuracy: number; timeSpent: number; isPerfect: boolean; isFast: boolean }) => void;
+}) {
+  const [discoveredWords, setDiscoveredWords] = useState<Set<string>>(new Set());
+  const [currentCategory, setCurrentCategory] = useState<VocabularyWord['category'] | 'all'>('all');
+  const [startTime] = useState(Date.now());
+  const { speak } = useVoiceEncouragement({ 
+    enabled: accessibilitySettings.soundEnabled,
+    volume: accessibilitySettings.voiceVolume || 1.0,
+    rate: accessibilitySettings.voiceRate || 0.9
+  });
+
+  const filteredWords = useMemo(() => {
+    if (currentCategory === 'all') {
+      return vocabularyWords;
+    }
+    return getWordsByCategory(currentCategory);
+  }, [currentCategory]);
+
+  const categories = useMemo(() => getCategories(), []);
+
+  useEffect(() => {
+    if (accessibilitySettings.soundEnabled) {
+      speak(`Bienvenue dans l'activité ${activity.title} ! Clique sur une image pour entendre le mot.`);
+    }
+  }, [accessibilitySettings.soundEnabled, activity.title, speak]);
+
+  const handleWordClick = (word: VocabularyWord) => {
+    if (accessibilitySettings.soundEnabled) {
+      speak(word.word);
+    }
+    setDiscoveredWords(prev => new Set(prev).add(word.id));
+  };
+
+  const progress = (discoveredWords.size / vocabularyWords.length) * 100;
+  const isComplete = discoveredWords.size === vocabularyWords.length;
+
+  useEffect(() => {
+    if (isComplete) {
+      const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+      onComplete({
+        accuracy: 100, // Always 100% if all words are discovered
+        timeSpent,
+        isPerfect: true,
+        isFast: timeSpent < 300 // Less than 5 minutes for 100 words
+      });
+    }
+  }, [isComplete, onComplete, startTime]);
+
+  return (
+    <div className="space-y-8">
+      {/* Catégories */}
+      <div className={`p-6 rounded-2xl ${
+        accessibilitySettings.colorScheme === 'dark' 
+          ? 'bg-gray-800 text-white' 
+          : 'bg-gradient-to-r from-violet-100 to-fuchsia-100 border-2 border-violet-300'
+      }`}>
+        <h3 className="text-2xl font-bold mb-4">Filtrer par catégorie :</h3>
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={() => setCurrentCategory('all')}
+            className={`px-4 py-2 rounded-full font-semibold transition-all ${
+              currentCategory === 'all' 
+                ? 'bg-violet-600 text-white shadow-md' 
+                : 'bg-white text-gray-800 hover:bg-gray-100'
+            }`}
+          >
+            Toutes
+          </button>
+          {categories.map(category => (
+            <button
+              key={category}
+              onClick={() => setCurrentCategory(category)}
+              className={`px-4 py-2 rounded-full font-semibold transition-all ${
+                currentCategory === category 
+                  ? 'bg-violet-600 text-white shadow-md' 
+                  : 'bg-white text-gray-800 hover:bg-gray-100'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Grille de mots */}
+      <div className={`p-6 rounded-2xl ${
+        accessibilitySettings.colorScheme === 'dark' 
+          ? 'bg-gray-700 text-white' 
+          : 'bg-white border-2 border-violet-200'
+      }`}>
+        <h3 className="text-2xl font-bold mb-4">Clique sur une image pour entendre le mot :</h3>
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+          {filteredWords.map(word => (
+            <button
+              key={word.id}
+              onClick={() => handleWordClick(word)}
+              className={`
+                p-4 sm:p-6 rounded-2xl transition-all transform text-4xl sm:text-5xl
+                ${discoveredWords.has(word.id) 
+                  ? 'bg-green-200 opacity-70 cursor-not-allowed border-4 border-green-500' 
+                  : 'bg-gradient-to-br from-violet-50 to-fuchsia-50 hover:scale-105 active:scale-95 shadow-lg border-2 border-violet-200'
+                }
+                ${accessibilitySettings.colorScheme === 'dark' && !discoveredWords.has(word.id) ? 'bg-gray-800 border-gray-600' : ''}
+              `}
+              style={{
+                pointerEvents: discoveredWords.has(word.id) ? 'none' : 'auto',
+                cursor: discoveredWords.has(word.id) ? 'not-allowed' : 'pointer'
+              }}
+              aria-label={word.word}
+            >
+              {word.emoji}
+              <p className={`text-sm sm:text-base font-semibold mt-2 ${
+                discoveredWords.has(word.id) ? 'text-green-700' : 
+                accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-gray-800'
+              }`}>
+                {word.word}
+              </p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Progression */}
+      <div className={`text-center p-4 rounded-xl ${
+        accessibilitySettings.colorScheme === 'dark' 
+          ? 'bg-gray-800 text-white' 
+          : 'bg-violet-50'
+      }`}>
+        <p className="text-lg font-semibold">
+          Mots découverts : {discoveredWords.size} / {vocabularyWords.length}
+        </p>
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+          <div 
+            className="bg-violet-600 h-2.5 rounded-full transition-all duration-500" 
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+      </div>
+
+      {isComplete && (
+        <div className="text-center py-8">
+          <div className="text-8xl mb-4 animate-bounce">🎉</div>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            Félicitations ! Tu as découvert tous les mots !
+          </h2>
+          <p className="text-xl text-gray-600">
+            Tu es un champion du vocabulaire !
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Composant spécifique pour l'activité Les Cris d'Animaux
 function AnimalSoundsActivity({ 
   activity, 
@@ -3310,189 +3793,18 @@ function AnimalSoundsActivity({
   accessibilitySettings: AccessibilitySettings;
   onComplete: (result: { accuracy: number; timeSpent: number; isPerfect: boolean; isFast: boolean }) => void;
 }) {
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnimal, setSelectedAnimal] = useState<string | null>(null);
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
-  const [score, setScore] = useState(0);
-  const [attempts, setAttempts] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [displayedWords, setDisplayedWords] = useState<VocabularyWord[]>([]);
+  const [clickedWords, setClickedWords] = useState<Set<string>>(new Set());
   const [startTime] = useState(Date.now());
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [isPlayingSound, setIsPlayingSound] = useState(false);
-  const [soundFinished, setSoundFinished] = useState(false); // Indique si le son a fini de jouer
-  const [audioReady, setAudioReady] = useState(false); // Indique si l'audio est prêt à être joué
-  const { encourage, speak } = useVoiceEncouragement({ 
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const { encourage } = useVoiceEncouragement({ 
     enabled: accessibilitySettings.soundEnabled,
     volume: accessibilitySettings.voiceVolume || 1.0,
     rate: accessibilitySettings.voiceRate || 0.9
   });
 
-  // Liste des animaux avec leurs cris et fichiers audio
-  // Utilisation des fichiers audio téléchargés dans /public/sounds/
-  // Support de différents formats : .mp3, .wav, .flac
-  const animals = [
-    { 
-      id: 'dog', 
-      emoji: '🐕', 
-      name: 'Dog', 
-      sound: 'Woof woof !', 
-      soundDescription: 'The dog says woof woof',
-      audioUrl: '/sounds/chien.wav', // Fichier téléchargé
-      fallbackUrl: null
-    },
-    { 
-      id: 'cat', 
-      emoji: '🐱', 
-      name: 'Cat', 
-      sound: 'Meow !', 
-      soundDescription: 'The cat says meow',
-      audioUrl: '/sounds/chat.wav', // Fichier téléchargé
-      fallbackUrl: null
-    },
-    { 
-      id: 'rooster', 
-      emoji: '🐓', 
-      name: 'Rooster', 
-      sound: 'Cock-a-doodle-doo !', 
-      soundDescription: 'The rooster says cock-a-doodle-doo',
-      audioUrl: '/sounds/coq.wav', // Fichier téléchargé
-      fallbackUrl: null
-    },
-    { 
-      id: 'cow', 
-      emoji: '🐄', 
-      name: 'Cow', 
-      sound: 'Moo !', 
-      soundDescription: 'The cow says moo',
-      audioUrl: '/sounds/vache.flac', // Fichier téléchargé
-      fallbackUrl: null
-    },
-    { 
-      id: 'sheep', 
-      emoji: '🐑', 
-      name: 'Sheep', 
-      sound: 'Baa !', 
-      soundDescription: 'The sheep says baa',
-      audioUrl: '/sounds/mouton.wav', // Fichier téléchargé
-      fallbackUrl: null
-    },
-    { 
-      id: 'pig', 
-      emoji: '🐷', 
-      name: 'Pig', 
-      sound: 'Oink oink !', 
-      soundDescription: 'The pig says oink oink',
-      audioUrl: '/sounds/cochon.wav', // Fichier téléchargé
-      fallbackUrl: null
-    },
-    { 
-      id: 'horse', 
-      emoji: '🐴', 
-      name: 'Horse', 
-      sound: 'Neigh !', 
-      soundDescription: 'The horse says neigh',
-      audioUrl: '/sounds/cheval.wav', // Fichier téléchargé
-      fallbackUrl: null
-    },
-    { 
-      id: 'duck', 
-      emoji: '🦆', 
-      name: 'Duck', 
-      sound: 'Quack quack !', 
-      soundDescription: 'The duck says quack quack',
-      audioUrl: '/sounds/canard.wav', // Fichier téléchargé
-      fallbackUrl: null
-    },
-    { 
-      id: 'lion', 
-      emoji: '🦁', 
-      name: 'Lion', 
-      sound: 'Roar !', 
-      soundDescription: 'The lion says roar',
-      audioUrl: '/sounds/lion.wav', // Fichier téléchargé
-      fallbackUrl: null
-    },
-    { 
-      id: 'elephant', 
-      emoji: '🐘', 
-      name: 'Elephant', 
-      sound: 'Trumpet !', 
-      soundDescription: 'The elephant says trumpet',
-      audioUrl: '/sounds/elephant.flac', // Fichier téléchargé
-      fallbackUrl: null
-    },
-    { 
-      id: 'monkey', 
-      emoji: '🐵', 
-      name: 'Monkey', 
-      sound: 'Ooh ooh aah aah !', 
-      soundDescription: 'The monkey says ooh ooh aah aah',
-      audioUrl: '/sounds/singe.flac', // Fichier téléchargé
-      fallbackUrl: null
-    },
-    { 
-      id: 'owl', 
-      emoji: '🦉', 
-      name: 'Owl', 
-      sound: 'Hoot hoot !', 
-      soundDescription: 'The owl says hoot hoot',
-      audioUrl: '/sounds/hibou.wav', // À télécharger si manquant
-      fallbackUrl: null
-    },
-    { 
-      id: 'wolf', 
-      emoji: '🐺', 
-      name: 'Wolf', 
-      sound: 'Howl !', 
-      soundDescription: 'The wolf says howl',
-      audioUrl: '/sounds/loup.wav', // Fichier téléchargé
-      fallbackUrl: null
-    },
-    { 
-      id: 'bear', 
-      emoji: '🐻', 
-      name: 'Bear', 
-      sound: 'Growl !', 
-      soundDescription: 'The bear says growl',
-      audioUrl: '/sounds/ours.mp3', // Fichier téléchargé
-      fallbackUrl: null
-    },
-    { 
-      id: 'frog', 
-      emoji: '🐸', 
-      name: 'Frog', 
-      sound: 'Ribbit !', 
-      soundDescription: 'The frog says ribbit',
-      audioUrl: '/sounds/grenouille.wav', // Fichier téléchargé
-      fallbackUrl: null
-    },
-    { 
-      id: 'bee', 
-      emoji: '🐝', 
-      name: 'Bee', 
-      sound: 'Buzz buzz !', 
-      soundDescription: 'The bee says buzz buzz',
-      audioUrl: '/sounds/abeille.wav', // À télécharger si manquant
-      fallbackUrl: null
-    }
-  ];
-
-  // Mélanger les animaux pour chaque question
-  const [shuffledAnimals] = useState(() => {
-    const shuffled = [...animals].sort(() => Math.random() - 0.5);
-    return shuffled;
-  });
-
-  const currentAnimal = shuffledAnimals[currentQuestionIndex];
-  const availableAnswers = useMemo(() => {
-    // Prendre l'animal correct et 3 autres animaux aléatoires
-    const otherAnimals = animals
-      .filter(a => a.id !== currentAnimal.id)
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3);
-    const allAnswers = [currentAnimal, ...otherAnimals].sort(() => Math.random() - 0.5);
-    return allAnswers;
-  }, [currentQuestionIndex, currentAnimal]);
+  const categories = getCategories();
 
   useEffect(() => {
     if (accessibilitySettings.soundEnabled) {
@@ -3502,377 +3814,252 @@ function AnimalSoundsActivity({
     }
   }, []);
 
-  // Nettoyer l'audio quand on change de question
   useEffect(() => {
-    // Arrêter tous les lecteurs audio précédents
-    const previousAudio = document.querySelectorAll('audio');
-    previousAudio.forEach(audio => {
-      audio.pause();
-      audio.currentTime = 0;
-    });
-  }, [currentQuestionIndex]);
-
-  // Fonction pour rejouer le son (utilisée par le bouton replay)
-  const playAnimalSound = () => {
-    if (!currentAnimal) return;
-    
-    const audioEl = document.querySelector(`audio[data-animal-id="${currentAnimal.id}"]`) as HTMLAudioElement;
-    if (audioEl) {
-      audioEl.currentTime = 0;
-      audioEl.play().catch(err => {
-        console.log('Erreur lors de la lecture:', err);
-        // Fallback vers la synthèse vocale si l'audio ne peut pas être joué
-        if (accessibilitySettings.soundEnabled) {
-          speak(currentAnimal.soundDescription);
-          setTimeout(() => {
-            setIsPlayingSound(false);
-            setSoundFinished(true);
-          }, 2000);
-        }
-      });
+    if (selectedCategory) {
+      const words = getWordsByCategory(selectedCategory);
+      setDisplayedWords(words);
     } else {
-      // Fallback vers la synthèse vocale si l'élément audio n'existe pas
-      if (accessibilitySettings.soundEnabled) {
-        speak(currentAnimal.soundDescription);
-        setTimeout(() => {
-          setIsPlayingSound(false);
-          setSoundFinished(true);
-        }, 2000);
-      }
+      // Afficher tous les mots par défaut
+      setDisplayedWords(vocabularyWords);
     }
+  }, [selectedCategory]);
+
+  // Fonction pour prononcer un mot avec la synthèse vocale
+  const speakWord = (word: string) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      console.warn('La synthèse vocale n\'est pas disponible dans ce navigateur');
+      return;
+    }
+
+    // Arrêter toute synthèse en cours
+    window.speechSynthesis.cancel();
+    
+    setIsSpeaking(true);
+    
+    const utterance = new SpeechSynthesisUtterance(word);
+    utterance.lang = 'fr-FR';
+    utterance.rate = accessibilitySettings.voiceRate || 0.9;
+    utterance.volume = accessibilitySettings.voiceVolume || 1.0;
+    utterance.pitch = 1.2; // Voix un peu plus aiguë pour les enfants
+    
+    // Essayer d'utiliser une voix française
+    const voices = window.speechSynthesis.getVoices();
+    const frenchVoice = voices.find(voice => 
+      voice.lang.startsWith('fr') && voice.name.toLowerCase().includes('french')
+    ) || voices.find(voice => voice.lang.startsWith('fr'));
+    
+    if (frenchVoice) {
+      utterance.voice = frenchVoice;
+    }
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+    };
+
+    utterance.onerror = (error) => {
+      console.error('Erreur synthèse vocale:', error);
+      setIsSpeaking(false);
+    };
+
+    window.speechSynthesis.speak(utterance);
   };
 
-  const handleAnimalSelect = (animalId: string) => {
-    // Ne pas permettre de sélectionner si le son n'a pas fini de jouer ou pendant le feedback
-    if (!soundFinished || showFeedback) return;
-    
-    setSelectedAnimal(animalId);
-    setAttempts(prev => prev + 1);
-    
-    const correct = animalId === currentAnimal.id;
-    setIsCorrect(correct);
-    setShowFeedback(true);
-    
-    // Arrêter l'audio si en cours
-    const audioEl = document.querySelector(`audio[data-animal-id="${currentAnimal.id}"]`) as HTMLAudioElement;
-    if (audioEl) {
-      audioEl.pause();
+  const handleWordClick = (word: VocabularyWord) => {
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
     }
     
-    if (correct) {
-      setScore(prev => prev + 1);
-      if (accessibilitySettings.soundEnabled) {
+    // Ajouter le mot aux mots cliqués
+    setClickedWords(prev => new Set([...prev, word.id]));
+    
+    // Prononcer le mot
+    speakWord(word.word);
+    
+    // Encouragement si le son est activé
+    if (accessibilitySettings.soundEnabled && clickedWords.size % 10 === 0 && clickedWords.size > 0) {
+      setTimeout(() => {
         encourage.correct();
-      }
-    } else {
-      if (accessibilitySettings.soundEnabled) {
-        encourage.incorrect();
-      }
+      }, 1000);
     }
-
-    // Passer à la question suivante après 2 secondes
-    setTimeout(() => {
-      if (currentQuestionIndex < shuffledAnimals.length - 1) {
-        setCurrentQuestionIndex(prev => prev + 1);
-      } else {
-        // Toutes les questions sont terminées
-        handleComplete();
-      }
-    }, 2000);
   };
 
-  const handleComplete = () => {
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category === selectedCategory ? null : category);
+  };
+
+  const handleCompleteActivity = () => {
     const timeSpent = Math.floor((Date.now() - startTime) / 1000);
-    const accuracy = (score / shuffledAnimals.length) * 100;
-    const isPerfect = score === shuffledAnimals.length;
-    const isFast = timeSpent < 180; // Moins de 3 minutes
-
-    setShowSuccess(true);
+    const totalWords = vocabularyWords.length;
+    const wordsClicked = clickedWords.size;
+    const accuracy = (wordsClicked / totalWords) * 100;
+    const isPerfect = wordsClicked === totalWords;
+    const isFast = timeSpent < 600; // Moins de 10 minutes
     
-    if (accessibilitySettings.soundEnabled) {
-      if (isPerfect) {
-        encourage.perfect();
-      } else if (score >= shuffledAnimals.length * 0.7) {
-        encourage.goodJob();
-      } else {
-        encourage.tryAgain();
-      }
-    }
-
-    setTimeout(() => {
-      onComplete({
-        accuracy,
-        timeSpent,
-        isPerfect,
-        isFast
-      });
-    }, 3000);
+    onComplete({
+      accuracy,
+      timeSpent,
+      isPerfect,
+      isFast
+    });
   };
 
-  const progress = ((currentQuestionIndex + 1) / shuffledAnimals.length) * 100;
+  // Charger les voix disponibles au chargement
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      // Les voix peuvent ne pas être disponibles immédiatement
+      const loadVoices = () => {
+        window.speechSynthesis.getVoices();
+      };
+      
+      loadVoices();
+      if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+      }
+    }
+  }, []);
 
   return (
-    <div className={`min-h-screen p-6 ${
-      accessibilitySettings.colorScheme === 'dark' 
-        ? 'bg-gray-900 text-white' 
-        : 'bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50'
-    }`}>
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h2 className={`text-4xl font-bold mb-4 ${
-            accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-gray-900'
-          }`}>
-            {activity.icon} {activity.title}
-          </h2>
-          <p className={`text-lg ${
-            accessibilitySettings.colorScheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-          }`}>
-            {activity.description}
-          </p>
-        </div>
+    <div className="space-y-8">
+      {/* Instructions */}
+      <div className={`text-center p-6 rounded-2xl ${
+        accessibilitySettings.colorScheme === 'dark' 
+          ? 'bg-gray-800 text-white' 
+          : 'bg-gradient-to-r from-violet-100 to-fuchsia-100 border-2 border-violet-300'
+      }`}>
+        <h3 className="text-2xl font-bold mb-2">
+          Vocabulaire en Images
+        </h3>
+        <p className="text-lg mb-4">
+          Clique sur les images pour entendre les mots ! 
+        </p>
+        <p className="text-sm opacity-80">
+          {clickedWords.size} / {vocabularyWords.length} mots découverts
+        </p>
+      </div>
 
-        {/* Barre de progression */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <span className={`text-sm font-semibold ${
-              accessibilitySettings.colorScheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-            }`}>
-              Question {currentQuestionIndex + 1} / {shuffledAnimals.length}
-            </span>
-            <span className={`text-sm font-semibold ${
-              accessibilitySettings.colorScheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-            }`}>
-              Score: {score} / {shuffledAnimals.length}
-            </span>
-          </div>
-          <div className={`w-full h-4 rounded-full overflow-hidden ${
-            accessibilitySettings.colorScheme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'
-          }`}>
-            <div 
-              className="h-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Zone du son avec lecteur audio */}
-        <div className={`mb-8 p-8 rounded-2xl text-center ${
-          accessibilitySettings.colorScheme === 'dark' 
-            ? 'bg-gray-800 border-2 border-gray-700' 
-            : 'bg-white border-2 border-amber-300 shadow-xl'
+      {/* Filtres par catégorie */}
+      <div>
+        <h4 className={`text-xl font-bold mb-4 ${
+          accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-gray-800'
         }`}>
-          <div className="text-6xl mb-4">🔊</div>
-          <h3 className={`text-2xl font-bold mb-4 ${
-            accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-gray-900'
-          }`}>
-            Listen to the animal sound
-          </h3>
-          
-          {/* Lecteur audio intégré */}
-          {currentAnimal && (
-            <div className="mb-4">
-              <audio
-                key={`audio-${currentQuestionIndex}-${currentAnimal.id}`}
-                data-animal-id={currentAnimal.id}
-                controls
-                className="w-full max-w-md mx-auto"
-                preload="auto"
-                onLoadedData={() => {
-                  setAudioReady(true);
-                }}
-                onCanPlayThrough={() => {
-                  setAudioReady(true);
-                }}
-                onPlay={() => {
-                  setIsPlayingSound(true);
-                  setSoundFinished(false);
-                }}
-                onEnded={() => {
-                  setSoundFinished(true);
-                  setIsPlayingSound(false);
-                }}
-                onPause={() => {
-                  setIsPlayingSound(false);
-                }}
-                onError={(e) => {
-                  console.error('Erreur audio:', e);
-                  setAudioReady(true);
-                  setSoundFinished(true);
-                  setIsPlayingSound(false);
-                }}
-              >
-                {currentAnimal.audioUrl && (
-                  <>
-                    <source src={currentAnimal.audioUrl} type={
-                      currentAnimal.audioUrl.endsWith('.mp3') ? 'audio/mpeg' : 
-                      currentAnimal.audioUrl.endsWith('.wav') ? 'audio/wav' : 
-                      currentAnimal.audioUrl.endsWith('.flac') ? 'audio/flac' : 
-                      'audio/mpeg'
-                    } />
-                    {currentAnimal.fallbackUrl && (
-                      <source src={currentAnimal.fallbackUrl} type="audio/mpeg" />
-                    )}
-                  </>
-                )}
-                Votre navigateur ne supporte pas l'élément audio.
-              </audio>
-            </div>
-          )}
-          
-          <p className={`text-lg mb-4 ${
-            accessibilitySettings.colorScheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-          }`}>
-            {currentAnimal?.sound}
-          </p>
-          
-          {/* Indicateur de statut */}
-          <div className="mb-4">
-            {!audioReady && (
-              <p className={`text-sm ${
-                accessibilitySettings.colorScheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-              }`}>
-                ⏳ Loading sound...
-              </p>
-            )}
-            {isPlayingSound && audioReady && (
-              <p className={`text-sm font-semibold ${
-                accessibilitySettings.colorScheme === 'dark' ? 'text-blue-400' : 'text-blue-600'
-              }`}>
-                🔊 Playing... Wait for the sound to finish
-              </p>
-            )}
-            {soundFinished && !isPlayingSound && (
-              <p className={`text-sm font-semibold ${
-                accessibilitySettings.colorScheme === 'dark' ? 'text-green-400' : 'text-green-600'
-              }`}>
-                ✅ Sound finished! Now select the correct animal below
-              </p>
-            )}
-          </div>
-          
+          Catégories :
+        </h4>
+        <div className="flex flex-wrap gap-3 mb-6">
           <button
-            onClick={() => {
-              // Rejouer le son en utilisant le lecteur audio
-              if (currentAnimal) {
-                const audioEl = document.querySelector(`audio[data-animal-id="${currentAnimal.id}"]`) as HTMLAudioElement;
-                if (audioEl) {
-                  audioEl.currentTime = 0;
-                  audioEl.play().catch(err => {
-                    console.log('Erreur lors de la lecture:', err);
-                  });
-                }
-              }
-            }}
-            disabled={isPlayingSound}
-            className={`
-              px-6 py-3 rounded-xl font-bold text-lg transition-all transform
-              ${isPlayingSound
-                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                : 'bg-amber-500 text-white hover:bg-amber-600 shadow-lg hover:scale-105 active:scale-95'
-              }
-            `}
+            onClick={() => handleCategorySelect('')}
+            className={`px-4 py-2 rounded-xl font-semibold transition-all transform hover:scale-105 ${
+              selectedCategory === null
+                ? 'bg-violet-500 text-white shadow-lg'
+                : accessibilitySettings.colorScheme === 'dark'
+                ? 'bg-gray-700 text-white'
+                : 'bg-white text-gray-700 border-2 border-gray-300'
+            }`}
           >
-            {isPlayingSound ? '🔊 Playing...' : '🔊 Replay sound'}
+            Tous ({vocabularyWords.length})
           </button>
-        </div>
-
-        {/* Grille d'animaux */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          {availableAnswers.map(animal => {
-            const isSelected = selectedAnimal === animal.id;
-            const isCorrectAnswer = animal.id === currentAnimal.id;
-            const showCorrect = showFeedback && isCorrectAnswer;
-            const showIncorrect = showFeedback && isSelected && !isCorrectAnswer;
-            const isDisabled = !soundFinished || showFeedback;
-
+          {categories.map((category) => {
+            const categoryWords = getWordsByCategory(category);
+            const isSelected = selectedCategory === category;
             return (
               <button
-                key={animal.id}
-                onClick={() => handleAnimalSelect(animal.id)}
-                disabled={isDisabled}
+                key={category}
+                onClick={() => handleCategorySelect(category)}
+                className={`px-4 py-2 rounded-xl font-semibold transition-all transform hover:scale-105 ${
+                  isSelected
+                    ? 'bg-violet-500 text-white shadow-lg'
+                    : accessibilitySettings.colorScheme === 'dark'
+                    ? 'bg-gray-700 text-white'
+                    : 'bg-white text-gray-700 border-2 border-gray-300'
+                }`}
+              >
+                {category} ({categoryWords.length})
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Grille des mots */}
+      <div>
+        <h4 className={`text-xl font-bold mb-4 ${
+          accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-gray-800'
+        }`}>
+          {selectedCategory ? `Mots de la catégorie "${selectedCategory}"` : 'Tous les mots'} :
+        </h4>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {displayedWords.map((word) => {
+            const isClicked = clickedWords.has(word.id);
+            const isCurrentlySpeaking = isSpeaking;
+            
+            return (
+              <button
+                key={word.id}
+                onClick={() => handleWordClick(word)}
+                disabled={isCurrentlySpeaking}
                 className={`
                   p-6 rounded-2xl transition-all transform
-                  ${isDisabled && !showFeedback
-                    ? 'opacity-50 cursor-not-allowed'
-                    : !isDisabled
-                    ? 'hover:scale-105 active:scale-95'
+                  ${isClicked
+                    ? 'bg-gradient-to-br from-violet-200 to-fuchsia-200 border-4 border-violet-400 scale-105'
+                    : 'bg-white hover:bg-violet-50 hover:scale-105 active:scale-95 shadow-lg border-2 border-gray-200'
+                  }
+                  ${accessibilitySettings.colorScheme === 'dark' && !isClicked 
+                    ? 'bg-gray-700 border-gray-600' 
                     : ''
                   }
-                  ${showCorrect
-                    ? 'bg-green-500 text-white shadow-xl ring-4 ring-green-300 scale-105'
-                    : showIncorrect
-                    ? 'bg-red-500 text-white shadow-xl ring-4 ring-red-300 scale-105'
-                    : isSelected
-                    ? 'bg-blue-500 text-white shadow-xl ring-4 ring-blue-300'
-                    : showFeedback
-                    ? 'opacity-50 cursor-not-allowed'
-                    : !soundFinished
-                    ? 'opacity-50 cursor-not-allowed bg-gray-300'
-                    : accessibilitySettings.colorScheme === 'dark'
-                    ? 'bg-gray-800 text-white hover:bg-gray-700 shadow-lg border-2 border-gray-600'
-                    : 'bg-white text-gray-800 hover:bg-amber-50 shadow-lg border-2 border-gray-200'
-                  }
+                  ${isCurrentlySpeaking ? 'opacity-75 cursor-wait' : 'cursor-pointer'}
                 `}
+                style={{
+                  pointerEvents: isCurrentlySpeaking ? 'none' : 'auto'
+                }}
+                aria-label={`Cliquer pour entendre: ${word.word}`}
               >
-                <div className="text-6xl mb-3">{animal.emoji}</div>
+                <div className="text-6xl mb-3">{word.emoji}</div>
                 <div className={`text-lg font-bold ${
-                  showCorrect || showIncorrect || isSelected ? 'text-white' : ''
+                  isClicked 
+                    ? 'text-violet-700' 
+                    : accessibilitySettings.colorScheme === 'dark' 
+                    ? 'text-white' 
+                    : 'text-gray-800'
                 }`}>
-                  {animal.name}
+                  {word.word}
                 </div>
-                {!soundFinished && !showFeedback && (
-                  <div className="text-sm mt-2 text-gray-500">
-                    Wait for sound...
-                  </div>
+                {isClicked && (
+                  <div className="text-2xl mt-2">✓</div>
                 )}
-                {showCorrect && (
-                  <div className="text-3xl mt-2">✓</div>
-                )}
-                {showIncorrect && (
-                  <div className="text-3xl mt-2">✕</div>
+                {isCurrentlySpeaking && (
+                  <div className="text-2xl mt-2 animate-pulse">🔊</div>
                 )}
               </button>
             );
           })}
         </div>
+      </div>
 
-        {/* Message de feedback */}
-        {showFeedback && (
-          <div className={`text-center p-4 rounded-xl mb-4 ${
-            isCorrect
-              ? 'bg-green-100 border-2 border-green-400 text-green-800'
-              : 'bg-red-100 border-2 border-red-400 text-red-800'
-          }`}>
-            <p className="text-xl font-bold">
-              {isCorrect ? '🎉 Great! That\'s correct!' : '❌ That\'s not the right animal. Try again!'}
-            </p>
-            {!isCorrect && (
-              <p className="text-sm mt-2">
-                The correct animal was: {currentAnimal.emoji} {currentAnimal.name}
-              </p>
-            )}
-          </div>
-        )}
+      {/* Bouton de fin d'activité */}
+      {clickedWords.size >= vocabularyWords.length * 0.5 && (
+        <div className="text-center">
+          <button
+            onClick={handleCompleteActivity}
+            className="px-8 py-4 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
+          >
+            🎉 Terminer l'activité
+          </button>
+        </div>
+      )}
 
-        {/* Message de succès final */}
-        {showSuccess && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl p-8 text-center shadow-2xl max-w-md mx-4">
-              <div className="text-6xl mb-4">
-                {score === shuffledAnimals.length ? '🎉' : '👍'}
-              </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-2">
-                {score === shuffledAnimals.length ? 'Perfect!' : 'Well done!'}
-              </h3>
-              <p className="text-lg text-gray-700 mb-4">
-                You found {score} animal{score !== 1 ? 's' : ''} out of {shuffledAnimals.length}!
-              </p>
-              <p className="text-sm text-gray-500">
-                Score: {Math.round((score / shuffledAnimals.length) * 100)}%
-              </p>
-            </div>
-          </div>
-        )}
+      {/* Statistiques */}
+      <div className={`text-center p-4 rounded-xl ${
+        accessibilitySettings.colorScheme === 'dark' 
+          ? 'bg-gray-800 text-white' 
+          : 'bg-violet-50'
+      }`}>
+        <p className="text-lg font-semibold">
+          Mots découverts : {clickedWords.size} / {vocabularyWords.length} 🎯
+        </p>
+        <p className="text-sm text-gray-600 mt-2">
+          Progression : {Math.round((clickedWords.size / vocabularyWords.length) * 100)}%
+        </p>
       </div>
     </div>
   );
@@ -6457,6 +6644,18 @@ export default function ActivityPage() {
           />
         ) : activity.id === 'animal-sounds' ? (
           <AnimalSoundsActivity
+            activity={activity}
+            accessibilitySettings={accessibilitySettings}
+            onComplete={handleComplete}
+          />
+        ) : activity.id === 'vocabulaire-images' ? (
+          <ImageVocabularyActivity
+            activity={activity}
+            accessibilitySettings={accessibilitySettings}
+            onComplete={handleComplete}
+          />
+        ) : activity.id === 'puzzle' ? (
+          <PuzzleActivity
             activity={activity}
             accessibilitySettings={accessibilitySettings}
             onComplete={handleComplete}

@@ -42,6 +42,16 @@ export default function AdminNotifications() {
   const [noModuleSending, setNoModuleSending] = useState(false);
   const [noModuleResult, setNoModuleResult] = useState<{success: boolean; message: string} | null>(null);
 
+  // État pour l'envoi du mail de maintenance
+  const [maintenanceEmail, setMaintenanceEmail] = useState('');
+  const [maintenanceUserName, setMaintenanceUserName] = useState('');
+  const [maintenanceSending, setMaintenanceSending] = useState(false);
+  const [maintenanceResult, setMaintenanceResult] = useState<{success: boolean; message: string} | null>(null);
+
+  // État pour le système d'inactivité
+  const [inactivityLoading, setInactivityLoading] = useState(false);
+  const [inactivityResult, setInactivityResult] = useState<any>(null);
+
   useEffect(() => {
     loadData();
     checkResendStatus();
@@ -245,6 +255,57 @@ export default function AdminNotifications() {
       });
     } finally {
       setNoModuleSending(false);
+    }
+  };
+
+  const sendMaintenanceEmail = async () => {
+    if (!maintenanceEmail) {
+      alert('Veuillez saisir une adresse email');
+      return;
+    }
+
+    setMaintenanceSending(true);
+    setMaintenanceResult(null);
+
+    try {
+      const response = await fetch('/api/admin/send-maintenance-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: maintenanceEmail,
+          userName: maintenanceUserName || maintenanceEmail.split('@')[0] || 'Utilisateur'
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMaintenanceResult({
+          success: true,
+          message: `✅ Email de maintenance envoyé avec succès à ${data.email}`
+        });
+        // Recharger les logs pour voir la nouvelle entrée
+        loadData();
+        // Réinitialiser les champs après 3 secondes
+        setTimeout(() => {
+          setMaintenanceEmail('');
+          setMaintenanceUserName('');
+          setMaintenanceResult(null);
+        }, 3000);
+      } else {
+        setMaintenanceResult({
+          success: false,
+          message: `❌ Erreur: ${data.message || data.error || 'Erreur inconnue'}`
+        });
+      }
+    } catch (error) {
+      console.error('❌ Erreur lors de l\'envoi:', error);
+      setMaintenanceResult({
+        success: false,
+        message: '❌ Erreur lors de l\'envoi de l\'email'
+      });
+    } finally {
+      setMaintenanceSending(false);
     }
   };
 
@@ -492,6 +553,315 @@ export default function AdminNotifications() {
               <div className="flex items-start space-x-2">
                 <span className="text-blue-600 mt-0.5">✓</span>
                 <span className="text-sm text-gray-700">Design responsive</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Envoi mail de maintenance */}
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg shadow-sm border-2 border-green-200 p-6">
+        <div className="mb-4">
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">🔧</span>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">
+                Envoyer le mail de fin de maintenance
+              </h2>
+              <p className="text-sm text-gray-600">
+                Notification pour informer que tous les services sont rétablis après une maintenance
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="maintenance-email" className="block text-sm font-medium text-gray-700 mb-1">
+              Adresse email *
+            </label>
+            <input
+              id="maintenance-email"
+              type="email"
+              value={maintenanceEmail}
+              onChange={(e) => setMaintenanceEmail(e.target.value)}
+              placeholder="utilisateur@example.com"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-green-500 focus:border-transparent placeholder:text-gray-400"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="maintenance-name" className="block text-sm font-medium text-gray-700 mb-1">
+              Nom de l'utilisateur (optionnel)
+            </label>
+            <input
+              id="maintenance-name"
+              type="text"
+              value={maintenanceUserName}
+              onChange={(e) => setMaintenanceUserName(e.target.value)}
+              placeholder="Prénom ou nom d'utilisateur"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-green-500 focus:border-transparent placeholder:text-gray-400"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Si vide, le nom sera extrait de l'adresse email
+            </p>
+          </div>
+
+          {maintenanceResult && (
+            <div className={`p-3 rounded-lg ${
+              maintenanceResult.success 
+                ? 'bg-green-50 border border-green-200 text-green-800' 
+                : 'bg-red-50 border border-red-200 text-red-800'
+            }`}>
+              <p className="text-sm font-medium">{maintenanceResult.message}</p>
+            </div>
+          )}
+
+          <button
+            onClick={sendMaintenanceEmail}
+            disabled={!maintenanceEmail || maintenanceSending}
+            className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+          >
+            {maintenanceSending ? (
+              <span className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Envoi en cours...
+              </span>
+            ) : (
+              '📧 Envoyer le mail de maintenance'
+            )}
+          </button>
+
+          <div className="mt-4 p-4 bg-white border border-green-200 rounded-lg">
+            <p className="text-sm text-gray-900 font-semibold mb-3 flex items-center">
+              <span className="mr-2">💡</span>
+              Contenu du mail :
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="flex items-start space-x-2">
+                <span className="text-green-600 mt-0.5">✓</span>
+                <span className="text-sm text-gray-700">Design moderne et professionnel</span>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-green-600 mt-0.5">✓</span>
+                <span className="text-sm text-gray-700">Confirmation de rétablissement</span>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-green-600 mt-0.5">✓</span>
+                <span className="text-sm text-gray-700">Bouton d'accès direct au site</span>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-green-600 mt-0.5">✓</span>
+                <span className="text-sm text-gray-700">Responsive et compatible email</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Système d'inactivité automatique */}
+      <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg shadow-sm border-2 border-orange-200 p-6">
+        <div className="mb-4">
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">⏰</span>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">
+                Gestion de l'inactivité automatique
+              </h2>
+              <p className="text-sm text-gray-600">
+                Les utilisateurs passent inactifs après 2 mois sans connexion. Avertissement envoyé 1 semaine avant.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button
+              onClick={async () => {
+                setInactivityLoading(true);
+                try {
+                  const response = await fetch('/api/admin/setup-inactivity-notification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                  });
+                  const data = await response.json();
+                  setInactivityResult(data);
+                  if (data.success) {
+                    loadData(); // Recharger les paramètres
+                  }
+                } catch (error) {
+                  setInactivityResult({ success: false, error: 'Erreur lors de l\'initialisation' });
+                } finally {
+                  setInactivityLoading(false);
+                }
+              }}
+              disabled={inactivityLoading}
+              className="px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+            >
+              {inactivityLoading ? '⏳ Initialisation...' : '🔧 Initialiser le template d\'email'}
+            </button>
+
+            <button
+              onClick={async () => {
+                setInactivityLoading(true);
+                setInactivityResult(null);
+                try {
+                  const response = await fetch('/api/admin/check-inactive-users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'check' })
+                  });
+                  const data = await response.json();
+                  setInactivityResult(data);
+                } catch (error) {
+                  setInactivityResult({ success: false, error: 'Erreur lors de la vérification' });
+                } finally {
+                  setInactivityLoading(false);
+                }
+              }}
+              disabled={inactivityLoading}
+              className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+            >
+              {inactivityLoading ? '⏳ Vérification...' : '🔍 Vérifier les utilisateurs inactifs'}
+            </button>
+
+            <button
+              onClick={async () => {
+                setInactivityLoading(true);
+                setInactivityResult(null);
+                try {
+                  const response = await fetch('/api/admin/check-inactive-users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'warn' })
+                  });
+                  const data = await response.json();
+                  setInactivityResult(data);
+                  if (data.success) {
+                    loadData(); // Recharger les logs
+                  }
+                } catch (error) {
+                  setInactivityResult({ success: false, error: 'Erreur lors de l\'envoi des avertissements' });
+                } finally {
+                  setInactivityLoading(false);
+                }
+              }}
+              disabled={inactivityLoading}
+              className="px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+            >
+              {inactivityLoading ? '⏳ Envoi...' : '📧 Envoyer les emails d\'avertissement'}
+            </button>
+
+            <button
+              onClick={async () => {
+                if (!confirm('Êtes-vous sûr de vouloir désactiver les utilisateurs inactifs ? Cette action est irréversible.')) {
+                  return;
+                }
+                setInactivityLoading(true);
+                setInactivityResult(null);
+                try {
+                  const response = await fetch('/api/admin/check-inactive-users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'deactivate' })
+                  });
+                  const data = await response.json();
+                  setInactivityResult(data);
+                  if (data.success) {
+                    loadData(); // Recharger les logs
+                  }
+                } catch (error) {
+                  setInactivityResult({ success: false, error: 'Erreur lors de la désactivation' });
+                } finally {
+                  setInactivityLoading(false);
+                }
+              }}
+              disabled={inactivityLoading}
+              className="px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+            >
+              {inactivityLoading ? '⏳ Désactivation...' : '🚫 Désactiver les utilisateurs inactifs'}
+            </button>
+          </div>
+
+          {inactivityResult && (
+            <div className={`p-4 rounded-lg border ${
+              inactivityResult.success 
+                ? 'bg-green-50 border-green-200' 
+                : 'bg-red-50 border-red-200'
+            }`}>
+              {inactivityResult.success ? (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-green-800">✅ Opération réussie</p>
+                  {inactivityResult.summary && (
+                    <div className="text-sm text-green-700 space-y-1">
+                      <p>📊 Utilisateurs vérifiés: {inactivityResult.summary.totalUsersChecked}</p>
+                      <p>⚠️ À avertir: {inactivityResult.summary.usersToWarn}</p>
+                      <p>📧 Avertis: {inactivityResult.summary.warnedUsersCount}</p>
+                      <p>🚫 À désactiver: {inactivityResult.summary.usersToDeactivate}</p>
+                      <p>✅ Désactivés: {inactivityResult.summary.deactivatedUsersCount}</p>
+                    </div>
+                  )}
+                  {inactivityResult.warnedUsers && inactivityResult.warnedUsers.length > 0 && (
+                    <div className="mt-2">
+                      <p className="text-xs font-medium text-green-800">Emails d'avertissement envoyés à:</p>
+                      <ul className="text-xs text-green-700 list-disc list-inside">
+                        {inactivityResult.warnedUsers.slice(0, 5).map((email: string) => (
+                          <li key={email}>{email}</li>
+                        ))}
+                        {inactivityResult.warnedUsers.length > 5 && (
+                          <li>... et {inactivityResult.warnedUsers.length - 5} autres</li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+                  {inactivityResult.deactivatedUsers && inactivityResult.deactivatedUsers.length > 0 && (
+                    <div className="mt-2">
+                      <p className="text-xs font-medium text-green-800">Utilisateurs désactivés:</p>
+                      <ul className="text-xs text-green-700 list-disc list-inside">
+                        {inactivityResult.deactivatedUsers.slice(0, 5).map((email: string) => (
+                          <li key={email}>{email}</li>
+                        ))}
+                        {inactivityResult.deactivatedUsers.length > 5 && (
+                          <li>... et {inactivityResult.deactivatedUsers.length - 5} autres</li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm font-medium text-red-800">
+                  ❌ Erreur: {inactivityResult.error || 'Erreur inconnue'}
+                </p>
+              )}
+            </div>
+          )}
+
+          <div className="mt-4 p-4 bg-white border border-orange-200 rounded-lg">
+            <p className="text-sm text-gray-900 font-semibold mb-3 flex items-center">
+              <span className="mr-2">ℹ️</span>
+              Fonctionnement du système :
+            </p>
+            <div className="space-y-2 text-sm text-gray-700">
+              <div className="flex items-start space-x-2">
+                <span className="text-orange-600 mt-0.5">1.</span>
+                <span>Les utilisateurs sont vérifiés quotidiennement (à configurer via cron)</span>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-orange-600 mt-0.5">2.</span>
+                <span>1 semaine avant les 2 mois d'inactivité : email d'avertissement envoyé</span>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-orange-600 mt-0.5">3.</span>
+                <span>Après 2 mois sans activité : compte automatiquement désactivé (is_active = false)</span>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-orange-600 mt-0.5">4.</span>
+                <span>Les utilisateurs peuvent réactiver leur compte via le lien dans l'email</span>
               </div>
             </div>
           </div>

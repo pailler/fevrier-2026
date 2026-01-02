@@ -24,8 +24,8 @@ services:
               count: 1
               capabilities: [gpu]
     volumes:
-      # Persister les modèles téléchargés
-      - hunyuan3d-models:/root/.cache/huggingface
+      # Persister les modèles téléchargés (dossier centralisé)
+      - ../ai-models-cache/huggingface:/root/.cache/huggingface
       # Persister les générations
       - hunyuan3d-output:/app/code/temp
       # Persister le cache Gradio
@@ -38,8 +38,6 @@ services:
       start_period: 300s  # 5 minutes pour le chargement initial
 
 volumes:
-  hunyuan3d-models:
-    driver: local
   hunyuan3d-output:
     driver: local
   hunyuan3d-cache:

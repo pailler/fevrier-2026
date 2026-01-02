@@ -6,6 +6,7 @@ import Breadcrumb from '../../../components/Breadcrumb';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
 import { trackCTAClick, trackModuleActivation, trackMeTubePageView, getUTMParams } from '../../../utils/tracking';
 import Analytics from '../../../components/Analytics';
+import YouTubeEmbed from '../../../components/YouTubeEmbed';
 
 export default function MeTubePage() {
   const router = useRouter();
@@ -337,18 +338,12 @@ export default function MeTubePage() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Colonne 1 - Vidéo */}
-          <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
-            <iframe
-              className="w-full h-full rounded-2xl"
-              src="https://www.youtube.com/embed/IZoAzwgQ8YY?autoplay=0&rel=0&modestbranding=1&enablejsapi=0&origin=https://iahome.fr"
-              title="Démonstration MeTube"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="strict-origin-when-cross-origin"
-            ></iframe>
-          </div>
+          <YouTubeEmbed
+            videoId="IZoAzwgQ8YY"
+            title="Démonstration MeTube"
+            enablejsapi={0}
+            origin="https://iahome.fr"
+          />
           
           {/* Colonne 2 - Système de boutons */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">

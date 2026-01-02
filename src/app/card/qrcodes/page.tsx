@@ -7,6 +7,7 @@ import Breadcrumb from '../../../components/Breadcrumb';
 import QRCodeAccessButton from '../../../components/QRCodeAccessButton';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
 import { supabase } from '../../../utils/supabaseClient';
+import YouTubeEmbed from '../../../components/YouTubeEmbed';
 
 interface Card {
   id: string;
@@ -525,16 +526,11 @@ export default function QRCodesPage() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Colonne 1 - Vidéo */}
-          <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
-            <iframe
-              className="w-full h-full rounded-2xl"
-              src="https://www.youtube.com/embed/SOtL5XeKvyY?autoplay=0&rel=0&modestbranding=1"
-              title="Démonstration QR Codes"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          </div>
+          <YouTubeEmbed
+            videoId="SOtL5XeKvyY"
+            title="Démonstration QR Codes"
+            origin="https://iahome.fr"
+          />
           
           {/* Colonne 2 - Système de boutons */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">

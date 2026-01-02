@@ -8,6 +8,7 @@ import Breadcrumb from '../../../components/Breadcrumb';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
 import { TOKEN_COSTS } from '../../../utils/tokenActionService';
 import { getAppLinks } from '../../../utils/appUsefulLinks';
+import YouTubeEmbed from '../../../components/YouTubeEmbed';
 // import { NotificationServiceClient } from '../../../utils/notificationServiceClient';
 // import AuthorizedAccessButton from '../../../components/AuthorizedAccessButton';
 
@@ -849,16 +850,11 @@ export default function CardDetailPage() {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             {/* Colonne 1 - Vidéo */}
-            <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
-              <iframe
-                className="w-full h-full rounded-2xl"
-                src="https://www.youtube.com/embed/6z6Fh4buWrU?autoplay=0&rel=0&modestbranding=1"
-                title="Démonstration LibreSpeed"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
+            <YouTubeEmbed
+              videoId="6z6Fh4buWrU"
+              title="Démonstration LibreSpeed"
+              origin="https://iahome.fr"
+            />
             
             {/* Colonne 2 - Système de boutons */}
             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
@@ -1295,16 +1291,11 @@ export default function CardDetailPage() {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             {/* Colonne 1 - Vidéo */}
-            <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
-              <iframe
-                className="w-full h-full rounded-2xl"
-                src="https://www.youtube.com/embed/IZoAzwgQ8YY?autoplay=0&rel=0&modestbranding=1"
-                title="Démonstration MeTube"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
+            <YouTubeEmbed
+              videoId="IZoAzwgQ8YY"
+              title="Démonstration MeTube"
+              origin="https://iahome.fr"
+            />
             
             {/* Colonne 2 - Système de boutons */}
             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
@@ -1358,16 +1349,11 @@ export default function CardDetailPage() {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             {/* Colonne 1 - Vidéo PsiTransfer */}
-            <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
-              <iframe
-                className="w-full h-full rounded-2xl"
-                src="https://www.youtube.com/embed/FlzQqgHFUOM?autoplay=0&rel=0&modestbranding=1"
-                title="Démonstration PsiTransfer"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
+            <YouTubeEmbed
+              videoId="FlzQqgHFUOM"
+              title="Démonstration PsiTransfer"
+              origin="https://iahome.fr"
+            />
             
             {/* Colonne 2 - Système de boutons */}
             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
@@ -1466,16 +1452,11 @@ export default function CardDetailPage() {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             {/* Colonne 1 - Vidéo */}
-            <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
-              <iframe
-                className="w-full h-full rounded-2xl"
-                src="https://www.youtube.com/embed/CP2cDFgbs8s?autoplay=0&rel=0&modestbranding=1"
-                title="Démonstration Hunyuan 3D"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
+            <YouTubeEmbed
+              videoId="CP2cDFgbs8s"
+              title="Démonstration Hunyuan 3D"
+              origin="https://iahome.fr"
+            />
             
             {/* Colonne 2 - Système de boutons */}
             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
@@ -1499,19 +1480,11 @@ export default function CardDetailPage() {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             {/* Colonne 1 - Vidéo */}
-            <div className="w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300">
-              <iframe
-                className="w-full h-full rounded-2xl"
-                src={card.youtube_url.includes('embed/') ? card.youtube_url : 
-                     card.youtube_url.includes('youtube.com/watch?v=') ? card.youtube_url.replace('youtube.com/watch?v=', 'youtube.com/embed/') :
-                     card.youtube_url.includes('youtu.be/') ? card.youtube_url.replace('youtu.be/', 'youtube.com/embed/') :
-                     `https://www.youtube.com/embed/${card.youtube_url}?autoplay=0&rel=0&modestbranding=1`}
-                title={`Démonstration ${card.title}`}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
+            <YouTubeEmbed
+              videoId={card.youtube_url}
+              title={`Démonstration ${card.title}`}
+              origin="https://iahome.fr"
+            />
             
             {/* Colonne 2 - Informations du module */}
             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">

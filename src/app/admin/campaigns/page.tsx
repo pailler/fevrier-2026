@@ -274,6 +274,8 @@ const facebookTemplates: CampaignTemplate[] = [
   }
 ];
 
+const googleTemplates: CampaignTemplate[] = [];
+
 interface ActiveCampaign {
   id: string;
   name: string;
@@ -1009,10 +1011,9 @@ export default function AdminCampaigns() {
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
-                          {template.format === 'text' && <span className="text-2xl">📝</span>}
                           {template.format === 'image' && <span className="text-2xl">🖼️</span>}
                           {template.format === 'video' && <span className="text-2xl">🎬</span>}
-                          {template.format === 'shopping' && <span className="text-2xl">🛒</span>}
+                          {template.format === 'carousel' && <span className="text-2xl">🎠</span>}
                           <h3 className="text-lg font-bold text-gray-900">{template.name}</h3>
                         </div>
                         <p className="text-sm text-gray-600 mb-4">{template.description}</p>
@@ -1880,7 +1881,8 @@ export default function AdminCampaigns() {
                         </div>
                       )}
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

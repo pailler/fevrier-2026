@@ -65,7 +65,7 @@ RUN mkdir -p /app/logs
 RUN chown -R nextjs:nodejs /app
 USER nextjs
 
-# Exposer le port
+# Exposer le port (peut être surchargé par docker-compose)
 EXPOSE 3000
 
 ENV PORT=3000

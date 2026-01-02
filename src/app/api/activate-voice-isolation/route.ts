@@ -20,23 +20,68 @@ export async function POST(request: NextRequest) {
 
     console.log('🔄 Activation Voice Isolation pour l\'utilisateur:', userId);
 
-    // 1. Vérifier les tokens de l'utilisateur (100 tokens requis)
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('tokens')
-      .eq('id', userId)
-      .single();
-
-    if (userError || !userData) {
-      console.error('❌ Erreur récupération utilisateur:', userError);
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Utilisateur non trouvé' 
-      }, { status: 404 });
+    // 1. Vérifier que l'utilisateur existe dans profiles
+    let targetUserId = userId;
+    
+    // Si userId est un email, récupérer l'UUID depuis profiles
+    if (userId.includes('@')) {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', userId)
+        .single();
+      
+      if (profileError || !profile) {
+        console.error('❌ Utilisateur non trouvé dans profiles:', profileError);
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Utilisateur non trouvé' 
+        }, { status: 404 });
+      }
+      targetUserId = profile.id;
+      console.log('🔄 UUID récupéré:', targetUserId, 'pour email:', userId);
+    } else {
+      // Vérifier que l'UUID existe dans profiles
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', targetUserId)
+        .single();
+      
+      if (profileError || !profile) {
+        console.error('❌ Utilisateur non trouvé dans profiles:', profileError);
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Utilisateur non trouvé' 
+        }, { status: 404 });
+      }
     }
 
-    const currentTokens = userData.tokens || 0;
+    // 2. Vérifier et consommer les tokens via l'API user-tokens-simple
     const requiredTokens = 100;
+    
+    // Récupérer les tokens actuels
+    const tokensResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/user-tokens-simple?userId=${targetUserId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!tokensResponse.ok) {
+      const tokensData = await tokensResponse.json().catch(() => ({}));
+      const currentTokens = tokensData.tokensRemaining || tokensData.tokens || 0;
+      
+      if (currentTokens < requiredTokens) {
+        return NextResponse.json({ 
+          success: false, 
+          error: `Tokens insuffisants. Vous avez ${currentTokens} tokens, ${requiredTokens} tokens sont requis.` 
+        }, { status: 400 });
+      }
+    }
+
+    const tokensData = await tokensResponse.json().catch(() => ({ tokensRemaining: 0 }));
+    const currentTokens = tokensData.tokensRemaining || tokensData.tokens || 0;
 
     if (currentTokens < requiredTokens) {
       console.log(`❌ Tokens insuffisants: ${currentTokens} < ${requiredTokens}`);
@@ -46,20 +91,33 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // 2. Consommer les tokens
-    const newTokenBalance = currentTokens - requiredTokens;
-    const { error: tokenUpdateError } = await supabase
-      .from('users')
-      .update({ tokens: newTokenBalance })
-      .eq('id', userId);
+    // Consommer les tokens via l'API user-tokens-simple
+    const consumeResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/user-tokens-simple`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: targetUserId,
+        tokensToConsume: requiredTokens,
+        moduleId: 'voice-isolation',
+        moduleName: 'Isolation Vocale par IA',
+        action: 'voice-isolation.activate',
+        description: 'Activation de l\'application Isolation Vocale par IA'
+      })
+    });
 
-    if (tokenUpdateError) {
-      console.error('❌ Erreur mise à jour tokens:', tokenUpdateError);
+    if (!consumeResponse.ok) {
+      const consumeError = await consumeResponse.json().catch(() => ({}));
+      console.error('❌ Erreur consommation tokens:', consumeError);
       return NextResponse.json({ 
         success: false, 
-        error: 'Erreur lors de la consommation des tokens' 
+        error: consumeError.message || 'Erreur lors de la consommation des tokens' 
       }, { status: 500 });
     }
+
+    const consumeResult = await consumeResponse.json();
+    const newTokenBalance = consumeResult.tokensRemaining || (currentTokens - requiredTokens);
 
     console.log(`✅ ${requiredTokens} tokens consommés. Nouveau solde: ${newTokenBalance}`);
 
@@ -95,11 +153,21 @@ export async function POST(request: NextRequest) {
 
       if (createModuleError || !createdModule) {
         console.error('❌ Erreur lors de la création du module:', createModuleError);
-        // Rembourser les tokens en cas d'erreur
-        await supabase
-          .from('users')
-          .update({ tokens: currentTokens })
-          .eq('id', userId);
+        // Rembourser les tokens en cas d'erreur (via API)
+        await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/user-tokens-simple`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: targetUserId,
+            tokensToConsume: -requiredTokens, // Remboursement
+            moduleId: 'voice-isolation',
+            moduleName: 'Isolation Vocale par IA',
+            action: 'voice-isolation.refund',
+            description: 'Remboursement - Erreur création module'
+          })
+        }).catch(() => {});
         return NextResponse.json({ 
           success: false, 
           error: 'Erreur lors de la création du module Voice Isolation' 
@@ -130,7 +198,7 @@ export async function POST(request: NextRequest) {
     const { data: existingAccess, error: accessError } = await supabase
       .from('user_applications')
       .select('id, is_active, expires_at, usage_count')
-      .eq('user_id', userId)
+      .eq('user_id', targetUserId)
       .eq('module_id', 'voice-isolation')
       .single();
 
@@ -147,11 +215,21 @@ export async function POST(request: NextRequest) {
 
       if (isActive && !isExpired) {
         console.log('✅ Voice Isolation déjà activé pour l\'utilisateur');
-        // Rembourser les tokens car l'application est déjà activée
-        await supabase
-          .from('users')
-          .update({ tokens: currentTokens })
-          .eq('id', userId);
+        // Rembourser les tokens car l'application est déjà activée (via API)
+        await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/user-tokens-simple`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: targetUserId,
+            tokensToConsume: -requiredTokens, // Remboursement
+            moduleId: 'voice-isolation',
+            moduleName: 'Isolation Vocale par IA',
+            action: 'voice-isolation.refund',
+            description: 'Remboursement - Déjà activé'
+          })
+        }).catch(() => {});
         return NextResponse.json({
           success: true,
           message: 'Voice Isolation déjà activé',
@@ -179,11 +257,21 @@ export async function POST(request: NextRequest) {
 
       if (reactivateError) {
         console.error('❌ Erreur réactivation accès:', reactivateError);
-        // Rembourser les tokens en cas d'erreur
-        await supabase
-          .from('users')
-          .update({ tokens: currentTokens })
-          .eq('id', userId);
+        // Rembourser les tokens en cas d'erreur (via API)
+        await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/user-tokens-simple`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: targetUserId,
+            tokensToConsume: -requiredTokens, // Remboursement
+            moduleId: 'voice-isolation',
+            moduleName: 'Isolation Vocale par IA',
+            action: 'voice-isolation.refund',
+            description: 'Remboursement - Erreur réactivation'
+          })
+        }).catch(() => {});
         return NextResponse.json({ 
           success: false, 
           error: 'Erreur lors de la réactivation de l\'accès' 
@@ -197,7 +285,7 @@ export async function POST(request: NextRequest) {
       const { data: newAccess, error: createAccessError } = await supabase
         .from('user_applications')
         .insert([{
-          user_id: userId,
+          user_id: targetUserId,
           module_id: 'voice-isolation',
           module_title: 'Isolation Vocale par IA',
           is_active: true,
@@ -213,11 +301,21 @@ export async function POST(request: NextRequest) {
 
       if (createAccessError) {
         console.error('❌ Erreur création accès:', createAccessError);
-        // Rembourser les tokens en cas d'erreur
-        await supabase
-          .from('users')
-          .update({ tokens: currentTokens })
-          .eq('id', userId);
+        // Rembourser les tokens en cas d'erreur (via API)
+        await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/user-tokens-simple`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: targetUserId,
+            tokensToConsume: -requiredTokens, // Remboursement
+            moduleId: 'voice-isolation',
+            moduleName: 'Isolation Vocale par IA',
+            action: 'voice-isolation.refund',
+            description: 'Remboursement - Erreur création accès'
+          })
+        }).catch(() => {});
         return NextResponse.json({ 
           success: false, 
           error: 'Erreur lors de la création de l\'accès' 
