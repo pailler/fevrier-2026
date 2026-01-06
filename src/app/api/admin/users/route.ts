@@ -165,6 +165,64 @@ export async function PUT(request: NextRequest) {
         result = activateResult;
         break;
 
+      case 'update_tokens':
+        const { tokens } = data;
+        
+        if (typeof tokens !== 'number' || tokens < 0) {
+          return NextResponse.json({ error: 'Nombre de tokens invalide' }, { status: 400 });
+        }
+
+        // Vérifier si l'utilisateur a déjà des tokens
+        const { data: existingTokens } = await supabase
+          .from('user_tokens')
+          .select('*')
+          .eq('user_id', userId)
+          .single();
+
+        let tokenResult;
+        if (existingTokens) {
+          // Mettre à jour les tokens existants
+          const { data: tokenUpdateResult, error: tokenUpdateError } = await supabase
+            .from('user_tokens')
+            .update({
+              tokens: tokens,
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', userId)
+            .select()
+            .single();
+
+          if (tokenUpdateError) {
+            console.error('❌ Erreur mise à jour tokens:', tokenUpdateError);
+            return NextResponse.json({ error: 'Erreur lors de la mise à jour des tokens' }, { status: 500 });
+          }
+
+          tokenResult = tokenUpdateResult;
+        } else {
+          // Créer un nouvel enregistrement de tokens
+          const { data: tokenInsertResult, error: tokenInsertError } = await supabase
+            .from('user_tokens')
+            .insert({
+              user_id: userId,
+              tokens: tokens,
+              package_name: 'Admin Manual Update',
+              purchase_date: new Date().toISOString(),
+              is_active: true
+            })
+            .select()
+            .single();
+
+          if (tokenInsertError) {
+            console.error('❌ Erreur création tokens:', tokenInsertError);
+            return NextResponse.json({ error: 'Erreur lors de la création des tokens' }, { status: 500 });
+          }
+
+          tokenResult = tokenInsertResult;
+        }
+
+        result = tokenResult;
+        break;
+
       default:
         return NextResponse.json({ error: 'Action non reconnue' }, { status: 400 });
     }

@@ -51,8 +51,8 @@ export NAS_PATH=/volume1/docker/iahome
 ssh admin@192.168.1.130
 
 # Créer les répertoires nécessaires
-mkdir -p /volume1/docker/iahome/traefik/dynamic
 mkdir -p /volume1/docker/immo
+mkdir -p /volume1/docker/iahome/traefik/dynamic
 ```
 
 #### Étape 2 : Copier les fichiers
@@ -61,7 +61,7 @@ Depuis votre machine locale :
 
 ```bash
 # Copier docker-compose
-scp docker-compose.real-estate.yml admin@192.168.1.130:/volume1/docker/iahome/
+scp docker-compose.real-estate.yml admin@192.168.1.130:/volume1/docker/immo/
 
 # Copier la configuration Traefik
 scp traefik/dynamic/real-estate.yml admin@192.168.1.130:/volume1/docker/iahome/traefik/dynamic/
@@ -77,7 +77,7 @@ scp package.json package-lock.json next.config.ts tsconfig.json Dockerfile admin
 Sur le NAS :
 
 ```bash
-cd /volume1/docker/iahome
+cd /volume1/docker/immo
 
 # Arrêter l'ancien container si existant
 docker-compose -f docker-compose.real-estate.yml down
@@ -96,7 +96,7 @@ docker-compose -f docker-compose.real-estate.yml logs -f
 
 ### Variables d'environnement
 
-Créer ou modifier `env.production.local` dans `/volume1/docker/immo/` sur le NAS avec :
+Créer ou modifier `.env.production` dans `/volume1/docker/immo/` sur le NAS avec :
 
 ```env
 # Supabase
@@ -152,7 +152,7 @@ ssh admin@192.168.1.130 "docker ps | grep real-estate-app"
 ### Vérifier les logs
 
 ```bash
-ssh admin@192.168.1.130 "cd /volume1/docker/iahome && docker-compose -f docker-compose.real-estate.yml logs -f"
+ssh admin@192.168.1.130 "cd /volume1/docker/immo && docker-compose -f docker-compose.real-estate.yml logs -f"
 ```
 
 ### Vérifier la santé du container
@@ -175,7 +175,7 @@ Pour mettre à jour l'application :
 
 # Méthode 2 : Manuellement
 ssh admin@192.168.1.130 << EOF
-cd /volume1/docker/iahome
+cd /volume1/docker/immo
 docker-compose -f docker-compose.real-estate.yml down
 # Copier les nouveaux fichiers...
 docker-compose -f docker-compose.real-estate.yml build --no-cache
@@ -239,7 +239,7 @@ docker system prune -a
 - Le port interne est **3001** pour éviter les conflits avec l'application principale (port 3000)
 - Le container utilise le réseau `iahome-network` partagé avec Traefik
 - Les certificats SSL sont gérés automatiquement par Let's Encrypt via Traefik
-- Les logs sont stockés dans `/volume1/docker/immo/logs` sur le NAS
+- Les logs sont stockés dans `/volume1/docker/immo/logs/` sur le NAS
 
 ## 🔐 Sécurité
 

@@ -226,18 +226,41 @@ export async function POST(request: NextRequest) {
       console.log('✅ Module activé avec succès:', activationData);
     }
 
-    // Envoyer une notification d'activation du module
+    // Envoyer une notification d'activation du module à l'utilisateur
     try {
-      const { NotificationService } = await import('../../../utils/notificationService');
-      const notificationService = NotificationService.getInstance();
+      const { EmailService } = await import('../../../utils/emailService');
+      const emailService = EmailService.getInstance();
       
-      await notificationService.sendModuleActivatedNotification(
-        userEmail,
-        userEmail.split('@')[0] || 'Utilisateur',
-        moduleTitle
-      );
+      await emailService.sendNotificationEmail('module_activated', userEmail, {
+        user_name: userEmail.split('@')[0] || 'Utilisateur',
+        user_email: userEmail,
+        module_name: moduleTitle,
+        module_id: moduleId,
+        activation_date: new Date().toLocaleDateString('fr-FR'),
+        activation_time: new Date().toLocaleTimeString('fr-FR'),
+        activation_method: 'Paiement'
+      });
     } catch (notificationError) {
-      console.error('Erreur lors de l\'envoi de la notification:', notificationError);
+      console.error('Erreur lors de l\'envoi de la notification utilisateur:', notificationError);
+      // Ne pas faire échouer l'activation si la notification échoue
+    }
+
+    // Envoyer une notification à l'admin
+    try {
+      const { EmailService } = await import('../../../utils/emailService');
+      const emailService = EmailService.getInstance();
+      
+      await emailService.sendNotificationEmail('admin_module_activated', 'formateur_tic@hotmail.com', {
+        user_name: userEmail.split('@')[0] || 'Utilisateur',
+        user_email: userEmail,
+        module_name: moduleTitle,
+        module_id: moduleId,
+        activation_date: new Date().toLocaleDateString('fr-FR'),
+        activation_time: new Date().toLocaleTimeString('fr-FR'),
+        activation_method: 'Paiement'
+      });
+    } catch (notificationError) {
+      console.error('Erreur lors de l\'envoi de la notification admin:', notificationError);
       // Ne pas faire échouer l'activation si la notification échoue
     }
 

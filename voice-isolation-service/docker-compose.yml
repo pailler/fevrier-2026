@@ -9,6 +9,7 @@ services:
       - ./uploads:/app/uploads
       - ./outputs:/app/outputs
       - ../ai-models-cache/torch:/root/.cache/torch
+      - ../ai-models-cache/demucs:/root/.cache/torch/hub/checkpoints
     environment:
       - CUDA_VISIBLE_DEVICES=0  # Utiliser GPU si disponible, sinon CPU
       - GRADIO_SERVER_NAME=0.0.0.0

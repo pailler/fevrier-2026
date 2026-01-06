@@ -1,0 +1,62 @@
+# Configuration Traefik pour Game Console Reservation - resas.regispailler.fr
+# Sous-domaine: resas.regispailler.fr
+# Note: SSL géré par Cloudflare, pas besoin de Let's Encrypt ici
+# Service sur 192.168.1.130:5000
+
+http:
+  routers:
+    # Route principale pour le frontend
+    resas:
+      rule: "Host(`resas.regispailler.fr`)"
+      service: resas-service
+      entryPoints:
+        - websecure
+        - web
+      # TLS désactivé car géré par Cloudflare
+      # tls:
+      #   certResolver: letsencrypt
+      priority: 10
+      middlewares:
+        - resas-headers
+        - resas-cors
+
+  services:
+    # Service pour le frontend (port 5000)
+    resas-service:
+      loadBalancer:
+        servers:
+          # Utiliser host.docker.internal pour accéder aux services sur l'hôte depuis Docker
+          # Si Traefik tourne dans Docker, cela permet d'accéder au port 5000 de l'hôte
+          - url: "http://host.docker.internal:5000"
+        passHostHeader: true
+
+  middlewares:
+    resas-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-For: ""
+        customResponseHeaders:
+          X-Frame-Options: "SAMEORIGIN"
+          X-Content-Type-Options: "nosniff"
+          Referrer-Policy: "strict-origin-when-cross-origin"
+          Access-Control-Allow-Origin: "*"
+          Access-Control-Allow-Methods: "GET, POST, PUT, DELETE, OPTIONS"
+          Access-Control-Allow-Headers: "Content-Type, Authorization"
+          Access-Control-Max-Age: "3600"
+    
+    resas-cors:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        accessControlAllowHeaders:
+          - Content-Type
+          - Authorization
+        accessControlAllowOriginList:
+          - "*"
+        accessControlMaxAge: 3600
+        addVaryHeader: true

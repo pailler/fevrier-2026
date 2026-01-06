@@ -112,6 +112,35 @@ services:
       - "traefik.http.services.traefik.loadbalancer.server.port=8080"
 
 
+  # Portainer - Interface de gestion Docker
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: iahome-portainer
+    restart: unless-stopped
+    command: -H unix:///var/run/docker.sock
+    ports:
+      - "9002:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainer_data:/data
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - iahome-network
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.25'
+        reservations:
+          memory: 256M
+          cpus: '0.1'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.iahome.fr`)"
+      - "traefik.http.routers.portainer.entrypoints=web"
+      - "traefik.http.routers.portainer.service=portainer-service"
+      - "traefik.http.services.portainer-service.loadbalancer.server.port=9000"
+
   # Service de monitoring (optionnel)
   # prometheus:
   #   image: prom/prometheus:latest
@@ -142,3 +171,4 @@ networks:
 
 volumes:
   letsencrypt:
+  portainer_data:

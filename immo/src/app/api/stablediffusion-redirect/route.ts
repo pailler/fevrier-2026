@@ -1,0 +1,27 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+const STABLEDIFFUSION_URL = 'https://stablediffusion.iahome.fr';
+const STABLEDIFFUSION_CREDENTIALS = {
+  username: 'admin',
+  password: 'Rasulova75'
+};
+
+export async function GET(request: NextRequest) {
+  try {
+    // Créer l'URL avec les credentials
+    const credentials = `${STABLEDIFFUSION_CREDENTIALS.username}:${STABLEDIFFUSION_CREDENTIALS.password}`;
+    const encodedCredentials = Buffer.from(credentials).toString('base64');
+    
+    // Construire l'URL avec authentification
+    const authUrl = `${STABLEDIFFUSION_URL.replace('https://', `https://${encodedCredentials}@`)}`;
+    
+    // Redirection vers Stable Diffusion avec authentification
+    return NextResponse.redirect(authUrl);
+
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Erreur interne du serveur' },
+      { status: 500 }
+    );
+  }
+} 

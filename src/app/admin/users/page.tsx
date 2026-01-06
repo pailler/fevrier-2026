@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getSupabaseClient } from '../../../utils/supabaseService';
 import EditUserModal from '../../../components/admin/EditUserModal';
+import AddTokensModal from '../../../components/admin/AddTokensModal';
 
 // Intervalle de rafraîchissement automatique (en millisecondes)
 const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes
@@ -26,6 +27,7 @@ interface User {
   status: 'active' | 'inactive' | 'suspended';
   modules: string[];
   applications: UserApplication[];
+  tokens?: number;
 }
 
 export default function AdminUsers() {
@@ -36,8 +38,12 @@ export default function AdminUsers() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [addingTokensUser, setAddingTokensUser] = useState<User | null>(null);
+  const [isAddTokensModalOpen, setIsAddTokensModalOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [editingTokens, setEditingTokens] = useState<{ userId: string; value: number } | null>(null);
+  const [tokensLoading, setTokensLoading] = useState<string | null>(null);
 
   const loadUsers = useCallback(async () => {
     try {
@@ -72,6 +78,17 @@ export default function AdminUsers() {
 
           if (appsError) {
             console.error(`❌ Erreur applications pour ${profile.email}:`, appsError);
+          }
+
+          // Récupérer les tokens de l'utilisateur
+          const { data: userTokens, error: tokensError } = await supabase
+            .from('user_tokens')
+            .select('tokens')
+            .eq('user_id', profile.id)
+            .single();
+
+          if (tokensError && tokensError.code !== 'PGRST116') {
+            console.error(`❌ Erreur tokens pour ${profile.email}:`, tokensError);
           }
 
           // Calculer la dernière connexion basée sur l'activité réelle
@@ -135,7 +152,8 @@ export default function AdminUsers() {
               expiresAt: app.expires_at,
               lastUsedAt: app.last_used_at,
               createdAt: app.created_at
-            })) || []
+            })) || [],
+            tokens: userTokens?.tokens || 0
           };
         })
       );
@@ -282,6 +300,66 @@ export default function AdminUsers() {
     } finally {
       setActionLoading(null);
     }
+  };
+
+  const handleAddTokens = (user: User) => {
+    setAddingTokensUser(user);
+    setIsAddTokensModalOpen(true);
+  };
+
+  const handleTokensAdded = () => {
+    // Recharger les utilisateurs pour mettre à jour les tokens
+    loadUsers();
+  };
+
+  const handleEditTokens = (user: User) => {
+    setEditingTokens({ userId: user.id, value: user.tokens || 0 });
+  };
+
+  const handleSaveTokens = async (userId: string, newTokens: number) => {
+    if (newTokens < 0) {
+      alert('Le nombre de tokens ne peut pas être négatif');
+      return;
+    }
+
+    setTokensLoading(userId);
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          action: 'update_tokens',
+          data: { tokens: newTokens }
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la mise à jour');
+      }
+
+      // Mettre à jour la liste des utilisateurs
+      setUsers(users.map(user => 
+        user.id === userId 
+          ? { ...user, tokens: newTokens }
+          : user
+      ));
+
+      setEditingTokens(null);
+      console.log('✅ Tokens mis à jour avec succès');
+    } catch (error) {
+      console.error('❌ Erreur lors de la mise à jour des tokens:', error);
+      alert(error instanceof Error ? error.message : 'Erreur lors de la mise à jour des tokens');
+    } finally {
+      setTokensLoading(null);
+    }
+  };
+
+  const handleCancelEditTokens = () => {
+    setEditingTokens(null);
   };
 
   const getStatusBadge = (status: string) => {
@@ -543,6 +621,9 @@ export default function AdminUsers() {
                   Modules
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Tokens
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Dernière activité
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -607,6 +688,60 @@ export default function AdminUsers() {
                             )}
                           </div>
                         ))}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {editingTokens?.userId === user.id ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min="0"
+                          value={editingTokens.value}
+                          onChange={(e) => setEditingTokens({ ...editingTokens, value: parseInt(e.target.value) || 0 })}
+                          className="w-24 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              handleSaveTokens(user.id, editingTokens.value);
+                            } else if (e.key === 'Escape') {
+                              handleCancelEditTokens();
+                            }
+                          }}
+                        />
+                        <button
+                          onClick={() => handleSaveTokens(user.id, editingTokens.value)}
+                          disabled={tokensLoading === user.id}
+                          className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Sauvegarder"
+                        >
+                          {tokensLoading === user.id ? '...' : '✓'}
+                        </button>
+                        <button
+                          onClick={handleCancelEditTokens}
+                          disabled={tokensLoading === user.id}
+                          className="text-xs px-2 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Annuler"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span 
+                          className={`text-sm font-semibold cursor-pointer hover:text-blue-600 ${(user.tokens || 0) > 0 ? 'text-green-600' : 'text-gray-400'}`}
+                          onClick={() => handleEditTokens(user)}
+                          title="Cliquer pour modifier"
+                        >
+                          {user.tokens?.toLocaleString() || 0}
+                        </span>
+                        <button
+                          onClick={() => handleAddTokens(user)}
+                          className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                          title="Ajouter des tokens"
+                        >
+                          + Ajouter
+                        </button>
                       </div>
                     )}
                   </td>
@@ -678,6 +813,19 @@ export default function AdminUsers() {
             setEditingUser(null);
           }}
           onSave={handleSaveUser}
+        />
+      )}
+
+      {/* Modal d'ajout de tokens */}
+      {addingTokensUser && (
+        <AddTokensModal
+          user={addingTokensUser}
+          isOpen={isAddTokensModalOpen}
+          onClose={() => {
+            setIsAddTokensModalOpen(false);
+            setAddingTokensUser(null);
+          }}
+          onSuccess={handleTokensAdded}
         />
       )}
     </div>

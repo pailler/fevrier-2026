@@ -23,16 +23,18 @@ services:
     volumes:
       # Persister les modèles téléchargés (dossier centralisé)
       - ../ai-models-cache/huggingface:/root/.cache/huggingface
+      # Persister aussi le cache hy3dgen (utilisé par le code)
+      - ../ai-models-cache/huggingface:/root/.cache/hy3dgen
       # Persister les générations
       - hunyuan3d-output:/app/code/temp
       # Persister le cache Gradio
       - hunyuan3d-cache:/app/code/gradio_cache
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8888/"]
-      interval: 30s
+      interval: 60s
       timeout: 10s
-      retries: 3
-      start_period: 300s  # 5 minutes pour le chargement initial
+      retries: 5
+      start_period: 600s  # 10 minutes pour le chargement initial (modèles volumineux)
     networks:
       - iahome-network
 

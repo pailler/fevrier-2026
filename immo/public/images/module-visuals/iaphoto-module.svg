@@ -1,0 +1,87 @@
+<svg width="400" height="225" viewBox="0 0 400 225" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="iaphoto-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="iaphoto-card" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#f8fafc;stop-opacity:0.95" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="225" fill="url(#iaphoto-bg)" rx="12"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="70" cy="70" r="22" fill="white" opacity="0.1"/>
+  <circle cx="330" cy="80" r="16" fill="white" opacity="0.08"/>
+  <circle cx="340" cy="160" r="24" fill="white" opacity="0.06"/>
+  
+  <!-- Main photo editor card -->
+  <rect x="40" y="30" width="320" height="165" fill="url(#iaphoto-card)" rx="16" filter="url(#shadow)"/>
+  
+  <!-- Photo gallery area -->
+  <rect x="60" y="50" width="280" height="120" fill="#f8fafc" rx="8" stroke="#e2e8f0" stroke-width="1"/>
+  
+  <!-- Photo thumbnails -->
+  <rect x="70" y="60" width="60" height="45" fill="#f1f5f9" rx="4"/>
+  <rect x="75" y="65" width="50" height="35" fill="#e2e8f0" rx="2"/>
+  
+  <rect x="140" y="60" width="60" height="45" fill="#f1f5f9" rx="4"/>
+  <rect x="145" y="65" width="50" height="35" fill="#dbeafe" rx="2"/>
+  
+  <rect x="210" y="60" width="60" height="45" fill="#f1f5f9" rx="4"/>
+  <rect x="215" y="65" width="50" height="35" fill="#fef3c7" rx="2"/>
+  
+  <rect x="280" y="60" width="60" height="45" fill="#f1f5f9" rx="4"/>
+  <rect x="285" y="65" width="50" height="35" fill="#fce7f3" rx="2"/>
+  
+  <!-- Main photo editor -->
+  <rect x="70" y="115" width="120" height="45" fill="#f1f5f9" rx="6"/>
+  <rect x="75" y="120" width="110" height="35" fill="#e2e8f0" rx="3"/>
+  
+  <!-- Camera icon -->
+  <circle cx="125" cy="137" r="8" fill="#3b82f6"/>
+  <circle cx="125" cy="137" r="4" fill="white"/>
+  <rect x="120" y="130" width="10" height="3" fill="#3b82f6" rx="1.5"/>
+  
+  <!-- AI tools panel -->
+  <rect x="210" y="115" width="120" height="45" fill="#f1f5f9" rx="6"/>
+  
+  <!-- AI enhancement button -->
+  <rect x="220" y="120" width="50" height="25" fill="#10b981" rx="4"/>
+  <text x="245" y="136" font-family="Inter, sans-serif" font-size="9" fill="white" font-weight="600" text-anchor="middle">Enhance</text>
+  
+  <!-- Background removal button -->
+  <rect x="280" y="120" width="40" height="25" fill="#8b5cf6" rx="4"/>
+  <text x="300" y="136" font-family="Inter, sans-serif" font-size="9" fill="white" font-weight="600" text-anchor="middle">Remove</text>
+  
+  <!-- Floating elements -->
+  <circle cx="320" cy="55" r="4" fill="#10b981" opacity="0.8"/>
+  <circle cx="330" cy="70" r="3" fill="#3b82f6" opacity="0.6"/>
+  <circle cx="315" cy="85" r="5" fill="#8b5cf6" opacity="0.7"/>
+  
+  <!-- Title overlay -->
+  <rect x="0" y="0" width="400" height="225" fill="url(#iaphoto-bg)" opacity="0" rx="12"/>
+</svg>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

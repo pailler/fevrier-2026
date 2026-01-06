@@ -54,7 +54,18 @@ export default function ApprendreAutrementPage() {
       if (typeof window === 'undefined') return;
 
       const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
+      let token = urlParams.get('token');
+      
+      // Si pas de token dans l'URL, vérifier dans sessionStorage (pour navigation interne)
+      if (!token && typeof window !== 'undefined') {
+        token = sessionStorage.getItem('apprendre-autrement-token');
+        if (token) {
+          // Remettre le token dans l'URL pour les navigations futures
+          const newUrl = new URL(window.location.href);
+          newUrl.searchParams.set('token', token);
+          window.history.replaceState({}, '', newUrl.toString());
+        }
+      }
 
       // En mode développement (localhost), permettre l'accès sans token
       const isDevelopment = typeof window !== 'undefined' && 
@@ -74,6 +85,11 @@ export default function ApprendreAutrementPage() {
         setTokenError('Token d\'accès manquant. Veuillez accéder à cette page via le bouton "Accéder à Apprendre Autrement" sur iahome.fr.');
         return;
       }
+      
+      // Sauvegarder le token dans sessionStorage pour les navigations futures
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('apprendre-autrement-token', token);
+      }
 
       try {
         // Utiliser l'API du projet principal (iahome) pour valider le token
@@ -86,7 +102,9 @@ export default function ApprendreAutrementPage() {
         
         console.log(`🔍 Validation token - Hostname: ${typeof window !== 'undefined' ? window.location.hostname : 'unknown'}, Development: ${isDevelopment}`);
         console.log(`🔍 Validation token vers: ${apiUrl}`);
-        console.log(`🔍 Token: ${token.substring(0, 50)}...`);
+        if (token) {
+          console.log(`🔍 Token: ${token.substring(0, 50)}...`);
+        }
         
         const response = await fetch(apiUrl, {
           method: 'POST',
@@ -122,8 +140,14 @@ export default function ApprendreAutrementPage() {
         const result = await response.json();
         console.log('✅ Token validé:', result);
 
-        // Token valide, nettoyer l'URL
-        window.history.replaceState({}, document.title, window.location.pathname);
+        // Token valide, préserver le token dans l'URL et sessionStorage
+        // token est déjà déclaré plus haut dans la fonction
+        if (token) {
+          // Sauvegarder dans sessionStorage pour les navigations futures
+          sessionStorage.setItem('apprendre-autrement-token', token);
+          // Garder le token dans l'URL pour les navigations futures
+          window.history.replaceState({}, document.title, `${window.location.pathname}?token=${encodeURIComponent(token)}`);
+        }
         setTokenValidated(true);
       } catch (err: any) {
         console.error('❌ Erreur validation token:', err);
@@ -189,8 +213,13 @@ export default function ApprendreAutrementPage() {
           isFast: parseInt(time) < 60
         });
 
-        // Nettoyer l'URL
-        window.history.replaceState({}, '', '/apprendre-autrement');
+        // Nettoyer l'URL mais préserver le token
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const cleanUrl = token 
+          ? `/apprendre-autrement?token=${encodeURIComponent(token)}`
+          : '/apprendre-autrement';
+        window.history.replaceState({}, '', cleanUrl);
       }
     }
 
@@ -590,8 +619,20 @@ export default function ApprendreAutrementPage() {
                 index={index}
                 isCompleted={completedActivities.includes(activity.id)}
                 onSelect={() => {
-                  // Rediriger vers la page d'activité
-                  window.location.href = `/apprendre-autrement/activity/${activity.id}`;
+                  // Récupérer le token de l'URL actuelle de manière synchrone
+                  let token: string | null = null;
+                  if (typeof window !== 'undefined') {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    token = urlParams.get('token');
+                  }
+                  
+                  // Rediriger vers la page d'activité en préservant le token
+                  const activityUrl = token 
+                    ? `/apprendre-autrement/activity/${activity.id}?token=${encodeURIComponent(token)}`
+                    : `/apprendre-autrement/activity/${activity.id}`;
+                  
+                  // Utiliser window.location.href pour garantir que le token est préservé
+                  window.location.href = activityUrl;
                 }}
                 accessibilitySettings={accessibilitySettings}
               />

@@ -3097,6 +3097,192 @@
         }
       ],
       "name": "Projet Lawn Mower Card"
+    },
+    {
+      "id": "dashboard-energetique",
+      "name": "Dashboard Énergétique",
+      "description": "Cartes pour dashboard énergétique professionnel avec jauges, graphiques, contrôles et visualisations avancées. Inspiré des dashboards modernes pour la gestion d'énergie, batteries, température et consommation.",
+      "codes": [
+        {
+          "id": "gauge-temperatures-pieces",
+          "name": "Jauges Température - Grille de Pièces",
+          "description": "Grille de jauges circulaires pour afficher les températures de différentes pièces avec fond coloré",
+          "tags": [
+            "jauge",
+            "température",
+            "pièces",
+            "grille",
+            "dashboard",
+            "gauge"
+          ],
+          "code": "type: grid\ncolumns: 3\nsquare: false\ncards:\n  - type: gauge\n    entity: sensor.temperature_salon\n    name: Salon\n    min: 0\n    max: 30\n    severity:\n      green: 18\n      yellow: 22\n      red: 25\n    card_mod:\n      style: |\n        ha-card {\n          background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%) !important;\n          border-radius: 15px !important;\n          color: white !important;\n        }\n  - type: gauge\n    entity: sensor.temperature_bureau\n    name: Bureau\n    min: 0\n    max: 30\n    severity:\n      green: 18\n      yellow: 22\n      red: 25\n    card_mod:\n      style: |\n        ha-card {\n          background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%) !important;\n          border-radius: 15px !important;\n          color: white !important;\n        }\n  - type: gauge\n    entity: sensor.temperature_chambre\n    name: Chambre\n    min: 0\n    max: 30\n    severity:\n      green: 18\n      yellow: 22\n      red: 25\n    card_mod:\n      style: |\n        ha-card {\n          background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%) !important;\n          border-radius: 15px !important;\n          color: white !important;\n        }"
+        },
+        {
+          "id": "gauge-batterie-ecoflow",
+          "name": "Jauge Batterie Ecoflow - Total",
+          "description": "Jauge circulaire pour afficher le niveau de charge total de la batterie Ecoflow avec puissance AC IN/OUT",
+          "tags": [
+            "jauge",
+            "batterie",
+            "ecoflow",
+            "énergie",
+            "gauge",
+            "puissance"
+          ],
+          "code": "type: vertical-stack\ncards:\n  - type: gauge\n    entity: sensor.ecoflow_battery_level\n    name: Batterie Totale\n    min: 0\n    max: 100\n    unit: '%'\n    severity:\n      green: 50\n      yellow: 20\n      red: 10\n    card_mod:\n      style: |\n        ha-card {\n          background: rgba(0, 0, 0, 0.3) !important;\n          border-radius: 20px !important;\n        }\n  - type: entities\n    title: Puissance\n    entities:\n      - entity: sensor.ecoflow_ac_in\n        name: AC IN\n      - entity: sensor.ecoflow_ac_out\n        name: AC OUT"
+        },
+        {
+          "id": "gauge-batteries-individuelles",
+          "name": "Grille Batteries Individuelles",
+          "description": "Grille de jauges pour afficher plusieurs batteries Ecoflow (River, Delta) avec leur niveau et puissance",
+          "tags": [
+            "jauge",
+            "batterie",
+            "ecoflow",
+            "grille",
+            "multiple",
+            "gauge"
+          ],
+          "code": "type: grid\ncolumns: 3\nsquare: false\ncards:\n  - type: gauge\n    entity: sensor.river_2_pro_battery\n    name: RIVER 2 PRO\n    min: 0\n    max: 100\n    unit: '%'\n    card_mod:\n      style: |\n        ha-card {\n          background: rgba(255, 255, 255, 0.1) !important;\n          border-radius: 15px !important;\n        }\n  - type: gauge\n    entity: sensor.river_3_ups_battery\n    name: RIVER 3 UPS\n    min: 0\n    max: 100\n    unit: '%'\n    card_mod:\n      style: |\n        ha-card {\n          background: rgba(255, 255, 255, 0.1) !important;\n          border-radius: 15px !important;\n        }\n  - type: gauge\n    entity: sensor.delta_2_battery\n    name: DELTA 2\n    min: 0\n    max: 100\n    unit: '%'\n    card_mod:\n      style: |\n        ha-card {\n          background: rgba(255, 255, 255, 0.1) !important;\n          border-radius: 15px !important;\n        }"
+        },
+        {
+          "id": "graph-vitesse-internet",
+          "name": "Graphique Vitesse Internet",
+          "description": "Carte avec graphique pour afficher la vitesse de téléchargement et d'upload avec ondes visuelles",
+          "tags": [
+            "graphique",
+            "internet",
+            "vitesse",
+            "download",
+            "upload",
+            "graph"
+          ],
+          "code": "type: vertical-stack\ncards:\n  - type: markdown\n    content: |\n      ## Vitesse Internet\n  - type: history-graph\n    entities:\n      - entity: sensor.internet_download_speed\n        name: Download\n      - entity: sensor.internet_upload_speed\n        name: Upload\n    hours_to_show: 24\n    refresh_interval: 60\n    card_mod:\n      style: |\n        ha-card {\n          background: rgba(255, 255, 255, 0.1) !important;\n          border-radius: 20px !important;\n          backdrop-filter: blur(10px) !important;\n        }\n  - type: entities\n    entities:\n      - entity: sensor.internet_download_speed\n        name: Vitesse Download\n        icon: mdi:download\n      - entity: sensor.internet_upload_speed\n        name: Vitesse Upload\n        icon: mdi:upload"
+        },
+        {
+          "id": "tableau-tarifs-octopus",
+          "name": "Tableau Tarifs Unitaires Octopus",
+          "description": "Tableau pour afficher les tarifs unitaires d'électricité par créneaux horaires (Octopus Energy)",
+          "tags": [
+            "tableau",
+            "tarifs",
+            "octopus",
+            "énergie",
+            "électricité",
+            "table"
+          ],
+          "code": "type: entities\ntitle: Tarifs Unitaires Octopus\nshow_header_toggle: false\nentities:\n  - type: custom:template-entity-row\n    entity: sensor.octopus_rate_12_00\n    name: 12:00\n    secondary: '{{ states.sensor.octopus_rate_12_00.state }} P'\n    icon: mdi:currency-gbp\n  - type: custom:template-entity-row\n    entity: sensor.octopus_rate_12_30\n    name: 12:30\n    secondary: '{{ states.sensor.octopus_rate_12_30.state }} P'\n    icon: mdi:currency-gbp\n  - type: custom:template-entity-row\n    entity: sensor.octopus_rate_15_00\n    name: 15:00\n    secondary: '{{ states.sensor.octopus_rate_15_00.state }} P'\n    icon: mdi:currency-gbp\ncard_mod:\n  style: |\n    ha-card {\n      background: rgba(255, 255, 255, 0.1) !important;\n      border-radius: 20px !important;\n      backdrop-filter: blur(10px) !important;\n    }"
+        },
+        {
+          "id": "meteo-prevision-heures",
+          "name": "Météo avec Prévision Horaires",
+          "description": "Carte météo avec conditions actuelles et prévision sur 5 heures avec icônes",
+          "tags": [
+            "météo",
+            "prévision",
+            "heures",
+            "weather",
+            "forecast"
+          ],
+          "code": "type: weather-forecast\nentity: weather.home\nname: Prévision HOMEHA\nforecast_type: hourly\nhours_to_show: 5\ncard_mod:\n  style: |\n    ha-card {\n      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;\n      border-radius: 20px !important;\n      color: white !important;\n    }"
+        },
+        {
+          "id": "carte-radar-meteo",
+          "name": "Carte Radar Météo",
+          "description": "Carte avec carte interactive pour afficher le radar météo et les précipitations",
+          "tags": [
+            "météo",
+            "radar",
+            "carte",
+            "précipitations",
+            "map",
+            "weather"
+          ],
+          "code": "type: map\nentities:\n  - entity: weather.home\n    name: Météo\ndefault_zoom: 8\naspect_ratio: 16:9\ncard_mod:\n  style: |\n    ha-card {\n      background: rgba(255, 255, 255, 0.1) !important;\n      border-radius: 20px !important;\n      overflow: hidden !important;\n    }"
+        },
+        {
+          "id": "lecteur-spotify",
+          "name": "Lecteur Spotify",
+          "description": "Carte média player pour contrôler la lecture Spotify avec informations de la piste",
+          "tags": [
+            "spotify",
+            "média",
+            "musique",
+            "lecteur",
+            "media_player"
+          ],
+          "code": "type: media-control\nentity: media_player.spotify_marcus_libby\ncard_mod:\n  style: |\n    ha-card {\n      background: linear-gradient(135deg, #1db954 0%, #1ed760 100%) !important;\n      border-radius: 20px !important;\n      color: white !important;\n    }\n    .media-info {\n      color: white !important;\n    }"
+        },
+        {
+          "id": "controles-appareils-grille",
+          "name": "Grille Contrôles Appareils",
+          "description": "Grille de boutons pour contrôler différents appareils et zones de la maison",
+          "tags": [
+            "boutons",
+            "contrôles",
+            "appareils",
+            "grille",
+            "buttons",
+            "devices"
+          ],
+          "code": "type: grid\ncolumns: 4\nsquare: true\ncards:\n  - type: custom:button-card\n    entity: switch.cuisine\n    name: Cuisine\n    icon: mdi:chef-hat\n    tap_action:\n      action: toggle\n    card_mod:\n      style: |\n        ha-card {\n          background: rgba(255, 255, 255, 0.1) !important;\n          border-radius: 15px !important;\n        }\n  - type: custom:button-card\n    entity: switch.salon\n    name: Salon\n    icon: mdi:sofa\n    tap_action:\n      action: toggle\n    card_mod:\n      style: |\n        ha-card {\n          background: rgba(255, 255, 255, 0.1) !important;\n          border-radius: 15px !important;\n        }\n  - type: custom:button-card\n    entity: switch.salle_de_bain\n    name: Salle de bain\n    icon: mdi:shower\n    tap_action:\n      action: toggle\n    card_mod:\n      style: |\n        ha-card {\n          background: rgba(255, 255, 255, 0.1) !important;\n          border-radius: 15px !important;\n        }\n  - type: custom:button-card\n    entity: switch.chambre\n    name: Chambre\n    icon: mdi:bed\n    tap_action:\n      action: toggle\n    card_mod:\n      style: |\n        ha-card {\n          background: rgba(255, 255, 255, 0.1) !important;\n          border-radius: 15px !important;\n        }"
+        },
+        {
+          "id": "lectures-puissance",
+          "name": "Lectures de Puissance",
+          "description": "Affichage des lectures de puissance pour différents points de mesure (PS1, PS2, PS3, Total)",
+          "tags": [
+            "puissance",
+            "énergie",
+            "watts",
+            "consommation",
+            "sensor",
+            "power"
+          ],
+          "code": "type: entities\ntitle: Lectures de Puissance\nshow_header_toggle: false\nentities:\n  - entity: sensor.ps1_power\n    name: PS1\n    icon: mdi:lightning-bolt\n  - entity: sensor.ps2_power\n    name: PS2\n    icon: mdi:lightning-bolt\n  - entity: sensor.ps3_power\n    name: PS3\n    icon: mdi:lightning-bolt\n  - type: custom:template-entity-row\n    name: Total\n    state: '{{ states.sensor.ps1_power.state | float + states.sensor.ps2_power.state | float + states.sensor.ps3_power.state | float }}'\n    unit: ' W'\n    icon: mdi:calculator\ncard_mod:\n  style: |\n    ha-card {\n      background: rgba(255, 255, 255, 0.1) !important;\n      border-radius: 20px !important;\n      backdrop-filter: blur(10px) !important;\n    }"
+        },
+        {
+          "id": "calendrier-planning",
+          "name": "Calendrier avec Planning",
+          "description": "Carte calendrier pour afficher les événements et le planning (ex: collecte des poubelles)",
+          "tags": [
+            "calendrier",
+            "planning",
+            "événements",
+            "calendar",
+            "schedule"
+          ],
+          "code": "type: custom:atomic-calendar-revive\nentities:\n  - entity: calendar.poubelles\n  - entity: calendar.evenements\nname: Calendrier\nfirstDayOfWeek: 1\nmaxDaysToShow: 31\ncard_mod:\n  style: |\n    ha-card {\n      background: rgba(255, 255, 255, 0.1) !important;\n      border-radius: 20px !important;\n      backdrop-filter: blur(10px) !important;\n    }"
+        },
+        {
+          "id": "systeme-energetique-ecoflow",
+          "name": "Système Énergétique Ecoflow",
+          "description": "Carte complète pour visualiser le système énergétique Ecoflow avec PV, batterie, consommation maison et campervan",
+          "tags": [
+            "ecoflow",
+            "énergie",
+            "solaire",
+            "batterie",
+            "système",
+            "smart energy"
+          ],
+          "code": "type: vertical-stack\ncards:\n  - type: markdown\n    content: |\n      ## ECOFLOW CHARGING SYSTEM\n      ### SMART ENERGY NETWORK\n  - type: grid\n    columns: 2\n    square: false\n    cards:\n      - type: custom:button-card\n        name: PV TOTAL\n        entity: sensor.ecoflow_pv_total\n        icon: mdi:solar-power\n        card_mod:\n          style: |\n            ha-card {\n              background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;\n              border-radius: 15px !important;\n              color: white !important;\n            }\n      - type: custom:button-card\n        name: Consommation Maison\n        entity: sensor.ecoflow_house_consumption\n        icon: mdi:home\n        card_mod:\n          style: |\n            ha-card {\n              background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;\n              border-radius: 15px !important;\n              color: white !important;\n            }\n      - type: custom:button-card\n        name: Consommation Campervan\n        entity: sensor.ecoflow_campervan_consumption\n        icon: mdi:van-utility\n        card_mod:\n          style: |\n            ha-card {\n              background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%) !important;\n              border-radius: 15px !important;\n              color: white !important;\n            }\n      - type: gauge\n        entity: sensor.ecoflow_battery_level\n        name: Batterie\n        min: 0\n        max: 100\n        unit: '%'\n        card_mod:\n          style: |\n            ha-card {\n              background: rgba(0, 0, 0, 0.3) !important;\n              border-radius: 15px !important;\n            }\n  - type: entities\n    title: Rendement Quotidien\n    entities:\n      - entity: sensor.ecoflow_daily_yield\n        name: Rendement Quotidien\n        icon: mdi:chart-line"
+        },
+        {
+          "id": "grid-usage",
+          "name": "Utilisation Réseau Électrique",
+          "description": "Carte pour afficher l'utilisation du réseau électrique avec taux actuel et suivant",
+          "tags": [
+            "réseau",
+            "électricité",
+            "grid",
+            "taux",
+            "rate",
+            "consommation"
+          ],
+          "code": "type: entities\ntitle: Utilisation Réseau\nshow_header_toggle: false\nentities:\n  - entity: sensor.grid_usage\n    name: Consommation Réseau\n    icon: mdi:transmission-tower\n  - entity: sensor.grid_rate_current\n    name: Taux Actuel\n    icon: mdi:currency-gbp\n  - entity: sensor.grid_rate_next\n    name: Taux Suivant\n    icon: mdi:clock-outline\ncard_mod:\n  style: |\n    ha-card {\n      background: rgba(255, 255, 255, 0.1) !important;\n      border-radius: 20px !important;\n      backdrop-filter: blur(10px) !important;\n    }"
+        }
+      ]
     }
   ]
 }

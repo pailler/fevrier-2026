@@ -1,0 +1,43 @@
+# Configuration Traefik pour Portainer
+# Route portainer.iahome.fr vers portainer:9000
+
+http:
+  routers:
+    # Route principale HTTP (Cloudflare SSL - HTTP vers Traefik)
+    portainer-main:
+      rule: "Host(`portainer.iahome.fr`)"
+      entryPoints: ["web"]
+      service: portainer-service
+      middlewares: ["security-headers@file", "portainer-proxy-headers@file"]
+      priority: 10
+
+    # Route HTTPS (si SSL direct sans Cloudflare)
+    portainer-https:
+      rule: "Host(`portainer.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: portainer-service
+      tls:
+        certResolver: letsencrypt
+      middlewares: ["security-headers@file", "portainer-proxy-headers@file"]
+      priority: 10
+
+  services:
+    # Service principal pour Portainer
+    portainer-service:
+      loadBalancer:
+        servers:
+          - url: "http://portainer:9000"
+        passHostHeader: true
+
+  middlewares:
+    # Headers proxy pour Portainer
+    portainer-proxy-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-For: ""
+          X-Real-IP: ""
+        customResponseHeaders:
+          X-Frame-Options: "SAMEORIGIN"
+          X-Content-Type-Options: "nosniff"
+          Referrer-Policy: "strict-origin-when-cross-origin"

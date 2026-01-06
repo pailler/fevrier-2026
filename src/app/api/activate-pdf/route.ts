@@ -57,6 +57,42 @@ export async function POST(request: Request) {
 
     console.log('✅ Accès PDF+ créé avec succès:', accessData.id);
 
+    // Envoyer une notification à l'utilisateur
+    try {
+      const { EmailService } = await import('../../../utils/emailService');
+      const emailService = EmailService.getInstance();
+      
+      await emailService.sendNotificationEmail('module_activated', email, {
+        user_name: email.split('@')[0] || 'Utilisateur',
+        user_email: email,
+        module_name: moduleTitle,
+        module_id: moduleId,
+        activation_date: new Date().toLocaleDateString('fr-FR'),
+        activation_time: new Date().toLocaleTimeString('fr-FR'),
+        activation_method: 'Gratuit'
+      });
+    } catch (emailError) {
+      console.error('Erreur lors de l\'envoi de la notification utilisateur:', emailError);
+    }
+
+    // Envoyer une notification à l'admin
+    try {
+      const { EmailService } = await import('../../../utils/emailService');
+      const emailService = EmailService.getInstance();
+      
+      await emailService.sendNotificationEmail('admin_module_activated', 'formateur_tic@hotmail.com', {
+        user_name: email.split('@')[0] || 'Utilisateur',
+        user_email: email,
+        module_name: moduleTitle,
+        module_id: moduleId,
+        activation_date: new Date().toLocaleDateString('fr-FR'),
+        activation_time: new Date().toLocaleTimeString('fr-FR'),
+        activation_method: 'Gratuit'
+      });
+    } catch (emailError) {
+      console.error('Erreur lors de l\'envoi de la notification admin:', emailError);
+    }
+
     return NextResponse.json({
       success: true,
       message: 'PDF+ activé avec succès',

@@ -23,14 +23,27 @@ export const vocabularyWords: VocabularyWord[] = [
   // Animaux
   { id: 'chat', word: 'chat', category: 'Animaux', emoji: '🐱' },
   { id: 'chien', word: 'chien', category: 'Animaux', emoji: '🐶' },
-  { id: 'oiseau', word: 'oiseau', category: 'Animaux', emoji: '🐦' },
-  { id: 'lapin', word: 'lapin', category: 'Animaux', emoji: '🐰' },
-  { id: 'ours', word: 'ours', category: 'Animaux', emoji: '🐻' },
-  { id: 'elephant', word: 'éléphant', category: 'Animaux', emoji: '🐘' },
-  { id: 'lion', word: 'lion', category: 'Animaux', emoji: '🦁' },
+  { id: 'coq', word: 'coq', category: 'Animaux', emoji: '🐓' },
+  { id: 'poule', word: 'poule', category: 'Animaux', emoji: '🐔' },
   { id: 'vache', word: 'vache', category: 'Animaux', emoji: '🐄' },
+  { id: 'mouton', word: 'mouton', category: 'Animaux', emoji: '🐑' },
+  { id: 'chevre', word: 'chèvre', category: 'Animaux', emoji: '🐐' },
   { id: 'cochon', word: 'cochon', category: 'Animaux', emoji: '🐷' },
   { id: 'cheval', word: 'cheval', category: 'Animaux', emoji: '🐴' },
+  { id: 'ane', word: 'âne', category: 'Animaux', emoji: '🫏' },
+  { id: 'canard', word: 'canard', category: 'Animaux', emoji: '🦆' },
+  { id: 'dinde', word: 'dinde', category: 'Animaux', emoji: '🦃' },
+  { id: 'souris', word: 'souris', category: 'Animaux', emoji: '🐭' },
+  { id: 'lapin', word: 'lapin', category: 'Animaux', emoji: '🐰' },
+  { id: 'lion', word: 'lion', category: 'Animaux', emoji: '🦁' },
+  { id: 'elephant', word: 'éléphant', category: 'Animaux', emoji: '🐘' },
+  { id: 'singe', word: 'singe', category: 'Animaux', emoji: '🐵' },
+  { id: 'hibou', word: 'hibou', category: 'Animaux', emoji: '🦉' },
+  { id: 'loup', word: 'loup', category: 'Animaux', emoji: '🐺' },
+  { id: 'ours', word: 'ours', category: 'Animaux', emoji: '🐻' },
+  { id: 'grenouille', word: 'grenouille', category: 'Animaux', emoji: '🐸' },
+  { id: 'abeille', word: 'abeille', category: 'Animaux', emoji: '🐝' },
+  { id: 'oiseau', word: 'oiseau', category: 'Animaux', emoji: '🐦' },
   
   // Aliments
   { id: 'pomme', word: 'pomme', category: 'Aliments', emoji: '🍎' },
@@ -141,6 +154,14 @@ export const vocabularyWords: VocabularyWord[] = [
   { id: 'petit', word: 'petit', category: 'Taille', emoji: '📐' },
   { id: 'chaud', word: 'chaud', category: 'Température', emoji: '🔥' },
   { id: 'froid', word: 'froid', category: 'Température', emoji: '❄️' },
+  
+  // Bruits de la Ville
+  { id: 'pompiers', word: 'Pompiers', category: 'Bruits de la Ville', emoji: '🚒' },
+  { id: 'camion-poubelle', word: 'Camion poubelle', category: 'Bruits de la Ville', emoji: '🗑️' },
+  { id: 'police', word: 'Police', category: 'Bruits de la Ville', emoji: '🚓' },
+  { id: 'ambulance', word: 'Ambulance', category: 'Bruits de la Ville', emoji: '🚑' },
+  { id: 'moto', word: 'Moto', category: 'Bruits de la Ville', emoji: '🏍️' },
+  { id: 'voiture', word: 'Voiture', category: 'Bruits de la Ville', emoji: '🚗' },
 ];
 
 // Fonction pour obtenir les mots par catégorie

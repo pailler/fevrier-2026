@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import Link from 'next/link';
+import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { activities } from '../../../../utils/apprendre-autrement/activities';
 import { getAccessibilitySettings, AccessibilitySettings } from '../../../../utils/apprendre-autrement/accessibility';
 import { useVoiceEncouragement } from '../../../../hooks/useVoiceEncouragement';
@@ -3793,16 +3792,43 @@ function AnimalSoundsActivity({
   accessibilitySettings: AccessibilitySettings;
   onComplete: (result: { accuracy: number; timeSpent: number; isPerfect: boolean; isFast: boolean }) => void;
 }) {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>('Animaux');
   const [displayedWords, setDisplayedWords] = useState<VocabularyWord[]>([]);
   const [clickedWords, setClickedWords] = useState<Set<string>>(new Set());
   const [startTime] = useState(Date.now());
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [playingSound, setPlayingSound] = useState<string | null>(null);
+  const [selectedCard, setSelectedCard] = useState<string | null>(null); // Carte sélectionnée pour affichage en grand
+  const [audioRefs, setAudioRefs] = useState<Map<string, HTMLAudioElement>>(new Map());
   const { encourage } = useVoiceEncouragement({ 
     enabled: accessibilitySettings.soundEnabled,
     volume: accessibilitySettings.voiceVolume || 1.0,
     rate: accessibilitySettings.voiceRate || 0.9
   });
+
+  // Mapping des animaux vers leurs fichiers audio
+  const animalSounds: Record<string, string> = {
+    'chien': '/sounds/chien.wav',
+    'chat': '/sounds/chat.wav',
+    'coq': '/sounds/coq.wav',
+    'poule': '/sounds/chicken.mp3', // Fichier téléchargé
+    'vache': '/sounds/vache.flac',
+    'mouton': '/sounds/mouton.wav',
+    'chevre': '/sounds/goat.mp3', // Fichier téléchargé
+    'cochon': '/sounds/cochon.wav',
+    'cheval': '/sounds/cheval.wav',
+    'ane': '/sounds/donkey.mp3', // Fichier téléchargé
+    'canard': '/sounds/canard.wav',
+    'dinde': '/sounds/turkey.mp3', // Fichier téléchargé
+    'souris': '/sounds/mouse.mp3', // Fichier téléchargé
+    'lapin': '/sounds/rabbits.mp3', // Fichier téléchargé
+    'lion': '/sounds/lion.wav',
+    'elephant': '/sounds/elephant.flac',
+    'singe': '/sounds/singe.flac',
+    'loup': '/sounds/loup.wav',
+    'ours': '/sounds/ours.mp3',
+    'grenouille': '/sounds/grenouille.wav',
+  };
 
   const categories = getCategories();
 
@@ -3815,14 +3841,67 @@ function AnimalSoundsActivity({
   }, []);
 
   useEffect(() => {
+    // Filtrer pour ne garder que les animaux avec fichiers audio disponibles
+    const filterAnimalsWithSounds = (words: VocabularyWord[]) => {
+      return words.filter(word => animalSounds[word.id] !== undefined);
+    };
+
     if (selectedCategory) {
       const words = getWordsByCategory(selectedCategory);
-      setDisplayedWords(words);
+      const animalsWithSounds = filterAnimalsWithSounds(words);
+      setDisplayedWords(animalsWithSounds);
     } else {
-      // Afficher tous les mots par défaut
-      setDisplayedWords(vocabularyWords);
+      // Afficher uniquement les animaux avec fichiers audio
+      const animalWords = getWordsByCategory('Animaux');
+      const animalsWithSounds = filterAnimalsWithSounds(animalWords);
+      setDisplayedWords(animalsWithSounds);
     }
   }, [selectedCategory]);
+
+  // Fonction pour jouer le cri de l'animal
+  const playAnimalSound = (animalId: string, word: string) => {
+    const soundUrl = animalSounds[animalId];
+    
+    if (!soundUrl) {
+      // Si pas de fichier audio, utiliser la synthèse vocale
+      speakWord(word);
+      return;
+    }
+
+    // Arrêter tout son en cours
+    audioRefs.forEach((audio) => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+
+    // Vérifier si l'audio existe déjà
+    let audio = audioRefs.get(animalId);
+    
+    if (!audio) {
+      // Créer un nouvel élément audio
+      audio = new Audio(soundUrl);
+      audio.volume = accessibilitySettings.voiceVolume || 1.0;
+      audioRefs.set(animalId, audio);
+      
+      audio.onended = () => {
+        setPlayingSound(null);
+      };
+      
+      audio.onerror = () => {
+        console.warn(`Erreur lors du chargement du son pour ${animalId}, utilisation de la synthèse vocale`);
+        setPlayingSound(null);
+        speakWord(word);
+      };
+    }
+
+    setPlayingSound(animalId);
+    audio.currentTime = 0;
+    audio.play().catch((error) => {
+      console.error('Erreur lors de la lecture du son:', error);
+      setPlayingSound(null);
+      speakWord(word);
+    });
+  };
 
   // Fonction pour prononcer un mot avec la synthèse vocale
   const speakWord = (word: string) => {
@@ -3865,23 +3944,28 @@ function AnimalSoundsActivity({
   };
 
   const handleWordClick = (word: VocabularyWord) => {
-    if (isSpeaking) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
+    // Si la carte est déjà sélectionnée, la désélectionner
+    if (selectedCard === word.id) {
+      setSelectedCard(null);
+      return;
     }
     
-    // Ajouter le mot aux mots cliqués
+    // Sinon, sélectionner la carte et prononcer le nom de l'animal
+    setSelectedCard(word.id);
     setClickedWords(prev => new Set([...prev, word.id]));
-    
-    // Prononcer le mot
     speakWord(word.word);
     
     // Encouragement si le son est activé
-    if (accessibilitySettings.soundEnabled && clickedWords.size % 10 === 0 && clickedWords.size > 0) {
+    if (accessibilitySettings.soundEnabled && clickedWords.size % 5 === 0 && clickedWords.size > 0) {
       setTimeout(() => {
         encourage.correct();
       }, 1000);
     }
+  };
+
+  const handleSoundButtonClick = (e: React.MouseEvent, word: VocabularyWord) => {
+    e.stopPropagation(); // Empêcher le déclenchement du handleWordClick
+    playAnimalSound(word.id, word.word);
   };
 
   const handleCategorySelect = (category: string) => {
@@ -3890,11 +3974,17 @@ function AnimalSoundsActivity({
 
   const handleCompleteActivity = () => {
     const timeSpent = Math.floor((Date.now() - startTime) / 1000);
-    const totalWords = vocabularyWords.length;
+    const totalWords = displayedWords.length;
     const wordsClicked = clickedWords.size;
     const accuracy = (wordsClicked / totalWords) * 100;
     const isPerfect = wordsClicked === totalWords;
     const isFast = timeSpent < 600; // Moins de 10 minutes
+    
+    // Arrêter tous les sons en cours
+    audioRefs.forEach((audio) => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
     
     onComplete({
       accuracy,
@@ -3903,6 +3993,16 @@ function AnimalSoundsActivity({
       isFast
     });
   };
+
+  // Nettoyer les références audio au démontage
+  useEffect(() => {
+    return () => {
+      audioRefs.forEach((audio) => {
+        audio.pause();
+        audio.currentTime = 0;
+      });
+    };
+  }, []);
 
   // Charger les voix disponibles au chargement
   useEffect(() => {
@@ -3925,123 +4025,214 @@ function AnimalSoundsActivity({
       <div className={`text-center p-6 rounded-2xl ${
         accessibilitySettings.colorScheme === 'dark' 
           ? 'bg-gray-800 text-white' 
-          : 'bg-gradient-to-r from-violet-100 to-fuchsia-100 border-2 border-violet-300'
+          : 'bg-gradient-to-r from-amber-100 to-orange-100 border-2 border-amber-300'
       }`}>
         <h3 className="text-2xl font-bold mb-2">
-          Vocabulaire en Images
+          Les Cris d'Animaux
         </h3>
         <p className="text-lg mb-4">
-          Clique sur les images pour entendre les mots ! 
+          Clique sur un animal pour entendre son nom, puis clique sur 🔊 pour entendre son cri ! 
         </p>
         <p className="text-sm opacity-80">
-          {clickedWords.size} / {vocabularyWords.length} mots découverts
+          {clickedWords.size} / {displayedWords.length} animaux découverts
         </p>
       </div>
 
-      {/* Filtres par catégorie */}
+      {/* Filtres par catégorie - Seulement pour les animaux */}
       <div>
         <h4 className={`text-xl font-bold mb-4 ${
           accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-gray-800'
         }`}>
-          Catégories :
+          Animaux disponibles :
         </h4>
         <div className="flex flex-wrap gap-3 mb-6">
           <button
-            onClick={() => handleCategorySelect('')}
+            onClick={() => handleCategorySelect('Animaux')}
             className={`px-4 py-2 rounded-xl font-semibold transition-all transform hover:scale-105 ${
-              selectedCategory === null
-                ? 'bg-violet-500 text-white shadow-lg'
+              selectedCategory === 'Animaux'
+                ? 'bg-amber-500 text-white shadow-lg'
                 : accessibilitySettings.colorScheme === 'dark'
                 ? 'bg-gray-700 text-white'
                 : 'bg-white text-gray-700 border-2 border-gray-300'
             }`}
           >
-            Tous ({vocabularyWords.length})
+            Tous les animaux ({getWordsByCategory('Animaux').length})
           </button>
-          {categories.map((category) => {
-            const categoryWords = getWordsByCategory(category);
-            const isSelected = selectedCategory === category;
-            return (
-              <button
-                key={category}
-                onClick={() => handleCategorySelect(category)}
-                className={`px-4 py-2 rounded-xl font-semibold transition-all transform hover:scale-105 ${
-                  isSelected
-                    ? 'bg-violet-500 text-white shadow-lg'
-                    : accessibilitySettings.colorScheme === 'dark'
-                    ? 'bg-gray-700 text-white'
-                    : 'bg-white text-gray-700 border-2 border-gray-300'
-                }`}
-              >
-                {category} ({categoryWords.length})
-              </button>
-            );
-          })}
         </div>
       </div>
 
-      {/* Grille des mots */}
+      {/* Modal pour afficher la carte en grand */}
+      {selectedCard && (() => {
+        const selectedWord = displayedWords.find(w => w.id === selectedCard);
+        if (!selectedWord) return null;
+        const isPlaying = playingSound === selectedWord.id;
+        
+        return (
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+            onClick={() => setSelectedCard(null)}
+          >
+            <div 
+              className={`
+                relative p-12 rounded-3xl transition-all transform max-w-md w-full mx-4
+                ${accessibilitySettings.colorScheme === 'dark'
+                  ? 'bg-gray-800 text-white'
+                  : 'bg-gradient-to-br from-amber-100 to-orange-100 border-4 border-amber-400'
+                }
+                shadow-2xl
+              `}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedCard(null)}
+                className={`
+                  absolute top-4 right-4 p-2 rounded-full transition-all transform hover:scale-110
+                  ${accessibilitySettings.colorScheme === 'dark'
+                    ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                    : 'bg-white hover:bg-gray-100 text-gray-800'
+                  }
+                  shadow-lg
+                `}
+                aria-label="Fermer"
+              >
+                <span className="text-2xl">✕</span>
+              </button>
+              
+              <div className="text-center">
+                <div className="text-9xl mb-6">{selectedWord.emoji}</div>
+                <div className={`text-4xl font-bold mb-6 ${
+                  accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-amber-700'
+                }`}>
+                  {selectedWord.word}
+                </div>
+                
+                <div className="flex justify-center gap-4">
+                  <button
+                    onClick={() => handleWordClick(selectedWord)}
+                    className={`
+                      px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105
+                      ${accessibilitySettings.colorScheme === 'dark'
+                        ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                        : 'bg-amber-500 hover:bg-amber-600 text-white'
+                      }
+                      shadow-lg
+                    `}
+                  >
+                    🔊 Prononcer
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSoundButtonClick(e, selectedWord);
+                    }}
+                    disabled={isPlaying}
+                    className={`
+                      px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105
+                      ${isPlaying
+                        ? 'bg-green-500 text-white animate-pulse'
+                        : accessibilitySettings.colorScheme === 'dark'
+                        ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                        : 'bg-orange-500 hover:bg-orange-600 text-white'
+                      }
+                      shadow-lg
+                    `}
+                  >
+                    {isPlaying ? '🔊 En cours...' : '🐾 Cri'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Grille des animaux */}
       <div>
         <h4 className={`text-xl font-bold mb-4 ${
           accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-gray-800'
         }`}>
-          {selectedCategory ? `Mots de la catégorie "${selectedCategory}"` : 'Tous les mots'} :
+          Clique sur un animal pour entendre son nom, puis sur 🔊 pour son cri :
         </h4>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {displayedWords.map((word) => {
             const isClicked = clickedWords.has(word.id);
             const isCurrentlySpeaking = isSpeaking;
+            const isPlaying = playingSound === word.id;
+            const isSelected = selectedCard === word.id;
             
             return (
-              <button
+              <div
                 key={word.id}
-                onClick={() => handleWordClick(word)}
-                disabled={isCurrentlySpeaking}
                 className={`
-                  p-6 rounded-2xl transition-all transform
-                  ${isClicked
-                    ? 'bg-gradient-to-br from-violet-200 to-fuchsia-200 border-4 border-violet-400 scale-105'
-                    : 'bg-white hover:bg-violet-50 hover:scale-105 active:scale-95 shadow-lg border-2 border-gray-200'
+                  relative p-6 rounded-2xl transition-all transform cursor-pointer
+                  ${isSelected
+                    ? 'bg-gradient-to-br from-amber-300 to-orange-300 border-4 border-amber-500 scale-110 shadow-2xl z-10'
+                    : isClicked
+                    ? 'bg-gradient-to-br from-amber-200 to-orange-200 border-4 border-amber-400 scale-105'
+                    : 'bg-white hover:bg-amber-50 hover:scale-105 active:scale-95 shadow-lg border-2 border-gray-200'
                   }
-                  ${accessibilitySettings.colorScheme === 'dark' && !isClicked 
+                  ${accessibilitySettings.colorScheme === 'dark' && !isClicked && !isSelected
                     ? 'bg-gray-700 border-gray-600' 
                     : ''
                   }
-                  ${isCurrentlySpeaking ? 'opacity-75 cursor-wait' : 'cursor-pointer'}
                 `}
-                style={{
-                  pointerEvents: isCurrentlySpeaking ? 'none' : 'auto'
-                }}
-                aria-label={`Cliquer pour entendre: ${word.word}`}
+                onClick={() => handleWordClick(word)}
               >
-                <div className="text-6xl mb-3">{word.emoji}</div>
-                <div className={`text-lg font-bold ${
-                  isClicked 
-                    ? 'text-violet-700' 
-                    : accessibilitySettings.colorScheme === 'dark' 
-                    ? 'text-white' 
-                    : 'text-gray-800'
-                }`}>
-                  {word.word}
+                <div className="w-full text-center">
+                  <div className="text-6xl mb-3">{word.emoji}</div>
+                  <div className={`text-lg font-bold ${
+                    isSelected || isClicked
+                      ? 'text-amber-700' 
+                      : accessibilitySettings.colorScheme === 'dark' 
+                      ? 'text-white' 
+                      : 'text-gray-800'
+                  }`}>
+                    {word.word}
+                  </div>
+                  {isClicked && !isSelected && (
+                    <div className="text-2xl mt-2">✓</div>
+                  )}
+                  {isCurrentlySpeaking && !isSelected && (
+                    <div className="text-2xl mt-2 animate-pulse">🔊</div>
+                  )}
                 </div>
-                {isClicked && (
-                  <div className="text-2xl mt-2">✓</div>
-                )}
-                {isCurrentlySpeaking && (
-                  <div className="text-2xl mt-2 animate-pulse">🔊</div>
-                )}
-              </button>
+                
+                {/* Bouton pour jouer le cri de l'animal - Toujours affiché car on filtre les animaux sans son */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSoundButtonClick(e, word);
+                  }}
+                  disabled={isPlaying}
+                  className={`
+                    absolute top-2 right-2 p-2 rounded-full transition-all transform
+                    ${isPlaying
+                      ? 'bg-green-500 text-white animate-pulse scale-110'
+                      : 'bg-amber-500 hover:bg-amber-600 text-white hover:scale-110 active:scale-95'
+                    }
+                    shadow-lg
+                  `}
+                  aria-label={`Jouer le cri de ${word.word}`}
+                  title={`Jouer le cri de ${word.word}`}
+                >
+                  {isPlaying ? (
+                    <span className="text-xl">🔊</span>
+                  ) : (
+                    <span className="text-xl">🔊</span>
+                  )}
+                </button>
+              </div>
             );
           })}
         </div>
       </div>
 
       {/* Bouton de fin d'activité */}
-      {clickedWords.size >= vocabularyWords.length * 0.5 && (
+      {clickedWords.size >= displayedWords.length * 0.5 && (
         <div className="text-center">
           <button
             onClick={handleCompleteActivity}
-            className="px-8 py-4 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
+            className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
           >
             🎉 Terminer l'activité
           </button>
@@ -4052,18 +4243,459 @@ function AnimalSoundsActivity({
       <div className={`text-center p-4 rounded-xl ${
         accessibilitySettings.colorScheme === 'dark' 
           ? 'bg-gray-800 text-white' 
-          : 'bg-violet-50'
+          : 'bg-amber-50'
       }`}>
         <p className="text-lg font-semibold">
-          Mots découverts : {clickedWords.size} / {vocabularyWords.length} 🎯
+          Animaux découverts : {clickedWords.size} / {displayedWords.length} 🎯
         </p>
         <p className="text-sm text-gray-600 mt-2">
-          Progression : {Math.round((clickedWords.size / vocabularyWords.length) * 100)}%
+          Progression : {Math.round((clickedWords.size / displayedWords.length) * 100)}%
         </p>
       </div>
     </div>
   );
 }
+
+
+
+// Composant spécifique pour l'activité Les Bruits de la Ville
+function CitySoundsActivity({ 
+  activity, 
+  accessibilitySettings,
+  onComplete 
+}: { 
+  activity: typeof activities[0];
+  accessibilitySettings: AccessibilitySettings;
+  onComplete: (result: { accuracy: number; timeSpent: number; isPerfect: boolean; isFast: boolean }) => void;
+}) {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>('Bruits de la Ville');
+  const [displayedWords, setDisplayedWords] = useState<VocabularyWord[]>([]);
+  const [clickedWords, setClickedWords] = useState<Set<string>>(new Set());
+  const [startTime] = useState(Date.now());
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [playingSound, setPlayingSound] = useState<string | null>(null);
+  const [selectedCard, setSelectedCard] = useState<string | null>(null); // Carte sélectionnée pour affichage en grand
+  const audioRefs = useMemo(() => new Map<string, HTMLAudioElement>(), []);
+  const { encourage } = useVoiceEncouragement({ 
+    enabled: accessibilitySettings.soundEnabled,
+    volume: accessibilitySettings.voiceVolume || 1.0,
+    rate: accessibilitySettings.voiceRate || 0.9
+  });
+
+  // Mapping des bruits de la ville vers leurs fichiers audio
+  const citySounds: Record<string, string> = {
+    'pompiers': '/sounds/fire-truck.mp3',
+    'camion-poubelle': '/sounds/garbage-truck.mp3',
+    'police': '/sounds/police-siren.mp3',
+    'ambulance': '/sounds/ambulance.mp3',
+    'moto': '/sounds/motorcycle.mp3',
+    'voiture': '/sounds/car.mp3',
+  };
+
+  useEffect(() => {
+    if (accessibilitySettings.soundEnabled) {
+      setTimeout(() => {
+        encourage.activityStart();
+      }, 500);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Filtrer pour ne garder que les bruits avec fichiers audio disponibles
+    const filterSoundsWithAudio = (words: VocabularyWord[]) => {
+      return words.filter(word => citySounds[word.id] !== undefined);
+    };
+
+    if (selectedCategory) {
+      const words = getWordsByCategory(selectedCategory);
+      const soundsWithAudio = filterSoundsWithAudio(words);
+      setDisplayedWords(soundsWithAudio);
+    } else {
+      const cityWords = getWordsByCategory('Bruits de la Ville');
+      const soundsWithAudio = filterSoundsWithAudio(cityWords);
+      setDisplayedWords(soundsWithAudio);
+    }
+  }, [selectedCategory]);
+
+  const playCitySound = (soundId: string, word: string) => {
+    const soundUrl = citySounds[soundId];
+    
+    if (!soundUrl) {
+      speakWord(word);
+      return;
+    }
+
+    audioRefs.forEach((audio) => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+
+    let audio = audioRefs.get(soundId);
+    
+    if (!audio) {
+      audio = new Audio(soundUrl);
+      audio.volume = accessibilitySettings.voiceVolume || 1.0;
+      audioRefs.set(soundId, audio);
+      
+      audio.onended = () => {
+        setPlayingSound(null);
+      };
+      
+      audio.onerror = () => {
+        console.warn(`Erreur lors du chargement du son pour ${soundId}, utilisation de la synthèse vocale`);
+        setPlayingSound(null);
+        speakWord(word);
+      };
+    }
+
+    setPlayingSound(soundId);
+    audio.currentTime = 0;
+    audio.play().catch((error) => {
+      console.error('Erreur lors de la lecture du son:', error);
+      setPlayingSound(null);
+      speakWord(word);
+    });
+  };
+
+  const speakWord = (word: string) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      console.warn('La synthèse vocale n\'est pas disponible dans ce navigateur');
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    
+    setIsSpeaking(true);
+    
+    const utterance = new SpeechSynthesisUtterance(word);
+    utterance.lang = 'fr-FR';
+    utterance.rate = accessibilitySettings.voiceRate || 0.9;
+    utterance.volume = accessibilitySettings.voiceVolume || 1.0;
+    utterance.pitch = 1.2;
+
+    const voices = window.speechSynthesis.getVoices();
+    const frenchVoice = voices.find(voice => 
+      voice.lang.startsWith('fr') && voice.name.toLowerCase().includes('french')
+    ) || voices.find(voice => voice.lang.startsWith('fr'));
+    
+    if (frenchVoice) {
+      utterance.voice = frenchVoice;
+    }
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+    };
+
+    utterance.onerror = (error) => {
+      console.error('Erreur synthèse vocale:', error);
+      setIsSpeaking(false);
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleWordClick = (word: VocabularyWord) => {
+    // Si la carte est déjà sélectionnée, la désélectionner
+    if (selectedCard === word.id) {
+      setSelectedCard(null);
+      return;
+    }
+    
+    // Sinon, sélectionner la carte et prononcer le mot
+    setSelectedCard(word.id);
+    setClickedWords(prev => new Set([...prev, word.id]));
+    speakWord(word.word);
+    
+    if (accessibilitySettings.soundEnabled && clickedWords.size % 3 === 0 && clickedWords.size > 0) {
+      setTimeout(() => {
+        encourage.correct();
+      }, 1000);
+    }
+  };
+
+  const handleSoundButtonClick = (e: React.MouseEvent, word: VocabularyWord) => {
+    e.stopPropagation();
+    playCitySound(word.id, word.word);
+  };
+
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category === selectedCategory ? null : category);
+  };
+
+  const handleCompleteActivity = () => {
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+    const totalWords = displayedWords.length;
+    const wordsClicked = clickedWords.size;
+    const accuracy = (wordsClicked / totalWords) * 100;
+    const isPerfect = wordsClicked === totalWords;
+    const isFast = timeSpent < 600;
+    
+    audioRefs.forEach((audio) => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+    
+    onComplete({
+      accuracy,
+      timeSpent,
+      isPerfect,
+      isFast
+    });
+  };
+
+  useEffect(() => {
+    return () => {
+      audioRefs.forEach((audio) => {
+        audio.pause();
+        audio.currentTime = 0;
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      const loadVoices = () => {
+        window.speechSynthesis.getVoices();
+      };
+      
+      loadVoices();
+      if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+      }
+    }
+  }, []);
+
+  return (
+    <div className="space-y-8">
+      <div className={`text-center p-6 rounded-2xl ${
+        accessibilitySettings.colorScheme === 'dark' 
+          ? 'bg-gray-800 text-white' 
+          : 'bg-gradient-to-r from-blue-100 to-cyan-100 border-2 border-blue-300'
+      }`}>
+        <h3 className="text-2xl font-bold mb-2">
+          Les Bruits de la Ville
+        </h3>
+        <p className="text-lg mb-4">
+          Clique sur un élément pour entendre son nom, puis clique sur 🔊 pour entendre son bruit ! 
+        </p>
+        <p className="text-sm opacity-80">
+          {clickedWords.size} / {displayedWords.length} bruits découverts
+        </p>
+      </div>
+
+      <div>
+        <h4 className={`text-xl font-bold mb-4 ${
+          accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-gray-800'
+        }`}>
+          Bruits disponibles :
+        </h4>
+        <div className="flex flex-wrap gap-3 mb-6">
+          <button
+            onClick={() => handleCategorySelect('Bruits de la Ville')}
+            className={`px-4 py-2 rounded-xl font-semibold transition-all transform hover:scale-105 ${
+              selectedCategory === 'Bruits de la Ville'
+                ? 'bg-blue-500 text-white shadow-lg'
+                : accessibilitySettings.colorScheme === 'dark'
+                ? 'bg-gray-700 text-white'
+                : 'bg-white text-gray-700 border-2 border-gray-300'
+            }`}
+          >
+            Tous les bruits ({getWordsByCategory('Bruits de la Ville').length})
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <h4 className={`text-xl font-bold mb-4 ${
+          accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-gray-800'
+        }`}>
+          Clique sur un élément pour entendre son nom, puis sur 🔊 pour son bruit :
+        </h4>
+        {/* Modal pour afficher la carte en grand */}
+        {selectedCard && (() => {
+          const selectedWord = displayedWords.find(w => w.id === selectedCard);
+          if (!selectedWord) return null;
+          const isPlaying = playingSound === selectedWord.id;
+          
+          return (
+            <div 
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+              onClick={() => setSelectedCard(null)}
+            >
+              <div 
+                className={`
+                  relative p-12 rounded-3xl transition-all transform max-w-md w-full mx-4
+                  ${accessibilitySettings.colorScheme === 'dark'
+                    ? 'bg-gray-800 text-white'
+                    : 'bg-gradient-to-br from-blue-100 to-cyan-100 border-4 border-blue-400'
+                  }
+                  shadow-2xl
+                `}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  onClick={() => setSelectedCard(null)}
+                  className={`
+                    absolute top-4 right-4 p-2 rounded-full transition-all transform hover:scale-110
+                    ${accessibilitySettings.colorScheme === 'dark'
+                      ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                      : 'bg-white hover:bg-gray-100 text-gray-800'
+                    }
+                    shadow-lg
+                  `}
+                  aria-label="Fermer"
+                >
+                  <span className="text-2xl">✕</span>
+                </button>
+                
+                <div className="text-center">
+                  <div className="text-9xl mb-6">{selectedWord.emoji}</div>
+                  <div className={`text-4xl font-bold mb-6 ${
+                    accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-blue-700'
+                  }`}>
+                    {selectedWord.word}
+                  </div>
+                  
+                  <div className="flex justify-center gap-4">
+                    <button
+                      onClick={() => handleWordClick(selectedWord)}
+                      className={`
+                        px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105
+                        ${accessibilitySettings.colorScheme === 'dark'
+                          ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                          : 'bg-blue-500 hover:bg-blue-600 text-white'
+                        }
+                        shadow-lg
+                      `}
+                    >
+                      🔊 Prononcer
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSoundButtonClick(e, selectedWord);
+                      }}
+                      disabled={isPlaying}
+                      className={`
+                        px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105
+                        ${isPlaying
+                          ? 'bg-green-500 text-white animate-pulse'
+                          : accessibilitySettings.colorScheme === 'dark'
+                          ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                          : 'bg-cyan-500 hover:bg-cyan-600 text-white'
+                        }
+                        shadow-lg
+                      `}
+                    >
+                      {isPlaying ? '🔊 En cours...' : '🚗 Bruit'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {displayedWords.map((word) => {
+            const isClicked = clickedWords.has(word.id);
+            const isCurrentlySpeaking = isSpeaking;
+            const isPlaying = playingSound === word.id;
+            const isSelected = selectedCard === word.id;
+            
+            return (
+              <div
+                key={word.id}
+                className={`
+                  relative p-6 rounded-2xl transition-all transform cursor-pointer
+                  ${isSelected
+                    ? 'bg-gradient-to-br from-blue-300 to-cyan-300 border-4 border-blue-500 scale-110 shadow-2xl z-10'
+                    : isClicked
+                    ? 'bg-gradient-to-br from-blue-200 to-cyan-200 border-4 border-blue-400 scale-105'
+                    : 'bg-white hover:bg-blue-50 hover:scale-105 active:scale-95 shadow-lg border-2 border-gray-200'
+                  }
+                  ${accessibilitySettings.colorScheme === 'dark' && !isClicked && !isSelected
+                    ? 'bg-gray-700 border-gray-600' 
+                    : ''
+                  }
+                `}
+                onClick={() => handleWordClick(word)}
+              >
+                <div className="w-full text-center">
+                  <div className="text-6xl mb-3">{word.emoji}</div>
+                  <div className={`text-lg font-bold ${
+                    isSelected || isClicked
+                      ? 'text-blue-700' 
+                      : accessibilitySettings.colorScheme === 'dark' 
+                      ? 'text-white' 
+                      : 'text-gray-800'
+                  }`}>
+                    {word.word}
+                  </div>
+                  {isClicked && !isSelected && (
+                    <div className="text-2xl mt-2">✓</div>
+                  )}
+                  {isCurrentlySpeaking && !isSelected && (
+                    <div className="text-2xl mt-2 animate-pulse">🔊</div>
+                  )}
+                </div>
+                
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSoundButtonClick(e, word);
+                  }}
+                  disabled={isPlaying}
+                  className={`
+                    absolute top-2 right-2 p-2 rounded-full transition-all transform
+                    ${isPlaying
+                      ? 'bg-green-500 text-white animate-pulse scale-110'
+                      : 'bg-blue-500 hover:bg-blue-600 text-white hover:scale-110 active:scale-95'
+                    }
+                    shadow-lg
+                  `}
+                  aria-label={`Jouer le bruit de ${word.word}`}
+                  title={`Jouer le bruit de ${word.word}`}
+                >
+                  {isPlaying ? (
+                    <span className="text-xl">🔊</span>
+                  ) : (
+                    <span className="text-xl">🔊</span>
+                  )}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {clickedWords.size >= displayedWords.length * 0.5 && (
+        <div className="text-center">
+          <button
+            onClick={handleCompleteActivity}
+            className="px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
+          >
+            🎉 Terminer l'activité
+          </button>
+        </div>
+      )}
+
+      <div className={`text-center p-4 rounded-xl ${
+        accessibilitySettings.colorScheme === 'dark' 
+          ? 'bg-gray-800 text-white' 
+          : 'bg-blue-50'
+      }`}>
+        <p className="text-lg font-semibold">
+          Bruits découverts : {clickedWords.size} / {displayedWords.length} 🎯
+        </p>
+        <p className="text-sm text-gray-600 mt-2">
+          Progression : {Math.round((clickedWords.size / displayedWords.length) * 100)}%
+        </p>
+      </div>
+    </div>
+  );
+}
+
 
 // Composant spécifique pour l'activité Mon Calendrier Visuel
 function DailyScheduleActivity({ 
@@ -6423,11 +7055,199 @@ function ColorsShapesActivity({
   );
 }
 
-export default function ActivityPage() {
+// Composant spécifique pour l'activité Espace de Calme
+function CalmingSpaceActivity({ 
+  activity, 
+  accessibilitySettings,
+  onComplete 
+}: { 
+  activity: typeof activities[0];
+  accessibilitySettings: AccessibilitySettings;
+  onComplete: (result: { accuracy: number; timeSpent: number; isPerfect: boolean; isFast: boolean }) => void;
+}) {
+  const [bubbles, setBubbles] = useState<Array<{ id: number; x: number; size: number; speed: number }>>([]);
+  const [isActive, setIsActive] = useState(true);
+  const [startTime] = useState(Date.now());
+  const [selectedScene, setSelectedScene] = useState<'ocean' | 'forest' | 'stars'>('ocean');
+  const { encourage, speak } = useVoiceEncouragement({ 
+    enabled: accessibilitySettings.soundEnabled,
+    volume: accessibilitySettings.voiceVolume || 1.0,
+    rate: accessibilitySettings.voiceRate || 0.9
+  });
+
+  // Créer des bulles animées
+  useEffect(() => {
+    if (!isActive) return;
+
+    const newBubbles: Array<{ id: number; x: number; size: number; speed: number }> = [];
+    for (let i = 0; i < 15; i++) {
+      newBubbles.push({
+        id: i,
+        x: Math.random() * 100,
+        size: Math.random() * 40 + 20,
+        speed: Math.random() * 2 + 1
+      });
+    }
+    setBubbles(newBubbles);
+
+    // Message d'accueil apaisant
+    if (accessibilitySettings.soundEnabled) {
+      setTimeout(() => {
+        speak("Prends le temps de respirer doucement. Tu es dans un espace calme et apaisant.");
+      }, 1000);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive, selectedScene]);
+
+  // Animation des bulles
+  useEffect(() => {
+    if (!isActive) return;
+
+    const interval = setInterval(() => {
+      setBubbles(prev => prev.map(bubble => ({
+        ...bubble,
+        x: bubble.x + (Math.random() - 0.5) * 2,
+        size: bubble.size + Math.sin(Date.now() / 1000) * 2
+      })));
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [isActive]);
+
+  const handleExit = () => {
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+    onComplete({
+      accuracy: 100,
+      timeSpent,
+      isPerfect: true,
+      isFast: false
+    });
+  };
+
+  const scenes = [
+    { id: 'ocean' as const, name: 'Océan', emoji: '🌊', gradient: 'from-blue-400 via-cyan-400 to-teal-400' },
+    { id: 'forest' as const, name: 'Forêt', emoji: '🌲', gradient: 'from-green-400 via-emerald-400 to-lime-400' },
+    { id: 'stars' as const, name: 'Étoiles', emoji: '✨', gradient: 'from-indigo-400 via-purple-400 to-pink-400' }
+  ];
+
+  const currentScene = scenes.find(s => s.id === selectedScene) || scenes[0];
+
+  return (
+    <div className="relative min-h-[600px] rounded-2xl overflow-hidden">
+      {/* Fond animé avec gradient */}
+      <div className={`absolute inset-0 bg-gradient-to-b ${currentScene.gradient} animate-pulse-slow`}>
+        {/* Vagues animées pour l'océan */}
+        {selectedScene === 'ocean' && (
+          <>
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-white/20 animate-wave"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-24 bg-white/15 animate-wave-delayed"></div>
+          </>
+        )}
+        
+        {/* Particules pour les étoiles */}
+        {selectedScene === 'stars' && (
+          <div className="absolute inset-0">
+            {Array.from({ length: 30 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-1 h-1 bg-white rounded-full animate-twinkle"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 3}s`,
+                  animationDuration: `${2 + Math.random() * 2}s`
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Bulles flottantes */}
+        {bubbles.map(bubble => (
+          <div
+            key={bubble.id}
+            className="absolute rounded-full bg-white/30 backdrop-blur-sm animate-float"
+            style={{
+              left: `${bubble.x}%`,
+              bottom: '-50px',
+              width: `${bubble.size}px`,
+              height: `${bubble.size}px`,
+              animationDuration: `${3 + bubble.speed}s`,
+              animationDelay: `${bubble.id * 0.2}s`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Contenu principal */}
+      <div className="relative z-10 p-8">
+        {/* Sélecteur de scène */}
+        <div className="mb-6 flex flex-wrap gap-3 justify-center">
+          {scenes.map(scene => (
+            <button
+              key={scene.id}
+              onClick={() => setSelectedScene(scene.id)}
+              className={`px-4 py-2 rounded-full transition-all ${
+                selectedScene === scene.id
+                  ? 'bg-white/90 text-gray-900 shadow-lg scale-105'
+                  : 'bg-white/40 text-white hover:bg-white/60'
+              }`}
+            >
+              <span className="text-2xl mr-2">{scene.emoji}</span>
+              {scene.name}
+            </button>
+          ))}
+        </div>
+
+        {/* Instructions apaisantes */}
+        <div className="text-center mb-8">
+          <div className="inline-block bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-xl">
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">
+              {currentScene.emoji} Espace de Calme
+            </h2>
+            <p className="text-lg text-gray-700 mb-4">
+              Respire doucement et regarde les animations apaisantes.
+            </p>
+            <p className="text-md text-gray-600">
+              Prends tout le temps dont tu as besoin. Quand tu te sens mieux, tu peux quitter cet espace.
+            </p>
+          </div>
+        </div>
+
+        {/* Exercice de respiration */}
+        <div className="text-center mb-8">
+          <div className="inline-block bg-white/70 backdrop-blur-md rounded-full p-6">
+            <div className="w-32 h-32 mx-auto mb-4 rounded-full bg-white/50 flex items-center justify-center animate-breathe">
+              <span className="text-4xl">💨</span>
+            </div>
+            <p className="text-gray-700 font-semibold">Inspire... Expire...</p>
+          </div>
+        </div>
+
+        {/* Bouton de sortie */}
+        <div className="text-center">
+          <button
+            onClick={handleExit}
+            className="px-8 py-4 bg-white/90 hover:bg-white text-gray-800 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+          >
+            Je me sens mieux ✨
+          </button>
+        </div>
+      </div>
+
+    </div>
+  );
+}
+
+function ActivityPageContent() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const activityId = params.id as string;
   const activity = activities.find(a => a.id === activityId);
+  
+  // Récupérer le token depuis les searchParams (plus fiable que window.location)
+  const currentToken = searchParams.get('token');
   
   const [accessibilitySettings, setAccessibilitySettings] = useState<AccessibilitySettings>({
     fontSize: 'medium',
@@ -6450,12 +7270,34 @@ export default function ActivityPage() {
 
   if (!activity) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Activité non trouvée</h1>
-          <Link href="/apprendre-autrement" className="text-blue-600 hover:underline">
-            Retour aux activités
-          </Link>
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+        {/* Fil d'Ariane */}
+        <div className="bg-white/60 backdrop-blur-sm border-b border-gray-200/50 pt-2">
+          <div className="max-w-7xl mx-auto px-6 py-1">
+            <nav className="flex items-center space-x-2 text-sm">
+              <button 
+                onClick={() => {
+                  // Utiliser le token depuis searchParams
+                  if (currentToken) {
+                    router.push(`/apprendre-autrement?token=${encodeURIComponent(currentToken)}`);
+                  } else {
+                    router.push('/apprendre-autrement');
+                  }
+                }}
+                className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer hover:underline"
+              >
+                Apprendre Autrement
+              </button>
+              <span className="text-gray-400">/</span>
+              <span className="text-gray-900 font-medium">Activité non trouvée</span>
+            </nav>
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Activité non trouvée</h1>
+            <p className="text-gray-600 mb-4">Cette activité n'existe pas ou a été supprimée.</p>
+          </div>
         </div>
       </div>
     );
@@ -6469,10 +7311,23 @@ export default function ActivityPage() {
       );
       activityResults[activityId] = result;
       localStorage.setItem('learn-differently-activity-results', JSON.stringify(activityResults));
+      
+      // Utiliser le token depuis searchParams
+      const token = currentToken;
+      
+      // Construire l'URL avec le token et les résultats
+      const params = new URLSearchParams();
+      params.set('completed', activityId);
+      params.set('accuracy', result.accuracy.toString());
+      params.set('time', result.timeSpent.toString());
+      params.set('perfect', result.isPerfect ? '1' : '0');
+      if (token) {
+        params.set('token', token);
+      }
+      
+      // Rediriger vers la page principale avec les résultats et le token
+      router.push(`/apprendre-autrement?${params.toString()}`);
     }
-
-    // Rediriger vers la page principale avec les résultats
-    router.push(`/apprendre-autrement?completed=${activityId}&accuracy=${result.accuracy}&time=${result.timeSpent}&perfect=${result.isPerfect ? '1' : '0'}`);
   };
 
   const getStyles = () => {
@@ -6505,13 +7360,22 @@ export default function ActivityPage() {
       <div className="bg-white/60 backdrop-blur-sm border-b border-gray-200/50 pt-2">
         <div className="max-w-7xl mx-auto px-6 py-1">
           <nav className="flex items-center space-x-2 text-sm">
-            <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
-              Accueil
-            </Link>
-            <span className="text-gray-400">/</span>
-            <Link href="/apprendre-autrement" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <button 
+              onClick={() => {
+                // Utiliser le token stocké ou le récupérer de l'URL
+                const token = currentToken || (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('token') : null);
+                
+                // Naviguer vers la page principale en préservant le token
+                if (token) {
+                  router.push(`/apprendre-autrement?token=${encodeURIComponent(token)}`);
+                } else {
+                  router.push('/apprendre-autrement');
+                }
+              }}
+              className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer hover:underline"
+            >
               Apprendre Autrement
-            </Link>
+            </button>
             <span className="text-gray-400">/</span>
             <span className="text-gray-900 font-medium">{activity.title}</span>
           </nav>
@@ -6525,21 +7389,13 @@ export default function ActivityPage() {
           : `bg-gradient-to-r ${activity.colorGradient}`
       }`}>
         <div className="max-w-4xl mx-auto px-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-white mb-2">
-                {activity.icon} {activity.title}
-              </h1>
-              <p className="text-white/90 text-lg">
-                {activity.description}
-              </p>
-            </div>
-            <Link
-              href="/apprendre-autrement"
-              className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg font-semibold transition-all backdrop-blur-sm"
-            >
-              ← Retour
-            </Link>
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2">
+              {activity.icon} {activity.title}
+            </h1>
+            <p className="text-white/90 text-lg">
+              {activity.description}
+            </p>
           </div>
         </div>
       </section>
@@ -6660,17 +7516,26 @@ export default function ActivityPage() {
             accessibilitySettings={accessibilitySettings}
             onComplete={handleComplete}
           />
+        ) : activity.id === 'calming-space' ? (
+          <CalmingSpaceActivity
+            activity={activity}
+            accessibilitySettings={accessibilitySettings}
+            onComplete={handleComplete}
+          />
+        ) : activity.id === 'city-sounds' ? (
+          <CitySoundsActivity
+            activity={activity}
+            accessibilitySettings={accessibilitySettings}
+            onComplete={handleComplete}
+          />
         ) : (
           <div className="text-center py-12">
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-600 mb-4">
               Cette activité sera bientôt disponible !
             </p>
-            <Link
-              href="/apprendre-autrement"
-              className="mt-4 inline-block px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
-            >
-              Retour aux activités
-            </Link>
+            <p className="text-gray-500 text-sm">
+              Nous travaillons sur cette activité pour vous offrir la meilleure expérience.
+            </p>
           </div>
         )}
       </div>
@@ -6678,3 +7543,17 @@ export default function ActivityPage() {
   );
 }
 
+export default function ActivityPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
+          <p className="text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    }>
+      <ActivityPageContent />
+    </Suspense>
+  );
+}

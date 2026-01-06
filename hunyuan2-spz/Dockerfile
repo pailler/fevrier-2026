@@ -45,8 +45,9 @@ COPY tools/ /app/tools/
 # Définir le répertoire de travail pour le code
 WORKDIR /app/code
 
-# Installer PyTorch avec support CUDA 12.1 (avant les autres dépendances)
+# Installer PyTorch avec support CUDA 12.4 (avant les autres dépendances)
 # Utiliser python3.11 -m pip pour s'assurer que les packages sont installés pour Python 3.11
+# CUDA 12.4 est compatible avec cu121 (rétrocompatibilité)
 RUN python3.11 -m pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 
 # Installer les dépendances Python de base (pybind11, ninja pour la compilation)
@@ -56,6 +57,7 @@ RUN python3.11 -m pip install --no-cache-dir pybind11 ninja
 RUN grep -v "^msvc_runtime" requirements.txt | grep -v "^#" | grep -v "^$" > requirements_linux.txt && \
     python3.11 -m pip install --no-cache-dir -r requirements_linux.txt && \
     python3.11 -m pip install --no-cache-dir gradio==4.44.1 && \
+    python3.11 -m pip install --no-cache-dir sentencepiece huggingface_hub accelerate && \
     python3.11 -c "import gradio; print('Gradio installed:', gradio.__version__)" || echo "Gradio installation failed"
 
 # Installer le package hy3dgen (compilera les extensions C++ si nécessaire)

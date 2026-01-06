@@ -1,0 +1,79 @@
+═══════════════════════════════════════════════════════════════
+POST REDDIT - VERSION PRÊTE À COPIER-COLLER
+═══════════════════════════════════════════════════════════════
+
+TITRE SUGGÉRÉ :
+───────────────────────────────────────────────────────────────
+J'ai créé une plateforme IA française avec tous les outils essentiels (transcription, images, PDF, etc.) - 200 tokens offerts pour tester
+
+───────────────────────────────────────────────────────────────
+
+CONTENU DU POST :
+───────────────────────────────────────────────────────────────
+
+Salut r/france et r/artificial !
+
+Je voulais partager avec vous un projet sur lequel je travaille depuis un moment : **iahome.fr** - une plateforme française qui regroupe des outils IA et des services essentiels en un seul endroit.
+
+**Pourquoi j'ai créé ça ?**
+
+Comme beaucoup d'entre vous, j'étais frustré de devoir utiliser 10 services différents pour mes besoins quotidiens :
+- Transcrire des réunions → un service
+- Générer des images → un autre service  
+- Traiter des PDF → encore un autre
+- Créer des QR codes → encore un autre...
+
+Et surtout, la plupart sont soit chers, soit en anglais, soit nécessitent des installations compliquées.
+
+**Ce que propose iahome.fr :**
+
+🤖 **Outils IA :**
+- **Whisper** : Transcription audio/vidéo (réunions, podcasts, vidéos YouTube)
+- **Stable Diffusion** : Génération d'images IA
+- **ComfyUI** : Workflows IA avancés
+- **Détection IA** : Détecter si un texte est généré par IA
+- **Isolation vocale** : Séparer la voix du bruit de fond
+- **Génération de prompts** : Créer des prompts optimisés
+
+🛠️ **Services essentiels :**
+- Traitement PDF (fusionner, diviser, compresser, signer)
+- QR Codes dynamiques avec statistiques
+- Test de vitesse Internet (LibreSpeed)
+- Téléchargement YouTube (MeTube)
+- Transfert de fichiers sécurisé (PsiTransfer)
+- Comptes-rendus de réunions automatiques
+- Home Assistant (domotique)
+- Apprendre Autrement (apprentissage pour enfants)
+
+**Pourquoi c'est différent :**
+
+✅ **100% web** - Aucune installation, tout fonctionne dans le navigateur
+✅ **Système de tokens** - Payez uniquement ce que vous utilisez (à partir de 4,99€)
+✅ **200 tokens offerts** - Pour tester sans dépenser un centime
+✅ **100% français** - Interface, support et conformité RGPD
+✅ **Prix transparents** - Tarifs dégressifs, pas d'abonnement caché
+
+**Exemples de prix :**
+- Transcription d'une réunion de 1h : ~100 tokens (0,49€ - 1,99€ selon le pack)
+- Génération d'images : ~100 tokens par image
+- Traitement PDF : ~10 tokens par opération
+
+**Mon objectif :**
+
+Créer une alternative française, accessible et abordable aux grandes plateformes américaines. J'ai voulu quelque chose de simple, sans fioritures, qui fonctionne vraiment.
+
+**Pour tester :**
+
+👉 **https://iahome.fr**
+
+Vous avez 200 tokens offerts à l'inscription pour tester tous les services. Pas besoin de carte bancaire pour commencer.
+
+**Feedback bienvenu !**
+
+Je suis ouvert à toutes vos suggestions, critiques constructives et idées d'amélioration. C'est un projet en constante évolution et votre feedback m'aide énormément.
+
+Des questions ? N'hésitez pas !
+
+═══════════════════════════════════════════════════════════════
+FIN DU POST
+═══════════════════════════════════════════════════════════════

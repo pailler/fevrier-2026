@@ -202,18 +202,40 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
 
   console.log('✅ Module activé avec succès via webhook:', activationData);
 
-  // Envoyer une notification
+  // Envoyer une notification à l'utilisateur
   try {
-    const { NotificationService } = await import('../../../utils/notificationService');
-    const notificationService = NotificationService.getInstance();
+    const { EmailService } = await import('../../../utils/emailService');
+    const emailService = EmailService.getInstance();
     
-    await notificationService.sendModuleActivatedNotification(
-      customerEmail,
-      customerEmail.split('@')[0] || 'Utilisateur',
-      moduleTitle
-    );
+    await emailService.sendNotificationEmail('module_activated', customerEmail, {
+      user_name: customerEmail.split('@')[0] || 'Utilisateur',
+      user_email: customerEmail,
+      module_name: moduleTitle,
+      module_id: moduleId,
+      activation_date: new Date().toLocaleDateString('fr-FR'),
+      activation_time: new Date().toLocaleTimeString('fr-FR'),
+      activation_method: 'Paiement'
+    });
   } catch (notificationError) {
-    console.error('Erreur lors de l\'envoi de la notification:', notificationError);
+    console.error('Erreur lors de l\'envoi de la notification utilisateur:', notificationError);
+  }
+
+  // Envoyer une notification à l'admin
+  try {
+    const { EmailService } = await import('../../../utils/emailService');
+    const emailService = EmailService.getInstance();
+    
+    await emailService.sendNotificationEmail('admin_module_activated', 'formateur_tic@hotmail.com', {
+      user_name: customerEmail.split('@')[0] || 'Utilisateur',
+      user_email: customerEmail,
+      module_name: moduleTitle,
+      module_id: moduleId,
+      activation_date: new Date().toLocaleDateString('fr-FR'),
+      activation_time: new Date().toLocaleTimeString('fr-FR'),
+      activation_method: 'Paiement'
+    });
+  } catch (notificationError) {
+    console.error('Erreur lors de l\'envoi de la notification admin:', notificationError);
   }
 }
 

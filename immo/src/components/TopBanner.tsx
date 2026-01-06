@@ -1,0 +1,76 @@
+'use client';
+import { useState, useEffect } from 'react';
+import { supabase } from '../utils/supabaseClient';
+
+export default function TopBanner() {
+  const [session, setSession] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Récupérer la session actuelle
+    const getSession = async () => {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      setSession(currentSession);
+      setUser(currentSession?.user || null);
+    };
+
+    getSession();
+
+    // Écouter les changements de session
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event: any, session: any) => {
+        setSession(session);
+        setUser(session?.user || null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    // Charger le rôle de l'utilisateur
+    const fetchUserRole = async () => {
+      if (session && user) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        
+        if (!error && data) {
+          setRole(data.role);
+        }
+      }
+    };
+    
+    fetchUserRole();
+  }, [session, user]);
+
+  return (
+    <div className="fixed top-0 left-0 right-0 z-50 bg-white text-gray-800 py-2 px-8 flex items-center justify-between text-sm border-b border-gray-200">
+      <div className="font-bold tracking-wide">
+        <a href="/" className="hover:text-blue-600 transition-colors">IAHome</a>
+      </div>
+      <div className="flex items-center gap-6">
+        <nav className="flex gap-6">
+          <a href="#" className="hover:text-blue-600 transition-colors">À propos</a>
+          <a href="#" className="hover:text-blue-600 transition-colors">Fonctionnalités</a>
+          <a href="#" className="hover:text-blue-600 transition-colors">Contact</a>
+        </nav>
+        {session && (
+          <div className="flex items-center gap-2 ml-4 pl-4 border-l border-gray-300">
+            <div className={`w-2 h-2 rounded-full animate-pulse ${
+              role === 'admin' ? 'bg-red-500' : 'bg-green-500'
+            }`}></div>
+            <span className={`text-xs font-medium ${
+              role === 'admin' ? 'text-red-600' : 'text-green-600'
+            }`}>
+              {role === 'admin' ? '👑 Admin connecté' : '👤 Utilisateur connecté'}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+} 

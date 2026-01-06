@@ -138,6 +138,48 @@ export async function POST(request: NextRequest) {
         `
       },
       {
+        event_type: 'admin_user_signup',
+        name: 'Notification admin - Nouvel utilisateur',
+        description: 'Notification envoyée à l\'administrateur lorsqu\'un nouvel utilisateur s\'inscrit',
+        is_enabled: true,
+        email_template_subject: 'Nouvel utilisateur inscrit - {{user_email}}',
+        email_template_body: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #2563eb;">Nouvel utilisateur inscrit</h2>
+            <p>Un nouvel utilisateur vient de s'inscrire sur IAHome.</p>
+            <p><strong>Nom:</strong> {{user_name}}</p>
+            <p><strong>Email:</strong> {{user_email}}</p>
+            <p><strong>Date d'inscription:</strong> {{signup_date}} à {{signup_time}}</p>
+            <p><strong>Méthode d'inscription:</strong> {{signup_method || 'Email'}}</p>
+            <hr>
+            <p style="color: #666; font-size: 12px;">
+              Cet email a été envoyé automatiquement par IAHome.
+            </p>
+          </div>
+        `
+      },
+      {
+        event_type: 'admin_module_activated',
+        name: 'Notification admin - Application activée',
+        description: 'Notification envoyée à l\'administrateur lorsqu\'une application est activée',
+        is_enabled: true,
+        email_template_subject: 'Nouvelle application activée - {{module_name}}',
+        email_template_body: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #2563eb;">Application activée</h2>
+            <p>Une nouvelle application a été activée par un utilisateur.</p>
+            <p><strong>Utilisateur:</strong> {{user_name}} ({{user_email}})</p>
+            <p><strong>Application:</strong> {{module_name}} ({{module_id}})</p>
+            <p><strong>Date d'activation:</strong> {{activation_date}}</p>
+            <p><strong>Méthode:</strong> {{activation_method || 'Tokens'}}</p>
+            <hr>
+            <p style="color: #666; font-size: 12px;">
+              Cet email a été envoyé automatiquement par IAHome.
+            </p>
+          </div>
+        `
+      },
+      {
         event_type: 'admin_alert',
         name: 'Alerte administrateur',
         description: 'Notification envoyée aux administrateurs pour les événements critiques',

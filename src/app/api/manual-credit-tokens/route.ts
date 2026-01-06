@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     // Vérifier les tokens actuels
     const { data: existingTokens, error: tokensError } = await supabase
       .from('user_tokens')
-      .select('tokens')
+      .select('tokens, package_name, purchase_date')
       .eq('user_id', profile.id)
       .single();
 
@@ -47,14 +47,34 @@ export async function POST(request: NextRequest) {
     const currentTokens = existingTokens?.tokens || 0;
     const newTokenCount = currentTokens + tokens;
 
-    // Mettre à jour les tokens
+    // Mettre à jour ou créer les tokens (upsert)
+    const upsertData: any = {
+      user_id: profile.id,
+      tokens: newTokenCount,
+      is_active: true,
+      updated_at: new Date().toISOString()
+    };
+
+    // Préserver les champs existants ou les initialiser si nouvelle entrée
+    if (existingTokens) {
+      // Préserver package_name et purchase_date existants
+      if (existingTokens.package_name) {
+        upsertData.package_name = existingTokens.package_name;
+      }
+      if (existingTokens.purchase_date) {
+        upsertData.purchase_date = existingTokens.purchase_date;
+      }
+    } else {
+      // Nouvelle entrée : initialiser les champs
+      upsertData.package_name = 'Manual Credit';
+      upsertData.purchase_date = new Date().toISOString();
+    }
+
     const { error: updateError } = await supabase
       .from('user_tokens')
-      .update({
-        tokens: newTokenCount,
-        updated_at: new Date().toISOString()
-      })
-      .eq('user_id', profile.id);
+      .upsert(upsertData, {
+        onConflict: 'user_id'
+      });
 
     if (updateError) {
       console.error('❌ Erreur mise à jour tokens:', updateError);

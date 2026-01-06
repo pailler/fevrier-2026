@@ -6,7 +6,7 @@ export interface Activity {
   skill: string;
   icon: string;
   duration: string;
-  type: 'visual' | 'audio' | 'matching' | 'story' | 'puzzle' | 'schedule' | 'family';
+  type: 'visual' | 'audio' | 'matching' | 'story' | 'puzzle' | 'schedule' | 'family' | 'calming';
   colorGradient: string;
   categoryColor: string;
   difficulty: 'facile' | 'moyen' | 'difficile';
@@ -279,6 +279,34 @@ export const activities: Activity[] = [
     categoryColor: 'bg-cyan-100 text-cyan-800',
     difficulty: 'moyen',
     objectives: ['Développer la logique spatiale', 'Améliorer la concentration', 'Reconnaître les formes', 'Assembler des pièces']
+  },
+  {
+    id: 'calming-space',
+    title: 'Espace de Calme',
+    description: 'Un espace apaisant avec des animations douces et des sons relaxants pour se calmer',
+    category: 'Bien-être',
+    skill: 'Régulation émotionnelle',
+    icon: '🌊',
+    duration: 'Variable',
+    type: 'calming',
+    colorGradient: 'from-blue-300 via-cyan-300 to-teal-300',
+    categoryColor: 'bg-blue-100 text-blue-800',
+    difficulty: 'facile',
+    objectives: ['Se calmer', 'Réguler ses émotions', 'Réduire le stress', 'Retrouver la sérénité']
+  },
+  {
+    id: 'city-sounds',
+    title: 'Les Bruits de la Ville',
+    description: 'Écoute les bruits de la ville et découvre les différents véhicules et services',
+    category: 'Auditif',
+    skill: 'Association',
+    icon: '🚗',
+    duration: '8 min',
+    type: 'audio',
+    colorGradient: 'from-gray-400 to-slate-500',
+    categoryColor: 'bg-gray-100 text-gray-800',
+    difficulty: 'facile',
+    objectives: ['Reconnaître les bruits de la ville', 'Associer son et image', 'Développer l\'écoute', 'Identifier les véhicules']
   }
 ];
 
