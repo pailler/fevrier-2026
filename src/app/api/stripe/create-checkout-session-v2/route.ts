@@ -40,31 +40,27 @@ const PACKAGES_V2 = {
 };
 
 // Emails autorisés pour les tests avec prix minimum
-const TEST_EMAILS = ['regispailler@gmail.com'];
+// DÉSACTIVÉ en production - Tous les utilisateurs paient le prix normal
+const TEST_EMAILS: string[] = []; // Liste vide en production
 
 // Fonction pour déterminer si on utilise les prix de test
 function shouldUseTestPrice(userEmail: string | undefined): boolean {
-  // Mode test forcé via variable d'environnement (pour tests)
+  // Mode test forcé via variable d'environnement (pour tests uniquement)
   const forceTestMode = process.env.STRIPE_FORCE_TEST_PRICE === 'true';
   if (forceTestMode) {
     console.log('🔧 MODE TEST FORCÉ via STRIPE_FORCE_TEST_PRICE');
     return true;
   }
   
-  if (!userEmail) {
-    console.log('⚠️ shouldUseTestPrice: userEmail est undefined');
-    return false;
-  }
-  const emailLower = userEmail.toLowerCase().trim();
-  const isTestEmail = TEST_EMAILS.includes(emailLower);
+  // En production, ne jamais utiliser les prix de test
+  // Même pour les emails de test, utiliser le prix normal
   console.log('🔍 Vérification prix test:', {
     userEmail,
-    emailLower,
-    isTestEmail,
-    testEmails: TEST_EMAILS,
-    forceTestMode
+    forceTestMode,
+    result: false,
+    reason: 'Production mode - Using normal prices'
   });
-  return isTestEmail;
+  return false; // Toujours false en production
 }
 
 export async function POST(request: NextRequest) {
