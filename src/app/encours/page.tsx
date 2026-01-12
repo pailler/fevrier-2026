@@ -1394,7 +1394,7 @@ export default function EncoursPage() {
                       </div>
                       
                       {/* Bouton de recharge */}
-                      <Link href="/pricing" className="group block w-full">
+                      <Link href="/pricing2" className="group block w-full">
                         <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 hover:from-yellow-500 hover:via-yellow-600 hover:to-orange-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 text-center">
                           <div className="flex items-center justify-center space-x-2">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1421,7 +1421,7 @@ export default function EncoursPage() {
                 </div>
 
                       {/* Bouton à droite */}
-                      <Link href="/pricing" className="group shrink-0">
+                      <Link href="/pricing2" className="group shrink-0">
                         <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 hover:from-yellow-500 hover:via-yellow-600 hover:to-orange-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
                           <div className="flex items-center space-x-2">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -3822,11 +3822,6 @@ function AnimalSoundsActivity({
     'dinde': '/sounds/turkey.mp3', // Fichier téléchargé
     'souris': '/sounds/mouse.mp3', // Fichier téléchargé
     'lapin': '/sounds/rabbits.mp3', // Fichier téléchargé
-    'lion': '/sounds/lion.wav',
-    'elephant': '/sounds/elephant.flac',
-    'singe': '/sounds/singe.flac',
-    'loup': '/sounds/loup.wav',
-    'ours': '/sounds/ours.mp3',
     'grenouille': '/sounds/grenouille.wav',
   };
 
@@ -3950,10 +3945,10 @@ function AnimalSoundsActivity({
       return;
     }
     
-    // Sinon, sélectionner la carte et prononcer le nom de l'animal
+    // Sinon, sélectionner la carte et jouer le cri de l'animal
     setSelectedCard(word.id);
     setClickedWords(prev => new Set([...prev, word.id]));
-    speakWord(word.word);
+    playAnimalSound(word.id, word.word);
     
     // Encouragement si le son est activé
     if (accessibilitySettings.soundEnabled && clickedWords.size % 5 === 0 && clickedWords.size > 0) {
@@ -4031,7 +4026,7 @@ function AnimalSoundsActivity({
           Les Cris d'Animaux
         </h3>
         <p className="text-lg mb-4">
-          Clique sur un animal pour entendre son nom, puis clique sur 🔊 pour entendre son cri ! 
+          Clique sur un animal pour entendre son cri ! Dans la carte, clique sur "Prononcer" pour entendre son nom.
         </p>
         <p className="text-sm opacity-80">
           {clickedWords.size} / {displayedWords.length} animaux découverts
@@ -4099,8 +4094,8 @@ function AnimalSoundsActivity({
               </button>
               
               <div className="text-center">
-                <div className="text-9xl mb-6">{selectedWord.emoji}</div>
-                <div className={`text-4xl font-bold mb-6 ${
+                <div className="text-[15rem] mb-8 leading-none">{selectedWord.emoji}</div>
+                <div className={`text-5xl font-bold mb-8 ${
                   accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-amber-700'
                 }`}>
                   {selectedWord.word}
@@ -4108,17 +4103,23 @@ function AnimalSoundsActivity({
                 
                 <div className="flex justify-center gap-4">
                   <button
-                    onClick={() => handleWordClick(selectedWord)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      speakWord(selectedWord.word);
+                    }}
+                    disabled={isSpeaking}
                     className={`
                       px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105
-                      ${accessibilitySettings.colorScheme === 'dark'
+                      ${isSpeaking
+                        ? 'bg-green-500 text-white animate-pulse'
+                        : accessibilitySettings.colorScheme === 'dark'
                         ? 'bg-gray-700 hover:bg-gray-600 text-white'
                         : 'bg-amber-500 hover:bg-amber-600 text-white'
                       }
                       shadow-lg
                     `}
                   >
-                    🔊 Prononcer
+                    {isSpeaking ? '🔊 En cours...' : '🗣️ Prononcer'}
                   </button>
                   <button
                     onClick={(e) => {
@@ -4151,9 +4152,9 @@ function AnimalSoundsActivity({
         <h4 className={`text-xl font-bold mb-4 ${
           accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-gray-800'
         }`}>
-          Clique sur un animal pour entendre son nom, puis sur 🔊 pour son cri :
+          Clique sur un animal pour entendre son cri :
         </h4>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {displayedWords.map((word) => {
             const isClicked = clickedWords.has(word.id);
             const isCurrentlySpeaking = isSpeaking;
@@ -4164,7 +4165,8 @@ function AnimalSoundsActivity({
               <div
                 key={word.id}
                 className={`
-                  relative p-6 rounded-2xl transition-all transform cursor-pointer
+                  relative p-8 sm:p-10 rounded-3xl transition-all transform cursor-pointer
+                  flex flex-col items-center justify-center min-h-[200px]
                   ${isSelected
                     ? 'bg-gradient-to-br from-amber-300 to-orange-300 border-4 border-amber-500 scale-110 shadow-2xl z-10'
                     : isClicked
@@ -4178,9 +4180,9 @@ function AnimalSoundsActivity({
                 `}
                 onClick={() => handleWordClick(word)}
               >
-                <div className="w-full text-center">
-                  <div className="text-6xl mb-3">{word.emoji}</div>
-                  <div className={`text-lg font-bold ${
+                <div className="w-full flex flex-col items-center justify-center text-center">
+                  <div className="text-8xl sm:text-9xl mb-4 flex items-center justify-center leading-none">{word.emoji}</div>
+                  <div className={`text-xl sm:text-2xl font-bold ${
                     isSelected || isClicked
                       ? 'text-amber-700' 
                       : accessibilitySettings.colorScheme === 'dark' 
@@ -4192,35 +4194,10 @@ function AnimalSoundsActivity({
                   {isClicked && !isSelected && (
                     <div className="text-2xl mt-2">✓</div>
                   )}
-                  {isCurrentlySpeaking && !isSelected && (
-                    <div className="text-2xl mt-2 animate-pulse">🔊</div>
+                  {isPlaying && !isSelected && (
+                    <div className="text-2xl mt-2 animate-pulse">🐾</div>
                   )}
                 </div>
-                
-                {/* Bouton pour jouer le cri de l'animal - Toujours affiché car on filtre les animaux sans son */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSoundButtonClick(e, word);
-                  }}
-                  disabled={isPlaying}
-                  className={`
-                    absolute top-2 right-2 p-2 rounded-full transition-all transform
-                    ${isPlaying
-                      ? 'bg-green-500 text-white animate-pulse scale-110'
-                      : 'bg-amber-500 hover:bg-amber-600 text-white hover:scale-110 active:scale-95'
-                    }
-                    shadow-lg
-                  `}
-                  aria-label={`Jouer le cri de ${word.word}`}
-                  title={`Jouer le cri de ${word.word}`}
-                >
-                  {isPlaying ? (
-                    <span className="text-xl">🔊</span>
-                  ) : (
-                    <span className="text-xl">🔊</span>
-                  )}
-                </button>
               </div>
             );
           })}
@@ -4284,12 +4261,12 @@ function CitySoundsActivity({
 
   // Mapping des bruits de la ville vers leurs fichiers audio
   const citySounds: Record<string, string> = {
-    'pompiers': '/sounds/fire-truck.mp3',
-    'camion-poubelle': '/sounds/garbage-truck.mp3',
-    'police': '/sounds/police-siren.mp3',
-    'ambulance': '/sounds/ambulance.mp3',
-    'moto': '/sounds/motorcycle.mp3',
-    'voiture': '/sounds/car.mp3',
+    'pompiers': '/sounds/fire-truck.wav',
+    'camion-poubelle': '/sounds/garbage-truck.wav',
+    'police': '/sounds/police-siren.wav',
+    'ambulance': '/sounds/ambulance.flac',
+    'moto': '/sounds/motorcycle.wav',
+    'voiture': '/sounds/car.wav',
   };
 
   useEffect(() => {
@@ -4549,8 +4526,8 @@ function CitySoundsActivity({
                 </button>
                 
                 <div className="text-center">
-                  <div className="text-9xl mb-6">{selectedWord.emoji}</div>
-                  <div className={`text-4xl font-bold mb-6 ${
+                  <div className="text-[15rem] mb-8 leading-none">{selectedWord.emoji}</div>
+                  <div className={`text-5xl font-bold mb-8 ${
                     accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-blue-700'
                   }`}>
                     {selectedWord.word}
@@ -4558,17 +4535,23 @@ function CitySoundsActivity({
                   
                   <div className="flex justify-center gap-4">
                     <button
-                      onClick={() => handleWordClick(selectedWord)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        speakWord(selectedWord.word);
+                      }}
+                      disabled={isSpeaking}
                       className={`
                         px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105
-                        ${accessibilitySettings.colorScheme === 'dark'
+                        ${isSpeaking
+                          ? 'bg-green-500 text-white animate-pulse'
+                          : accessibilitySettings.colorScheme === 'dark'
                           ? 'bg-gray-700 hover:bg-gray-600 text-white'
                           : 'bg-blue-500 hover:bg-blue-600 text-white'
                         }
                         shadow-lg
                       `}
                     >
-                      🔊 Prononcer
+                      {isSpeaking ? '🔊 En cours...' : '🗣️ Prononcer'}
                     </button>
                     <button
                       onClick={(e) => {
@@ -4596,7 +4579,7 @@ function CitySoundsActivity({
           );
         })()}
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {displayedWords.map((word) => {
             const isClicked = clickedWords.has(word.id);
             const isCurrentlySpeaking = isSpeaking;
@@ -4607,7 +4590,8 @@ function CitySoundsActivity({
               <div
                 key={word.id}
                 className={`
-                  relative p-6 rounded-2xl transition-all transform cursor-pointer
+                  relative p-8 sm:p-10 rounded-3xl transition-all transform cursor-pointer
+                  flex flex-col items-center justify-center min-h-[200px]
                   ${isSelected
                     ? 'bg-gradient-to-br from-blue-300 to-cyan-300 border-4 border-blue-500 scale-110 shadow-2xl z-10'
                     : isClicked
@@ -4621,9 +4605,9 @@ function CitySoundsActivity({
                 `}
                 onClick={() => handleWordClick(word)}
               >
-                <div className="w-full text-center">
-                  <div className="text-6xl mb-3">{word.emoji}</div>
-                  <div className={`text-lg font-bold ${
+                <div className="w-full flex flex-col items-center justify-center text-center">
+                  <div className="text-8xl sm:text-9xl mb-4 flex items-center justify-center leading-none">{word.emoji}</div>
+                  <div className={`text-xl sm:text-2xl font-bold ${
                     isSelected || isClicked
                       ? 'text-blue-700' 
                       : accessibilitySettings.colorScheme === 'dark' 

@@ -149,7 +149,7 @@ export default function SimpleHeader() {
                 </div>
               )}
               <Link 
-                href="/pricing" 
+                href="/pricing2" 
                 className="flex items-center space-x-1 bg-purple-100 hover:bg-purple-200 px-2 py-1.5 rounded-full font-medium transition-colors group text-sm"
               >
                 <svg 
@@ -328,7 +328,7 @@ export default function SimpleHeader() {
               <div className="px-4 py-3 border-b border-blue-500">
                 <div className="text-sm text-blue-100 mb-2">Premium</div>
                 <Link
-                  href="/pricing"
+                  href="/pricing2"
                   className="flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700 text-white px-4 py-3 rounded-full font-semibold transition-all shadow-lg w-full"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >

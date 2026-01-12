@@ -17,6 +17,18 @@ warnings.filterwarnings("ignore")
 # Configuration
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
+# Configuration du cache des modèles
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(ROOT_DIR)  # Remonter d'un niveau depuis photo-animation
+MODELS_CACHE_DIR = os.path.join(PROJECT_ROOT, "ai-models-cache", "huggingface")
+
+# Configurer les variables d'environnement pour utiliser le cache personnalisé
+os.environ["HF_HOME"] = MODELS_CACHE_DIR
+os.environ["HUGGINGFACE_HUB_CACHE"] = MODELS_CACHE_DIR
+os.environ["TRANSFORMERS_CACHE"] = MODELS_CACHE_DIR
+
+print(f"[INFO] Cache des modeles configure: {MODELS_CACHE_DIR}")
+
 # Essayer d'importer diffusers, utiliser fallback si non disponible
 DIFFUSERS_AVAILABLE = False
 StableDiffusionImg2ImgPipeline = None
@@ -54,8 +66,14 @@ class PhotoAnimator:
             # Utilisation d'un modèle Img2Img pour l'animation
             model_id = "runwayml/stable-diffusion-v1-5"
             
+            # Utiliser le cache personnalisé
+            cache_dir = MODELS_CACHE_DIR
+            
+            print(f"[INFO] Utilisation du cache: {cache_dir}")
+            
             self.pipeline = StableDiffusionImg2ImgPipeline.from_pretrained(
                 model_id,
+                cache_dir=cache_dir,
                 torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
                 safety_checker=None,
                 requires_safety_checker=False
@@ -64,9 +82,11 @@ class PhotoAnimator:
             if self.device == "cuda":
                 self.pipeline.enable_attention_slicing()
                 self.pipeline.enable_model_cpu_offload()
-            print("Modèle chargé avec succès!")
+            print("[OK] Modele charge avec succes depuis le cache!")
         except Exception as e:
-            print(f"Erreur lors du chargement du modèle: {e}")
+            print(f"[ERREUR] Erreur lors du chargement du modele: {e}")
+            import traceback
+            traceback.print_exc()
             print("Utilisation d'un mode de fallback...")
             self.pipeline = None
             self.use_diffusers = False

@@ -10,7 +10,7 @@ interface TokenBalanceLinkProps {
 export default function TokenBalanceLink({ className = '', showIcon = true }: TokenBalanceLinkProps) {
   return (
     <Link
-      href="/pricing"
+      href="/pricing2"
       className={`inline-flex items-center space-x-2 ${className}`}
       title="Acheter des tokens"
     >

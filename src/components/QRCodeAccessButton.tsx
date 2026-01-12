@@ -43,7 +43,7 @@ export default function QRCodeAccessButton({
             <>
               Plus de tokens ?{' '}
               <a 
-                href="https://iahome.fr/pricing" 
+                href="https://iahome.fr/pricing2" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="underline font-semibold hover:text-red-700"

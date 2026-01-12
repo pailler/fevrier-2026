@@ -421,7 +421,7 @@ export default function Header() {
                 </div>
               )}
               <Link 
-                href="/pricing" 
+                href="/pricing2" 
                 className="flex items-center space-x-1 bg-purple-100 hover:bg-purple-200 text-purple-800 px-2 py-1.5 rounded-full font-semibold transition-all shadow-sm hover:shadow-md text-sm"
               >
                 <svg 
@@ -633,7 +633,7 @@ export default function Header() {
               {/* Bouton Obtenir Plus - Mobile */}
               <div className="px-2 sm:px-4 py-3 border-b border-blue-500 w-full">
                 <Link
-                  href="/pricing"
+                  href="/pricing2"
                   className="flex items-center justify-center space-x-1 bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-2 rounded-full font-semibold transition-all shadow-sm hover:shadow-md w-full text-sm"
                   onClick={closeMobileMenu}
                 >

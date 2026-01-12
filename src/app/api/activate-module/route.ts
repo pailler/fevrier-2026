@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
 
     // 7. Envoyer une notification à l'utilisateur
     try {
-      const { EmailService } = await import('../../../../utils/emailService');
+      const { EmailService } = await import('../../../utils/emailService');
       const emailService = EmailService.getInstance();
       
       await emailService.sendNotificationEmail('module_activated', userEmail, {
@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
 
     // 8. Envoyer une notification à l'admin
     try {
-      const { EmailService } = await import('../../../../utils/emailService');
+      const { EmailService } = await import('../../../utils/emailService');
       const emailService = EmailService.getInstance();
       
       await emailService.sendNotificationEmail('admin_module_activated', 'formateur_tic@hotmail.com', {

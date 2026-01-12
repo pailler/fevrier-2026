@@ -47,7 +47,7 @@ export default function TokenBalance({ className = '', showIcon = true, linkToPr
   if (linkToPricing) {
     return (
       <Link
-        href="/pricing"
+        href="/pricing2"
         className={`inline-flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer ${className}`}
         title="Acheter des tokens"
       >

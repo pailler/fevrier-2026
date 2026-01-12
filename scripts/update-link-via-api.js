@@ -133,7 +133,7 @@ const articleContent = `
   <p>En choisissant Stable Diffusion sur IAHome plutôt qu'un service commercial, vous bénéficiez de :</p>
 
   <ul>
-    <li><strong>Des offres adaptées à vos besoins</strong> : <a href="https://iahome.fr/pricing" style="color: #2563eb; text-decoration: underline; font-weight: 600;">Obtenir +</a></li>
+    <li><strong>Des offres adaptées à vos besoins</strong> : <a href="https://iahome.fr/pricing2" style="color: #2563eb; text-decoration: underline; font-weight: 600;">Obtenir +</a></li>
     <li><strong>Pas de limites</strong> : Générez autant d'images que vous voulez</li>
     <li><strong>Confidentialité</strong> : Vos données restent sur nos serveurs sécurisés</li>
     <li><strong>Personnalisation</strong> : Utilisez vos propres modèles et LoRA</li>

@@ -37,7 +37,7 @@ export default function ApprendreAutrementPage() {
     levelUp: boolean;
     newLevel?: number;
   } | null>(null);
-  const [childName, setChildNameState] = useState<string>('Adent');
+  const [childName, setChildNameState] = useState<string>('');
   const [tokenValidated, setTokenValidated] = useState(false);
   const [tokenError, setTokenError] = useState<string | null>(null);
 
@@ -465,6 +465,38 @@ export default function ApprendreAutrementPage() {
           </div>
         </div>
       </section>
+
+      {/* Note sur le développement de nouvelles activités */}
+      <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className={`bg-gradient-to-r from-blue-50 to-cyan-50 border-l-4 border-blue-500 rounded-lg p-4 shadow-md ${
+          accessibilitySettings.colorScheme === 'dark' 
+            ? 'bg-gray-800 border-blue-400' 
+            : ''
+        }`}>
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">💡</span>
+            <div className="flex-1">
+              <p className={`text-sm font-medium ${
+                accessibilitySettings.colorScheme === 'dark' 
+                  ? 'text-gray-200' 
+                  : 'text-gray-800'
+              }`}>
+                <strong>Nouvelle activité ?</strong> Vous souhaitez demander le développement d'une nouvelle activité parmi celles déjà proposées ? 
+                C'est possible grâce à la partie développement de iahome.{' '}
+                <a 
+                  href="https://iahome.fr/contact" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline font-semibold"
+                >
+                  Contactez-nous
+                </a>
+                {' '}pour en discuter !
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Section Configuration du Prénom */}
       <div className="max-w-7xl mx-auto px-6 py-6">

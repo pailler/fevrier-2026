@@ -1,5 +1,5 @@
 const CHILD_NAME_STORAGE_KEY = 'learn-differently-child-name';
-const DEFAULT_CHILD_NAME = 'Adent'; // Prononcé "adent" (sans le "m" de Adam)
+const DEFAULT_CHILD_NAME = ''; // Champ vide par défaut
 
 export function getChildName(): string {
   if (typeof window === 'undefined') {

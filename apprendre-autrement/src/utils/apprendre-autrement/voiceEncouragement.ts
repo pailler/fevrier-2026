@@ -14,90 +14,107 @@ export type EncouragementType =
   | 'good-job'
   | 'amazing';
 
+// Fonction helper pour formater les messages avec ou sans prénom
+function formatMessage(template: string, childName: string): string {
+  if (!childName || childName.trim() === '') {
+    // Retirer le prénom et les virgules/espaces associés
+    return template
+      .replace(/\$\{childName\},?\s*/g, '')
+      .replace(/\$\{childName\}/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+  return template.replace(/\$\{childName\}/g, childName);
+}
+
 export function getEncouragementMessages(childName: string): Record<EncouragementType, string[]> {
+  const name = childName && childName.trim() ? childName.trim() : '';
+  const nameWithComma = name ? `${name}, ` : '';
+  const nameWithSpace = name ? ` ${name}` : '';
+  
   return {
   welcome: [
-    `Salut ${childName} ! Je suis content de te revoir. Prêt pour de nouvelles aventures ?`,
-    `Bonjour ${childName} ! Tu vas faire de super activités aujourd'hui !`,
-    `Coucou ${childName} ! On va s'amuser ensemble !`
+    name ? `Salut ${name} ! Je suis content de te revoir. Prêt pour de nouvelles aventures ?` : `Salut ! Je suis content de te revoir. Prêt pour de nouvelles aventures ?`,
+    name ? `Bonjour ${name} ! Tu vas faire de super activités aujourd'hui !` : `Bonjour ! Tu vas faire de super activités aujourd'hui !`,
+    name ? `Coucou ${name} ! On va s'amuser ensemble !` : `Coucou ! On va s'amuser ensemble !`
   ],
   'activity-start': [
-    `Allez ${childName}, tu vas y arriver ! C'est parti !`,
-    `${childName}, tu es prêt ? On commence cette activité ensemble !`,
-    `Super ${childName} ! Tu as choisi une super activité. On y va !`,
-    `Parfait ${childName} ! Tu vas être génial dans cette activité !`
+    name ? `Allez ${name}, tu vas y arriver ! C'est parti !` : `Allez, tu vas y arriver ! C'est parti !`,
+    name ? `${name}, tu es prêt ? On commence cette activité ensemble !` : `Tu es prêt ? On commence cette activité ensemble !`,
+    name ? `Super ${name} ! Tu as choisi une super activité. On y va !` : `Super ! Tu as choisi une super activité. On y va !`,
+    name ? `Parfait ${name} ! Tu vas être génial dans cette activité !` : `Parfait ! Tu vas être génial dans cette activité !`
   ],
   'activity-progress': [
-    `Continue ${childName}, tu es sur la bonne voie !`,
-    `C'est bien ${childName} ! Tu progresses super bien !`,
-    `Bravo ${childName} ! Tu fais du super travail !`,
-    `Excellent ${childName} ! Continue comme ça !`
+    name ? `Continue ${name}, tu es sur la bonne voie !` : `Continue, tu es sur la bonne voie !`,
+    name ? `C'est bien ${name} ! Tu progresses super bien !` : `C'est bien ! Tu progresses super bien !`,
+    name ? `Bravo ${name} ! Tu fais du super travail !` : `Bravo ! Tu fais du super travail !`,
+    name ? `Excellent ${name} ! Continue comme ça !` : `Excellent ! Continue comme ça !`
   ],
   'activity-complete': [
-    `Félicitations ${childName} ! Tu as terminé l'activité ! Tu es génial !`,
-    `Bravo ${childName} ! Tu as réussi ! Je suis fier de toi !`,
-    `Super travail ${childName} ! Tu as tout fait !`,
-    `Incroyable ${childName} ! Tu es vraiment doué !`
+    name ? `Félicitations ${name} ! Tu as terminé l'activité ! Tu es génial !` : `Félicitations ! Tu as terminé l'activité ! Tu es génial !`,
+    name ? `Bravo ${name} ! Tu as réussi ! Je suis fier de toi !` : `Bravo ! Tu as réussi ! Je suis fier de toi !`,
+    name ? `Super travail ${name} ! Tu as tout fait !` : `Super travail ! Tu as tout fait !`,
+    name ? `Incroyable ${name} ! Tu es vraiment doué !` : `Incroyable ! Tu es vraiment doué !`
   ],
   'points-earned': [
-    `Wow ${childName} ! Tu as gagné des points ! Continue comme ça !`,
-    `Excellent ${childName} ! Des points bien mérités !`,
-    `${childName}, tu accumules les points ! Tu es fantastique !`,
-    `Bravo ${childName} ! Chaque point compte, tu progresses !`
+    name ? `Wow ${name} ! Tu as gagné des points ! Continue comme ça !` : `Wow ! Tu as gagné des points ! Continue comme ça !`,
+    name ? `Excellent ${name} ! Des points bien mérités !` : `Excellent ! Des points bien mérités !`,
+    name ? `${name}, tu accumules les points ! Tu es fantastique !` : `Tu accumules les points ! Tu es fantastique !`,
+    name ? `Bravo ${name} ! Chaque point compte, tu progresses !` : `Bravo ! Chaque point compte, tu progresses !`
   ],
   'level-up': [
-    `🎉 ${childName}, tu as monté de niveau ! Tu es incroyable !`,
-    `Félicitations ${childName} ! Nouveau niveau atteint ! Tu es un champion !`,
-    `Wow ${childName} ! Tu progresses tellement vite ! Nouveau niveau !`,
-    `${childName}, tu es maintenant à un niveau supérieur ! Tu es génial !`
+    name ? `🎉 ${name}, tu as monté de niveau ! Tu es incroyable !` : `🎉 Tu as monté de niveau ! Tu es incroyable !`,
+    name ? `Félicitations ${name} ! Nouveau niveau atteint ! Tu es un champion !` : `Félicitations ! Nouveau niveau atteint ! Tu es un champion !`,
+    name ? `Wow ${name} ! Tu progresses tellement vite ! Nouveau niveau !` : `Wow ! Tu progresses tellement vite ! Nouveau niveau !`,
+    name ? `${name}, tu es maintenant à un niveau supérieur ! Tu es génial !` : `Tu es maintenant à un niveau supérieur ! Tu es génial !`
   ],
   'badge-earned': [
-    `🎖️ ${childName}, tu as gagné un nouveau badge ! Tu es exceptionnel !`,
-    `Félicitations ${childName} ! Un nouveau badge pour toi ! Tu es formidable !`,
-    `Bravo ${childName} ! Ce badge est bien mérité !`,
-    `${childName}, tu collectionnes les badges ! Tu es incroyable !`
+    name ? `🎖️ ${name}, tu as gagné un nouveau badge ! Tu es exceptionnel !` : `🎖️ Tu as gagné un nouveau badge ! Tu es exceptionnel !`,
+    name ? `Félicitations ${name} ! Nouveau badge pour toi ! Tu es formidable !` : `Félicitations ! Nouveau badge pour toi ! Tu es formidable !`,
+    name ? `Bravo ${name} ! Ce badge est bien mérité !` : `Bravo ! Ce badge est bien mérité !`,
+    name ? `${name}, tu collectionnes les badges ! Tu es incroyable !` : `Tu collectionnes les badges ! Tu es incroyable !`
   ],
   streak: [
-    `🔥 ${childName}, tu es en série ! Continue comme ça !`,
-    `Super ${childName} ! Tu reviens chaque jour, c'est génial !`,
-    `${childName}, ta série continue ! Tu es déterminé !`,
-    `Bravo ${childName} ! Tu ne lâches rien ! Continue !`
+    name ? `🔥 ${name}, tu es en série ! Continue comme ça !` : `🔥 Tu es en série ! Continue comme ça !`,
+    name ? `Super ${name} ! Tu reviens chaque jour, c'est génial !` : `Super ! Tu reviens chaque jour, c'est génial !`,
+    name ? `${name}, ta série continue ! Tu es déterminé !` : `Ta série continue ! Tu es déterminé !`,
+    name ? `Bravo ${name} ! Tu ne lâches rien ! Continue !` : `Bravo ! Tu ne lâches rien ! Continue !`
   ],
   'keep-going': [
-    `Continue ${childName}, tu peux le faire !`,
-    `Ne lâche pas ${childName}, tu es presque au bout !`,
-    `Allez ${childName}, encore un petit effort !`,
-    `Tu y es presque ${childName} ! Continue !`
+    name ? `Continue ${name}, tu peux le faire !` : `Continue, tu peux le faire !`,
+    name ? `Ne lâche pas ${name}, tu es presque au bout !` : `Ne lâche pas, tu es presque au bout !`,
+    name ? `Allez ${name}, encore un petit effort !` : `Allez, encore un petit effort !`,
+    name ? `Tu y es presque ${name} ! Continue !` : `Tu y es presque ! Continue !`
   ],
   'almost-there': [
-    `Presque terminé ${childName} ! Encore un peu !`,
-    `Tu y es presque ${childName} ! Tu es sur le point de réussir !`,
-    `Plus qu'un petit effort ${childName} ! Tu vas y arriver !`,
-    `C'est bientôt fini ${childName} ! Continue !`
+    name ? `Presque terminé ${name} ! Encore un peu !` : `Presque terminé ! Encore un peu !`,
+    name ? `Tu y es presque ${name} ! Tu es sur le point de réussir !` : `Tu y es presque ! Tu es sur le point de réussir !`,
+    name ? `Plus qu'un petit effort ${name} ! Tu vas y arriver !` : `Plus qu'un petit effort ! Tu vas y arriver !`,
+    name ? `C'est bientôt fini ${name} ! Continue !` : `C'est bientôt fini ! Continue !`
   ],
   perfect: [
-    `Parfait ${childName} ! Tu as tout réussi ! Tu es génial !`,
-    `100% ${childName} ! C'est parfait ! Tu es incroyable !`,
-    `Excellent ${childName} ! Tu as tout fait sans erreur !`,
-    `Wow ${childName} ! C'est parfait ! Tu es vraiment doué !`
+    name ? `Parfait ${name} ! Tu as tout réussi ! Tu es génial !` : `Parfait ! Tu as tout réussi ! Tu es génial !`,
+    name ? `100% ${name} ! C'est parfait ! Tu es incroyable !` : `100% ! C'est parfait ! Tu es incroyable !`,
+    name ? `Excellent ${name} ! Tu as tout fait sans erreur !` : `Excellent ! Tu as tout fait sans erreur !`,
+    name ? `Wow ${name} ! C'est parfait ! Tu es vraiment doué !` : `Wow ! C'est parfait ! Tu es vraiment doué !`
   ],
   'try-again': [
-    `Ce n'est pas grave ${childName}, on réessaie ensemble !`,
-    `${childName}, on apprend de nos erreurs. Essayons encore !`,
-    `Pas de problème ${childName}, on recommence ! Tu vas y arriver !`,
-    `${childName}, c'est en essayant qu'on apprend ! On continue !`
+    name ? `Ce n'est pas grave ${name}, on réessaie ensemble !` : `Ce n'est pas grave, on réessaie ensemble !`,
+    name ? `${name}, on apprend de nos erreurs. Essayons encore !` : `On apprend de nos erreurs. Essayons encore !`,
+    name ? `Pas de problème ${name}, on recommence ! Tu vas y arriver !` : `Pas de problème, on recommence ! Tu vas y arriver !`,
+    name ? `${name}, c'est en essayant qu'on apprend ! On continue !` : `C'est en essayant qu'on apprend ! On continue !`
   ],
   'good-job': [
-    `Bien joué ${childName} ! Tu fais du super travail !`,
-    `Bravo ${childName} ! Continue comme ça !`,
-    `Excellent ${childName} ! Tu progresses bien !`,
-    `Super ${childName} ! Je suis fier de toi !`
+    name ? `Bien joué ${name} ! Tu fais du super travail !` : `Bien joué ! Tu fais du super travail !`,
+    name ? `Bravo ${name} ! Continue comme ça !` : `Bravo ! Continue comme ça !`,
+    name ? `Excellent ${name} ! Tu progresses bien !` : `Excellent ! Tu progresses bien !`,
+    name ? `Super ${name} ! Je suis fier de toi !` : `Super ! Je suis fier de toi !`
   ],
   amazing: [
-    `Incroyable ${childName} ! Tu es vraiment impressionnant !`,
-    `Wow ${childName} ! Tu es fantastique !`,
-    `${childName}, tu es génial ! Continue comme ça !`,
-    `Extraordinaire ${childName} ! Tu es un champion !`
+    name ? `Incroyable ${name} ! Tu es vraiment impressionnant !` : `Incroyable ! Tu es vraiment impressionnant !`,
+    name ? `Wow ${name} ! Tu es fantastique !` : `Wow ! Tu es fantastique !`,
+    name ? `${name}, tu es génial ! Continue comme ça !` : `Tu es génial ! Continue comme ça !`,
+    name ? `Extraordinaire ${name} ! Tu es un champion !` : `Extraordinaire ! Tu es un champion !`
   ]
   };
 }
@@ -110,7 +127,7 @@ class VoiceEncouragementManager {
   private volume: number = 1.0;
   private rate: number = 0.9;
   private pitch: number = 1.1;
-  private childName: string = 'Adent';
+  private childName: string = '';
 
   constructor() {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -170,7 +187,7 @@ class VoiceEncouragementManager {
   }
 
   setChildName(name: string) {
-    this.childName = name || 'Adent';
+    this.childName = name || '';
   }
 
   getChildName(): string {
@@ -185,54 +202,54 @@ class VoiceEncouragementManager {
   speak(message: string, options?: {
     priority?: 'high' | 'normal' | 'low';
     interrupt?: boolean;
-  }): Promise<void> {
-    return new Promise((resolve, reject) => {
-      if (!this.isEnabled || !this.speechSynthesis) {
-        resolve();
-        return;
-      }
+  }) {
+    if (!this.isEnabled || !this.speechSynthesis) return;
 
-      if (options?.interrupt && this.currentUtterance) {
-        this.speechSynthesis.cancel();
-      }
+    const priority = options?.priority || 'normal';
+    const interrupt = options?.interrupt !== false;
 
-      if (this.speechSynthesis.speaking && options?.priority === 'low') {
-        resolve();
-        return;
-      }
+    if (interrupt && this.currentUtterance) {
+      this.speechSynthesis.cancel();
+    }
 
-      const utterance = new SpeechSynthesisUtterance(message);
-      utterance.voice = this.voice;
-      utterance.volume = this.volume;
-      utterance.rate = this.rate;
-      utterance.pitch = this.pitch;
-      utterance.lang = 'fr-FR';
+    const utterance = new SpeechSynthesisUtterance(message);
+    utterance.voice = this.voice;
+    utterance.volume = this.volume;
+    utterance.rate = this.rate;
+    utterance.pitch = this.pitch;
+    utterance.lang = 'fr-FR';
 
-      utterance.onend = () => {
-        this.currentUtterance = null;
-        resolve();
-      };
+    this.currentUtterance = utterance;
 
-      utterance.onerror = (error) => {
-        this.currentUtterance = null;
-        console.error('Erreur synthèse vocale:', error);
-        reject(error);
-      };
+    utterance.onend = () => {
+      this.currentUtterance = null;
+    };
 
-      this.currentUtterance = utterance;
-      this.speechSynthesis.speak(utterance);
-    });
+    utterance.onerror = (error) => {
+      console.error('Erreur de synthèse vocale:', error);
+      this.currentUtterance = null;
+    };
+
+    this.speechSynthesis.speak(utterance);
   }
 
   encourage(type: EncouragementType, options?: {
     priority?: 'high' | 'normal' | 'low';
     interrupt?: boolean;
     customMessage?: string;
-  }): Promise<void> {
-    if (!this.isEnabled) return Promise.resolve();
+  }) {
+    if (!this.isEnabled) return;
 
     const message = options?.customMessage || this.getRandomMessage(type);
-    return this.speak(message, options);
+    this.speak(message, options);
+  }
+
+  correct() {
+    this.encourage('good-job', { priority: 'normal', interrupt: false });
+  }
+
+  incorrect() {
+    this.encourage('try-again', { priority: 'normal', interrupt: false });
   }
 
   stop() {
@@ -243,41 +260,43 @@ class VoiceEncouragementManager {
   }
 
   isSpeaking(): boolean {
-    return this.speechSynthesis?.speaking || false;
+    return this.currentUtterance !== null && this.speechSynthesis !== null && this.speechSynthesis.speaking;
   }
 }
 
 export const voiceManager = new VoiceEncouragementManager();
 
 export function createEncourage(childName: string) {
+  const name = childName && childName.trim() ? childName.trim() : '';
+  
   return {
     welcome: () => voiceManager.encourage('welcome', { priority: 'high' }),
     activityStart: () => voiceManager.encourage('activity-start', { priority: 'high' }),
     activityProgress: () => voiceManager.encourage('activity-progress', { priority: 'normal' }),
     activityComplete: () => voiceManager.encourage('activity-complete', { priority: 'high' }),
     pointsEarned: (points: number) => {
-      const message = `Bravo ${childName} ! Tu as gagné ${points} points ! Continue comme ça !`;
+      const message = name ? `Bravo ${name} ! Tu as gagné ${points} points ! Continue comme ça !` : `Bravo ! Tu as gagné ${points} points ! Continue comme ça !`;
       return voiceManager.encourage('points-earned', { 
         priority: 'high',
         customMessage: message 
       });
     },
     levelUp: (level: number) => {
-      const message = `Félicitations ${childName} ! Tu as atteint le niveau ${level} ! Tu es incroyable !`;
+      const message = name ? `Félicitations ${name} ! Tu as atteint le niveau ${level} ! Tu es incroyable !` : `Félicitations ! Tu as atteint le niveau ${level} ! Tu es incroyable !`;
       return voiceManager.encourage('level-up', { 
         priority: 'high',
         customMessage: message 
       });
     },
     badgeEarned: (badgeName: string) => {
-      const message = `Bravo ${childName} ! Tu as gagné le badge ${badgeName} ! Tu es génial !`;
+      const message = name ? `Bravo ${name} ! Tu as gagné le badge ${badgeName} ! Tu es génial !` : `Bravo ! Tu as gagné le badge ${badgeName} ! Tu es génial !`;
       return voiceManager.encourage('badge-earned', { 
         priority: 'high',
         customMessage: message 
       });
     },
     streak: (days: number) => {
-      const message = `Super ${childName} ! ${days} jours consécutifs ! Tu es déterminé !`;
+      const message = name ? `Super ${name} ! ${days} jours consécutifs ! Tu es déterminé !` : `Super ! ${days} jours consécutifs ! Tu es déterminé !`;
       return voiceManager.encourage('streak', { 
         priority: 'normal',
         customMessage: message 
@@ -288,12 +307,8 @@ export function createEncourage(childName: string) {
     perfect: () => voiceManager.encourage('perfect', { priority: 'high' }),
     tryAgain: () => voiceManager.encourage('try-again', { priority: 'normal' }),
     goodJob: () => voiceManager.encourage('good-job', { priority: 'normal' }),
-    amazing: () => voiceManager.encourage('amazing', { priority: 'high' }),
-    correct: () => voiceManager.encourage('good-job', { priority: 'high' }),
-    incorrect: () => voiceManager.encourage('try-again', { priority: 'normal' })
+    amazing: () => voiceManager.encourage('amazing', { priority: 'normal' }),
+    correct: () => voiceManager.correct(),
+    incorrect: () => voiceManager.incorrect()
   };
 }
-
-// Export pour compatibilité avec le code existant
-export const encourage = createEncourage('Adent');
-
