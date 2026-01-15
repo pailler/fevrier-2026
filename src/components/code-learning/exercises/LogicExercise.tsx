@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface LogicExerciseProps {
   exerciseId: string;
@@ -12,6 +12,15 @@ export default function LogicExercise({ exerciseId, onComplete }: LogicExerciseP
   const [input2, setInput2] = useState('');
   const [result, setResult] = useState('');
   const [showHint, setShowHint] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  useEffect(() => {
+    setInput1('');
+    setInput2('');
+    setResult('');
+    setShowHint(false);
+    setIsSuccess(false);
+  }, [exerciseId]);
 
   const handleRun = () => {
     if (exerciseId === 'logique-1') {
@@ -20,6 +29,7 @@ export default function LogicExercise({ exerciseId, onComplete }: LogicExerciseP
       const pasDePluie = input2.toLowerCase() === 'oui';
       
       if (input1 && input2) {
+        setIsSuccess(true);
         if (beauTemps && pasDePluie) {
           setResult('🎉 Parfait ! On peut aller au parc ! ☀️');
         } else {
@@ -27,6 +37,7 @@ export default function LogicExercise({ exerciseId, onComplete }: LogicExerciseP
         }
       } else {
         setResult('⚠️ Réponds aux deux questions (oui/non)');
+        setIsSuccess(false);
       }
     } else if (exerciseId === 'logique-2') {
       // Exercice 2: Le Gardien du Trésor (clé ET code correct)
@@ -34,6 +45,7 @@ export default function LogicExercise({ exerciseId, onComplete }: LogicExerciseP
       const codeCorrect = input2 === '1234';
       
       if (input1 && input2) {
+        setIsSuccess(true);
         if (aLaCle && codeCorrect) {
           setResult('🎉 Bravo ! Le coffre s\'ouvre ! Tu as trouvé le trésor ! 💎');
         } else if (!aLaCle && codeCorrect) {
@@ -45,6 +57,51 @@ export default function LogicExercise({ exerciseId, onComplete }: LogicExerciseP
         }
       } else {
         setResult('⚠️ Réponds aux deux questions');
+        setIsSuccess(false);
+      }
+    } else if (exerciseId === 'logique-3') {
+      // Exercice 3: Entrer à la fête (invitation OU parent)
+      const invitation = input1.toLowerCase() === 'oui';
+      const parent = input2.toLowerCase() === 'oui';
+
+      if (!input1 || !input2) {
+        setResult('⚠️ Réponds aux deux questions (oui/non)');
+        setIsSuccess(false);
+        return;
+      }
+
+      setIsSuccess(true);
+      if (invitation || parent) {
+        setResult('🎉 Tu peux entrer à la fête !');
+      } else {
+        setResult('😅 Pas d\'invitation et pas de parent… tu ne peux pas entrer.');
+      }
+    } else if (exerciseId === 'logique-4') {
+      // Exercice 4: Mot de passe ET âge minimum
+      const mdp = input1.trim().toLowerCase();
+      const age = parseInt(input2, 10);
+      if (!mdp || !input2) {
+        setResult('⚠️ Remplis le mot de passe et l\'âge');
+        setIsSuccess(false);
+        return;
+      }
+      if (isNaN(age)) {
+        setResult('⚠️ L\'âge doit être un nombre');
+        setIsSuccess(false);
+        return;
+      }
+
+      const mdpOk = mdp === 'licorne';
+      const ageOk = age >= 11;
+      setIsSuccess(true);
+      if (mdpOk && ageOk) {
+        setResult('✅ Accès autorisé ! Bienvenue 🎉');
+      } else if (!mdpOk && ageOk) {
+        setResult('🔒 Mot de passe incorrect');
+      } else if (mdpOk && !ageOk) {
+        setResult('🔒 Trop jeune : il faut au moins 11 ans');
+      } else {
+        setResult('🔒 Mot de passe incorrect ET âge insuffisant');
       }
     }
   };
@@ -156,6 +213,104 @@ export default function LogicExercise({ exerciseId, onComplete }: LogicExerciseP
               </div>
             </>
           )}
+          {exerciseId === 'logique-3' && (
+            <>
+              <div>
+                <span className="text-purple-400">let</span>{' '}
+                <span className="text-yellow-400">invitation</span>{' '}
+                <span className="text-white">=</span>{' '}
+                <input
+                  type="text"
+                  value={input1}
+                  onChange={(e) => setInput1(e.target.value)}
+                  placeholder="oui/non"
+                  className="bg-gray-800 text-green-400 border border-gray-700 rounded px-2 py-1 w-24 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                />
+                <span className="text-white">;</span>
+              </div>
+              <div className="mt-2">
+                <span className="text-purple-400">let</span>{' '}
+                <span className="text-yellow-400">parent</span>{' '}
+                <span className="text-white">=</span>{' '}
+                <input
+                  type="text"
+                  value={input2}
+                  onChange={(e) => setInput2(e.target.value)}
+                  placeholder="oui/non"
+                  className="bg-gray-800 text-green-400 border border-gray-700 rounded px-2 py-1 w-24 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                />
+                <span className="text-white">;</span>
+              </div>
+              <div className="mt-2">
+                <span className="text-purple-400">if</span>{' '}
+                <span className="text-white">(</span>
+                <span className="text-yellow-400">invitation</span>{' '}
+                <span className="text-white">||</span>{' '}
+                <span className="text-yellow-400">parent</span>
+                <span className="text-white">) {'{'}</span>
+              </div>
+              <div className="ml-4">
+                <span className="text-blue-400">console.log</span>
+                <span className="text-white">(</span>
+                <span className="text-yellow-400">'Tu peux entrer !'</span>
+                <span className="text-white">);</span>
+              </div>
+              <div>
+                <span className="text-white">{'}'}</span>
+              </div>
+            </>
+          )}
+          {exerciseId === 'logique-4' && (
+            <>
+              <div>
+                <span className="text-purple-400">let</span>{' '}
+                <span className="text-yellow-400">motDePasse</span>{' '}
+                <span className="text-white">=</span>{' '}
+                <input
+                  type="text"
+                  value={input1}
+                  onChange={(e) => setInput1(e.target.value)}
+                  placeholder="licorne"
+                  className="bg-gray-800 text-green-400 border border-gray-700 rounded px-2 py-1 w-32 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                />
+                <span className="text-white">;</span>
+              </div>
+              <div className="mt-2">
+                <span className="text-purple-400">let</span>{' '}
+                <span className="text-yellow-400">age</span>{' '}
+                <span className="text-white">=</span>{' '}
+                <input
+                  type="number"
+                  value={input2}
+                  onChange={(e) => setInput2(e.target.value)}
+                  placeholder="11"
+                  className="bg-gray-800 text-green-400 border border-gray-700 rounded px-2 py-1 w-24 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                />
+                <span className="text-white">;</span>
+              </div>
+              <div className="mt-2">
+                <span className="text-purple-400">if</span>{' '}
+                <span className="text-white">(</span>
+                <span className="text-yellow-400">motDePasse</span>{' '}
+                <span className="text-white">===</span>{' '}
+                <span className="text-orange-400">'licorne'</span>{' '}
+                <span className="text-white">&amp;&amp;</span>{' '}
+                <span className="text-yellow-400">age</span>{' '}
+                <span className="text-white">&gt;=</span>{' '}
+                <span className="text-orange-400">11</span>
+                <span className="text-white">) {'{'}</span>
+              </div>
+              <div className="ml-4">
+                <span className="text-blue-400">console.log</span>
+                <span className="text-white">(</span>
+                <span className="text-yellow-400">'Accès OK'</span>
+                <span className="text-white">);</span>
+              </div>
+              <div>
+                <span className="text-white">{'}'}</span>
+              </div>
+            </>
+          )}
         </div>
 
         <button
@@ -188,12 +343,16 @@ export default function LogicExercise({ exerciseId, onComplete }: LogicExerciseP
           <p className="text-yellow-800">
             {exerciseId === 'logique-1' 
               ? 'Le symbole && signifie "ET". Les deux conditions doivent être vraies pour que le code s\'exécute.'
-              : 'Pour ouvrir le coffre, tu dois avoir la clé ET le bon code. Les deux conditions doivent être vraies !'}
+              : exerciseId === 'logique-3'
+                ? 'Le symbole || signifie "OU". Il suffit qu\'une des deux conditions soit vraie.'
+                : exerciseId === 'logique-4'
+                  ? 'Ici, on utilise && : il faut le bon mot de passe ET l\'âge minimum.'
+                : 'Pour ouvrir le coffre, tu dois avoir la clé ET le bon code. Les deux conditions doivent être vraies !'}
           </p>
         </div>
       )}
 
-      {result && (result.includes('🎉') || result.includes('Parfait')) ? (
+      {isSuccess ? (
         <button
           onClick={onComplete}
           className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-4 rounded-lg font-bold text-lg hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg"

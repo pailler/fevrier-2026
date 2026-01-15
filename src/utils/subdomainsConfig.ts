@@ -275,16 +275,16 @@ export const subdomainsConfig: SubdomainInfo[] = [
     subdomain: 'code-learning.iahome.fr',
     url: 'https://iahome.fr/code-learning',
     title: 'Apprendre le Code aux enfants - Initiation à la Programmation | IA Home',
-    description: 'Des exercices courts et amusants pour découvrir la programmation. Parfait pour les enfants de 8 à 12 ans ! Apprenez les bases du code de manière ludique et interactive.',
+    description: 'Des exercices courts et amusants pour découvrir la programmation, avec une progression par âge. Parfait pour les enfants de 6 à 14 ans ! Apprenez les bases du code de manière ludique et interactive.',
     keywords: ['apprendre code', 'programmation enfants', 'initiation code', 'apprendre programmation', 'code learning', 'éducation code', 'programmation ludique'],
     category: 'formation',
     icon: '💻',
     features: [
       'Exercices interactifs et amusants',
-      'Progression adaptée aux enfants',
-      'Apprentissage des concepts de base',
+      'Progression par âge (du plus simple au plus avancé)',
+      'Apprentissage des concepts de base (variables, boucles, conditions, logique, fonctions)',
       'Interface colorée et intuitive',
-      'Exercices pratiques variés'
+      'Exercices pratiques variés (tableaux, objets, mini-défis)'
     ],
     useCases: [
       'Découvrir la programmation de manière ludique',

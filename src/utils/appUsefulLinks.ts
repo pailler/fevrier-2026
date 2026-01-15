@@ -47,8 +47,9 @@ export const appUsefulLinks: AppLinks = {
     { label: 'Documentation', url: 'https://github.com/Tencent/Hunyuan3D#readme', icon: '📚' },
   ],
   'code-learning': [
-    { label: 'Documentation Python', url: 'https://docs.python.org/fr/', icon: '🐍' },
-    { label: 'Learn Python', url: 'https://www.learnpython.org', icon: '📚' },
+    { label: 'MDN JavaScript', url: 'https://developer.mozilla.org/fr/docs/Web/JavaScript', icon: '🟨' },
+    { label: 'JavaScript (guide)', url: 'https://javascript.info', icon: '📚' },
+    { label: 'Code.org (enfants)', url: 'https://code.org', icon: '🧒' },
   ],
   'meeting-reports': [
     { label: 'Documentation OpenAI Whisper', url: 'https://github.com/openai/whisper', icon: '🔗' },

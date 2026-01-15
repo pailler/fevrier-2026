@@ -13,6 +13,7 @@ import { addActivityPoints, loadPointsData } from '../../utils/apprendre-autreme
 import { updatePathProgress, loadPaths } from '../../utils/apprendre-autrement/paths';
 import { useVoiceEncouragement } from '../../hooks/useVoiceEncouragement';
 import { getChildName, setChildName } from '../../utils/apprendre-autrement/childName';
+import { BUILD_TAG } from '../../buildInfo.generated';
 
 export default function ApprendreAutrementPage() {
   const router = useRouter();
@@ -38,8 +39,8 @@ export default function ApprendreAutrementPage() {
     newLevel?: number;
   } | null>(null);
   const [childName, setChildNameState] = useState<string>('');
-  const [tokenValidated, setTokenValidated] = useState(false);
-  const [tokenError, setTokenError] = useState<string | null>(null);
+  // Token optionnel (préservé si présent), mais l'app doit rester accessible sans token
+  const [optionalToken, setOptionalToken] = useState<string | null>(null);
 
   const { encourage } = useVoiceEncouragement({ 
     enabled: accessibilitySettings.soundEnabled,
@@ -48,136 +49,21 @@ export default function ApprendreAutrementPage() {
     childName: childName
   });
 
-  // Valider le token au chargement de la page
+  // Token optionnel au chargement (URL ou sessionStorage)
   useEffect(() => {
-    const validateToken = async () => {
-      if (typeof window === 'undefined') return;
-
-      const urlParams = new URLSearchParams(window.location.search);
-      let token = urlParams.get('token');
-      
-      // Si pas de token dans l'URL, vérifier dans sessionStorage (pour navigation interne)
-      if (!token && typeof window !== 'undefined') {
-        token = sessionStorage.getItem('apprendre-autrement-token');
-        if (token) {
-          // Remettre le token dans l'URL pour les navigations futures
-          const newUrl = new URL(window.location.href);
-          newUrl.searchParams.set('token', token);
-          window.history.replaceState({}, '', newUrl.toString());
-        }
-      }
-
-      // En mode développement (localhost), permettre l'accès sans token
-      const isDevelopment = typeof window !== 'undefined' && 
-        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-      
-      console.log(`🔍 Validation token - Hostname: ${typeof window !== 'undefined' ? window.location.hostname : 'unknown'}, Development: ${isDevelopment}, Token: ${token ? 'présent' : 'manquant'}`);
-      
-      if (!token) {
-        if (isDevelopment) {
-          // En développement, permettre l'accès sans token
-          console.log('🔓 Mode développement : accès sans token autorisé');
-          setTokenValidated(true);
-          return;
-        }
-        // En production, bloquer l'accès sans token
-        console.error('❌ Token manquant en production');
-        setTokenError('Token d\'accès manquant. Veuillez accéder à cette page via le bouton "Accéder à Apprendre Autrement" sur iahome.fr.');
-        return;
-      }
-      
-      // Sauvegarder le token dans sessionStorage pour les navigations futures
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('apprendre-autrement-token', token);
-      }
-
-      try {
-        // Utiliser l'API du projet principal (iahome) pour valider le token
-        // En développement : localhost, en production : toujours iahome.fr
-        const isDevelopment = typeof window !== 'undefined' && 
-          (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-        const apiUrl = isDevelopment
-          ? 'http://localhost:3000/api/validate-internal-token'
-          : 'https://iahome.fr/api/validate-internal-token';
-        
-        console.log(`🔍 Validation token - Hostname: ${typeof window !== 'undefined' ? window.location.hostname : 'unknown'}, Development: ${isDevelopment}`);
-        console.log(`🔍 Validation token vers: ${apiUrl}`);
-        if (token) {
-          console.log(`🔍 Token: ${token.substring(0, 50)}...`);
-        }
-        
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Origin': typeof window !== 'undefined' ? window.location.origin : '',
-          },
-          mode: 'cors', // Explicitement activer CORS
-          credentials: 'omit', // Ne pas envoyer les cookies
-          body: JSON.stringify({
-            token: token,
-            moduleId: 'apprendre-autrement'
-          })
-        });
-
-        console.log(`📡 Réponse API: Status ${response.status}, OK: ${response.ok}`);
-
-        if (!response.ok) {
-          let errorMessage = 'Token invalide ou expiré. Veuillez réessayer.';
-          try {
-            const errorData = await response.json();
-            errorMessage = errorData.error || errorMessage;
-            console.error('❌ Erreur API:', errorData);
-          } catch (parseError) {
-            const errorText = await response.text();
-            console.error('❌ Erreur API (texte):', errorText);
-            errorMessage = `Erreur ${response.status}: ${errorText || 'Erreur inconnue'}`;
-          }
-          setTokenError(errorMessage);
-          return;
-        }
-
-        const result = await response.json();
-        console.log('✅ Token validé:', result);
-
-        // Token valide, préserver le token dans l'URL et sessionStorage
-        // token est déjà déclaré plus haut dans la fonction
-        if (token) {
-          // Sauvegarder dans sessionStorage pour les navigations futures
-          sessionStorage.setItem('apprendre-autrement-token', token);
-          // Garder le token dans l'URL pour les navigations futures
-          window.history.replaceState({}, document.title, `${window.location.pathname}?token=${encodeURIComponent(token)}`);
-        }
-        setTokenValidated(true);
-      } catch (err: any) {
-        console.error('❌ Erreur validation token:', err);
-        console.error('❌ Détails:', {
-          message: err.message,
-          name: err.name,
-          stack: err.stack
-        });
-        const errorMessage = err.message?.includes('CORS') || err.message?.includes('NetworkError')
-          ? 'Erreur de connexion CORS. Vérifiez que le serveur est accessible.'
-          : `Erreur lors de la validation du token: ${err.message || 'Erreur inconnue'}`;
-        setTokenError(errorMessage);
-      }
-    };
-
-    validateToken();
+    if (typeof window === 'undefined') return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenFromUrl = urlParams.get('token');
+    const tokenFromSession = sessionStorage.getItem('apprendre-autrement-token');
+    const token = tokenFromUrl || tokenFromSession;
+    if (token) {
+      sessionStorage.setItem('apprendre-autrement-token', token);
+    }
+    setOptionalToken(token);
   }, []);
 
   useEffect(() => {
-    // Ne charger le reste que si le token est validé ou s'il n'y a pas de token (mode développement)
-    const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-    
-    if (tokenError && typeof window !== 'undefined' && !isDevelopment) {
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
-      if (token) {
-        // Il y a un token mais il est invalide, ne pas charger l'application
-        return;
-      }
-    }
+    // Charger le reste de l'application (aucune restriction par token)
 
     const savedSettings = getAccessibilitySettings();
     if (savedSettings) {
@@ -224,13 +110,13 @@ export default function ApprendreAutrementPage() {
     }
 
     // Message de bienvenue
-    if (accessibilitySettings.soundEnabled && (tokenValidated || !tokenError)) {
+    if (accessibilitySettings.soundEnabled) {
       setTimeout(() => {
         encourage.welcome();
       }, 1000);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokenValidated, tokenError]);
+  }, [optionalToken]);
 
   const handleActivityComplete = async (
     activityId: string,
@@ -307,78 +193,7 @@ export default function ApprendreAutrementPage() {
   const totalActivities = activities.length;
   const progress = (completedActivities.length / totalActivities) * 100;
 
-  // Afficher l'erreur de token si présente
-  if (tokenError) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-4">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-            <p className="text-red-800 font-medium mb-2">⚠️ Erreur d'accès</p>
-            <p className="text-red-600 mb-4">{tokenError}</p>
-            <button
-              onClick={() => {
-                const isDevelopment = typeof window !== 'undefined' && 
-                  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-                const apiUrl = isDevelopment
-                  ? 'http://localhost:3000/encours'
-                  : 'https://iahome.fr/encours';
-                window.location.href = apiUrl;
-              }}
-              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-            >
-              Retour aux modules
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Afficher un loader pendant la validation du token (sauf en mode développement)
-  const isDevelopment = typeof window !== 'undefined' && 
-    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-  
-  // En production, bloquer l'accès si le token n'est pas validé
-  // IMPORTANT: Cette vérification doit être faite AVANT tout rendu du contenu principal
-  if (typeof window !== 'undefined' && !isDevelopment && !tokenValidated) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    
-    // Si un token est présent mais pas encore validé, afficher un loader
-    if (token) {
-      return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
-            <p className="text-gray-600">Vérification de l'accès...</p>
-          </div>
-        </div>
-      );
-    }
-    
-    // Si pas de token en production, bloquer l'accès
-    // tokenError devrait être défini, mais on bloque quand même si ce n'est pas le cas
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-4">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-            <p className="text-red-800 font-medium mb-2">⚠️ Erreur d'accès</p>
-            <p className="text-red-600 mb-4">
-              {tokenError || 'Token d\'accès manquant. Veuillez accéder à cette page via le bouton "Accéder à Apprendre Autrement" sur iahome.fr.'}
-            </p>
-            <button
-              onClick={() => {
-                window.location.href = 'https://iahome.fr/encours';
-              }}
-              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-            >
-              Retour aux modules
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Plus de blocage d'accès: l'app est accessible sans token (subdomain public).
 
   const getStyles = () => {
     const baseStyles: React.CSSProperties = {
@@ -408,6 +223,11 @@ export default function ApprendreAutrementPage() {
       }`}
       style={getStyles()}
     >
+      {/* Badge version (temporaire) */}
+      <div className="fixed bottom-3 right-3 z-[9999] select-none rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white shadow-lg backdrop-blur">
+        Version: {BUILD_TAG}
+      </div>
+
       {/* Bannière spéciale (style code-learning exact) */}
       <section className="bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 py-12 relative overflow-hidden">
         <div className="absolute inset-0">
@@ -651,16 +471,9 @@ export default function ApprendreAutrementPage() {
                 index={index}
                 isCompleted={completedActivities.includes(activity.id)}
                 onSelect={() => {
-                  // Récupérer le token de l'URL actuelle de manière synchrone
-                  let token: string | null = null;
-                  if (typeof window !== 'undefined') {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    token = urlParams.get('token');
-                  }
-                  
                   // Rediriger vers la page d'activité en préservant le token
-                  const activityUrl = token 
-                    ? `/apprendre-autrement/activity/${activity.id}?token=${encodeURIComponent(token)}`
+                  const activityUrl = optionalToken 
+                    ? `/apprendre-autrement/activity/${activity.id}?token=${encodeURIComponent(optionalToken)}`
                     : `/apprendre-autrement/activity/${activity.id}`;
                   
                   // Utiliser window.location.href pour garantir que le token est préservé

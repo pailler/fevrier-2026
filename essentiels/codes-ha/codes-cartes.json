@@ -3283,6 +3283,179 @@
           "code": "type: entities\ntitle: Utilisation Réseau\nshow_header_toggle: false\nentities:\n  - entity: sensor.grid_usage\n    name: Consommation Réseau\n    icon: mdi:transmission-tower\n  - entity: sensor.grid_rate_current\n    name: Taux Actuel\n    icon: mdi:currency-gbp\n  - entity: sensor.grid_rate_next\n    name: Taux Suivant\n    icon: mdi:clock-outline\ncard_mod:\n  style: |\n    ha-card {\n      background: rgba(255, 255, 255, 0.1) !important;\n      border-radius: 20px !important;\n      backdrop-filter: blur(10px) !important;\n    }"
         }
       ]
+    },
+    {
+      "id": "picture-entity-plus",
+      "name": "Picture Entity Plus",
+      "description": "Cartes picture-entity avancées avec personnalisation et affichage d'attributs",
+      "github": "https://github.com/iantrich/picture-entity-plus",
+      "hacs": "picture-entity-plus",
+      "codes": [
+        {
+          "id": "picture-entity-core-basic",
+          "name": "Picture Entity (Core) - Basique",
+          "description": "Carte picture-entity native de Home Assistant - Affichage basique d'une entité avec image",
+          "tags": [
+            "picture-entity",
+            "core",
+            "basique",
+            "native",
+            "image"
+          ],
+          "code": "type: picture-entity\nentity: camera.salon\nname: Caméra Salon\nimage: /local/photos/salon.jpg"
+        },
+        {
+          "id": "picture-entity-core-camera",
+          "name": "Picture Entity (Core) - Caméra Live",
+          "description": "Carte picture-entity avec flux caméra en direct",
+          "tags": [
+            "picture-entity",
+            "core",
+            "caméra",
+            "camera",
+            "live"
+          ],
+          "code": "type: picture-entity\nentity: camera.salon\nname: Caméra Salon\ncamera_image: camera.salon\ncamera_view: live"
+        },
+        {
+          "id": "picture-entity-core-tap-action",
+          "name": "Picture Entity (Core) - Avec Action",
+          "description": "Carte picture-entity avec action au clic (more-info)",
+          "tags": [
+            "picture-entity",
+            "core",
+            "action",
+            "tap",
+            "more-info"
+          ],
+          "code": "type: picture-entity\nentity: camera.salon\nname: Caméra Salon\nimage: /local/photos/salon.jpg\ntap_action:\n  action: more-info"
+        },
+        {
+          "id": "picture-elements-core-advanced",
+          "name": "Picture Elements (Core) - Avancé",
+          "description": "Carte picture-elements native - Permet de superposer des éléments interactifs sur une image",
+          "tags": [
+            "picture-elements",
+            "core",
+            "avancé",
+            "superposition",
+            "elements"
+          ],
+          "code": "type: picture-elements\nimage: /local/photos/maison.jpg\nelements:\n  - type: state-badge\n    entity: sensor.temperature\n    style:\n      top: 10%\n      left: 10%\n      '--paper-item-icon-color': '#FF5722'\n  - type: state-label\n    entity: sensor.humidity\n    style:\n      top: 20%\n      left: 10%\n      color: '#2196F3'\n  - type: icon\n    entity: light.salon\n    style:\n      top: 50%\n      left: 50%\n      '--mdc-icon-size': '48px'\n      color: '#4CAF50'\n    tap_action:\n      action: toggle"
+        },
+        {
+          "id": "picture-elements-core-buttons",
+          "name": "Picture Elements (Core) - Avec Boutons",
+          "description": "Carte picture-elements avec boutons interactifs superposés",
+          "tags": [
+            "picture-elements",
+            "core",
+            "boutons",
+            "buttons",
+            "interactif"
+          ],
+          "code": "type: picture-elements\nimage: /local/photos/plan_maison.jpg\nelements:\n  - type: service-button\n    service: light.toggle\n    service_data:\n      entity_id: light.salon\n    style:\n      top: 30%\n      left: 20%\n      width: 60px\n      height: 60px\n      border-radius: 50%\n      background: 'rgba(255, 255, 255, 0.8)'\n    title: Salon\n  - type: service-button\n    service: light.toggle\n    service_data:\n      entity_id: light.cuisine\n    style:\n      top: 30%\n      left: 60%\n      width: 60px\n      height: 60px\n      border-radius: 50%\n      background: 'rgba(255, 255, 255, 0.8)'\n    title: Cuisine"
+        },
+        {
+          "id": "picture-entity-plus-basic",
+          "name": "Picture Entity Plus - Basique",
+          "description": "Carte picture-entity-plus avec personnalisation avancée - Configuration de base",
+          "tags": [
+            "picture-entity-plus",
+            "personnalisable",
+            "avancé",
+            "custom"
+          ],
+          "github": "https://github.com/iantrich/picture-entity-plus",
+          "hacs": "picture-entity-plus",
+          "code": "type: custom:picture-entity-plus\nentity: camera.salon\nimage: /local/photos/salon.jpg\nname: Salon\nstate_image:\n  'on': /local/photos/salon_on.jpg\n  'off': /local/photos/salon_off.jpg"
+        },
+        {
+          "id": "picture-entity-plus-attributes",
+          "name": "Picture Entity Plus - Attributs",
+          "description": "Carte picture-entity-plus avec affichage des attributs de l'entité",
+          "tags": [
+            "picture-entity-plus",
+            "attributs",
+            "attributes",
+            "informations"
+          ],
+          "github": "https://github.com/iantrich/picture-entity-plus",
+          "hacs": "picture-entity-plus",
+          "code": "type: custom:picture-entity-plus\nentity: sensor.weather_temperature\nimage: /local/photos/meteo.jpg\nname: Météo\nshow_attributes: true\nattributes:\n  - temperature\n  - humidity\n  - pressure\n  - wind_speed"
+        },
+        {
+          "id": "picture-entity-plus-custom-style",
+          "name": "Picture Entity Plus - Style Personnalisé",
+          "description": "Carte picture-entity-plus avec style CSS personnalisé",
+          "tags": [
+            "picture-entity-plus",
+            "style",
+            "css",
+            "personnalisation"
+          ],
+          "github": "https://github.com/iantrich/picture-entity-plus",
+          "hacs": "picture-entity-plus",
+          "code": "type: custom:picture-entity-plus\nentity: light.salon\nimage: /local/photos/salon.jpg\nname: Salon\nstate_image:\n  'on': /local/photos/salon_on.jpg\n  'off': /local/photos/salon_off.jpg\ncard_mod:\n  style: |\n    ha-card {\n      border-radius: 20px !important;\n      overflow: hidden !important;\n      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;\n    }\n    .picture-entity-plus {\n      transition: transform 0.3s ease !important;\n    }\n    .picture-entity-plus:hover {\n      transform: scale(1.05) !important;\n    }"
+        },
+        {
+          "id": "picture-entity-plus-tap-actions",
+          "name": "Picture Entity Plus - Actions Multiples",
+          "description": "Carte picture-entity-plus avec actions tap, hold et double-tap personnalisées",
+          "tags": [
+            "picture-entity-plus",
+            "actions",
+            "tap",
+            "hold",
+            "double-tap"
+          ],
+          "github": "https://github.com/iantrich/picture-entity-plus",
+          "hacs": "picture-entity-plus",
+          "code": "type: custom:picture-entity-plus\nentity: light.salon\nimage: /local/photos/salon.jpg\nname: Salon\ntap_action:\n  action: toggle\nhold_action:\n  action: more-info\ndouble_tap_action:\n  action: call-service\n  service: light.turn_on\n  service_data:\n    brightness: 255\n    rgb_color: [255, 0, 0]"
+        },
+        {
+          "id": "picture-card-attributes-basic",
+          "name": "Picture Card Attributes - Basique",
+          "description": "Carte picture-card-attributes pour afficher les attributs d'une entité sur une image",
+          "tags": [
+            "picture-card-attributes",
+            "attributs",
+            "attributes",
+            "affichage"
+          ],
+          "github": "https://github.com/custom-cards/picture-card-attributes",
+          "hacs": "picture-card-attributes",
+          "code": "type: custom:picture-card-attributes\nentity: sensor.weather\nimage: /local/photos/meteo.jpg\nattributes:\n  - temperature\n  - humidity\n  - pressure\n  - wind_speed\n  - condition"
+        },
+        {
+          "id": "picture-card-attributes-styled",
+          "name": "Picture Card Attributes - Style Personnalisé",
+          "description": "Carte picture-card-attributes avec style personnalisé pour les attributs",
+          "tags": [
+            "picture-card-attributes",
+            "style",
+            "personnalisation",
+            "attributs"
+          ],
+          "github": "https://github.com/custom-cards/picture-card-attributes",
+          "hacs": "picture-card-attributes",
+          "code": "type: custom:picture-card-attributes\nentity: sensor.weather\nimage: /local/photos/meteo.jpg\nattributes:\n  - temperature\n  - humidity\n  - pressure\n  - wind_speed\nattribute_style:\n  background: 'rgba(0, 0, 0, 0.6)'\n  color: '#FFFFFF'\n  padding: '8px 12px'\n  border-radius: '8px'\n  font-size: '14px'\ncard_mod:\n  style: |\n    ha-card {\n      border-radius: 20px !important;\n      overflow: hidden !important;\n    }"
+        },
+        {
+          "id": "picture-card-attributes-position",
+          "name": "Picture Card Attributes - Position Personnalisée",
+          "description": "Carte picture-card-attributes avec position personnalisée des attributs",
+          "tags": [
+            "picture-card-attributes",
+            "position",
+            "attributs",
+            "layout"
+          ],
+          "github": "https://github.com/custom-cards/picture-card-attributes",
+          "hacs": "picture-card-attributes",
+          "code": "type: custom:picture-card-attributes\nentity: sensor.weather\nimage: /local/photos/meteo.jpg\nattributes:\n  - temperature\n  - humidity\n  - pressure\nattribute_position: top-left\nattribute_layout: vertical\ncard_mod:\n  style: |\n    ha-card {\n      border-radius: 20px !important;\n      overflow: hidden !important;\n    }"
+        }
+      ]
     }
   ]
 }

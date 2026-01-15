@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface CodeCompletionExerciseProps {
   exerciseId: string;
@@ -12,6 +12,15 @@ export default function CodeCompletionExercise({ exerciseId, onComplete }: CodeC
   const [result, setResult] = useState('');
   const [showHint, setShowHint] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  useEffect(() => {
+    setAnswers({});
+    setResult('');
+    setShowHint(false);
+    setAttempts(0);
+    setIsSuccess(false);
+  }, [exerciseId]);
 
   type ExerciseConfig = {
     title: string;
@@ -112,6 +121,166 @@ export default function CodeCompletionExercise({ exerciseId, onComplete }: CodeC
         }
         return '⚠️ Vérifie le nom de la fonction et le calcul.';
       }
+    },
+    'complete-5': {
+      title: 'Complète le Tableau',
+      code: [
+        { type: 'code', text: 'let animaux = ["chat", "chien"];' },
+        { type: 'code', text: '// Ajoute "panda" dans le tableau :' },
+        { type: 'input', key: 'push', placeholder: 'animaux.push("panda")', correct: 'animaux.push("panda")' },
+        { type: 'code', text: 'console.log(animaux);' }
+      ],
+      hint: 'Pour ajouter un élément dans un tableau, tu peux utiliser la méthode .push(...).',
+      checkAnswer: (answer: string) => {
+        const normalized = answer.trim().toLowerCase().replace(/\s+/g, '');
+        return (
+          normalized.includes('animaux.push(') &&
+          (normalized.includes('"panda"') || normalized.includes("'panda'"))
+        );
+      },
+      runCode: (answer: string) => {
+        const normalized = answer.trim().toLowerCase().replace(/\s+/g, '');
+        if (
+          normalized.includes('animaux.push(') &&
+          (normalized.includes('"panda"') || normalized.includes("'panda'"))
+        ) {
+          const animaux = ['chat', 'chien', 'panda'];
+          return `✅ Bravo !\n${JSON.stringify(animaux)}`;
+        }
+        return '⚠️ Utilise animaux.push("panda") pour ajouter panda dans le tableau.';
+      }
+    },
+    'complete-6': {
+      title: 'Complète l\'Index',
+      code: [
+        { type: 'code', text: 'let couleurs = ["rouge", "vert", "bleu"];' },
+        { type: 'code', text: '// Je veux récupérer "vert" :' },
+        { type: 'code', text: 'let choix = couleurs[' },
+        { type: 'input', key: 'index', placeholder: '1', correct: '1' },
+        { type: 'code', text: '];' },
+        { type: 'code', text: 'console.log(choix);' }
+      ],
+      hint: 'Les tableaux commencent à l\'index 0. Donc "rouge" = 0, "vert" = 1, "bleu" = 2.',
+      checkAnswer: (answer: string) => answer.trim() === '1',
+      runCode: (answer: string) => {
+        if (answer.trim() === '1') return '✅ Bravo ! choix = "vert"';
+        return '⚠️ Essaie 1 (car rouge=0, vert=1, bleu=2).';
+      }
+    },
+    'complete-7': {
+      title: 'Complète l\'Objet',
+      code: [
+        { type: 'code', text: 'let joueur = { nom: "Lina", score: 0 };' },
+        { type: 'code', text: '// Ajoute 5 points au score :' },
+        { type: 'input', key: 'score', placeholder: 'joueur.score = joueur.score + 5', correct: 'joueur.score = joueur.score + 5' },
+        { type: 'code', text: 'console.log(joueur.score);' }
+      ],
+      hint: 'Pour modifier une propriété : joueur.score = ... (tu peux utiliser joueur.score + 5).',
+      checkAnswer: (answer: string) => {
+        const n = answer.trim().toLowerCase().replace(/\s+/g, '');
+        return (
+          n.includes('joueur.score=') &&
+          (n.includes('joueur.score+5') || n.includes('0+5') || n.endsWith('=5') || n.endsWith('=5;'))
+        );
+      },
+      runCode: (answer: string) => {
+        const n = answer.trim().toLowerCase().replace(/\s+/g, '');
+        if (
+          n.includes('joueur.score=') &&
+          (n.includes('joueur.score+5') || n.includes('0+5') || n.endsWith('=5') || n.endsWith('=5;'))
+        ) {
+          return '✅ Bravo ! joueur.score = 5';
+        }
+        return '⚠️ Mets à jour la propriété score (ex: joueur.score = joueur.score + 5).';
+      }
+    },
+    'complete-8': {
+      title: 'Complète le For + Tableau',
+      code: [
+        { type: 'code', text: 'let fruits = ["pomme", "banane", "kiwi"];' },
+        { type: 'code', text: 'for (let i = 0; i < fruits.length; i++) {' },
+        { type: 'input', key: 'line', placeholder: 'console.log(fruits[i])', correct: 'console.log(fruits[i])' },
+        { type: 'code', text: '}' }
+      ],
+      hint: 'Tu dois afficher le fruit à l\'index i : fruits[i].',
+      checkAnswer: (answer: string) => {
+        const n = answer.trim().toLowerCase().replace(/\s+/g, '');
+        return n.includes('console.log(') && n.includes('fruits[i]');
+      },
+      runCode: (answer: string) => {
+        const n = answer.trim().toLowerCase().replace(/\s+/g, '');
+        if (n.includes('console.log(') && n.includes('fruits[i]')) {
+          return ['pomme', 'banane', 'kiwi'].join('\n');
+        }
+        return '⚠️ Utilise console.log(fruits[i]) dans la boucle.';
+      }
+    },
+    'complete-9': {
+      title: 'Complète le &&',
+      code: [
+        { type: 'code', text: 'let aUneCle = true;' },
+        { type: 'code', text: 'let code = "1234";' },
+        { type: 'code', text: 'if (aUneCle' },
+        { type: 'input', key: 'and', placeholder: '&& code === "1234"', correct: '&& code === "1234"' },
+        { type: 'code', text: ') {' },
+        { type: 'code', text: '  console.log("Ouvert !");' },
+        { type: 'code', text: '}' }
+      ],
+      hint: 'Il faut vérifier 2 conditions avec && : aUneCle ET code === "1234".',
+      checkAnswer: (answer: string) => answer.includes('&&') && answer.includes('1234'),
+      runCode: (answer: string) => {
+        if (answer.includes('&&') && answer.includes('1234')) return '✅ Ouvert !';
+        return '⚠️ Ajoute && code === "1234"';
+      }
+    },
+    'complete-10': {
+      title: 'Complète l\'Objet (niveau +1)',
+      code: [
+        { type: 'code', text: 'let joueur = { nom: "Noé", niveau: 1 };' },
+        { type: 'code', text: '// Augmente le niveau de 1 :' },
+        { type: 'input', key: 'level', placeholder: 'joueur.niveau += 1', correct: 'joueur.niveau += 1' },
+        { type: 'code', text: 'console.log(joueur.niveau);' }
+      ],
+      hint: 'Tu peux utiliser += 1 pour augmenter : joueur.niveau += 1',
+      checkAnswer: (answer: string) => {
+        const n = answer.trim().toLowerCase().replace(/\s+/g, '');
+        return n === 'joueur.niveau+=1' || n === 'joueur.niveau=joueur.niveau+1';
+      },
+      runCode: (answer: string) => {
+        const n = answer.trim().toLowerCase().replace(/\s+/g, '');
+        if (n === 'joueur.niveau+=1' || n === 'joueur.niveau=joueur.niveau+1') return '✅ Niveau = 2';
+        return '⚠️ Utilise joueur.niveau += 1 (ou joueur.niveau = joueur.niveau + 1).';
+      }
+    },
+    'complete-11': {
+      title: 'Complète la Variable (niveau 1)',
+      code: [
+        { type: 'code', text: 'let prenom = "Mia";' },
+        { type: 'code', text: 'console.log("Bonjour " +' },
+        { type: 'input', key: 'var', placeholder: 'prenom', correct: 'prenom' },
+        { type: 'code', text: ');' }
+      ],
+      hint: 'Tu dois utiliser la variable prenom.',
+      checkAnswer: (answer: string) => answer.trim() === 'prenom',
+      runCode: (answer: string) => {
+        if (answer.trim() === 'prenom') return '✅ Bonjour Mia';
+        return '⚠️ Écris prenom';
+      }
+    },
+    'complete-12': {
+      title: 'Complète la Concatenation',
+      code: [
+        { type: 'code', text: 'let mot = "chat";' },
+        { type: 'code', text: 'console.log("J\'aime le " +' },
+        { type: 'input', key: 'word', placeholder: 'mot', correct: 'mot' },
+        { type: 'code', text: ');' }
+      ],
+      hint: 'Pour mettre le mot dans la phrase, utilise la variable mot.',
+      checkAnswer: (answer: string) => answer.trim() === 'mot',
+      runCode: (answer: string) => {
+        if (answer.trim() === 'mot') return '✅ J\'aime le chat';
+        return '⚠️ Écris mot';
+      }
     }
   };
 
@@ -154,9 +323,50 @@ export default function CodeCompletionExercise({ exerciseId, onComplete }: CodeC
       const runFn = exercise.runCode as (arg1: string, arg2: string) => string;
       isCorrect = checkFn(answers['funcName'] || '', answers['return'] || '');
       output = runFn(answers['funcName'] || '', answers['return'] || '');
+    } else if (exerciseId === 'complete-5') {
+      const checkFn = exercise.checkAnswer as (answer: string) => boolean;
+      const runFn = exercise.runCode as (answer: string) => string;
+      isCorrect = checkFn(answers['push'] || '');
+      output = runFn(answers['push'] || '');
+    } else if (exerciseId === 'complete-6') {
+      const checkFn = exercise.checkAnswer as (answer: string) => boolean;
+      const runFn = exercise.runCode as (answer: string) => string;
+      isCorrect = checkFn(answers['index'] || '');
+      output = runFn(answers['index'] || '');
+    } else if (exerciseId === 'complete-7') {
+      const checkFn = exercise.checkAnswer as (answer: string) => boolean;
+      const runFn = exercise.runCode as (answer: string) => string;
+      isCorrect = checkFn(answers['score'] || '');
+      output = runFn(answers['score'] || '');
+    } else if (exerciseId === 'complete-8') {
+      const checkFn = exercise.checkAnswer as (answer: string) => boolean;
+      const runFn = exercise.runCode as (answer: string) => string;
+      isCorrect = checkFn(answers['line'] || '');
+      output = runFn(answers['line'] || '');
+    } else if (exerciseId === 'complete-9') {
+      const checkFn = exercise.checkAnswer as (answer: string) => boolean;
+      const runFn = exercise.runCode as (answer: string) => string;
+      isCorrect = checkFn(answers['and'] || '');
+      output = runFn(answers['and'] || '');
+    } else if (exerciseId === 'complete-10') {
+      const checkFn = exercise.checkAnswer as (answer: string) => boolean;
+      const runFn = exercise.runCode as (answer: string) => string;
+      isCorrect = checkFn(answers['level'] || '');
+      output = runFn(answers['level'] || '');
+    } else if (exerciseId === 'complete-11') {
+      const checkFn = exercise.checkAnswer as (answer: string) => boolean;
+      const runFn = exercise.runCode as (answer: string) => string;
+      isCorrect = checkFn(answers['var'] || '');
+      output = runFn(answers['var'] || '');
+    } else if (exerciseId === 'complete-12') {
+      const checkFn = exercise.checkAnswer as (answer: string) => boolean;
+      const runFn = exercise.runCode as (answer: string) => string;
+      isCorrect = checkFn(answers['word'] || '');
+      output = runFn(answers['word'] || '');
     }
 
     setResult(output);
+    setIsSuccess(isCorrect && output && !output.includes('⚠️'));
     
     if (isCorrect && output && !output.includes('⚠️')) {
       setTimeout(() => {
@@ -242,7 +452,7 @@ export default function CodeCompletionExercise({ exerciseId, onComplete }: CodeC
         </div>
       )}
 
-      {result && !result.includes('⚠️') && (
+      {isSuccess && (
         <button
           onClick={onComplete}
           className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-4 rounded-lg font-bold text-lg hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg"

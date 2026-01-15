@@ -3799,6 +3799,7 @@ function AnimalSoundsActivity({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [playingSound, setPlayingSound] = useState<string | null>(null);
   const [selectedCard, setSelectedCard] = useState<string | null>(null); // Carte sélectionnée pour affichage en grand
+  const [showEmojiInPopup, setShowEmojiInPopup] = useState(false);
   const [audioRefs, setAudioRefs] = useState<Map<string, HTMLAudioElement>>(new Map());
   const { encourage } = useVoiceEncouragement({ 
     enabled: accessibilitySettings.soundEnabled,
@@ -3942,11 +3943,13 @@ function AnimalSoundsActivity({
     // Si la carte est déjà sélectionnée, la désélectionner
     if (selectedCard === word.id) {
       setSelectedCard(null);
+      setShowEmojiInPopup(false);
       return;
     }
     
     // Sinon, sélectionner la carte et jouer le cri de l'animal
     setSelectedCard(word.id);
+    setShowEmojiInPopup(false);
     setClickedWords(prev => new Set([...prev, word.id]));
     playAnimalSound(word.id, word.word);
     
@@ -4065,7 +4068,10 @@ function AnimalSoundsActivity({
         return (
           <div 
             className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
-            onClick={() => setSelectedCard(null)}
+            onClick={() => {
+              setSelectedCard(null);
+              setShowEmojiInPopup(false);
+            }}
           >
             <div 
               className={`
@@ -4079,7 +4085,10 @@ function AnimalSoundsActivity({
               onClick={(e) => e.stopPropagation()}
             >
               <button
-                onClick={() => setSelectedCard(null)}
+                onClick={() => {
+                  setSelectedCard(null);
+                  setShowEmojiInPopup(false);
+                }}
                 className={`
                   absolute top-4 right-4 p-2 rounded-full transition-all transform hover:scale-110
                   ${accessibilitySettings.colorScheme === 'dark'
@@ -4094,7 +4103,9 @@ function AnimalSoundsActivity({
               </button>
               
               <div className="text-center">
-                <div className="text-[15rem] mb-8 leading-none">{selectedWord.emoji}</div>
+                {showEmojiInPopup && (
+                  <div className="text-[15rem] mb-8 leading-none">{selectedWord.emoji}</div>
+                )}
                 <div className={`text-5xl font-bold mb-8 ${
                   accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-amber-700'
                 }`}>
@@ -4105,6 +4116,7 @@ function AnimalSoundsActivity({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      setShowEmojiInPopup(true);
                       speakWord(selectedWord.word);
                     }}
                     disabled={isSpeaking}
@@ -4119,7 +4131,7 @@ function AnimalSoundsActivity({
                       shadow-lg
                     `}
                   >
-                    {isSpeaking ? '🔊 En cours...' : '🗣️ Prononcer'}
+                    {isSpeaking ? '🔊 En cours...' : '🗣️ Mot prononcé'}
                   </button>
                   <button
                     onClick={(e) => {
@@ -4173,7 +4185,7 @@ function AnimalSoundsActivity({
                     ? 'bg-gradient-to-br from-amber-200 to-orange-200 border-4 border-amber-400 scale-105'
                     : 'bg-white hover:bg-amber-50 hover:scale-105 active:scale-95 shadow-lg border-2 border-gray-200'
                   }
-                  ${accessibilitySettings.colorScheme === 'dark' && !isClicked && !isSelected
+                  ${accessibilitySettings.colorScheme === 'dark' && !isClicked
                     ? 'bg-gray-700 border-gray-600' 
                     : ''
                   }
@@ -4252,6 +4264,7 @@ function CitySoundsActivity({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [playingSound, setPlayingSound] = useState<string | null>(null);
   const [selectedCard, setSelectedCard] = useState<string | null>(null); // Carte sélectionnée pour affichage en grand
+  const [showEmojiInPopup, setShowEmojiInPopup] = useState(false);
   const audioRefs = useMemo(() => new Map<string, HTMLAudioElement>(), []);
   const { encourage } = useVoiceEncouragement({ 
     enabled: accessibilitySettings.soundEnabled,
@@ -4261,12 +4274,36 @@ function CitySoundsActivity({
 
   // Mapping des bruits de la ville vers leurs fichiers audio
   const citySounds: Record<string, string> = {
-    'pompiers': '/sounds/fire-truck.wav',
-    'camion-poubelle': '/sounds/garbage-truck.wav',
-    'police': '/sounds/police-siren.wav',
-    'ambulance': '/sounds/ambulance.flac',
-    'moto': '/sounds/motorcycle.wav',
-    'voiture': '/sounds/car.wav',
+    // 10 bruits disponibles
+    'city-voiture': '/sounds/car.wav',
+    'city-moto': '/sounds/motorcycle.wav',
+    'city-velo': '/sounds/bicycle.mp3',
+    'city-train': '/sounds/train.mp3',
+    'city-avion': '/sounds/airplane.mp3',
+    'city-helicoptere': '/sounds/helicopter.mp3',
+    'city-police': '/sounds/police-siren.wav',
+    'city-ambulance': '/sounds/ambulance.flac',
+    'city-pompiers': '/sounds/fire-truck.wav',
+    'city-camion-poubelle': '/sounds/garbage-truck.wav',
+  };
+
+  // Fallback d'emoji (au cas où la donnée `emoji` est vide pour certains items)
+  const cityEmojiFallback: Record<string, string> = {
+    'city-voiture': '🚗',
+    'city-moto': '🏍️',
+    'city-velo': '🚲',
+    'city-train': '🚆',
+    'city-avion': '✈️',
+    'city-helicoptere': '🚁',
+    'city-police': '🚓',
+    'city-ambulance': '🚑',
+    'city-pompiers': '🚒',
+    'city-camion-poubelle': '🚛',
+  };
+
+  const getDisplayEmoji = (word: VocabularyWord) => {
+    const v = (word.emoji || '').trim();
+    return v || cityEmojiFallback[word.id] || '🔊';
   };
 
   useEffect(() => {
@@ -4371,18 +4408,30 @@ function CitySoundsActivity({
     window.speechSynthesis.speak(utterance);
   };
 
+  // Demande: revenir au comportement précédent (modale, bouton 🔊), et inverser uniquement le son du clic.
+  // => au clic sur la carte, on joue le bruit (au lieu de prononcer le mot).
   const handleWordClick = (word: VocabularyWord) => {
     // Si la carte est déjà sélectionnée, la désélectionner
     if (selectedCard === word.id) {
       setSelectedCard(null);
+      setShowEmojiInPopup(false);
       return;
     }
-    
-    // Sinon, sélectionner la carte et prononcer le mot
+
+    // Stopper une éventuelle synthèse en cours (sinon ça peut couvrir le bruit)
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    setIsSpeaking(false);
+
+    // Ouvrir la carte en grand (comportement précédent) + compter comme découvert
     setSelectedCard(word.id);
+    setShowEmojiInPopup(false);
     setClickedWords(prev => new Set([...prev, word.id]));
-    speakWord(word.word);
-    
+
+    // Inversion demandée: jouer le bruit au clic
+    playCitySound(word.id, word.word);
+
     if (accessibilitySettings.soundEnabled && clickedWords.size % 3 === 0 && clickedWords.size > 0) {
       setTimeout(() => {
         encourage.correct();
@@ -4453,7 +4502,7 @@ function CitySoundsActivity({
           Les Bruits de la Ville
         </h3>
         <p className="text-lg mb-4">
-          Clique sur un élément pour entendre son nom, puis clique sur 🔊 pour entendre son bruit ! 
+          Clique sur un élément pour entendre son bruit !
         </p>
         <p className="text-sm opacity-80">
           {clickedWords.size} / {displayedWords.length} bruits découverts
@@ -4486,9 +4535,9 @@ function CitySoundsActivity({
         <h4 className={`text-xl font-bold mb-4 ${
           accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-gray-800'
         }`}>
-          Clique sur un élément pour entendre son nom, puis sur 🔊 pour son bruit :
+          Clique sur un élément pour entendre son bruit, puis sur 🔊 pour le réécouter :
         </h4>
-        {/* Modal pour afficher la carte en grand */}
+        {/* Modal pour afficher la carte en grand (comportement précédent) */}
         {selectedCard && (() => {
           const selectedWord = displayedWords.find(w => w.id === selectedCard);
           if (!selectedWord) return null;
@@ -4497,7 +4546,10 @@ function CitySoundsActivity({
           return (
             <div 
               className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
-              onClick={() => setSelectedCard(null)}
+              onClick={() => {
+                setSelectedCard(null);
+                setShowEmojiInPopup(false);
+              }}
             >
               <div 
                 className={`
@@ -4511,7 +4563,10 @@ function CitySoundsActivity({
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
-                  onClick={() => setSelectedCard(null)}
+                  onClick={() => {
+                    setSelectedCard(null);
+                    setShowEmojiInPopup(false);
+                  }}
                   className={`
                     absolute top-4 right-4 p-2 rounded-full transition-all transform hover:scale-110
                     ${accessibilitySettings.colorScheme === 'dark'
@@ -4526,7 +4581,9 @@ function CitySoundsActivity({
                 </button>
                 
                 <div className="text-center">
-                  <div className="text-[15rem] mb-8 leading-none">{selectedWord.emoji}</div>
+                  {showEmojiInPopup && (
+                    <div className="text-[15rem] mb-8 leading-none">{getDisplayEmoji(selectedWord)}</div>
+                  )}
                   <div className={`text-5xl font-bold mb-8 ${
                     accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-blue-700'
                   }`}>
@@ -4537,6 +4594,7 @@ function CitySoundsActivity({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        setShowEmojiInPopup(true);
                         speakWord(selectedWord.word);
                       }}
                       disabled={isSpeaking}
@@ -4551,7 +4609,7 @@ function CitySoundsActivity({
                         shadow-lg
                       `}
                     >
-                      {isSpeaking ? '🔊 En cours...' : '🗣️ Prononcer'}
+                      {isSpeaking ? '🔊 En cours...' : '🗣️ Mot prononcé'}
                     </button>
                     <button
                       onClick={(e) => {
@@ -4606,7 +4664,7 @@ function CitySoundsActivity({
                 onClick={() => handleWordClick(word)}
               >
                 <div className="w-full flex flex-col items-center justify-center text-center">
-                  <div className="text-8xl sm:text-9xl mb-4 flex items-center justify-center leading-none">{word.emoji}</div>
+                  <div className="text-8xl sm:text-9xl mb-4 flex items-center justify-center leading-none">{getDisplayEmoji(word)}</div>
                   <div className={`text-xl sm:text-2xl font-bold ${
                     isSelected || isClicked
                       ? 'text-blue-700' 
@@ -4619,7 +4677,7 @@ function CitySoundsActivity({
                   {isClicked && !isSelected && (
                     <div className="text-2xl mt-2">✓</div>
                   )}
-                  {isCurrentlySpeaking && !isSelected && (
+                  {isPlaying && !isSelected && (
                     <div className="text-2xl mt-2 animate-pulse">🔊</div>
                   )}
                 </div>
@@ -4641,11 +4699,7 @@ function CitySoundsActivity({
                   aria-label={`Jouer le bruit de ${word.word}`}
                   title={`Jouer le bruit de ${word.word}`}
                 >
-                  {isPlaying ? (
-                    <span className="text-xl">🔊</span>
-                  ) : (
-                    <span className="text-xl">🔊</span>
-                  )}
+                  <span className="text-xl">🔊</span>
                 </button>
               </div>
             );

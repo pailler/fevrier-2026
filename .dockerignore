@@ -7,7 +7,9 @@ yarn-debug.log*
 yarn-error.log*
 
 # Fichiers de build
-.next
+# NOTE: on **garde** `.next/` dans le contexte Docker pour pouvoir builder l'image
+# en se basant sur un build Next.js fait sur la machine hôte (plus stable que `next build` dans Docker sur Windows).
+# Le cache interne reste ignoré via `.next/cache/`.
 out
 dist
 build
@@ -68,6 +70,22 @@ test-*
 tmp/
 temp/
 uploads/
+
+# Cache modèles IA (très volumineux, ne doit jamais partir dans l'image iahome-app)
+ai-models-cache/
+
+# Dossiers projet volumineux / non nécessaires au build iahome-app
+apprendre-autrement/
+photo-animation/
+photo-portfolio/
+real-estate/
+prompt-generator/
+prompts/
+
+# Artefacts locaux (Cursor / Windows)
+.cursor/
+terminals/
+*.pid
 
 # Gros fichiers et binaires
 cloudflared.exe*

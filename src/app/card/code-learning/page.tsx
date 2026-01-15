@@ -74,7 +74,7 @@ export default function CodeLearningCardPage() {
         "price": "10",
         "priceCurrency": "TOKENS"
       },
-      "description": "Application éducative interactive pour apprendre la programmation aux enfants de 8 à 12 ans. Exercices progressifs sur les variables, boucles, conditions, fonctions. Interface ludique et colorée.",
+      "description": "Application éducative interactive pour apprendre la programmation aux enfants de 6 à 14 ans, avec une progression par âge. Exercices progressifs sur les variables, boucles, conditions, logique, fonctions, tableaux et objets. Interface ludique et colorée.",
       "url": "https://iahome.fr/card/code-learning",
       "aggregateRating": {
         "@type": "AggregateRating",
@@ -82,14 +82,16 @@ export default function CodeLearningCardPage() {
         "ratingCount": "150"
       },
       "featureList": [
-        "12 exercices progressifs",
+        "35 exercices progressifs",
         "Apprentissage des variables",
         "Apprentissage des boucles",
         "Apprentissage des conditions",
+        "Apprentissage de la logique (ET / OU)",
         "Apprentissage des fonctions",
+        "Tableaux et objets (notions essentielles)",
         "Interface ludique et colorée",
         "Système de progression",
-        "Programmation pour enfants 8-12 ans"
+        "Progression par âge (6-14 ans)"
       ]
     };
 
@@ -102,7 +104,7 @@ export default function CodeLearningCardPage() {
           "name": "Qu'est-ce qu'Apprendre le Code aux Enfants ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Apprendre le Code aux Enfants est une application éducative interactive qui permet aux enfants de 8 à 12 ans d'apprendre les bases de la programmation de manière ludique. L'application propose 12 exercices progressifs sur les concepts fondamentaux : variables, boucles, conditions, et fonctions."
+            "text": "Apprendre le Code aux Enfants est une application éducative interactive qui permet aux enfants de 6 à 14 ans d'apprendre les bases de la programmation de manière ludique. L'application propose 35 exercices progressifs, organisés par âge, sur les concepts fondamentaux : variables, boucles, conditions, logique, fonctions, tableaux et objets."
           }
         },
         {
@@ -110,7 +112,7 @@ export default function CodeLearningCardPage() {
           "name": "Pour quel âge est conçue cette application ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'application est spécialement conçue pour les enfants de 8 à 12 ans. Les exercices sont adaptés à ce niveau d'âge, avec une interface colorée et ludique qui rend l'apprentissage de la programmation amusant et accessible."
+            "text": "L'application est conçue pour les enfants de 6 à 14 ans. Les exercices sont regroupés par tranches d'âge, du plus simple au plus avancé, avec une interface colorée et ludique qui rend l'apprentissage de la programmation amusant et accessible."
           }
         },
         {
@@ -118,7 +120,7 @@ export default function CodeLearningCardPage() {
           "name": "Quels concepts de programmation sont enseignés ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'application couvre les concepts fondamentaux de la programmation : les variables (stockage de données), les boucles (répétition d'actions), les conditions (décisions logiques), et les fonctions (blocs de code réutilisables). Chaque concept est expliqué de manière simple et illustré par des exercices pratiques."
+            "text": "L'application couvre les concepts fondamentaux de la programmation : les variables (stockage de données), les boucles (répétition d'actions), les conditions (décisions), la logique (ET/OU), les fonctions (blocs réutilisables), ainsi que les tableaux et objets. Chaque concept est expliqué de manière simple et illustré par des exercices pratiques."
           }
         },
         {
@@ -150,7 +152,7 @@ export default function CodeLearningCardPage() {
           "name": "Quel langage de programmation est enseigné ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'application enseigne les concepts fondamentaux de la programmation de manière générale, sans se concentrer sur un langage spécifique. Les concepts appris (variables, boucles, conditions, fonctions) sont universels et s'appliquent à tous les langages de programmation, ce qui constitue une excellente base pour apprendre ensuite Python, JavaScript, ou tout autre langage."
+            "text": "Les exercices sont réalisés en JavaScript (directement dans le navigateur), mais les concepts appris (variables, boucles, conditions, logique, fonctions, tableaux, objets) sont universels et s'appliquent à tous les langages. C'est une excellente base avant d'apprendre ensuite Python, JavaScript plus avancé, ou tout autre langage."
           }
         }
       ]
@@ -223,13 +225,13 @@ export default function CodeLearningCardPage() {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                Apprendre le code aux enfants : programmation ludique pour enfants de 8 à 12 ans
+                Apprendre le code aux enfants : programmation ludique (6 à 14 ans)
               </h1>
               <span className="inline-block px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full mb-4 backdrop-blur-sm">
                 ÉDUCATION
               </span>
               <p className="text-xl text-white/90 mb-6">
-                Apprenez la programmation en vous amusant ! Des exercices interactifs et progressifs pour découvrir les bases du code : variables, boucles, conditions, fonctions. Interface ludique et colorée, parfaite pour les enfants de 8 à 12 ans.
+                Apprenez la programmation en vous amusant ! Des exercices interactifs et progressifs, organisés par âge, pour découvrir les bases du code : variables, boucles, conditions, logique, fonctions, tableaux, objets. Interface ludique et colorée, parfaite pour les enfants de 6 à 14 ans.
               </p>
               
               <div className="flex flex-wrap gap-3 mb-6">
@@ -279,15 +281,16 @@ export default function CodeLearningCardPage() {
               <p className="text-lg">
                 Cette application propose des exercices interactifs et amusants pour apprendre 
                 les bases de la programmation. Chaque exercice est conçu pour être court, concret 
-                et adapté aux enfants de 8 à 12 ans.
+                et adapté aux enfants de 6 à 14 ans (progression par âge).
               </p>
               <div className="bg-purple-50 border-l-4 border-purple-500 p-4 rounded">
                 <p className="font-semibold text-purple-900 mb-2">✨ Fonctionnalités :</p>
                 <ul className="list-disc list-inside text-purple-800 space-y-1">
-                  <li>12 exercices progressifs</li>
+                  <li>35 exercices progressifs</li>
                   <li>Interface colorée et ludique</li>
                   <li>Système de progression avec récompenses</li>
-                  <li>Concepts de base : variables, boucles, conditions</li>
+                  <li>Progression par âge (du plus simple au plus avancé)</li>
+                  <li>Concepts : variables, boucles, conditions, logique, fonctions, tableaux, objets</li>
                   <li>10 tokens par accès</li>
                 </ul>
               </div>
@@ -412,7 +415,7 @@ export default function CodeLearningCardPage() {
               {/* Paragraphe citable par les IA (GEO) */}
               <div className="bg-gradient-to-r from-purple-100 to-pink-100 p-6 rounded-2xl mb-8 border-l-4 border-purple-500">
                 <p className="text-lg leading-relaxed text-gray-800">
-                  <strong>Apprendre le Code aux Enfants est une application éducative interactive qui permet aux enfants de 8 à 12 ans d'apprendre les bases de la programmation de manière ludique.</strong> Avec 12 exercices progressifs sur les concepts fondamentaux (variables, boucles, conditions, fonctions), une interface colorée et ludique, et un système de progression, chaque enfant peut découvrir la programmation à son rythme. L'application est parfaite pour une initiation à la programmation sans connaissances préalables.
+                  <strong>Apprendre le Code aux Enfants est une application éducative interactive qui permet aux enfants de 6 à 14 ans d'apprendre les bases de la programmation de manière ludique.</strong> Avec 35 exercices progressifs organisés par âge (variables, boucles, conditions, logique, fonctions, tableaux, objets), une interface colorée et ludique, et un système de progression, chaque enfant peut découvrir la programmation à son rythme. L'application est parfaite pour une initiation à la programmation sans connaissances préalables.
                 </p>
               </div>
 
@@ -441,9 +444,9 @@ export default function CodeLearningCardPage() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                   <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl border border-purple-200">
-                    <h3 className="text-2xl font-bold text-purple-900 mb-4">12 exercices progressifs</h3>
+                    <h3 className="text-2xl font-bold text-purple-900 mb-4">35 exercices progressifs</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Des exercices interactifs et amusants qui couvrent les concepts fondamentaux de la programmation. Chaque exercice est conçu pour être court, concret et adapté aux enfants de 8 à 12 ans.
+                      Des exercices interactifs et amusants qui couvrent les concepts fondamentaux de la programmation. Chaque exercice est conçu pour être court, concret et adapté aux enfants de 6 à 14 ans, avec une progression par âge.
                     </p>
                   </div>
                   
@@ -577,7 +580,7 @@ export default function CodeLearningCardPage() {
                         </tr>
                         <tr className="bg-gray-50">
                           <td className="border border-gray-300 p-4 font-semibold">Exercices interactifs</td>
-                          <td className="border border-gray-300 p-4 text-center">✅ 12 exercices pratiques</td>
+                          <td className="border border-gray-300 p-4 text-center">✅ 35 exercices pratiques</td>
                           <td className="border border-gray-300 p-4 text-center">⚠️ Exercices papier</td>
                         </tr>
                         <tr className="bg-white">
@@ -611,21 +614,21 @@ export default function CodeLearningCardPage() {
                   <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-purple-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Qu'est-ce qu'Apprendre le Code aux Enfants ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Apprendre le Code aux Enfants est une application éducative interactive qui permet aux enfants de 8 à 12 ans d'apprendre les bases de la programmation de manière ludique. L'application propose 12 exercices progressifs sur les concepts fondamentaux : variables, boucles, conditions, et fonctions.
+                      Apprendre le Code aux Enfants est une application éducative interactive qui permet aux enfants de 6 à 14 ans d'apprendre les bases de la programmation de manière ludique. L'application propose 35 exercices progressifs organisés par âge (variables, boucles, conditions, logique, fonctions, tableaux, objets).
                     </p>
                   </div>
                   
                   <div className="bg-gradient-to-r from-pink-50 to-orange-50 p-6 rounded-2xl border-l-4 border-pink-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Pour quel âge est conçue cette application ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'application est spécialement conçue pour les enfants de 8 à 12 ans. Les exercices sont adaptés à ce niveau d'âge, avec une interface colorée et ludique qui rend l'apprentissage de la programmation amusant et accessible.
+                      L'application est conçue pour les enfants de 6 à 14 ans. Les exercices sont regroupés par tranches d'âge, du plus simple au plus avancé, avec une interface colorée et ludique qui rend l'apprentissage de la programmation amusant et accessible.
                     </p>
                   </div>
                   
                   <div className="bg-gradient-to-r from-orange-50 to-blue-50 p-6 rounded-2xl border-l-4 border-orange-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Quels concepts de programmation sont enseignés ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'application couvre les concepts fondamentaux de la programmation : les variables (stockage de données), les boucles (répétition d'actions), les conditions (décisions logiques), et les fonctions (blocs de code réutilisables). Chaque concept est expliqué de manière simple et illustré par des exercices pratiques.
+                      L'application couvre les concepts fondamentaux de la programmation : les variables (stockage de données), les boucles (répétition d'actions), les conditions (décisions), la logique (ET/OU), les fonctions (blocs de code réutilisables), ainsi que les tableaux et objets. Chaque concept est expliqué de manière simple et illustré par des exercices pratiques.
                     </p>
                   </div>
                   
@@ -653,7 +656,7 @@ export default function CodeLearningCardPage() {
                   <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-teal-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Quel langage de programmation est enseigné ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'application enseigne les concepts fondamentaux de la programmation de manière générale, sans se concentrer sur un langage spécifique. Les concepts appris (variables, boucles, conditions, fonctions) sont universels et s'appliquent à tous les langages de programmation, ce qui constitue une excellente base pour apprendre ensuite Python, JavaScript, ou tout autre langage.
+                      Les exercices sont réalisés en JavaScript (directement dans le navigateur), mais les concepts appris (variables, boucles, conditions, logique, fonctions, tableaux, objets) sont universels et s'appliquent à tous les langages. C'est une excellente base avant d'apprendre ensuite Python, JavaScript plus avancé, ou tout autre langage.
                     </p>
                   </div>
                 </div>

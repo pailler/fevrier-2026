@@ -69,8 +69,19 @@ Thumbs.db
 
 # Fichiers de backup
 *.backup
-*.bakdocker-services/essentiels/pdf/temp/
+*.bak
+
+# Cloudflared (runtime)
+cloudflared.pid
+
+# Stirling-PDF / PDF service temp + perf
+docker-services/essentiels/pdf/temp/
+docker-services/essentiels/pdf/temp/**
+**/hsperfdata_*/
 docker-services/essentiels/pdf/temp/**/OSL_PIPE*
+
+# Backup keys (ne jamais versionner)
+docker-services/essentiels/pdf/data/backup/keys/*.key
 ffmpeg.zip
 
 # Fichiers LFS volumineux (> 100 Mo) - exclus du dépôt GitHub

@@ -18,6 +18,12 @@ RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 # Copier le code source
 COPY . .
 
+# Écrire un tag de build visible dans l'UI (affiché sur /apprendre-autrement)
+# Format: aa-YYYYMMDD-HHMMSSZ
+RUN TAG="aa-$(date -u +%Y%m%d-%H%M%SZ)" && \
+    printf "// Auto-généré au build Docker\nexport const BUILD_TAG = '%s';\n" "$TAG" > src/buildInfo.generated.ts && \
+    echo "BUILD_TAG=$TAG"
+
 # Construire l'application
 RUN npm run build
 

@@ -151,12 +151,18 @@ export const vocabularyWords: VocabularyWord[] = [
   { id: 'froid', word: 'froid', category: 'Température', emoji: '❄️' },
   
   // Bruits de la Ville
-  { id: 'pompiers', word: 'Pompiers', category: 'Bruits de la Ville', emoji: '🚒' },
-  { id: 'camion-poubelle', word: 'Camion poubelle', category: 'Bruits de la Ville', emoji: '🗑️' },
-  { id: 'police', word: 'Police', category: 'Bruits de la Ville', emoji: '🚓' },
-  { id: 'ambulance', word: 'Ambulance', category: 'Bruits de la Ville', emoji: '🚑' },
-  { id: 'moto', word: 'Moto', category: 'Bruits de la Ville', emoji: '🏍️' },
-  { id: 'voiture', word: 'Voiture', category: 'Bruits de la Ville', emoji: '🚗' },
+  // NOTE: ids préfixés pour éviter les collisions avec d'autres catégories (ex: voiture/train existent ailleurs).
+  { id: 'city-voiture', word: 'Voiture', category: 'Bruits de la Ville', emoji: '🚗' },
+  { id: 'city-moto', word: 'Moto', category: 'Bruits de la Ville', emoji: '🏍️' },
+  { id: 'city-velo', word: 'Vélo', category: 'Bruits de la Ville', emoji: '🚲' },
+  { id: 'city-train', word: 'Train', category: 'Bruits de la Ville', emoji: '🚆' },
+  { id: 'city-avion', word: 'Avion', category: 'Bruits de la Ville', emoji: '✈️' },
+  { id: 'city-helicoptere', word: 'Hélicoptère', category: 'Bruits de la Ville', emoji: '🚁' },
+  { id: 'city-police', word: 'Police', category: 'Bruits de la Ville', emoji: '🚓' },
+  { id: 'city-ambulance', word: 'Ambulance', category: 'Bruits de la Ville', emoji: '🚑' },
+  { id: 'city-pompiers', word: 'Pompiers', category: 'Bruits de la Ville', emoji: '🚒' },
+  // Emoji "camion poubelle" : on utilise un vrai camion (pas une poubelle seule)
+  { id: 'city-camion-poubelle', word: 'Camion poubelle', category: 'Bruits de la Ville', emoji: '🚛' },
 ];
 
 // Fonction pour obtenir les mots par catégorie

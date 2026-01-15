@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       .insert([{
         id: 'code-learning',
         title: 'Apprendre le Code aux enfants',
-        description: 'Des exercices courts et amusants pour découvrir la programmation. Parfait pour les enfants de 8 à 12 ans !',
+        description: 'Des exercices courts et amusants pour découvrir la programmation, avec une progression par âge. Parfait pour les enfants de 6 à 14 ans !',
         subtitle: 'Apprentissage du code pour enfants',
         category: 'ÉDUCATION',
         price: 10,

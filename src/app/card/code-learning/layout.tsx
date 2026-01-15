@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Apprendre le code aux enfants : programmation ludique pour enfants de 8 à 12 ans | IA Home',
-  description: 'Apprenez la programmation en vous amusant ! Exercices interactifs et progressifs pour enfants de 8 à 12 ans. Découvrez les bases du code : variables, boucles, conditions, fonctions. Interface ludique et colorée.',
+  title: 'Apprendre le code aux enfants : programmation ludique (6 à 14 ans) | IA Home',
+  description: 'Apprenez la programmation en vous amusant ! Exercices interactifs et progressifs avec une progression par âge (6 à 14 ans). Découvrez les bases du code : variables, boucles, conditions, logique, fonctions, tableaux, objets.',
   keywords: [
     'apprendre le code aux enfants',
     'programmation enfants',
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
     'conditions programmation',
     'fonctions programmation',
     'code informatique enfants',
-    'programmation 8-12 ans',
-    'apprendre python enfant',
+    'programmation 6-14 ans',
+    'apprendre javascript enfant',
     'initiation informatique enfants',
     'coding kids',
     'programmation éducative',
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
     canonical: 'https://iahome.fr/card/code-learning',
   },
   openGraph: {
-    title: 'Apprendre le code aux enfants : programmation ludique pour enfants de 8 à 12 ans | IA Home',
-    description: 'Apprenez la programmation en vous amusant ! Exercices interactifs et progressifs pour enfants de 8 à 12 ans. Découvrez les bases du code : variables, boucles, conditions, fonctions.',
+    title: 'Apprendre le code aux enfants : programmation ludique (6 à 14 ans) | IA Home',
+    description: 'Apprenez la programmation en vous amusant ! Exercices interactifs et progressifs avec une progression par âge (6 à 14 ans). Variables, boucles, conditions, logique, fonctions, tableaux, objets.',
     url: 'https://iahome.fr/card/code-learning',
     siteName: 'IA Home',
     locale: 'fr_FR',
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
         url: 'https://iahome.fr/images/code-learning.jpg',
         width: 1200,
         height: 630,
-        alt: 'Apprendre le code aux enfants - Programmation ludique pour enfants de 8 à 12 ans',
+        alt: 'Apprendre le code aux enfants - Programmation ludique (6 à 14 ans)',
       },
     ],
   },
@@ -48,8 +48,8 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@iahome_fr',
     creator: '@iahome_fr',
-    title: 'Apprendre le code aux enfants : programmation ludique pour enfants de 8 à 12 ans | IA Home',
-    description: 'Apprenez la programmation en vous amusant ! Exercices interactifs et progressifs pour enfants de 8 à 12 ans.',
+    title: 'Apprendre le code aux enfants : programmation ludique (6 à 14 ans) | IA Home',
+    description: 'Apprenez la programmation en vous amusant ! Exercices interactifs et progressifs avec une progression par âge (6 à 14 ans).',
     images: ['https://iahome.fr/images/code-learning.jpg'],
   },
   robots: {

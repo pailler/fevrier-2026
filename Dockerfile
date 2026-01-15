@@ -1,75 +1,52 @@
 # Dockerfile pour iahome.fr - Production
-FROM node:20-alpine AS base
+#
+# IMPORTANT:
+# Sur cette machine, `next build` dans Docker a parfois des erreurs de type EOF.
+# On utilise donc un build Next.js **pré-généré sur l'hôte** (le dossier `.next/`),
+# puis on construit une image runtime légère autour.
 
-# Installer les dépendances nécessaires
+FROM node:20-alpine AS deps
+
 RUN apk add --no-cache libc6-compat curl
-
-# Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers de dépendances
 COPY package*.json ./
+# Dépendances runtime (Next est nécessaire pour `next start`)
+RUN npm ci --omit=dev
 
-# Installer toutes les dépendances (y compris dev pour le build)
-RUN npm ci
-
-# Copier les fichiers d'environnement pour le build
-COPY env.production.local ./.env.production
-COPY env.production.local ./.env.local
-
-# Définir les variables d'environnement comme ARG pour qu'elles soient disponibles au build time
-# Next.js remplace process.env.NEXT_PUBLIC_* au moment du build, donc elles doivent être disponibles
-ARG NEXT_PUBLIC_SUPABASE_URL=https://xemtoyzcihmncbrlsmhr.supabase.co
-ARG NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlbXRveXpjaGhtbmNicmxzbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0MDUzMDUsImV4cCI6MjA2NTk4MTMwNX0.afcRGhlB5Jj-7kgCV6IzUDRdGUQkHkm1Fdl1kzDdj6M
-
-# Convertir les ARG en ENV pour qu'elles soient disponibles pendant le build
-ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-# Copier le code source
-COPY . .
-
-# Construire l'application
-RUN npm run build
-
-# Image de production
 FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-    # Installer curl pour healthcheck (wget non disponible)
-    RUN apk add --no-cache curl
+# curl pour healthcheck
+RUN apk add --no-cache curl
 
-# Copier les variables d'environnement
-COPY --from=base /app/.env.production ./
-COPY --from=base /app/.env.local ./
+# Variables d'environnement
+COPY env.production.local ./.env.production
+COPY env.production.local ./.env.local
+
+# Dépendances + app buildée
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json ./package.json
+COPY public ./public
+COPY .next ./.next
+
+# S'assurer que tous les fichiers statiques sont copiés
+RUN ls -la ./.next/static || echo "Static files not found"
 
 # Créer un utilisateur non-root
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copier les fichiers nécessaires
-COPY --from=base /app/public ./public
-COPY --from=base /app/.next ./.next
-COPY --from=base /app/package.json ./package.json
-COPY --from=base /app/node_modules ./node_modules
-
-# S'assurer que tous les fichiers statiques sont copiés
-RUN ls -la ./.next/static || echo "Static files not found"
-
 # Créer le dossier logs
 RUN mkdir -p /app/logs
 
-# Changer les permissions
 RUN chown -R nextjs:nodejs /app
 USER nextjs
 
-# Exposer le port (peut être surchargé par docker-compose)
 EXPOSE 3000
-
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Commande de démarrage
 CMD ["npm", "start"]

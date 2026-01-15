@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface FunctionExerciseProps {
   exerciseId: string;
@@ -12,14 +12,25 @@ export default function FunctionExercise({ exerciseId, onComplete }: FunctionExe
   const [input2, setInput2] = useState('');
   const [result, setResult] = useState('');
   const [showHint, setShowHint] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  useEffect(() => {
+    setInput1('');
+    setInput2('');
+    setResult('');
+    setShowHint(false);
+    setIsSuccess(false);
+  }, [exerciseId]);
 
   const handleRun = () => {
     if (exerciseId === 'fonctions-1') {
       // Exercice 1: Ma Première Fonction
       if (input1.trim()) {
         setResult(`Bonjour ${input1} ! 👋`);
+        setIsSuccess(true);
       } else {
         setResult('⚠️ Entrez un prénom !');
+        setIsSuccess(false);
       }
     } else if (exerciseId === 'fonctions-2') {
       // Exercice 2: La Machine à Calculer
@@ -36,9 +47,42 @@ export default function FunctionExercise({ exerciseId, onComplete }: FunctionExe
           `${num1} - ${num2} = ${soustraction}\n` +
           `${num1} × ${num2} = ${multiplication}`
         );
+        setIsSuccess(true);
       } else {
         setResult('⚠️ Entrez deux nombres valides !');
+        setIsSuccess(false);
       }
+    } else if (exerciseId === 'fonctions-3') {
+      // Exercice 3: Générateur de pseudo (fonction qui combine des mots)
+      const prenom = input1.trim();
+      const surnom = input2.trim();
+
+      if (!prenom) {
+        setResult('⚠️ Entrez ton prénom !');
+        setIsSuccess(false);
+        return;
+      }
+
+      if (!surnom) {
+        setResult('⚠️ Entrez un surnom (ex: "Super Panda") !');
+        setIsSuccess(false);
+        return;
+      }
+
+      // Petit nettoyage pour éviter une sortie bizarre
+      const cleanPrenom = prenom.replace(/\s+/g, ' ').slice(0, 30);
+      const cleanSurnom = surnom.replace(/\s+/g, ' ').slice(0, 40);
+
+      setResult(`🎉 Ton pseudo : ${cleanSurnom} - ${cleanPrenom} 🪄`);
+      setIsSuccess(true);
+    } else if (exerciseId === 'fonctions-4') {
+      // Exercice 4: Le Dé Magique (nombre aléatoire)
+      const faces = parseInt(input1, 10);
+      const maxFaces = !isNaN(faces) ? faces : 6;
+      const safeFaces = Math.max(2, Math.min(20, maxFaces));
+      const roll = Math.floor(Math.random() * safeFaces) + 1;
+      setResult(`🎲 Résultat du dé (${safeFaces} faces) : ${roll}`);
+      setIsSuccess(true);
     }
   };
 
@@ -161,6 +205,103 @@ export default function FunctionExercise({ exerciseId, onComplete }: FunctionExe
               </div>
             </>
           )}
+          {exerciseId === 'fonctions-3' && (
+            <>
+              <div>
+                <span className="text-purple-400">function</span>{' '}
+                <span className="text-yellow-400">genererPseudo</span>
+                <span className="text-white">(</span>
+                <span className="text-yellow-400">prenom</span>
+                <span className="text-white">,</span>{' '}
+                <span className="text-yellow-400">surnom</span>
+                <span className="text-white">) {'{'}</span>
+              </div>
+              <div className="ml-4">
+                <span className="text-blue-400">return</span>{' '}
+                <span className="text-yellow-400">surnom + ' - ' + prenom</span>
+                <span className="text-white">;</span>
+              </div>
+              <div>
+                <span className="text-white">{'}'}</span>
+              </div>
+              <div className="mt-4">
+                <span className="text-blue-400">console.log</span>
+                <span className="text-white">(</span>
+                <span className="text-yellow-400">genererPseudo</span>
+                <span className="text-white">(</span>
+                <input
+                  type="text"
+                  value={input1}
+                  onChange={(e) => setInput1(e.target.value)}
+                  placeholder="'Lina'"
+                  className="bg-gray-800 text-green-400 border border-gray-700 rounded px-2 py-1 w-28 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <span className="text-white">,</span>{' '}
+                <input
+                  type="text"
+                  value={input2}
+                  onChange={(e) => setInput2(e.target.value)}
+                  placeholder="'Super Panda'"
+                  className="bg-gray-800 text-green-400 border border-gray-700 rounded px-2 py-1 w-40 ml-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <span className="text-white">));</span>
+              </div>
+            </>
+          )}
+          {exerciseId === 'fonctions-4' && (
+            <>
+              <div>
+                <span className="text-purple-400">function</span>{' '}
+                <span className="text-yellow-400">lancerDe</span>
+                <span className="text-white">(</span>
+                <span className="text-yellow-400">faces</span>
+                <span className="text-white">) {'{'}</span>
+              </div>
+              <div className="ml-4">
+                <span className="text-purple-400">let</span>{' '}
+                <span className="text-yellow-400">resultat</span>{' '}
+                <span className="text-white">=</span>{' '}
+                <span className="text-blue-400">Math.floor</span>
+                <span className="text-white">(</span>
+                <span className="text-blue-400">Math.random</span>
+                <span className="text-white">() * faces) +</span>{' '}
+                <span className="text-orange-400">1</span>
+                <span className="text-white">;</span>
+              </div>
+              <div className="ml-4">
+                <span className="text-blue-400">return</span>{' '}
+                <span className="text-yellow-400">resultat</span>
+                <span className="text-white">;</span>
+              </div>
+              <div>
+                <span className="text-white">{'}'}</span>
+              </div>
+              <div className="mt-4">
+                <span className="text-purple-400">let</span>{' '}
+                <span className="text-yellow-400">faces</span>{' '}
+                <span className="text-white">=</span>{' '}
+                <input
+                  type="number"
+                  value={input1}
+                  onChange={(e) => setInput1(e.target.value)}
+                  placeholder="6"
+                  min={2}
+                  max={20}
+                  className="bg-gray-800 text-green-400 border border-gray-700 rounded px-2 py-1 w-20 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <span className="text-white">;</span>{' '}
+                <span className="text-gray-500 text-xs ml-2">// 2 à 20</span>
+              </div>
+              <div className="mt-2">
+                <span className="text-blue-400">console.log</span>
+                <span className="text-white">(</span>
+                <span className="text-yellow-400">lancerDe</span>
+                <span className="text-white">(</span>
+                <span className="text-yellow-400">faces</span>
+                <span className="text-white">));</span>
+              </div>
+            </>
+          )}
         </div>
 
         <button
@@ -193,12 +334,16 @@ export default function FunctionExercise({ exerciseId, onComplete }: FunctionExe
           <p className="text-yellow-800">
             {exerciseId === 'fonctions-1' 
               ? 'Une fonction est comme une recette que tu peux réutiliser. Ici, elle prend un prénom et retourne un message de salutation.'
-              : 'Les fonctions permettent de faire des calculs réutilisables. Chaque fonction fait une opération différente (addition, soustraction, multiplication).'}
+              : exerciseId === 'fonctions-3'
+                ? 'Une fonction peut aussi combiner des mots. Ici, elle prend 2 paramètres (prenom et surnom) et retourne une seule phrase.'
+                : exerciseId === 'fonctions-4'
+                  ? 'Math.random() donne un nombre entre 0 et 1. Avec Math.floor(...) + 1, tu obtiens un nombre entier entre 1 et faces.'
+                : 'Les fonctions permettent de faire des calculs réutilisables. Chaque fonction fait une opération différente (addition, soustraction, multiplication).'}
           </p>
         </div>
       )}
 
-      {result && (result.includes('👋') || result.includes('Résultats')) ? (
+      {isSuccess ? (
         <button
           onClick={onComplete}
           className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-4 rounded-lg font-bold text-lg hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg"

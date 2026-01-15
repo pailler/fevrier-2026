@@ -42,6 +42,12 @@ export default function AdminNotifications() {
   const [noModuleSending, setNoModuleSending] = useState(false);
   const [noModuleResult, setNoModuleResult] = useState<{success: boolean; message: string} | null>(null);
 
+  // État pour l'envoi du mail "appli activée sans utilisation"
+  const [appNoUsageEmail, setAppNoUsageEmail] = useState('');
+  const [appNoUsageUserName, setAppNoUsageUserName] = useState('');
+  const [appNoUsageSending, setAppNoUsageSending] = useState(false);
+  const [appNoUsageResult, setAppNoUsageResult] = useState<{success: boolean; message: string} | null>(null);
+
   // État pour l'envoi du mail de maintenance
   const [maintenanceEmail, setMaintenanceEmail] = useState('');
   const [maintenanceUserName, setMaintenanceUserName] = useState('');
@@ -255,6 +261,57 @@ export default function AdminNotifications() {
       });
     } finally {
       setNoModuleSending(false);
+    }
+  };
+
+  const sendAppNoUsageEmail = async () => {
+    if (!appNoUsageEmail) {
+      alert('Veuillez saisir une adresse email');
+      return;
+    }
+
+    setAppNoUsageSending(true);
+    setAppNoUsageResult(null);
+
+    try {
+      const response = await fetch('/api/test-app-activated-no-usage-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: appNoUsageEmail,
+          userName: appNoUsageUserName || appNoUsageEmail.split('@')[0] || 'Utilisateur'
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setAppNoUsageResult({
+          success: true,
+          message: `✅ Email envoyé avec succès à ${data.email}`
+        });
+        // Recharger les logs pour voir la nouvelle entrée
+        loadData();
+        // Réinitialiser les champs après 3 secondes
+        setTimeout(() => {
+          setAppNoUsageEmail('');
+          setAppNoUsageUserName('');
+          setAppNoUsageResult(null);
+        }, 3000);
+      } else {
+        setAppNoUsageResult({
+          success: false,
+          message: `❌ Erreur: ${data.message || data.error || 'Erreur inconnue'}`
+        });
+      }
+    } catch (error) {
+      console.error('❌ Erreur lors de l\'envoi:', error);
+      setAppNoUsageResult({
+        success: false,
+        message: '❌ Erreur lors de l\'envoi de l\'email'
+      });
+    } finally {
+      setAppNoUsageSending(false);
     }
   };
 
@@ -552,6 +609,103 @@ export default function AdminNotifications() {
               </div>
               <div className="flex items-start space-x-2">
                 <span className="text-blue-600 mt-0.5">✓</span>
+                <span className="text-sm text-gray-700">Design responsive</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Envoi mail "Appli activée sans utilisation" */}
+      <div className="bg-gradient-to-r from-purple-50 to-fuchsia-50 rounded-lg shadow-sm border-2 border-purple-200 p-6">
+        <div className="mb-4">
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">🚀</span>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">
+                Envoyer le mail "Appli activée sans utilisation"
+              </h2>
+              <p className="text-sm text-gray-600">
+                Mail pour encourager l'utilisation d'une application déjà activée
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="app-no-usage-email" className="block text-sm font-medium text-gray-700 mb-1">
+              Adresse email *
+            </label>
+            <input
+              id="app-no-usage-email"
+              type="email"
+              value={appNoUsageEmail}
+              onChange={(e) => setAppNoUsageEmail(e.target.value)}
+              placeholder="utilisateur@example.com"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder:text-gray-400"
+            />
+          </div>
+          <div>
+            <label htmlFor="app-no-usage-name" className="block text-sm font-medium text-gray-700 mb-1">
+              Nom de l'utilisateur (optionnel)
+            </label>
+            <input
+              id="app-no-usage-name"
+              type="text"
+              value={appNoUsageUserName}
+              onChange={(e) => setAppNoUsageUserName(e.target.value)}
+              placeholder="Prénom ou nom d'utilisateur"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder:text-gray-400"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Si vide, le nom sera extrait de l'adresse email
+            </p>
+          </div>
+          {appNoUsageResult && (
+            <div className={`p-3 rounded-lg ${
+              appNoUsageResult.success 
+                ? 'bg-green-50 border border-green-200 text-green-800' 
+                : 'bg-red-50 border border-red-200 text-red-800'
+            }`}>
+              <p className="text-sm font-medium">{appNoUsageResult.message}</p>
+            </div>
+          )}
+          <button
+            onClick={sendAppNoUsageEmail}
+            disabled={!appNoUsageEmail || appNoUsageSending}
+            className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+          >
+            {appNoUsageSending ? (
+              <span className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Envoi en cours...
+              </span>
+            ) : (
+              '📧 Envoyer le mail'
+            )}
+          </button>
+          <div className="mt-4 p-4 bg-white border border-purple-200 rounded-lg">
+            <p className="text-sm text-gray-900 font-semibold mb-3 flex items-center">
+              <span className="mr-2">💡</span>
+              Contenu du mail :
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="flex items-start space-x-2">
+                <span className="text-purple-600 mt-0.5">✓</span>
+                <span className="text-sm text-gray-700">Rappel d'utilisation de l'application</span>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-purple-600 mt-0.5">✓</span>
+                <span className="text-sm text-gray-700">Guide simple en 3 étapes pour y accéder</span>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-purple-600 mt-0.5">✓</span>
+                <span className="text-sm text-gray-700">Bouton d'accès direct à "Mes applications"</span>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-purple-600 mt-0.5">✓</span>
                 <span className="text-sm text-gray-700">Design responsive</span>
               </div>
             </div>

@@ -7,6 +7,8 @@ export interface Exercise {
   category: 'variables' | 'boucles' | 'conditions' | 'fonctions' | 'logique';
   icon: string;
   estimatedTime: string;
+  ageMin: number;
+  ageMax: number;
 }
 
 export const exercises: Exercise[] = [
@@ -18,7 +20,9 @@ export const exercises: Exercise[] = [
     difficulty: 'facile',
     category: 'variables',
     icon: '📝',
-    estimatedTime: '5 min'
+    estimatedTime: '5 min',
+    ageMin: 6,
+    ageMax: 7
   },
   {
     id: 'variables-2',
@@ -28,7 +32,57 @@ export const exercises: Exercise[] = [
     difficulty: 'facile',
     category: 'variables',
     icon: '🔢',
-    estimatedTime: '7 min'
+    estimatedTime: '7 min',
+    ageMin: 8,
+    ageMax: 9
+  },
+  {
+    id: 'variables-3',
+    title: 'Mon Animal Préféré',
+    description: 'Stocke un mot dans une variable et découvre des infos dessus !',
+    objective: 'Créer une variable "animal" et afficher un message',
+    difficulty: 'facile',
+    category: 'variables',
+    icon: '🐾',
+    estimatedTime: '6 min',
+    ageMin: 6,
+    ageMax: 7
+  },
+  {
+    id: 'variables-4',
+    title: 'Mon Score + Bonus',
+    description: 'Fais un calcul simple avec une variable de score !',
+    objective: 'Ajouter un bonus à un score',
+    difficulty: 'facile',
+    category: 'variables',
+    icon: '🏆',
+    estimatedTime: '7 min',
+    ageMin: 7,
+    ageMax: 8
+  },
+  {
+    id: 'variables-5',
+    title: 'Ma Couleur Préférée',
+    description: 'Stocke une couleur et affiche un message rigolo !',
+    objective: 'Créer une variable "couleur" et l\'utiliser dans une phrase',
+    difficulty: 'facile',
+    category: 'variables',
+    icon: '🎨',
+    estimatedTime: '6 min',
+    ageMin: 6,
+    ageMax: 7
+  },
+  {
+    id: 'variables-6',
+    title: 'Les Mots Magiques',
+    description: 'Combine deux mots pour créer une phrase !',
+    objective: 'Assembler deux mots avec une variable',
+    difficulty: 'facile',
+    category: 'variables',
+    icon: '✨',
+    estimatedTime: '7 min',
+    ageMin: 6,
+    ageMax: 7
   },
   {
     id: 'boucles-1',
@@ -38,7 +92,9 @@ export const exercises: Exercise[] = [
     difficulty: 'facile',
     category: 'boucles',
     icon: '🔁',
-    estimatedTime: '8 min'
+    estimatedTime: '8 min',
+    ageMin: 7,
+    ageMax: 8
   },
   {
     id: 'boucles-2',
@@ -48,7 +104,33 @@ export const exercises: Exercise[] = [
     difficulty: 'moyen',
     category: 'boucles',
     icon: '⭐',
-    estimatedTime: '10 min'
+    estimatedTime: '10 min',
+    ageMin: 8,
+    ageMax: 9
+  },
+  {
+    id: 'boucles-4',
+    title: 'Pixel Art - Damier Emoji',
+    description: 'Dessine un damier (comme un échiquier) en utilisant des boucles !',
+    objective: 'Créer un damier en alternant 2 emojis dans une double boucle',
+    difficulty: 'moyen',
+    category: 'boucles',
+    icon: '🧱',
+    estimatedTime: '12 min',
+    ageMin: 10,
+    ageMax: 11
+  },
+  {
+    id: 'boucles-5',
+    title: 'Mon Mot en Lettres',
+    description: 'Affiche chaque lettre de ton mot sur une ligne avec une boucle !',
+    objective: 'Utiliser une boucle pour parcourir un mot lettre par lettre',
+    difficulty: 'moyen',
+    category: 'boucles',
+    icon: '🔤',
+    estimatedTime: '10 min',
+    ageMin: 9,
+    ageMax: 10
   },
   {
     id: 'conditions-1',
@@ -58,7 +140,9 @@ export const exercises: Exercise[] = [
     difficulty: 'facile',
     category: 'conditions',
     icon: '🤔',
-    estimatedTime: '8 min'
+    estimatedTime: '8 min',
+    ageMin: 8,
+    ageMax: 9
   },
   {
     id: 'conditions-2',
@@ -68,7 +152,9 @@ export const exercises: Exercise[] = [
     difficulty: 'moyen',
     category: 'conditions',
     icon: '🎯',
-    estimatedTime: '12 min'
+    estimatedTime: '12 min',
+    ageMin: 10,
+    ageMax: 11
   },
   {
     id: 'logique-1',
@@ -78,7 +164,9 @@ export const exercises: Exercise[] = [
     difficulty: 'moyen',
     category: 'logique',
     icon: '🧩',
-    estimatedTime: '10 min'
+    estimatedTime: '10 min',
+    ageMin: 11,
+    ageMax: 12
   },
   {
     id: 'fonctions-1',
@@ -88,7 +176,33 @@ export const exercises: Exercise[] = [
     difficulty: 'moyen',
     category: 'fonctions',
     icon: '⚙️',
-    estimatedTime: '12 min'
+    estimatedTime: '12 min',
+    ageMin: 9,
+    ageMax: 10
+  },
+  {
+    id: 'fonctions-3',
+    title: 'Générateur de Pseudo',
+    description: 'Crée un pseudo fun en combinant des mots avec une fonction !',
+    objective: 'Écrire une fonction qui combine un prénom + un surnom (ex: "Super Panda")',
+    difficulty: 'moyen',
+    category: 'fonctions',
+    icon: '🪄',
+    estimatedTime: '12 min',
+    ageMin: 10,
+    ageMax: 11
+  },
+  {
+    id: 'fonctions-4',
+    title: 'Le Dé Magique',
+    description: 'Lance un dé avec une fonction et un peu de hasard !',
+    objective: 'Utiliser une fonction pour générer un nombre aléatoire',
+    difficulty: 'moyen',
+    category: 'fonctions',
+    icon: '🎲',
+    estimatedTime: '12 min',
+    ageMin: 11,
+    ageMax: 12
   },
   {
     id: 'boucles-3',
@@ -98,7 +212,9 @@ export const exercises: Exercise[] = [
     difficulty: 'moyen',
     category: 'boucles',
     icon: '✖️',
-    estimatedTime: '10 min'
+    estimatedTime: '10 min',
+    ageMin: 9,
+    ageMax: 10
   },
   {
     id: 'conditions-3',
@@ -108,7 +224,57 @@ export const exercises: Exercise[] = [
     difficulty: 'moyen',
     category: 'conditions',
     icon: '📊',
-    estimatedTime: '12 min'
+    estimatedTime: '12 min',
+    ageMin: 11,
+    ageMax: 12
+  },
+  {
+    id: 'conditions-4',
+    title: 'Le Robot des Réponses',
+    description: 'Donne un mot au robot et il choisit la bonne réponse !',
+    objective: 'Utiliser des conditions pour réagir selon un mot (bonjour / merci / au revoir...)',
+    difficulty: 'facile',
+    category: 'conditions',
+    icon: '🤖',
+    estimatedTime: '8 min',
+    ageMin: 7,
+    ageMax: 8
+  },
+  {
+    id: 'conditions-5',
+    title: 'Le Thermomètre',
+    description: 'Selon la température, ton programme décide !',
+    objective: 'Utiliser if/else if pour classer une température',
+    difficulty: 'moyen',
+    category: 'conditions',
+    icon: '🌡️',
+    estimatedTime: '10 min',
+    ageMin: 9,
+    ageMax: 10
+  },
+  {
+    id: 'logique-3',
+    title: 'Entrer à la Fête',
+    description: 'Tu peux entrer si tu as une invitation OU si un parent t\'accompagne !',
+    objective: 'Utiliser le OU (||) pour une décision',
+    difficulty: 'moyen',
+    category: 'logique',
+    icon: '🎉',
+    estimatedTime: '10 min',
+    ageMin: 11,
+    ageMax: 12
+  },
+  {
+    id: 'logique-4',
+    title: 'Le Mot de Passe',
+    description: 'Tu peux entrer si le mot de passe est bon ET si tu as l\'âge minimum !',
+    objective: 'Utiliser ET (&&) avec deux conditions',
+    difficulty: 'moyen',
+    category: 'logique',
+    icon: '🔐',
+    estimatedTime: '12 min',
+    ageMin: 11,
+    ageMax: 12
   },
   {
     id: 'logique-2',
@@ -118,7 +284,9 @@ export const exercises: Exercise[] = [
     difficulty: 'difficile',
     category: 'logique',
     icon: '🗝️',
-    estimatedTime: '15 min'
+    estimatedTime: '15 min',
+    ageMin: 12,
+    ageMax: 14
   },
   {
     id: 'fonctions-2',
@@ -128,7 +296,9 @@ export const exercises: Exercise[] = [
     difficulty: 'difficile',
     category: 'fonctions',
     icon: '🧮',
-    estimatedTime: '15 min'
+    estimatedTime: '15 min',
+    ageMin: 12,
+    ageMax: 14
   },
   {
     id: 'complete-1',
@@ -138,7 +308,9 @@ export const exercises: Exercise[] = [
     difficulty: 'facile',
     category: 'boucles',
     icon: '✏️',
-    estimatedTime: '8 min'
+    estimatedTime: '8 min',
+    ageMin: 7,
+    ageMax: 8
   },
   {
     id: 'complete-2',
@@ -148,7 +320,9 @@ export const exercises: Exercise[] = [
     difficulty: 'facile',
     category: 'conditions',
     icon: '✏️',
-    estimatedTime: '8 min'
+    estimatedTime: '8 min',
+    ageMin: 8,
+    ageMax: 9
   },
   {
     id: 'complete-3',
@@ -158,7 +332,9 @@ export const exercises: Exercise[] = [
     difficulty: 'facile',
     category: 'variables',
     icon: '✏️',
-    estimatedTime: '7 min'
+    estimatedTime: '7 min',
+    ageMin: 6,
+    ageMax: 7
   },
   {
     id: 'complete-4',
@@ -168,7 +344,141 @@ export const exercises: Exercise[] = [
     difficulty: 'moyen',
     category: 'fonctions',
     icon: '✏️',
-    estimatedTime: '10 min'
+    estimatedTime: '10 min',
+    ageMin: 10,
+    ageMax: 11
+  },
+  {
+    id: 'complete-5',
+    title: 'Complète le Tableau',
+    description: 'Ajoute un nouvel animal dans une liste !',
+    objective: 'Compléter la ligne manquante pour ajouter un élément dans un tableau',
+    difficulty: 'moyen',
+    category: 'variables',
+    icon: '✏️',
+    estimatedTime: '10 min',
+    ageMin: 9,
+    ageMax: 10
+  },
+  {
+    id: 'complete-6',
+    title: 'Complète l\'Index',
+    description: 'Récupère un élément dans un tableau avec [index] !',
+    objective: 'Compléter le bon index pour obtenir le bon élément',
+    difficulty: 'moyen',
+    category: 'variables',
+    icon: '✏️',
+    estimatedTime: '10 min',
+    ageMin: 10,
+    ageMax: 11
+  },
+  {
+    id: 'complete-7',
+    title: 'Complète l\'Objet',
+    description: 'Mets à jour la propriété score d\'un objet joueur !',
+    objective: 'Compléter la ligne manquante pour modifier une propriété',
+    difficulty: 'difficile',
+    category: 'variables',
+    icon: '✏️',
+    estimatedTime: '12 min',
+    ageMin: 12,
+    ageMax: 14
+  },
+  {
+    id: 'complete-8',
+    title: 'Complète le For + Tableau',
+    description: 'Complète la boucle pour afficher chaque fruit !',
+    objective: 'Compléter la ligne manquante pour parcourir un tableau',
+    difficulty: 'difficile',
+    category: 'boucles',
+    icon: '✏️',
+    estimatedTime: '12 min',
+    ageMin: 12,
+    ageMax: 14
+  },
+  {
+    id: 'complete-9',
+    title: 'Complète le &&',
+    description: 'Complète la condition pour vérifier deux choses à la fois !',
+    objective: 'Compléter une condition avec &&',
+    difficulty: 'difficile',
+    category: 'logique',
+    icon: '✏️',
+    estimatedTime: '12 min',
+    ageMin: 12,
+    ageMax: 14
+  },
+  {
+    id: 'complete-10',
+    title: 'Complète l\'Objet (niveau +1)',
+    description: 'Augmente le niveau d\'un joueur dans un objet !',
+    objective: 'Compléter la ligne pour modifier une propriété (+= 1)',
+    difficulty: 'difficile',
+    category: 'variables',
+    icon: '✏️',
+    estimatedTime: '12 min',
+    ageMin: 11,
+    ageMax: 12
+  },
+  {
+    id: 'conditions-6',
+    title: 'Le Mot Secret',
+    description: 'Si tu écris le bon mot… victoire !',
+    objective: 'Utiliser une condition pour vérifier un mot',
+    difficulty: 'facile',
+    category: 'conditions',
+    icon: '🕵️',
+    estimatedTime: '8 min',
+    ageMin: 7,
+    ageMax: 8
+  },
+  {
+    id: 'conditions-7',
+    title: 'Pair ou Impair',
+    description: 'Ton programme dit si un nombre est pair ou impair !',
+    objective: 'Utiliser une condition avec le reste (%)',
+    difficulty: 'facile',
+    category: 'conditions',
+    icon: '➗',
+    estimatedTime: '10 min',
+    ageMin: 8,
+    ageMax: 9
+  },
+  {
+    id: 'boucles-6',
+    title: 'Compter de 2 en 2',
+    description: 'Affiche 2, 4, 6, 8, 10 avec une boucle !',
+    objective: 'Utiliser une boucle avec un pas de 2',
+    difficulty: 'facile',
+    category: 'boucles',
+    icon: '🔢',
+    estimatedTime: '8 min',
+    ageMin: 8,
+    ageMax: 9
+  },
+  {
+    id: 'complete-11',
+    title: 'Complète la Variable (niveau 1)',
+    description: 'Complète une petite variable pour afficher un message.',
+    objective: 'Compléter le bon nom de variable',
+    difficulty: 'facile',
+    category: 'variables',
+    icon: '✏️',
+    estimatedTime: '8 min',
+    ageMin: 7,
+    ageMax: 8
+  },
+  {
+    id: 'complete-12',
+    title: 'Complète la Concatenation',
+    description: 'Complète la phrase en ajoutant le bon mot !',
+    objective: 'Compléter une addition de chaînes',
+    difficulty: 'facile',
+    category: 'variables',
+    icon: '✏️',
+    estimatedTime: '8 min',
+    ageMin: 6,
+    ageMax: 7
   }
 ];
 

@@ -151,6 +151,22 @@ export default function CodeLearningPage() {
             <p className="text-xl lg:text-2xl text-white/90 mb-6 max-w-3xl mx-auto">
               Des exercices courts et amusants pour découvrir la programmation
             </p>
+
+            {/* Infos clés (âges / progression) */}
+            <div className="flex flex-wrap justify-center gap-3 mb-6">
+              <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm">
+                👧🧒 6–14 ans
+              </span>
+              <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm">
+                🧩 {totalExercises} exercices
+              </span>
+              <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm">
+                🪜 Progression par âge (du plus simple au plus avancé)
+              </span>
+              <span className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm">
+                🟨 JavaScript (dans le navigateur)
+              </span>
+            </div>
             
             {/* Barre de progression */}
             <div className="max-w-2xl mx-auto">
@@ -246,81 +262,75 @@ export default function CodeLearningPage() {
 
           {/* Trier les exercices par difficulté */}
           {(() => {
+            const difficultyOrder = { facile: 1, moyen: 2, difficile: 3 } as const;
+
             const sortedExercises = [...exercises].sort((a, b) => {
-              const difficultyOrder = { 'facile': 1, 'moyen': 2, 'difficile': 3 };
-              return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
+              return (
+                a.ageMin - b.ageMin ||
+                a.ageMax - b.ageMax ||
+                difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty] ||
+                a.title.localeCompare(b.title)
+              );
             });
 
-            const exercisesByDifficulty = {
-              facile: sortedExercises.filter(e => e.difficulty === 'facile'),
-              moyen: sortedExercises.filter(e => e.difficulty === 'moyen'),
-              difficile: sortedExercises.filter(e => e.difficulty === 'difficile')
+            const groupKey = (ageMin: number, ageMax: number) => `${ageMin}-${ageMax}`;
+            const groupLabel = (ageMin: number, ageMax: number) => `${ageMin}–${ageMax} ans`;
+
+            const groups = sortedExercises.reduce((acc, ex) => {
+              const key = groupKey(ex.ageMin, ex.ageMax);
+              if (!acc[key]) acc[key] = [];
+              acc[key].push(ex);
+              return acc;
+            }, {} as Record<string, typeof exercises>);
+
+            const orderedGroupKeys = Object.keys(groups).sort((a, b) => {
+              const [aMin] = a.split('-').map(Number);
+              const [bMin] = b.split('-').map(Number);
+              return aMin - bMin;
+            });
+
+            const groupStyle: Record<string, { titleClass: string; pillClass: string }> = {
+              '6-7': { titleClass: 'text-green-700', pillClass: 'bg-green-100 text-green-800' },
+              '7-8': { titleClass: 'text-emerald-700', pillClass: 'bg-emerald-100 text-emerald-800' },
+              '8-9': { titleClass: 'text-blue-700', pillClass: 'bg-blue-100 text-blue-800' },
+              '9-10': { titleClass: 'text-purple-700', pillClass: 'bg-purple-100 text-purple-800' },
+              '10-11': { titleClass: 'text-yellow-700', pillClass: 'bg-yellow-100 text-yellow-800' },
+              '11-12': { titleClass: 'text-orange-700', pillClass: 'bg-orange-100 text-orange-800' },
+              '12-14': { titleClass: 'text-red-700', pillClass: 'bg-red-100 text-red-800' }
             };
 
             return (
               <div className="space-y-12">
-                {/* Exercices Faciles */}
-                <div>
-                  <h3 className="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2">
-                    <span className="bg-green-100 px-3 py-1 rounded-full text-green-800">Facile</span>
-                    <span className="text-gray-600 text-lg font-normal">
-                      ({exercisesByDifficulty.facile.length} exercices)
-                    </span>
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {exercisesByDifficulty.facile.map((exercise, index) => (
-                      <ExerciseCard
-                        key={exercise.id}
-                        exercise={exercise}
-                        index={exercises.findIndex(e => e.id === exercise.id)}
-                        isCompleted={completedExercises.includes(exercise.id)}
-                        onSelect={() => setSelectedExercise(exercise.id)}
-                      />
-                    ))}
-                  </div>
-                </div>
+                {orderedGroupKeys.map((key) => {
+                  const [minAge, maxAge] = key.split('-').map(Number);
+                  const style = groupStyle[key] ?? { titleClass: 'text-gray-800', pillClass: 'bg-gray-100 text-gray-800' };
 
-                {/* Exercices Moyens */}
-                <div>
-                  <h3 className="text-2xl font-bold text-yellow-700 mb-4 flex items-center gap-2">
-                    <span className="bg-yellow-100 px-3 py-1 rounded-full text-yellow-800">Moyen</span>
-                    <span className="text-gray-600 text-lg font-normal">
-                      ({exercisesByDifficulty.moyen.length} exercices)
-                    </span>
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {exercisesByDifficulty.moyen.map((exercise, index) => (
-                      <ExerciseCard
-                        key={exercise.id}
-                        exercise={exercise}
-                        index={exercises.findIndex(e => e.id === exercise.id)}
-                        isCompleted={completedExercises.includes(exercise.id)}
-                        onSelect={() => setSelectedExercise(exercise.id)}
-                      />
-                    ))}
-                  </div>
-                </div>
+                  return (
+                    <div key={key}>
+                      <h3 className={`text-2xl font-bold mb-4 flex items-center gap-2 ${style.titleClass}`}>
+                        <span className={`px-3 py-1 rounded-full ${style.pillClass}`}>{groupLabel(minAge, maxAge)}</span>
+                        <span className="text-gray-600 text-lg font-normal">
+                          ({groups[key].length} exercices)
+                        </span>
+                      </h3>
 
-                {/* Exercices Difficiles */}
-                <div>
-                  <h3 className="text-2xl font-bold text-red-700 mb-4 flex items-center gap-2">
-                    <span className="bg-red-100 px-3 py-1 rounded-full text-red-800">Difficile</span>
-                    <span className="text-gray-600 text-lg font-normal">
-                      ({exercisesByDifficulty.difficile.length} exercices)
-                    </span>
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {exercisesByDifficulty.difficile.map((exercise, index) => (
-                      <ExerciseCard
-                        key={exercise.id}
-                        exercise={exercise}
-                        index={exercises.findIndex(e => e.id === exercise.id)}
-                        isCompleted={completedExercises.includes(exercise.id)}
-                        onSelect={() => setSelectedExercise(exercise.id)}
-                      />
-                    ))}
-                  </div>
-                </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {groups[key].map((exercise) => {
+                          const globalIndex = sortedExercises.findIndex((e) => e.id === exercise.id);
+                          return (
+                            <ExerciseCard
+                              key={exercise.id}
+                              exercise={exercise}
+                              index={globalIndex}
+                              isCompleted={completedExercises.includes(exercise.id)}
+                              onSelect={() => setSelectedExercise(exercise.id)}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             );
           })()}
@@ -352,6 +362,7 @@ function ExerciseModal({
   const exercise = exercises.find(e => e.id === exerciseId);
   
   if (!exercise) return null;
+  const isCompletion = exercise.id.startsWith('complete-');
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -371,6 +382,17 @@ function ExerciseModal({
         <div className="p-6">
           <div className="mb-6">
             <p className="text-lg text-gray-700 mb-4">{exercise.description}</p>
+            <div className="flex flex-wrap gap-2 mb-4">
+              <span className="px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
+                Âge conseillé : {exercise.ageMin}–{exercise.ageMax} ans
+              </span>
+              <span className="px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-800">
+                Durée : {exercise.estimatedTime}
+              </span>
+              <span className="px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-800">
+                Niveau : {exercise.difficulty}
+              </span>
+            </div>
             <div className="bg-purple-50 border-l-4 border-purple-500 p-4 rounded">
               <p className="font-semibold text-purple-900 mb-2">💡 Objectif :</p>
               <p className="text-purple-800">{exercise.objective}</p>
@@ -379,7 +401,7 @@ function ExerciseModal({
 
           {/* Composant d'exercice spécifique */}
           <div className="bg-gray-50 rounded-lg p-6 mb-6">
-            {exercise.category === 'variables' && (
+            {!isCompletion && exercise.category === 'variables' && (
               <VariableExercise 
                 exerciseId={exercise.id} 
                 onComplete={() => {
@@ -388,7 +410,7 @@ function ExerciseModal({
                 }}
               />
             )}
-            {exercise.category === 'boucles' && (
+            {!isCompletion && exercise.category === 'boucles' && (
               <LoopExercise 
                 exerciseId={exercise.id} 
                 onComplete={() => {
@@ -397,7 +419,7 @@ function ExerciseModal({
                 }}
               />
             )}
-            {exercise.category === 'conditions' && (
+            {!isCompletion && exercise.category === 'conditions' && (
               <ConditionExercise 
                 exerciseId={exercise.id} 
                 onComplete={() => {
@@ -406,7 +428,7 @@ function ExerciseModal({
                 }}
               />
             )}
-            {exercise.category === 'logique' && (
+            {!isCompletion && exercise.category === 'logique' && (
               <LogicExercise 
                 exerciseId={exercise.id} 
                 onComplete={() => {
@@ -415,7 +437,7 @@ function ExerciseModal({
                 }}
               />
             )}
-            {exercise.category === 'fonctions' && (
+            {!isCompletion && exercise.category === 'fonctions' && (
               <FunctionExercise 
                 exerciseId={exercise.id} 
                 onComplete={() => {
@@ -424,7 +446,7 @@ function ExerciseModal({
                 }}
               />
             )}
-            {exercise.id.startsWith('complete-') && (
+            {isCompletion && (
               <CodeCompletionExercise 
                 exerciseId={exercise.id} 
                 onComplete={() => {

@@ -100,6 +100,26 @@ const termExplanations = {
         title: 'Grilles',
         content: 'Les grilles permettent d\'organiser plusieurs cartes en une grille avec un nombre de colonnes défini.',
         category: 'grid'
+    },
+    'Gauge Card Pro': {
+        title: 'Gauge Card Pro',
+        content: 'Gauge Card Pro est une carte personnalisée avancée pour Home Assistant qui permet de créer des jauges professionnelles avec gradients, templates, jauges doubles (inner/outer), indicateurs min/max, et support du mode clair/sombre. Elle offre des fonctionnalités avancées comme les segments personnalisés, les aiguilles, les marqueurs, et la personnalisation complète via Card Mod.',
+        category: 'gauge-card-pro'
+    },
+    'Picture Entity Plus': {
+        title: 'Picture Entity Plus',
+        content: 'Picture Entity Plus est une carte personnalisée avancée qui étend les fonctionnalités de la carte picture-entity native de Home Assistant. Elle permet d\'afficher des images dynamiques selon l\'état de l\'entité, de personnaliser l\'affichage des attributs, et d\'ajouter des styles CSS personnalisés. Disponible sur GitHub et HACS.',
+        category: 'picture-entity-plus'
+    },
+    'Picture Card Attributes': {
+        title: 'Picture Card Attributes',
+        content: 'Picture Card Attributes est une carte personnalisée qui permet d\'afficher les attributs d\'une entité directement sur une image. Elle offre un contrôle précis sur la position, le style et le layout des attributs affichés.',
+        category: 'picture-entity-plus'
+    },
+    'Picture Elements': {
+        title: 'Picture Elements',
+        content: 'Picture Elements est une carte native de Home Assistant qui permet de superposer des éléments interactifs (badges, labels, icônes, boutons) sur une image. Elle offre un contrôle total sur la position et le style de chaque élément.',
+        category: 'picture-entity-plus'
     }
 };
 
@@ -117,7 +137,9 @@ const categoryColors = {
     'grid': { primary: '#34495e', light: '#ebedef', border: '#2c3e50' },
     'other': { primary: '#7f8c8d', light: '#ecf0f1', border: '#5d6d7e' },
     'templates-automations': { primary: '#16a085', light: '#d5f4e6', border: '#138d75' },
-    'hyper-design': { primary: '#9333ea', light: '#f3e8ff', border: '#7c3aed' }
+    'hyper-design': { primary: '#9333ea', light: '#f3e8ff', border: '#7c3aed' },
+    'gauge-card-pro': { primary: '#ff6b35', light: '#ffe5de', border: '#e55a2b' },
+    'picture-entity-plus': { primary: '#00bcd4', light: '#e0f7fa', border: '#0097a7' }
 };
 
 // Mapping des icônes par catégorie
@@ -134,7 +156,9 @@ const categoryIcons = {
     'grid': '📐',
     'other': '📦',
     'templates-automations': '🔧',
-    'hyper-design': '💎'
+    'hyper-design': '💎',
+    'gauge-card-pro': '📊',
+    'picture-entity-plus': '🖼️'
 };
 
 // Charger les données
@@ -799,6 +823,21 @@ const cardTypeSources = {
         name: 'Big Temperature Card',
         url: 'https://github.com/OmenWild/big-temperature-card',
         hacs: 'big-temperature-card'
+    },
+    'custom:picture-entity-plus': {
+        name: 'Picture Entity Plus',
+        url: 'https://github.com/iantrich/picture-entity-plus',
+        hacs: 'picture-entity-plus'
+    },
+    'custom:picture-card-attributes': {
+        name: 'Picture Card Attributes',
+        url: 'https://github.com/custom-cards/picture-card-attributes',
+        hacs: 'picture-card-attributes'
+    },
+    'type: picture-elements': {
+        name: 'Picture Elements',
+        url: 'https://www.home-assistant.io/dashboards/picture-elements/',
+        official: true
     }
 };
 

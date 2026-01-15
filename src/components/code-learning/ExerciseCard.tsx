@@ -46,9 +46,14 @@ export default function ExerciseCard({ exercise, index, isCompleted, onSelect }:
       <div className={`bg-gradient-to-r ${difficultyColors[exercise.difficulty]} p-6 text-white`}>
         <div className="flex items-center justify-between mb-2">
           <span className="text-4xl">{exercise.icon}</span>
-          <span className={`px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-sm`}>
-            {exercise.difficulty.toUpperCase()}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className={`px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-sm`}>
+              {exercise.difficulty.toUpperCase()}
+            </span>
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-sm">
+              {exercise.ageMin}–{exercise.ageMax} ans
+            </span>
+          </div>
         </div>
         <h3 className="text-xl font-bold mb-1">{exercise.title}</h3>
         <p className="text-sm text-white/90">{exercise.estimatedTime}</p>
