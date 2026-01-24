@@ -7,6 +7,28 @@ import os
 import tempfile
 import shutil
 from pathlib import Path
+import mimetypes
+
+# IMPORTANT: Appliquer le patch AVANT l'import de gradio
+# Le patch corrige le bug gradio_client TypeError: argument of type 'bool' is not iterable
+try:
+    import patch_gradio_early  # Ce module applique le patch
+except ImportError:
+    # Si le module n'existe pas, appliquer le patch directement
+    try:
+        import gradio_client.utils as client_utils
+        _original_get_type = client_utils.get_type
+        
+        def patched_get_type(schema):
+            if isinstance(schema, bool):
+                return "boolean"
+            return _original_get_type(schema)
+        
+        client_utils.get_type = patched_get_type
+        print("✅ Patch gradio_client appliqué (fallback)")
+    except Exception as e:
+        print(f"⚠️ Impossible d'appliquer le patch: {e}")
+
 import gradio as gr
 import torch
 import torchaudio
@@ -22,14 +44,36 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import base64
 from io import BytesIO
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+
+# --- MIME types ---
+# Sur certains environnements/proxys, les réponses peuvent retomber sur
+# `application/octet-stream`. Avec `X-Content-Type-Options: nosniff`,
+# certains navigateurs (notamment Firefox) refusent alors de décoder l'audio.
+# On force ici les types courants pour que les fichiers servis (ex: /file=...wav)
+# aient un Content-Type correct.
+mimetypes.add_type("audio/wav", ".wav")
+mimetypes.add_type("audio/x-wav", ".wav")
+mimetypes.add_type("audio/flac", ".flac")
+mimetypes.add_type("audio/mpeg", ".mp3")
+mimetypes.add_type("audio/mp4", ".m4a")
+mimetypes.add_type("audio/ogg", ".ogg")
 
 # Configuration
 MODEL_NAME = "htdemucs"  # Modèle Demucs v4 (HT = Hybrid Transformer)
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-# Charger le modèle au démarrage
-print(f"🔄 Chargement du modèle Demucs ({MODEL_NAME}) sur {DEVICE}...")
+# S'assurer que le modèle utilise le cache existant (pas de re-téléchargement)
+# Le cache est monté dans /root/.cache/torch depuis ai-models-cache/torch
+torch_cache_dir = os.environ.get("TORCH_HOME", "/root/.cache/torch")
+print(f"📁 Cache PyTorch: {torch_cache_dir}")
+
+# Charger le modèle au démarrage (utilise automatiquement le cache si disponible)
+print(f"🔄 Chargement du modèle Demucs ({MODEL_NAME}) depuis le cache sur {DEVICE}...")
 try:
+    # get_model() utilise automatiquement le cache PyTorch
+    # Le modèle existant dans /root/.cache/torch/hub/checkpoints/ sera utilisé
     model = get_model(MODEL_NAME)
     model.to(DEVICE)
     model.eval()
@@ -179,6 +223,9 @@ def create_track_html(audio_file, title, icon, color, waveform_img=None):
     else:
         audio_url = f"/file={audio_file}"
     
+    # Obtenir le nom du fichier pour l'attribut download
+    filename = audio_path.name if audio_path.name else "audio.wav"
+    
     waveform_html = f'<img src="{waveform_img}" style="width: 100%; height: auto; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />' if waveform_img else ""
     
     return f"""
@@ -193,11 +240,6 @@ def create_track_html(audio_file, title, icon, color, waveform_img=None):
                 <source src="{audio_url}" type="audio/wav">
                 Votre navigateur ne supporte pas l'élément audio.
             </audio>
-        </div>
-        <div style="margin-top: 10px; text-align: center;">
-            <a href="{audio_url}" download style="display: inline-block; padding: 10px 20px; background: {color}; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                📥 Télécharger cette piste
-            </a>
         </div>
     </div>
     """
@@ -289,39 +331,155 @@ def separate_sources(audio_file, stem="vocals", progress=None):
             
             try:
                 # Essayer de charger avec torchaudio (sans torchcodec)
+                # Pour les gros fichiers, torchaudio est plus efficace en mémoire
+                print(f"📂 Chargement du fichier avec torchaudio...")
+                
+                # Obtenir la taille du fichier pour estimer la mémoire nécessaire
+                file_size_bytes = Path(audio_file).stat().st_size
+                file_size_mb = file_size_bytes / (1024 * 1024)
+                print(f"📊 Taille du fichier: {file_size_mb:.2f} MB")
+                
+                # Charger le fichier
                 wav, sr = torchaudio.load(audio_file, backend="soundfile")
+                print(f"✅ Fichier chargé: {wav.shape}, sample_rate: {sr} Hz")
+                
+                # Libérer la mémoire immédiatement après chargement si possible
+                import gc
+                gc.collect()
             except Exception as e:
                 # Si échec, utiliser librosa comme fallback
                 print(f"⚠️ torchaudio échoué, utilisation de librosa: {e}")
                 import librosa
-                audio_data, sr = librosa.load(audio_file, sr=None, mono=False)
+                # Pour les gros fichiers, charger avec offset et duration si nécessaire
+                # Mais d'abord essayer le chargement normal
+                try:
+                    audio_data, sr = librosa.load(audio_file, sr=None, mono=False)
+                    print(f"✅ Fichier chargé avec librosa: {audio_data.shape}, sample_rate: {sr} Hz")
+                except MemoryError:
+                    print(f"⚠️ Mémoire insuffisante pour charger le fichier complet. Tentative de traitement par chunks...")
+                    # Pour les très gros fichiers, on pourrait implémenter un traitement par chunks
+                    # Pour l'instant, on retourne une erreur explicite
+                    return None, None, None, None, f"❌ Fichier trop volumineux pour être traité en une fois. Veuillez diviser le fichier en segments plus petits (< 50 MB).", ""
                 if len(audio_data.shape) == 1:
                     audio_data = audio_data.reshape(1, -1)  # Ajouter dimension channel
                 wav = torch.from_numpy(audio_data).float()
+            
+            # Vérifier la taille du fichier en mémoire
+            file_size_mb = wav.numel() * wav.element_size() / (1024 * 1024)
+            duration_seconds = wav.shape[-1] / sr if len(wav.shape) > 1 else 0
+            print(f"📊 Taille du fichier en mémoire: {file_size_mb:.2f} MB")
+            print(f"⏱️ Durée estimée: {duration_seconds:.2f} secondes ({duration_seconds/60:.2f} minutes)")
+            
+            # Avertissement pour les très gros fichiers
+            if file_size_mb > 200:
+                print(f"⚠️ Fichier volumineux détecté ({file_size_mb:.1f} MB). Le traitement peut prendre du temps et nécessiter beaucoup de mémoire.")
+            
+            if file_size_mb > 1000:  # 1 GB en mémoire
+                return None, None, None, None, f"❌ Fichier trop volumineux en mémoire ({file_size_mb:.1f} MB). Limite: 1000 MB. Veuillez utiliser un fichier plus petit ou diviser en segments.", ""
             
             if wav.shape[0] > 1:
                 wav = wav.mean(dim=0, keepdim=True)  # Convertir en mono si stéréo
         
         # Convertir au format attendu par Demucs
-        wav = convert_audio(wav, sr, MODEL_SAMPLE_RATE, MODEL_CHANNELS)
-        wav = wav.to(DEVICE)
+        print(f"🔄 Conversion audio au format Demucs (SR: {MODEL_SAMPLE_RATE} Hz, Channels: {MODEL_CHANNELS})...")
         
-        print(f"🔊 Audio chargé: {wav.shape}, sample_rate: {MODEL_SAMPLE_RATE}")
+        # Sauvegarder l'ancien tensor pour libérer la mémoire après conversion
+        original_wav = wav
+        wav = convert_audio(wav, sr, MODEL_SAMPLE_RATE, MODEL_CHANNELS)
+        
+        # Libérer la mémoire de l'original
+        del original_wav
+        import gc
+        gc.collect()
+        
+        # Calculer la durée en secondes pour estimer la complexité
+        duration_seconds = wav.shape[-1] / MODEL_SAMPLE_RATE
+        print(f"⏱️ Durée du fichier: {duration_seconds:.2f} secondes ({duration_seconds/60:.2f} minutes)")
+        
+        # Déterminer la taille de segment optimale pour les gros fichiers
+        # Pour les fichiers > 10 minutes, utiliser des segments plus petits pour économiser la mémoire
+        # Demucs utilise automatiquement des segments avec split=True, mais on peut optimiser
+        segment_size = None  # Utiliser la valeur par défaut de Demucs (généralement ~11 secondes)
+        
+        if duration_seconds > 600:  # > 10 minutes
+            print(f"📦 Fichier long détecté ({duration_seconds/60:.1f} min), Demucs utilisera des segments automatiques")
+        elif duration_seconds > 300:  # > 5 minutes
+            print(f"📦 Fichier moyen détecté ({duration_seconds/60:.1f} min)")
+        
+        # Libérer la mémoire du CPU avant de transférer sur GPU
+        if DEVICE == "cuda":
+            print(f"🚀 Transfert vers GPU...")
+            wav = wav.to(DEVICE)
+            # Nettoyer le cache CPU
+            import gc
+            gc.collect()
+        else:
+            wav = wav.to(DEVICE)
+        
+        print(f"🔊 Audio prêt pour traitement: {wav.shape}, device: {DEVICE}")
         
         # Séparer les sources
         print("🔄 Séparation des sources en cours...")
-        if progress:
-            progress(0.3, desc="🔄 Chargement et préparation de l'audio...")
+        try:
+            if progress is not None:
+                progress(0.3, desc="🔄 Chargement et préparation de l'audio...")
+        except:
+            pass  # Ignorer les erreurs de progress
         
-        with torch.no_grad():
-            # Utiliser apply_model au lieu d'un appel direct
-            if progress:
-                progress(0.5, desc="🎵 Séparation des sources avec Demucs...")
-            sources = apply_model(model, wav[None], device=DEVICE, split=True, overlap=0.25, progress=False)
-            sources = sources[0]  # Retirer dimension batch
+        try:
+            with torch.no_grad():
+                # Utiliser apply_model avec split=True pour traiter par chunks
+                # overlap=0.25 pour éviter les artefacts aux frontières
+                try:
+                    if progress is not None:
+                        progress(0.5, desc="🎵 Séparation des sources avec Demucs (cela peut prendre du temps pour les gros fichiers)...")
+                except:
+                    pass  # Ignorer les erreurs de progress
+                
+                # Demucs gère automatiquement le découpage avec split=True
+                # Il utilise des segments d'environ 11 secondes par défaut pour économiser la mémoire
+                # overlap=0.25 (25%) évite les artefacts aux frontières entre segments
+                print(f"🎵 Démarrage de la séparation avec Demucs (split=True pour traitement par chunks)...")
+                
+                sources = apply_model(
+                    model, 
+                    wav[None], 
+                    device=DEVICE, 
+                    split=True,  # Traitement par chunks automatique
+                    overlap=0.25,  # 25% de chevauchement entre chunks
+                    progress=False
+                )
+                
+                print(f"✅ Séparation terminée")
+                
+                sources = sources[0]  # Retirer dimension batch
+                
+                # Libérer la mémoire GPU immédiatement après traitement
+                if DEVICE == "cuda":
+                    torch.cuda.empty_cache()
+                    print("🧹 Cache GPU nettoyé")
+                
+        except RuntimeError as e:
+            error_msg = str(e)
+            if "out of memory" in error_msg.lower() or "cuda" in error_msg.lower():
+                print(f"❌ Erreur mémoire GPU: {e}")
+                return None, None, None, None, f"❌ Mémoire GPU insuffisante pour traiter ce fichier ({duration_seconds/60:.1f} min). Essayez un fichier plus court ou utilisez CPU.", ""
+            else:
+                print(f"❌ Erreur lors de la séparation: {e}")
+                import traceback
+                traceback.print_exc()
+                return None, None, None, None, f"❌ Erreur lors de la séparation: {str(e)}", ""
+        except Exception as e:
+            print(f"❌ Erreur inattendue: {e}")
+            import traceback
+            traceback.print_exc()
+            return None, None, None, None, f"❌ Erreur lors du traitement: {str(e)}", ""
         
-        if progress:
-            progress(0.8, desc="💾 Sauvegarde des fichiers séparés...")
+        try:
+            if progress is not None:
+                progress(0.8, desc="💾 Sauvegarde des fichiers séparés...")
+        except:
+            pass  # Ignorer les erreurs de progress
         
         # Les sources sont dans l'ordre: [drums, bass, other, vocals]
         drums, bass, other, vocals = sources
@@ -376,8 +534,11 @@ def separate_sources(audio_file, stem="vocals", progress=None):
         # Obtenir les informations du fichier
         file_info = get_audio_info(audio_file)
         
-        if progress:
-            progress(1.0, desc="✅ Traitement terminé!")
+        try:
+            if progress is not None:
+                progress(1.0, desc="✅ Traitement terminé!")
+        except:
+            pass  # Ignorer les erreurs de progress
         
         # Retourner les résultats selon le stem demandé
         if stem == "all":
@@ -405,7 +566,30 @@ def separate_sources(audio_file, stem="vocals", progress=None):
         return None, None, None, None, error_msg, file_info
 
 # Interface Gradio
-with gr.Blocks() as demo:
+# CSS personnalisé pour le style de l'application
+custom_css = """
+.gradio-container {
+    max-width: 1400px !important;
+}
+.main-header {
+    text-align: center;
+    padding: 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.main-header h1 {
+    margin: 0 0 10px 0;
+    font-size: 2.5em;
+}
+.main-header p {
+    margin: 5px 0;
+}
+"""
+
+with gr.Blocks(theme=gr.themes.Soft(), css=custom_css) as demo:
     
     gr.HTML("""
     <div class="main-header">
@@ -484,7 +668,7 @@ with gr.Blocks() as demo:
                 vocals_output = gr.Audio(
                     label="🎤 Voix isolée",
                     type="filepath",
-                    visible=True
+                    visible=False  # Toujours invisible - la carte HTML "Voix isolée" n'est pas affichée
                 )
                 drums_output = gr.Audio(
                     label="🥁 Batterie isolée",
@@ -513,14 +697,14 @@ with gr.Blocks() as demo:
     def update_outputs_visibility(stem):
         if stem == "all":
             return (
-                gr.update(visible=True),  # vocals
+                gr.update(visible=False),  # vocals - toujours invisible
                 gr.update(visible=True),  # drums
                 gr.update(visible=True),  # bass
                 gr.update(visible=True),  # other
             )
         else:
             return (
-                gr.update(visible=(stem == "vocals")),  # vocals
+                gr.update(visible=(stem == "vocals")),  # vocals - visible seulement si stem == "vocals"
                 gr.update(visible=(stem == "drums")),  # drums
                 gr.update(visible=(stem == "bass")),  # bass
                 gr.update(visible=(stem == "other")),  # other
@@ -549,11 +733,11 @@ with gr.Blocks() as demo:
         if other:
             waveforms['other'] = generate_waveform_image(other, "🎹 Autres instruments", "#10b981")
         
-        # Créer le HTML de visualisation
+        # Créer le HTML de visualisation (waveforms uniquement, pas de boutons colorés)
+        # Les boutons de téléchargement natifs des composants Gradio Audio sont utilisés à la place
         tracks_html = ""
         if stem == "all":
-            if vocals:
-                tracks_html += create_track_html(vocals, "Voix isolée", "🎤", "#9333ea", waveforms.get('vocals'))
+            # Pour "all", on affiche les waveforms pour toutes les pistes SAUF vocals
             if drums:
                 tracks_html += create_track_html(drums, "Batterie isolée", "🥁", "#ef4444", waveforms.get('drums'))
             if bass:
@@ -561,6 +745,8 @@ with gr.Blocks() as demo:
             if other:
                 tracks_html += create_track_html(other, "Autres instruments", "🎹", "#10b981", waveforms.get('other'))
         else:
+            # Pour chaque stem individuel, générer la carte HTML avec waveform (sans bouton coloré)
+            # Le bouton de téléchargement natif du composant Gradio Audio sera utilisé
             if stem == "vocals" and vocals:
                 tracks_html = create_track_html(vocals, "Voix isolée", "🎤", "#9333ea", waveforms.get('vocals'))
             elif stem == "drums" and drums:
@@ -580,23 +766,23 @@ with gr.Blocks() as demo:
         
         if stem == "all":
             return (
-                vocals,
+                None,  # vocals - jamais retourné pour éviter l'affichage du composant
                 drums,
                 bass,
                 other,
                 status_msg,
                 file_info,
-                gr.update(visible=True),
-                gr.update(visible=True),
-                gr.update(visible=True),
-                gr.update(visible=True),
+                gr.update(visible=False),  # vocals - toujours invisible (carte HTML supprimée)
+                gr.update(visible=True),  # drums
+                gr.update(visible=True),  # bass
+                gr.update(visible=True),  # other
                 gr.update(value=download_files, visible=True) if download_files else gr.update(visible=False),
                 gr.HTML(tracks_html) if tracks_html else gr.HTML(""),
             )
         else:
             visibility = update_outputs_visibility(stem)
             return (
-                vocals if stem == "vocals" else None,
+                vocals if stem == "vocals" else None,  # vocals - retourné si stem == "vocals" pour le bouton natif
                 drums if stem == "drums" else None,
                 bass if stem == "bass" else None,
                 other if stem == "other" else None,
@@ -692,31 +878,16 @@ if __name__ == "__main__":
     upload_dir.mkdir(parents=True, exist_ok=True)
     output_dir.mkdir(parents=True, exist_ok=True)
     
+    # Démarrer Gradio
+    # Note: L'endpoint /gradio_api/upload_progress peut retourner 404 dans certaines versions
+    # mais cela n'empêche pas le fonctionnement de l'application
+    # Pour Gradio 4.44.0, utiliser la syntaxe correcte
+    # Le CSS doit être défini dans gr.Blocks() avec le paramètre css, pas dans launch()
     demo.launch(
         server_name="0.0.0.0",
         server_port=7860,
         share=False,
         show_error=True,
-        theme=gr.themes.Soft(),
-        css="""
-        .gradio-container {
-            max-width: 1400px !important;
-        }
-        .main-header {
-            text-align: center;
-            padding: 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .main-header h1 {
-            margin: 0 0 10px 0;
-            font-size: 2.5em;
-        }
-        .main-header p {
-            margin: 5px 0;
-        }
-        """
+        max_file_size=500 * 1024 * 1024,  # Limite de 500 MB (524288000 bytes) pour les uploads
+        max_threads=40  # Augmenter le nombre de threads pour gérer les gros fichiers
     )

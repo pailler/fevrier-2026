@@ -140,6 +140,8 @@ export default function EncoursPage() {
         // Gérer les messages de succès
         if (messageParam) {
           setSuccessMessage(decodeURIComponent(messageParam));
+          // Effacer toute erreur existante si un message de succès est présent
+          setTokenError(null);
           try {
             window.history.replaceState({}, document.title, window.location.pathname);
           } catch (e) {
@@ -151,27 +153,42 @@ export default function EncoursPage() {
           }, 5000);
         }
         
-        if (errorParam) {
-          switch (errorParam) {
-            case 'invalid_token':
-              setTokenError('Token d\'accès invalide. Veuillez cliquer à nouveau sur "Accéder à l\'application".');
-              break;
-            case 'token_expired':
-              setTokenError('Token d\'accès expiré. Veuillez cliquer à nouveau sur "Accéder à l\'application".');
-              break;
-            case 'token_verification_failed':
-              setTokenError('Erreur de vérification du token. Veuillez réessayer.');
-              break;
-            case 'insufficient_tokens':
-              const moduleName = moduleParam || 'cette application';
-              const balance = balanceParam || '0';
-              setTokenError(`🪙 Tokens insuffisants pour accéder à ${moduleName}. Solde actuel: ${balance} token(s). Veuillez acheter des tokens pour continuer.`);
-              break;
-            case 'token_check_failed':
-              setTokenError('Erreur lors de la vérification des tokens. Veuillez réessayer ou contacter le support.');
-              break;
-            default:
-              setTokenError('Erreur d\'accès à l\'application. Veuillez réessayer.');
+        // Ne pas traiter les erreurs si un message de succès est présent (activation réussie)
+        if (errorParam && !messageParam) {
+          // Ne pas afficher d'erreur si l'utilisateur vient juste d'activer une application
+          // Vérifier si c'est une erreur liée à un accès direct sans token (après activation)
+          if (errorParam === 'direct_access_denied' && user && isAuthenticated) {
+            // Ignorer cette erreur si l'utilisateur est connecté (probablement après activation)
+            console.log('⚠️ Erreur direct_access_denied ignorée - utilisateur connecté après activation');
+          } else {
+            switch (errorParam) {
+              case 'invalid_token':
+                setTokenError('Token d\'accès invalide. Veuillez cliquer à nouveau sur "Accéder à l\'application".');
+                break;
+              case 'token_expired':
+                setTokenError('Token d\'accès expiré. Veuillez cliquer à nouveau sur "Accéder à l\'application".');
+                break;
+              case 'token_verification_failed':
+                setTokenError('Erreur de vérification du token. Veuillez réessayer.');
+                break;
+              case 'insufficient_tokens':
+                const moduleName = moduleParam || 'cette application';
+                const balance = balanceParam || '0';
+                setTokenError(`🪙 Tokens insuffisants pour accéder à ${moduleName}. Solde actuel: ${balance} token(s). Veuillez acheter des tokens pour continuer.`);
+                break;
+              case 'token_check_failed':
+                setTokenError('Erreur lors de la vérification des tokens. Veuillez réessayer ou contacter le support.');
+                break;
+              case 'direct_access_denied':
+                // Ne pas afficher d'erreur pour les accès directs si l'utilisateur est connecté
+                // (cela peut arriver après une activation réussie)
+                if (!user || !isAuthenticated) {
+                  setTokenError('Accès direct non autorisé. Veuillez accéder à l\'application depuis la page Mes Applications.');
+                }
+                break;
+              default:
+                setTokenError('Erreur d\'accès à l\'application. Veuillez réessayer.');
+            }
           }
           
           try {
@@ -843,7 +860,7 @@ export default function EncoursPage() {
       // Isolation Vocale : localhost:8100 en dev, voice-isolation.iahome.fr en prod (ou via proxy)
       'voice-isolation': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
         ? 'http://localhost:8100'
-        : 'https://iahome.fr/voice-isolation',
+        : 'https://voice-isolation.iahome.fr',
     };
     
     // Convertir module_id numérique en slug si nécessaire
@@ -1235,7 +1252,40 @@ export default function EncoursPage() {
         )}
 
         {/* Affichage des erreurs de token */}
-        {tokenError && (
+        {tokenError && user && isAuthenticated && (
+          <div className="mb-6 bg-pink-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3 flex-1">
+                <h3 className="text-sm font-medium text-red-800 mb-2">
+                  {tokenError.includes('Token') || tokenError.includes('token') 
+                    ? 'Erreur d\'accès' 
+                    : 'Accès à l\'application non autorisé'}
+                </h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p className="mb-2">
+                    {tokenError}
+                  </p>
+                </div>
+                <div className="mt-4">
+                  <button
+                    onClick={() => setTokenError(null)}
+                    className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200 transition-colors"
+                  >
+                    Fermer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Message pour utilisateurs non connectés */}
+        {tokenError && !user && (
           <div className="mb-6 bg-pink-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-center">
               <div className="flex-shrink-0">
@@ -1251,14 +1301,12 @@ export default function EncoursPage() {
                   <p className="mb-2">
                     Pour accéder gratuitement aux applications IAHome, veuillez vous connecter avec votre compte.
                   </p>
-                  {!user && (
-                    <Link 
-                      href="/login"
-                      className="inline-block mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                    >
-                      Se connecter
-                    </Link>
-                  )}
+                  <Link 
+                    href="/login"
+                    className="inline-block mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    Se connecter
+                  </Link>
                 </div>
                 <div className="mt-4">
                   <button

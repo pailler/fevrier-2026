@@ -412,8 +412,9 @@ export default function HomeAssistantPage() {
                           if (card?.id && !updated.includes(card.id)) updated.push(card.id);
                           return updated;
                         });
-                        // Rediriger vers l'application Home Assistant
-                        window.location.href = 'https://homeassistant.iahome.fr';
+                        // Rediriger vers /encours pour voir l'application activée
+                        // L'utilisateur pourra ensuite accéder à Home Assistant depuis la page /encours
+                        router.push('/encours?message=' + encodeURIComponent('Home Assistant activé avec succès !'));
                       } else {
                         console.error('❌ Erreur activation Home Assistant:', result);
                         console.error('❌ Détails complets:', result.errorDetails);

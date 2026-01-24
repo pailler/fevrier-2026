@@ -16,6 +16,13 @@ COPY requirements.txt .
 # Installer les dépendances Python
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copier les scripts de patch
+COPY patch_gradio_client.py .
+COPY patch_gradio_early.py .
+
+# Appliquer le patch au build (optionnel, le patch sera aussi appliqué au runtime)
+RUN python patch_gradio_client.py || true
+
 # Copier le code de l'application
 COPY app.py .
 

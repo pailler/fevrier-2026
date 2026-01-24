@@ -1,6 +1,20 @@
+# ⚠️ ATTENTION : Cette configuration Docker ne fonctionne plus
+# Les images Docker ComfyUI ne sont plus disponibles
+# 
+# SOLUTION : Utilisez Stability Matrix pour installer et gérer ComfyUI
+# Voir le fichier FIX-DEMARRAGE-COMPFYUI.md pour les instructions complètes
+#
+# Pour utiliser Docker, vous devez :
+# 1. Construire votre propre image depuis le Dockerfile (si disponible)
+# 2. Ou utiliser Stability Matrix (recommandé)
+
 services:
   comfyui:
-    image: yanwk/comfyui:latest
+    # Image non disponible - utiliser Stability Matrix à la place
+    # image: yanwk/comfyui:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: comfyui
     restart: unless-stopped
     ports:

@@ -29,7 +29,7 @@ const MODULE_URLS: Record<string, string> = {
   'ai-detector': 'https://iahome.fr/ai-detector',
   'code-learning': 'https://iahome.fr/code-learning',
   'administration': 'https://iahome.fr/administration',
-  'voice-isolation': 'https://iahome.fr/voice-isolation',
+  'voice-isolation': 'https://voice-isolation.iahome.fr',
 };
 
 // Mapping des IDs numériques vers les slugs

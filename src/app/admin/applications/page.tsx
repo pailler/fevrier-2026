@@ -21,6 +21,7 @@ interface Application {
   lastUsedAt: string;
   activeUsers: Array<{
     id: string;
+    activationId?: string;
     email: string;
     fullName: string;
     usageCount: number;
@@ -84,6 +85,8 @@ interface ApplicationHealthCheck {
 export default function AdminApplications() {
   const { user, isAuthenticated } = useCustomAuth();
   const [activeMainTab, setActiveMainTab] = useState<'applications' | 'services-admin'>('applications');
+  const [selectedUsers, setSelectedUsers] = useState<Record<string, Set<string>>>({}); // { moduleId: Set<userId> }
+  const [deactivating, setDeactivating] = useState(false);
   
   // Détecter le paramètre d'URL pour ouvrir l'onglet Services admin
   useEffect(() => {
@@ -172,6 +175,7 @@ export default function AdminApplications() {
       const { data: usageData, error: usageError } = await supabase
         .from('user_applications')
         .select(`
+          id,
           module_id, 
           usage_count, 
           max_usage, 
@@ -206,6 +210,12 @@ export default function AdminApplications() {
         modulesMap[module.id] = module;
       });
 
+      // Créer une map de tous les modules pour accéder facilement aux noms
+      const allModulesMap = {};
+      (modulesData || []).forEach(module => {
+        allModulesMap[module.id] = module;
+      });
+
       if (usageError) {
         console.error('❌ Erreur lors de la récupération des statistiques d\'usage:', usageError);
       }
@@ -235,6 +245,7 @@ export default function AdminApplications() {
         if (profile) {
           acc[app.module_id].activeUsers.push({
             id: app.user_id,
+            activationId: app.id, // ID de l'activation dans user_applications
             email: profile.email,
             fullName: profile.full_name || profile.email,
             usageCount: app.usage_count || 0,
@@ -248,9 +259,10 @@ export default function AdminApplications() {
         return acc;
       }, {} as Record<string, any>);
 
-      const uniqueModuleIds = [...new Set((usageData || []).map(app => app.module_id))];
+      // Utiliser TOUS les modules de la table modules, pas seulement ceux avec des utilisations actives
+      const allModuleIds = (modulesData || []).map(module => module.id);
       
-      const applicationsWithRealData = uniqueModuleIds.map(moduleId => {
+      const applicationsWithRealData = allModuleIds.map(moduleId => {
         const stats = applicationStats[moduleId] || {
           users: 0,
           totalUsage: 0,
@@ -319,19 +331,25 @@ export default function AdminApplications() {
           description = `Application utilitaire. Coût: ${tokenCost} tokens par utilisation.`;
         }
 
-        let moduleName = moduleId.charAt(0).toUpperCase() + moduleId.slice(1);
-        if (moduleId.includes('home-assistant') || moduleId.includes('homeassistant')) {
-          moduleName = 'Home Assistant';
-        } else if (moduleId.includes('code-learning')) {
-          moduleName = 'Code Learning';
-        } else if (moduleId.includes('meeting-reports')) {
-          moduleName = 'Meeting Reports';
-        } else if (moduleId.includes('administration')) {
-          moduleName = 'Services de l\'Administration';
-        } else if (moduleId.includes('prompt-generator')) {
-          moduleName = 'Générateur de prompts';
-        } else if (moduleId.includes('ai-detector') || moduleId.includes('detecteur')) {
-          moduleName = 'Détecteur de Contenu IA';
+        // Utiliser le nom du module depuis modulesData si disponible, sinon utiliser la logique de fallback
+        const moduleData = allModulesMap[moduleId];
+        let moduleName = moduleData?.name || moduleData?.title || moduleId.charAt(0).toUpperCase() + moduleId.slice(1);
+        
+        // Fallback pour les noms spéciaux si le nom n'est pas dans la base de données
+        if (!moduleData?.name && !moduleData?.title) {
+          if (moduleId.includes('home-assistant') || moduleId.includes('homeassistant')) {
+            moduleName = 'Home Assistant';
+          } else if (moduleId.includes('code-learning')) {
+            moduleName = 'Code Learning';
+          } else if (moduleId.includes('meeting-reports')) {
+            moduleName = 'Meeting Reports';
+          } else if (moduleId.includes('administration')) {
+            moduleName = 'Services de l\'Administration';
+          } else if (moduleId.includes('prompt-generator')) {
+            moduleName = 'Générateur de prompts';
+          } else if (moduleId.includes('ai-detector') || moduleId.includes('detecteur')) {
+            moduleName = 'Détecteur de Contenu IA';
+          }
         }
 
         return {
@@ -347,7 +365,7 @@ export default function AdminApplications() {
           maxUsage: stats.totalMaxUsage,
           expiresAt: '2025-12-31',
           isActive: true,
-          createdAt: stats.createdAt || new Date().toISOString(),
+          createdAt: stats.createdAt || moduleData?.created_at || new Date().toISOString(),
           lastUsedAt: stats.lastUsedAt || null,
           activeUsers: stats.activeUsers || [],
           tokenCost: tokenCost
@@ -686,6 +704,114 @@ export default function AdminApplications() {
     );
   };
 
+  // Fonction pour gérer la sélection/désélection d'utilisateurs
+  const toggleUserSelection = (moduleId: string, userId: string) => {
+    setSelectedUsers(prev => {
+      const newSelection = { ...prev };
+      if (!newSelection[moduleId]) {
+        newSelection[moduleId] = new Set();
+      }
+      const userSet = new Set(newSelection[moduleId]);
+      if (userSet.has(userId)) {
+        userSet.delete(userId);
+      } else {
+        userSet.add(userId);
+      }
+      if (userSet.size === 0) {
+        delete newSelection[moduleId];
+      } else {
+        newSelection[moduleId] = userSet;
+      }
+      return newSelection;
+    });
+  };
+
+  // Fonction pour sélectionner/désélectionner tous les utilisateurs d'une application
+  const toggleAllUsersForModule = (moduleId: string, userIds: string[]) => {
+    setSelectedUsers(prev => {
+      const newSelection = { ...prev };
+      const currentSelection = newSelection[moduleId] || new Set();
+      const allSelected = userIds.every(id => currentSelection.has(id));
+      
+      if (allSelected) {
+        // Désélectionner tous
+        delete newSelection[moduleId];
+      } else {
+        // Sélectionner tous
+        newSelection[moduleId] = new Set(userIds);
+      }
+      return newSelection;
+    });
+  };
+
+  // Fonction pour désactiver les applications sélectionnées
+  const handleDeactivateSelected = async (moduleId: string) => {
+    const selectedUserIds = Array.from(selectedUsers[moduleId] || []);
+    
+    if (selectedUserIds.length === 0) {
+      alert('Veuillez sélectionner au moins un utilisateur');
+      return;
+    }
+
+    const application = applications.find(app => app.id === moduleId);
+    if (!application) return;
+
+    // Récupérer les IDs d'activation pour les utilisateurs sélectionnés
+    const selectedActivations = application.activeUsers
+      .filter(user => selectedUserIds.includes(user.id))
+      .map(user => user.activationId)
+      .filter(Boolean) as string[];
+
+    const confirmMessage = `Êtes-vous sûr de vouloir désactiver l'accès à "${application.name}" pour ${selectedUserIds.length} utilisateur(s) ?\n\nCette action désactivera leur accès mais ne supprimera pas l'application ni le workflow d'activation.`;
+    
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    setDeactivating(true);
+    try {
+      const response = await fetch('/api/admin/deactivate-user-applications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userIds: selectedUserIds,
+          moduleIds: [moduleId],
+          applicationIds: selectedActivations.length > 0 ? selectedActivations : undefined
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const userNames = application.activeUsers
+          .filter(user => selectedUserIds.includes(user.id))
+          .map(user => user.fullName || user.email)
+          .join(', ');
+        
+        alert(`✅ ${data.deactivatedCount} activation(s) désactivée(s) avec succès.\n\nUtilisateurs affectés: ${userNames}\n\nLes utilisateurs sélectionnés n'auront plus accès à cette application.`);
+        
+        // Réinitialiser les sélections pour ce module
+        setSelectedUsers(prev => {
+          const newSelection = { ...prev };
+          delete newSelection[moduleId];
+          return newSelection;
+        });
+        
+        // Recharger les applications
+        loadApplications();
+      } else {
+        alert(`❌ Erreur: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la désactivation:', error);
+      alert('❌ Erreur lors de la désactivation des applications');
+    } finally {
+      setDeactivating(false);
+    }
+  };
+
   const getApplicationIcon = (appName: string) => {
     if (appName.includes('cogstudio') || appName.includes('stablediffusion') || appName.includes('ruinedfooocus')) {
       return '🤖';
@@ -1013,34 +1139,90 @@ export default function AdminApplications() {
 
                           {application.activeUsers && application.activeUsers.length > 0 && (
                             <div className="mt-4">
-                              <h4 className="text-sm font-medium text-gray-700 mb-2">
-                                Utilisateurs actifs ({application.activeUsers.length})
-                              </h4>
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center gap-3">
+                                  <h4 className="text-sm font-medium text-gray-700">
+                                    Utilisateurs actifs ({application.activeUsers.length})
+                                  </h4>
+                                  {selectedUsers[application.id] && selectedUsers[application.id].size > 0 && (
+                                    <span className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full">
+                                      {selectedUsers[application.id].size} sélectionné(s)
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => toggleAllUsersForModule(application.id, application.activeUsers.map(u => u.id))}
+                                    className="text-xs text-blue-600 hover:text-blue-800 font-medium px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+                                  >
+                                    {application.activeUsers.every(u => selectedUsers[application.id]?.has(u.id)) 
+                                      ? '☐ Désélectionner tout' 
+                                      : '☑ Sélectionner tout'}
+                                  </button>
+                                  {selectedUsers[application.id] && selectedUsers[application.id].size > 0 && (
+                                    <button
+                                      onClick={() => handleDeactivateSelected(application.id)}
+                                      disabled={deactivating}
+                                      className="px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 shadow-sm transition-all"
+                                    >
+                                      {deactivating ? (
+                                        <>
+                                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                                          Désactivation...
+                                        </>
+                                      ) : (
+                                        <>
+                                          <span>🗑️</span>
+                                          <span>Désactiver ({selectedUsers[application.id].size})</span>
+                                        </>
+                                      )}
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                {application.activeUsers.map((user) => (
-                                  <div key={user.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                                    <div className="flex items-center justify-between">
-                                      <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 truncate">
-                                          {user.fullName}
-                                        </p>
-                                        <p className="text-xs text-gray-500 truncate">
-                                          {user.email}
-                                        </p>
+                                {application.activeUsers.map((user) => {
+                                  const isSelected = selectedUsers[application.id]?.has(user.id) || false;
+                                  return (
+                                    <div 
+                                      key={user.id} 
+                                      className={`bg-gray-50 rounded-lg p-3 border-2 transition-all ${
+                                        isSelected 
+                                          ? 'border-blue-500 bg-blue-50' 
+                                          : 'border-gray-200 hover:border-gray-300'
+                                      }`}
+                                    >
+                                      <div className="flex items-start justify-between">
+                                        <div className="flex items-start gap-2 flex-1 min-w-0">
+                                          <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={() => toggleUserSelection(application.id, user.id)}
+                                            className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                          />
+                                          <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-gray-900 truncate">
+                                              {user.fullName}
+                                            </p>
+                                            <p className="text-xs text-gray-500 truncate">
+                                              {user.email}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+                                        <div className="flex items-center">
+                                          <span className="mr-1">📊</span>
+                                          {user.usageCount} utilisations
+                                        </div>
+                                        <div className="flex items-center">
+                                          <span className="mr-1">📅</span>
+                                          {user.lastUsedAt ? new Date(user.lastUsedAt).toLocaleDateString('fr-FR') : 'Jamais'}
+                                        </div>
                                       </div>
                                     </div>
-                                    <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
-                                      <div className="flex items-center">
-                                        <span className="mr-1">📊</span>
-                                        {user.usageCount} utilisations
-                                      </div>
-                                      <div className="flex items-center">
-                                        <span className="mr-1">📅</span>
-                                        {user.lastUsedAt ? new Date(user.lastUsedAt).toLocaleDateString('fr-FR') : 'Jamais'}
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
+                                  );
+                                })}
                               </div>
                             </div>
                           )}

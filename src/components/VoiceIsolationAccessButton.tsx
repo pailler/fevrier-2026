@@ -55,14 +55,49 @@ export default function VoiceIsolationAccessButton({
         return;
       }
 
-      // Déterminer l'URL selon l'environnement
-      const voiceIsolationUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost'
-        ? 'http://localhost:8100'
-        : 'https://iahome.fr/voice-isolation';
+      const isLocalhost =
+        typeof window !== 'undefined' &&
+        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-      // Ouvrir l'application
-      window.open(voiceIsolationUrl, '_blank');
-      
+      // En local (dev), on garde l'accès direct sans token (service local)
+      if (isLocalhost) {
+        const localUrl = 'http://localhost:8100';
+        window.open(localUrl, '_blank', 'noopener,noreferrer');
+        onAccessGranted?.(localUrl);
+        return;
+      }
+
+      // En prod, ouvrir le sous-domaine public avec token (et non une route locale /voice-isolation)
+      const tokenResponse = await fetch('/api/generate-access-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          userEmail: user.email,
+          moduleId: 'voice-isolation'
+        })
+      });
+
+      if (!tokenResponse.ok) {
+        let errorMessage = 'Erreur génération token';
+        try {
+          const errorData = await tokenResponse.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // ignore
+        }
+        throw new Error(errorMessage);
+      }
+
+      const tokenData = await tokenResponse.json();
+      if (!tokenData.token) {
+        throw new Error('Token non généré par le serveur');
+      }
+
+      const voiceIsolationUrl = `https://voice-isolation.iahome.fr?token=${encodeURIComponent(tokenData.token)}`;
+      window.open(voiceIsolationUrl, '_blank', 'noopener,noreferrer');
       onAccessGranted?.(voiceIsolationUrl);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
