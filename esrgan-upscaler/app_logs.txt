@@ -1,0 +1,18 @@
+
+============================================================
+Application ESRGAN Upscaler
+============================================================
+Modeles disponibles:
+   - UltraSharp: OK
+   - Anime: OK
+
+Interface web: http://localhost:8892
+============================================================
+
+ * Serving Flask app 'app'
+ * Debug mode: on
+INFO:werkzeug:WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8892
+ * Running on http://192.168.1.150:8892
+INFO:werkzeug:Press CTRL+C to quit

@@ -1,0 +1,27 @@
+# Dossiers de travail
+uploads/
+outputs/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environnement virtuel
+venv/
+env/
+.venv/
+
+# Fichiers temporaires
+*.tmp
+*.log
+*.cache
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

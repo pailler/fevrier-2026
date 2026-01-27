@@ -206,7 +206,8 @@ export default function Essentiels() {
       'whisper': 'whisper',
       'home-assistant': 'home-assistant',
       'administration': 'administration',
-      'voice-isolation': 'voice-isolation'
+      'voice-isolation': 'voice-isolation',
+      'photomaker': 'photomaker'
     };
 
     // Vérifier d'abord le mapping direct

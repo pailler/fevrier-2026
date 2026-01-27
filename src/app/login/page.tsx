@@ -20,12 +20,27 @@ function LoginContent() {
     if (typeof window !== 'undefined') {
       const originalError = console.error;
       console.error = (...args: any[]) => {
-        const message = args.join(' ');
-        // Ignorer les erreurs CORS YouTube qui sont normales
-        if (message.includes('youtube.com') && message.includes('CORS')) {
-          return; // Ne pas afficher ces erreurs
+        try {
+          const message = args.join(' ');
+          // Ignorer les erreurs CORS YouTube qui sont normales
+          if (message.includes('youtube.com') && message.includes('CORS')) {
+            return; // Ne pas afficher ces erreurs
+          }
+          // Utiliser call au lieu de apply pour plus de sécurité
+          originalError.call(console, ...args);
+        } catch (err) {
+          // En cas d'erreur, utiliser la méthode originale de manière sécurisée
+          try {
+            originalError(...args);
+          } catch {
+            // Si tout échoue, ignorer silencieusement
+          }
         }
-        originalError.apply(console, args);
+      };
+      
+      // Nettoyer l'override lors du démontage du composant
+      return () => {
+        console.error = originalError;
       };
     }
 

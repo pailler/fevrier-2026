@@ -18,6 +18,10 @@ const APPLICATION_PORTS: { [key: string]: number } = {
   'cogstudio': 8080,
   'hunyuan3d': 8888,
   'apprendre-autrement': 9001,
+  'photomaker': 7881,
+  'animagine-xl': 7883,
+  'florence-2': 7884,
+  'birefnet': 7882,
 };
 
 // Mapping des modules vers leurs hôtes locaux (si différent de localhost)

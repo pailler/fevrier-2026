@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESRGAN Image Upscaler - Application Web</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #e0e0e0;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: #f9f9f9;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            background: #f0f0f0;
+            border-color: #764ba2;
+        }
+
+        .upload-area.dragover {
+            background: #e8e8ff;
+            border-color: #667eea;
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .model-selector {
+            margin-bottom: 20px;
+        }
+
+        .model-selector label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .model-selector select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .preview-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .preview-box {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            background: #f9f9f9;
+        }
+
+        .preview-box h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .preview-image {
+            width: 100%;
+            border-radius: 8px;
+            max-height: 500px;
+            object-fit: contain;
+            background: #f0f0f0;
+        }
+
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .info-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 30px;
+            display: none;
+        }
+
+        .progress-bar-container.active {
+            display: block;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 150px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .stat-item strong {
+            color: #667eea;
+            display: block;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .use-case-card {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .use-case-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .use-case-card p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .batch-files {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .file-tag {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .preview-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .upload-area {
+                padding: 20px;
+            }
+
+            .preview-box {
+                margin-bottom: 20px;
+            }
+
+            .toast {
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+            }
+        }
+
+        /* Amélioration de l'accessibilité */
+        .btn:focus,
+        .tab:focus {
+            outline: 3px solid #667eea;
+            outline-offset: 2px;
+        }
+
+        /* Animation de chargement améliorée */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .loading.active p {
+            animation: pulse 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast notifications -->
+    <div id="toast" class="toast"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🎨 ESRGAN Image Upscaler</h1>
+            <p>Upscaling d'images haute qualité avec intelligence artificielle</p>
+        </div>
+
+        <div class="content">
+            <!-- Onglets -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('single')">📷 Image Unique</button>
+                <button class="tab" onclick="switchTab('batch')">📦 Traitement par Lot</button>
+                <button class="tab" onclick="switchTab('screenshot')">💻 Capture d'Écran</button>
+                <button class="tab" onclick="switchTab('print')">🖨️ Préparation Impression</button>
+                <button class="tab" onclick="switchTab('video')">🎬 Frame Vidéo</button>
+            </div>
+
+            <!-- Onglet: Image Unique -->
+            <div id="single" class="tab-content active">
+                <div class="use-case-card">
+                    <h3>📷 Upscaling d'Image Unique</h3>
+                    <p>Upscalez une seule image avec un facteur d'agrandissement de 4x. Parfait pour améliorer la qualité d'une photo ou d'une image.</p>
+                </div>
+
+                <div class="model-selector">
+                    <label for="model-single">Modèle ESRGAN:</label>
+                    <select id="model-single">
+                        <option value="ultrasharp">4x UltraSharp (Images générales)</option>
+                        <option value="anime">4x Anime Sharp (Images animées)</option>
+                    </select>
+                </div>
+
+                <div class="upload-area" onclick="document.getElementById('file-single').click()" 
+                     ondrop="handleDrop(event, 'single')" ondragover="event.preventDefault()" ondragenter="this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')">
+                    <div class="upload-icon">📤</div>
+                    <p>Cliquez ou glissez-déposez une image ici</p>
+                    <p style="color: #666; font-size: 0.9em;">PNG, JPG, JPEG, BMP, WEBP (max 50MB)</p>
+                </div>
+                <input type="file" id="file-single" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'single')">
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="upscaleSingle()" id="btn-single" disabled>🚀 Upscaler l'Image</button>
+                </div>
+
+                <div class="loading" id="loading-single">
+                    <div class="spinner"></div>
+                    <p>Upscaling en cours... Cela peut prendre quelques instants.</p>
+                </div>
+
+                <div class="progress-bar-container" id="progress-single">
+                    <div class="progress-bar" id="progress-bar-single">0%</div>
+                </div>
+
+                <div class="preview-container" id="preview-single" style="display: none;">
+                    <div class="preview-box">
+                        <h3>Image Originale</h3>
+                        <div class="preview-image-container">
+                            <img id="original-single" class="preview-image" alt="Original" onclick="zoomImage(this)">
+                            <div class="image-actions">
+                                <button class="btn-icon" onclick="downloadImage('original-single', 'original')" title="Télécharger">💾</button>
+                                <button class="btn-icon" onclick="zoomImage(document.getElementById('original-single'))" title="Zoom">🔍</button>
+                            </div>
+                            <div class="zoom-controls">
+                                <button class="btn-icon" onclick="zoomIn('original-single')">+</button>
+                                <button class="btn-icon" onclick="zoomOut('original-single')">-</button>
+                                <button class="btn-icon" onclick="resetZoom('original-single')">⌂</button>
+                            </div>
+                        </div>
+                        <div class="stats" id="stats-original-single"></div>
+                    </div>
+                    <div class="preview-box">
+                        <h3>Image Upscalée (4x)</h3>
+                        <div class="preview-image-container">
+                            <img id="upscaled-single" class="preview-image" alt="Upscaled" onclick="zoomImage(this)">
+                            <div class="image-actions">
+                                <button class="btn-icon" onclick="downloadImage('upscaled-single', 'upscaled')" title="Télécharger">💾</button>
+                                <button class="btn-icon" onclick="zoomImage(document.getElementById('upscaled-single'))" title="Zoom">🔍</button>
+                            </div>
+                            <div class="zoom-controls">
+                                <button class="btn-icon" onclick="zoomIn('upscaled-single')">+</button>
+                                <button class="btn-icon" onclick="zoomOut('upscaled-single')">-</button>
+                                <button class="btn-icon" onclick="resetZoom('upscaled-single')">⌂</button>
+                            </div>
+                        </div>
+                        <div class="stats" id="stats-upscaled-single"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onglet: Traitement par Lot -->
+            <div id="batch" class="tab-content">
+                <div class="use-case-card">
+                    <h3>📦 Traitement par Lot</h3>
+                    <p>Upscalez plusieurs images en une seule fois. Idéal pour traiter des dossiers entiers d'images.</p>
+                </div>
+
+                <div class="model-selector">
+                    <label for="model-batch">Modèle ESRGAN:</label>
+                    <select id="model-batch">
+                        <option value="ultrasharp">4x UltraSharp (Images générales)</option>
+                        <option value="anime">4x Anime Sharp (Images animées)</option>
+                    </select>
+                </div>
+
+                <div class="upload-area" onclick="document.getElementById('file-batch').click()" 
+                     ondrop="handleDrop(event, 'batch')" ondragover="event.preventDefault()" ondragenter="this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')">
+                    <div class="upload-icon">📤</div>
+                    <p>Cliquez ou glissez-déposez plusieurs images ici</p>
+                    <p style="color: #666; font-size: 0.9em;">Sélectionnez plusieurs fichiers (Ctrl+Click)</p>
+                </div>
+                <input type="file" id="file-batch" class="file-input" accept="image/*" multiple onchange="handleFileSelect(event, 'batch')">
+
+                <div id="batch-files-list" class="batch-files"></div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="upscaleBatch()" id="btn-batch" disabled>🚀 Upscaler Toutes les Images</button>
+                </div>
+
+                <div class="loading" id="loading-batch">
+                    <div class="spinner"></div>
+                    <p>Traitement en cours...</p>
+                </div>
+
+                <div id="batch-results"></div>
+            </div>
+
+            <!-- Onglet: Capture d'Écran -->
+            <div id="screenshot" class="tab-content">
+                <div class="use-case-card">
+                    <h3>💻 Amélioration de Captures d'Écran</h3>
+                    <p>Améliorez la qualité des captures d'écran, particulièrement efficace pour préserver la netteté du texte et des interfaces.</p>
+                </div>
+
+                <div class="upload-area" onclick="document.getElementById('file-screenshot').click()" 
+                     ondrop="handleDrop(event, 'screenshot')" ondragover="event.preventDefault()" ondragenter="this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')">
+                    <div class="upload-icon">📤</div>
+                    <p>Cliquez ou glissez-déposez une capture d'écran ici</p>
+                </div>
+                <input type="file" id="file-screenshot" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'screenshot')">
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="improveScreenshot()" id="btn-screenshot" disabled>✨ Améliorer la Capture</button>
+                </div>
+
+                <div class="loading" id="loading-screenshot">
+                    <div class="spinner"></div>
+                    <p>Amélioration en cours...</p>
+                </div>
+
+                <div class="preview-container" id="preview-screenshot" style="display: none;">
+                    <div class="preview-box">
+                        <h3>Capture Originale</h3>
+                        <div class="preview-image-container">
+                            <img id="original-screenshot" class="preview-image" alt="Original" onclick="zoomImage(this)">
+                            <div class="image-actions">
+                                <button class="btn-icon" onclick="downloadImage('original-screenshot', 'original-screenshot')" title="Télécharger">💾</button>
+                                <button class="btn-icon" onclick="zoomImage(document.getElementById('original-screenshot'))" title="Zoom">🔍</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="preview-box">
+                        <h3>Capture Améliorée</h3>
+                        <div class="preview-image-container">
+                            <img id="improved-screenshot" class="preview-image" alt="Improved" onclick="zoomImage(this)">
+                            <div class="image-actions">
+                                <button class="btn-icon" onclick="downloadImage('improved-screenshot', 'improved-screenshot')" title="Télécharger">💾</button>
+                                <button class="btn-icon" onclick="zoomImage(document.getElementById('improved-screenshot'))" title="Zoom">🔍</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onglet: Préparation Impression -->
+            <div id="print" class="tab-content">
+                <div class="use-case-card">
+                    <h3>🖨️ Préparation d'Images pour l'Impression</h3>
+                    <p>Préparez vos images pour l'impression haute qualité. Optimisé pour obtenir la résolution nécessaire pour différents formats d'impression (A4, A3, etc.).</p>
+                </div>
+
+                <div class="model-selector">
+                    <label for="print-size">Format d'impression:</label>
+                    <select id="print-size">
+                        <option value="A4">A4 (210×297mm)</option>
+                        <option value="A3">A3 (297×420mm)</option>
+                        <option value="A2">A2 (420×594mm)</option>
+                        <option value="A1">A1 (594×841mm)</option>
+                    </select>
+                </div>
+
+                <div class="model-selector">
+                    <label for="print-dpi">Résolution (DPI):</label>
+                    <select id="print-dpi">
+                        <option value="300">300 DPI (Haute qualité)</option>
+                        <option value="150">150 DPI (Qualité standard)</option>
+                        <option value="600">600 DPI (Qualité professionnelle)</option>
+                    </select>
+                </div>
+
+                <div class="upload-area" onclick="document.getElementById('file-print').click()" 
+                     ondrop="handleDrop(event, 'print')" ondragover="event.preventDefault()" ondragenter="this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')">
+                    <div class="upload-icon">📤</div>
+                    <p>Cliquez ou glissez-déposez une image ici</p>
+                </div>
+                <input type="file" id="file-print" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'print')">
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="preparePrint()" id="btn-print" disabled>🖨️ Préparer pour l'Impression</button>
+                </div>
+
+                <div class="loading" id="loading-print">
+                    <div class="spinner"></div>
+                    <p>Préparation en cours...</p>
+                </div>
+
+                <div class="preview-container" id="preview-print" style="display: none;">
+                    <div class="preview-box">
+                        <h3>Image Originale</h3>
+                        <div class="preview-image-container">
+                            <img id="original-print" class="preview-image" alt="Original" onclick="zoomImage(this)">
+                            <div class="image-actions">
+                                <button class="btn-icon" onclick="downloadImage('original-print', 'original-print')" title="Télécharger">💾</button>
+                                <button class="btn-icon" onclick="zoomImage(document.getElementById('original-print'))" title="Zoom">🔍</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="preview-box">
+                        <h3>Image Prête pour Impression</h3>
+                        <div class="preview-image-container">
+                            <img id="print-ready" class="preview-image" alt="Print Ready" onclick="zoomImage(this)">
+                            <div class="image-actions">
+                                <button class="btn-icon" onclick="downloadImage('print-ready', 'print-ready')" title="Télécharger">💾</button>
+                                <button class="btn-icon" onclick="zoomImage(document.getElementById('print-ready'))" title="Zoom">🔍</button>
+                            </div>
+                        </div>
+                        <div class="info-box" id="print-info"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onglet: Frame Vidéo -->
+            <div id="video" class="tab-content">
+                <div class="use-case-card">
+                    <h3>🎬 Amélioration de Vidéos (Frame par Frame)</h3>
+                    <p>Upscalez des frames individuelles de vidéo pour améliorer la qualité globale. Traitez chaque frame séparément pour un meilleur résultat.</p>
+                </div>
+
+                <div class="upload-area" onclick="document.getElementById('file-video').click()" 
+                     ondrop="handleDrop(event, 'video')" ondragover="event.preventDefault()" ondragenter="this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')">
+                    <div class="upload-icon">📤</div>
+                    <p>Cliquez ou glissez-déposez une frame de vidéo ici</p>
+                    <p style="color: #666; font-size: 0.9em;">Note: Traitez chaque frame individuellement</p>
+                </div>
+                <input type="file" id="file-video" class="file-input" accept="image/*" onchange="handleFileSelect(event, 'video')">
+
+                <div class="model-selector">
+                    <label for="frame-number">Numéro de Frame (optionnel):</label>
+                    <input type="number" id="frame-number" value="0" min="0" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="upscaleVideoFrame()" id="btn-video" disabled>🎬 Upscaler la Frame</button>
+                </div>
+
+                <div class="loading" id="loading-video">
+                    <div class="spinner"></div>
+                    <p>Upscaling de la frame en cours...</p>
+                </div>
+
+                <div class="preview-container" id="preview-video" style="display: none;">
+                    <div class="preview-box">
+                        <h3>Frame Originale</h3>
+                        <div class="preview-image-container">
+                            <img id="original-video" class="preview-image" alt="Original" onclick="zoomImage(this)">
+                            <div class="image-actions">
+                                <button class="btn-icon" onclick="downloadImage('original-video', 'original-video')" title="Télécharger">💾</button>
+                                <button class="btn-icon" onclick="zoomImage(document.getElementById('original-video'))" title="Zoom">🔍</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="preview-box">
+                        <h3>Frame Upscalée</h3>
+                        <div class="preview-image-container">
+                            <img id="upscaled-video" class="preview-image" alt="Upscaled" onclick="zoomImage(this)">
+                            <div class="image-actions">
+                                <button class="btn-icon" onclick="downloadImage('upscaled-video', 'upscaled-video')" title="Télécharger">💾</button>
+                                <button class="btn-icon" onclick="zoomImage(document.getElementById('upscaled-video'))" title="Zoom">🔍</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFiles = {
+            single: null,
+            batch: [],
+            screenshot: null,
+            print: null,
+            video: null
+        };
+
+        function switchTab(tabName) {
+            // Masquer tous les onglets
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            // Afficher l'onglet sélectionné
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function handleDrop(e, type) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+            handleFiles(files, type);
+        }
+
+        function handleFileSelect(e, type) {
+            const files = Array.from(e.target.files);
+            handleFiles(files, type);
+        }
+
+        function handleFiles(files, type) {
+            if (type === 'batch') {
+                selectedFiles.batch = files;
+                displayBatchFiles();
+                document.getElementById('btn-batch').disabled = files.length === 0;
+            } else {
+                selectedFiles[type] = files[0];
+                document.getElementById(`btn-${type}`).disabled = false;
+                previewImage(files[0], `original-${type}`);
+            }
+        }
+
+        function displayBatchFiles() {
+            const container = document.getElementById('batch-files-list');
+            container.innerHTML = selectedFiles.batch.map(f => 
+                `<span class="file-tag">${f.name}</span>`
+            ).join('');
+        }
+
+        function previewImage(file, imgId) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById(imgId).src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function upscaleSingle() {
+            if (!selectedFiles.single) return;
+            
+            const loading = document.getElementById('loading-single');
+            const preview = document.getElementById('preview-single');
+            const btn = document.getElementById('btn-single');
+            
+            loading.classList.add('active');
+            btn.disabled = true;
+            
+            const formData = new FormData();
+            formData.append('image', selectedFiles.single);
+            formData.append('model', document.getElementById('model-single').value);
+            
+            try {
+                const response = await fetch('/api/upscale', {
+                    method: 'POST',
+                    body: formData,
+                    signal: AbortSignal.timeout(300000) // 5 minutes timeout
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({error: `HTTP ${response.status}: ${response.statusText}`}));
+                    throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('upscaled-single').src = data.image;
+                    document.getElementById('stats-original-single').innerHTML = `
+                        <div class="stat-item">
+                            <strong>${data.original_size[0]}×${data.original_size[1]}</strong>
+                            <span>Taille originale</span>
+                        </div>
+                    `;
+                    document.getElementById('stats-upscaled-single').innerHTML = `
+                        <div class="stat-item">
+                            <strong>${data.upscaled_size[0]}×${data.upscaled_size[1]}</strong>
+                            <span>Taille upscalée</span>
+                        </div>
+                        <div class="stat-item">
+                            <strong>${data.scale_factor.toFixed(1)}x</strong>
+                            <span>Facteur d'agrandissement</span>
+                        </div>
+                    `;
+                    preview.style.display = 'grid';
+                    showToast('Image upscalée avec succès !', 'success');
+                    if (typeof finishProgress === 'function') finishProgress();
+                } else {
+                    showToast('Erreur: ' + data.error, 'error');
+                    if (typeof finishProgress === 'function') finishProgress();
+                }
+            } catch (error) {
+                console.error('Erreur fetch:', error);
+                let errorMsg = 'Erreur réseau';
+                if (error.message) {
+                    errorMsg = error.message;
+                } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorMsg = 'Impossible de contacter le serveur. Vérifiez que l\'application est démarrée.';
+                }
+                showToast('Erreur: ' + errorMsg, 'error');
+                if (typeof finishProgress === 'function') finishProgress();
+            } finally {
+                loading.classList.remove('active');
+                btn.disabled = false;
+            }
+        }
+
+        async function upscaleBatch() {
+            if (selectedFiles.batch.length === 0) return;
+            
+            const loading = document.getElementById('loading-batch');
+            const btn = document.getElementById('btn-batch');
+            const results = document.getElementById('batch-results');
+            
+            loading.classList.add('active');
+            btn.disabled = true;
+            results.innerHTML = '';
+            
+            const formData = new FormData();
+            selectedFiles.batch.forEach(f => formData.append('images', f));
+            formData.append('model', document.getElementById('model-batch').value);
+            
+            try {
+                const response = await fetch('/api/upscale-batch', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    results.innerHTML = `
+                        <div class="info-box">
+                            <h4>✓ Traitement terminé</h4>
+                            <p>${data.processed} image(s) traitée(s) avec succès</p>
+                        </div>
+                        ${data.results.map((r, i) => r.error ? 
+                            `<div class="use-case-card">
+                                <h3>✗ ${r.filename}</h3>
+                                <p>Erreur: ${r.error}</p>
+                            </div>` :
+                            `<div class="use-case-card">
+                                <h3>✓ ${r.filename}</h3>
+                                <div class="preview-image-container">
+                                    <img src="${r.image || r.output_path}" class="preview-image" style="max-height: 300px;" onclick="zoomImage(this)" id="batch-result-${i}">
+                                    <div class="image-actions">
+                                        <button class="btn-icon" onclick="downloadImage('batch-result-${i}', 'batch-${i}')" title="Télécharger">💾</button>
+                                        <button class="btn-icon" onclick="zoomImage(document.getElementById('batch-result-${i}'))" title="Zoom">🔍</button>
+                                    </div>
+                                </div>
+                                <p>Taille: ${r.original_size[0]}×${r.original_size[1]} → ${r.upscaled_size[0]}×${r.upscaled_size[1]} (${r.scale_factor.toFixed(1)}x)</p>
+                            </div>`
+                        ).join('')}
+                    `;
+                    showToast(`${data.processed} image(s) traitée(s) avec succès !`, 'success');
+                } else {
+                    showToast('Erreur: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Erreur fetch:', error);
+                let errorMsg = 'Erreur réseau';
+                if (error.message) {
+                    errorMsg = error.message;
+                } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorMsg = 'Impossible de contacter le serveur. Vérifiez que l\'application est démarrée.';
+                }
+                showToast('Erreur: ' + errorMsg, 'error');
+            } finally {
+                loading.classList.remove('active');
+                btn.disabled = false;
+            }
+        }
+
+
+        async function improveScreenshot() {
+            if (!selectedFiles.screenshot) return;
+            
+            const loading = document.getElementById('loading-screenshot');
+            const preview = document.getElementById('preview-screenshot');
+            const btn = document.getElementById('btn-screenshot');
+            
+            loading.classList.add('active');
+            btn.disabled = true;
+            
+            const formData = new FormData();
+            formData.append('image', selectedFiles.screenshot);
+            
+            try {
+                const response = await fetch('/api/improve-screenshot', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('improved-screenshot').src = data.image;
+                    preview.style.display = 'grid';
+                } else {
+                    showToast('Erreur: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Erreur fetch:', error);
+                let errorMsg = 'Erreur réseau';
+                if (error.message) {
+                    errorMsg = error.message;
+                } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorMsg = 'Impossible de contacter le serveur. Vérifiez que l\'application est démarrée.';
+                }
+                showToast('Erreur: ' + errorMsg, 'error');
+            } finally {
+                loading.classList.remove('active');
+                btn.disabled = false;
+            }
+        }
+
+        async function preparePrint() {
+            if (!selectedFiles.print) return;
+            
+            const loading = document.getElementById('loading-print');
+            const preview = document.getElementById('preview-print');
+            const btn = document.getElementById('btn-print');
+            
+            loading.classList.add('active');
+            btn.disabled = true;
+            
+            const formData = new FormData();
+            formData.append('image', selectedFiles.print);
+            formData.append('target_size', document.getElementById('print-size').value);
+            formData.append('dpi', document.getElementById('print-dpi').value);
+            
+            try {
+                const response = await fetch('/api/prepare-print', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('print-ready').src = data.image;
+                    document.getElementById('print-info').innerHTML = `
+                        <h4>Informations d'impression</h4>
+                        <p><strong>Format:</strong> ${data.print_size}</p>
+                        <p><strong>Résolution:</strong> ${data.dpi} DPI</p>
+                        <p><strong>Taille finale:</strong> ${data.final_size[0]}×${data.final_size[1]} pixels</p>
+                    `;
+                    preview.style.display = 'grid';
+                } else {
+                    showToast('Erreur: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Erreur fetch:', error);
+                let errorMsg = 'Erreur réseau';
+                if (error.message) {
+                    errorMsg = error.message;
+                } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorMsg = 'Impossible de contacter le serveur. Vérifiez que l\'application est démarrée.';
+                }
+                showToast('Erreur: ' + errorMsg, 'error');
+            } finally {
+                loading.classList.remove('active');
+                btn.disabled = false;
+            }
+        }
+
+        async function upscaleVideoFrame() {
+            if (!selectedFiles.video) return;
+            
+            const loading = document.getElementById('loading-video');
+            const preview = document.getElementById('preview-video');
+            const btn = document.getElementById('btn-video');
+            
+            loading.classList.add('active');
+            btn.disabled = true;
+            
+            const formData = new FormData();
+            formData.append('image', selectedFiles.video);
+            formData.append('frame_number', document.getElementById('frame-number').value);
+            
+            try {
+                const response = await fetch('/api/upscale-video-frame', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('upscaled-video').src = data.image;
+                    preview.style.display = 'grid';
+                } else {
+                    showToast('Erreur: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Erreur fetch:', error);
+                let errorMsg = 'Erreur réseau';
+                if (error.message) {
+                    errorMsg = error.message;
+                } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorMsg = 'Impossible de contacter le serveur. Vérifiez que l\'application est démarrée.';
+                }
+                showToast('Erreur: ' + errorMsg, 'error');
+            } finally {
+                loading.classList.remove('active');
+                btn.disabled = false;
+            }
+        }
+
+        // Fonction pour afficher des notifications toast
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Fonctions de zoom
+        const zoomLevels = {};
+        
+        function zoomImage(imgElement) {
+            if (!zoomLevels[imgElement.id]) {
+                zoomLevels[imgElement.id] = 1;
+            }
+            zoomLevels[imgElement.id] = zoomLevels[imgElement.id] === 1 ? 2 : 1;
+            imgElement.style.transform = `scale(${zoomLevels[imgElement.id]})`;
+            imgElement.style.transition = 'transform 0.3s';
+        }
+
+        function zoomIn(imgId) {
+            const img = document.getElementById(imgId);
+            if (!zoomLevels[imgId]) zoomLevels[imgId] = 1;
+            zoomLevels[imgId] = Math.min(zoomLevels[imgId] + 0.5, 3);
+            img.style.transform = `scale(${zoomLevels[imgId]})`;
+            img.style.transition = 'transform 0.3s';
+        }
+
+        function zoomOut(imgId) {
+            const img = document.getElementById(imgId);
+            if (!zoomLevels[imgId]) zoomLevels[imgId] = 1;
+            zoomLevels[imgId] = Math.max(zoomLevels[imgId] - 0.5, 0.5);
+            img.style.transform = `scale(${zoomLevels[imgId]})`;
+            img.style.transition = 'transform 0.3s';
+        }
+
+        function resetZoom(imgId) {
+            const img = document.getElementById(imgId);
+            zoomLevels[imgId] = 1;
+            img.style.transform = 'scale(1)';
+            img.style.transition = 'transform 0.3s';
+        }
+
+        // Fonction de téléchargement
+        function downloadImage(imgId, prefix = 'image') {
+            const img = document.getElementById(imgId);
+            if (!img || !img.src) {
+                showToast('Aucune image à télécharger', 'error');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.href = img.src;
+            link.download = `${prefix}_${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Image téléchargée avec succès', 'success');
+        }
+
+        // Barre de progression simulée
+        function simulateProgress(progressBarId, duration = 3000) {
+            const progressBar = document.getElementById(progressBarId);
+            if (!progressBar) return;
+            
+            progressBar.parentElement.classList.add('active');
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 2;
+                if (progress > 90) {
+                    clearInterval(interval);
+                } else {
+                    progressBar.style.width = progress + '%';
+                    progressBar.textContent = progress + '%';
+                }
+            }, duration / 50);
+            
+            return () => {
+                clearInterval(interval);
+                progressBar.style.width = '100%';
+                progressBar.textContent = '100%';
+                setTimeout(() => {
+                    progressBar.parentElement.classList.remove('active');
+                    progressBar.style.width = '0%';
+                }, 500);
+            };
+        }
+
+        // Précharger les modèles au démarrage
+        function preloadModels() {
+            showToast('Préchargement des modèles...', 'info');
+            fetch('/api/models')
+                .then(r => {
+                    if (!r.ok) {
+                        throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+                    }
+                    return r.json();
+                })
+                .then(data => {
+                    console.log('Modèles disponibles:', data);
+                    // Précharger le premier modèle
+                    if (data.models && data.models.length > 0) {
+                        fetch('/api/health')
+                            .then(r => r.json())
+                            .then(health => {
+                                if (!health.models.ultrasharp) {
+                                    // Déclencher le chargement du modèle
+                                    console.log('Préchargement du modèle UltraSharp...');
+                                }
+                                showToast('Modèles prêts', 'success');
+                            });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement des modèles:', error);
+                    showToast('Erreur lors du chargement des modèles', 'error');
+                });
+        }
+
+        // Appeler au chargement de la page
+        window.addEventListener('load', () => {
+            preloadModels();
+        });
+    </script>
+</body>
+</html>

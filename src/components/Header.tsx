@@ -241,13 +241,17 @@ export default function Header() {
                   {user.role === 'admin' ? '👑 Administrateur' : '👤 Connecté'} : {user?.full_name || user?.email?.split('@')[0] || 'Utilisateur'}
                 </span>
                 {role && (
-                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                    role === 'admin' 
-                      ? 'bg-red-500/20 text-red-100 border border-red-400/50' 
-                      : 'bg-green-500/20 text-green-100 border border-green-400/50'
-                  }`}>
+                  <Link
+                    href="/account"
+                    className={`px-2 py-1 rounded-full text-xs font-semibold transition-all hover:scale-105 cursor-pointer ${
+                      role === 'admin' 
+                        ? 'bg-red-500/20 text-red-100 border border-red-400/50 hover:bg-red-500/30' 
+                        : 'bg-green-500/20 text-green-100 border border-green-400/50 hover:bg-green-500/30'
+                    }`}
+                    title="Voir mes informations"
+                  >
                     {role === 'admin' ? 'ADMIN' : 'UTILISATEUR'}
-                  </span>
+                  </Link>
                 )}
               </>
             ) : (

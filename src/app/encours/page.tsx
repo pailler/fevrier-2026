@@ -818,6 +818,7 @@ export default function EncoursPage() {
       'apprendre-autrement': 'apprendre-autrement', // Apprendre Autrement -> apprendre-autrement
       'ai-detector': 'ai-detector', // Détecteur de Contenu IA -> ai-detector
       'voice-isolation': 'voice-isolation', // Isolation Vocale -> voice-isolation
+      'photomaker': 'photomaker', // PhotoMaker -> photomaker
     };
 
     // Mapping des slugs vers les URLs directes des applications
@@ -861,6 +862,10 @@ export default function EncoursPage() {
       'voice-isolation': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
         ? 'http://localhost:8100'
         : 'https://voice-isolation.iahome.fr',
+      // PhotoMaker : sous-domaine comme les autres modules IA
+      'photomaker': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+        ? 'http://localhost:7881'
+        : 'https://photomaker.iahome.fr',
     };
     
     // Convertir module_id numérique en slug si nécessaire
@@ -883,6 +888,10 @@ export default function EncoursPage() {
       'prompt-generator': 100,
       'ai-detector': 100, // Détecteur de Contenu IA -> 100 tokens
       'voice-isolation': 100, // Isolation Vocale -> 100 tokens
+      'photomaker': 100, // PhotoMaker -> 100 tokens
+      'animagine-xl': 100, // Animagine XL -> 100 tokens
+      'florence-2': 100, // Florence-2 -> 100 tokens
+      'birefnet': 100, // BiRefNet -> 100 tokens
       
       // Applications essentielles (10 tokens)
       'librespeed': 10,
@@ -1678,7 +1687,7 @@ export default function EncoursPage() {
                         }
                         
                         // Applications IA (100 tokens)
-                        if (['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui', 'hunyuan3d', 'prompt-generator'].includes(moduleId)) {
+                        if (['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui', 'hunyuan3d', 'prompt-generator', 'photomaker'].includes(moduleId)) {
                           if (!user) {
                             console.error('❌ user is null in AIAccessButton');
                             return null;

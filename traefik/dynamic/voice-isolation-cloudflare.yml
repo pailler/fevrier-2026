@@ -1,0 +1,31 @@
+# Configuration Voice Isolation pour Cloudflare SSL
+# Note: SSL géré par Cloudflare, pas besoin de Let's Encrypt
+http:
+  routers:
+    # Route principale pour Voice Isolation (Gradio)
+    # Cloudflare gère le HTTPS, Traefik reçoit du HTTP
+    # Cette route capture toutes les requêtes (y compris /gradio_api/*, /file=*, etc.)
+    voice-isolation-main:
+      rule: "Host(`voice-isolation.iahome.fr`)"
+      entryPoints: ["web"]
+      service: voice-isolation-service
+      middlewares: ["security-headers@file", "compress@file", "voice-isolation-buffer@file"]
+      priority: 10
+
+  middlewares:
+    # Middleware pour Voice Isolation - Support des gros fichiers
+    voice-isolation-buffer:
+      buffering:
+        maxRequestBodyBytes: 524288000  # 500 MB
+        maxResponseBodyBytes: 524288000  # 500 MB
+        memRequestBodyBytes: 52428800    # 50 MB en mémoire
+        memResponseBodyBytes: 52428800   # 50 MB en mémoire
+        retryExpression: "IsNetworkError() && Attempts() < 2"
+
+  services:
+    # Service pour Voice Isolation (Gradio sur port 8100)
+    voice-isolation-service:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.1.150:8100"
+        passHostHeader: true

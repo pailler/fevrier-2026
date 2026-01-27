@@ -281,7 +281,11 @@ export default function CardDetailPage() {
         'pdf+': '/api/gradio-proxy?service=stirling-pdf',
         'iaphoto': '/api/gradio-proxy?service=stablediffusion', 
         'cogstudio': '/api/gradio-proxy?service=cogstudio',
-        'meeting-reports': 'https://meeting-reports.iahome.fr'
+        'meeting-reports': 'https://meeting-reports.iahome.fr',
+        'photomaker': 'https://photomaker.iahome.fr',
+        'animagine-xl': '/api/secure-proxy?module=animagine-xl',
+        'florence-2': '/api/secure-proxy?module=florence-2',
+        'birefnet': '/api/secure-proxy?module=birefnet'
       };
 
       const normalizedName = (moduleTitle || '').toLowerCase().replace(/\s+/g, '');
@@ -404,7 +408,7 @@ export default function CardDetailPage() {
       console.log('🔧 Chargement carte pour:', params.id);
 
       // Liste des modules qui ont des pages spécifiques
-      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'cogstudio', 'ruinedfooocus', 'whisper', 'meeting-reports', 'psitransfer', 'hunyuan3d'];
+      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'cogstudio', 'ruinedfooocus', 'whisper', 'meeting-reports', 'psitransfer', 'hunyuan3d', 'photomaker', 'animagine-xl', 'florence-2', 'birefnet'];
       
       // Si c'est un module avec une page spécifique, charger la page spécifique
       if (specificPages.includes(params.id as string)) {
@@ -864,6 +868,10 @@ export default function CardDetailPage() {
                     {card.price === 0 || card.price === '0' ? 
                       (isFreeModule ? '10 tokens' : 'Free') : 
                       card.id === 'qrcodes' ? '100 tokens' :
+                      card.id === 'photomaker' ? '100 tokens' :
+                      card.id === 'animagine-xl' ? '100 tokens' :
+                      card.id === 'florence-2' ? '100 tokens' :
+                      card.id === 'birefnet' ? '100 tokens' :
                       `${card.price} tokens`
                     }
                   </div>
@@ -1305,6 +1313,10 @@ export default function CardDetailPage() {
                     {card.price === 0 || card.price === '0' ? 
                       (isFreeModule ? '10 tokens' : 'Free') : 
                       card.id === 'qrcodes' ? '100 tokens' :
+                      card.id === 'photomaker' ? '100 tokens' :
+                      card.id === 'animagine-xl' ? '100 tokens' :
+                      card.id === 'florence-2' ? '100 tokens' :
+                      card.id === 'birefnet' ? '100 tokens' :
                       `${card.price} tokens`
                     }
                   </div>
@@ -1363,6 +1375,10 @@ export default function CardDetailPage() {
                     {card.price === 0 || card.price === '0' ? 
                       (isFreeModule ? '10 tokens' : 'Free') : 
                       card.id === 'qrcodes' ? '100 tokens' :
+                      card.id === 'photomaker' ? '100 tokens' :
+                      card.id === 'animagine-xl' ? '100 tokens' :
+                      card.id === 'florence-2' ? '100 tokens' :
+                      card.id === 'birefnet' ? '100 tokens' :
                       `${card.price} tokens`
                     }
                   </div>
@@ -1494,6 +1510,10 @@ export default function CardDetailPage() {
                     {card.price === 0 || card.price === '0' ? 
                       (isFreeModule ? '10 tokens' : 'Free') : 
                       card.id === 'qrcodes' ? '100 tokens' :
+                      card.id === 'photomaker' ? '100 tokens' :
+                      card.id === 'animagine-xl' ? '100 tokens' :
+                      card.id === 'florence-2' ? '100 tokens' :
+                      card.id === 'birefnet' ? '100 tokens' :
                       `${card.price} tokens`
                     }
                   </div>

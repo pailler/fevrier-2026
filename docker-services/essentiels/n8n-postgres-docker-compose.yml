@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  n8n-postgres:
+    container_name: n8n-postgres
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: n8n
+      POSTGRES_PASSWORD: Rasulova75
+      POSTGRES_DB: n8ndb
+    volumes:
+      - /volume1/docker/n8n/postgres:/var/lib/postgresql/data
+    networks:
+      - n8n-net
+
+  n8n:
+    container_name: n8n
+    image: n8nio/n8n
+    restart: always
+    user: "1000:1000"
+    ports:
+      - "5678:5678"
+    depends_on:
+      - n8n-postgres
+    environment:
+      # Configuration de la base de donnees PostgreSQL
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: n8n-postgres
+      DB_POSTGRESDB_PORT: 5432
+      DB_POSTGRESDB_DATABASE: n8ndb
+      DB_POSTGRESDB_USER: n8n
+      DB_POSTGRESDB_PASSWORD: Rasulova75
+
+      # Configuration n8n
+      # WEBHOOK_URL doit être l'URL complète sans port (utilisée pour OAuth callbacks et webhooks)
+      WEBHOOK_URL: "https://n8n.regispailler.fr"
+      # N8N_HOST est le hostname sans protocole ni port
+      N8N_HOST: n8n.regispailler.fr
+      # N8N_PORT est le port interne (5678), pas utilisé dans les URLs publiques
+      N8N_PORT: 5678
+      # N8N_PROTOCOL doit être https car on passe par Traefik avec SSL
+      N8N_PROTOCOL: https
+      # N8N_EDITOR_BASE_URL pour l'interface utilisateur
+      N8N_EDITOR_BASE_URL: "https://n8n.regispailler.fr"
+      # Cookies sécurisés - activé car on utilise HTTPS via Traefik
+      N8N_SECURE_COOKIE: "true"
+
+      # Configuration generale
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: false
+      GENERIC_TIMEZONE: Europe/Paris
+      TZ: Europe/Paris
+      PUID: 1000
+      PGID: 1000
+      # Clé de chiffrement pour éviter l'écriture du fichier config
+      N8N_ENCRYPTION_KEY: "n8n-encryption-key-2024-regispailler-secure"
+    volumes:
+      - /volume1/docker/n8n/n8n:/home/node/.n8n
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - n8n-net
+
+networks:
+  n8n-net:
+    driver: bridge

@@ -1,0 +1,36 @@
+# Configuration Traefik pour n8n
+# Route n8n.regispailler.fr vers n8n:5678
+# Container: n8n (sur réseau n8n-net)
+# Port exposé: 5678
+
+http:
+  routers:
+    # Route principale HTTP (Cloudflare SSL - HTTP vers Traefik)
+    n8n-main:
+      rule: "Host(`n8n.regispailler.fr`)"
+      entryPoints: ["web"]
+      service: n8n-service
+      priority: 10
+
+  services:
+    # Service principal pour n8n
+    # IMPORTANT : Si n8n est sur le NAS (machine différente de Traefik),
+    # remplacez host.docker.internal par l'IP du NAS (ex: 192.168.1.100)
+    # Si n8n et Traefik sont sur la même machine, gardez host.docker.internal
+    n8n-service:
+      loadBalancer:
+        servers:
+          # n8n est sur le NAS à l'adresse 192.168.1.130
+          - url: "http://192.168.1.130:5678"
+        passHostHeader: true
+
+  middlewares:
+    # Headers proxy pour n8n
+    # NOTE: n8n ne détecte pas toujours HTTPS correctement via X-Forwarded-Proto
+    # Si l'erreur "secure cookie" persiste, désactivez N8N_SECURE_COOKIE dans docker-compose.yml
+    n8n-proxy-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-Host: "n8n.regispailler.fr"
+          X-Forwarded-Ssl: "on"

@@ -22,6 +22,7 @@ const MODULE_URLS: { [key: string]: string } = {
   'comfyui': 'https://comfyui.iahome.fr',
   'cogstudio': 'https://cogstudio.iahome.fr',
   'hunyuan3d': 'https://hunyuan3d.iahome.fr',
+  'photomaker': 'https://photomaker.iahome.fr',
 };
 
 export async function GET(request: NextRequest) {

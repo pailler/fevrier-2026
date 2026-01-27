@@ -52,7 +52,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       'administration': 'administration',
       'apprendre-autrement': 'apprendre-autrement',
       'prompt-generator': 'prompt-generator',
-      'voice-isolation': 'voice-isolation'
+      'voice-isolation': 'voice-isolation',
+      'photomaker': 'photomaker',
+      'animagine-xl': 'animagine-xl',
+      'animaginexl': 'animagine-xl'
     };
 
     // Vérifier d'abord le mapping direct
@@ -115,6 +118,9 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     }
     if (titleLower.includes('voice isolation') || titleLower.includes('voice-isolation') || titleLower.includes('isolation vocale')) {
       return 'voice-isolation';
+    }
+    if (titleLower.includes('animagine') || titleLower.includes('animaginexl') || titleLower.includes('animagine-xl')) {
+      return 'animagine-xl';
     }
 
     // Fallback: utiliser l'ID tel quel (peut-être déjà un slug valide)
@@ -218,6 +224,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       return '/images/module-visuals/meeting-reports-module.svg'; // Utiliser l'image SVG Meeting Reports
     }
     
+    if (titleLower.includes('animagine') || titleLower.includes('animaginexl') || titleLower.includes('animagine-xl') || idLower === 'animagine-xl' || idLower === 'animaginexl') {
+      return '/images/animagine-xl.jpg'; // Image HD de style manga
+    }
+    
     // Image par défaut pour tous les autres modules
     return '/images/module-visuals/generic-module.svg';
   };
@@ -261,6 +271,9 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   
   // Vérifier si c'est le module RuinedFooocus IA pour appliquer un style spécial
   const isRuinedFooocus = module.title.toLowerCase().includes('ruinedfooocus') || module.title.toLowerCase().includes('ruined') || module.title.toLowerCase().includes('fooocus') || module.id === 'ruinedfooocus';
+  
+  // Vérifier si c'est le module AnimagineXL pour appliquer un style spécial
+  const isAnimagineXL = module.title.toLowerCase().includes('animagine') || module.title.toLowerCase().includes('animaginexl') || module.title.toLowerCase().includes('animagine-xl') || module.id === 'animagine-xl' || module.id === 'animaginexl';
   
   
   // Vérifier si c'est le module QRcodes dynamiques pour appliquer un style spécial
@@ -326,14 +339,42 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   }
 
   return (
-    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isIAPhoto ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isIATube ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isStirlingPDF ? 'ring-2 ring-gray-500 ring-opacity-50' : ''} ${isMeetingReports ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isHunyuan3D ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCodeLearning ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isApprendreAutrement ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isHomeAssistant ? 'ring-2 ring-orange-500 ring-opacity-50' : ''} ${isAdministration ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPromptGenerator ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isAIDetector ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''}`}>
+    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isAnimagineXL ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isIAPhoto ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isIATube ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isStirlingPDF ? 'ring-2 ring-gray-500 ring-opacity-50' : ''} ${isMeetingReports ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isHunyuan3D ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCodeLearning ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isApprendreAutrement ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isHomeAssistant ? 'ring-2 ring-orange-500 ring-opacity-50' : ''} ${isAdministration ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPromptGenerator ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isAIDetector ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''}`}>
       
       {/* Image du module - Cliquable */}
       <Link href={`/card/${moduleSlug}`} className="block">
         <div 
-          className={`relative h-48 cursor-pointer group overflow-hidden ${isAIDetector ? 'bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-700' : isMeetingReports ? 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700' : isHunyuan3D ? 'bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-700' : isCodeLearning ? 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600' : isApprendreAutrement ? 'bg-gradient-to-br from-purple-500 via-pink-600 to-orange-500' : isPromptGenerator ? 'bg-gradient-to-br from-purple-500 via-pink-600 to-orange-500' : isHomeAssistant ? 'bg-gradient-to-br from-orange-400 via-red-500 to-blue-600' : isAdministration ? 'bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600' : isMeTube ? 'bg-gradient-to-br from-red-500 via-pink-600 to-purple-600' : isLibrespeed ? 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600' : 'bg-gradient-to-br from-blue-50 to-indigo-100'}`} 
+          className={`relative h-48 cursor-pointer group overflow-hidden ${
+            isAnimagineXL ? '' :
+            isStableDiffusion ? 'bg-gradient-to-br from-emerald-400 via-teal-500 via-cyan-500 to-blue-600' :
+            isComfyUI ? 'bg-gradient-to-br from-teal-400 via-cyan-500 via-blue-500 to-indigo-600' :
+            isRuinedFooocus ? 'bg-gradient-to-br from-violet-400 via-purple-500 via-fuchsia-500 to-pink-600' :
+            isAIDetector ? 'bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-700' : 
+            isMeetingReports ? 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700' : 
+            isHunyuan3D ? 'bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-700' : 
+            isCodeLearning ? 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600' : 
+            isApprendreAutrement ? 'bg-gradient-to-br from-purple-500 via-pink-600 to-orange-500' : 
+            isPromptGenerator ? 'bg-gradient-to-br from-purple-500 via-pink-600 to-orange-500' : 
+            isHomeAssistant ? 'bg-gradient-to-br from-orange-400 via-red-500 to-blue-600' : 
+            isAdministration ? 'bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600' : 
+            isMeTube ? 'bg-gradient-to-br from-red-500 via-pink-600 to-purple-600' : 
+            isLibrespeed ? 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600' : 
+            'bg-gradient-to-br from-blue-50 to-indigo-100'
+          }`} 
           style={isHomeAssistant ? { 
             background: 'linear-gradient(to bottom right, #fb923c, #ef4444, #2563eb)',
+            backgroundImage: 'none'
+          } : isAnimagineXL ? {
+            background: 'transparent',
+            backgroundImage: 'none'
+          } : isStableDiffusion ? {
+            background: 'linear-gradient(135deg, #34d399 0%, #14b8a6 25%, #06b6d4 50%, #3b82f6 100%)',
+            backgroundImage: 'none'
+          } : isComfyUI ? {
+            background: 'linear-gradient(135deg, #2dd4bf 0%, #06b6d4 25%, #3b82f6 50%, #4f46e5 100%)',
+            backgroundImage: 'none'
+          } : isRuinedFooocus ? {
+            background: 'linear-gradient(135deg, #a78bfa 0%, #9333ea 25%, #d946ef 50%, #ec4899 100%)',
             backgroundImage: 'none'
           } : {}}
         >
@@ -419,8 +460,26 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             </div>
           )}
           
+          {/* Particules animées pour les modules créatifs */}
+          {(isStableDiffusion || isComfyUI || isRuinedFooocus || isAnimagineXL) && (
+            <>
+              <div className="absolute inset-0">
+                <div className="absolute top-8 left-8 w-3 h-3 bg-white/30 rounded-full animate-pulse"></div>
+                <div className="absolute top-16 right-12 w-2 h-2 bg-white/40 rounded-full animate-bounce"></div>
+                <div className="absolute bottom-12 left-1/4 w-2.5 h-2.5 bg-white/35 rounded-full animate-pulse"></div>
+                <div className="absolute bottom-16 right-1/3 w-1.5 h-1.5 bg-white/30 rounded-full animate-bounce"></div>
+                <div className="absolute top-1/2 left-1/3 w-2 h-2 bg-white/25 rounded-full animate-pulse"></div>
+                <div className="absolute top-24 right-1/4 w-1.5 h-1.5 bg-white/35 rounded-full animate-bounce"></div>
+                <div className="absolute bottom-24 left-1/2 w-2 h-2 bg-white/30 rounded-full animate-pulse"></div>
+                <div className="absolute top-32 left-1/4 w-1 h-1 bg-white/40 rounded-full animate-bounce"></div>
+              </div>
+              {/* Effet de vague en bas */}
+              <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+            </>
+          )}
+
           {/* Image simple sans gestion d'erreur - forcer l'affichage (masquée pour les modules spéciaux) */}
-          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && !isHunyuan3D && !isCodeLearning && !isApprendreAutrement && !isHomeAssistant && !isAdministration && !isPromptGenerator && !isAIDetector && imageUrl && (
+          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isAnimagineXL && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && !isHunyuan3D && !isCodeLearning && !isApprendreAutrement && !isHomeAssistant && !isAdministration && !isPromptGenerator && !isAIDetector && imageUrl && (
             <img 
               src={imageUrl} 
               alt={module.title}
@@ -430,7 +489,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
           )}
           
           {/* Overlay au survol - seulement pour les modules non-spéciaux */}
-          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && !isHunyuan3D && !isCodeLearning && !isHomeAssistant && !isAdministration && !isPromptGenerator && !isAIDetector && (
+          {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isAnimagineXL && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && !isHunyuan3D && !isCodeLearning && !isHomeAssistant && !isAdministration && !isPromptGenerator && !isAIDetector && (
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
               <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white bg-opacity-90 rounded-full p-3">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -790,39 +849,40 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               
               {/* Logo ComfyUI IA au centre */}
               <div className="absolute inset-0 flex items-center justify-center z-20">
-                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-teal-500/20">
-                  {/* Logo ComfyUI IA avec icône d'interface modulaire */}
-                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
-                    {/* Cercle de fond */}
-                    <circle cx="12" cy="12" r="10" fill="#14B8A6" stroke="#0D9488" strokeWidth="1"/>
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-5 shadow-2xl border-4 border-teal-400/30 group-hover:scale-110 transition-transform duration-300">
+                  {/* Logo ComfyUI IA avec icône d'interface modulaire améliorée */}
+                  <svg className="w-20 h-20" viewBox="0 0 24 24" fill="none">
+                    <defs>
+                      <linearGradient id="comfyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#2dd4bf" />
+                        <stop offset="50%" stopColor="#06b6d4" />
+                        <stop offset="100%" stopColor="#3b82f6" />
+                      </linearGradient>
+                    </defs>
+                    {/* Cercle de fond avec gradient */}
+                    <circle cx="12" cy="12" r="10" fill="url(#comfyGradient)" stroke="#0d9488" strokeWidth="1.5"/>
                     
                     {/* Interface modulaire - grille de base */}
-                    <rect x="6" y="6" width="12" height="12" rx="1" fill="white" opacity="0.9"/>
+                    <rect x="6" y="6" width="12" height="12" rx="1.5" fill="white" opacity="0.95"/>
                     
-                    {/* Nœuds de l'interface */}
-                    <circle cx="8" cy="8" r="1.5" fill="#14B8A6"/>
-                    <circle cx="16" cy="8" r="1.5" fill="#14B8A6"/>
-                    <circle cx="8" cy="16" r="1.5" fill="#14B8A6"/>
-                    <circle cx="16" cy="16" r="1.5" fill="#14B8A6"/>
-                    <circle cx="12" cy="12" r="1.5" fill="#14B8A6"/>
+                    {/* Nœuds de l'interface avec couleurs vives */}
+                    <circle cx="8" cy="8" r="2" fill="#2dd4bf" stroke="white" strokeWidth="1"/>
+                    <circle cx="16" cy="8" r="2" fill="#06b6d4" stroke="white" strokeWidth="1"/>
+                    <circle cx="8" cy="16" r="2" fill="#3b82f6" stroke="white" strokeWidth="1"/>
+                    <circle cx="16" cy="16" r="2" fill="#2dd4bf" stroke="white" strokeWidth="1"/>
+                    <circle cx="12" cy="12" r="2.5" fill="url(#comfyGradient)" stroke="white" strokeWidth="1.5"/>
                     
-                    {/* Connexions entre nœuds */}
-                    <path d="M8 8 L12 12" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M16 8 L12 12" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M8 16 L12 12" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M16 16 L12 12" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                    {/* Connexions entre nœuds avec gradient */}
+                    <path d="M8 8 L12 12" stroke="url(#comfyGradient)" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M16 8 L12 12" stroke="url(#comfyGradient)" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M8 16 L12 12" stroke="url(#comfyGradient)" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M16 16 L12 12" stroke="url(#comfyGradient)" strokeWidth="2" strokeLinecap="round"/>
                     
-                    {/* Indicateurs de flux de données */}
-                    <path d="M9.5 8 L10.5 8" stroke="white" strokeWidth="1" strokeLinecap="round"/>
-                    <path d="M13.5 8 L14.5 8" stroke="white" strokeWidth="1" strokeLinecap="round"/>
-                    <path d="M9.5 16 L10.5 16" stroke="white" strokeWidth="1" strokeLinecap="round"/>
-                    <path d="M13.5 16 L14.5 16" stroke="white" strokeWidth="1" strokeLinecap="round"/>
-                    
-                    {/* Points de connexion externes */}
-                    <circle cx="6" cy="12" r="0.8" fill="white" opacity="0.7"/>
-                    <circle cx="18" cy="12" r="0.8" fill="white" opacity="0.7"/>
-                    <circle cx="12" cy="6" r="0.8" fill="white" opacity="0.7"/>
-                    <circle cx="12" cy="18" r="0.8" fill="white" opacity="0.7"/>
+                    {/* Points de connexion externes animés */}
+                    <circle cx="6" cy="12" r="1" fill="#2dd4bf" opacity="0.8"/>
+                    <circle cx="18" cy="12" r="1" fill="#06b6d4" opacity="0.8"/>
+                    <circle cx="12" cy="6" r="1" fill="#3b82f6" opacity="0.8"/>
+                    <circle cx="12" cy="18" r="1" fill="#2dd4bf" opacity="0.8"/>
                   </svg>
                 </div>
               </div>
@@ -861,39 +921,45 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               
               {/* Logo Stable Diffusion IA au centre */}
               <div className="absolute inset-0 flex items-center justify-center z-20">
-                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-emerald-500/20">
-                  {/* Logo Stable Diffusion IA avec icône de génération d'images avancée */}
-                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
-                    {/* Cercle de fond */}
-                    <circle cx="12" cy="12" r="10" fill="#10B981" stroke="#059669" strokeWidth="1"/>
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-5 shadow-2xl border-4 border-emerald-400/30 group-hover:scale-110 transition-transform duration-300">
+                  {/* Logo Stable Diffusion IA avec icône de génération d'images avancée améliorée */}
+                  <svg className="w-20 h-20" viewBox="0 0 24 24" fill="none">
+                    <defs>
+                      <linearGradient id="stableGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#34d399" />
+                        <stop offset="50%" stopColor="#14b8a6" />
+                        <stop offset="100%" stopColor="#06b6d4" />
+                      </linearGradient>
+                      <radialGradient id="stableRadial" cx="50%" cy="50%">
+                        <stop offset="0%" stopColor="#34d399" stopOpacity="0.8" />
+                        <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.3" />
+                      </radialGradient>
+                    </defs>
+                    {/* Cercle de fond avec gradient */}
+                    <circle cx="12" cy="12" r="10" fill="url(#stableGradient)" stroke="#059669" strokeWidth="1.5"/>
+                    <circle cx="12" cy="12" r="10" fill="url(#stableRadial)"/>
                     
-                    {/* Image générée - cadre */}
-                    <rect x="6" y="6" width="12" height="12" rx="2" fill="white" opacity="0.9"/>
+                    {/* Image générée - cadre avec ombre */}
+                    <rect x="6" y="6" width="12" height="12" rx="2" fill="white" opacity="0.95" stroke="url(#stableGradient)" strokeWidth="1"/>
                     
-                    {/* Éléments de l'image générée */}
-                    <circle cx="9" cy="9" r="1.5" fill="#10B981"/>
-                    <circle cx="15" cy="9" r="1.5" fill="#10B981"/>
-                    <circle cx="9" cy="15" r="1.5" fill="#10B981"/>
-                    <circle cx="15" cy="15" r="1.5" fill="#10B981"/>
+                    {/* Éléments de l'image générée colorés */}
+                    <circle cx="9" cy="9" r="2" fill="#34d399" stroke="white" strokeWidth="0.5"/>
+                    <circle cx="15" cy="9" r="2" fill="#14b8a6" stroke="white" strokeWidth="0.5"/>
+                    <circle cx="9" cy="15" r="2" fill="#06b6d4" stroke="white" strokeWidth="0.5"/>
+                    <circle cx="15" cy="15" r="2" fill="#34d399" stroke="white" strokeWidth="0.5"/>
                     
-                    {/* Lignes de connexion - diffusion */}
-                    <path d="M9 9 L15 15" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M15 9 L9 15" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M12 6 L12 18" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M6 12 L18 12" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round"/>
+                    {/* Lignes de connexion - diffusion avec gradient */}
+                    <path d="M9 9 L15 15" stroke="url(#stableGradient)" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M15 9 L9 15" stroke="url(#stableGradient)" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M12 6 L12 18" stroke="url(#stableGradient)" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M6 12 L18 12" stroke="url(#stableGradient)" strokeWidth="2" strokeLinecap="round"/>
                     
-                    {/* Particules de diffusion */}
-                    <circle cx="12" cy="12" r="0.8" fill="#10B981"/>
-                    <circle cx="8" cy="12" r="0.5" fill="#10B981" opacity="0.7"/>
-                    <circle cx="16" cy="12" r="0.5" fill="#10B981" opacity="0.7"/>
-                    <circle cx="12" cy="8" r="0.5" fill="#10B981" opacity="0.7"/>
-                    <circle cx="12" cy="16" r="0.5" fill="#10B981" opacity="0.7"/>
-                    
-                    {/* Indicateurs de stabilité */}
-                    <rect x="7" y="7" width="1" height="1" fill="white" opacity="0.6"/>
-                    <rect x="16" y="7" width="1" height="1" fill="white" opacity="0.6"/>
-                    <rect x="7" y="16" width="1" height="1" fill="white" opacity="0.6"/>
-                    <rect x="16" y="16" width="1" height="1" fill="white" opacity="0.6"/>
+                    {/* Particules de diffusion animées */}
+                    <circle cx="12" cy="12" r="1.2" fill="#34d399"/>
+                    <circle cx="8" cy="12" r="0.8" fill="#14b8a6" opacity="0.8"/>
+                    <circle cx="16" cy="12" r="0.8" fill="#06b6d4" opacity="0.8"/>
+                    <circle cx="12" cy="8" r="0.8" fill="#34d399" opacity="0.8"/>
+                    <circle cx="12" cy="16" r="0.8" fill="#14b8a6" opacity="0.8"/>
                   </svg>
                 </div>
               </div>
@@ -912,12 +978,12 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                     {module.subtitle}
                   </p>
                 )}
-                                 {/* Badge "FOCUSED" pour RuinedFooocus IA */}
-                 <div className="mt-2">
-                   <span className="bg-gradient-to-r from-violet-400 to-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-                     🎯 FOCUSED
-                   </span>
-                 </div>
+                                 {/* Badge "STABLE" pour Stable Diffusion IA */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-emerald-400 to-cyan-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    ✨ STABLE
+                  </span>
+                </div>
               </div>
             </>
           ) : isRuinedFooocus ? (
@@ -932,39 +998,40 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               
               {/* Logo RuinedFooocus IA au centre */}
               <div className="absolute inset-0 flex items-center justify-center z-20">
-                <div className="bg-white/95 backdrop-blur-sm rounded-full p-4 shadow-2xl border-2 border-violet-500/20">
-                  {/* Logo RuinedFooocus IA avec icône de génération d'images avancée */}
-                  <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none">
-                    {/* Cercle de fond */}
-                    <circle cx="12" cy="12" r="10" fill="#9333EA" stroke="#7C3AED" strokeWidth="1"/>
+                <div className="bg-white/95 backdrop-blur-sm rounded-full p-5 shadow-2xl border-4 border-violet-400/30 group-hover:scale-110 transition-transform duration-300">
+                  {/* Logo RuinedFooocus IA avec icône de génération d'images avancée améliorée */}
+                  <svg className="w-20 h-20" viewBox="0 0 24 24" fill="none">
+                    <defs>
+                      <linearGradient id="ruinedGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#a78bfa" />
+                        <stop offset="50%" stopColor="#9333ea" />
+                        <stop offset="100%" stopColor="#d946ef" />
+                      </linearGradient>
+                    </defs>
+                    {/* Cercle de fond avec gradient */}
+                    <circle cx="12" cy="12" r="10" fill="url(#ruinedGradient)" stroke="#7c3aed" strokeWidth="1.5"/>
                     
-                    {/* Image générée - cadre */}
-                    <rect x="6" y="6" width="12" height="12" rx="2" fill="white" opacity="0.9"/>
+                    {/* Image générée - cadre avec ombre */}
+                    <rect x="6" y="6" width="12" height="12" rx="2" fill="white" opacity="0.95" stroke="url(#ruinedGradient)" strokeWidth="1"/>
                     
-                    {/* Éléments de l'image générée */}
-                    <circle cx="9" cy="9" r="1.5" fill="#9333EA"/>
-                    <circle cx="15" cy="9" r="1.5" fill="#9333EA"/>
-                    <circle cx="9" cy="15" r="1.5" fill="#9333EA"/>
-                    <circle cx="15" cy="15" r="1.5" fill="#9333EA"/>
+                    {/* Éléments de l'image générée colorés */}
+                    <circle cx="9" cy="9" r="2" fill="#a78bfa" stroke="white" strokeWidth="0.5"/>
+                    <circle cx="15" cy="9" r="2" fill="#9333ea" stroke="white" strokeWidth="0.5"/>
+                    <circle cx="9" cy="15" r="2" fill="#d946ef" stroke="white" strokeWidth="0.5"/>
+                    <circle cx="15" cy="15" r="2" fill="#a78bfa" stroke="white" strokeWidth="0.5"/>
                     
-                    {/* Lignes de connexion - diffusion */}
-                    <path d="M9 9 L15 15" stroke="#9333EA" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M15 9 L9 15" stroke="#9333EA" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M12 6 L12 18" stroke="#9333EA" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M6 12 L18 12" stroke="#9333EA" strokeWidth="1.5" strokeLinecap="round"/>
+                    {/* Lignes de connexion - diffusion avec gradient */}
+                    <path d="M9 9 L15 15" stroke="url(#ruinedGradient)" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M15 9 L9 15" stroke="url(#ruinedGradient)" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M12 6 L12 18" stroke="url(#ruinedGradient)" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M6 12 L18 12" stroke="url(#ruinedGradient)" strokeWidth="2" strokeLinecap="round"/>
                     
-                    {/* Particules de diffusion */}
-                    <circle cx="12" cy="12" r="0.8" fill="#9333EA"/>
-                    <circle cx="8" cy="12" r="0.5" fill="#9333EA" opacity="0.7"/>
-                    <circle cx="16" cy="12" r="0.5" fill="#9333EA" opacity="0.7"/>
-                    <circle cx="12" cy="8" r="0.5" fill="#9333EA" opacity="0.7"/>
-                    <circle cx="12" cy="16" r="0.5" fill="#9333EA" opacity="0.7"/>
-                    
-                    {/* Indicateurs de stabilité */}
-                    <rect x="7" y="7" width="1" height="1" fill="white" opacity="0.6"/>
-                    <rect x="16" y="7" width="1" height="1" fill="white" opacity="0.6"/>
-                    <rect x="7" y="16" width="1" height="1" fill="white" opacity="0.6"/>
-                    <rect x="16" y="16" width="1" height="1" fill="white" opacity="0.6"/>
+                    {/* Particules de diffusion animées */}
+                    <circle cx="12" cy="12" r="1.2" fill="#9333ea"/>
+                    <circle cx="8" cy="12" r="0.8" fill="#a78bfa" opacity="0.8"/>
+                    <circle cx="16" cy="12" r="0.8" fill="#d946ef" opacity="0.8"/>
+                    <circle cx="12" cy="8" r="0.8" fill="#9333ea" opacity="0.8"/>
+                    <circle cx="12" cy="16" r="0.8" fill="#a78bfa" opacity="0.8"/>
                   </svg>
                 </div>
               </div>
@@ -983,10 +1050,82 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                     {module.subtitle}
                   </p>
                 )}
-                {/* Badge "STABLE" pour Stable Diffusion IA */}
+                {/* Badge "FOCUSED" pour RuinedFooocus IA */}
                 <div className="mt-2">
-                  <span className="bg-gradient-to-r from-emerald-400 to-green-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-                    🎯 STABLE
+                  <span className="bg-gradient-to-r from-violet-400 to-fuchsia-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                    🎯 FOCUSED
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : isAnimagineXL ? (
+            <>
+              {/* Style AnimagineXL - Reconstruit avec photo HD de style manga */}
+              
+              {/* Container principal pour l'image de fond */}
+              <div className="absolute inset-0 overflow-hidden">
+                {/* Image de fond HD de style manga */}
+                <img 
+                  src="/images/animagine-xl.jpg" 
+                  alt="Animagine XL - Style Manga"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                  style={{ 
+                    zIndex: 0,
+                    filter: 'brightness(1.3) contrast(1.2) saturate(1.2)',
+                    opacity: 1
+                  }}
+                  loading="eager"
+                  onError={(e) => {
+                    console.error('Erreur de chargement de l\'image AnimagineXL: /images/animagine-xl.jpg');
+                    // Afficher un gradient de fallback si l'image ne charge pas
+                    const container = e.currentTarget.parentElement;
+                    if (container) {
+                      container.style.background = 'linear-gradient(135deg, #ec4899 0%, #f43f5e 25%, #a855f7 50%, #6366f1 100%)';
+                    }
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+              
+              {/* Badge catégorie en haut à gauche */}
+              <div className="absolute top-3 left-3 z-30">
+                <span className="bg-white/97 backdrop-blur-md text-pink-600 text-xs font-bold px-3 py-1.5 rounded-full shadow-xl border border-pink-200/60">
+                  {module.category}
+                </span>
+              </div>
+              
+              {/* Badge prix en haut à droite */}
+              <div className="absolute top-3 right-3 z-30">
+                <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-xl backdrop-blur-md`}>
+                  {formatPrice(module.price)}
+                </span>
+              </div>
+              
+              {/* Overlay "Generating..." en bas à gauche (exactement comme l'exemple) */}
+              <div className="absolute bottom-4 left-4 z-30">
+                <div className="bg-white/97 backdrop-blur-md rounded-xl px-4 py-2.5 shadow-xl border border-purple-200/70">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex gap-1.5">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style={{animationDelay: '0.15s'}}></div>
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.3s'}}></div>
+                    </div>
+                    <span className="text-xs font-semibold text-purple-700 tracking-tight">Generating...</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Overlay avec sous-titre en bas - style professionnel (supprimé pour test) */}
+              <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
+                {module.subtitle && (
+                  <p className="text-white text-sm leading-relaxed drop-shadow-2xl line-clamp-2 mb-2.5 font-bold" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.6)' }}>
+                    {module.subtitle}
+                  </p>
+                )}
+                {/* Badge "ANIME & MANGA" amélioré */}
+                <div className="mt-2">
+                  <span className="bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                    🎨 ANIME & MANGA
                   </span>
                 </div>
               </div>
@@ -2095,13 +2234,13 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
         <Link href={`/card/${moduleSlug}`} className="block group">
           {/* Titre du module - affiché pour tous les modules */}
           <h3 className="text-3xl sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
-            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : isHunyuan3D ? "Hunyuan 3D - Génération 3D par IA" : isCodeLearning ? "Apprendre le Code aux enfants" : isApprendreAutrement ? "Apprendre Autrement" : isPromptGenerator ? "Générateur de prompts" : isHomeAssistant ? "Domotisez votre habitat" : isAdministration ? "Services de l'Administration" : isAIDetector ? "Détecteur de Contenu IA" : module.title}
+            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isAnimagineXL ? "Génération d'anime et manga par IA" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : isHunyuan3D ? "Hunyuan 3D - Génération 3D par IA" : isCodeLearning ? "Apprendre le Code aux enfants" : isApprendreAutrement ? "Apprendre Autrement" : isPromptGenerator ? "Générateur de prompts" : isHomeAssistant ? "Domotisez votre habitat" : isAdministration ? "Services de l'Administration" : isAIDetector ? "Détecteur de Contenu IA" : module.title}
           </h3>
           {/* Pour les modules spéciaux, afficher seulement la description si pas de sous-titre */}
-          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isQRCodes || isWhisper || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports || isHunyuan3D || isCodeLearning || isApprendreAutrement || isPromptGenerator || isHomeAssistant || isAdministration || isAIDetector ? (
+          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isAnimagineXL || isQRCodes || isWhisper || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports || isHunyuan3D || isCodeLearning || isApprendreAutrement || isPromptGenerator || isHomeAssistant || isAdministration || isAIDetector ? (
             !module.subtitle && (
               <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
-                {isComfyUI ? "ComfyUI : contrôle total sur chaque étape de la création d'image" : isMeetingReports ? "Transformez automatiquement vos réunions en rapports professionnels avec l'IA" : isHunyuan3D ? "Hunyuan 3D : Générez des modèles 3D à partir d'images avec l'intelligence artificielle" : isHomeAssistant ? (module.description?.toLowerCase().startsWith('avec home assistant') ? module.description : `Avec Home Assistant, ${module.description || 'domotisez votre habitat (maison, garage, lieu de vacances, lieu de travail, etc.) sans frais d\'installation, ni frais de logiciels puisque tout est open-source. Des centaines de codes prêts à l\'emploi sont aussi mis à disposition gratuitement.'}`) : module.description}
+                {isComfyUI ? "ComfyUI : contrôle total sur chaque étape de la création d'image" : isAnimagineXL ? "Animagine XL : modèle SDXL super-optimisé pour la génération d'images de type anime et manga avec connaissance de 5000+ personnages" : isMeetingReports ? "Transformez automatiquement vos réunions en rapports professionnels avec l'IA" : isHunyuan3D ? "Hunyuan 3D : Générez des modèles 3D à partir d'images avec l'intelligence artificielle" : isHomeAssistant ? (module.description?.toLowerCase().startsWith('avec home assistant') ? module.description : `Avec Home Assistant, ${module.description || 'domotisez votre habitat (maison, garage, lieu de vacances, lieu de travail, etc.) sans frais d\'installation, ni frais de logiciels puisque tout est open-source. Des centaines de codes prêts à l\'emploi sont aussi mis à disposition gratuitement.'}`) : module.description}
               </p>
             )
           ) : (

@@ -26,7 +26,7 @@ http:
     portainer-service:
       loadBalancer:
         servers:
-          - url: "http://portainer:9000"
+          - url: "http://iahome-portainer:9000"
         passHostHeader: true
 
   middlewares:

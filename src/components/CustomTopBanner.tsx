@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 
 export default function CustomTopBanner() {
@@ -19,13 +20,17 @@ export default function CustomTopBanner() {
       <div className="flex items-center space-x-4">
         {isAuthenticated && user && (
           <>
-            <div className={`px-3 py-1 rounded-full text-xs font-bold shadow-md ${
-              user.role === 'admin' 
-                ? 'bg-red-600 text-white border-2 border-red-400' 
-                : 'bg-green-100 text-green-700'
-            }`}>
+            <Link
+              href="/account"
+              className={`px-3 py-1 rounded-full text-xs font-bold shadow-md transition-all hover:scale-105 cursor-pointer ${
+                user.role === 'admin' 
+                  ? 'bg-red-600 text-white border-2 border-red-400 hover:bg-red-700' 
+                  : 'bg-green-100 text-green-700 hover:bg-green-200'
+              }`}
+              title="Voir mes informations"
+            >
               {user.role === 'admin' ? '👑 ADMIN' : 'USER'}
-            </div>
+            </Link>
             <div className="flex items-center space-x-2">
               <div className={`w-2 h-2 rounded-full animate-pulse ${
                 user.role === 'admin' ? 'bg-red-400' : 'bg-green-400'

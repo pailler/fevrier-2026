@@ -237,19 +237,23 @@ export default function Home() {
       return matchesSearch;
     });
 
-  // Pagination
+  // Pagination - Configuration pour 15 applications par page (désactivée pour afficher toutes les apps)
   const [currentPage, setCurrentPage] = useState(1);
-  const modulesPerPage = 9;
+  const modulesPerPage = 15; // Changé de 9 à 15 pour la pagination future
   
-  // Calculer les indices pour la pagination
+  // Afficher toutes les applications sur la première page (pas de pagination active)
+  // Pour rétablir la pagination, remplacer filteredModules par currentModules ci-dessous
+  const currentModules = filteredModules; // Afficher toutes les applications
+  
+  // Calculer les indices pour la pagination (pour référence future)
   const indexOfLastModule = currentPage * modulesPerPage;
   const indexOfFirstModule = indexOfLastModule - modulesPerPage;
-  const currentModules = filteredModules.slice(indexOfFirstModule, indexOfLastModule);
+  // const currentModules = filteredModules.slice(indexOfFirstModule, indexOfLastModule); // Décommenter pour activer la pagination
   
   // Calculer le nombre total de pages
   const totalPages = Math.ceil(filteredModules.length / modulesPerPage);
   
-  // Fonctions de navigation
+  // Fonctions de navigation (pour référence future)
   const goToPage = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
@@ -420,8 +424,9 @@ export default function Home() {
                 )}
               </div>
               
-              {/* Contrôles de pagination */}
-              {totalPages > 1 && (
+              {/* Contrôles de pagination - Désactivée pour afficher toutes les applications */}
+              {/* Pour rétablir la pagination, décommenter la condition ci-dessous et utiliser currentModules au lieu de filteredModules */}
+              {false && filteredModules.length >= 15 && totalPages > 1 && (
                 <div className="flex justify-center items-center gap-2 mt-8">
                   <button
                     onClick={goToPreviousPage}
@@ -478,10 +483,10 @@ export default function Home() {
                 </div>
               )}
               
-              {/* Informations de pagination */}
+              {/* Informations de pagination - Afficher toutes les applications */}
               {filteredModules.length > 0 && (
                 <div className="text-left text-gray-600 text-sm mt-4">
-                  Affichage de {indexOfFirstModule + 1} à {Math.min(indexOfLastModule, filteredModules.length)} sur {filteredModules.length} templates
+                  Affichage de {filteredModules.length} application{filteredModules.length > 1 ? 's' : ''} sur {filteredModules.length} au total
                 </div>
               )}
           </div>

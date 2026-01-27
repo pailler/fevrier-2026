@@ -118,6 +118,10 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'hunyuan3d': 'hunyuan3d', // Hunyuan 3D -> hunyuan3d
         'prompt-generator': 'prompt-generator', // Générateur de prompts -> prompt-generator
         'apprendre-autrement': 'apprendre-autrement', // Apprendre Autrement -> apprendre-autrement
+        'photomaker': 'photomaker', // PhotoMaker -> photomaker
+        'animagine-xl': 'animagine-xl', // Animagine XL -> animagine-xl
+        'florence-2': 'florence-2', // Florence-2 -> florence-2
+        'birefnet': 'birefnet', // BiRefNet -> birefnet
       };
       
       const moduleSubdomains: Record<string, string> = {
@@ -143,6 +147,14 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'apprendre-autrement': isDevelopment ? 'http://localhost:9001' : 'https://apprendre-autrement.iahome.fr',
         // Détecteur de Contenu IA : sur le domaine principal
         'ai-detector': isDevelopment ? 'http://localhost:3000/ai-detector' : 'https://iahome.fr/ai-detector',
+        // PhotoMaker : sous-domaine comme les autres modules IA
+        'photomaker': isDevelopment ? 'http://localhost:7881' : 'https://photomaker.iahome.fr',
+        // Animagine XL : sous-domaine comme les autres modules IA
+        'animagine-xl': isDevelopment ? 'http://localhost:7883' : 'https://animaginexl.iahome.fr',
+        // Florence-2 : sous-domaine comme les autres modules IA
+        'florence-2': isDevelopment ? 'http://127.0.0.1:7884' : 'https://florence2.iahome.fr',
+        // BiRefNet : sous-domaine comme les autres modules IA
+        'birefnet': isDevelopment ? 'http://127.0.0.1:7882' : 'https://birefnet.iahome.fr',
       };
       
       // Convertir module_id numérique en slug si nécessaire
@@ -156,7 +168,7 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         throw new Error(`Module ${moduleId} non trouvé`);
       }
       
-      // Ouvrir le sous-domaine avec le token en paramètre
+      // Ouvrir le sous-domaine avec le token en paramètre (même système pour tous les modules)
       const directUrl = `${moduleUrl}?token=${encodeURIComponent(tokenData.token)}`;
       
       console.log(`🔗 ${moduleTitle}: Accès direct au sous-domaine avec token:`, directUrl);

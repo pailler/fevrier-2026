@@ -9,6 +9,10 @@ export const TOKEN_COSTS = {
   'prompt-generator': 100,
   'ai-detector': 100,
   'ia-generator': 100, // Alias pour ai-detector
+  'photomaker': 100, // PhotoMaker -> 100 tokens
+  'animagine-xl': 100, // Animagine XL -> 100 tokens
+  'florence-2': 100, // Florence-2 -> 100 tokens
+  'birefnet': 100, // BiRefNet -> 100 tokens
   
   // Applications essentielles (10 tokens)
   'metube': 10,

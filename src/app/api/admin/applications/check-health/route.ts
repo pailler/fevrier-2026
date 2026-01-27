@@ -30,6 +30,7 @@ const MODULE_URLS: Record<string, string> = {
   'code-learning': 'https://iahome.fr/code-learning',
   'administration': 'https://iahome.fr/administration',
   'voice-isolation': 'https://voice-isolation.iahome.fr',
+  'photomaker': 'https://photomaker.iahome.fr',
 };
 
 // Mapping des IDs numériques vers les slugs
@@ -103,6 +104,9 @@ function getModuleSlug(moduleId: string, moduleTitle: string): string {
   }
   if (titleLower.includes('prompt generator') || titleLower.includes('prompt-generator')) {
     return 'prompt-generator';
+  }
+  if (titleLower.includes('photomaker') || titleLower.includes('photo maker')) {
+    return 'photomaker';
   }
   if (titleLower.includes('apprendre autrement') || titleLower.includes('apprendre-autrement')) {
     return 'apprendre-autrement';
