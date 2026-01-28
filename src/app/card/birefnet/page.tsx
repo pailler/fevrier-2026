@@ -37,7 +37,7 @@ export default function BiRefNetPage() {
     id: 'birefnet',
     title: 'BiRefNet',
     subtitle: 'Suppression de fond haute précision avec IA - Séparation automatique premier plan/fond',
-    description: 'BiRefNet est un modèle de suppression de fond haute résolution développé par Peng Zheng et son équipe. Spécialement optimisé pour la suppression d\'arrière-plan, BiRefNet permet de séparer automatiquement le premier plan du fond dans vos images avec une précision exceptionnelle. Idéal pour les graphistes, designers et créateurs de contenu qui ont besoin de supprimer des fonds rapidement et professionnellement.',
+    description: 'BiRefNet est un outil de suppression de fond d\'image parfait utilisant l\'intelligence artificielle. Supprimez automatiquement les arrière-plans de vos images avec une précision exceptionnelle en un seul clic. BiRefNet sépare parfaitement le premier plan du fond, générant des résultats de qualité professionnelle prêts à l\'emploi. Idéal pour les graphistes, designers et créateurs de contenu qui ont besoin de supprimer des fonds rapidement et efficacement.',
     category: 'AI VISION',
     price: '100 tokens',
     image_url: '/images/birefnet.jpg',
@@ -249,7 +249,7 @@ export default function BiRefNetPage() {
         "price": "100",
         "priceCurrency": "TOKENS"
       },
-      "description": "BiRefNet est un modèle de suppression de fond haute résolution qui permet de supprimer automatiquement les arrière-plans de vos images avec une précision exceptionnelle. Spécialement optimisé pour la suppression de fond, BiRefNet génère des résultats de qualité professionnelle.",
+      "description": "BiRefNet est un outil de suppression de fond d'image parfait utilisant l'intelligence artificielle. Supprimez automatiquement les arrière-plans de vos images avec une précision exceptionnelle. BiRefNet génère des résultats de qualité professionnelle avec transparence parfaite.",
       "url": "https://iahome.fr/card/birefnet",
       "aggregateRating": {
         "@type": "AggregateRating",
@@ -276,7 +276,7 @@ export default function BiRefNetPage() {
           "name": "Qu'est-ce que BiRefNet ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "BiRefNet est un modèle de suppression de fond haute résolution développé par Peng Zheng et son équipe. Spécialement optimisé pour la suppression d'arrière-plan, il permet de supprimer automatiquement les fonds de vos images avec une précision exceptionnelle. BiRefNet utilise une architecture bilatérale de référence pour détecter précisément le premier plan et générer des masques de transparence de qualité professionnelle."
+            "text": "BiRefNet est un outil de suppression de fond d'image parfait utilisant l'intelligence artificielle. Il permet de supprimer automatiquement les arrière-plans de vos images avec une précision exceptionnelle. BiRefNet sépare parfaitement le premier plan du fond et génère des masques de transparence de qualité professionnelle."
           }
         },
         {
@@ -781,7 +781,7 @@ export default function BiRefNetPage() {
                 {/* Paragraphe citable par les IA (GEO) */}
                 <div className="bg-gradient-to-r from-emerald-100 to-teal-100 p-6 rounded-2xl border-l-4 border-emerald-500 mb-8">
                   <p className="text-lg leading-relaxed text-gray-800">
-                    <strong>BiRefNet est un modèle de suppression de fond haute résolution développé par Peng Zheng et son équipe qui permet de supprimer automatiquement les arrière-plans de vos images avec une précision exceptionnelle.</strong> Le modèle utilise une architecture bilatérale de référence (Bilateral Reference) pour détecter et séparer précisément le premier plan du fond. Spécialement optimisé pour la suppression de fond, BiRefNet génère des masques de transparence de qualité professionnelle. Malgré sa taille compacte (0,2B paramètres), le modèle maintient une excellente performance même sur des images haute résolution (2048x2048). C'est l'outil idéal pour les graphistes, designers et créateurs de contenu qui ont besoin de supprimer des fonds rapidement et efficacement.
+                    <strong>BiRefNet est un outil de suppression de fond d'image parfait utilisant l'intelligence artificielle.</strong> Supprimez automatiquement les arrière-plans de vos images avec une précision exceptionnelle en un seul clic. BiRefNet sépare parfaitement le premier plan du fond, générant des résultats de qualité professionnelle avec transparence parfaite. L'outil est spécialement optimisé pour la suppression de fond et maintient une excellente performance même sur des images haute résolution (2048x2048). C'est la solution idéale pour les graphistes, designers et créateurs de contenu qui ont besoin de supprimer des fonds rapidement et efficacement.
                   </p>
                 </div>
 
@@ -990,7 +990,7 @@ export default function BiRefNetPage() {
                     <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-6 rounded-2xl border-l-4 border-emerald-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Qu'est-ce que BiRefNet ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        BiRefNet est un modèle de suppression de fond haute résolution développé par Peng Zheng et son équipe. Spécialement optimisé pour la suppression d'arrière-plan, il permet de supprimer automatiquement les fonds de vos images avec une précision exceptionnelle. BiRefNet utilise une architecture bilatérale de référence pour détecter précisément le premier plan et générer des masques de transparence de qualité professionnelle.
+                        BiRefNet est un outil de suppression de fond d'image parfait utilisant l'intelligence artificielle. Il permet de supprimer automatiquement les arrière-plans de vos images avec une précision exceptionnelle en un seul clic. BiRefNet sépare parfaitement le premier plan du fond et génère des masques de transparence de qualité professionnelle.
                       </p>
                     </div>
                     
@@ -1041,8 +1041,8 @@ export default function BiRefNetPage() {
                 {/* Description principale */}
                 <div className="text-center max-w-5xl mx-auto">
                   <p className="text-lg sm:text-xl lg:text-2xl leading-relaxed text-gray-700 mb-6">
-                    BiRefNet est un modèle révolutionnaire spécialement conçu pour la suppression de fond automatique avec une précision exceptionnelle. 
-                    Cette technologie de pointe vous permet de supprimer les arrière-plans de vos images en un clic, créer des visuels avec transparence professionnelle, et obtenir des résultats de qualité même sur des images haute résolution.
+                    BiRefNet est un outil révolutionnaire de suppression de fond d'image parfait utilisant l'intelligence artificielle. 
+                    Cette technologie de pointe vous permet de supprimer automatiquement les arrière-plans de vos images en un seul clic avec une précision exceptionnelle, créer des visuels avec transparence professionnelle, et obtenir des résultats de qualité même sur des images haute résolution.
                   </p>
                   {card.subtitle && (
                     <p className="text-base sm:text-lg text-gray-600 italic mb-8">

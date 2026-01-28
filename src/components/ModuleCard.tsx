@@ -314,6 +314,18 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   // Vérifier si c'est le module Générateur de prompts pour appliquer un style spécial
   const isPromptGenerator = module.title.toLowerCase().includes('prompt') || module.title.toLowerCase().includes('générateur de prompts') || module.id === 'prompt-generator';
   
+  // Vérifier si c'est le module BiRefNet pour appliquer un style spécial
+  const isBiRefNet = module.title.toLowerCase().includes('birefnet') || module.title.toLowerCase().includes('bi-refnet') || module.title.toLowerCase().includes('bi refnet') || module.id === 'birefnet';
+  
+  // Vérifier si c'est le module Isolation Vocale IA pour appliquer un style spécial
+  const isVoiceIsolation = module.title.toLowerCase().includes('isolation vocale') || module.title.toLowerCase().includes('voice isolation') || module.title.toLowerCase().includes('voice-isolation') || module.id === 'voice-isolation';
+  
+  // Vérifier si c'est le module PhotoMaker pour appliquer un style spécial
+  const isPhotoMaker = module.title.toLowerCase().includes('photomaker') || module.title.toLowerCase().includes('photo maker') || module.title.toLowerCase().includes('photo-maker') || module.id === 'photomaker';
+  
+  // Vérifier si c'est le module Florence-2 pour appliquer un style spécial
+  const isFlorence2 = module.title.toLowerCase().includes('florence-2') || module.title.toLowerCase().includes('florence 2') || module.title.toLowerCase().includes('florence2') || module.id === 'florence-2';
+  
   // Vérifier si c'est le module Détecteur de Contenu IA pour appliquer un style spécial
   const isAIDetector = module.title.toLowerCase().includes('détecteur') || module.title.toLowerCase().includes('detecteur') || module.title.toLowerCase().includes('ai detector') || module.title.toLowerCase().includes('contenu ia') || module.id === 'ai-detector';
   
@@ -336,6 +348,137 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   // Debug temporaire
   if (module.id === 'code-learning' || module.title.toLowerCase().includes('apprendre')) {
     console.log('🔍 Code Learning détecté:', { id: module.id, title: module.title, isCodeLearning });
+  }
+
+  // Style Claid.ai inspiré - design épuré et moderne
+  const useClaidStyle = true; // Flag pour activer le style Claid.ai
+  
+  if (useClaidStyle) {
+    const claidImageSrc = isHunyuan3D
+      ? '/images/hunyuan3d.jpg'
+      : isComfyUI
+        ? '/images/comfyui.jpg'
+        : isStableDiffusion
+          ? '/images/stablediffusion.jpg'
+        : isMeetingReports
+          ? '/images/compte-rendu.jpg'
+        : isApprendreAutrement
+          ? '/images/apprendre-autrement.jpg'
+        : isCodeLearning
+          ? '/images/apprendre-le-code.jpg'
+        : isHomeAssistant
+          ? '/images/home-assistant.jpg'
+        : isLibrespeed
+          ? '/images/librespeed.jpg'
+        : isMeTube
+          ? '/images/metube.jpg'
+        : isPdfPlus
+          ? '/images/pdf.jpg'
+        : isPsitransfer
+          ? '/images/psitransfer.jpg'
+        : isQRCodes
+          ? '/images/qrcodes.jpg'
+        : isAdministration
+          ? '/images/administratifs.jpg'
+        : isRuinedFooocus
+          ? '/images/ruinedfooocus.jpg'
+          : isWhisper
+            ? '/images/whisper.jpg'
+            : isVoiceIsolation
+              ? '/images/demucs.jpg'
+              : isPromptGenerator
+                ? '/images/prompts-generator.jpg'
+                : isBiRefNet
+                  ? '/images/birefnet.jpg'
+                  : isPhotoMaker
+                    ? '/images/photomaker.jpg'
+                    : isFlorence2
+                      ? '/images/florence-2.jpg'
+                      : isAIDetector
+                        ? '/images/iapasia.jpg'
+                        : '/images/animagine-xl.jpg';
+
+    // Déterminer les badges selon le type de module (style Claid.ai : badge violet "New")
+    const getBadgeLabel = () => {
+      if (isStableDiffusion || isComfyUI || isAnimagineXL) return { text: 'Top seller', show: true };
+      if (isRuinedFooocus || isCogStudio || isMeetingReports || isHunyuan3D) return { text: 'New', show: true };
+      return { text: null, show: false };
+    };
+    
+    const badge = getBadgeLabel();
+    
+    return (
+      <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 group">
+        <Link href={`/card/${moduleSlug}`} className="block">
+          {/* Zone visuelle - style Claid.ai avec image illustrative */}
+          <div className="relative h-56 overflow-hidden bg-gray-50">
+            {/* Image de fond - style Claid.ai (images dédiées par module, sinon animagine-xl.jpg) */}
+            <img 
+              src={claidImageSrc}
+              alt={module.title}
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              style={{ 
+                filter: 'brightness(1.1) contrast(1.05) saturate(1.05)',
+                opacity: 1
+              }}
+              loading="lazy"
+              onError={(e) => {
+                console.error('Erreur de chargement de l\'image:', claidImageSrc);
+                // Fallback vers un gradient si l'image ne charge pas
+                e.currentTarget.style.display = 'none';
+                const container = e.currentTarget.parentElement;
+                if (container) {
+                  container.style.background = 'linear-gradient(135deg, #ec4899 0%, #f43f5e 25%, #a855f7 50%, #6366f1 100%)';
+                }
+              }}
+            />
+          </div>
+        </Link>
+
+        {/* Contenu - style Claid.ai épuré */}
+        <div className="p-6">
+          <Link href={`/card/${moduleSlug}`} className="block group">
+            {/* Titre avec badge - style Claid.ai */}
+            <div className="flex items-center gap-2 mb-3">
+              <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
+                {module.title}
+              </h3>
+              {badge.show && (
+                <span className="bg-purple-600 text-white text-xs font-semibold px-2 py-0.5 rounded">
+                  {badge.text}
+                </span>
+              )}
+            </div>
+            
+            {/* Description - style Claid.ai (texte gris, concis) */}
+            <p className="text-gray-700 text-sm mb-6 line-clamp-3 leading-relaxed">
+              {module.subtitle || module.description}
+            </p>
+          </Link>
+
+          {/* Footer avec CTA - style Claid.ai (juste "Explore →" en bas à gauche) */}
+          <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+            <div className="flex items-center gap-2">
+              <span className={`text-base font-semibold ${
+                isFree ? 'text-green-600' : 'text-gray-700'
+              }`}>
+                {formatPrice(module.price)}
+              </span>
+            </div>
+            
+            <Link
+              href={`/card/${moduleSlug}`}
+              className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1 group/btn"
+            >
+              <span>Explore</span>
+              <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

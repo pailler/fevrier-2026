@@ -9,7 +9,7 @@ export default function ClientRedirectHandler() {
       return;
     }
     
-    const HEADER_VERSION = '4.0.0';
+    const HEADER_VERSION = '4.0.1'; // Incrémenté pour forcer le vidage de cache après rebuild
     
     // Vérifier la version du Header stockée AVANT toute opération coûteuse
     const storedHeaderVersion = localStorage.getItem('header_version');
@@ -90,13 +90,15 @@ export default function ClientRedirectHandler() {
   }, []);
 
   useEffect(() => {
-    // Gestionnaire d'erreur global pour les erreurs webpack
+    // Gestionnaire d'erreur global pour les erreurs webpack et chunks
     if (typeof window === 'undefined') {
       return;
     }
     
     let reloadCount = 0;
     const MAX_RELOADS = 2; // Limiter à 2 rechargements pour éviter les boucles infinies
+    let chunkErrorCount = 0;
+    const MAX_CHUNK_ERRORS = 1; // Recharger après 1 erreur de chunk
     
     const handleError = function(event: ErrorEvent) {
       const error = event.error || event.message || '';
@@ -155,6 +157,51 @@ export default function ClientRedirectHandler() {
     
     window.addEventListener('error', handleError, true);
     
+    // Gestionnaire spécifique pour les erreurs de chargement de scripts/chunks
+    const handleScriptError = function(event: Event) {
+      const target = event.target as HTMLElement;
+      if (target && target.tagName === 'SCRIPT') {
+        const script = target as HTMLScriptElement;
+        const src = script.src || '';
+        
+        // Détecter les erreurs de chunks Next.js
+        if (src.includes('/_next/static/chunks/') || src.includes('/_next/static/js/')) {
+          console.warn('⚠️ Erreur de chargement de chunk détectée:', src);
+          
+          // Vider le cache et recharger une seule fois
+          if (reloadCount < MAX_RELOADS && typeof window !== 'undefined' && window.location) {
+            reloadCount++;
+            setTimeout(function() {
+              if (typeof window === 'undefined' || !window.location) {
+                return;
+              }
+              
+              const reloadWindow = () => {
+                if (typeof window !== 'undefined' && window.location) {
+                  window.location.reload();
+                }
+              };
+              
+              if ('caches' in window) {
+                caches.keys().then(function(names) {
+                  names.forEach(function(name) {
+                    caches.delete(name);
+                  });
+                  reloadWindow();
+                }).catch(function() {
+                  reloadWindow();
+                });
+              } else {
+                reloadWindow();
+              }
+            }, 1000);
+          }
+        }
+      }
+    };
+    
+    window.addEventListener('error', handleScriptError, true);
+    
     // Intercepter les erreurs non capturées
     let rejectionReloadCount = 0;
     const MAX_REJECTION_RELOADS = 2;
@@ -195,6 +242,7 @@ export default function ClientRedirectHandler() {
     
     return () => {
       window.removeEventListener('error', handleError, true);
+      window.removeEventListener('error', handleScriptError, true);
       window.removeEventListener('unhandledrejection', handleRejection);
     };
   }, []);

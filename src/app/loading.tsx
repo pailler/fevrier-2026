@@ -1,4 +1,19 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+
 export default function Loading() {
+  const [showTimeout, setShowTimeout] = useState(false);
+
+  useEffect(() => {
+    // Afficher un message après 10 secondes si le chargement prend trop de temps
+    const timeout = setTimeout(() => {
+      setShowTimeout(true);
+    }, 10000);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="text-center">
@@ -22,9 +37,23 @@ export default function Loading() {
           Chargement...
         </h2>
         
-        <p className="text-gray-600">
+        <p className="text-gray-600 mb-4">
           Veuillez patienter pendant le chargement de la page.
         </p>
+
+        {showTimeout && (
+          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg max-w-md mx-auto">
+            <p className="text-sm text-yellow-800 mb-2">
+              ⚠️ Le chargement prend plus de temps que prévu.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="text-sm text-yellow-700 hover:text-yellow-900 underline"
+            >
+              Rafraîchir la page
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

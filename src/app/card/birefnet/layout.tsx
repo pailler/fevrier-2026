@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'BiRefNet : segmentation d\'images dichotomique haute résolution | IA Home',
-  description: 'Séparez efficacement le premier plan du fond dans vos images avec une précision exceptionnelle. Performance SOTA sur DIS, COD et HRSOD. Support de multiples résolutions (1024x1024, 2048x2048). Parfait pour graphistes, designers et développeurs.',
+  title: 'BiRefNet : Suppression de fond d\'image parfaite avec IA | IA Home',
+  description: 'Supprimez automatiquement les arrière-plans de vos images avec une précision exceptionnelle. BiRefNet sépare parfaitement le premier plan du fond en un seul clic. Support de multiples résolutions (1024x1024, 2048x2048). Parfait pour graphistes, designers et créateurs de contenu.',
   keywords: [
     'BiRefNet',
     'segmentation images',
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
     canonical: 'https://iahome.fr/card/birefnet',
   },
   openGraph: {
-    title: 'BiRefNet : segmentation d\'images dichotomique haute résolution | IA Home',
-    description: 'Séparez efficacement le premier plan du fond dans vos images avec une précision exceptionnelle. Performance SOTA sur DIS, COD et HRSOD.',
+    title: 'BiRefNet : Suppression de fond d\'image parfaite avec IA | IA Home',
+    description: 'Supprimez automatiquement les arrière-plans de vos images avec une précision exceptionnelle. BiRefNet sépare parfaitement le premier plan du fond en un seul clic.',
     url: 'https://iahome.fr/card/birefnet',
     siteName: 'IA Home',
     locale: 'fr_FR',
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
         url: 'https://iahome.fr/images/birefnet.jpg',
         width: 1200,
         height: 630,
-        alt: 'BiRefNet - Segmentation d\'images dichotomique haute résolution',
+        alt: 'BiRefNet - Suppression de fond d\'image parfaite avec IA',
       },
     ],
   },
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@iahome_fr',
     creator: '@iahome_fr',
-    title: 'BiRefNet : segmentation d\'images dichotomique haute résolution | IA Home',
+    title: 'BiRefNet : Suppression de fond d\'image parfaite avec IA | IA Home',
     description: 'Séparez efficacement le premier plan du fond dans vos images avec une précision exceptionnelle.',
     images: ['https://iahome.fr/images/birefnet.jpg'],
   },
