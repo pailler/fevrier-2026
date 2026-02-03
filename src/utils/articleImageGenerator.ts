@@ -24,7 +24,9 @@ const IMAGE_THEMES = [
   'cloud-computing',
   'cybersecurity',
   'iot',
-  'virtual-reality'
+  'virtual-reality',
+  'analytics-dashboard',
+  'benchmark'
 ];
 
 /**
@@ -139,6 +141,7 @@ const LOCAL_IMAGES = [
   '/images/iametube-interface.jpg',
   '/images/pdf-plus.jpg',
   '/images/canvas-framework.jpg',
+  '/images/barometres-ia.jpg',
 ];
 
 /**

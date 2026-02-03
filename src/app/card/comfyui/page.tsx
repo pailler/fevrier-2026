@@ -255,7 +255,7 @@ export default function ComfyUIPage() {
           "name": "ComfyUI est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation de ComfyUI coûte 100 tokens par utilisation. Une fois activé, vous avez accès à l'interface graphique complète avec toutes les fonctionnalités : système de nœuds modulaires, workflows réutilisables, contrôle granulaire, et performance optimisée."
+            "text": "L'activation de ComfyUI coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à l'interface graphique complète avec toutes les fonctionnalités : système de nœuds modulaires, workflows réutilisables, contrôle granulaire, et performance optimisée."
           }
         },
         {
@@ -494,7 +494,7 @@ export default function ComfyUIPage() {
                   {card.price === 0 || card.price === '0' ? 'Free' : '100 tokens'}
                 </div>
                 <div className="text-sm opacity-90">
-                  {card.price === 0 || card.price === '0' ? 'Gratuit' : 'par utilisation'}
+                  {card.price === 0 || card.price === '0' ? 'Gratuit' : 'par accès, et utilisez l\'application aussi longtemps que vous souhaitez'}
                 </div>
               </div>
             </div>
@@ -850,7 +850,7 @@ export default function ComfyUIPage() {
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-blue-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">ComfyUI est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'activation de ComfyUI coûte 100 tokens par utilisation. Une fois activé, vous avez accès à l'interface graphique complète avec toutes les fonctionnalités : système de nœuds modulaires, workflows réutilisables, contrôle granulaire, et performance optimisée.
+                      L'activation de ComfyUI coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à l'interface graphique complète avec toutes les fonctionnalités : système de nœuds modulaires, workflows réutilisables, contrôle granulaire, et performance optimisée.
                     </p>
                   </div>
                   
@@ -1073,7 +1073,7 @@ export default function ComfyUIPage() {
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 tokens par utilisation'}
+                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez'}
                         </p>
                       </div>
                     </div>
@@ -1170,7 +1170,7 @@ export default function ComfyUIPage() {
         moduleId={card?.id || 'comfyui'}
         moduleName="ComfyUI"
         tokenCost={100}
-        tokenUnit="par utilisation"
+        tokenUnit="par accès, et utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-module"
         gradientColors="from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
         icon="🎭"

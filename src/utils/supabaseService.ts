@@ -7,6 +7,89 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 const DEFAULT_SUPABASE_URL = 'https://xemtoyzcihmncbrlsmhr.supabase.co';
 const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlbXRveXpjaWhtbmNicmxzbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0MDUzMDUsImV4cCI6MjA2NTk4MTMwNX0.afcRGhlB5Jj-7kgCV6IzUDRdGUQkHkm1Fdl1kzDdj6M';
 
+const AUTH_STORAGE_KEY = 'sb-xemtoyzcihmncbrlsmhr-auth-token';
+const AUTH_CODE_VERIFIER_KEY = AUTH_STORAGE_KEY + '-code-verifier'; // Clé utilisée par Supabase pour le PKCE
+const PKCE_COOKIE_PREFIX = 'sb_iahome_'; // sb_iahome_0, sb_iahome_1, ...
+const PKCE_CV_COOKIE = 'sb_iahome_cv'; // Cookie dédié au code_verifier (petit, toujours < 4KB)
+const PKCE_CHUNK_SIZE = 1200; // Taille brute par cookie (après encodeURIComponent reste < 4KB)
+const COOKIE_DOMAIN = '.iahome.fr';
+
+/** Stockage hybride: cookies (domain=.iahome.fr) + localStorage. Supabase stocke le code_verifier sous storageKey + '-code-verifier'. */
+function getAuthStorage(): { getItem: (key: string) => string | null; setItem: (key: string, value: string) => void; removeItem: (key: string) => void } {
+  const isProduction = typeof window !== 'undefined' && (window.location.hostname === 'iahome.fr' || window.location.hostname === 'www.iahome.fr');
+
+  const getCookie = (name: string): string | null => {
+    if (typeof document === 'undefined') return null;
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const match = document.cookie.match(new RegExp('(^|;\\s*)' + escaped + '=([^;]*)'));
+    if (!match) return null;
+    try {
+      return decodeURIComponent(match[2].trim());
+    } catch {
+      return match[2].trim();
+    }
+  };
+  const setCookie = (name: string, value: string, maxAge = 3600) => {
+    if (typeof document === 'undefined') return;
+    const secure = window.location.protocol === 'https:';
+    const opts = `path=/; domain=${COOKIE_DOMAIN}; max-age=${maxAge}; SameSite=Lax${secure ? '; Secure' : ''}`;
+    const encoded = encodeURIComponent(value);
+    if (encoded.length > 4000) return;
+    document.cookie = `${name}=${encoded}; ${opts}`;
+  };
+  const removeCookie = (name: string) => {
+    if (typeof document === 'undefined') return;
+    document.cookie = `${name}=; path=/; domain=${COOKIE_DOMAIN}; max-age=0`;
+  };
+
+  const getCookieChunks = (): string | null => {
+    const parts: string[] = [];
+    for (let i = 0; i < 10; i++) {
+      const chunk = getCookie(PKCE_COOKIE_PREFIX + i);
+      if (chunk == null || chunk === '') break;
+      parts.push(chunk);
+    }
+    return parts.length ? parts.join('') : null;
+  };
+  const setCookieChunks = (value: string) => {
+    for (let i = 0; i < 10; i++) removeCookie(PKCE_COOKIE_PREFIX + i);
+    for (let i = 0; i < value.length; i += PKCE_CHUNK_SIZE) {
+      const chunk = value.slice(i, i + PKCE_CHUNK_SIZE);
+      setCookie(PKCE_COOKIE_PREFIX + Math.floor(i / PKCE_CHUNK_SIZE), chunk);
+    }
+  };
+  const removeCookieChunks = () => {
+    for (let i = 0; i < 10; i++) removeCookie(PKCE_COOKIE_PREFIX + i);
+  };
+
+  return {
+    getItem(key: string): string | null {
+      if (typeof window === 'undefined') return null;
+      if (isProduction && key === AUTH_CODE_VERIFIER_KEY) {
+        const fromCookie = getCookie(PKCE_CV_COOKIE);
+        if (fromCookie) return fromCookie;
+      }
+      if (key === AUTH_STORAGE_KEY && isProduction) {
+        const fromCookie = getCookieChunks();
+        if (fromCookie) return fromCookie;
+      }
+      return localStorage.getItem(key);
+    },
+    setItem(key: string, value: string): void {
+      if (typeof window === 'undefined') return;
+      if (isProduction && key === AUTH_CODE_VERIFIER_KEY) setCookie(PKCE_CV_COOKIE, value);
+      if (key === AUTH_STORAGE_KEY && isProduction) setCookieChunks(value);
+      localStorage.setItem(key, value);
+    },
+    removeItem(key: string): void {
+      if (typeof window === 'undefined') return;
+      if (key === AUTH_CODE_VERIFIER_KEY && isProduction) removeCookie(PKCE_CV_COOKIE);
+      if (key === AUTH_STORAGE_KEY && isProduction) removeCookieChunks();
+      localStorage.removeItem(key);
+    },
+  };
+}
+
 // Fonction helper pour obtenir une variable d'environnement avec fallback garanti
 // Évite que process.env.NEXT_PUBLIC_* soit undefined dans le bundle
 function getEnvVar(key: string, defaultValue: string): string {
@@ -162,14 +245,15 @@ export const getSupabaseClient = (): SupabaseClient => {
       throw new Error(errorMsg);
     }
     
-    // Configuration optimisée pour éviter les conflits et instances multiples
+    // Stockage hybride cookie (domain=.iahome.fr) + localStorage pour partager le code_verifier PKCE entre iahome.fr et www.iahome.fr
+    const authStorage = typeof window !== 'undefined' ? getAuthStorage() : undefined;
     clientInstance = createClient(finalUrl, finalKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true, // IMPORTANT: Doit être true pour que PKCE fonctionne
-        storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-        storageKey: 'sb-xemtoyzcihmncbrlsmhr-auth-token', // Clé de stockage unique pour éviter les conflits
+        storage: authStorage,
+        storageKey: AUTH_STORAGE_KEY,
         flowType: 'pkce', // Utiliser PKCE (recommandé par Supabase pour une meilleure fiabilité)
         debug: false, // Désactiver les logs pour réduire les avertissements
       },

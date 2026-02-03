@@ -141,7 +141,7 @@ export class TokenActionServiceClient {
     }
   }
 
-  // Méthode pour récupérer l'historique des tokens d'un utilisateur
+  // Méthode pour récupérer l'historique des tokens d'un utilisateur (ne rejette jamais)
   async getUserTokenHistory(userId: string, limit: number = 20): Promise<any[]> {
     try {
       const response = await fetch(`/api/user-tokens-simple/history?userId=${userId}&limit=${limit}`, {
@@ -152,15 +152,16 @@ export class TokenActionServiceClient {
       });
 
       if (!response.ok) {
-        console.error('Erreur lors de la récupération de l\'historique des tokens');
         return [];
       }
 
-      const data = await response.json();
-      return data.history || [];
-
-    } catch (error) {
-      console.error('Erreur getUserTokenHistory:', error);
+      try {
+        const data = await response.json();
+        return Array.isArray(data?.history) ? data.history : [];
+      } catch {
+        return [];
+      }
+    } catch {
       return [];
     }
   }

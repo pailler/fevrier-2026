@@ -10,10 +10,13 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Paris
+      # Options yt-dlp pour contourner l'erreur 403 YouTube (vidéos longues, restrictions)
+      - YTDL_OPTIONS_FILE=/config/yt-dlp-options.json
     volumes:
       - ./downloads:/downloads
       # Script de nettoyage automatique
       - ./cleanup-metube-auto.sh:/usr/local/bin/cleanup-metube.sh:ro
+      - ./yt-dlp-options.json:/config/yt-dlp-options.json:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081"]
       interval: 30s

@@ -543,6 +543,14 @@ export default function MarketingPage() {
                   Suivi des emprunts et retours
                 </li>
               </ul>
+              <a
+                href="https://resas.iahome.fr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-purple-100 text-purple-800 hover:bg-purple-200 px-4 py-2 rounded-lg font-medium text-sm transition-colors"
+              >
+                Voir la démo →
+              </a>
             </div>
 
             {/* Exemple 4: Application de gestion */}

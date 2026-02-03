@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   iahome-app:
     build:
@@ -12,8 +10,11 @@ services:
       - RUINEDFOOOCUS_INTERNAL_URL=${RUINEDFOOOCUS_INTERNAL_URL:-http://matrix-stability:7870}
       - PORT=3000
       - HOSTNAME=0.0.0.0
+    # Fichier d'env sur l'hôte (à côté de ce docker-compose).
+    # Doit contenir STRIPE_SECRET_KEY, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET, etc.
+    # Si vous utilisez env.production.local (sans point), renommez-le en .env.production.local ou copiez-le.
     env_file:
-      - env.production.local
+      - .env.production.local
     # Port exposé pour cloudflared
     ports:
       - "3000:3000"

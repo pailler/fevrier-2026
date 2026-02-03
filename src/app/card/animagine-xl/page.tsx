@@ -130,7 +130,7 @@ export default function AnimagineXLPage() {
       // Utiliser le sous-domaine comme les autres modules IA
       const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
       const animaginexlUrl = isDevelopment 
-        ? 'http://localhost:7883' 
+        ? 'http://localhost:7881' 
         : 'https://animaginexl.iahome.fr';
       
       const accessUrl = `${animaginexlUrl}?token=${encodeURIComponent(tokenData.token)}`;
@@ -300,7 +300,7 @@ export default function AnimagineXLPage() {
           "name": "Animagine XL est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation d'Animagine XL coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : génération d'anime de haute qualité, connaissance de 5000+ personnages, pas de LoRA requis pour les personnages connus, et génération optimisée."
+            "text": "L'activation d'Animagine XL coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : génération d'anime de haute qualité, connaissance de 5000+ personnages, pas de LoRA requis pour les personnages connus, et génération optimisée."
           }
         },
         {
@@ -572,7 +572,7 @@ export default function AnimagineXLPage() {
                   100 tokens
                 </div>
                 <div className="text-sm opacity-90">
-                  par utilisation
+                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
                 </div>
               </div>
             </div>
@@ -935,7 +935,7 @@ export default function AnimagineXLPage() {
                           </tr>
                           <tr className="bg-white">
                             <td className="border border-gray-300 p-4 font-semibold">Prix</td>
-                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par utilisation</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez</td>
                             <td className="border border-gray-300 p-4 text-center">⚠️ Coûts variables</td>
                           </tr>
                         </tbody>
@@ -978,7 +978,7 @@ export default function AnimagineXLPage() {
                     <div className="bg-gradient-to-r from-indigo-50 to-violet-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Animagine XL est-il gratuit ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        L'activation d'Animagine XL coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : génération d'anime de haute qualité, connaissance de 5000+ personnages, pas de LoRA requis pour les personnages connus, et génération optimisée.
+                        L'activation d'Animagine XL coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : génération d'anime de haute qualité, connaissance de 5000+ personnages, pas de LoRA requis pour les personnages connus, et génération optimisée.
                       </p>
                     </div>
                     
@@ -1072,7 +1072,7 @@ export default function AnimagineXLPage() {
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 tokens par utilisation'}
+                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez'}
                         </p>
                       </div>
                     </div>
@@ -1144,7 +1144,7 @@ export default function AnimagineXLPage() {
         moduleId={card?.id || 'animagine-xl'}
         moduleName="Animagine XL"
         tokenCost={100}
-        tokenUnit="par utilisation"
+        tokenUnit="par accès, et utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-module"
         gradientColors="from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
         icon="🎨"

@@ -213,15 +213,26 @@ export default function Home() {
 
   // Modules essentiels à exclure de la page applications (affichés dans la page essentiels)
   const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'code-learning', 'apprendre-autrement', 'home-assistant', 'administration'];
+  // Modules masqués de la liste (page et fichiers conservés, seul l'affichage dans la liste est désactivé)
+  const hiddenFromListing = ['hunyuan3d'];
+  const isHiddenModule = (module: { id?: string | number; title?: string }) => {
+    const idStr = String(module.id ?? '').toLowerCase();
+    const titleNorm = (module.title ?? '').toLowerCase().replace(/\s+/g, '').replace(/-/g, '');
+    return hiddenFromListing.some(id => {
+      const idNorm = id.toLowerCase().replace(/-/g, '');
+      return idStr === idNorm || idStr.includes(idNorm) || titleNorm.includes(idNorm) || (module.title?.toLowerCase().includes('hunyuan') && module.title?.toLowerCase().includes('3d'));
+    });
+  };
   
   // Filtrer les modules
   const filteredModules = modules
     .filter(module => {
+      // Exclure les modules masqués (ex: Hunyuan 3D)
+      if (isHiddenModule(module)) return false;
       // Exclure les modules essentiels (affichés dans la page essentiels)
       const isEssential = essentialModules.some(essentialId => 
         module.id === essentialId || 
-        module.title.toLowerCase().includes(essentialId.toLowerCase()) ||
-        module.title.toLowerCase().includes(essentialId.replace('-', ' '))
+        (module.title && (module.title.toLowerCase().includes(essentialId.toLowerCase()) || module.title.toLowerCase().includes(essentialId.replace('-', ' '))))
       );
       
       if (isEssential) return false;

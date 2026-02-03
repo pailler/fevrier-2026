@@ -65,11 +65,15 @@ function shouldUseTestPrice(userEmail: string | undefined): boolean {
 
 export async function POST(request: NextRequest) {
   try {
-    // Vérifier la configuration Stripe
-    if (!process.env.STRIPE_SECRET_KEY) {
-      console.error('❌ STRIPE_SECRET_KEY manquante');
+    // Vérifier la configuration Stripe (côté serveur / conteneur)
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY?.trim();
+    if (!stripeSecretKey) {
+      console.error('❌ STRIPE_SECRET_KEY manquante. Vérifiez le fichier d’env du conteneur (.env.production.local ou env_file dans docker-compose).');
       return NextResponse.json(
-        { error: 'Configuration Stripe manquante' },
+        {
+          error: 'Clés Stripe manquantes',
+          details: 'STRIPE_SECRET_KEY n’est pas définie. En Docker : vérifiez que le fichier .env.production.local (ou env.production.local) est bien lu par le conteneur (env_file dans docker-compose.prod.yml).',
+        },
         { status: 500 }
       );
     }
@@ -153,7 +157,7 @@ export async function POST(request: NextRequest) {
           tokens: packageData.tokens.toString(),
           totalTokens: (packageData as any).totalTokens?.toString() || packageData.tokens.toString(),
         },
-        customer_email: userEmail, // Email non nettoyé pour l'envoi
+        customer_email: userEmail, // Email pour reçu / factures Stripe (abonnements)
         subscription_data: {
           metadata: {
             userId: cleanMetadataValue(userId),
@@ -178,7 +182,7 @@ export async function POST(request: NextRequest) {
         url: session.url 
       });
     } else {
-      // Mode paiement unique
+      // Mode paiement unique : reçu + facture PDF envoyés au client par Stripe
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [
@@ -203,7 +207,19 @@ export async function POST(request: NextRequest) {
           packageType: cleanMetadataValue(packageType),
           tokens: packageData.tokens.toString(),
         },
-        customer_email: userEmail, // Email non nettoyé pour l'envoi
+        customer_email: userEmail, // Email pour reçu et facture Stripe
+        // Justificatif : Stripe envoie reçu + facture PDF au client après paiement
+        invoice_creation: {
+          enabled: true,
+          invoice_data: {
+            description: `${packageData.name} - ${packageData.description}`,
+            footer: 'IA Home - iahome.fr',
+          },
+        },
+        // Texte affiché sur le reçu email
+        payment_intent_data: {
+          description: `${packageData.name} - ${packageData.tokens} tokens`,
+        },
       });
 
       console.log('✅ Session paiement unique créée:', session.id);

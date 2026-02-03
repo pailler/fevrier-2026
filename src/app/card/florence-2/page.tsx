@@ -300,7 +300,7 @@ export default function Florence2Page() {
           "name": "Florence-2 est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation de Florence-2 coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : captioning, détection d'objets, segmentation, OCR, et toutes les autres tâches supportées par le modèle."
+            "text": "L'activation de Florence-2 coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : captioning, détection d'objets, segmentation, OCR, et toutes les autres tâches supportées par le modèle."
           }
         },
         {
@@ -565,7 +565,7 @@ export default function Florence2Page() {
                   100 tokens
                 </div>
                 <div className="text-sm opacity-90">
-                  par utilisation
+                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
                 </div>
               </div>
             </div>
@@ -928,7 +928,7 @@ export default function Florence2Page() {
                           </tr>
                           <tr className="bg-white">
                             <td className="border border-gray-300 p-4 font-semibold">Prix</td>
-                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par utilisation</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez</td>
                             <td className="border border-gray-300 p-4 text-center">⚠️ Coûts variables</td>
                           </tr>
                         </tbody>
@@ -971,7 +971,7 @@ export default function Florence2Page() {
                     <div className="bg-gradient-to-r from-blue-50 to-sky-50 p-6 rounded-2xl border-l-4 border-blue-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Florence-2 est-il gratuit ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        L'activation de Florence-2 coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : captioning, détection d'objets, segmentation, OCR, et toutes les autres tâches supportées par le modèle.
+                        L'activation de Florence-2 coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : captioning, détection d'objets, segmentation, OCR, et toutes les autres tâches supportées par le modèle.
                       </p>
                     </div>
                     
@@ -1065,7 +1065,7 @@ export default function Florence2Page() {
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 tokens par utilisation'}
+                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez'}
                         </p>
                       </div>
                     </div>
@@ -1137,7 +1137,7 @@ export default function Florence2Page() {
         moduleId={card?.id || 'florence-2'}
         moduleName="Florence-2"
         tokenCost={100}
-        tokenUnit="par utilisation"
+        tokenUnit="par accès, et utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-module"
         gradientColors="from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
         icon="👁️"

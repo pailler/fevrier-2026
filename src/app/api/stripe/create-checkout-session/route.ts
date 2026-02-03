@@ -39,10 +39,13 @@ const TOKEN_PACKAGES = {
 export async function POST(request: NextRequest) {
   try {
     // Vérifier la configuration Stripe
-    if (!process.env.STRIPE_SECRET_KEY) {
-      console.error('❌ STRIPE_SECRET_KEY manquante');
+    if (!process.env.STRIPE_SECRET_KEY?.trim()) {
+      console.error('❌ STRIPE_SECRET_KEY manquante. Vérifiez le fichier d’env du conteneur.');
       return NextResponse.json(
-        { error: 'Configuration Stripe manquante' },
+        {
+          error: 'Clés Stripe manquantes',
+          details: 'STRIPE_SECRET_KEY n’est pas définie. En Docker : vérifiez env_file dans docker-compose (.env.production.local).',
+        },
         { status: 500 }
       );
     }
@@ -92,6 +95,16 @@ export async function POST(request: NextRequest) {
         tokens: packageData.tokens.toString(),
       },
       customer_email: userEmail,
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          description: `${packageData.name} - ${packageData.tokens} tokens`,
+          footer: 'IA Home - iahome.fr',
+        },
+      },
+      payment_intent_data: {
+        description: `${packageData.name} - ${packageData.tokens} tokens`,
+      },
     });
 
     console.log('✅ Session créée:', session.id);

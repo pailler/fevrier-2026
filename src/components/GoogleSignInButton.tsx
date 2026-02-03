@@ -33,10 +33,10 @@ export default function GoogleSignInButton({
         const isProductionDomain = hostname === 'iahome.fr' || hostname === 'www.iahome.fr';
         
         if (isProductionDomain) {
-          // EN PRODUCTION: FORCER TOUJOURS https://iahome.fr/auth/callback
-          // Ignorer complètement redirectUrl, NEXT_PUBLIC_BASE_URL, et toute autre source
+          // Domaine canonique forcé par le middleware (www → iahome.fr), donc l'utilisateur est toujours sur iahome.fr.
+          // Callback fixe = même origine que la page = code_verifier disponible.
           baseRedirectUrl = 'https://iahome.fr/auth/callback';
-          console.log('🔒 PRODUCTION DÉTECTÉE - URL de redirection forcée à https://iahome.fr/auth/callback');
+          console.log('🔒 PRODUCTION - Redirect canonique (PKCE):', baseRedirectUrl);
         } else {
           // En développement, utiliser redirectUrl ou l'origin actuel
           if (redirectUrl && !redirectUrl.includes('localhost')) {

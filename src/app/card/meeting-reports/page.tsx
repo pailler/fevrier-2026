@@ -277,7 +277,7 @@ export default function MeetingReportsPage() {
           "name": "Compte rendus IA est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation de Compte rendus IA coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : enregistrement audio, transcription automatique, résumé intelligent, identification des intervenants, extraction des points clés, et export PDF/Markdown. Il n'y a pas de frais supplémentaires pour le traitement des réunions."
+            "text": "L'activation de Compte rendus IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : enregistrement audio, transcription automatique, résumé intelligent, identification des intervenants, extraction des points clés, et export PDF/Markdown. Il n'y a pas de frais supplémentaires pour le traitement des réunions."
           }
         },
         {
@@ -620,7 +620,7 @@ export default function MeetingReportsPage() {
                   100 tokens
                 </div>
                 <div className="text-sm opacity-90">
-                  par utilisation
+                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
                 </div>
               </div>
             </div>
@@ -958,7 +958,7 @@ export default function MeetingReportsPage() {
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-blue-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Compte rendus IA est-il gratuit ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        L'activation de Compte rendus IA coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : enregistrement audio, transcription automatique, résumé intelligent, identification des intervenants, extraction des points clés, et export PDF/Markdown. Il n'y a pas de frais supplémentaires pour le traitement des réunions.
+                        L'activation de Compte rendus IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : enregistrement audio, transcription automatique, résumé intelligent, identification des intervenants, extraction des points clés, et export PDF/Markdown. Il n'y a pas de frais supplémentaires pour le traitement des réunions.
                       </p>
                     </div>
                     
@@ -1193,7 +1193,7 @@ export default function MeetingReportsPage() {
                 </div>
                 <div>
                   <h5 className="font-semibold text-gray-900">Prix</h5>
-                  <p className="text-gray-600 text-sm">100 tokens par utilisation</p>
+                  <p className="text-gray-600 text-sm">100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez</p>
                 </div>
               </div>
               
@@ -1279,7 +1279,7 @@ export default function MeetingReportsPage() {
         moduleId={card?.id || 'meeting-reports'}
         moduleName="Meeting Reports"
         tokenCost={100}
-        tokenUnit="par utilisation"
+        tokenUnit="par accès, et utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-meeting-reports"
         gradientColors="from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
         icon="📝"

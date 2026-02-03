@@ -31,6 +31,10 @@ const MODULE_URLS: Record<string, string> = {
   'administration': 'https://iahome.fr/administration',
   'voice-isolation': 'https://voice-isolation.iahome.fr',
   'photomaker': 'https://photomaker.iahome.fr',
+  // Applications IA (Gradio / sous-domaines)
+  'animagine-xl': 'https://animaginexl.iahome.fr',
+  'birefnet': 'https://birefnet.iahome.fr',
+  'florence-2': 'https://florence2.iahome.fr',
 };
 
 // Mapping des IDs numériques vers les slugs
@@ -123,6 +127,15 @@ function getModuleSlug(moduleId: string, moduleTitle: string): string {
   if (titleLower.includes('voice isolation') || titleLower.includes('voice-isolation') || titleLower.includes('isolation vocale')) {
     return 'voice-isolation';
   }
+  if (titleLower.includes('animagine') || titleLower.includes('animagine xl')) {
+    return 'animagine-xl';
+  }
+  if (titleLower.includes('birefnet') || titleLower.includes('bi ref net')) {
+    return 'birefnet';
+  }
+  if (titleLower.includes('florence-2') || titleLower.includes('florence 2')) {
+    return 'florence-2';
+  }
 
   // Retourner le slug nettoyé par défaut
   return slug;
@@ -169,9 +182,13 @@ async function checkUrl(url: string): Promise<{
       response.status === 526 ||
       response.status === 527;
 
-    // Considérer comme valide si le status code est entre 200 et 399
+    // Considérer comme valide si le status code est entre 200 et 399, ou 405 (Method Not Allowed)
+    // 405 = le serveur répond mais n'accepte pas HEAD (fréquent pour Gradio / Flask) → service opérationnel
     // Ne pas considérer les headers Cloudflare comme des erreurs - ils sont normaux
-    const isValid = response.status >= 200 && response.status < 400 && !isCloudflareErrorCode;
+    const isValid = (
+      (response.status >= 200 && response.status < 400) ||
+      response.status === 405
+    ) && !isCloudflareErrorCode;
 
     let errorMessage: string | undefined;
     let isCloudflareError = false;

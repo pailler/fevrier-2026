@@ -866,6 +866,10 @@ export default function EncoursPage() {
       'photomaker': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
         ? 'http://localhost:7881'
         : 'https://photomaker.iahome.fr',
+      // Animagine XL : port 7881 en dev, animaginexl.iahome.fr en prod
+      'animagine-xl': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+        ? 'http://localhost:7881'
+        : 'https://animaginexl.iahome.fr',
     };
     
     // Convertir module_id numérique en slug si nécessaire

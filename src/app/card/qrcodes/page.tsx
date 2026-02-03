@@ -255,7 +255,7 @@ export default function QRCodesPage() {
           "name": "Les QR codes dynamiques sont-ils gratuits ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation du service QR codes dynamiques coûte 100 tokens par utilisation. Une fois activé, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes."
+            "text": "L'activation du service QR codes dynamiques coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes."
           }
         },
         {
@@ -338,7 +338,7 @@ export default function QRCodesPage() {
             requirements: [
               'Connexion internet',
               'Navigateur moderne',
-              '100 tokens par utilisation'
+              '100 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
             ],
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
@@ -376,7 +376,7 @@ export default function QRCodesPage() {
           requirements: [
             'Connexion internet',
             'Navigateur moderne',
-            '100 tokens par utilisation'
+            '100 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
           ],
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
@@ -541,7 +541,7 @@ export default function QRCodesPage() {
                   100 tokens
                 </div>
                 <div className="text-sm opacity-90">
-                  par utilisation
+                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
                 </div>
               </div>
             </div>
@@ -870,7 +870,7 @@ export default function QRCodesPage() {
                   <div className="bg-gradient-to-r from-red-50 to-orange-50 p-6 rounded-2xl border-l-4 border-red-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Les QR codes dynamiques sont-ils gratuits ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'activation du service QR codes dynamiques coûte 100 tokens par utilisation. Une fois activé, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes.
+                      L'activation du service QR codes dynamiques coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes.
                     </p>
                   </div>
                   
@@ -1207,7 +1207,7 @@ export default function QRCodesPage() {
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          100 tokens par utilisation
+                          100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez
                         </p>
                       </div>
                     </div>

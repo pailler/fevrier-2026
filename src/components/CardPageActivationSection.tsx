@@ -9,7 +9,7 @@ interface CardPageActivationSectionProps {
   moduleId: string;
   moduleName: string;
   tokenCost: number;
-  tokenUnit?: string; // "par accès" ou "par utilisation"
+  tokenUnit?: string; // "par accès, et utilisez l'application aussi longtemps que vous souhaitez"
   apiEndpoint: string; // e.g., '/api/activate-code-learning'
   gradientColors?: string; // e.g., 'from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
   icon?: string;

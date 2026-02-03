@@ -1,17 +1,18 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Home Assistant : domotisez votre habitat gratuitement et facilement | IA Home',
-  description: 'Domotisez votre habitat avec Home Assistant : manuel complet, codes Lovelace prêts à l\'emploi, automatisations. Installation open-source gratuite pour maison, garage, lieu de vacances. Guide pas à pas avec centaines de codes.',
+  title: 'Home Assistant : domotique et maison connectée gratuite | IA Home',
+  description: 'Pilotez votre maison avec Home Assistant. Automatisations, dashboards Lovelace, open source. Guide et exemples pour installer et configurer.',
   keywords: [
     'Home Assistant',
     'domotique',
+    'maison connectée',
     'automatisation maison',
+    'Home Assistant installation',
+    'Lovelace dashboard',
     'smart home',
-    'contrôle domotique',
     'installation Home Assistant',
     'configuration Home Assistant',
-    'dashboard Home Assistant',
     'codes Lovelace',
     'automatisation domotique',
     'domotique open source',
@@ -20,7 +21,6 @@ export const metadata: Metadata = {
     'manuel Home Assistant',
     'tutoriel Home Assistant',
     'domotiser sa maison',
-    'automatisation habitat',
     'maison intelligente',
     'domotique Raspberry Pi',
     'Home Assistant Docker'
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
     canonical: 'https://iahome.fr/card/home-assistant',
   },
   openGraph: {
-    title: 'Home Assistant : domotisez votre habitat gratuitement et facilement | IA Home',
-    description: 'Domotisez votre habitat avec Home Assistant : manuel complet, codes Lovelace prêts à l\'emploi, automatisations. Installation open-source gratuite pour maison, garage, lieu de vacances.',
+    title: 'Home Assistant : domotique et maison connectée gratuite | IA Home',
+    description: 'Pilotez votre maison avec Home Assistant. Automatisations, Lovelace, open source. Guide et exemples.',
     url: 'https://iahome.fr/card/home-assistant',
     siteName: 'IA Home',
     locale: 'fr_FR',
@@ -48,8 +48,8 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@iahome_fr',
     creator: '@iahome_fr',
-    title: 'Home Assistant : domotisez votre habitat gratuitement et facilement | IA Home',
-    description: 'Domotisez votre habitat avec Home Assistant : manuel complet, codes Lovelace prêts à l\'emploi, automatisations.',
+    title: 'Home Assistant : domotique et maison connectée gratuite | IA Home',
+    description: 'Pilotez votre maison avec Home Assistant. Automatisations, Lovelace, open source.',
     images: ['https://iahome.fr/images/home-assistant-module.jpg'],
   },
   robots: {

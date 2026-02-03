@@ -39,9 +39,12 @@ export default function StripeButton({ packageType, className, children }: Strip
       console.log('📡 Réponse API:', response.status, response.statusText);
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         console.error('❌ Erreur HTTP:', errorData);
-        throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
+        const msg = errorData.details
+          ? `${errorData.error || 'Erreur'}\n\n${errorData.details}`
+          : (errorData.error || `Erreur HTTP ${response.status}`);
+        throw new Error(msg);
       }
 
       const data = await response.json();

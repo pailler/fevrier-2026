@@ -1,9 +1,18 @@
 # Configuration MeTube pour contourner l'erreur 403 YouTube
 
 ## Problème
-L'erreur `ERROR: unable to download video data: HTTP Error 403: Forbidden` indique que YouTube bloque les requêtes sans cookies de session valides.
+L'erreur `ERROR: unable to download video data: HTTP Error 403: Forbidden` indique que YouTube bloque les requêtes (vidéos longues, restrictions, etc.).
 
-## Solution 1 : Utiliser des cookies de navigateur (RECOMMANDÉ)
+## Solution appliquée (docker-compose)
+
+Le conteneur utilise **YTDL_OPTIONS_FILE** pointant vers `yt-dlp-options.json`, qui contient :
+- **extractor_args** : `player_client=android,web` pour contourner les blocages YouTube
+- **retries** / **fragment_retries** : 5 pour les vidéos longues
+- **http_headers** : User-Agent et Referer pour simuler un navigateur
+
+Après modification de la config, redémarrer : `docker compose restart metube` (depuis `docker-services/essentiels/`).
+
+## Solution 1 : Utiliser des cookies de navigateur (si le 403 persiste)
 
 ### Étape 1 : Exporter les cookies YouTube
 

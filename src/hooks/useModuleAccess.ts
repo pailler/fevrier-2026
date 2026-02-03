@@ -149,8 +149,8 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'ai-detector': isDevelopment ? 'http://localhost:3000/ai-detector' : 'https://iahome.fr/ai-detector',
         // PhotoMaker : sous-domaine comme les autres modules IA
         'photomaker': isDevelopment ? 'http://localhost:7881' : 'https://photomaker.iahome.fr',
-        // Animagine XL : sous-domaine comme les autres modules IA
-        'animagine-xl': isDevelopment ? 'http://localhost:7883' : 'https://animaginexl.iahome.fr',
+        // Animagine XL : sous-domaine comme les autres modules IA (port 7881)
+        'animagine-xl': isDevelopment ? 'http://localhost:7881' : 'https://animaginexl.iahome.fr',
         // Florence-2 : sous-domaine comme les autres modules IA
         'florence-2': isDevelopment ? 'http://127.0.0.1:7884' : 'https://florence2.iahome.fr',
         // BiRefNet : sous-domaine comme les autres modules IA

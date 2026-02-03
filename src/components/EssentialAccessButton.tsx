@@ -214,23 +214,23 @@ export default function EssentialAccessButton({
         ) : moduleId === 'administration' ? (
           <>
             <span>🏛️</span>
-            <span>Accéder aux services administratifs (10 tokens)</span>
+            <span>Accéder aux services administratifs (10 tokens par accès)</span>
           </>
         ) : moduleId === 'apprendre-autrement' ? (
           <>
             <span>🌈</span>
             <span>Accéder à Apprendre Autrement</span>
-            <span className="text-xs opacity-90">(10 tokens)</span>
+            <span className="text-xs opacity-90">(10 tokens par accès)</span>
           </>
         ) : moduleId === 'code-learning' ? (
           <>
             <span>💻</span>
-            <span>Accéder à Apprendre le Code (10 tokens)</span>
+            <span>Accéder à Apprendre le Code (10 tokens par accès)</span>
           </>
         ) : (
           <>
             <span>🔧</span>
-            <span>Accéder à {moduleTitle} (10 tokens)</span>
+            <span>Accéder à {moduleTitle} (10 tokens par accès)</span>
           </>
         )}
       </button>

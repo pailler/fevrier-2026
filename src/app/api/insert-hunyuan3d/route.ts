@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
       title: 'Hunyuan 3D - Génération 3D par IA',
       description: 'Hunyuan 3D : Générez des modèles 3D à partir de texte ou d\'images avec l\'intelligence artificielle. Créez des objets 3D réalistes et détaillés pour vos projets.',
       category: 'IA',
-      price: 100, // 100 tokens par utilisation
+      price: 100, // 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez
       youtube_url: 'https://www.youtube.com/embed/CP2cDFgbs8s?autoplay=0&rel=0&modestbranding=1',
       url: 'https://hunyuan3d.iahome.fr',
       image_url: '/images/module-visuals/hunyuan3d-module.svg',

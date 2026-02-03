@@ -97,6 +97,16 @@ export async function POST(request: NextRequest) {
           environment: isProductionMode ? 'production' : 'test',
         },
         billing_address_collection: 'required',
+        invoice_creation: {
+          enabled: true,
+          invoice_data: {
+            description: `${tokenPackage.name} - ${tokens} tokens pour ${moduleTitle || 'modules payants'}`,
+            footer: 'IA Home - iahome.fr',
+          },
+        },
+        payment_intent_data: {
+          description: `${tokenPackage.name} - ${tokens} tokens`,
+        },
       });
 
       console.log('✅ Session Stripe créée (tokens):', {
@@ -206,7 +216,7 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    // Créer la session de paiement
+    // Créer la session de paiement (reçu + facture PDF envoyés au client par Stripe)
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
@@ -224,6 +234,16 @@ export async function POST(request: NextRequest) {
       billing_address_collection: 'required',
       shipping_address_collection: {
         allowed_countries: ['FR', 'BE', 'CH', 'CA'],
+      },
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          description: items[0]?.title ? `Prestation IA Home - ${items[0].title}` : 'Prestation IA Home',
+          footer: 'IA Home - iahome.fr',
+        },
+      },
+      payment_intent_data: {
+        description: items[0]?.title ? `Prestation - ${items[0].title}` : 'Prestation IA Home',
       },
     });
 

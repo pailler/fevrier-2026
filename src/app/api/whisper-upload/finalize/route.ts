@@ -126,15 +126,17 @@ async function processTranscriptionAsync(taskId: string, session: any, type: str
     const blob = new Blob([uint8Array], { type: 'application/octet-stream' });
     formData.append(fieldName, blob, session.filename);
     
-    // Envoyer vers le service Whisper approprié
-    let targetUrl;
+    // Envoyer vers le proxy Whisper (port 8096 = whisper-proxy dans docker)
+    const whisperProxy = process.env.WHISPER_PROXY_URL || 'http://localhost:8096';
+    let path;
     if (type === 'video') {
-      targetUrl = 'http://localhost:8095/asr';
+      path = '/video-asr';
     } else if (type === 'image' || type === 'document') {
-      targetUrl = 'http://localhost:8094/ocr';
+      path = type === 'document' ? '/documents' : '/ocr';
     } else {
-      targetUrl = 'http://localhost:8092/asr';
+      path = '/asr';
     }
+    const targetUrl = `${whisperProxy}${path}`;
     
     console.log(`🎯 Envoi vers: ${targetUrl} (type: ${type})`);
     
@@ -147,7 +149,7 @@ async function processTranscriptionAsync(taskId: string, session: any, type: str
         'Pragma': 'no-cache'
       },
       // Timeout de 10 minutes pour les gros fichiers
-      signal: AbortSignal.timeout(10 * 60 * 1000)
+      signal: AbortSignal.timeout(30 * 60 * 1000) // 30 min pour gros fichiers
     });
     
     console.log(`📡 Réponse reçue de Whisper: ${response.status} ${response.statusText}`);
@@ -157,7 +159,16 @@ async function processTranscriptionAsync(taskId: string, session: any, type: str
       throw new Error(`Erreur service Whisper: ${response.status} - ${errorText}`);
     }
     
-    const result = await response.text();
+    const rawResult = await response.text();
+    // Whisper peut renvoyer du JSON { "text": "..." } ou du texte brut
+    let result = rawResult;
+    try {
+      const parsed = JSON.parse(rawResult);
+      if (parsed?.text != null) result = parsed;
+      else if (typeof parsed === 'string') result = parsed;
+    } catch {
+      // Garder le texte brut
+    }
     
     // Mettre à jour la tâche avec le résultat
     const task = uploadSessions.get(`task_${taskId}`);

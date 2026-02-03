@@ -260,7 +260,11 @@ export default function AdminApplications() {
       }, {} as Record<string, any>);
 
       // Utiliser TOUS les modules de la table modules, pas seulement ceux avec des utilisations actives
-      const allModuleIds = (modulesData || []).map(module => module.id);
+      // Modules masqués de l'admin (page et fichiers conservés)
+      const hiddenFromAdmin = ['hunyuan3d'];
+      const allModuleIds = (modulesData || [])
+        .map(module => module.id)
+        .filter(id => !hiddenFromAdmin.includes(id));
       
       const applicationsWithRealData = allModuleIds.map(moduleId => {
         const stats = applicationStats[moduleId] || {
@@ -284,7 +288,7 @@ export default function AdminApplications() {
         if (moduleId.includes('cogstudio') || moduleId.includes('stablediffusion') || moduleId.includes('ruinedfooocus')) {
           tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Application d'intelligence artificielle pour la génération d'images. Coût: ${tokenCost} tokens par utilisation.`;
+          description = `Application d'intelligence artificielle pour la génération d'images. Coût: ${tokenCost} tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez.`;
         } else if (moduleId.includes('metube') || moduleId.includes('librespeed')) {
           tokenCost = 10;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
@@ -328,7 +332,7 @@ export default function AdminApplications() {
         } else {
           tokenCost = 10;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Application utilitaire. Coût: ${tokenCost} tokens par utilisation.`;
+          description = `Application utilitaire. Coût: ${tokenCost} tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez.`;
         }
 
         // Utiliser le nom du module depuis modulesData si disponible, sinon utiliser la logique de fallback

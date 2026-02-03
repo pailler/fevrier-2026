@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
   experimental: {
     // outputFileTracingRoot: undefined,
     optimizePackageImports: ['@supabase/supabase-js'],
+    // Limite body pour /api/whisper-upload/chunk (chunks 20MB) — défaut 10MB avec middleware
+    middlewareClientMaxBodySize: '100mb',
   },
   
   // Définir explicitement les variables d'environnement avec des valeurs par défaut
@@ -70,28 +72,8 @@ const nextConfig: NextConfig = {
       config.resolve.alias = {
         ...config.resolve.alias,
       };
-      
-      // Améliorer la gestion des chunks pour éviter les erreurs "can't access property call"
-      config.optimization = config.optimization || {};
-      config.optimization.splitChunks = {
-        ...config.optimization.splitChunks,
-        chunks: 'all',
-        cacheGroups: {
-          default: {
-            minChunks: 2,
-            priority: -20,
-            reuseExistingChunk: true,
-          },
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            priority: -10,
-            reuseExistingChunk: true,
-          },
-        },
-      };
-      
-      // Ajouter une gestion d'erreur pour les chunks manquants
+      // Pas de splitChunks personnalisé : le name: 'vendors' fixe peut provoquer
+      // "Cannot read properties of undefined (reading 'call')" avec les imports dynamiques.
       config.plugins = config.plugins || [];
       config.plugins.push(
         new webpack.DefinePlugin({
@@ -118,6 +100,24 @@ const nextConfig: NextConfig = {
   // Configuration pour le domaine avec optimisations de cache
   async headers() {
     return [
+      // Polices Next.js (Geist) : en-têtes pour éviter les erreurs de chargement
+      {
+        source: '/__nextjs_font/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+          {
+            key: 'Content-Type',
+            value: 'font/woff2',
+          },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: 'same-origin',
+          },
+        ],
+      },
       {
         source: '/services',
         headers: [
@@ -166,7 +166,7 @@ const nextConfig: NextConfig = {
           // CORS headers retirés - gérés par les routes API individuelles
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self' https://iahome.fr https://*.iahome.fr; connect-src 'self' https://iahome.fr https://*.iahome.fr http://localhost:8003 http://localhost:7960 https://hunyuan3d.iahome.fr https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io wss://*.supabase.co wss://*.supabase.io https://*.cloudflareaccess.com https://cloudflare.com https://*.cloudflare.com https://www.google-analytics.com https://www.googletagmanager.com https://stats.g.doubleclick.net https://*.doubleclick.net https://connect.facebook.net https://www.facebook.com https://*.facebook.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://iahome.fr https://*.iahome.fr https://iahome.fr/_next/static/ https://*.iahome.fr/_next/static/ https://iahome.fr/cdn-cgi/ https://*.cloudflareaccess.com https://*.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; img-src 'self' data: https://iahome.fr https://*.iahome.fr https: https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' data: https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; worker-src 'self' blob: https://iahome.fr https://*.iahome.fr; frame-src 'self' https: https://*.cloudflareaccess.com https://hunyuan3d.iahome.fr https://www.youtube.com https://www.youtube-nocookie.com https://youtube.com https://youtube-nocookie.com; frame-ancestors 'self'; report-uri /api/csp-report;"
+            value: "default-src 'self' https://iahome.fr https://*.iahome.fr; connect-src 'self' https://iahome.fr https://*.iahome.fr wss://iahome.fr wss://www.iahome.fr http://localhost:8003 http://localhost:7960 https://hunyuan3d.iahome.fr https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io wss://*.supabase.co wss://*.supabase.io https://*.cloudflareaccess.com https://cloudflare.com https://*.cloudflare.com https://www.google-analytics.com https://www.googletagmanager.com https://stats.g.doubleclick.net https://*.doubleclick.net https://connect.facebook.net https://www.facebook.com https://*.facebook.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://iahome.fr https://*.iahome.fr https://iahome.fr/_next/static/ https://*.iahome.fr/_next/static/ https://iahome.fr/cdn-cgi/ https://*.cloudflareaccess.com https://*.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; img-src 'self' data: https://iahome.fr https://*.iahome.fr https: https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' data: https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; worker-src 'self' blob: https://iahome.fr https://*.iahome.fr; frame-src 'self' https: https://*.cloudflareaccess.com https://hunyuan3d.iahome.fr https://www.youtube.com https://www.youtube-nocookie.com https://youtube.com https://youtube-nocookie.com; frame-ancestors 'self'; report-uri /api/csp-report;"
           },
           {
             key: 'Cache-Control',
@@ -385,6 +385,9 @@ const nextConfig: NextConfig = {
         source: '/fonts/:path*',
         destination: '/fonts/:path*',
       },
+      // Éviter 502 sur favicon / apple-touch-icon si les fichiers manquent
+      { source: '/favicon.ico', destination: '/iahome-logo.svg' },
+      { source: '/apple-touch-icon.png', destination: '/iahome-logo.svg' },
     ];
   },
 };

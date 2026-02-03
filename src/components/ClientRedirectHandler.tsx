@@ -8,6 +8,11 @@ export default function ClientRedirectHandler() {
     if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
       return;
     }
+    // NE JAMAIS recharger sur /auth/callback : le code OAuth est à usage unique,
+    // un reload consommerait le code et provoquerait "session non trouvée"
+    if (window.location.pathname === '/auth/callback') {
+      return;
+    }
     
     const HEADER_VERSION = '4.0.1'; // Incrémenté pour forcer le vidage de cache après rebuild
     
@@ -38,11 +43,14 @@ export default function ClientRedirectHandler() {
           });
         }, 0);
       }
-      // Vider localStorage et sessionStorage des anciennes versions
+      // Stocker la nouvelle version en premier (évite toute race avant le replace)
+      localStorage.setItem('header_version', HEADER_VERSION);
+
+      // Vider localStorage des anciennes versions (sauf header_version)
       const oldKeys = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && (key.includes('header') || key.includes('cache') || key.includes('version') || key.includes('banner'))) {
+        if (key && key !== 'header_version' && (key.includes('header') || key.includes('cache') || key.includes('version') || key.includes('banner'))) {
           oldKeys.push(key);
         }
       }
@@ -63,9 +71,6 @@ export default function ClientRedirectHandler() {
           sessionStorage.removeItem(key);
         });
       }
-      
-      // Stocker la nouvelle version
-      localStorage.setItem('header_version', HEADER_VERSION);
       
       // FORCER le rechargement immédiat avec cache bypass
       const timestamp = Date.now();
@@ -94,12 +99,43 @@ export default function ClientRedirectHandler() {
     if (typeof window === 'undefined') {
       return;
     }
-    
-    let reloadCount = 0;
+
+    const CHUNK_RELOAD_KEY = 'chunk_error_reload_count';
+    const CHUNK_RELOAD_RESET_MS = 30000; // Réinitialiser le compteur après 30 s sans erreur
     const MAX_RELOADS = 2; // Limiter à 2 rechargements pour éviter les boucles infinies
-    let chunkErrorCount = 0;
-    const MAX_CHUNK_ERRORS = 1; // Recharger après 1 erreur de chunk
-    
+
+    const getPersistedReloadCount = (): number => {
+      try {
+        const stored = sessionStorage.getItem(CHUNK_RELOAD_KEY);
+        if (!stored) return 0;
+        const parsed = parseInt(stored, 10);
+        return isNaN(parsed) ? 0 : parsed;
+      } catch {
+        return 0;
+      }
+    };
+
+    const incrementPersistedReloadCount = (): number => {
+      const count = getPersistedReloadCount() + 1;
+      try {
+        sessionStorage.setItem(CHUNK_RELOAD_KEY, String(count));
+      } catch {
+        // ignore
+      }
+      return count;
+    };
+
+    // Réinitialiser le compteur après un délai si la page se charge correctement (pas d'erreur)
+    const resetTimeoutId = setTimeout(() => {
+      try {
+        sessionStorage.removeItem(CHUNK_RELOAD_KEY);
+      } catch {
+        // ignore
+      }
+    }, CHUNK_RELOAD_RESET_MS);
+
+    let reloadCount = getPersistedReloadCount();
+
     const handleError = function(event: ErrorEvent) {
       const error = event.error || event.message || '';
       const errorMessage = (typeof error === 'string' ? error : (error && error.message ? error.message : ''));
@@ -122,10 +158,9 @@ export default function ClientRedirectHandler() {
         ));
       
       if (isWebpackError && reloadCount < MAX_RELOADS) {
-        reloadCount++;
-        // Logs réduits pour améliorer les performances
+        const newCount = incrementPersistedReloadCount();
+        reloadCount = newCount;
         
-        // Vider le cache et recharger
         setTimeout(function() {
           if (typeof window === 'undefined' || !window.location) {
             return;
@@ -164,53 +199,52 @@ export default function ClientRedirectHandler() {
         const script = target as HTMLScriptElement;
         const src = script.src || '';
         
-        // Détecter les erreurs de chunks Next.js
         if (src.includes('/_next/static/chunks/') || src.includes('/_next/static/js/')) {
+          const currentCount = getPersistedReloadCount();
+          if (currentCount >= MAX_RELOADS) {
+            console.warn('⚠️ Erreur de chunk - rechargement déjà tenté', currentCount, 'fois, abandon.');
+            return;
+          }
           console.warn('⚠️ Erreur de chargement de chunk détectée:', src);
           
-          // Vider le cache et recharger une seule fois
-          if (reloadCount < MAX_RELOADS && typeof window !== 'undefined' && window.location) {
-            reloadCount++;
-            setTimeout(function() {
-              if (typeof window === 'undefined' || !window.location) {
-                return;
+          incrementPersistedReloadCount();
+          setTimeout(function() {
+            if (typeof window === 'undefined' || !window.location) {
+              return;
+            }
+            
+            const reloadWindow = () => {
+              if (typeof window !== 'undefined' && window.location) {
+                window.location.reload();
               }
-              
-              const reloadWindow = () => {
-                if (typeof window !== 'undefined' && window.location) {
-                  window.location.reload();
-                }
-              };
-              
-              if ('caches' in window) {
-                caches.keys().then(function(names) {
-                  names.forEach(function(name) {
-                    caches.delete(name);
-                  });
-                  reloadWindow();
-                }).catch(function() {
-                  reloadWindow();
+            };
+            
+            if ('caches' in window) {
+              caches.keys().then(function(names) {
+                names.forEach(function(name) {
+                  caches.delete(name);
                 });
-              } else {
                 reloadWindow();
-              }
-            }, 1000);
-          }
+              }).catch(function() {
+                reloadWindow();
+              });
+            } else {
+              reloadWindow();
+            }
+          }, 1000);
         }
       }
     };
     
     window.addEventListener('error', handleScriptError, true);
     
-    // Intercepter les erreurs non capturées
-    let rejectionReloadCount = 0;
+    let rejectionReloadCount = getPersistedReloadCount();
     const MAX_REJECTION_RELOADS = 2;
     
     const handleRejection = function(event: PromiseRejectionEvent) {
       const error = event.reason || '';
       const errorMessage = (typeof error === 'string' ? error : (error && error.message ? error.message : ''));
       
-      // Ignorer les erreurs liées à url.length pour éviter les boucles infinies
       if (errorMessage.includes("can't access property") && errorMessage.includes("url") && errorMessage.includes("undefined")) {
         console.warn('⚠️ Erreur url.length (promise rejection) détectée - Rechargement automatique désactivé');
         event.preventDefault();
@@ -226,8 +260,8 @@ export default function ClientRedirectHandler() {
         ));
       
       if (isWebpackError && rejectionReloadCount < MAX_REJECTION_RELOADS) {
-        rejectionReloadCount++;
-        // Logs réduits pour améliorer les performances
+        const newCount = incrementPersistedReloadCount();
+        rejectionReloadCount = newCount;
         event.preventDefault();
         setTimeout(function() {
           window.location.reload();
@@ -241,6 +275,7 @@ export default function ClientRedirectHandler() {
     window.addEventListener('unhandledrejection', handleRejection);
     
     return () => {
+      clearTimeout(resetTimeoutId);
       window.removeEventListener('error', handleError, true);
       window.removeEventListener('error', handleScriptError, true);
       window.removeEventListener('unhandledrejection', handleRejection);

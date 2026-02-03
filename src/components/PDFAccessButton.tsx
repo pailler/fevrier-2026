@@ -32,7 +32,7 @@ export default function PDFAccessButton({
             : 'bg-blue-600 hover:bg-blue-700'
           }`}
       >
-        {isLoading ? '⏳ Ouverture...' : '📄 Accéder à PDF+ (10 tokens)'}
+        {isLoading ? '⏳ Ouverture...' : '📄 Accéder à PDF+ (10 tokens par accès)'}
       </button>
       {error && (
         <p className="text-red-500 text-sm">

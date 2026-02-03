@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import DynamicNavigation from './DynamicNavigation';
 import { useTokenContext } from '../contexts/TokenContext';
@@ -57,10 +56,8 @@ export default function Header() {
     setIsMobileMenuOpen((prev) => !prev);
   }, []);
 
-  // Protection contre les erreurs de référence
-  if (typeof window === 'undefined') {
-    return null;
-  }
+  // Ne pas utiliser typeof window pour retourner null : ça provoque une erreur d'hydratation
+  // (serveur = null, client = <header>). Le Header n'est monté qu'après ClientHeader mounted.
 
   // Vérifier le rôle de l'utilisateur
   useEffect(() => {
@@ -308,13 +305,14 @@ export default function Header() {
               }}
             >
               <div className="relative h-8 w-auto md:h-9 lg:h-10">
-                <Image
+                {/* img natif pour éviter "Cannot read properties of undefined (reading 'call')" dans le chunk dynamique next/image */}
+                <img
                   src="/iahome-logo.svg"
                   alt="IAhome"
                   width={40}
                   height={40}
-                  priority
                   className="h-8 md:h-9 lg:h-10 w-auto"
+                  loading="eager"
                 />
               </div>
               <span className="text-lg sm:text-xl font-bold text-white">IAhome</span>

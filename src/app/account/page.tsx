@@ -33,12 +33,16 @@ interface UserApplication {
 
 export default function AccountPage() {
   const router = useRouter();
-  const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
+  const { user, isAuthenticated, loading: authLoading, signOut } = useCustomAuth();
   const { tokens, isLoading: tokensLoading } = useTokenContext();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [applications, setApplications] = useState<UserApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -113,6 +117,27 @@ export default function AccountPage() {
     const expiry = new Date(expiresAt);
     const diff = expiry.getTime() - now.getTime();
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirm !== 'SUPPRIMER') return;
+    setDeleteError(null);
+    setDeleteLoading(true);
+    try {
+      const res = await fetch('/api/account/delete', { method: 'POST', credentials: 'include' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || 'Erreur lors de la suppression du compte');
+      }
+      setShowDeleteModal(false);
+      setDeleteConfirm('');
+      await signOut();
+      router.push('/');
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : 'Une erreur est survenue');
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   if (authLoading || loading) {
@@ -383,9 +408,68 @@ export default function AccountPage() {
                 </Link>
               </div>
             </div>
+
+            {/* Zone dangereuse - Supprimer mon compte */}
+            <div className="bg-white rounded-xl shadow-lg border border-red-200 p-6">
+              <h2 className="text-xl font-bold text-red-700 mb-2 flex items-center">
+                <span className="mr-2">⚠️</span>
+                Zone dangereuse
+              </h2>
+              <p className="text-gray-600 text-sm mb-4">
+                La suppression de votre compte est définitive. Toutes vos données (profil, applications, tokens) seront supprimées.
+              </p>
+              <button
+                type="button"
+                onClick={() => { setShowDeleteModal(true); setDeleteError(null); setDeleteConfirm(''); }}
+                className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-center font-medium transition-colors"
+              >
+                Supprimer mon compte
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Modal de confirmation suppression */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <h3 id="delete-modal-title" className="text-lg font-bold text-red-700 mb-2">Supprimer définitivement mon compte</h3>
+            <p className="text-gray-600 text-sm mb-4">
+              Cette action est irréversible. Pour confirmer, tapez <strong>SUPPRIMER</strong> ci-dessous.
+            </p>
+            <input
+              type="text"
+              value={deleteConfirm}
+              onChange={(e) => setDeleteConfirm(e.target.value)}
+              placeholder="SUPPRIMER"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              aria-label="Confirmer en tapant SUPPRIMER"
+            />
+            {deleteError && (
+              <p className="text-red-600 text-sm mb-4" role="alert">{deleteError}</p>
+            )}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => { setShowDeleteModal(false); setDeleteConfirm(''); setDeleteError(null); }}
+                disabled={deleteLoading}
+                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium disabled:opacity-50"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirm !== 'SUPPRIMER' || deleteLoading}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deleteLoading ? 'Suppression…' : 'Supprimer mon compte'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

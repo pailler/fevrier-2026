@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
       title: 'Compte-rendus automatiques',
       description: 'Compte-rendus automatiques : Transformez automatiquement vos réunions en rapports professionnels avec l\'intelligence artificielle. Enregistrez, transcrivez et résumez vos réunions avec une précision exceptionnelle.',
       category: 'Productivité',
-      price: 100, // 100 tokens par utilisation
+      price: 100, // 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez
       youtube_url: '',
       url: 'https://meeting-reports.iahome.fr',
       image_url: '/images/module-visuals/meeting-reports-module.svg',

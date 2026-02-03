@@ -77,7 +77,7 @@ S'assurer qu'une image `/public/images/voice-isolation.jpg` existe pour l'affich
 
 ## 🔧 Configuration
 
-- **Coût**: 100 tokens par utilisation
+- **Coût**: 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez
 - **URL locale**: `http://localhost:8100`
 - **URL production**: `https://iahome.fr/voice-isolation` (via proxy Next.js)
 - **Module ID**: `voice-isolation`

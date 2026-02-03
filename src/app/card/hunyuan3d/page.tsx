@@ -264,7 +264,7 @@ export default function Hunyuan3DPage() {
           "name": "Hunyuan 3D est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation du service Hunyuan 3D coûte 100 tokens par utilisation. Une fois activé, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles."
+            "text": "L'activation du service Hunyuan 3D coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles."
           }
         },
         {
@@ -654,7 +654,7 @@ export default function Hunyuan3DPage() {
                   100 tokens
                 </div>
                 <div className="text-sm opacity-90">
-                  par utilisation
+                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
                 </div>
               </div>
             </div>
@@ -963,7 +963,7 @@ export default function Hunyuan3DPage() {
                   <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-blue-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Hunyuan 3D est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'activation du service Hunyuan 3D coûte 100 tokens par utilisation. Une fois activé, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles.
+                      L'activation du service Hunyuan 3D coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles.
                     </p>
                   </div>
                   
@@ -1186,7 +1186,7 @@ export default function Hunyuan3DPage() {
                 </div>
                 <div>
                   <h5 className="font-semibold text-gray-900">Prix</h5>
-                  <p className="text-gray-600 text-sm">100 tokens par utilisation</p>
+                  <p className="text-gray-600 text-sm">100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez</p>
                 </div>
               </div>
               
@@ -1272,7 +1272,7 @@ export default function Hunyuan3DPage() {
         moduleId={card?.id || 'hunyuan3d'}
         moduleName="Hunyuan 3D"
         tokenCost={100}
-        tokenUnit="par utilisation"
+        tokenUnit="par accès, et utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-hunyuan3d"
         gradientColors="from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
         icon="🎭"

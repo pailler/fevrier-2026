@@ -96,7 +96,7 @@ export default function CardDetailPage() {
     // Vérifier si le module a un coût en tokens défini
     const tokenCost = TOKEN_COSTS[moduleId as keyof typeof TOKEN_COSTS];
     if (tokenCost) {
-      return `${tokenCost} tokens par utilisation`;
+      return `${tokenCost} tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez`;
     }
     
     // Fallback: utiliser le prix tel quel (pour compatibilité avec les anciens modules)
@@ -423,8 +423,8 @@ export default function CardDetailPage() {
           const librespeedCard = {
             id: 'librespeed',
             title: 'LibreSpeed',
-            description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision. Coûte 10 tokens par utilisation.',
-            subtitle: 'Test de vitesse internet complet - mesurez la qualité de votre bande passante (10 tokens)',
+            description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision. Coûte 10 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez.',
+            subtitle: 'Test de vitesse internet complet - 10 tokens par accès, utilisez aussi longtemps que vous souhaitez',
             category: 'WEB TOOLS',
             price: 10,
             image_url: '/images/librespeed.jpg',
@@ -433,7 +433,7 @@ export default function CardDetailPage() {
               'Interface moderne et intuitive',
               'Résultats détaillés',
               'Compatible tous navigateurs',
-              '10 tokens par utilisation'
+              '10 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
             ],
             requirements: [
               'Connexion internet stable',
@@ -486,7 +486,7 @@ export default function CardDetailPage() {
             id: 'psitransfer',
             title: 'PsiTransfer',
             description: 'Transfert de fichiers sécurisé et privé. Envoyez vos fichiers sans surveillance, sans publicité. Quota maximum: 10 Go.',
-            subtitle: 'Transfert de fichiers sécurisé (10 tokens)',
+            subtitle: 'Transfert de fichiers sécurisé (10 tokens par accès)',
             category: 'WEB TOOLS',
             price: 10,
             image_url: '/images/psitransfer.jpg',
@@ -496,7 +496,7 @@ export default function CardDetailPage() {
               'Chiffrement end-to-end',
               'Partage par lien temporaire',
               'Interface simple et intuitive',
-              '10 tokens par utilisation'
+              '10 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
             ],
             requirements: [
               'Connexion internet stable',
@@ -877,8 +877,8 @@ export default function CardDetailPage() {
                   </div>
                   <div className="text-sm opacity-90">
                     {card.price === 0 || card.price === '0' ? 
-                      (isFreeModule ? 'par utilisation' : 'Gratuit') : 
-                      'par utilisation'
+                      (isFreeModule ? 'par accès, et utilisez l\'application aussi longtemps que vous souhaitez' : 'Gratuit') : 
+                      'par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
                     }
                   </div>
                 </div>
@@ -1085,7 +1085,7 @@ export default function CardDetailPage() {
                             if (result.success) {
                               console.log('✅ Apprendre le Code aux enfants activé avec succès');
                               setAlreadyActivatedModules(prev => [...prev, card.id]);
-                              alert('Apprendre le Code aux enfants activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation (10 tokens).');
+                              alert('Apprendre le Code aux enfants activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. 10 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez.');
                               router.push('/encours');
                             } else {
                               console.error('❌ Erreur activation Apprendre le Code aux enfants:', result.error);
@@ -1100,7 +1100,7 @@ export default function CardDetailPage() {
                       >
                         <span className="text-xl">⚡</span>
                         <span>
-                          {isAuthenticated && user ? `Activer Apprendre le Code aux enfants (10 tokens)` : `Connectez-vous pour activer Apprendre le Code aux enfants (10 tokens)`}
+                          {isAuthenticated && user ? `Activer Apprendre le Code aux enfants (10 tokens par accès)` : `Connectez-vous pour activer Apprendre le Code aux enfants (10 tokens par accès)`}
                         </span>
                       </button>
                     )}
@@ -1134,7 +1134,7 @@ export default function CardDetailPage() {
                             if (result.success) {
                               console.log('✅ Apprendre Autrement activé avec succès');
                               setAlreadyActivatedModules(prev => [...prev, card.id]);
-                              alert('Apprendre Autrement activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation (10 tokens).');
+                              alert('Apprendre Autrement activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. 10 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez.');
                               router.push('/encours');
                             } else {
                               console.error('❌ Erreur activation Apprendre Autrement:', result.error);
@@ -1149,7 +1149,7 @@ export default function CardDetailPage() {
                       >
                         <span className="text-xl">🌈</span>
                         <span>
-                          {isAuthenticated && user ? `Activer Apprendre Autrement (10 tokens)` : `Connectez-vous pour activer Apprendre Autrement (10 tokens)`}
+                          {isAuthenticated && user ? `Activer Apprendre Autrement (10 tokens par accès)` : `Connectez-vous pour activer Apprendre Autrement (10 tokens par accès)`}
                         </span>
                       </button>
                     )}
@@ -1198,7 +1198,7 @@ export default function CardDetailPage() {
                       >
                         <span className="text-xl">⚡</span>
                         <span>
-                          {isAuthenticated && user ? `Activer LibreSpeed (10 tokens)` : `Connectez-vous pour activer LibreSpeed (10 tokens)`}
+                          {isAuthenticated && user ? `Activer LibreSpeed (10 tokens par accès)` : `Connectez-vous pour activer LibreSpeed (10 tokens par accès)`}
                         </span>
                       </button>
                     )}
@@ -1322,8 +1322,8 @@ export default function CardDetailPage() {
                   </div>
                   <div className="text-sm opacity-90">
                     {card.price === 0 || card.price === '0' ? 
-                      (isFreeModule ? 'par utilisation' : 'Gratuit') : 
-                      'par utilisation'
+                      (isFreeModule ? 'par accès, et utilisez l\'application aussi longtemps que vous souhaitez' : 'Gratuit') : 
+                      'par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
                     }
                   </div>
                 </div>
@@ -1384,8 +1384,8 @@ export default function CardDetailPage() {
                   </div>
                   <div className="text-sm opacity-90">
                     {card.price === 0 || card.price === '0' ? 
-                      (isFreeModule ? 'par utilisation' : 'Gratuit') : 
-                      'par utilisation'
+                      (isFreeModule ? 'par accès, et utilisez l\'application aussi longtemps que vous souhaitez' : 'Gratuit') : 
+                      'par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
                     }
                   </div>
                 </div>
@@ -1436,7 +1436,7 @@ export default function CardDetailPage() {
                   >
                     <span className="text-xl">📁</span>
                     <span>
-                      {isAuthenticated && user ? `Activer PsiTransfer (10 tokens)` : `Connectez-vous pour activer PsiTransfer (10 tokens)`}
+                      {isAuthenticated && user ? `Activer PsiTransfer (10 tokens par accès)` : `Connectez-vous pour activer PsiTransfer (10 tokens par accès)`}
                     </span>
                   </button>
                 )}
@@ -1482,7 +1482,7 @@ export default function CardDetailPage() {
                     100 tokens
                   </div>
                   <div className="text-sm opacity-90">
-                    par utilisation
+                    par accès, et utilisez l'application aussi longtemps que vous souhaitez
                   </div>
                 </div>
               </div>
@@ -1519,8 +1519,8 @@ export default function CardDetailPage() {
                   </div>
                   <div className="text-sm opacity-90">
                     {card.price === 0 || card.price === '0' ? 
-                      (isFreeModule ? 'par utilisation' : 'Gratuit') : 
-                      'par utilisation'
+                      (isFreeModule ? 'par accès, et utilisez l\'application aussi longtemps que vous souhaitez' : 'Gratuit') : 
+                      'par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
                     }
                   </div>
                 </div>

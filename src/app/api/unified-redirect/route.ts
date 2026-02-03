@@ -23,6 +23,9 @@ const MODULE_URLS: { [key: string]: string } = {
   'cogstudio': 'https://cogstudio.iahome.fr',
   'hunyuan3d': 'https://hunyuan3d.iahome.fr',
   'photomaker': 'https://photomaker.iahome.fr',
+  'birefnet': 'https://birefnet.iahome.fr',
+  'florence-2': 'https://florence2.iahome.fr',
+  'animagine-xl': 'https://animaginexl.iahome.fr',
 };
 
 export async function GET(request: NextRequest) {

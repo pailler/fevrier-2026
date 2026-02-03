@@ -90,7 +90,7 @@ const moduleData = {
   description: 'Transformez automatiquement vos réunions en rapports professionnels avec l\'intelligence artificielle...',
   subtitle: 'Transcription et résumé automatique de réunions avec l\'IA',
   category: 'Productivité',
-  price: 100, // 100 tokens par utilisation
+  price: 100, // 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez
   url: 'https://meeting-reports.iahome.fr',
   image_url: '/images/module-visuals/meeting-reports-module.svg'
 };
@@ -144,7 +144,7 @@ const moduleData = {
 ### **2. Système de Tokens**
 
 #### **Prix et Activation**
-- **Coût** : 100 tokens par utilisation
+- **Coût** : 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez
 - **Activation** : Via `ModuleActivationButton`
 - **Vérification** : Solde utilisateur suffisant
 - **Déduction** : Automatique lors de l'activation

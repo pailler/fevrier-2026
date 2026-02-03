@@ -308,7 +308,7 @@ export default function VoiceIsolationPage() {
           "name": "L'Isolation Vocale par IA est-elle gratuite ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation de l'Isolation Vocale par IA coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : isolation vocale, séparation de batterie, extraction de basse, et isolation d'instruments."
+            "text": "L'activation de l'Isolation Vocale par IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : isolation vocale, séparation de batterie, extraction de basse, et isolation d'instruments."
           }
         },
         {
@@ -534,7 +534,7 @@ export default function VoiceIsolationPage() {
                   100 tokens
                 </div>
                 <div className="text-sm opacity-90">
-                  par utilisation
+                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
                 </div>
               </div>
             </div>
@@ -696,7 +696,7 @@ export default function VoiceIsolationPage() {
         moduleId="voice-isolation"
         moduleName="Voice Isolation"
         tokenCost={100}
-        tokenUnit="par utilisation"
+        tokenUnit="par accès, et utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-voice-isolation"
         gradientColors="from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
         icon="🎤"

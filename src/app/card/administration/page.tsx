@@ -15,7 +15,7 @@ export default function AdministrationPage() {
   const [checkingActivation, setCheckingActivation] = useState(false);
 
   const moduleId = 'administration';
-  const isFreeModule = false; // Module payant : 10 tokens par activation
+  const isFreeModule = false; // Module payant : 10 tokens par accès
 
   // Fonction pour vérifier si un module est déjà activé
   const checkModuleActivation = useCallback(async (moduleId: string) => {
@@ -107,7 +107,7 @@ export default function AdministrationPage() {
           "name": "Les Services de l'Administration sont-ils gratuits ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation du portail Services de l'Administration coûte 10 tokens par activation. Une fois activé, vous pouvez accéder à tous les liens et services sans frais supplémentaires. Les liens pointent vers les sites officiels des administrations françaises."
+            "text": "L'activation du portail Services de l'Administration coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez accéder à tous les liens et services sans frais supplémentaires. Les liens pointent vers les sites officiels des administrations françaises."
           }
         },
         {
@@ -306,7 +306,7 @@ export default function AdministrationPage() {
                   <li>Liens directs vers les sites officiels et applications mobiles</li>
                   <li>Services populaires mis en avant</li>
                   <li>Navigation par ancres pour accéder rapidement à une section</li>
-                  <li>10 tokens par activation</li>
+                  <li>10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez</li>
                 </ul>
               </div>
               
@@ -338,7 +338,7 @@ export default function AdministrationPage() {
                   10 tokens
                 </div>
                 <div className="text-sm opacity-90">
-                  par activation
+                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
                 </div>
               </div>
             </div>
@@ -424,7 +424,7 @@ export default function AdministrationPage() {
                       <>
                         <span className="text-xl">🏛️</span>
                         <span>
-                          {isAuthenticated && user ? 'Activez les services administratifs (10 tokens)' : 'Connectez-vous pour activer (10 tokens)'}
+                          {isAuthenticated && user ? 'Activez les services administratifs (10 tokens par accès)' : 'Connectez-vous pour activer (10 tokens par accès)'}
                         </span>
                       </>
                     )}
@@ -672,7 +672,7 @@ export default function AdministrationPage() {
                   <div className="bg-gradient-to-r from-pink-50 to-red-50 p-6 rounded-2xl border-l-4 border-pink-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Les Services de l'Administration sont-ils gratuits ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'activation du portail Services de l'Administration coûte 10 tokens par activation. Une fois activé, vous pouvez accéder à tous les liens et services sans frais supplémentaires. Les liens pointent vers les sites officiels des administrations françaises.
+                      L'activation du portail Services de l'Administration coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez accéder à tous les liens et services sans frais supplémentaires. Les liens pointent vers les sites officiels des administrations françaises.
                     </p>
                   </div>
                   
@@ -865,7 +865,7 @@ export default function AdministrationPage() {
         moduleId={moduleId}
         moduleName="Administration"
         tokenCost={10}
-        tokenUnit="par activation"
+        tokenUnit="par accès, et utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-administration"
         gradientColors="from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
         icon="⚙️"

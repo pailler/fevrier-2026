@@ -21,8 +21,8 @@ export default function LibreSpeedCardPage() {
   const librespeedModule = {
     id: 'librespeed',
     title: 'LibreSpeed',
-    subtitle: 'Test de vitesse internet complet - mesurez la qualité de votre bande passante (10 tokens)',
-    description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision. Coûte 10 tokens par utilisation.',
+    subtitle: 'Test de vitesse internet complet - 10 tokens par accès, utilisez aussi longtemps que vous souhaitez',
+    description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision. Coûte 10 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez.',
     category: 'WEB TOOLS',
     price: '10 tokens',
     image: '/images/librespeed.jpg',
@@ -129,7 +129,7 @@ export default function LibreSpeedCardPage() {
           "name": "LibreSpeed est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "LibreSpeed est un outil open-source et gratuit. L'activation du service coûte 10 tokens par utilisation. Une fois activé, vous pouvez effectuer des tests de vitesse sans frais supplémentaires."
+            "text": "LibreSpeed est un outil open-source et gratuit. L'activation du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez effectuer des tests de vitesse sans frais supplémentaires."
           }
         },
         {
@@ -309,7 +309,7 @@ export default function LibreSpeedCardPage() {
                   <li>Interface moderne et intuitive</li>
                   <li>Résultats détaillés</li>
                   <li>Compatible tous navigateurs</li>
-                  <li>10 tokens par utilisation</li>
+                  <li>10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez</li>
                 </ul>
               </div>
             </div>
@@ -323,7 +323,7 @@ export default function LibreSpeedCardPage() {
                   10 tokens
                 </div>
                 <div className="text-sm opacity-90">
-                  par utilisation
+                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
                 </div>
               </div>
             </div>
@@ -410,7 +410,7 @@ export default function LibreSpeedCardPage() {
                       <>
                         <span className="text-xl">⚡</span>
                         <span>
-                          {isAuthenticated && user ? 'Activer LibreSpeed (10 tokens)' : 'Connectez-vous pour activer (10 tokens)'}
+                          {isAuthenticated && user ? 'Activer LibreSpeed (10 tokens par accès)' : 'Connectez-vous pour activer (10 tokens par accès)'}
                         </span>
                       </>
                     )}
@@ -630,7 +630,7 @@ export default function LibreSpeedCardPage() {
                   <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-2xl border-l-4 border-purple-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">LibreSpeed est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      LibreSpeed est un outil open-source et gratuit. L'activation du service coûte 10 tokens par utilisation. Une fois activé, vous pouvez effectuer des tests de vitesse sans frais supplémentaires.
+                      LibreSpeed est un outil open-source et gratuit. L'activation du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez effectuer des tests de vitesse sans frais supplémentaires.
                     </p>
                   </div>
                   
@@ -674,7 +674,7 @@ export default function LibreSpeedCardPage() {
         moduleId={moduleId}
         moduleName="LibreSpeed"
         tokenCost={10}
-        tokenUnit="par utilisation"
+        tokenUnit="par accès, et utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-librespeed-test"
         gradientColors="from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
         icon="⚡"

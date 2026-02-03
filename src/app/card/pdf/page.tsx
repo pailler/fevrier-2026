@@ -109,7 +109,7 @@ export default function PDFPage() {
           "name": "Est-ce gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'IA PDF de IA Home est accessible avec un système de tokens. Chaque utilisation coûte 10 tokens, ce qui permet un accès équitable à tous les utilisateurs. Consultez la page d'activation pour connaître les détails de tarification et les options disponibles."
+            "text": "L'IA PDF de IA Home est accessible avec un système de tokens. 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Consultez la page d'activation pour connaître les détails de tarification et les options disponibles."
           }
         },
         {
@@ -334,7 +334,7 @@ export default function PDFPage() {
                   10 tokens
                 </div>
                 <div className="text-sm opacity-90">
-                  par utilisation
+                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
                 </div>
               </div>
             </div>
@@ -385,7 +385,7 @@ export default function PDFPage() {
               >
                 <span className="text-xl">📄</span>
                 <span>
-                  {isAuthenticated && user ? 'Activez PDF+ (10 tokens)' : 'Connectez-vous pour activer PDF+ (10 tokens)'}
+                  {isAuthenticated && user ? 'Activez PDF+ (10 tokens par accès)' : 'Connectez-vous pour activer PDF+ (10 tokens par accès)'}
                 </span>
               </button>
             </div>
@@ -627,7 +627,7 @@ export default function PDFPage() {
                   <div className="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-2xl border-l-4 border-red-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Est-ce gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'IA PDF de IA Home est accessible avec un système de tokens. Chaque utilisation coûte 10 tokens, ce qui permet un accès équitable à tous les utilisateurs. Consultez la page d'activation pour connaître les détails de tarification et les options disponibles.
+                      L'IA PDF de IA Home est accessible avec un système de tokens. 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Consultez la page d'activation pour connaître les détails de tarification et les options disponibles.
                     </p>
                   </div>
                   

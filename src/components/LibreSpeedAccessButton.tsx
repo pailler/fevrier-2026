@@ -32,7 +32,7 @@ export default function LibreSpeedAccessButton({
             : 'bg-blue-600 hover:bg-blue-700'
           }`}
       >
-        {isLoading ? '⏳ Ouverture...' : '🚀 Accéder à LibreSpeed (10 tokens)'}
+        {isLoading ? '⏳ Ouverture...' : '🚀 Accéder à LibreSpeed (10 tokens par accès)'}
       </button>
       {error && (
         <p className="text-red-500 text-sm">

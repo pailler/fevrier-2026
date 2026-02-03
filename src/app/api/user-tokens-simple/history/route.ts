@@ -63,11 +63,14 @@ export async function GET(request: NextRequest) {
       .limit(limit);
 
     if (historyError) {
-      console.error('Erreur lors de la récupération de l\'historique user_applications:', historyError);
-      return NextResponse.json(
-        { error: 'Erreur lors de la récupération de l\'historique' },
-        { status: 500 }
-      );
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Historique user_applications non disponible:', historyError.message);
+      }
+      return NextResponse.json({
+        success: true,
+        history: [],
+        total: 0
+      });
     }
 
     // Transformer les données avec les coûts depuis TOKEN_COSTS

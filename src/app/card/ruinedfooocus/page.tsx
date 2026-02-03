@@ -255,7 +255,7 @@ export default function RuinedFooocusPage() {
           "name": "RuinedFooocus est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation de RuinedFooocus coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, support multi-plateformes, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images."
+            "text": "L'activation de RuinedFooocus coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, support multi-plateformes, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images."
           }
         },
         {
@@ -530,7 +530,7 @@ export default function RuinedFooocusPage() {
                   {card.price === 0 || card.price === '0' ? 'Free' : '100 tokens'}
                 </div>
                 <div className="text-sm opacity-90">
-                  {card.price === 0 || card.price === '0' ? 'Gratuit' : 'par utilisation'}
+                  {card.price === 0 || card.price === '0' ? 'Gratuit' : 'par accès, et utilisez l\'application aussi longtemps que vous souhaitez'}
                 </div>
               </div>
             </div>
@@ -851,7 +851,7 @@ export default function RuinedFooocusPage() {
                           </tr>
                           <tr className="bg-white">
                             <td className="border border-gray-300 p-4 font-semibold">Prix</td>
-                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par utilisation</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez</td>
                             <td className="border border-gray-300 p-4 text-center">⚠️ Abonnements mensuels souvent chers</td>
                           </tr>
                         </tbody>
@@ -894,7 +894,7 @@ export default function RuinedFooocusPage() {
                     <div className="bg-gradient-to-r from-cyan-50 to-teal-50 p-6 rounded-2xl border-l-4 border-cyan-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">RuinedFooocus est-il gratuit ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        L'activation de RuinedFooocus coûte 100 tokens par utilisation. Une fois activé, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, support multi-plateformes, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images.
+                        L'activation de RuinedFooocus coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, support multi-plateformes, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images.
                       </p>
                     </div>
                     
@@ -1188,7 +1188,7 @@ export default function RuinedFooocusPage() {
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 tokens par utilisation'}
+                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez'}
                         </p>
                       </div>
                     </div>
@@ -1285,7 +1285,7 @@ export default function RuinedFooocusPage() {
         moduleId={card?.id || 'ruinedfooocus'}
         moduleName="RuinedFooocus"
         tokenCost={100}
-        tokenUnit="par utilisation"
+        tokenUnit="par accès, et utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-module"
         gradientColors="from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
         icon="🎨"

@@ -1,13 +1,16 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'LibreSpeed : test de vitesse internet rapide et précis | IA Home',
-  description: 'Testez votre débit internet avec LibreSpeed : mesure précise du téléchargement, upload et latence. Test de vitesse internet gratuit, open-source, sans publicité et respectueux de la vie privée.',
+  title: 'Test de vitesse internet – Débit, ping, fibre | IA Home',
+  description: 'Mesurez votre débit (download/upload) et votre latence. Test gratuit, sans pub, open source. Vérifiez votre connexion fibre ou ADSL.',
   keywords: [
     'test vitesse internet',
     'test débit internet',
+    'test débit fibre',
+    'speed test français',
     'test connexion internet',
     'speed test',
+    'mesurer débit',
     'test bande passante',
     'mesure débit internet',
     'test vitesse fibre',
@@ -17,11 +20,8 @@ export const metadata: Metadata = {
     'test upload download',
     'LibreSpeed',
     'test vitesse gratuit',
-    'test internet rapide',
-    'test connexion précise',
     'test vitesse sans publicité',
     'test vitesse open source',
-    'test vitesse privé',
     'test vitesse RGPD',
     'test vitesse français'
   ],
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
     canonical: 'https://iahome.fr/card/librespeed',
   },
   openGraph: {
-    title: 'LibreSpeed : test de vitesse internet rapide et précis | IA Home',
-    description: 'Testez votre débit internet avec LibreSpeed : mesure précise du téléchargement, upload et latence. Test de vitesse internet gratuit, open-source, sans publicité.',
+    title: 'Test de vitesse internet – Débit, ping, fibre | IA Home',
+    description: 'Mesurez débit (download/upload) et latence. Test gratuit, sans pub, open source. Fibre ou ADSL.',
     url: 'https://iahome.fr/card/librespeed',
     siteName: 'IA Home',
     locale: 'fr_FR',
@@ -48,8 +48,8 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@iahome_fr',
     creator: '@iahome_fr',
-    title: 'LibreSpeed : test de vitesse internet rapide et précis | IA Home',
-    description: 'Testez votre débit internet avec LibreSpeed : mesure précise du téléchargement, upload et latence.',
+    title: 'Test de vitesse internet – Débit, ping, fibre | IA Home',
+    description: 'Mesurez débit et latence. Test gratuit, sans pub. Fibre ou ADSL.',
     images: ['https://iahome.fr/images/librespeed.jpg'],
   },
   robots: {
