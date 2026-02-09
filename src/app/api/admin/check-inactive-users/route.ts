@@ -3,10 +3,10 @@ import { getSupabaseUrl, getSupabaseServiceRoleKey } from '../../../../utils/sup
 import { createClient } from '@supabase/supabase-js';
 import { EmailService } from '../../../../utils/emailService';
 
-// 2 mois en millisecondes
-const INACTIVITY_PERIOD_MS = 2 * 30 * 24 * 60 * 60 * 1000; // 2 mois
-// Avertissement 1 semaine avant l'inactivité
-const WARNING_PERIOD_MS = INACTIVITY_PERIOD_MS - (7 * 24 * 60 * 60 * 1000); // 2 mois moins 7 jours
+// 2 ans en millisecondes
+const INACTIVITY_PERIOD_MS = 2 * 365 * 24 * 60 * 60 * 1000; // 2 ans
+// Avertissement 1 semaine avant la désactivation
+const WARNING_PERIOD_MS = INACTIVITY_PERIOD_MS - (7 * 24 * 60 * 60 * 1000); // 2 ans moins 7 jours
 
 export async function POST(request: NextRequest) {
   try {
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       const daysSinceLastActivity = Math.floor((now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24));
       const timeSinceLastActivity = now.getTime() - lastActivity.getTime();
 
-      // Vérifier si l'utilisateur doit être averti (1 semaine avant les 2 mois)
+      // Vérifier si l'utilisateur doit être averti (1 semaine avant les 2 ans)
       if (timeSinceLastActivity >= WARNING_PERIOD_MS && timeSinceLastActivity < INACTIVITY_PERIOD_MS) {
         // Vérifier si l'email d'avertissement a déjà été envoyé
         const { data: existingLog } = await supabase
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Vérifier si l'utilisateur doit être désactivé (2 mois sans activité)
+      // Vérifier si l'utilisateur doit être désactivé (2 ans sans activité)
       if (timeSinceLastActivity >= INACTIVITY_PERIOD_MS) {
         usersToDeactivate.push({
           ...profile,

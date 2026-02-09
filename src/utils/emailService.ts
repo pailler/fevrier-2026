@@ -1,5 +1,7 @@
 import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 import { Resend } from 'resend';
+import fs from 'fs';
+import path from 'path';
 
 export interface EmailData {
   to: string;
@@ -174,11 +176,35 @@ export class EmailService {
         html = html.replace(new RegExp(placeholder, 'g'), templateData[key] || '');
       });
 
+      // Pièce jointe inline pour le visuel iahome (relance offres) — affichage garanti même si le client bloque les images externes
+      const attachments: { content: string; filename: string; contentId?: string }[] = [];
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://iahome.fr';
+      if (eventType === 'relance_offres_iahome') {
+        try {
+          const imagePath = path.join(process.cwd(), 'public', 'images', 'email-visuel-iahome.png');
+          if (fs.existsSync(imagePath)) {
+            const content = fs.readFileSync(imagePath).toString('base64');
+            attachments.push({
+              content,
+              filename: 'email-visuel-iahome.png',
+              contentId: 'iahome-visuel',
+            });
+          } else {
+            // Fallback : image hébergée (si fichier absent en build serverless)
+            html = html.replace(/src="cid:iahome-visuel"/g, `src="${baseUrl}/images/email-visuel-iahome.png"`);
+          }
+        } catch (attachErr) {
+          console.warn('⚠️ Visuel iahome non attaché (image introuvable):', attachErr);
+          html = html.replace(/src="cid:iahome-visuel"/g, `src="${baseUrl}/images/email-visuel-iahome.png"`);
+        }
+      }
+
       const result = await this.resend.emails.send({
         from: process.env.RESEND_FROM_EMAIL || 'IAHome <noreply@iahome.fr>',
         to: userEmail,
         subject,
         html,
+        ...(attachments.length > 0 && { attachments }),
       });
 
       if (result.error) {

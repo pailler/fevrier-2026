@@ -58,9 +58,33 @@ export default function AdminNotifications() {
   const [inactivityLoading, setInactivityLoading] = useState(false);
   const [inactivityResult, setInactivityResult] = useState<any>(null);
 
+  // État pour l'envoi de test avec choix de la notification
+  const [selectedTestEventType, setSelectedTestEventType] = useState<string>('');
+  const [testNotificationEmail, setTestNotificationEmail] = useState('');
+  const [testNotificationUserName, setTestNotificationUserName] = useState('');
+  const [testNotificationSending, setTestNotificationSending] = useState(false);
+  const [testNotificationResult, setTestNotificationResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [ensureRelanceLoading, setEnsureRelanceLoading] = useState(false);
+  const [ensureRelanceMessage, setEnsureRelanceMessage] = useState<string | null>(null);
+
   useEffect(() => {
-    loadData();
-    checkResendStatus();
+    let cancelled = false;
+    (async () => {
+      try {
+        const ensureRes = await fetch('/api/admin/ensure-relance-offres-notification', { method: 'POST' });
+        const ensureData = await ensureRes.json();
+        if (!cancelled && ensureData.success) {
+          await loadData();
+        }
+      } catch {
+        // ignore
+      }
+      if (!cancelled) {
+        await loadData();
+        checkResendStatus();
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   const loadData = async () => {
@@ -164,6 +188,46 @@ export default function AdminNotifications() {
       alert('❌ Erreur lors de l\'envoi du test');
     } finally {
       setTestSending(false);
+    }
+  };
+
+  const sendTestNotificationByType = async () => {
+    if (!selectedTestEventType || !testNotificationEmail) {
+      setTestNotificationResult({
+        success: false,
+        message: 'Veuillez sélectionner une notification et saisir une adresse email.'
+      });
+      return;
+    }
+    setTestNotificationSending(true);
+    setTestNotificationResult(null);
+    try {
+      const response = await fetch('/api/admin/send-test-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventType: selectedTestEventType,
+          email: testNotificationEmail,
+          userName: testNotificationUserName || undefined
+        })
+      });
+      const data = await response.json();
+      if (data.success) {
+        setTestNotificationResult({ success: true, message: `Email envoyé avec succès à ${data.email}` });
+        loadData();
+        setTimeout(() => {
+          setTestNotificationEmail('');
+          setTestNotificationUserName('');
+          setTestNotificationResult(null);
+        }, 4000);
+      } else {
+        setTestNotificationResult({ success: false, message: data.error || 'Erreur lors de l\'envoi' });
+      }
+    } catch (error) {
+      console.error('❌ Envoi test notification:', error);
+      setTestNotificationResult({ success: false, message: 'Erreur réseau ou serveur' });
+    } finally {
+      setTestNotificationSending(false);
     }
   };
 
@@ -493,21 +557,125 @@ export default function AdminNotifications() {
         )}
       </div>
 
-      {/* Test d'envoi d'email */}
+      {/* Test d'envoi : choix de la notification */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Test d'envoi d'email</h2>
-        <div className="flex space-x-4">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Envoyer un email de test</h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Choisissez le type de notification à envoyer, puis l'adresse email de test. L'email reçu sera le vrai contenu du template (sujet et corps).
+        </p>
+        {!settings.some((s) => s.event_type === 'relance_offres_iahome') && (
+          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <p className="text-sm text-amber-800 mb-2">
+              Le template « Relance offres IAHome » n&apos;apparaît pas dans la liste ? Créez-le puis rechargez la page.
+            </p>
+            <button
+              type="button"
+              onClick={async () => {
+                setEnsureRelanceLoading(true);
+                setEnsureRelanceMessage(null);
+                try {
+                  const res = await fetch('/api/admin/ensure-relance-offres-notification', { method: 'POST' });
+                  const data = await res.json();
+                  setEnsureRelanceMessage(data.success ? 'Template créé. Rechargement de la liste…' : `Erreur : ${data.error || 'inconnue'}`);
+                  if (data.success) {
+                    await loadData();
+                  }
+                } catch (e) {
+                  setEnsureRelanceMessage('Erreur réseau');
+                } finally {
+                  setEnsureRelanceLoading(false);
+                }
+              }}
+              disabled={ensureRelanceLoading}
+              className="px-3 py-1.5 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 disabled:opacity-50"
+            >
+              {ensureRelanceLoading ? 'Création…' : 'Créer le template Relance offres IAHome'}
+            </button>
+            {ensureRelanceMessage && (
+              <p className={`text-sm mt-2 ${ensureRelanceMessage.startsWith('Erreur') ? 'text-red-700' : 'text-green-700'}`}>
+                {ensureRelanceMessage}
+              </p>
+            )}
+          </div>
+        )}
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="test-notification-type" className="block text-sm font-medium text-gray-700 mb-1">
+              Notification à envoyer *
+            </label>
+            <select
+              id="test-notification-type"
+              value={selectedTestEventType}
+              onChange={(e) => setSelectedTestEventType(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">— Choisir une notification —</option>
+              <option value="relance_offres_iahome">Relance offres IAHome (relance_offres_iahome)</option>
+              {settings
+                .filter((s) => s.event_type !== 'relance_offres_iahome')
+                .map((s) => (
+                  <option key={s.id} value={s.event_type}>
+                    {s.name} ({s.event_type})
+                  </option>
+                ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="test-notification-email" className="block text-sm font-medium text-gray-700 mb-1">
+              Adresse email *
+            </label>
+            <input
+              id="test-notification-email"
+              type="email"
+              value={testNotificationEmail}
+              onChange={(e) => setTestNotificationEmail(e.target.value)}
+              placeholder="exemple@email.com"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400"
+            />
+          </div>
+          <div>
+            <label htmlFor="test-notification-username" className="block text-sm font-medium text-gray-700 mb-1">
+              Nom du destinataire (optionnel)
+            </label>
+            <input
+              id="test-notification-username"
+              type="text"
+              value={testNotificationUserName}
+              onChange={(e) => setTestNotificationUserName(e.target.value)}
+              placeholder="Utilisé pour {{user_name}} dans le template"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400"
+            />
+          </div>
+          {testNotificationResult && (
+            <div className={`p-3 rounded-lg text-sm ${
+              testNotificationResult.success ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-800'
+            }`}>
+              {testNotificationResult.message}
+            </div>
+          )}
+          <button
+            onClick={sendTestNotificationByType}
+            disabled={!selectedTestEventType || !testNotificationEmail || testNotificationSending}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          >
+            {testNotificationSending ? 'Envoi en cours...' : 'Envoyer l\'email de test'}
+          </button>
+        </div>
+        <p className="mt-3 text-xs text-gray-500">
+          Test Resend brut (sans template) : utilisez le champ email ci-dessous puis le bouton « Envoyer test » dans la section Configuration Resend si besoin.
+        </p>
+        <div className="flex space-x-4 mt-2">
           <input
             type="email"
             value={testEmail}
             onChange={(e) => setTestEmail(e.target.value)}
-            placeholder="Email de test..."
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent placeholder:text-gray-400"
+            placeholder="Email pour test Resend..."
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-gray-800 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent placeholder:text-gray-400 max-w-xs"
           />
           <button
             onClick={sendTestEmail}
             disabled={!testEmail || testSending}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
           >
             {testSending ? 'Envoi...' : 'Envoyer test'}
           </button>
@@ -827,7 +995,7 @@ export default function AdminNotifications() {
                 Gestion de l'inactivité automatique
               </h2>
               <p className="text-sm text-gray-600">
-                Les utilisateurs passent inactifs après 2 mois sans connexion. Avertissement envoyé 1 semaine avant.
+                Les utilisateurs passent inactifs après 2 ans sans connexion. Avertissement envoyé 1 semaine avant.
               </p>
             </div>
           </div>
@@ -1007,11 +1175,11 @@ export default function AdminNotifications() {
               </div>
               <div className="flex items-start space-x-2">
                 <span className="text-orange-600 mt-0.5">2.</span>
-                <span>1 semaine avant les 2 mois d'inactivité : email d'avertissement envoyé</span>
+                <span>1 semaine avant les 2 ans d'inactivité : email d'avertissement envoyé</span>
               </div>
               <div className="flex items-start space-x-2">
                 <span className="text-orange-600 mt-0.5">3.</span>
-                <span>Après 2 mois sans activité : compte automatiquement désactivé (is_active = false)</span>
+                <span>Après 2 ans sans activité : compte automatiquement désactivé (is_active = false)</span>
               </div>
               <div className="flex items-start space-x-2">
                 <span className="text-orange-600 mt-0.5">4.</span>

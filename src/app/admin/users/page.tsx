@@ -127,10 +127,10 @@ export default function AdminUsers() {
           let status: 'active' | 'inactive' | 'suspended' = 'active';
           if (!profile.is_active) {
             status = 'suspended';
-          } else if (!isAdmin && daysSinceLastLogin && daysSinceLastLogin > 60) {
+          } else if (!isAdmin && daysSinceLastLogin && daysSinceLastLogin > 730) {
             // Les admins sont toujours considérés comme actifs s'ils ont is_active: true
-            // Seuls les utilisateurs normaux sont marqués inactifs après 2 mois (60 jours)
-            // Note: La désactivation automatique se fait après 2 mois exactement via l'API
+            // Seuls les utilisateurs normaux sont marqués inactifs après 2 ans (730 jours)
+            // Note: La désactivation automatique se fait après 2 ans exactement via l'API
             status = 'inactive';
           } else {
             status = 'active';

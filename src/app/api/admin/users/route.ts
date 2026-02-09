@@ -57,9 +57,9 @@ export async function GET(request: NextRequest) {
         let status: 'active' | 'inactive' | 'suspended' = 'active';
         if (!profile.is_active) {
           status = 'suspended';
-        } else if (!isAdmin && daysSinceLastLogin && daysSinceLastLogin > 60) {
+        } else if (!isAdmin && daysSinceLastLogin && daysSinceLastLogin > 730) {
           // Les admins sont toujours considérés comme actifs s'ils ont is_active: true
-          // Seuls les utilisateurs normaux sont marqués inactifs après 60 jours
+          // Seuls les utilisateurs normaux sont marqués inactifs après 2 ans (730 jours)
           status = 'inactive';
         }
 
