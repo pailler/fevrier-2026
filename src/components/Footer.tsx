@@ -1,6 +1,13 @@
 'use client';
+
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import DynamicNavigation from './DynamicNavigation';
+
+// Éviter le chargement de MenuService/Supabase côté serveur (cause possible de 500 sur /login)
+const DynamicNavigation = dynamic(
+  () => import('./DynamicNavigation'),
+  { ssr: false, loading: () => <div className="space-y-2"><div className="h-4 bg-gray-700 rounded w-24 animate-pulse" /><div className="h-4 bg-gray-700 rounded w-20 animate-pulse" /></div> }
+);
 
 export default function Footer() {
   return (

@@ -146,6 +146,30 @@
             "démarrage"
           ],
           "code": "type: vertical-stack\ncards:\n  - show_name: true\n    show_icon: true\n    type: button\n    name: Démarrer PORTAINER\n    icon: mdi:play\n    tap_action:\n      action: call-service\n      service: script.start_portainer\n    show_state: true\n  - show_name: true\n    show_icon: true\n    type: button\n    name: Arrêter PORTAINER\n    icon: mdi:account\n    tap_action:\n      action: call-service\n      service: script.stop_portainer\n    show_state: true"
+        },
+        {
+          "id": "button-vacuum",
+          "name": "Button Card - Aspirateur Robot",
+          "description": "Bouton pour démarrer ou revenir à la base du robot aspirateur",
+          "tags": [
+            "bouton",
+            "aspirateur",
+            "vacuum",
+            "robot"
+          ],
+          "code": "type: button\nentity: vacuum.robot_aspirateur\nname: Aspirateur\nicon: mdi:robot-vacuum\ntap_action:\n  action: toggle\nhold_action:\n  action: call-service\n  service: vacuum.return_to_base\n  target:\n    entity_id: vacuum.robot_aspirateur"
+        },
+        {
+          "id": "button-climate",
+          "name": "Button Card - Chauffage",
+          "description": "Bouton rapide pour passer le thermostat en mode confort",
+          "tags": [
+            "bouton",
+            "chauffage",
+            "thermostat",
+            "climate"
+          ],
+          "code": "type: button\nname: Mode Confort\nicon: mdi:thermometer\ntap_action:\n  action: call-service\n  service: climate.set_preset_mode\n  target:\n    entity_id: climate.maison\n  data:\n    preset_mode: Comfort"
         }
       ]
     },
@@ -409,6 +433,18 @@
             "vigilance"
           ],
           "code": "type: custom:meteoalarm-card\nentities:\n  - entity: sensor.78_weather_alert\nintegration: meteofrance\ndisable_swiper: false\nhide_when_no_warning: true"
+        },
+        {
+          "id": "weather-forecast-simple",
+          "name": "Weather Forecast - Carte Météo Simple",
+          "description": "Carte météo native avec prévisions sur 5 jours",
+          "tags": [
+            "météo",
+            "prévisions",
+            "weather",
+            "native"
+          ],
+          "code": "type: weather-forecast\nentity: weather.home\nname: Météo\nshow_forecast: true\nforecast_days: 5"
         }
       ]
     },
@@ -489,6 +525,18 @@
             "température"
           ],
           "code": "type: history-graph\nentities:\n  - entity: sensor.rasp5_cpu_thermal_1_temperature\n    name: Tc RPI5\n  - entity: sensor.ds224_disque_1_temperature\n    name: Tc NAS Disque1\n  - entity: sensor.ds224_disque_2_temperature\n    name: Tc NAS Disque2\nhours_to_show: 12\nlogarithmic_scale: false\ncard_mod:\n  style: |\n    ha-card {\n      --ha-card-background: white;\n      color: var(--primary-color);\n    }\n    ha-card {\n      color: white;\n    }"
+        },
+        {
+          "id": "history-graph-humidity",
+          "name": "History Graph - Humidité",
+          "description": "Graphique historique pour suivre l'humidité sur 24h",
+          "tags": [
+            "graphique",
+            "historique",
+            "humidité",
+            "history"
+          ],
+          "code": "type: history-graph\ntitle: Humidité 24h\nentities:\n  - entity: sensor.humidite_salon\n    name: Salon\n  - entity: sensor.humidite_chambre\n    name: Chambre\nhours_to_show: 24"
         }
       ]
     },
@@ -529,6 +577,18 @@
             "système"
           ],
           "code": "type: gauge\nentity: sensor.pc_pailler_cpu\nneedle: true\nseverity:\n  green: 0\n  yellow: 60\n  red: 80\nmin: 0\nmax: 100\nname: Ordinateur (CPU)"
+        },
+        {
+          "id": "gauge-temperature",
+          "name": "Jauge Température",
+          "description": "Jauge circulaire pour afficher une température avec seuils de couleur",
+          "tags": [
+            "jauge",
+            "température",
+            "gauge",
+            "thermometer"
+          ],
+          "code": "type: gauge\nentity: sensor.temperature_salon\nname: Salon\nneedle: true\nmin: 15\nmax: 30\nseverity:\n  green: 18\n  yellow: 22\n  red: 26\nunit: °C"
         }
       ]
     },
@@ -558,6 +618,18 @@
             "météo"
           ],
           "code": "type: conditional\nconditions:\n  - condition: state\n    entity: binary_sensor.orages_en_approche\n    state: \"on\"\ncard:\n  type: entities\n  entities:\n    - entity: sensor.blitzortung_radar_orages_lightning_azimuth\n    - entity: sensor.blitzortung_radar_orages_lightning_counter\n    - entity: sensor.blitzortung_radar_orages_lightning_distance\n  title: Orages alentours (-30kms)\n  state_color: white\n  card_mod:\n    style: |\n      ha-card {\n        color: yellow;\n      }"
+        },
+        {
+          "id": "conditional-presence",
+          "name": "Carte Conditionnelle - Présence",
+          "description": "Afficher une carte uniquement quand une personne est à la maison",
+          "tags": [
+            "conditionnel",
+            "présence",
+            "personne",
+            "occupation"
+          ],
+          "code": "type: conditional\nconditions:\n  - condition: state\n    entity: person.maison\n    state: \"home\"\ncard:\n  type: entities\n  title: Contrôles rapides\n  entities:\n    - light.salon\n    - light.cuisine"
         }
       ]
     },
@@ -758,6 +830,42 @@
             "graphique"
           ],
           "code": "type: vertical-stack\ncards:\n  - type: entity\n    entity: sensor.portainer_status_docker\n    name: Docker Status\n    icon: |\n      {% set state = states('sensor.portainer_status_docker') %}\n      {% if state == 'running' %} mdi:docker\n      {% elif state == 'exited' %} mdi:alert-circle\n      {% else %} mdi:help-circle\n      {% endif %}\n    state_color: true\n  - type: history-graph\n    title: Historique du statut (24h)\n    hours_to_show: 24\n    entities:\n      - entity: sensor.portainer_status_docker\n        name: Portainer\n        state_color: true"
+        },
+        {
+          "id": "stat-button-card",
+          "name": "Stat Button Card",
+          "description": "Bouton natif affichant l'état d'une entité avec action au clic",
+          "tags": [
+            "bouton",
+            "entité",
+            "état",
+            "native"
+          ],
+          "code": "type: button\nentity: sensor.temperature_salon\nname: Température Salon\nicon: mdi:thermometer\ntap_action:\n  action: more-info"
+        },
+        {
+          "id": "markdown-info-card",
+          "name": "Markdown - Bloc d'information",
+          "description": "Carte markdown pour afficher un bloc d'info ou instructions",
+          "tags": [
+            "markdown",
+            "information",
+            "texte",
+            "aide"
+          ],
+          "code": "type: markdown\ncontent: \"## Comment utiliser\\n1. Cliquez sur une carte pour voir le détail.\\n2. Utilisez les filtres pour affiner.\\n3. Copiez le code YAML dans votre config.\"\ncard_mod:\n  style: |\n    ha-card { padding: 16px; border-radius: 12px; }"
+        },
+        {
+          "id": "entity-card-simple",
+          "name": "Entity Card - Entité simple",
+          "description": "Carte entité native pour afficher et contrôler une entité",
+          "tags": [
+            "entité",
+            "native",
+            "simple",
+            "contrôle"
+          ],
+          "code": "type: entity\nentity: light.salon\nname: Salon\nicon: mdi:sofa"
         }
       ]
     },
@@ -891,6 +999,42 @@
             "blitzortung"
           ],
           "code": "automation:\n- id: alerte_orages_approche\n  alias: Alerte - Orages en approche\n  description: Notification si orages détectés à proximité\n  mode: single\n  trigger:\n    - platform: state\n      entity_id: binary_sensor.orages_en_approche\n      to: 'on'\n  condition:\n    - condition: state\n      entity_id: binary_sensor.orages_en_approche\n      state: 'on'\n  action:\n    - service: notify.mobile_app_votre_telephone\n      data:\n        title: \"⚡ Orages en approche\"\n        message: \"Orages détectés à {{ states('sensor.blitzortung_radar_orages_lightning_distance') }} km\"\n        data:\n          priority: high"
+        },
+        {
+          "id": "automation-presence-lumiere",
+          "name": "Automation - Lumière à la Détection de Présence",
+          "description": "Allumer une lumière quand un capteur de présence détecte un mouvement",
+          "tags": [
+            "automatisation",
+            "présence",
+            "lumière",
+            "mouvement"
+          ],
+          "code": "automation:\n- id: lumiere_presence\n  alias: Lumière sur présence\n  mode: restart\n  trigger:\n    - platform: state\n      entity_id: binary_sensor.capteur_presence_salon\n      to: 'on'\n  action:\n    - service: light.turn_on\n      target:\n        entity_id: light.salon\n      data:\n        brightness_pct: 80"
+        },
+        {
+          "id": "automation-coucher-soleil",
+          "name": "Automation - Allumage au Coucher du Soleil",
+          "description": "Allumer des lumières au coucher du soleil avec décalage optionnel",
+          "tags": [
+            "automatisation",
+            "soleil",
+            "lumière",
+            "sun"
+          ],
+          "code": "automation:\n- id: lumieres_coucher_soleil\n  alias: Lumières au coucher du soleil\n  trigger:\n    - platform: sun\n      event: sunset\n      offset: '-00:30:00'\n  action:\n    - service: light.turn_on\n      target:\n        entity_id:\n          - light.salon\n          - light.couloir\n      data:\n        brightness_pct: 60"
+        },
+        {
+          "id": "template-sensor-derniere-mise-a-jour",
+          "name": "Template Sensor - Dernière Mise à Jour",
+          "description": "Capteur template affichant la dernière mise à jour d'une entité",
+          "tags": [
+            "template",
+            "capteur",
+            "dernière_mise_à_jour",
+            "timestamp"
+          ],
+          "code": "template:\n- sensor:\n  - name: Dernière mise à jour température\n    state: \"{{ state_attr('sensor.temperature_salon', 'last_updated') | as_timestamp | timestamp_custom('%d/%m %H:%M') if state_attr('sensor.temperature_salon', 'last_updated') else 'N/A' }}\"\n    icon: mdi:clock-outline"
         }
       ]
     },
@@ -2339,6 +2483,30 @@
           "code": "# Nouvelles fonctionnalités UI disponibles :\n# - Navigation améliorée avec menu latéral redessiné\n# - Glisser-déposer pour réorganiser les cartes\n# - Prévisualisation en temps réel des modifications\n# - Thèmes améliorés avec plus d'options de personnalisation\n# - Mode sombre amélioré avec transitions fluides\n\n# Exemple de personnalisation avancée :\n- type: vertical-stack\ncards:\n  - type: markdown\n    content: |\n      # Mon Tableau de Bord Personnalisé\n      Interface améliorée avec nouvelles fonctionnalités 2025.5\n  - type: entities\n    title: Contrôles Rapides\n    # Utilisez les nouvelles options de personnalisation\n    card_mod:\n      style: |\n        ha-card {\n          border-radius: 16px;\n          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);\n        }"
         },
         {
+          "id": "vertical-stack-entities",
+          "name": "Vertical Stack - Pile d'Entités",
+          "description": "Empiler plusieurs cartes verticalement (entités, boutons, etc.)",
+          "tags": [
+            "vertical-stack",
+            "pile",
+            "empiler",
+            "layout"
+          ],
+          "code": "type: vertical-stack\ncards:\n  - type: entities\n    title: Lumières\n    entities:\n      - light.salon\n      - light.cuisine\n  - type: entities\n    title: Capteurs\n    entities:\n      - sensor.temperature_salon\n      - sensor.humidite_salon"
+        },
+        {
+          "id": "horizontal-stack-buttons",
+          "name": "Horizontal Stack - Boutons Côte à Côte",
+          "description": "Afficher des boutons ou cartes côte à côte",
+          "tags": [
+            "horizontal-stack",
+            "boutons",
+            "layout",
+            "ligne"
+          ],
+          "code": "type: horizontal-stack\ncards:\n  - type: button\n    entity: light.salon\n    name: Salon\n    icon: mdi:sofa\n  - type: button\n    entity: light.cuisine\n    name: Cuisine\n    icon: mdi:chef-hat\n  - type: button\n    entity: light.chambre\n    name: Chambre\n    icon: mdi:bed"
+        },
+        {
           "id": "automation-editor-2025-5",
           "name": "Éditeur Automatisations Amélioré (2025.5)",
           "description": "Nouvelles actions et déclencheurs pour des automatisations plus complexes (version 2025.5)",
@@ -3281,6 +3449,19 @@
             "consommation"
           ],
           "code": "type: entities\ntitle: Utilisation Réseau\nshow_header_toggle: false\nentities:\n  - entity: sensor.grid_usage\n    name: Consommation Réseau\n    icon: mdi:transmission-tower\n  - entity: sensor.grid_rate_current\n    name: Taux Actuel\n    icon: mdi:currency-gbp\n  - entity: sensor.grid_rate_next\n    name: Taux Suivant\n    icon: mdi:clock-outline\ncard_mod:\n  style: |\n    ha-card {\n      background: rgba(255, 255, 255, 0.1) !important;\n      border-radius: 20px !important;\n      backdrop-filter: blur(10px) !important;\n    }"
+        },
+        {
+          "id": "carte-consommation-instantanee",
+          "name": "Carte Consommation Instantanée",
+          "description": "Afficher la puissance instantanée et le coût en temps réel",
+          "tags": [
+            "consommation",
+            "puissance",
+            "coût",
+            "énergie",
+            "instant"
+          ],
+          "code": "type: entities\ntitle: Consommation instantanée\nshow_header_toggle: false\nentities:\n  - entity: sensor.puissance_instantanee\n    name: Puissance\n    icon: mdi:flash\n  - entity: sensor.cout_instantane\n    name: Coût temps réel\n    icon: mdi:currency-eur"
         }
       ]
     },

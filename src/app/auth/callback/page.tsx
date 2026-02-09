@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/utils/supabaseClient';
+import { isAdminEmail } from '@/utils/adminEmails';
 
 function AuthCallbackContent() {
   const router = useRouter();
@@ -538,11 +539,12 @@ function AuthCallbackContent() {
         });
         
         // Créer les données utilisateur pour localStorage (format identique aux connexions classiques)
+        const userEmail = profileData.email || user.email;
         const userData = {
           id: profileData.id || user.id,
-          email: profileData.email || user.email,
+          email: userEmail,
           full_name: profileData.full_name || user.user_metadata?.full_name || user.email,
-          role: profileData.role || 'user',
+          role: isAdminEmail(userEmail) ? 'admin' : (profileData.role || 'user'),
           is_active: profileData.is_active !== false,
           email_verified: profileData.email_verified !== false,
           avatar_url: user.user_metadata?.avatar_url || null

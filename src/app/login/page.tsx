@@ -1,9 +1,18 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
-import GoogleSignInButton from '../../components/GoogleSignInButton';
-import WorkingSignInForm from '../../components/WorkingSignInForm';
+
+// Chargement côté client uniquement pour éviter toute erreur SSR (Supabase, etc.)
+const GoogleSignInButton = dynamic(
+  () => import('../../components/GoogleSignInButton'),
+  { ssr: false, loading: () => <div className="h-12 bg-gray-100 rounded-lg animate-pulse" /> }
+);
+const WorkingSignInForm = dynamic(
+  () => import('../../components/WorkingSignInForm'),
+  { ssr: false, loading: () => <div className="h-32 bg-gray-100 rounded-lg animate-pulse" /> }
+);
 
 function LoginContent() {
   const router = useRouter();

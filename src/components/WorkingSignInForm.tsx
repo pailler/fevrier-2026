@@ -74,14 +74,13 @@ export default function WorkingSignInForm({
         if (result.oauth_account && result.needs_password) {
           const errorMessage = 'Ce compte a été créé avec Google. Veuillez vous connecter avec le bouton "Se connecter avec Google" ci-dessus.';
           setError(errorMessage);
-          onError?.(new Error(errorMessage));
+          onError?.({ message: errorMessage });
         } else {
           const errorMessage = result.error || 'Erreur lors de la connexion';
-          // Ne pas logger les erreurs de connexion normales dans la console
-          // car elles sont déjà affichées à l'utilisateur via setError
-          // Les erreurs de connexion normales (email/mot de passe incorrect) sont attendues
+          // Erreurs attendues (email/mot de passe incorrect) : on passe un objet, pas une Error,
+          // pour éviter qu'elles soient traitées comme des erreurs non gérées dans la console
           setError(errorMessage);
-          onError?.(new Error(errorMessage));
+          onError?.({ message: errorMessage });
         }
         return;
       }

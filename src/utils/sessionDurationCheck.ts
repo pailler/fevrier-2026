@@ -1,14 +1,15 @@
 /**
  * Utilitaire pour vérifier la durée de session
  * Limite les sessions à 60 minutes (1 heure) pour tous les utilisateurs
- * Exception: Le compte admin (formateur_tic@hotmail.com) n'a jamais de déconnexion automatique
+ * Exception: Les comptes admin n'ont jamais de déconnexion automatique
  */
 
 import { createClient } from '@supabase/supabase-js';
 import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 
 const SESSION_DURATION_MS = 60 * 60 * 1000; // 60 minutes (1 heure) en millisecondes
-const ADMIN_EMAIL = 'formateur_tic@hotmail.com';
+
+import { isAdminEmail } from './adminEmails';
 
 const supabase = createClient(
   getSupabaseUrl(),
@@ -237,11 +238,11 @@ export async function checkSessionDuration(session: any): Promise<SessionDuratio
 }
 
 /**
- * Vérifie si un utilisateur est l'admin (formateur_tic@hotmail.com)
- * Note: L'admin n'a pas de limite de session (session illimitée)
+ * Vérifie si un utilisateur est admin (présent dans la liste admin)
+ * Note: Les admins n'ont pas de limite de session (session illimitée)
  */
 export function isAdminUser(email: string | undefined | null): boolean {
-  return email === ADMIN_EMAIL;
+  return isAdminEmail(email);
 }
 
 

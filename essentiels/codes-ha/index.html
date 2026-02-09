@@ -3,90 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Codes Home Assistant - Recherche de Cartes</title>
+    <title>Ressources Home-Assistant - Recherche de Cartes</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Bannière fusionnée IAHome + YouTube -->
-        <section class="fused-banner">
-            <!-- Partie gauche : IAHome -->
-            <div class="fused-banner-part">
-                <div class="banner-background">
-                    <!-- Éléments décoratifs animés -->
-                    <div class="decorative-circle circle-yellow"></div>
-                    <div class="decorative-circle circle-green"></div>
-                    <div class="decorative-icon icon-controller">🏠</div>
-                </div>
-                <div class="banner-brand-content">
-                    <h1 class="banner-brand-title">IAHome</h1>
-                    <p class="banner-brand-subtitle">Codes Home Assistant</p>
-                </div>
+    <div class="container container--full-bleed">
+        <!-- Hero unique style iahome -->
+        <header class="hero-home">
+            <div class="hero-home__bg">
+                <span class="hero-home__dot hero-home__dot--1"></span>
+                <span class="hero-home__dot hero-home__dot--2"></span>
+                <span class="hero-home__dot hero-home__dot--3"></span>
+                <span class="hero-home__dot hero-home__dot--4"></span>
+                <span class="hero-home__dot hero-home__dot--5"></span>
             </div>
-
-            <!-- Partie droite : Adamhome -->
-            <div class="fused-banner-part">
-                <div class="youtube-background">
-                    <div class="youtube-decorative youtube-circle-1"></div>
-                    <div class="youtube-decorative youtube-circle-2"></div>
-                    <div class="youtube-decorative youtube-circle-3"></div>
+            <div class="hero-home__wave"></div>
+            <div class="hero-home__inner">
+                <div class="hero-home__brand">
+                    <h1 class="hero-home__title">IAHome</h1>
+                    <p class="hero-home__subtitle">Ressources Home-Assistant</p>
+                    <p class="hero-home__stat" id="heroTotalResources" aria-live="polite">Chargement…</p>
+                    <span class="hero-home__badge">DOMOTIQUE</span>
                 </div>
-                <div class="banner-brand-content">
-                    <p class="banner-partnership">En partenariat avec</p>
-                    <h1 class="banner-brand-title">Adamhome</h1>
-                    <p class="banner-brand-subtitle">@pailleradamhome</p>
-                    <a href="https://www.youtube.com/@pailleradamhome" target="_blank" rel="noopener noreferrer" class="banner-brand-link">
-                        <span class="banner-brand-link-icon">▶️</span>
-                        <span>Voir la chaîne</span>
+                <div class="hero-home__partner">
+                    <p class="hero-home__partner-label">En partenariat avec</p>
+                    <p class="hero-home__partner-name">Adamhome</p>
+                    <p class="hero-home__partner-handle">@pailleradamhome</p>
+                    <a href="https://www.youtube.com/@pailleradamhome" target="_blank" rel="noopener noreferrer" class="hero-home__link">
+                        <span class="hero-home__link-icon" aria-hidden="true">▶</span>
+                        Voir la chaîne
                     </a>
                 </div>
             </div>
-        </section>
+        </header>
 
-        <!-- Section avec les informations principales (titre, progression, manuel) -->
-        <section class="main-info-section">
-            <div class="main-info-content">
-                <h1 class="main-title">🏠 Codes Home Assistant</h1>
-                <p class="main-subtitle">Recherchez et copiez facilement les codes de cartes Lovelace</p>
-                <p class="main-codes-count" id="totalCodesCount">Chargement...</p>
-                
-                <!-- Barre de progression -->
-                <div class="progress-section">
-                    <div class="progress-bar-container">
-                        <div class="progress-bar-fill" id="progressBar">
-                            <span class="progress-text" id="progressText">0%</span>
-                        </div>
-                    </div>
-                    <p class="progress-info" id="progressInfo">0 codes disponibles</p>
-                </div>
-                
-                <!-- Section Manuel -->
-                <div class="manual-card-integrated">
-                    <div class="manual-header-integrated">
-                        <div class="manual-icon-integrated">📖</div>
-                        <div class="manual-content-integrated">
-                            <h2>Manuel Complet Home Assistant</h2>
-                            <p>Guide complet d'installation, configuration et création de dashboards professionnels</p>
-                        </div>
-                    </div>
-                    <div class="manual-actions-integrated">
-                        <a href="manuel-home-assistant.pdf" target="_blank" class="btn-manual-download-integrated" download>
-                            <span class="btn-icon">📥</span>
-                            <span>Télécharger le PDF</span>
-                        </a>
-                        <button class="btn-manual-view-integrated" id="viewManualBtn">
-                            <span class="btn-icon">👁️</span>
-                            <span>Voir le manuel</span>
-                        </button>
-                    </div>
-                </div>
+        <!-- Menu principal -->
+        <nav class="top-menu" aria-label="Navigation principale">
+            <a href="#accueil" class="top-menu-btn">Accueil</a>
+            <a href="#section-codes" class="top-menu-btn">Codes prêts à l'emploi</a>
+            <a href="#section-cartes" class="top-menu-btn">Cartes à installer</a>
+            <a href="#section-automatisations" class="top-menu-btn">Automatisations</a>
+            <a href="#section-tableaux" class="top-menu-btn">Tableaux de bord</a>
+            <a href="#section-configs" class="top-menu-btn">Configs</a>
+        </nav>
+
+        <!-- Page d'accueil : ressources -->
+        <section class="page-section accueil-section" id="accueil">
+            <h2 class="section-heading accueil-title">Améliorez votre instance Home Assistant</h2>
+            <p class="accueil-intro">Codes, cartes, automatisations et tableaux de bord pour Home Assistant.</p>
+            <div class="accueil-cards">
+                <a href="#section-codes" class="accueil-card accueil-card-codes">
+                    <span class="accueil-card-icon">📋</span>
+                    <h3 class="accueil-card-title">Codes HA</h3>
+                    <p class="accueil-card-desc">Codes prêts à l'emploi : cartes Lovelace, templates, automatisations. Recherchez et copiez en un clic.</p>
+                </a>
+                <a href="#section-cartes" class="accueil-card accueil-card-cartes">
+                    <span class="accueil-card-icon">🎴</span>
+                    <h3 class="accueil-card-title">Cartes HA</h3>
+                    <p class="accueil-card-desc">Cartes à installer : comprendre les cartes Lovelace, les intégrations et comment les utiliser.</p>
+                </a>
+                <a href="#section-automatisations" class="accueil-card accueil-card-automatisations">
+                    <span class="accueil-card-icon">⚙️</span>
+                    <h3 class="accueil-card-title">Automatisations HA</h3>
+                    <p class="accueil-card-desc">Créer des automatisations : déclencheurs, conditions et actions. Guide et codes prêts à l'emploi.</p>
+                </a>
+                <a href="#section-tableaux" class="accueil-card accueil-card-tableaux">
+                    <span class="accueil-card-icon">📊</span>
+                    <h3 class="accueil-card-title">Tableaux de bord HA</h3>
+                    <p class="accueil-card-desc">Manuel et ressources pour créer et organiser vos tableaux de bord Home Assistant.</p>
+                </a>
+                <a href="#section-configs" class="accueil-card accueil-card-configs">
+                    <span class="accueil-card-icon">💡</span>
+                    <h3 class="accueil-card-title">Configs</h3>
+                    <p class="accueil-card-desc">Dépôts GitHub de configurations complètes : inspirez-vous et récupérez du YAML prêt à l'emploi.</p>
+                </a>
             </div>
         </section>
 
-        <div class="info-section">
+        <!-- Section Codes prêts à l'emploi -->
+        <section id="section-codes" class="page-section section-codes-wrapper">
+            <header class="section-banner">
+                <h2 class="section-banner__title">Codes classiques</h2>
+                <p class="section-banner__subtitle">Cartes Lovelace, templates et autres codes à copier-coller</p>
+            </header>
+            <div class="main-info-section">
+                <div class="main-info-content">
+                    <p class="main-codes-count" id="totalCodesCount">Chargement...</p>
+                    <!-- Barre de progression -->
+                    <div class="progress-section">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" id="progressBar">
+                                <span class="progress-text" id="progressText">0%</span>
+                            </div>
+                        </div>
+                        <p class="progress-info" id="progressInfo">0 codes disponibles</p>
+                    </div>
+                </div>
+            </div>
+
+        <div class="search-section">
+            <div class="search-bar">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Rechercher un code (ex: banner, button, météo, slider...)"
+                    autocomplete="off"
+                >
+                <span class="search-icon">🔍</span>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Catégories :</label>
+                    <div class="category-filters" id="categoryFilters"></div>
+                </div>
+                <div class="filter-group">
+                    <label>Tags actifs :</label>
+                    <div class="active-tags" id="activeTags"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <div class="results-header">
+                <span id="resultsCount">0 codes trouvés</span>
+                <button id="clearFilters" class="btn-clear">Effacer les filtres</button>
+            </div>
+
+            <div class="codes-grid" id="codesGrid">
+                <!-- Les codes seront injectés ici -->
+            </div>
+
+            <div class="no-results" id="noResults" style="display: none;">
+                <p>😔 Aucun code trouvé</p>
+                <p>Essayez de modifier vos critères de recherche</p>
+            </div>
+        </div>
+        </section>
+
+        <!-- Section Cartes à installer -->
+        <div class="page-section info-section" id="section-cartes">
+            <header class="section-banner">
+                <h2 class="section-banner__title">Cartes à installer</h2>
+                <p class="section-banner__subtitle">Cartes Lovelace, intégrations et custom cards</p>
+            </header>
             <div class="info-card">
                 <div class="info-header">
-                    <h2>Home Assistant, Qu'est-ce que c'est ? (déplie chaque partie)</h2>
+                    <h3 class="info-card-subtitle">Home Assistant, Qu'est-ce que c'est ? (déplie chaque partie)</h3>
                     <button class="btn-toggle-info" id="toggleInfo" aria-label="Masquer/Afficher les explications">
                         <span class="toggle-icon">▼</span>
                     </button>
@@ -135,27 +198,6 @@
                     
                     <div class="info-item">
                         <div class="info-item-header">
-                            <h3>⚙️ Automatisations</h3>
-                            <button class="btn-toggle-item" data-item="automatisations" aria-label="Plier/Déplier">
-                                <span class="toggle-icon-item">▲</span>
-                            </button>
-                        </div>
-                        <div class="info-item-content collapsed" id="infoItem-automatisations">
-                            <p>Les automatisations permettent d'automatiser des actions en fonction de conditions (ex: allumer la lumière quand il fait nuit, envoyer une notification si une porte s'ouvre, etc.).</p>
-                            <p><strong>Comment les utiliser :</strong></p>
-                            <ol>
-                                <li>Copiez le code d'automation (section <strong>Templates & Automations</strong>)</li>
-                                <li>Dans Home Assistant, allez dans <strong>Paramètres</strong> → <strong>Automatisations et scènes</strong> → <strong>Automatisations</strong></li>
-                                <li>Cliquez sur <strong>+ Créer une automatisation</strong> → <strong>Créer une nouvelle automatisation</strong></li>
-                                <li>Cliquez sur les <strong>3 points</strong> (⋮) → <strong>Modifier en YAML</strong></li>
-                                <li>Collez le code YAML et adaptez les entités selon vos besoins</li>
-                                <li>Cliquez sur <strong>Sauvegarder</strong></li>
-                            </ol>
-                        </div>
-                    </div>
-                    
-                    <div class="info-item">
-                        <div class="info-item-header">
                             <h3>🔌 Intégrations</h3>
                             <button class="btn-toggle-item" data-item="integrations" aria-label="Plier/Déplier">
                                 <span class="toggle-icon-item">▲</span>
@@ -178,46 +220,239 @@
                 </div>
                 </div>
             </div>
+
+            <!-- Cartes personnalisées (Custom Cards) - source Awesome HA -->
+            <div class="custom-cards-block">
+                <h3 class="custom-cards-title">🎴 Cartes personnalisées à installer (Custom Cards)</h3>
+                <p class="custom-cards-intro">Liste issue de <a href="https://www.awesome-ha.com/#custom-cards" target="_blank" rel="noopener noreferrer">Awesome Home Assistant</a>. Cliquez sur une carte pour accéder à son dépôt (installation via HACS ou manuelle).</p>
+                <ul class="custom-cards-list">
+                    <li><a href="https://github.com/thomasloven/lovelace-auto-entities" target="_blank" rel="noopener noreferrer">Carte Auto-Entités</a> — Ajoute des entités dynamiquement</li>
+                    <li><a href="https://github.com/custom-cards/canvas-gauge-card" target="_blank" rel="noopener noreferrer">Carte Jauge Canvas</a> — Jauges depuis canvas-gauges.com</li>
+                    <li><a href="https://github.com/custom-cards/bignumber-card" target="_blank" rel="noopener noreferrer">Carte Grand Nombre</a> — Grands chiffres pour capteurs, avec niveau de sévérité</li>
+                    <li><a href="https://github.com/bramkragten/weather-card" target="_blank" rel="noopener noreferrer">Carte Météo Animée</a> — Météo avec animations</li>
+                    <li><a href="https://github.com/ciotlosm/lovelace-thermostat-dark-card" target="_blank" rel="noopener noreferrer">Carte Thermostat</a> — Style Nest Thermostat</li>
+                    <li><a href="https://github.com/kalkih/mini-media-player" target="_blank" rel="noopener noreferrer">Mini Lecteur Média</a> — Lecteur média minimaliste</li>
+                    <li><a href="https://github.com/kalkih/mini-graph-card" target="_blank" rel="noopener noreferrer">Carte Mini Graphique</a> — Graphique de capteur minimaliste</li>
+                    <li><a href="https://github.com/kuuji/button-card" target="_blank" rel="noopener noreferrer">Carte Bouton</a> — Boutons pour vos entités</li>
+                    <li><a href="https://github.com/thomasloven/lovelace-slider-entity-row" target="_blank" rel="noopener noreferrer">Ligne d'entité avec curseur</a> — Curseur (ex. luminosité) dans les lignes d'entités</li>
+                    <li><a href="https://github.com/gurbyz/power-wheel-card" target="_blank" rel="noopener noreferrer">Carte Roue Énergétique</a> — Consommation ou production d'énergie</li>
+                    <li><a href="https://github.com/nervetattoo/simple-thermostat" target="_blank" rel="noopener noreferrer">Thermostat Simple</a> — Thermostat flexible et simple</li>
+                    <li><a href="https://github.com/thomasloven/lovelace-card-mod" target="_blank" rel="noopener noreferrer">Card Modder</a> — Styliser vos cartes Lovelace</li>
+                    <li><a href="https://github.com/Gluwc/bar-card" target="_blank" rel="noopener noreferrer">Carte Barres</a> — Barres animées personnalisables</li>
+                    <li><a href="https://github.com/kalkih/forked-daapd-card" target="_blank" rel="noopener noreferrer">Carte forked-daapd</a> — Contrôle d'une instance forked-daapd</li>
+                    <li><a href="https://github.com/Rocka84/dual-gauge-card" target="_blank" rel="noopener noreferrer">Carte Double Jauge</a> — Deux jauges en une</li>
+                    <li><a href="https://github.com/totaldebug/atomic-calendar-revive" target="_blank" rel="noopener noreferrer">Atomic Calendar Revive</a> — Calendrier avec options avancées</li>
+                    <li><a href="https://github.com/benct/lovelace-xiaomi-vacuum-card" target="_blank" rel="noopener noreferrer">Carte Aspirateur Xiaomi</a> — Détails pour aspirateurs Xiaomi et autres</li>
+                    <li><a href="https://github.com/kalkih/simple-weather-card" target="_blank" rel="noopener noreferrer">Carte Météo Simple</a> — Météo minimaliste style Material Design</li>
+                    <li><a href="https://github.com/postlund/home-card" target="_blank" rel="noopener noreferrer">Carte Accueil</a> — Aperçu rapide de l'état de la maison</li>
+                    <li><a href="https://github.com/nervetattoo/banner-card" target="_blank" rel="noopener noreferrer">Carte Bannière</a> — Bannière cliquable avec aperçus</li>
+                    <li><a href="https://github.com/custom-cards/spotify-card" target="_blank" rel="noopener noreferrer">Carte Spotify</a> — Appareils et playlists Spotify</li>
+                    <li><a href="https://github.com/cbulock/lovelace-battery-entity" target="_blank" rel="noopener noreferrer">Entité Batterie</a> — Afficher les niveaux de batterie</li>
+                    <li><a href="https://github.com/benct/lovelace-multiple-entity-row" target="_blank" rel="noopener noreferrer">Ligne multi-entités</a> — Plusieurs états ou attributs par ligne</li>
+                    <li><a href="https://github.com/PiotrMachowski/Home-Assistant-Lovelace-Xiaomi-Vacuum-Map-card" target="_blank" rel="noopener noreferrer">Carte Carte Aspirateur</a> — Carte de zone pour Xiaomi, Neato, etc.</li>
+                    <li><a href="https://github.com/gadgetchnnel/lovelace-home-feed-card" target="_blank" rel="noopener noreferrer">Carte Fil d'accueil</a> — Notifications, calendrier et entités en fil</li>
+                    <li><a href="https://github.com/custom-cards/config-template-card" target="_blank" rel="noopener noreferrer">Carte Modèle de configuration</a> — Utiliser des templates dans Lovelace</li>
+                    <li><a href="https://github.com/bokub/rgb-light-card" target="_blank" rel="noopener noreferrer">Carte Lumière RGB</a> — Boutons pour lumières RGB</li>
+                    <li><a href="https://github.com/madmicio/LG-WebOS-Remote-Control" target="_blank" rel="noopener noreferrer">Télécommande LG WebOS</a> — Contrôle TV LG WebOS</li>
+                    <li><a href="https://github.com/iantrich/restriction-card" target="_blank" rel="noopener noreferrer">Carte Restriction</a> — Restreindre l'accès à des cartes</li>
+                    <li><a href="https://github.com/denysdovhan/vacuum-card" target="_blank" rel="noopener noreferrer">Carte Aspirateur</a> — Contrôle d'un aspirateur robot</li>
+                    <li><a href="https://github.com/denysdovhan/purifier-card" target="_blank" rel="noopener noreferrer">Carte Purificateur</a> — Contrôle des purificateurs d'air</li>
+                    <li><a href="https://github.com/ironsheep/lovelace-rpi-monitor-card" target="_blank" rel="noopener noreferrer">Carte État Raspberry Pi</a> — Statut de vos Raspberry Pi</li>
+                </ul>
+            </div>
         </div>
 
-        <div class="search-section">
-            <div class="search-bar">
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    placeholder="Rechercher un code (ex: banner, button, météo, slider...)"
-                    autocomplete="off"
-                >
-                <span class="search-icon">🔍</span>
-            </div>
-
-            <div class="filters">
-                <div class="filter-group">
-                    <label>Catégories :</label>
-                    <div class="category-filters" id="categoryFilters"></div>
+        <!-- Section Automatisations -->
+        <section id="section-automatisations" class="page-section section-automatisations-wrapper">
+            <header class="section-banner">
+                <h2 class="section-banner__title">Automatisations</h2>
+                <p class="section-banner__subtitle">Codes, tutos et liens hadiscover & Blueprints</p>
+            </header>
+            <div class="automatisations-codes-block">
+                <div class="automatisations-codes-header">
+                    <span id="automationsCount" class="automatisations-codes-count">0 codes automatisations</span>
+                    <div class="automatisations-search-wrap">
+                        <input type="text" id="searchAutomations" placeholder="Rechercher une automatisation…" autocomplete="off" class="automatisations-search-input">
+                        <span class="search-icon" aria-hidden="true">🔍</span>
+                    </div>
                 </div>
-                <div class="filter-group">
-                    <label>Tags actifs :</label>
-                    <div class="active-tags" id="activeTags"></div>
+                <div class="codes-grid" id="codesGridAutomations">
+                    <!-- Codes automatisations injectés par JS -->
+                </div>
+                <div class="no-results" id="noResultsAutomations" style="display: none;">
+                    <p>😔 Aucune automatisation trouvée</p>
                 </div>
             </div>
-        </div>
-
-        <div class="results-section">
-            <div class="results-header">
-                <span id="resultsCount">0 codes trouvés</span>
-                <button id="clearFilters" class="btn-clear">Effacer les filtres</button>
+            <div class="automatisations-card">
+                <h3 class="automatisations-tuto-title">Comment utiliser les automatisations</h3>
+                <p>Les automatisations permettent d'automatiser des actions en fonction de conditions (ex: allumer la lumière quand il fait nuit, envoyer une notification si une porte s'ouvre, etc.).</p>
+                <p><strong>Comment les utiliser :</strong></p>
+                <ol>
+                    <li>Copiez le code d'automation ci-dessus</li>
+                    <li>Dans Home Assistant, allez dans <strong>Paramètres</strong> → <strong>Automatisations et scènes</strong> → <strong>Automatisations</strong></li>
+                    <li>Cliquez sur <strong>+ Créer une automatisation</strong> → <strong>Créer une nouvelle automatisation</strong></li>
+                    <li>Cliquez sur les <strong>3 points</strong> (⋮) → <strong>Modifier en YAML</strong></li>
+                    <li>Collez le code YAML et adaptez les entités selon vos besoins</li>
+                    <li>Cliquez sur <strong>Sauvegarder</strong></li>
+                </ol>
             </div>
-
-            <div class="codes-grid" id="codesGrid">
-                <!-- Les codes seront injectés ici -->
+            <div class="automatisations-hadiscover">
+                <h3 class="automatisations-hadiscover-title">🔍 Découvrir d'autres automatisations (hadiscover)</h3>
+                <p>hadiscover indexe les automatisations Home Assistant partagées par la communauté depuis les dépôts GitHub avec le topic <code>hadiscover</code>. Vous pouvez y rechercher des automatisations par nom, déclencheur ou action.</p>
+                <p><strong>Comment les ajouter à Home Assistant :</strong></p>
+                <ol>
+                    <li><strong>Copier le YAML</strong> — Cliquez sur le lien GitHub d'une automatisation et copiez le code YAML.</li>
+                    <li><strong>Ouvrir Home Assistant</strong> — Paramètres → Automatisations et scènes → Créer une automatisation.</li>
+                    <li><strong>Coller le code</strong> — Menu 3 points (⋮) → Modifier en YAML, puis collez votre code.</li>
+                    <li><strong>Adapter</strong> — Modifiez les noms d'entités et paramètres selon votre installation.</li>
+                    <li><strong>Enregistrer</strong> — Sauvegardez et testez l'automatisation.</li>
+                </ol>
+                <p class="automatisations-hadiscover-share">Vous partagez vos automatisations ? Ajoutez le topic <code>hadiscover</code> à votre dépôt GitHub pour les faire découvrir à la communauté.</p>
+                <a href="https://hadiscover.com/" target="_blank" rel="noopener noreferrer" class="automatisations-hadiscover-link">Ouvrir hadiscover — Découvrir des automatisations</a>
             </div>
-
-            <div class="no-results" id="noResults" style="display: none;">
-                <p>😔 Aucun code trouvé</p>
-                <p>Essayez de modifier vos critères de recherche</p>
+            <div class="automatisations-blueprints">
+                <h3 class="automatisations-blueprints-title">📘 Blueprints — HA Blueprint Hub</h3>
+                <p>Découvrez, partagez et importez des <strong>blueprints</strong> (modèles d'automatisation réutilisables) pour Home Assistant. Le <a href="https://hablueprints.directory/" target="_blank" rel="noopener noreferrer">HA Blueprint Hub</a> référence plus de <strong>170 blueprints</strong> créés par la communauté, répartis en plusieurs catégories (contrôle d'appareils, notifications, boutons et télécommandes, etc.).</p>
+                <ul class="automatisations-blueprints-list">
+                    <li>🎛️ <strong>Contrôle d'appareils</strong> — ex. lumière activée au mouvement</li>
+                    <li>🔔 <strong>Notifications</strong> — ex. alerte quand une personne quitte une zone</li>
+                    <li>🔘 <strong>Actions sur boutons</strong> — télécommandes IKEA, Philips Hue, SONOFF, Xiaomi Aqara…</li>
+                </ul>
+                <p><strong>Comment importer un blueprint :</strong> sur le site, choisissez un blueprint puis cliquez sur <em>Import</em> pour obtenir l’URL ou les instructions d’import dans Home Assistant (Paramètres → Automatisations et scènes → Blueprints).</p>
+                <a href="https://hablueprints.directory/" target="_blank" rel="noopener noreferrer" class="automatisations-blueprints-link">Ouvrir HA Blueprint Hub — Parcourir les blueprints</a>
             </div>
-        </div>
+        </section>
+
+        <!-- Section Tableaux de bord HA -->
+        <section id="section-tableaux" class="page-section section-tableaux-wrapper">
+            <header class="section-banner">
+                <h2 class="section-banner__title">Tableaux de bord HA</h2>
+                <p class="section-banner__subtitle">Manuel et ressources pour vos dashboards</p>
+            </header>
+            <div class="manual-card-integrated">
+                <div class="manual-header-integrated">
+                    <div class="manual-icon-integrated">📖</div>
+                    <div class="manual-content-integrated">
+                        <h2>Manuel Complet Home Assistant</h2>
+                        <p>Guide complet d'installation, configuration et création de dashboards professionnels</p>
+                    </div>
+                </div>
+                <div class="manual-actions-integrated">
+                    <a href="manuel-home-assistant.pdf" target="_blank" class="btn-manual-download-integrated" download>
+                        <span class="btn-icon">📥</span>
+                        <span>Télécharger le PDF</span>
+                    </a>
+                    <button class="btn-manual-view-integrated" id="viewManualBtn">
+                        <span class="btn-icon">👁️</span>
+                        <span>Voir le manuel</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Configs -->
+        <section id="section-configs" class="page-section section-configs-wrapper">
+            <header class="section-banner">
+                <h2 class="section-banner__title">Configs</h2>
+                <p class="section-banner__subtitle">Configurations Home Assistant à reprendre</p>
+            </header>
+            <p class="section-configs-intro">Quelques dépôts GitHub de configurations et de <strong>blueprints / automatisations</strong> Home Assistant — utiles pour 2025-2026, à importer ou à reprendre dans ton instance.</p>
+            <div class="configs-tip" role="note">
+                <strong>Importer un blueprint :</strong> <strong>Paramètres</strong> → <strong>Automatisations & Scènes</strong> → <strong>Blueprints</strong> → <strong>Importer Blueprint</strong>, puis colle l’URL du fichier YAML (ex. <code>https://raw.githubusercontent.com/.../blueprint.yaml</code>). <a href="https://www.home-assistant.io/docs/automation/using_blueprints/" target="_blank" rel="noopener noreferrer">Doc Home Assistant</a>
+            </div>
+            <h3 class="configs-subtitle">Collections de blueprints et automatisations</h3>
+            <div class="configs-grid" id="configsGrid">
+                <a href="https://github.com/airalab/home-assistant-blueprints" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📂</span>
+                    <span class="configs-card-author">airalab / home-assistant-blueprints</span>
+                    <span class="configs-card-desc">Blueprints simples : notifications Telegram, contrôle par temps, lumières sur mouvement, température… Import direct depuis GitHub.</span>
+                </a>
+                <a href="https://github.com/SirGoodenough/HA_Blueprints" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📂</span>
+                    <span class="configs-card-author">SirGoodenough / HA_Blueprints</span>
+                    <span class="configs-card-desc">Bibliothèque de blueprints avec documentation — chaque blueprint a son YAML et un fichier .md d’explications.</span>
+                </a>
+                <a href="https://github.com/Maneridiet/home-assistant-blueprints" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📂</span>
+                    <span class="configs-card-author">Maneridiet / home-assistant-blueprints</span>
+                    <span class="configs-card-desc">Collection de blueprints et dashboards Lovelace prêts à importer et à utiliser.</span>
+                </a>
+                <a href="https://github.com/pickerin/HA_Blueprints" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📂</span>
+                    <span class="configs-card-author">pickerin / HA_Blueprints</span>
+                    <span class="configs-card-desc">Blueprints d’automatisations réelles utilisés par l’auteur dans son environnement HA.</span>
+                </a>
+                <a href="https://github.com/apollo1220/blueprints" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📂</span>
+                    <span class="configs-card-author">apollo1220 / blueprints</span>
+                    <span class="configs-card-desc">Collection légère de blueprints : mouvement, boutons Zigbee, etc. Import direct depuis GitHub.</span>
+                </a>
+                <a href="https://github.com/EPMatt/awesome-ha-blueprints" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📂</span>
+                    <span class="configs-card-author">EPMatt / awesome-ha-blueprints</span>
+                    <span class="configs-card-desc">Liste curatée de blueprints fiables et utiles — importer les liens YAML dans ton instance.</span>
+                </a>
+            </div>
+            <h3 class="configs-subtitle">Configurations complètes (configs)</h3>
+            <div class="configs-grid">
+                <a href="https://github.com/CCOSTAN/Home-AssistantConfig" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📁</span>
+                    <span class="configs-card-author">Carlo Costanzo</span>
+                    <span class="configs-card-desc">Une des configs les plus documentées, idéale pour apprendre.</span>
+                </a>
+                <a href="https://github.com/DubhAd/Home-AssistantConfig" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📁</span>
+                    <span class="configs-card-author">DubhAd (Tinkerer)</span>
+                    <span class="configs-card-desc">Partage de fichiers de configuration et d’idées.</span>
+                </a>
+                <a href="https://github.com/geekofweek/homeassistant" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📁</span>
+                    <span class="configs-card-author">geekofweek</span>
+                    <span class="configs-card-desc">Plus de 300 automatisations pour s’inspirer.</span>
+                </a>
+                <a href="https://github.com/skalavala/mysmarthome" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📁</span>
+                    <span class="configs-card-author">Mahasri Kalavala</span>
+                    <span class="configs-card-desc">Installation impressionnante, nombreux types de matériel.</span>
+                </a>
+                <a href="https://github.com/arsaboo/homeassistant-config" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📁</span>
+                    <span class="configs-card-author">Alok Saboo (arsaboo)</span>
+                    <span class="configs-card-desc">Config régulièrement mise à jour.</span>
+                </a>
+                <a href="https://github.com/bachya/smart-home" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📁</span>
+                    <span class="configs-card-author">Aaron Bach (bachya)</span>
+                    <span class="configs-card-desc">Config à jour avec de nombreux services Dockerisés.</span>
+                </a>
+                <a href="https://github.com/frenck/home-assistant-config" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📁</span>
+                    <span class="configs-card-author">Franck Nijhof</span>
+                    <span class="configs-card-desc">Structure Hass.io, approche différente et claire.</span>
+                </a>
+                <a href="https://github.com/klaasnicolaas/Student-homeassistant-config" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📁</span>
+                    <span class="configs-card-author">Klaas Schoute</span>
+                    <span class="configs-card-desc">Hass.io, NUC, Ubuntu, Docker, régulièrement mis à jour.</span>
+                </a>
+                <a href="https://github.com/SeLLeRoNe/HA-Config" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📁</span>
+                    <span class="configs-card-author">Andrea Iannucci (SeLLeRoNe)</span>
+                    <span class="configs-card-desc">Configuration régulièrement maintenue.</span>
+                </a>
+                <a href="https://github.com/basnijholt/home-assistant-config" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📁</span>
+                    <span class="configs-card-author">basnijholt / home-assistant-config</span>
+                    <span class="configs-card-desc">Config structurée avec plus de 100 automatisations documentées, scripts, inclusions — organisation claire (automations, appdaemon, custom_components). Idéal 2025–2026.</span>
+                </a>
+                <a href="https://github.com/denysdovhan/home-assistant-config" target="_blank" rel="noopener noreferrer" class="configs-card">
+                    <span class="configs-card-icon" aria-hidden="true">📁</span>
+                    <span class="configs-card-author">denysdovhan / home-assistant-config</span>
+                    <span class="configs-card-desc">Exemple de configuration personnelle : YAML variés, idées d’automatisations et structure réaliste pour organiser ton HA.</span>
+                </a>
+            </div>
+            <p class="section-configs-note">Ces dépôts sont listés dans la catégorie <a href="https://www.awesome-ha.com/#public-configurations" target="_blank" rel="noopener noreferrer">Public Configurations</a> d’Awesome Home Assistant.</p>
+        </section>
 
     </div>
 
@@ -292,6 +527,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Bouton retour en haut -->
+    <button type="button" class="btn-back-to-top" id="btnBackToTop" aria-label="Remonter en haut de la page">↑</button>
 
     <script src="app.js"></script>
 </body>

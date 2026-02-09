@@ -4,6 +4,7 @@ import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import { useCustomAuth } from '../../hooks/useCustomAuth';
+import { isAdminUser } from '../../utils/sessionDurationCheck';
 import LibreSpeedAccessButton from '../../components/LibreSpeedAccessButton';
 import MeTubeAccessButton from '../../components/MeTubeAccessButton';
 import AIAccessButton from '../../components/AIAccessButton';
@@ -222,7 +223,7 @@ export default function EncoursPage() {
         
         // Vérifier si c'est un admin (par rôle ou par email)
         const isAdminByRole = userRole === 'admin';
-        const isAdminByEmail = user.email === 'formateur_tic@hotmail.com';
+        const isAdminByEmail = isAdminUser(user.email);
         setIsAdmin(isAdminByRole || isAdminByEmail);
         
         if (isAdminByRole || isAdminByEmail) {
@@ -370,7 +371,7 @@ export default function EncoursPage() {
       }
       
       // Vérifier si c'est un admin (par rôle ou par email) directement dans la fonction
-      const userIsAdmin = user.role === 'admin' || user.email === 'formateur_tic@hotmail.com';
+      const userIsAdmin = user.role === 'admin' || isAdminUser(user.email);
       
       try {
         setLoading(true);

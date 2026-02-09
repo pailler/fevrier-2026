@@ -4,6 +4,9 @@ let filteredCodes = [];
 let activeCategories = new Set();
 let activeTags = new Set();
 
+// Catégorie des codes "automatisations" (séparée des codes classiques)
+const AUTOMATIONS_CATEGORY_ID = 'templates-automations';
+
 // Dictionnaire des termes techniques avec leurs explications et catégories de couleurs
 const termExplanations = {
     'configuration.yaml': {
@@ -176,6 +179,7 @@ async function loadData() {
 
 // Initialiser l'application
 function initializeApp() {
+    updateHeroTotalResources();
     updateTotalCodesCount();
     setupCategoryFilters();
     setupSearch();
@@ -184,52 +188,68 @@ function initializeApp() {
     setupManualModal();
     setupInfoToggle();
     updateProgressBar();
-    // Mettre à jour l'affichage des tags (pour mettre en évidence les tags actifs dans les catégories)
     updateActiveTagsDisplay();
-    // Afficher toutes les cartes par défaut
     loadAllCodes();
-    // Ajouter les tooltips après un court délai pour s'assurer que le DOM est prêt
+    // Grille des codes automatisations (section dédiée)
+    filterAndRenderAutomationCodes();
+    const searchAutomationsEl = document.getElementById('searchAutomations');
+    if (searchAutomationsEl) {
+        searchAutomationsEl.addEventListener('input', () => filterAndRenderAutomationCodes());
+    }
+    // Recalculer le total des ressources une fois tout le DOM et les données prêts
+    updateHeroTotalResources();
     setTimeout(() => {
         addTermTooltips();
     }, 100);
 }
 
-// Mettre à jour le nombre total de codes
+// Mettre à jour la stat globale en haut de page (tous les codes + dépôts config/blueprints)
+function updateHeroTotalResources() {
+    let total = 0;
+    if (codesData && codesData.categories) {
+        codesData.categories.forEach(category => {
+            total += category.codes ? category.codes.length : 0;
+        });
+    }
+    const configCards = document.querySelectorAll('.configs-card');
+    if (configCards.length) total += configCards.length;
+    const el = document.getElementById('heroTotalResources');
+    if (el) el.textContent = total > 0 ? `${total} ressource${total > 1 ? 's' : ''}` : 'Aucune ressource';
+}
+
+// Mettre à jour le nombre total de codes (codes classiques uniquement)
 function updateTotalCodesCount() {
     if (!codesData || !codesData.categories) return;
     
     let totalCodes = 0;
     codesData.categories.forEach(category => {
+        if (category.id === AUTOMATIONS_CATEGORY_ID) return;
         totalCodes += category.codes ? category.codes.length : 0;
     });
     
     const countElement = document.getElementById('totalCodesCount');
     if (countElement) {
-        countElement.textContent = `${totalCodes} codes disponibles`;
+        countElement.textContent = `${totalCodes} codes classiques disponibles`;
     }
 }
 
-// Mettre à jour la barre de progression
+// Mettre à jour la barre de progression (codes classiques)
 function updateProgressBar() {
-    // Calculer le nombre total de codes
     let totalCodes = 0;
     codesData.categories.forEach(category => {
+        if (category.id === AUTOMATIONS_CATEGORY_ID) return;
         totalCodes += category.codes.length;
     });
     
-    // Mettre à jour l'affichage
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
     const progressInfo = document.getElementById('progressInfo');
     
     if (progressBar && progressText && progressInfo) {
-        // Pour cette application, on considère qu'on a atteint 100% avec tous les codes disponibles
-        const progress = 100; // 100% car tous les codes sont disponibles
-        
-        // Initialiser à 0 pour l'animation
+        const progress = 100;
         progressBar.style.width = '0%';
         progressText.textContent = '0%';
-        progressInfo.textContent = `${totalCodes} codes disponibles`;
+        progressInfo.textContent = `${totalCodes} codes classiques disponibles`;
         
         // Animer la barre de progression après un court délai
         setTimeout(() => {
@@ -281,10 +301,11 @@ function setupItemToggles() {
     });
 }
 
-// Configurer les filtres de catégories
+// Configurer les filtres de catégories (exclut la catégorie automatisations, affichée à part)
 function setupCategoryFilters() {
     const categoryFilters = document.getElementById('categoryFilters');
     codesData.categories.forEach(category => {
+        if (category.id === AUTOMATIONS_CATEGORY_ID) return;
         // Créer un conteneur pour la catégorie (style expandable)
         const categoryItem = document.createElement('div');
         categoryItem.className = 'category-item';
@@ -460,11 +481,12 @@ function setupSearch() {
     });
 }
 
-// Filtrer les codes
+// Filtrer les codes (codes classiques uniquement, hors automatisations)
 function filterCodes(searchQuery = '') {
     filteredCodes = [];
     
     codesData.categories.forEach(category => {
+        if (category.id === AUTOMATIONS_CATEGORY_ID) return;
         // Filtrer par catégorie
         if (activeCategories.size > 0 && !activeCategories.has(category.id)) {
             return;
@@ -499,10 +521,11 @@ function filterCodes(searchQuery = '') {
     renderCodes();
 }
 
-// Charger toutes les cartes au démarrage
+// Charger toutes les cartes classiques au démarrage (hors automatisations)
 function loadAllCodes() {
     filteredCodes = [];
     codesData.categories.forEach(category => {
+        if (category.id === AUTOMATIONS_CATEGORY_ID) return;
         category.codes.forEach(code => {
             filteredCodes.push({
                 ...code,
@@ -513,6 +536,55 @@ function loadAllCodes() {
     });
     updateResultsCount();
     renderCodes();
+}
+
+// Récupérer les codes de la catégorie automatisations
+function getAutomationCodes() {
+    if (!codesData || !codesData.categories) return [];
+    const cat = codesData.categories.find(c => c.id === AUTOMATIONS_CATEGORY_ID);
+    if (!cat || !cat.codes) return [];
+    return cat.codes.map(code => ({
+        ...code,
+        category: cat.name,
+        categoryId: cat.id
+    }));
+}
+
+// Filtrer et afficher les codes automatisations
+function filterAndRenderAutomationCodes() {
+    const searchInput = document.getElementById('searchAutomations');
+    const grid = document.getElementById('codesGridAutomations');
+    const noResults = document.getElementById('noResultsAutomations');
+    const countEl = document.getElementById('automationsCount');
+    if (!grid || !noResults) return;
+
+    const query = (searchInput && searchInput.value) ? searchInput.value.trim().toLowerCase() : '';
+    const allAutomationCodes = getAutomationCodes();
+
+    const filtered = query
+        ? allAutomationCodes.filter(code => {
+            const searchable = [code.name, code.description, ...(code.tags || [])].join(' ').toLowerCase();
+            return searchable.includes(query);
+          })
+        : allAutomationCodes;
+
+    if (countEl) countEl.textContent = `${filtered.length} code${filtered.length !== 1 ? 's' : ''} automatisation${filtered.length !== 1 ? 's' : ''}`;
+
+    if (filtered.length === 0) {
+        grid.innerHTML = '';
+        noResults.style.display = 'block';
+        return;
+    }
+    noResults.style.display = 'none';
+    grid.innerHTML = filtered.map(code => createCodeCard(code)).join('');
+
+    // Tags : clic pour filtrer (ouverture du modal gérée par délégation dans setupModal)
+    document.querySelectorAll('#codesGridAutomations .code-card-tag').forEach(tag => {
+        tag.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleTag(tag.textContent);
+        });
+    });
 }
 
 // Rendre les codes
@@ -528,14 +600,9 @@ function renderCodes() {
 
     noResults.style.display = 'none';
     grid.innerHTML = filteredCodes.map(code => createCodeCard(code)).join('');
-    
-    // Ajouter les event listeners aux cartes
-    document.querySelectorAll('.code-card').forEach(card => {
-        card.addEventListener('click', () => showCodeModal(card.dataset.codeId));
-    });
 
-    // Ajouter les event listeners aux tags
-    document.querySelectorAll('.code-card-tag').forEach(tag => {
+    // Tags : clic pour filtrer (la délégation dans setupModal gère l'ouverture du modal sur la carte)
+    document.querySelectorAll('#codesGrid .code-card-tag').forEach(tag => {
         tag.addEventListener('click', (e) => {
             e.stopPropagation();
             toggleTag(tag.textContent);
@@ -918,9 +985,13 @@ function getCardSourceLink(cardType) {
     };
 }
 
-// Afficher le modal avec le code complet
+// Afficher le modal avec le code complet (codes classiques ou automatisations)
 function showCodeModal(codeId) {
-    const code = filteredCodes.find(c => c.id === codeId);
+    let code = filteredCodes.find(c => c.id === codeId);
+    if (!code) {
+        const automationCodes = getAutomationCodes();
+        code = automationCodes.find(c => c.id === codeId);
+    }
     if (!code) return;
 
     const modal = document.getElementById('codeModal');
@@ -1010,6 +1081,17 @@ function setupModal() {
             closeModal();
         }
     });
+
+    // Délégation : un seul listener par grille, fonctionne même avec hash/token dans l'URL
+    function handleGridClick(e) {
+        if (e.target.closest('.code-card-tag')) return;
+        const card = e.target.closest('.code-card');
+        if (!card || !card.dataset.codeId) return;
+        e.preventDefault();
+        showCodeModal(card.dataset.codeId);
+    }
+    document.getElementById('codesGrid')?.addEventListener('click', handleGridClick);
+    document.getElementById('codesGridAutomations')?.addEventListener('click', handleGridClick);
 }
 
 // Copier dans le presse-papiers
@@ -2461,9 +2543,29 @@ function getIconEmoji(icon) {
     return '⚪';
 }
 
+// Bouton retour en haut de page
+function initBackToTop() {
+    const btn = document.getElementById('btnBackToTop');
+    if (!btn) return;
+    const scrollThreshold = 300;
+    function toggleVisibility() {
+        if (window.scrollY > scrollThreshold) {
+            btn.classList.add('visible');
+        } else {
+            btn.classList.remove('visible');
+        }
+    }
+    window.addEventListener('scroll', toggleVisibility, { passive: true });
+    toggleVisibility();
+    btn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+}
+
 // Initialiser au chargement
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
     updateActiveTagsDisplay();
+    initBackToTop();
 });
 

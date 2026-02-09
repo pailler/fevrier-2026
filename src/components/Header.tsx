@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useCustomAuth } from '../hooks/useCustomAuth';
+import { isAdminUser } from '../utils/sessionDurationCheck';
 import DynamicNavigation from './DynamicNavigation';
 import { useTokenContext } from '../contexts/TokenContext';
 import { NotificationServiceClient } from '../utils/notificationServiceClient';
@@ -61,8 +62,7 @@ export default function Header() {
 
   // Vérifier le rôle de l'utilisateur
   useEffect(() => {
-    // Vérifier si l'utilisateur est l'admin (formateur_tic@hotmail.com)
-    if (user?.email === 'formateur_tic@hotmail.com') {
+    if (isAdminUser(user?.email) || user?.role === 'admin') {
       setRole('admin');
     } else if (user?.role) {
       setRole(user.role);
