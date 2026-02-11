@@ -1,0 +1,33 @@
+# Configuration Traefik pour Animagine XL
+# Route animaginexl.iahome.fr vers host:7883
+# Timeout augmenté + pas de compress (Gradio peut streamer)
+
+http:
+  serversTransports:
+    animaginexl-transport:
+      forwardingTimeouts:
+        dialTimeout: "30s"
+        responseHeaderTimeout: "30s"
+        idleConnTimeout: "90s"
+  routers:
+    animaginexl-main:
+      rule: "Host(`animaginexl.iahome.fr`)"
+      entryPoints: ["web"]
+      service: animaginexl-service
+      middlewares: ["security-headers@file"]
+      priority: 10
+    animaginexl-https:
+      rule: "Host(`animaginexl.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: animaginexl-service
+      tls:
+        certResolver: letsencrypt
+      middlewares: ["security-headers@file"]
+      priority: 10
+  services:
+    animaginexl-service:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:7883"
+        passHostHeader: true
+        serversTransport: animaginexl-transport

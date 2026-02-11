@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       ],
       mode: 'payment',
       success_url: `${baseUrl}/payment-success?package=${packageType}`,
-      cancel_url: `${baseUrl}/pricing?canceled=true`,
+      cancel_url: `${baseUrl}/pricing2?canceled=true`,
       metadata: {
         userId: userId || '',
         userEmail: userEmail || '',

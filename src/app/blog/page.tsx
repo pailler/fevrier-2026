@@ -117,7 +117,7 @@ export default function BlogPage() {
     { value: 'all', label: 'Tous' },
     { value: 'resources', label: 'Resources' },
     { value: 'community', label: 'Community' },
-    { value: 'pricing', label: 'Pricing' },
+    { value: 'pricing2', label: 'Pricing' },
     { value: 'enterprise', label: 'Enterprise' },
     { value: 'product', label: 'Product' },
     { value: 'examples', label: 'Examples' }

@@ -51,7 +51,7 @@ export default function DynamicPage() {
     'contact',
     'privacy',
     'terms',
-    'pricing',
+    'pricing2',
     'blog',
     'formation',
     'community',

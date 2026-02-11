@@ -107,7 +107,7 @@ https://iahome.fr/card/metube?utm_source=facebook&utm_medium=social&utm_campaign
 
 - **Mots-clés** : "télécharger vidéo youtube", "youtube downloader"
 - **Annonces** : Utilisez les annonces fournies dans le guide marketing
-- **Extensions** : Sitelinks vers `/card/metube`, `/pricing`, `/signup`
+- **Extensions** : Sitelinks vers `/card/metube`, `/pricing2`, `/signup`
 
 ### Facebook Ads
 

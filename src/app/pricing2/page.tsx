@@ -1,8 +1,63 @@
 'use client';
+import { useState } from 'react';
 import Link from 'next/link';
 import StripeButton2 from '../../components/StripeButton2';
 
+const PRICES = {
+  monthly: 9.9,
+  yearly: 99,
+  pack: 19.8,
+} as const;
+
+function formatPrice(value: number) {
+  return value.toFixed(2).replace('.', ',') + '€';
+}
+
 export default function Pricing2Page() {
+  const [promoInput, setPromoInput] = useState('');
+  const [promoResult, setPromoResult] = useState<{
+    valid: true;
+    promotion_code_id: string;
+    percent_off: number;
+    code: string;
+  } | { valid: false; error?: string } | null>(null);
+  const [promoLoading, setPromoLoading] = useState(false);
+
+  const applyPromo = async () => {
+    const code = promoInput.trim().toUpperCase();
+    if (!code) {
+      setPromoResult(null);
+      return;
+    }
+    setPromoLoading(true);
+    setPromoResult(null);
+    try {
+      const res = await fetch(`/api/stripe/validate-promo?code=${encodeURIComponent(code)}`);
+      const data = await res.json();
+      if (data.valid && data.promotion_code_id) {
+        setPromoResult({
+          valid: true,
+          promotion_code_id: data.promotion_code_id,
+          percent_off: data.percent_off ?? 20,
+          code: data.code || code,
+        });
+      } else {
+        setPromoResult({ valid: false, error: data.error || 'Code invalide ou expiré' });
+      }
+    } catch {
+      setPromoResult({ valid: false, error: 'Erreur de vérification' });
+    } finally {
+      setPromoLoading(false);
+    }
+  };
+
+  const hasPromo = promoResult?.valid === true && promoResult.percent_off > 0;
+  const discountFactor = hasPromo ? 1 - (promoResult.percent_off / 100) : 1;
+  const priceMonthly = PRICES.monthly * discountFactor;
+  const priceYearly = PRICES.yearly * discountFactor;
+  const pricePack = PRICES.pack * discountFactor;
+  const promotionCodeId = hasPromo ? promoResult.promotion_code_id : undefined;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 via-white to-blue-50">
       {/* Hero Section avec bannière animée */}
@@ -69,6 +124,45 @@ export default function Pricing2Page() {
             </div>
           </div>
 
+          {/* Code promo */}
+          <div className="mb-8 max-w-xl mx-auto">
+            <div className="bg-white/10 backdrop-blur-sm border-2 border-white/30 rounded-lg p-4 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+              <label htmlFor="promo-code" className="text-white font-medium shrink-0">
+                Code promo
+              </label>
+              <input
+                id="promo-code"
+                type="text"
+                value={promoInput}
+                onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                onKeyDown={(e) => e.key === 'Enter' && applyPromo()}
+                placeholder="ex. BIENVENUE10"
+                className="flex-1 px-3 py-2 rounded border border-white/30 bg-white/10 text-white placeholder-white/60 focus:ring-2 focus:ring-white/50 focus:border-white"
+              />
+              <button
+                type="button"
+                onClick={applyPromo}
+                disabled={promoLoading}
+                className="px-4 py-2 bg-white text-green-700 font-semibold rounded hover:bg-green-100 transition-colors disabled:opacity-50"
+              >
+                {promoLoading ? 'Vérification...' : 'Appliquer'}
+              </button>
+            </div>
+            {promoResult?.valid === true && (
+              <p className="mt-2 text-center text-green-200 text-sm">
+                ✓ Code <strong>{promoResult.code}</strong> appliqué : -{promoResult.percent_off}% sur tous les tarifs.
+              </p>
+            )}
+            {promoResult?.valid === false && (
+              <p className="mt-2 text-center text-red-200 text-sm">
+                {promoResult.error}
+              </p>
+            )}
+            <p className="mt-1 text-center text-white/80 text-xs">
+              BIENVENUE10 : 20% de remise sur tous les tarifs
+            </p>
+          </div>
+
           {/* Section Abonnement */}
           <div className="mb-16">
             <div className="text-center mb-8">
@@ -90,7 +184,12 @@ export default function Pricing2Page() {
                 </div>
                 <div className="text-center mb-4">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">Starter Mensuel</h3>
-                  <div className="text-3xl font-bold text-blue-600 mb-2">9,90€</div>
+                  <div className="text-3xl font-bold text-blue-600 mb-2">
+                    {formatPrice(priceMonthly)}
+                    {hasPromo && (
+                      <span className="block text-sm font-normal text-gray-500 line-through mt-0.5">9,90€</span>
+                    )}
+                  </div>
                   <div className="text-sm text-gray-500 mb-1">par mois</div>
                 </div>
                 <ul className="space-y-2 mb-6 text-sm">
@@ -113,6 +212,7 @@ export default function Pricing2Page() {
                 </ul>
                 <StripeButton2 
                   packageType="subscription_monthly"
+                  promotionCodeId={promotionCodeId}
                   className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-2 rounded-lg font-medium transition-colors text-sm"
                 >
                   S'abonner
@@ -128,7 +228,12 @@ export default function Pricing2Page() {
                 </div>
                 <div className="text-center mb-4">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">Starter Annuel</h3>
-                  <div className="text-3xl font-bold text-green-600 mb-2">99,00€</div>
+                  <div className="text-3xl font-bold text-green-600 mb-2">
+                    {formatPrice(priceYearly)}
+                    {hasPromo && (
+                      <span className="block text-sm font-normal text-gray-500 line-through mt-0.5">99,00€</span>
+                    )}
+                  </div>
                   <div className="text-sm text-gray-500 mb-1">par an</div>
                   <div className="mt-2 bg-green-200 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">
                     Économisez 19,80€ (2 mois gratuits)
@@ -158,6 +263,7 @@ export default function Pricing2Page() {
                 </ul>
                 <StripeButton2 
                   packageType="subscription_yearly"
+                  promotionCodeId={promotionCodeId}
                   className="block w-full bg-green-600 hover:bg-green-700 text-white text-center px-4 py-2 rounded-lg font-medium transition-colors text-sm"
                 >
                   S'abonner
@@ -187,7 +293,12 @@ export default function Pricing2Page() {
                 </div>
                 <div className="text-center mb-4">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">Pack Standard</h3>
-                  <div className="text-3xl font-bold text-blue-600 mb-2">19,80€</div>
+                  <div className="text-3xl font-bold text-blue-600 mb-2">
+                    {formatPrice(pricePack)}
+                    {hasPromo && (
+                      <span className="block text-sm font-normal text-gray-500 line-through mt-0.5">19,80€</span>
+                    )}
+                  </div>
                   <div className="text-sm text-gray-500 mb-2">Idéal pour tester toutes les applications sans engagement</div>
                   <div className="mt-2 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold">
                     💡 Économisez 50% avec l'abonnement
@@ -213,6 +324,7 @@ export default function Pricing2Page() {
                 </ul>
                 <StripeButton2 
                   packageType="pack_standard"
+                  promotionCodeId={promotionCodeId}
                   className="block w-full bg-gray-600 hover:bg-gray-700 text-white text-center px-4 py-2 rounded-lg font-medium transition-colors text-sm"
                 >
                   Acheter

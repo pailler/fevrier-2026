@@ -6,9 +6,11 @@ interface StripeButton2Props {
   packageType: 'subscription_monthly' | 'subscription_yearly' | 'pack_standard';
   className?: string;
   children: React.ReactNode;
+  /** ID du code promo Stripe (ex. prom_xxx) pour appliquer la réduction au checkout */
+  promotionCodeId?: string | null;
 }
 
-export default function StripeButton2({ packageType, className, children }: StripeButton2Props) {
+export default function StripeButton2({ packageType, className, children, promotionCodeId }: StripeButton2Props) {
   const [isLoading, setIsLoading] = useState(false);
   const { user, isAuthenticated } = useCustomAuth();
 
@@ -33,6 +35,7 @@ export default function StripeButton2({ packageType, className, children }: Stri
           packageType,
           userId: user?.id,
           userEmail: user?.email,
+          ...(promotionCodeId && { promotion_code_id: promotionCodeId }),
         }),
       });
 

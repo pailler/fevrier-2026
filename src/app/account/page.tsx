@@ -350,7 +350,7 @@ export default function AccountPage() {
                   </div>
                   <p className="text-blue-100 text-sm mb-4">tokens disponibles</p>
                   <Link
-                    href="/pricing"
+                    href="/pricing2"
                     className="block w-full text-center px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 font-semibold transition-colors"
                   >
                     Acheter des tokens
@@ -401,7 +401,7 @@ export default function AccountPage() {
                   Découvrir les applications
                 </Link>
                 <Link
-                  href="/pricing"
+                  href="/pricing2"
                   className="block w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-center font-medium transition-colors"
                 >
                   Acheter des tokens

@@ -1,0 +1,33 @@
+# Configuration Traefik pour Florence-2
+# Route florence2.iahome.fr vers host:7884
+# Timeout augmenté + pas de compress (Gradio peut streamer)
+
+http:
+  serversTransports:
+    florence2-transport:
+      forwardingTimeouts:
+        dialTimeout: "30s"
+        responseHeaderTimeout: "30s"
+        idleConnTimeout: "90s"
+  routers:
+    florence2-main:
+      rule: "Host(`florence2.iahome.fr`)"
+      entryPoints: ["web"]
+      service: florence2-service
+      middlewares: ["security-headers@file"]
+      priority: 10
+    florence2-https:
+      rule: "Host(`florence2.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: florence2-service
+      tls:
+        certResolver: letsencrypt
+      middlewares: ["security-headers@file"]
+      priority: 10
+  services:
+    florence2-service:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:7884"
+        passHostHeader: true
+        serversTransport: florence2-transport

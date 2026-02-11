@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
         error: `Solde de tokens insuffisant. Vous avez ${tokenBalance} tokens, mais 100 tokens sont requis pour activer cette application.`,
         requiredTokens: 100,
         currentBalance: tokenBalance,
-        pricingUrl: 'https://iahome.fr/pricing'
+        pricingUrl: 'https://iahome.fr/pricing2'
       }, { status: 400 });
     }
 
@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
           error: `Solde de tokens insuffisant. Vous avez ${recheckBalance} tokens, mais 100 tokens sont requis.`,
           requiredTokens: 100,
           currentBalance: recheckBalance,
-          pricingUrl: 'https://iahome.fr/pricing'
+          pricingUrl: 'https://iahome.fr/pricing2'
         }, { status: 400 });
       }
 
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: false,
           error: 'Erreur lors du débit des tokens. Veuillez réessayer.',
-          pricingUrl: 'https://iahome.fr/pricing'
+          pricingUrl: 'https://iahome.fr/pricing2'
         }, { status: 500 });
       }
     }

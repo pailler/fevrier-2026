@@ -129,7 +129,7 @@ export class TokenActionService {
           tokensConsumed: 0,
           tokensRemaining: 0,
           reason: errorData.message || 'Plus de tokens ? Rechargez',
-          pricingUrl: errorData.pricingUrl || 'https://iahome.fr/pricing'
+          pricingUrl: errorData.pricingUrl || 'https://iahome.fr/pricing2'
         };
       }
 

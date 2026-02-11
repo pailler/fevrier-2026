@@ -7,7 +7,7 @@ export default function TokensRedirectPage() {
 
   useEffect(() => {
     // Rediriger automatiquement vers la page des offres
-    router.replace('/pricing');
+    router.replace('/pricing2');
   }, [router]);
 
   return (

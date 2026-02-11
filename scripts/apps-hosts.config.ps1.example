@@ -1,0 +1,7 @@
+# Exemple de configuration pour start-apps-gradio-et-homeassistant.ps1
+# Copiez ce fichier en apps-hosts.config.ps1 et adaptez les chemins a vos installations.
+
+$PhotomakerPath   = "C:\chemin\vers\photomaker"      # Dossier contenant app.py (port 7881)
+$BirefnetPath     = "C:\chemin\vers\birefnet"        # Dossier contenant app.py (port 7882)
+$Florence2Path    = "C:\chemin\vers\florence-2"     # Dossier contenant app.py (port 7884)
+$AnimagineXLPath  = "C:\chemin\vers\animagine-xl"   # Dossier contenant app.py (port 7881)

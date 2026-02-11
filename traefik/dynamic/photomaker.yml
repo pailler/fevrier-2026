@@ -1,33 +1,36 @@
 # Configuration Traefik pour PhotoMaker
-# Route photomaker.iahome.fr vers localhost:7881
+# Route photomaker.iahome.fr vers port 7881 (host.docker.internal)
+# Timeouts augmentés pour Gradio, pas de compress (streaming)
 
 http:
+  serversTransports:
+    photomaker-transport:
+      forwardingTimeouts:
+        dialTimeout: "30s"
+        responseHeaderTimeout: "30s"
+        idleConnTimeout: "90s"
   routers:
-    # Route principale HTTP (Cloudflare SSL - HTTP vers Traefik)
     photomaker-main:
       rule: "Host(`photomaker.iahome.fr`)"
       entryPoints: ["web"]
       service: photomaker-service
-      middlewares: ["security-headers@file", "compress@file"]
+      middlewares: ["security-headers@file"]
       priority: 10
-
-    # Route HTTPS (si SSL direct sans Cloudflare)
     photomaker-https:
       rule: "Host(`photomaker.iahome.fr`)"
       entryPoints: ["websecure"]
       service: photomaker-service
       tls:
         certResolver: letsencrypt
-      middlewares: ["security-headers@file", "compress@file"]
+      middlewares: ["security-headers@file"]
       priority: 10
-
   services:
-    # Service principal pour PhotoMaker
     photomaker-service:
       loadBalancer:
         servers:
           - url: "http://host.docker.internal:7881"
         passHostHeader: true
+        serversTransport: photomaker-transport
         healthCheck:
           path: "/"
           interval: "30s"

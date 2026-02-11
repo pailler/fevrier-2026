@@ -83,7 +83,7 @@ export async function POST(request: Request) {
         success: false,
         error: 'Plus de tokens ? Rechargez',
         message: 'Plus de tokens ? Rechargez',
-        pricingUrl: 'https://iahome.fr/pricing'
+        pricingUrl: 'https://iahome.fr/pricing2'
       }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }

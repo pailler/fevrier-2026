@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
         { 
           error: 'Plus de tokens ? Rechargez',
           message: 'Plus de tokens ? Rechargez',
-          pricingUrl: 'https://iahome.fr/pricing'
+          pricingUrl: 'https://iahome.fr/pricing2'
         },
         { status: 500 }
       );

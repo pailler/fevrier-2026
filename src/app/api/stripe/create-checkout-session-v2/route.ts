@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { packageType, userId, userEmail } = await request.json();
+    const { packageType, userId, userEmail, promotion_code_id } = await request.json();
     
     console.log('🔄 Création session Stripe V2:', { 
       packageType, 
@@ -126,6 +126,10 @@ export async function POST(request: NextRequest) {
         .substring(0, 500); // Limiter la longueur
     };
 
+    const discounts = promotion_code_id && typeof promotion_code_id === 'string' && promotion_code_id.startsWith('prom_')
+      ? [{ promotion_code: promotion_code_id }]
+      : undefined;
+
     // Créer la session de paiement Stripe
     if (packageData.mode === 'subscription') {
       // Mode abonnement
@@ -150,6 +154,7 @@ export async function POST(request: NextRequest) {
         mode: 'subscription',
         success_url: `${baseUrl}/payment-success?package=${packageType}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/pricing2?canceled=true`,
+        ...(discounts && { discounts }),
         metadata: {
           userId: cleanMetadataValue(userId),
           userEmail: cleanMetadataValue(userEmail),
@@ -201,6 +206,7 @@ export async function POST(request: NextRequest) {
         mode: 'payment',
         success_url: `${baseUrl}/payment-success?package=${packageType}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/pricing2?canceled=true`,
+        ...(discounts && { discounts }),
         metadata: {
           userId: cleanMetadataValue(userId),
           userEmail: cleanMetadataValue(userEmail),

@@ -378,6 +378,12 @@ const nextConfig: NextConfig = {
     ],
   },
   
+  async redirects() {
+    return [
+      { source: '/pricing', destination: '/pricing2', permanent: true },
+    ];
+  },
+
   // Configuration pour optimiser le préchargement
   async rewrites() {
     return [

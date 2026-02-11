@@ -221,12 +221,12 @@ export default function AdminContent() {
             url: '/contact'
           },
           {
-            id: 'pricing',
+            id: 'pricing2',
             title: 'Tarifs',
             type: 'page',
             status: 'published',
             created_at: new Date().toISOString(),
-            url: '/pricing'
+            url: '/pricing2'
           },
           {
             id: 'about',

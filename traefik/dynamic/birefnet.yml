@@ -1,0 +1,29 @@
+# Configuration Traefik pour BiRefNet
+# Route birefnet.iahome.fr vers host:7882
+
+http:
+  routers:
+    birefnet-main:
+      rule: "Host(`birefnet.iahome.fr`)"
+      entryPoints: ["web"]
+      service: birefnet-service
+      middlewares: ["security-headers@file", "compress@file"]
+      priority: 10
+    birefnet-https:
+      rule: "Host(`birefnet.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: birefnet-service
+      tls:
+        certResolver: letsencrypt
+      middlewares: ["security-headers@file", "compress@file"]
+      priority: 10
+  services:
+    birefnet-service:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:7882"
+        passHostHeader: true
+        healthCheck:
+          path: "/"
+          interval: "30s"
+          timeout: "5s"
