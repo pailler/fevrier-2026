@@ -3,9 +3,9 @@
 // même si les variables d'environnement ne sont pas définies au moment du build
 
 // Valeurs par défaut hardcodées - TOUJOURS utilisées comme fallback
-export const DEFAULT_SUPABASE_URL = 'https://xemtoyzcihmncbrlsmhr.supabase.co';
-export const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlbXRveXpjaGhtbmNicmxzbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0MDUzMDUsImV4cCI6MjA2NTk4MTMwNX0.afcRGhlB5Jj-7kgCV6IzUDRdGUQkHkm1Fdl1kzDdj6M';
-export const DEFAULT_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlbXRveXpjaGhtbmNicmxzbWhyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDQwNTMwNSwiZXhwIjoyMDY1OTgxMzA1fQ.CwVYrasKI78pAXnEfLMiamBIV_QtPQtwFJSmUJ68GQM';
+export const DEFAULT_SUPABASE_URL = 'https://example.supabase.co';
+export const DEFAULT_SUPABASE_ANON_KEY = 'REPLACE_WITH_REAL_VALUE';
+export const DEFAULT_SERVICE_ROLE_KEY = 'REPLACE_WITH_REAL_VALUE';
 
 // Fonction helper pour obtenir une variable d'environnement avec fallback garanti
 // Évite que process.env.NEXT_PUBLIC_* soit undefined dans le bundle
