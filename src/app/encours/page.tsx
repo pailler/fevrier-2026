@@ -34,6 +34,7 @@ interface UserModule {
   created_by?: string;
   price?: number | string;
   is_free?: boolean;
+  last_used_at?: string | null;
 }
 
 export default function EncoursPage() {
@@ -141,26 +142,24 @@ export default function EncoursPage() {
         // Gérer les messages de succès
         if (messageParam) {
           setSuccessMessage(decodeURIComponent(messageParam));
-          // Effacer toute erreur existante si un message de succès est présent
           setTokenError(null);
           try {
             window.history.replaceState({}, document.title, window.location.pathname);
           } catch (e) {
             console.warn('Erreur lors du nettoyage de l\'URL:', e);
           }
-          // Effacer le message après 5 secondes
           messageTimeout = setTimeout(() => {
             setSuccessMessage(null);
           }, 5000);
         }
         
-        // Ne pas traiter les erreurs si un message de succès est présent (activation réussie)
+        // Ne pas traiter les erreurs si un message de succès est présent (accès réussi)
         if (errorParam && !messageParam) {
-          // Ne pas afficher d'erreur si l'utilisateur vient juste d'activer une application
-          // Vérifier si c'est une erreur liée à un accès direct sans token (après activation)
+          // Ne pas afficher d'erreur si l'utilisateur vient juste d'accéder à une application
+          // Vérifier si c'est une erreur liée à un accès direct sans token (après un accès direct)
           if (errorParam === 'direct_access_denied' && user && isAuthenticated) {
-            // Ignorer cette erreur si l'utilisateur est connecté (probablement après activation)
-            console.log('⚠️ Erreur direct_access_denied ignorée - utilisateur connecté après activation');
+            // Ignorer cette erreur si l'utilisateur est connecté (probablement après un accès précédent)
+            console.log('⚠️ Erreur direct_access_denied ignorée - utilisateur connecté après un accès direct');
           } else {
             switch (errorParam) {
               case 'invalid_token':
@@ -182,7 +181,7 @@ export default function EncoursPage() {
                 break;
               case 'direct_access_denied':
                 // Ne pas afficher d'erreur pour les accès directs si l'utilisateur est connecté
-                // (cela peut arriver après une activation réussie)
+                // (cela peut arriver après un accès réussi)
                 if (!user || !isAuthenticated) {
                   setTokenError('Accès direct non autorisé. Veuillez accéder à l\'application depuis la page Mes Applications.');
                 }
@@ -376,22 +375,6 @@ export default function EncoursPage() {
       try {
         setLoading(true);
         console.log('🔍 Chargement des modules pour utilisateur:', user.id, userIsAdmin ? '(ADMIN)' : '');
-        
-        // Désactiver automatiquement les modules expirés pour cet utilisateur
-        try {
-          const deactivateResponse = await fetch(`/api/deactivate-expired-modules?userId=${user.id}`, {
-            method: 'GET'
-          });
-          if (deactivateResponse.ok) {
-            const deactivateResult = await deactivateResponse.json();
-            if (deactivateResult.deactivatedCount > 0) {
-              console.log(`⏰ ${deactivateResult.deactivatedCount} module(s) expiré(s) désactivé(s) automatiquement`);
-            }
-          }
-        } catch (deactivateError) {
-          console.warn('⚠️ Erreur lors de la désactivation des modules expirés:', deactivateError);
-          // Continuer même en cas d'erreur
-        }
         
         // Récupérer les modules souscrits via user_applications avec jointure vers modules
         let moduleAccessData: any[] | null = null;
@@ -944,6 +927,7 @@ export default function EncoursPage() {
         is_active,
         created_at,
         usage_count,
+        last_used_at,
         max_usage
       `)
       .eq('user_id', user.id)
@@ -1001,8 +985,8 @@ export default function EncoursPage() {
             id: access.id,
             module_id: access.module_id,
             module_title: access.module_title || moduleInfo.title || `Module ${access.module_id}`,
-            module_description: moduleInfo.description || 'Application activée via souscription',
-            module_category: 'Application activée',
+            module_description: moduleInfo.description || 'Application disponible via souscription',
+            module_category: 'Application disponible',
             module_url: moduleInfo.url || '',
             access_type: (access.access_level || 'basic').replace(/premium\d+/, 'premium'),
             expires_at: access.expires_at,
@@ -1013,7 +997,8 @@ export default function EncoursPage() {
             user_id: access.user_id,
             created_by: access.user_id,
             price: moduleInfo.price || 0,
-            is_free: isFree
+            is_free: isFree,
+            last_used_at: access.last_used_at || null
           };
         });
 
@@ -1065,46 +1050,29 @@ export default function EncoursPage() {
     });
   };
 
-  const getDaysRemaining = (endDate: string) => {
-    const end = new Date(endDate);
-    const now = new Date();
-    const diffTime = end.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
+  const formatDurationSince = (dateString: string) => {
+    const target = new Date(dateString).getTime();
+    if (Number.isNaN(target)) {
+      return '';
+    }
+    const now = Date.now();
+    const diffMs = Math.max(now - target, 0);
+    const minutes = Math.floor(diffMs / (1000 * 60));
 
-  const formatTimeRemaining = (endDate: string) => {
-    const days = getDaysRemaining(endDate);
-    if (days < 0) return 'Expiré';
-    if (days === 0) return 'Expire aujourd\'hui';
-    if (days === 1) return 'Expire demain';
-    if (days < 7) return `Expire dans ${days} jours`;
-    if (days < 30) return `Expire dans ${Math.floor(days / 7)} semaines`;
-    return `Expire dans ${Math.floor(days / 30)} mois`;
-  };
-
-  const getTimeRemainingColor = (endDate: string) => {
-    const days = getDaysRemaining(endDate);
-    if (days < 0) return 'text-red-600';
-    if (days <= 3) return 'text-orange-600';
-    if (days <= 7) return 'text-yellow-600';
-    return 'text-green-600';
-  };
-
-  // Calculer une date d'expiration virtuelle (1 mois après la création) si expires_at est null
-  const getVirtualExpirationDate = (createdAt: string): string => {
-    const created = new Date(createdAt);
-    const virtualExpiration = new Date(created);
-    virtualExpiration.setMonth(virtualExpiration.getMonth() + 1); // Ajouter 1 mois
-    return virtualExpiration.toISOString();
-  };
-
-  const getUsageColor = (current: number, max: number) => {
-    const percentage = max ? (current / max) * 100 : 0;
-    if (percentage >= 90) return 'text-red-600';
-    if (percentage >= 75) return 'text-orange-600';
-    if (percentage >= 50) return 'text-yellow-600';
-    return 'text-green-600';
+    if (minutes < 1) {
+      return 'moins d’1 min';
+    }
+    if (minutes < 60) {
+      return `${minutes} min`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    if (hours < 24) {
+      return `${hours} h${remainingMinutes ? ` ${remainingMinutes} min` : ''}`;
+    }
+    const days = Math.floor(hours / 24);
+    const remainingHours = hours % 24;
+    return `${days} j${remainingHours ? ` ${remainingHours} h` : ''}`;
   };
 
   const getModuleTypeColor = (module: UserModule) => {
@@ -1146,6 +1114,15 @@ export default function EncoursPage() {
     // Pour les autres modules, afficher "Module IA"
     return 'Module IA 🤖';
   };
+
+  const recentModulesCount = userModules.filter((module) => {
+    if (!module.last_used_at) return false;
+    const lastUsed = new Date(module.last_used_at).getTime();
+    if (Number.isNaN(lastUsed)) return false;
+    const diffMs = Date.now() - lastUsed;
+    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+    return diffMs <= sevenDaysMs;
+  }).length;
 
   // Contrôles d'accès
   if (loading) {
@@ -1391,15 +1368,9 @@ export default function EncoursPage() {
                 </div>
                 <div className="bg-orange-50 p-4 rounded-lg">
                   <div className="text-2xl font-bold text-orange-600">
-                    {userModules.filter(m => {
-                      if (!m.expires_at) return false;
-                      const expirationDate = m.expires_at || getVirtualExpirationDate(m.created_at);
-                      const days = getDaysRemaining(expirationDate);
-                      // Modules qui expirent dans les 7 prochains jours (mais pas encore expirés)
-                      return days >= 0 && days <= 7;
-                    }).length}
+                    {recentModulesCount}
                   </div>
-                  <div className="text-sm text-gray-600">Accès qui expirent bientôt</div>
+                  <div className="text-sm text-gray-600">Accès récents (7 jours)</div>
                 </div>
               </div>
             </div>
@@ -1536,20 +1507,12 @@ export default function EncoursPage() {
                 return null;
               })()}
               {userModules.map((module) => {
-                const expirationDate = module.expires_at || getVirtualExpirationDate(module.created_at);
-                const isExpired = new Date(expirationDate) <= new Date();
-                const isExpiringSoon = getDaysRemaining(expirationDate) <= 7;
                 const maxUsage = module.max_usage || 20;
                 const isQuotaExceeded = (module.current_usage || 0) >= maxUsage;
+                const usageCount = Math.max(module.current_usage || 0, module.last_used_at ? 1 : 0);
                 
                 return (
-                  <div key={module.id} className={`bg-white rounded-xl shadow-lg border overflow-hidden transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 ${
-                    isExpired 
-                      ? 'border-red-300 bg-red-50' 
-                      : isExpiringSoon
-                        ? 'border-yellow-300 bg-yellow-50'
-                        : 'border-gray-200 hover:border-blue-300'
-                  }`}>
+                  <div key={module.id} className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1">
                     
                     {/* En-tête de la carte avec titre en haut */}
                     <div className={`p-6 text-white bg-gradient-to-r ${getModuleTypeColor(module)}`}>
@@ -1561,37 +1524,14 @@ export default function EncoursPage() {
                       {/* Badges et informations */}
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
-                          {/* Badge pour le type de module */}
                           <span className="px-2 py-1 rounded-full text-xs font-bold bg-white/20 text-white">
                             {getModuleTypeIcon(module)} {getModuleTypeLabel(module)}
                           </span>
-                          {(() => {
-                            const expirationDate = module.expires_at || getVirtualExpirationDate(module.created_at);
-                            const isVirtualExpiration = !module.expires_at;
-                            const days = getDaysRemaining(expirationDate);
-                            const isExpired = days < 0;
-                            const isExpiringSoon = days <= 7;
-                            
-                            return (
-                              <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                                isExpired 
-                                  ? 'bg-red-500 text-white' 
-                                  : isExpiringSoon
-                                    ? 'bg-yellow-500 text-white'
-                                    : isVirtualExpiration
-                                      ? 'bg-green-500 text-white'
-                                      : 'bg-white/20 text-white'
-                              }`}>
-                                {(() => {
-                                  const days = getDaysRemaining(expirationDate);
-                                  if (days < 0) return 'Expiré';
-                                  if (days === 0) return 'Aujourd\'hui';
-                                  if (days === 1) return 'Demain';
-                                  return `${days} jours`;
-                                })()}
-                              </span>
-                            );
-                          })()}
+                          {isQuotaExceeded && (
+                            <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-500 text-white">
+                              Quota dépassé
+                            </span>
+                          )}
                         </div>
                       </div>
                       
@@ -1612,54 +1552,19 @@ export default function EncoursPage() {
 
                       {/* Informations d'utilisation pour tous les modules (affichage uniquement) */}
                       <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                        <div className="flex justify-between text-sm text-gray-600 mb-2">
-                          <span>Utilisations : {module.current_usage || 0}</span>
+                        <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
+                          <span>Utilisations : {usageCount}</span>
+                          {module.last_used_at && (
+                            <span className="text-xs text-gray-500 uppercase tracking-wide whitespace-nowrap">
+                              Session : {formatDurationSince(module.last_used_at)}
+                            </span>
+                          )}
                         </div>
-                      </div>
-
-                      {/* Informations de date */}
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                        <h4 className="text-xs font-semibold text-blue-900 mb-3 uppercase tracking-wide">
-                          📅 Période d'Activation
-                        </h4>
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-blue-700 font-medium">Date de début :</span>
-                            <span className="text-sm font-semibold text-blue-900">{formatDate(module.created_at)}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-blue-700 font-medium">Date de fin :</span>
-                          {(() => {
-                            const expirationDate = module.expires_at || getVirtualExpirationDate(module.created_at);
-                            return (
-                              <span className={`text-sm font-semibold ${getTimeRemainingColor(expirationDate)}`}>
-                                {formatDate(expirationDate)}
-                              </span>
-                            );
-                          })()}
-                        </div>
-                        <div className="mt-2 pt-2 border-t border-blue-200">
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-blue-600 font-medium">Durée restante :</span>
-                            {(() => {
-                              const expirationDate = module.expires_at || getVirtualExpirationDate(module.created_at);
-                              const days = getDaysRemaining(expirationDate);
-                              const displayText = days < 0 
-                                ? 'Expiré' 
-                                : days === 0 
-                                  ? 'Expire aujourd\'hui'
-                                  : days === 1
-                                    ? 'Expire demain'
-                                    : `${days} jours`;
-                              return (
-                                <span className={`text-xs font-bold ${getTimeRemainingColor(expirationDate)}`}>
-                                  {displayText}
-                                </span>
-                              );
-                            })()}
+                        {module.last_used_at && (
+                          <div className="text-xs text-gray-400">
+                            Dernière visite : {formatDate(module.last_used_at)}
                           </div>
-                        </div>
-                        </div>
+                        )}
                       </div>
 
                       {/* Bouton d'accès */}
