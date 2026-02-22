@@ -38,6 +38,10 @@ diagnose-*.ps1
 public/test-*.html
 public/force-*.html
 
+# Photos photobooth (contenu du dossier, pas la structure)
+photobooth/photos/*
+!photobooth/photos/.gitkeep
+
 # Fichiers de credentials temporaires
 temp_credentials.json
 *_credentials.json
@@ -55,6 +59,10 @@ ai-models-cache/
 .env.local
 .env.production.local
 .env.development.local
+essentiels/env.production.local
+docs/CONFIGURATION_STRIPE_KEYS.md
+docs/STRIPE-CLES-DOCKER.md
+docs/TEST_STRIPE_MODE_TEST.md
 
 # Logs
 logs/
