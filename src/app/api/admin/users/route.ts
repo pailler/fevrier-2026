@@ -7,6 +7,109 @@ const supabase = createClient(
   getSupabaseServiceRoleKey()
 );
 
+type UserApplication = {
+  moduleId: string;
+  usageCount: number;
+  maxUsage: number;
+  expiresAt: string | null;
+  lastUsedAt: string | null;
+  createdAt: string;
+};
+
+function normalizeModuleId(moduleId: string): string {
+  const normalized = (moduleId || '').toString().toLowerCase().trim();
+  const compact = normalized.replace(/[\s_-]/g, '');
+  const aliases: Record<string, string> = {
+    '1': 'pdf',
+    '2': 'metube',
+    '3': 'librespeed',
+    '4': 'psitransfer',
+    '5': 'qrcodes',
+    '7': 'stablediffusion',
+    '8': 'ruinedfooocus',
+    '10': 'comfyui',
+    '11': 'cogstudio',
+    'animaginexl': 'animagine-xl',
+    'xhisper': 'whisper',
+    'photo-maker': 'photomaker',
+    'codelearning': 'code-learning',
+    'homeassistant': 'home-assistant',
+    'home_assistant': 'home-assistant',
+    'home-assistant': 'home-assistant',
+    'domotisezvotrehabitat': 'home-assistant',
+    'photobooth-mariage': 'photobooth',
+    'photoboothmariage': 'photobooth',
+  };
+  return aliases[normalized] || aliases[compact] || normalized;
+}
+
+async function ensureHomeAssistantFor300Tokens(userId: string, tokens: number): Promise<{ inserted: boolean; reactivated: boolean }> {
+  if (typeof tokens !== 'number' || tokens < 300) {
+    return { inserted: false, reactivated: false };
+  }
+
+  const nowIso = new Date().toISOString();
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 30);
+
+  const { data: existingApp, error: existingAppError } = await supabase
+    .from('user_applications')
+    .select('id, is_active')
+    .eq('user_id', userId)
+    .eq('module_id', 'home-assistant')
+    .limit(1)
+    .maybeSingle();
+
+  if (existingAppError) {
+    console.warn('⚠️ Impossible de vérifier Home Assistant auto:', existingAppError.message);
+    return { inserted: false, reactivated: false };
+  }
+
+  if (existingApp) {
+    if (!existingApp.is_active) {
+      const { error: reactivateError } = await supabase
+        .from('user_applications')
+        .update({
+          is_active: true,
+          updated_at: nowIso,
+          expires_at: expiresAt.toISOString()
+        })
+        .eq('id', existingApp.id);
+
+      if (reactivateError) {
+        console.warn('⚠️ Impossible de réactiver Home Assistant auto:', reactivateError.message);
+        return { inserted: false, reactivated: false };
+      }
+
+      return { inserted: false, reactivated: true };
+    }
+
+    return { inserted: false, reactivated: false };
+  }
+
+  const { error: insertAppError } = await supabase
+    .from('user_applications')
+    .insert({
+      user_id: userId,
+      module_id: 'home-assistant',
+      module_title: 'Home Assistant',
+      is_active: true,
+      access_level: 'premium',
+      usage_count: 0,
+      max_usage: null,
+      expires_at: expiresAt.toISOString(),
+      created_at: nowIso,
+      updated_at: nowIso
+    });
+
+  if (insertAppError) {
+    console.warn('⚠️ Impossible d’ajouter Home Assistant auto:', insertAppError.message);
+    return { inserted: false, reactivated: false };
+  }
+
+  return { inserted: true, reactivated: false };
+}
+
 export async function GET(request: NextRequest) {
   try {
     ;
@@ -22,67 +125,115 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Erreur lors de la récupération des profils' }, { status: 500 });
     }
 
-    // Récupérer les applications utilisateurs pour chaque profil
-    const usersWithApplications = await Promise.all(
-      profiles.map(async (profile) => {
-        // Récupérer les applications actives de l'utilisateur
-        const { data: applications, error: appsError } = await supabase
-          .from('user_applications')
-          .select('module_id, usage_count, max_usage, expires_at, is_active, created_at, last_used_at')
-          .eq('user_id', profile.id)
-          .eq('is_active', true);
+    const profileIds = (profiles || []).map((profile) => profile.id).filter(Boolean);
 
-        if (appsError) {
-          console.error(`❌ Erreur applications pour ${profile.email}:`, appsError);
+    const { data: allApplications, error: appsError } = await supabase
+      .from('user_applications')
+      .select('user_id, module_id, module_title, usage_count, max_usage, expires_at, is_active, created_at, updated_at, last_used_at')
+      .in('user_id', profileIds);
+
+    if (appsError) {
+      console.warn('⚠️ user_applications indisponible:', appsError.message);
+    }
+
+    const appsByUser = new Map<string, any[]>();
+    for (const app of allApplications || []) {
+      if (!app.user_id) continue;
+      const list = appsByUser.get(app.user_id) || [];
+      list.push(app);
+      appsByUser.set(app.user_id, list);
+    }
+
+    const { data: allTokens } = await supabase
+      .from('user_tokens')
+      .select('user_id, tokens')
+      .in('user_id', profileIds);
+
+    const tokensByUser = new Map<string, number>();
+    for (const tokenRow of allTokens || []) {
+      if (!tokenRow.user_id) continue;
+      tokensByUser.set(tokenRow.user_id, tokenRow.tokens || 0);
+    }
+
+    await Promise.all(
+      (profiles || []).map(async (profile) => {
+        const tokens = tokensByUser.get(profile.id) || 0;
+        if (tokens >= 300) {
+          const haResult = await ensureHomeAssistantFor300Tokens(profile.id, tokens);
+          if (haResult.inserted) {
+            console.log(`✅ Home Assistant auto ajouté pour ${profile.email}`);
+          } else if (haResult.reactivated) {
+            console.log(`♻️ Home Assistant auto réactivé pour ${profile.email}`);
+          }
         }
-
-        // Récupérer la dernière connexion depuis les logs d'accès
-        const { data: lastAccess, error: accessError } = await supabase
-          .from('access_logs')
-          .select('created_at')
-          .eq('user_id', profile.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
-
-        // Calculer les modules actifs
-        const activeModules = applications?.map(app => app.module_id) || [];
-        
-        // Calculer le statut basé sur l'activité
-        const now = new Date();
-        const lastLogin = lastAccess?.created_at ? new Date(lastAccess.created_at) : null;
-        const daysSinceLastLogin = lastLogin ? Math.floor((now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60 * 24)) : null;
-        const isAdmin = profile.role === 'admin';
-        
-        let status: 'active' | 'inactive' | 'suspended' = 'active';
-        if (!profile.is_active) {
-          status = 'suspended';
-        } else if (!isAdmin && daysSinceLastLogin && daysSinceLastLogin > 730) {
-          // Les admins sont toujours considérés comme actifs s'ils ont is_active: true
-          // Seuls les utilisateurs normaux sont marqués inactifs après 2 ans (730 jours)
-          status = 'inactive';
-        }
-
-        return {
-          id: profile.id,
-          email: profile.email,
-          fullName: profile.full_name || profile.email,
-          role: profile.role || 'user',
-          createdAt: profile.created_at,
-          lastLogin: lastLogin?.toISOString() || null,
-          status,
-          modules: activeModules,
-          applications: applications?.map(app => ({
-            moduleId: app.module_id,
-            usageCount: app.usage_count || 0,
-            maxUsage: app.max_usage || 0,
-            expiresAt: app.expires_at,
-            lastUsedAt: app.last_used_at,
-            createdAt: app.created_at
-          })) || []
-        };
       })
     );
+
+    const usersWithApplications = profiles.map((profile) => {
+      const rawApps = appsByUser.get(profile.id) || [];
+      const visitedApps: UserApplication[] = rawApps
+        .map((app) => {
+          const moduleId = normalizeModuleId(app.module_id || app.module_title || '');
+          if (!moduleId) return null;
+          const lastUsedAt = app.last_used_at || app.last_accessed_at || null;
+          const hasAnyLastAccess = Boolean(lastUsedAt);
+          const usageCount =
+            moduleId === 'home-assistant'
+              ? Math.max(app.usage_count || 0, hasAnyLastAccess ? 1 : 0)
+              : (app.usage_count || 0);
+          return {
+            moduleId,
+            usageCount,
+            maxUsage: app.max_usage || 0,
+            expiresAt: app.expires_at || null,
+            // "Visité" = accès via bouton token, pas simple activation.
+            lastUsedAt,
+            createdAt: app.created_at || new Date().toISOString(),
+          };
+        })
+        .filter((app): app is UserApplication => !!app)
+        .filter((app) => (app.usageCount || 0) > 0 || !!app.lastUsedAt)
+        .sort(
+          (a, b) =>
+            (b.lastUsedAt ? new Date(b.lastUsedAt).getTime() : 0) -
+            (a.lastUsedAt ? new Date(a.lastUsedAt).getTime() : 0)
+        );
+
+      let lastLogin: Date | null = null;
+      if (visitedApps.length > 0 && visitedApps[0].lastUsedAt) {
+        lastLogin = new Date(visitedApps[0].lastUsedAt);
+      } else if (profile.updated_at) {
+        lastLogin = new Date(profile.updated_at);
+      } else {
+        lastLogin = new Date(profile.created_at);
+      }
+
+      const now = new Date();
+      const daysSinceLastLogin = lastLogin
+        ? Math.floor((now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60 * 24))
+        : null;
+      const isAdmin = profile.role === 'admin';
+
+      let status: 'active' | 'inactive' | 'suspended' = 'active';
+      if (!profile.is_active) {
+        status = 'suspended';
+      } else if (!isAdmin && daysSinceLastLogin && daysSinceLastLogin > 730) {
+        status = 'inactive';
+      }
+
+      return {
+        id: profile.id,
+        email: profile.email,
+        fullName: profile.full_name || profile.email,
+        role: profile.role || 'user',
+        createdAt: profile.created_at,
+        lastLogin: lastLogin?.toISOString() || null,
+        status,
+        modules: visitedApps.map((app) => app.moduleId),
+        applications: visitedApps,
+        tokens: tokensByUser.get(profile.id) || 0,
+      };
+    });
 
     console.log(`✅ Admin Users API: ${usersWithApplications.length} utilisateurs récupérés`);
 
@@ -220,7 +371,13 @@ export async function PUT(request: NextRequest) {
           tokenResult = tokenInsertResult;
         }
 
-        result = tokenResult;
+        const homeAssistantAuto = await ensureHomeAssistantFor300Tokens(userId, tokens);
+
+        result = {
+          ...tokenResult,
+          homeAssistantAutoAdded: homeAssistantAuto.inserted,
+          homeAssistantAutoReactivated: homeAssistantAuto.reactivated
+        };
         break;
 
       default:
