@@ -56,6 +56,7 @@ export function useCustomAuth() {
   const networkErrorCountRef = useRef<number>(0);
   const errorHandlerRef = useRef<((error: ErrorEvent) => void) | null>(null);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const signOutRef = useRef<() => Promise<void>>(async () => {});
   const MAX_LOADING_TIME = 5000; // Maximum 5 secondes de chargement
 
   useEffect(() => {
@@ -68,9 +69,27 @@ export function useCustomAuth() {
   const checkSessionExpiry = useCallback(async () => {
     if (!isClient) return;
 
-    // Désactivation de la déconnexion automatique - toujours retourner sans déconnecter
-    return;
-  }, [isClient, router]);
+    const sessionStartTime = localStorage.getItem('session_start_time');
+    if (!sessionStartTime) return;
+
+    const sessionStart = parseInt(sessionStartTime, 10);
+    if (Number.isNaN(sessionStart)) return;
+
+    const sessionAge = Date.now() - sessionStart;
+    if (sessionAge <= SESSION_DURATION_MS) return;
+
+    const userData = localStorage.getItem('user_data');
+    const user = userData ? JSON.parse(userData) : null;
+    if (user && isAdminUser(user.email)) {
+      return; // conservez la session pour les administrateurs
+    }
+
+    // Déconnexion automatique après 1h
+    const signOutCurrent = signOutRef.current;
+    if (signOutCurrent) {
+      await signOutCurrent();
+    }
+  }, [isClient]);
 
   useEffect(() => {
     // Ne pas exécuter côté serveur - mais toujours retourner une fonction de nettoyage à la fin
@@ -110,14 +129,60 @@ export function useCustomAuth() {
       }
     };
 
+    // Récupérer la session depuis Supabase si notre localStorage est vide (ex. après redirect ou rechargement)
+    const recoverSessionFromSupabase = async (): Promise<boolean> => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error || !session?.user) return false;
+        const user = session.user;
+        let profileData: { id?: string; email?: string; full_name?: string; role?: string; is_active?: boolean; email_verified?: boolean } | null = null;
+        try {
+          const profileRes = await fetch('/api/auth/get-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: user.id, email: user.email })
+          });
+          if (profileRes.ok) profileData = await profileRes.json();
+        } catch {
+          // Ignorer
+        }
+        const userEmail = profileData?.email || user.email || '';
+        const appUser = {
+          id: profileData?.id || user.id,
+          email: userEmail,
+          full_name: profileData?.full_name ?? user.user_metadata?.full_name ?? userEmail,
+          role: isAdminUser(userEmail) ? 'admin' : (profileData?.role || 'user'),
+          is_active: profileData?.is_active !== false,
+          email_verified: profileData?.email_verified !== false
+        };
+        const token = session.access_token;
+        try {
+          localStorage.setItem('user_data', JSON.stringify(appUser));
+          localStorage.setItem('auth_token', token);
+          localStorage.setItem('session_start_time', Date.now().toString());
+        } catch {
+          return false;
+        }
+        setAuthState({ user: appUser, token, isAuthenticated: true, loading: false });
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('userLoggedIn'));
+        }
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
     // Vérifier l'état d'authentification au chargement
     const checkAuthState = async () => {
       try {
-        const token = localStorage.getItem('auth_token');
-        const userData = localStorage.getItem('user_data');
+        let token = localStorage.getItem('auth_token');
+        let userData = localStorage.getItem('user_data');
 
-        // Si pas de token ni userData, arrêter immédiatement le chargement
+        // Si pas de token ni userData, tenter de récupérer la session depuis Supabase (cookies/storage)
         if (!token || !userData) {
+          const recovered = await recoverSessionFromSupabase();
+          if (recovered) return;
           setAuthState({
             user: null,
             token: null,
@@ -773,6 +838,10 @@ export function useCustomAuth() {
     
     console.log('✅ Déconnexion complète');
   }, []);
+
+  useEffect(() => {
+    signOutRef.current = signOut;
+  }, [signOut]);
 
   // Fonction pour obtenir les headers d'authentification
   const getAuthHeaders = useCallback(() => {
