@@ -130,7 +130,7 @@ export default function AdminUsers() {
           } else if (!isAdmin && daysSinceLastLogin && daysSinceLastLogin > 730) {
             // Les admins sont toujours considérés comme actifs s'ils ont is_active: true
             // Seuls les utilisateurs normaux sont marqués inactifs après 2 ans (730 jours)
-            // Note: La désactivation automatique se fait après 2 ans exactement via l'API
+            // Note: La suspension automatique se fait après 2 ans exactement via l'API
             status = 'inactive';
           } else {
             status = 'active';
@@ -265,7 +265,7 @@ export default function AdminUsers() {
   };
 
   const handleActivateUser = async (userId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir activer cet utilisateur ?')) {
+    if (!confirm('Êtes-vous sûr de vouloir accéder à cet utilisateur ?')) {
       return;
     }
 
@@ -283,7 +283,7 @@ export default function AdminUsers() {
       });
 
       if (!response.ok) {
-        throw new Error('Erreur lors de l\'activation');
+        throw new Error('Erreur lors de l\'accès');
       }
 
       // Mettre à jour la liste des utilisateurs
@@ -293,10 +293,10 @@ export default function AdminUsers() {
           : user
       ));
 
-      console.log('✅ Utilisateur activé avec succès');
+      console.log('✅ Utilisateur accessible avec succès');
     } catch (error) {
-      console.error('❌ Erreur lors de l\'activation:', error);
-      alert('Erreur lors de l\'activation de l\'utilisateur');
+      console.error('❌ Erreur lors de l\'accès:', error);
+      alert('Erreur lors de l\'accès de l\'utilisateur');
     } finally {
       setActionLoading(null);
     }
@@ -523,7 +523,7 @@ export default function AdminUsers() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Sans modules activés</p>
+              <p className="text-sm font-medium text-gray-600">Sans modules accessibles</p>
               <p className="text-3xl font-bold text-orange-600 mt-2">
                 {users.filter(u => u.modules.length === 0).length}
               </p>
@@ -539,7 +539,7 @@ export default function AdminUsers() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Au moins 2 modules activés</p>
+              <p className="text-sm font-medium text-gray-600">Au moins 2 modules accessibles</p>
               <p className="text-3xl font-bold text-purple-600 mt-2">
                 {users.filter(u => u.modules.length >= 2).length}
               </p>
@@ -763,7 +763,7 @@ export default function AdminUsers() {
                           className="text-green-600 hover:text-green-900 disabled:opacity-50"
                           disabled={actionLoading === user.id}
                         >
-                          {actionLoading === user.id ? 'Activation...' : 'Activer'}
+                          {actionLoading === user.id ? 'accès...' : 'accéder à'}
                         </button>
                       ) : (
                         <button 
@@ -831,3 +831,4 @@ export default function AdminUsers() {
     </div>
   );
 }
+

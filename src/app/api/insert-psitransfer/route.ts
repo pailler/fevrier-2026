@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       youtube_url: '',
       url: 'https://psitransfer.iahome.fr',
       image_url: '/images/psitransfer.jpg',
-      is_visible: true, // Important : rendre le module visible dans /encours
+      is_visible: true, // Important : rendre le module visible dans /account
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
@@ -87,6 +87,7 @@ export async function POST(request: NextRequest) {
     }, { status: 500 });
   }
 }
+
 
 
 

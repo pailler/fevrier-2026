@@ -28,12 +28,12 @@ export default function LibreSpeedCardPage() {
     image: '/images/librespeed.jpg',
   };
 
-  // Fonction pour vérifier si un module est déjà activé
+  // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
     if (!user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-activation', {
+      const response = await fetch('/api/check-module-accès', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,12 +49,12 @@ export default function LibreSpeedCardPage() {
         return result.isActivated || false;
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification d\'activation:', error);
+      console.error('Erreur lors de la vérification d\'accès:', error);
     }
     return false;
   }, [user?.id]);
 
-  // Vérifier si le module est activé
+  // Vérifier si le module est accessible
   useEffect(() => {
     const checkActivation = async () => {
       if (user?.id && moduleId) {
@@ -121,7 +121,7 @@ export default function LibreSpeedCardPage() {
           "name": "Comment tester ma vitesse internet avec LibreSpeed ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour tester votre vitesse internet avec LibreSpeed, activez d'abord le service avec 10 tokens. Une fois activé, lancez le test depuis l'interface. LibreSpeed mesurera automatiquement votre débit de téléchargement (download), votre débit d'upload, et votre latence (ping) en quelques secondes."
+            "text": "Pour tester votre vitesse internet avec LibreSpeed, accédez directement au service avec 10 tokens. L'accès est immédiat, lancez le test depuis l'interface. LibreSpeed mesurera automatiquement votre débit de téléchargement (download), votre débit d'upload, et votre latence (ping) en quelques secondes."
           }
         },
         {
@@ -129,7 +129,7 @@ export default function LibreSpeedCardPage() {
           "name": "LibreSpeed est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "LibreSpeed est un outil open-source et gratuit. L'activation du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez effectuer des tests de vitesse sans frais supplémentaires."
+            "text": "LibreSpeed est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez effectuer des tests de vitesse sans frais supplémentaires."
           }
         },
         {
@@ -334,18 +334,47 @@ export default function LibreSpeedCardPage() {
                   <div className="flex items-center justify-center space-x-3 text-green-800 mb-4">
                     <span className="text-2xl">✅</span>
                     <div className="text-center">
-                      <p className="font-semibold">Service déjà activé !</p>
-                      <p className="text-sm opacity-80">Pour y accéder, cliquez sur Mes Applis activées</p>
+                      <p className="font-semibold">Accès direct disponible</p>
+                      <p className="text-sm opacity-80">Pour y accéder, cliquez sur Mes applications</p>
                     </div>
                   </div>
                   <div className="mt-3 text-center">
-                    <Link
-                      href="/encours"
+                    <button
+                      onClick={async () => {
+                        if (!user?.id || !user?.email) {
+                          router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}`)}`);
+                          return;
+                        }
+                        try {
+                          const tokenResponse = await fetch('/api/generate-access-token', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              userId: user.id,
+                              userEmail: user.email,
+                              moduleId: 'librespeed',
+                            }),
+                          });
+                          if (!tokenResponse.ok) {
+                            const tokenError = await tokenResponse.json().catch(() => ({ error: 'Erreur inconnue' }));
+                            throw new Error(tokenError.error || 'Erreur génération token');
+                          }
+                          const tokenData = await tokenResponse.json();
+                          if (!tokenData?.token) {
+                            throw new Error('Token d\'accès manquant');
+                          }
+                          window.open(`https://librespeed.iahome.fr?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
+                        } catch (error) {
+                          alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                        }
+                      }}
                       className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
                     >
                       <span className="mr-2">📱</span>
                       Aller à Mes Applications
-                    </Link>
+                    </button>
                   </div>
                 </div>
               )}
@@ -371,21 +400,40 @@ export default function LibreSpeedCardPage() {
                           if (response.ok) {
                             const data = await response.json();
                             if (data.success) {
-                              console.log('✅ LibreSpeed activé avec succès');
+                              console.log('✅ LibreSpeed accessible avec succès');
                               setAlreadyActivatedModules(prev => [...prev, moduleId]);
-                              router.push('/encours');
+                              const tokenResponse = await fetch('/api/generate-access-token', {
+                                method: 'POST',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                  userId: user.id,
+                                  userEmail: user.email,
+                                  moduleId: 'librespeed',
+                                }),
+                              });
+                              if (!tokenResponse.ok) {
+                                const tokenError = await tokenResponse.json().catch(() => ({ error: 'Erreur inconnue' }));
+                                throw new Error(tokenError.error || 'Erreur génération token');
+                              }
+                              const tokenData = await tokenResponse.json();
+                              if (!tokenData?.token) {
+                                throw new Error('Token d\'accès manquant');
+                              }
+                              window.open(`https://librespeed.iahome.fr?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
                             } else {
-                              console.error('❌ Erreur activation LibreSpeed:', data.error);
-                              alert('Erreur lors de l\'activation: ' + (data.error || 'Erreur inconnue'));
+                              console.error('❌ Erreur accès LibreSpeed:', data.error);
+                              alert('Erreur lors de l\'accès: ' + (data.error || 'Erreur inconnue'));
                             }
                           } else {
                             const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
                             console.error('❌ Erreur réponse API:', response.status, errorData);
-                            alert('Erreur lors de l\'activation: ' + (errorData.error || 'Erreur inconnue'));
+                            alert('Erreur lors de l\'accès: ' + (errorData.error || 'Erreur inconnue'));
                           }
                         } catch (error) {
-                          console.error('❌ Erreur lors de l\'activation de LibreSpeed:', error);
-                          alert('Erreur lors de l\'activation');
+                          console.error('❌ Erreur lors de l\'accès de LibreSpeed:', error);
+                          alert('Erreur lors de l\'accès');
                         } finally {
                           setLoading(false);
                         }
@@ -404,13 +452,13 @@ export default function LibreSpeedCardPage() {
                     {loading || checkingActivation ? (
                       <>
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                        <span>Activation en cours...</span>
+                        <span>Ouverture en cours...</span>
                       </>
                     ) : (
                       <>
                         <span className="text-xl">⚡</span>
                         <span>
-                          {isAuthenticated && user ? 'Activer LibreSpeed (10 tokens par accès)' : 'Connectez-vous pour activer (10 tokens par accès)'}
+                          {isAuthenticated && user ? 'Accéder à LibreSpeed (10 tokens par accès)' : 'Connectez-vous pour accéder (10 tokens par accès)'}
                         </span>
                       </>
                     )}
@@ -497,9 +545,9 @@ export default function LibreSpeedCardPage() {
                     <div className="flex items-start">
                       <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Activer LibreSpeed</h3>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à LibreSpeed</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Activez LibreSpeed avec 10 tokens. Une fois activé, le service est accessible depuis vos applications actives.
+                          Accédez à LibreSpeed avec 10 tokens. L'accès est immédiat, le service est accessible depuis vos applications.
                         </p>
                       </div>
                     </div>
@@ -623,14 +671,14 @@ export default function LibreSpeedCardPage() {
                   <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Comment tester ma vitesse internet avec LibreSpeed ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Pour tester votre vitesse internet avec LibreSpeed, activez d'abord le service avec 10 tokens. Une fois activé, lancez le test depuis l'interface. LibreSpeed mesurera automatiquement votre débit de téléchargement (download), votre débit d'upload, et votre latence (ping) en quelques secondes.
+                      Pour tester votre vitesse internet avec LibreSpeed, accédez directement au service avec 10 tokens. L'accès est immédiat, lancez le test depuis l'interface. LibreSpeed mesurera automatiquement votre débit de téléchargement (download), votre débit d'upload, et votre latence (ping) en quelques secondes.
                     </p>
                   </div>
                   
                   <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-2xl border-l-4 border-purple-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">LibreSpeed est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      LibreSpeed est un outil open-source et gratuit. L'activation du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez effectuer des tests de vitesse sans frais supplémentaires.
+                      LibreSpeed est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez effectuer des tests de vitesse sans frais supplémentaires.
                     </p>
                   </div>
                   
@@ -669,7 +717,7 @@ export default function LibreSpeedCardPage() {
         </div>
       </section>
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId={moduleId}
         moduleName="LibreSpeed"
@@ -684,5 +732,10 @@ export default function LibreSpeedCardPage() {
     </div>
   );
 }
+
+
+
+
+
 
 

@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       
       if (!tokenValidation.hasAccess) {
         ;
-        return NextResponse.redirect('https://iahome.fr/encours?error=invalid_token', 302);
+        return NextResponse.redirect('https://iahome.fr/account?error=invalid_token', 302);
       }
       
       // Rediriger vers LibreSpeed avec le token
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     
     if (!cookieHeader) {
       ;
-      return NextResponse.redirect('https://iahome.fr/login?redirect=/encours', 302);
+      return NextResponse.redirect('https://iahome.fr/login?redirect=/account', 302);
     }
 
     // Créer un client Supabase avec les cookies
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     
     if (error || !session) {
       ;
-      return NextResponse.redirect('https://iahome.fr/login?redirect=/encours', 302);
+      return NextResponse.redirect('https://iahome.fr/login?redirect=/account', 302);
     }
 
     // Vérifier la durée de session (60 minutes)
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
         console.warn('⚠️ Erreur lors de la déconnexion Supabase:', error);
       }
       
-      return NextResponse.redirect(`https://iahome.fr/login?redirect=/encours&error=session_expired&message=${encodeURIComponent('Votre session a expiré après 1 heure. Veuillez vous reconnecter.')}`, 302);
+      return NextResponse.redirect(`https://iahome.fr/login?redirect=/account&error=session_expired&message=${encodeURIComponent('Votre session a expiré après 1 heure. Veuillez vous reconnecter.')}`, 302);
     }
 
     // Vérifier l'accès à LibreSpeed
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
     
     if (!accessCheck.hasAccess) {
       console.log('❌ LibreSpeed Redirect: Accès refusé -', accessCheck.reason);
-      return NextResponse.redirect(`https://iahome.fr/encours?error=access_denied&reason=${encodeURIComponent(accessCheck.reason || 'Accès refusé')}`, 302);
+      return NextResponse.redirect(`https://iahome.fr/account?error=access_denied&reason=${encodeURIComponent(accessCheck.reason || 'Accès refusé')}`, 302);
     }
 
     // Générer un token d'accès temporaire
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
     
     if (!tokenResult.hasAccess || !tokenResult.token) {
       ;
-      return NextResponse.redirect('https://iahome.fr/encours?error=token_generation_failed', 302);
+      return NextResponse.redirect('https://iahome.fr/account?error=token_generation_failed', 302);
     }
 
     // Rediriger vers LibreSpeed avec le token
@@ -107,6 +107,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('❌ LibreSpeed Redirect Error:', error);
-    return NextResponse.redirect('https://iahome.fr/encours?error=internal_error', 302);
+    return NextResponse.redirect('https://iahome.fr/account?error=internal_error', 302);
   }
 }
+

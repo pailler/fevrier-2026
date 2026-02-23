@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
 
     console.log('🧪 Test de notification réelle pour:', { email, appName, userName });
 
-    // Simuler exactement ce qui se passe dans la page /encours
+    // Simuler exactement ce qui se passe dans la page /account
     const notificationService = NotificationService.getInstance();
     
     console.log('📧 Tentative d\'envoi de notification app_accessed...');
@@ -43,3 +43,4 @@ export async function POST(request: NextRequest) {
     }, { status: 500 });
   }
 }
+

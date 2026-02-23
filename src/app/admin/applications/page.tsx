@@ -245,7 +245,7 @@ export default function AdminApplications() {
         if (profile) {
           acc[app.module_id].activeUsers.push({
             id: app.user_id,
-            activationId: app.id, // ID de l'activation dans user_applications
+            activationId: app.id, // ID de l'accès dans user_applications
             email: profile.email,
             fullName: profile.full_name || profile.email,
             usageCount: app.usage_count || 0,
@@ -316,11 +316,11 @@ export default function AdminApplications() {
         } else if (moduleId.includes('home-assistant') || moduleId.includes('homeassistant')) {
           tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Manuel utilisateur ultra complet pour domotiser votre habitat. Coût: ${tokenCost} tokens par activation.`;
+          description = `Manuel utilisateur ultra complet pour domotiser votre habitat. Coût: ${tokenCost} tokens par accès.`;
         } else if (moduleId.includes('administration')) {
           tokenCost = 10;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Portail centralisé pour accéder rapidement aux principaux services de l'administration française. Coût: ${tokenCost} tokens par activation.`;
+          description = `Portail centralisé pour accéder rapidement aux principaux services de l'administration française. Coût: ${tokenCost} tokens par accès.`;
         } else if (moduleId.includes('prompt-generator')) {
           tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
@@ -748,7 +748,7 @@ export default function AdminApplications() {
     });
   };
 
-  // Fonction pour désactiver les applications sélectionnées
+  // Fonction pour suspendre les applications sélectionnées
   const handleDeactivateSelected = async (moduleId: string) => {
     const selectedUserIds = Array.from(selectedUsers[moduleId] || []);
     
@@ -760,13 +760,13 @@ export default function AdminApplications() {
     const application = applications.find(app => app.id === moduleId);
     if (!application) return;
 
-    // Récupérer les IDs d'activation pour les utilisateurs sélectionnés
+    // Récupérer les IDs d'accès pour les utilisateurs sélectionnés
     const selectedActivations = application.activeUsers
       .filter(user => selectedUserIds.includes(user.id))
       .map(user => user.activationId)
       .filter(Boolean) as string[];
 
-    const confirmMessage = `Êtes-vous sûr de vouloir désactiver l'accès à "${application.name}" pour ${selectedUserIds.length} utilisateur(s) ?\n\nCette action désactivera leur accès mais ne supprimera pas l'application ni le workflow d'activation.`;
+    const confirmMessage = `Êtes-vous sûr de vouloir suspendre l'accès à "${application.name}" pour ${selectedUserIds.length} utilisateur(s) ?\n\nCette action désactivera leur accès mais ne supprimera pas l'application ni le workflow d'accès.`;
     
     if (!confirm(confirmMessage)) {
       return;
@@ -794,7 +794,7 @@ export default function AdminApplications() {
           .map(user => user.fullName || user.email)
           .join(', ');
         
-        alert(`✅ ${data.deactivatedCount} activation(s) désactivée(s) avec succès.\n\nUtilisateurs affectés: ${userNames}\n\nLes utilisateurs sélectionnés n'auront plus accès à cette application.`);
+        alert(`✅ ${data.deactivatedCount} accès(s) suspendue(s) avec succès.\n\nUtilisateurs affectés: ${userNames}\n\nLes utilisateurs sélectionnés n'auront plus accès à cette application.`);
         
         // Réinitialiser les sélections pour ce module
         setSelectedUsers(prev => {
@@ -809,8 +809,8 @@ export default function AdminApplications() {
         alert(`❌ Erreur: ${data.error}`);
       }
     } catch (error) {
-      console.error('Erreur lors de la désactivation:', error);
-      alert('❌ Erreur lors de la désactivation des applications');
+      console.error('Erreur lors de la suspension:', error);
+      alert('❌ Erreur lors de la suspension des applications');
     } finally {
       setDeactivating(false);
     }
@@ -963,7 +963,7 @@ export default function AdminApplications() {
                       <span className="text-2xl">🟢</span>
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">Applications actives</p>
+                      <p className="text-sm font-medium text-gray-600">applications</p>
                       <p className="text-2xl font-bold text-gray-900">
                         {applications.filter(a => a.status === 'active').length}
                       </p>
@@ -1172,12 +1172,12 @@ export default function AdminApplications() {
                                       {deactivating ? (
                                         <>
                                           <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
-                                          Désactivation...
+                                          suspension...
                                         </>
                                       ) : (
                                         <>
                                           <span>🗑️</span>
-                                          <span>Désactiver ({selectedUsers[application.id].size})</span>
+                                          <span>suspendre ({selectedUsers[application.id].size})</span>
                                         </>
                                       )}
                                     </button>
@@ -1811,3 +1811,7 @@ export default function AdminApplications() {
     </div>
   );
 }
+
+
+
+

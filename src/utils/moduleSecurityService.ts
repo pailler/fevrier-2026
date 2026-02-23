@@ -16,7 +16,7 @@ export interface ModuleSecurityResult {
 
 /**
  * Service centralisé pour la sécurité des modules
- * Vérifie si un module apparaît dans /encours pour un utilisateur donné
+ * Vérifie si un module apparaît dans /account pour un utilisateur donné
  */
 export class ModuleSecurityService {
   private static instance: ModuleSecurityService;
@@ -29,7 +29,7 @@ export class ModuleSecurityService {
   }
 
   /**
-   * Vérifie si un module apparaît dans /encours pour un utilisateur
+   * Vérifie si un module apparaît dans /account pour un utilisateur
    * @param userId - ID de l'utilisateur
    * @param moduleIdentifier - ID ou nom du module à vérifier
    * @returns ModuleSecurityResult avec les détails de la vérification
@@ -39,7 +39,7 @@ export class ModuleSecurityService {
     moduleIdentifier: string
   ): Promise<ModuleSecurityResult> {
     try {
-      console.log(`🔍 ModuleSecurityService: Vérification module ${moduleIdentifier} dans /encours pour utilisateur:`, userId);
+      console.log(`🔍 ModuleSecurityService: Vérification module ${moduleIdentifier} dans /account pour utilisateur:`, userId);
       
       // 1. Trouver le module dans la base de données
       const { data: moduleData, error: moduleError } = await supabase
@@ -57,15 +57,15 @@ export class ModuleSecurityService {
         };
       }
 
-      // 2. Vérifier que le module est visible (apparaît dans /encours)
+      // 2. Vérifier que le module est visible (apparaît dans /account)
       if (moduleData.is_visible === false) {
-        console.log(`❌ ModuleSecurityService: Module ${moduleIdentifier} masqué dans /encours`);
+        console.log(`❌ ModuleSecurityService: Module ${moduleIdentifier} masqué dans /account`);
         return {
           isVisible: false,
           hasAccess: false,
           moduleId: moduleData.id,
           moduleTitle: moduleData.title,
-          reason: `Module ${moduleIdentifier} masqué dans /encours`
+          reason: `Module ${moduleIdentifier} masqué dans /account`
         };
       }
 
@@ -145,7 +145,7 @@ export class ModuleSecurityService {
         };
       }
 
-      console.log(`✅ ModuleSecurityService: Module ${moduleIdentifier} visible dans /encours pour l'utilisateur`);
+      console.log(`✅ ModuleSecurityService: Module ${moduleIdentifier} visible dans /account pour l'utilisateur`);
       return {
         isVisible: true,
         hasAccess: true,
@@ -154,7 +154,7 @@ export class ModuleSecurityService {
       };
 
     } catch (error) {
-      console.error(`❌ ModuleSecurityService: Erreur vérification module /encours pour ${moduleIdentifier}:`, error);
+      console.error(`❌ ModuleSecurityService: Erreur vérification module /account pour ${moduleIdentifier}:`, error);
       return {
         isVisible: false,
         hasAccess: false,
@@ -187,5 +187,6 @@ export class ModuleSecurityService {
 }
 
 export default ModuleSecurityService;
+
 
 

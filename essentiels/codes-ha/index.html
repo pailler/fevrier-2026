@@ -40,10 +40,10 @@
         <!-- Menu principal -->
         <nav class="top-menu" aria-label="Navigation principale">
             <a href="#accueil" class="top-menu-btn">Accueil</a>
+            <a href="#section-tableaux" class="top-menu-btn">Manuels HA</a>
             <a href="#section-codes" class="top-menu-btn">Codes prêts à l'emploi</a>
             <a href="#section-cartes" class="top-menu-btn">Cartes à installer</a>
             <a href="#section-automatisations" class="top-menu-btn">Automatisations</a>
-            <a href="#section-tableaux" class="top-menu-btn">Tableaux de bord</a>
             <a href="#section-configs" class="top-menu-btn">Configs</a>
         </nav>
 
@@ -69,14 +69,41 @@
                 </a>
                 <a href="#section-tableaux" class="accueil-card accueil-card-tableaux">
                     <span class="accueil-card-icon">📊</span>
-                    <h3 class="accueil-card-title">Tableaux de bord HA</h3>
-                    <p class="accueil-card-desc">Manuel et ressources pour créer et organiser vos tableaux de bord Home Assistant.</p>
+                    <h3 class="accueil-card-title">Manuels HA</h3>
+                    <p class="accueil-card-desc">Manuel et ressources pour installer, configurer et organiser Home Assistant.</p>
                 </a>
                 <a href="#section-configs" class="accueil-card accueil-card-configs">
                     <span class="accueil-card-icon">💡</span>
                     <h3 class="accueil-card-title">Configs</h3>
                     <p class="accueil-card-desc">Dépôts GitHub de configurations complètes : inspirez-vous et récupérez du YAML prêt à l'emploi.</p>
                 </a>
+            </div>
+        </section>
+
+        <!-- Section Manuels HA -->
+        <section id="section-tableaux" class="page-section section-tableaux-wrapper">
+            <header class="section-banner">
+                <h2 class="section-banner__title">Manuels HA</h2>
+                <p class="section-banner__subtitle">Manuel et ressources pour vos dashboards</p>
+            </header>
+            <div class="manual-card-integrated">
+                <div class="manual-header-integrated">
+                    <div class="manual-icon-integrated">📖</div>
+                    <div class="manual-content-integrated">
+                        <h2>Manuel Complet Home Assistant</h2>
+                        <p>Guide complet d'installation, configuration et creation de dashboards professionnels</p>
+                    </div>
+                </div>
+                <div class="manual-actions-integrated">
+                    <a href="manuel-home-assistant.pdf" target="_blank" class="btn-manual-download-integrated" download>
+                        <span class="btn-icon">📥</span>
+                        <span>Telecharger le PDF</span>
+                    </a>
+                    <button class="btn-manual-view-integrated" id="viewManualBtn">
+                        <span class="btn-icon">👁️</span>
+                        <span>Voir le manuel</span>
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -320,33 +347,6 @@
                 </ul>
                 <p><strong>Comment importer un blueprint :</strong> sur le site, choisissez un blueprint puis cliquez sur <em>Import</em> pour obtenir l’URL ou les instructions d’import dans Home Assistant (Paramètres → Automatisations et scènes → Blueprints).</p>
                 <a href="https://hablueprints.directory/" target="_blank" rel="noopener noreferrer" class="automatisations-blueprints-link">Ouvrir HA Blueprint Hub — Parcourir les blueprints</a>
-            </div>
-        </section>
-
-        <!-- Section Tableaux de bord HA -->
-        <section id="section-tableaux" class="page-section section-tableaux-wrapper">
-            <header class="section-banner">
-                <h2 class="section-banner__title">Tableaux de bord HA</h2>
-                <p class="section-banner__subtitle">Manuel et ressources pour vos dashboards</p>
-            </header>
-            <div class="manual-card-integrated">
-                <div class="manual-header-integrated">
-                    <div class="manual-icon-integrated">📖</div>
-                    <div class="manual-content-integrated">
-                        <h2>Manuel Complet Home Assistant</h2>
-                        <p>Guide complet d'installation, configuration et création de dashboards professionnels</p>
-                    </div>
-                </div>
-                <div class="manual-actions-integrated">
-                    <a href="manuel-home-assistant.pdf" target="_blank" class="btn-manual-download-integrated" download>
-                        <span class="btn-icon">📥</span>
-                        <span>Télécharger le PDF</span>
-                    </a>
-                    <button class="btn-manual-view-integrated" id="viewManualBtn">
-                        <span class="btn-icon">👁️</span>
-                        <span>Voir le manuel</span>
-                    </button>
-                </div>
             </div>
         </section>
 

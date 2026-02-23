@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     
     if (!moduleId) {
       ;
-      return NextResponse.redirect('https://iahome.fr/encours?error=no_module', 302);
+      return NextResponse.redirect('https://iahome.fr/account?error=no_module', 302);
     }
 
     console.log('📱 Module demandé:', moduleId);
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
         
         if (!tokenValidation.hasAccess) {
           ;
-          return NextResponse.redirect('https://iahome.fr/encours?error=invalid_token', 302);
+          return NextResponse.redirect('https://iahome.fr/account?error=invalid_token', 302);
         }
         
         const destinationUrl = `${MODULE_URLS[moduleId]}?token=${token}`;
@@ -71,13 +71,13 @@ export async function GET(request: NextRequest) {
         
         if (tokenError || !tokenData) {
           ;
-          return NextResponse.redirect('https://iahome.fr/encours?error=invalid_token', 302);
+          return NextResponse.redirect('https://iahome.fr/account?error=invalid_token', 302);
         }
         
         // Vérifier l'expiration
         if (tokenData.expires_at && new Date(tokenData.expires_at) <= new Date()) {
           ;
-          return NextResponse.redirect('https://iahome.fr/encours?error=token_expired', 302);
+          return NextResponse.redirect('https://iahome.fr/account?error=token_expired', 302);
         }
         
         // Vérifier l'accès au module
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
         if (!canAccess) {
           const reason = await securityService.getAccessDenialReason(tokenData.created_by, moduleId);
           console.log('❌ Accès refusé:', reason);
-          return NextResponse.redirect(`https://iahome.fr/encours?error=access_denied&reason=${encodeURIComponent(reason)}`, 302);
+          return NextResponse.redirect(`https://iahome.fr/account?error=access_denied&reason=${encodeURIComponent(reason)}`, 302);
         }
         
         // Marquer le token comme utilisé
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
     const cookieHeader = request.headers.get('cookie');
     if (!cookieHeader) {
       ;
-      return NextResponse.redirect('https://iahome.fr/login?redirect=/encours', 302);
+      return NextResponse.redirect('https://iahome.fr/login?redirect=/account', 302);
     }
 
     // Créer un client Supabase avec les cookies
@@ -133,7 +133,7 @@ export async function GET(request: NextRequest) {
     
     if (error || !session) {
       ;
-      return NextResponse.redirect('https://iahome.fr/login?redirect=/encours', 302);
+      return NextResponse.redirect('https://iahome.fr/login?redirect=/account', 302);
     }
 
     // DÉSACTIVÉ : Plus de vérification de durée de session (déconnexion automatique supprimée)
@@ -150,7 +150,7 @@ export async function GET(request: NextRequest) {
     //     console.warn('⚠️ Erreur lors de la déconnexion Supabase:', error);
     //   }
     //   
-    //   return NextResponse.redirect(`https://iahome.fr/login?redirect=/encours&error=session_expired&message=${encodeURIComponent('Votre session a expiré après 1 heure. Veuillez vous reconnecter.')}`, 302);
+    //   return NextResponse.redirect(`https://iahome.fr/login?redirect=/account&error=session_expired&message=${encodeURIComponent('Votre session a expiré après 1 heure. Veuillez vous reconnecter.')}`, 302);
     // }
 
     console.log('👤 Utilisateur authentifié:', session.user.email);
@@ -163,7 +163,7 @@ export async function GET(request: NextRequest) {
       
       if (!accessCheck.hasAccess) {
         console.log('❌ Accès LibreSpeed refusé:', accessCheck.reason);
-        return NextResponse.redirect(`https://iahome.fr/encours?error=access_denied&reason=${encodeURIComponent(accessCheck.reason || 'Accès refusé')}`, 302);
+        return NextResponse.redirect(`https://iahome.fr/account?error=access_denied&reason=${encodeURIComponent(accessCheck.reason || 'Accès refusé')}`, 302);
       }
       
       // Générer un token d'accès temporaire
@@ -171,7 +171,7 @@ export async function GET(request: NextRequest) {
       
       if (!tokenResult.hasAccess || !tokenResult.token) {
         ;
-        return NextResponse.redirect('https://iahome.fr/encours?error=token_generation_failed', 302);
+        return NextResponse.redirect('https://iahome.fr/account?error=token_generation_failed', 302);
       }
       
       const destinationUrl = `${MODULE_URLS[moduleId]}?token=${tokenResult.token}`;
@@ -185,7 +185,7 @@ export async function GET(request: NextRequest) {
       if (!canAccess) {
         const reason = await securityService.getAccessDenialReason(session.user.id, moduleId);
         console.log('❌ Module non accessible:', reason);
-        return NextResponse.redirect(`https://iahome.fr/encours?error=module_not_accessible&reason=${encodeURIComponent(reason)}`, 302);
+        return NextResponse.redirect(`https://iahome.fr/account?error=module_not_accessible&reason=${encodeURIComponent(reason)}`, 302);
       }
       
       const destinationUrl = MODULE_URLS[moduleId];
@@ -195,7 +195,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('❌ Unified Redirect Error:', error);
-    return NextResponse.redirect('https://iahome.fr/encours?error=internal_error', 302);
+    return NextResponse.redirect('https://iahome.fr/account?error=internal_error', 302);
   }
 }
 
@@ -203,3 +203,4 @@ export async function POST(request: NextRequest) {
   // Même logique que GET pour la compatibilité
   return GET(request);
 }
+

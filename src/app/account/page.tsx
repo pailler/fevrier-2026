@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../utils/supabaseClient';
@@ -31,6 +31,31 @@ interface UserApplication {
   max_usage: number | null;
 }
 
+const MODULE_DESCRIPTIONS: Record<string, string> = {
+  'photomaker': 'Generation de portraits styles et photorealistes.',
+  'birefnet': 'Suppression de fond et detourage rapide.',
+  'animagine-xl': 'Generation d\'images style anime.',
+  'florence-2': 'Analyse visuelle et description intelligente d\'images.',
+  'home-assistant': 'Ressources et manuels pour votre domotique HA.',
+  'hunyuan3d': 'Generation et exploration d\'objets 3D.',
+  'stablediffusion': 'Creation d\'images IA depuis vos prompts.',
+  'meeting-reports': 'Synthese automatique de reunions.',
+  'whisper': 'Transcription audio et video en texte.',
+  'ruinedfooocus': 'Generation creative d\'images rapide.',
+  'comfyui': 'Workflows visuels avances pour l\'image IA.',
+  'apprendre-autrement': 'Apprentissage assiste par IA.',
+  'prompt-generator': 'Generation de prompts optimises.',
+  'qrcodes': 'Creation et gestion de QR codes.',
+  'librespeed': 'Test de vitesse internet complet.',
+  'metube': 'Telechargement et gestion de videos.',
+  'psitransfer': 'Transfert securise de fichiers.',
+  'pdf': 'Outils PDF : convertir, fusionner, optimiser.',
+  'voice-isolation': 'Isolation vocale et nettoyage audio.',
+  'administration': 'Outils d\'administration de la plateforme.',
+  'ai-detector': 'Detection de contenus generes par IA.',
+  'code-learning': 'Apprendre le code avec parcours guides.',
+};
+
 export default function AccountPage() {
   const router = useRouter();
   const { user, isAuthenticated, loading: authLoading, signOut } = useCustomAuth();
@@ -43,6 +68,7 @@ export default function AccountPage() {
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [accessingModuleId, setAccessingModuleId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -118,6 +144,113 @@ export default function AccountPage() {
     const diff = expiry.getTime() - now.getTime();
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
+
+  const resolveModuleUrl = useCallback((moduleId: string) => {
+    const normalizedModuleId = (moduleId || '').trim().toLowerCase();
+    const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const urlMap: Record<string, string> = isDevelopment
+      ? {
+          'photomaker': 'http://localhost:7881',
+          'birefnet': 'http://localhost:7882',
+          'animagine-xl': 'http://localhost:7883',
+          'florence-2': 'http://localhost:7884',
+          'home-assistant': 'http://localhost:8123/',
+          'hunyuan3d': 'http://localhost:8888',
+          'stablediffusion': 'http://localhost:7880',
+          'meeting-reports': 'http://localhost:3050',
+          'whisper': 'http://localhost:8093',
+          'ruinedfooocus': 'http://localhost:7870',
+          'comfyui': 'http://localhost:8188',
+          'apprendre-autrement': 'http://localhost:9001',
+          'prompt-generator': 'http://localhost:3002',
+          'qrcodes': 'http://localhost:7006',
+          'librespeed': 'http://localhost:8085',
+          'metube': 'http://localhost:8081',
+          'psitransfer': 'http://localhost:8087',
+          'pdf': 'http://localhost:8086',
+          'voice-isolation': 'http://localhost:8100',
+        }
+      : {
+          'photomaker': 'https://photomaker.iahome.fr',
+          'birefnet': 'https://birefnet.iahome.fr',
+          'animagine-xl': 'https://animaginexl.iahome.fr',
+          'florence-2': 'https://florence2.iahome.fr',
+          'home-assistant': 'https://homeassistant.iahome.fr',
+          'hunyuan3d': 'https://hunyuan3d.iahome.fr',
+          'stablediffusion': 'https://stablediffusion.iahome.fr',
+          'meeting-reports': 'https://meeting-reports.iahome.fr',
+          'whisper': 'https://whisper.iahome.fr',
+          'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
+          'comfyui': 'https://comfyui.iahome.fr',
+          'apprendre-autrement': 'https://apprendre-autrement.iahome.fr',
+          'prompt-generator': 'https://prompt-generator.iahome.fr',
+          'qrcodes': 'https://qrcodes.iahome.fr',
+          'librespeed': 'https://librespeed.iahome.fr',
+          'metube': 'https://metube.iahome.fr',
+          'psitransfer': 'https://psitransfer.iahome.fr',
+          'pdf': 'https://pdf.iahome.fr',
+          'voice-isolation': 'https://voice-isolation.iahome.fr',
+        };
+
+    if (urlMap[normalizedModuleId]) {
+      return urlMap[normalizedModuleId];
+    }
+
+    const subdomainAliases: Record<string, string> = {
+      'animagine-xl': 'animaginexl',
+      'florence-2': 'florence2',
+      'home-assistant': 'homeassistant',
+    };
+
+    const computedSubdomain = subdomainAliases[normalizedModuleId] || normalizedModuleId;
+    return computedSubdomain ? `https://${computedSubdomain}.iahome.fr` : '';
+  }, []);
+
+  const handleDirectAccess = useCallback(async (app: UserApplication) => {
+    if (!user?.id || !user?.email) {
+      router.push('/login?redirect=/account');
+      return;
+    }
+
+    const targetUrl = resolveModuleUrl(app.module_id);
+    if (!targetUrl) {
+      alert(`URL d'accès introuvable pour le module ${app.module_id}`);
+      return;
+    }
+
+    try {
+      setAccessingModuleId(app.id);
+      const tokenResponse = await fetch('/api/generate-access-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          userEmail: user.email,
+          moduleId: app.module_id,
+        }),
+      });
+
+      if (!tokenResponse.ok) {
+        const tokenError = await tokenResponse.json().catch(() => ({ error: 'Erreur inconnue' }));
+        throw new Error(tokenError.error || 'Erreur génération token');
+      }
+
+      const tokenData = await tokenResponse.json();
+      if (!tokenData?.token) {
+        throw new Error('Token d\'accès manquant');
+      }
+
+      const separator = targetUrl.includes('?') ? '&' : '?';
+      window.open(`${targetUrl}${separator}token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
+      await fetchUserData();
+    } catch (error) {
+      alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+    } finally {
+      setAccessingModuleId(null);
+    }
+  }, [resolveModuleUrl, router, user?.email, user?.id]);
 
   const handleDeleteAccount = async () => {
     if (deleteConfirm !== 'SUPPRIMER') return;
@@ -270,7 +403,7 @@ export default function AccountPage() {
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
                 <span className="mr-3">📱</span>
-                Applications actives ({applications.length})
+                Applis les plus visites ({applications.length})
               </h2>
               
               {applications.length === 0 ? (
@@ -301,6 +434,9 @@ export default function AccountPage() {
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
                             <h3 className="font-semibold text-gray-900">{app.module_title}</h3>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {MODULE_DESCRIPTIONS[app.module_id] || 'Application IA disponible avec acces direct tokenise.'}
+                            </p>
                             <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
                               <span>Utilisations: {app.usage_count}{app.max_usage ? ` / ${app.max_usage}` : ''}</span>
                               {app.expires_at && (
@@ -316,12 +452,13 @@ export default function AccountPage() {
                               )}
                             </div>
                           </div>
-                          <Link
-                            href="/encours"
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+                          <button
+                            onClick={() => handleDirectAccess(app)}
+                            disabled={accessingModuleId === app.id}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
                           >
-                            Accéder
-                          </Link>
+                            {accessingModuleId === app.id ? 'Ouverture...' : 'Accéder'}
+                          </button>
                         </div>
                       </div>
                     );
@@ -389,7 +526,7 @@ export default function AccountPage() {
               <h2 className="text-xl font-bold text-gray-900 mb-4">⚡ Actions rapides</h2>
               <div className="space-y-2">
                 <Link
-                  href="/encours"
+                  href="/account"
                   className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center font-medium transition-colors"
                 >
                   Mes applications
@@ -473,3 +610,4 @@ export default function AccountPage() {
     </div>
   );
 }
+

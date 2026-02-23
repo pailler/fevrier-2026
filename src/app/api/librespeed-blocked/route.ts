@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
             <li>Cliquez sur le module <strong>LibreSpeed</strong></li>
         </ol>
         
-        <a href="https://iahome.fr/encours" class="btn">
+        <a href="https://iahome.fr/account" class="btn">
             🏠 Aller au Tableau de Bord
         </a>
     </div>
@@ -108,3 +108,4 @@ export async function GET(request: NextRequest) {
     return new NextResponse('Access Denied', { status: 403 });
   }
 }
+

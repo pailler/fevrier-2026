@@ -36,13 +36,13 @@ export default function AdminNotifications() {
   const [resendStatus, setResendStatus] = useState<any>(null);
   const [testingNotifications, setTestingNotifications] = useState<{[key: string]: boolean}>({});
 
-  // État pour l'envoi du mail "sans module activé"
+  // État pour l'envoi du mail "sans module accessible"
   const [noModuleEmail, setNoModuleEmail] = useState('');
   const [noModuleUserName, setNoModuleUserName] = useState('');
   const [noModuleSending, setNoModuleSending] = useState(false);
   const [noModuleResult, setNoModuleResult] = useState<{success: boolean; message: string} | null>(null);
 
-  // État pour l'envoi du mail "appli activée sans utilisation"
+  // État pour l'envoi du mail "appli accessible sans utilisation"
   const [appNoUsageEmail, setAppNoUsageEmail] = useState('');
   const [appNoUsageUserName, setAppNoUsageUserName] = useState('');
   const [appNoUsageSending, setAppNoUsageSending] = useState(false);
@@ -156,7 +156,7 @@ export default function AdminNotifications() {
         setting.id === id ? { ...setting, is_enabled: enabled } : setting
       ));
 
-      console.log(`✅ Notification ${enabled ? 'activée' : 'désactivée'}: ${id}`);
+      console.log(`✅ Notification ${enabled ? 'accessible' : 'suspendue'}: ${id}`);
     } catch (error) {
       console.error('❌ Erreur lors de la mise à jour:', error);
     } finally {
@@ -434,12 +434,12 @@ export default function AdminNotifications() {
     return enabled ? (
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
         <span className="mr-1">✅</span>
-        Activé
+        accessible
       </span>
     ) : (
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
         <span className="mr-1">❌</span>
-        Désactivé
+        suspendu
       </span>
     );
   };
@@ -682,7 +682,7 @@ export default function AdminNotifications() {
         </div>
       </div>
 
-      {/* Envoi mail "Sans module activé" */}
+      {/* Envoi mail "Sans module accessible" */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-sm border-2 border-blue-200 p-6">
         <div className="mb-4">
           <div className="flex items-center space-x-3 mb-2">
@@ -691,7 +691,7 @@ export default function AdminNotifications() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">
-                Envoyer le mail "Sans module activé"
+                Envoyer le mail "Sans module accessible"
               </h2>
               <p className="text-sm text-gray-600">
                 Mail de bienvenue avec tutoriel et offre de 200 tokens bonus
@@ -784,7 +784,7 @@ export default function AdminNotifications() {
         </div>
       </div>
 
-      {/* Envoi mail "Appli activée sans utilisation" */}
+      {/* Envoi mail "Appli accessible sans utilisation" */}
       <div className="bg-gradient-to-r from-purple-50 to-fuchsia-50 rounded-lg shadow-sm border-2 border-purple-200 p-6">
         <div className="mb-4">
           <div className="flex items-center space-x-3 mb-2">
@@ -793,10 +793,10 @@ export default function AdminNotifications() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">
-                Envoyer le mail "Appli activée sans utilisation"
+                Envoyer le mail "Appli accessible sans utilisation"
               </h2>
               <p className="text-sm text-gray-600">
-                Mail pour encourager l'utilisation d'une application déjà activée
+                Mail pour encourager l'utilisation d'une application déjà accessible
               </p>
             </div>
           </div>
@@ -1081,7 +1081,7 @@ export default function AdminNotifications() {
 
             <button
               onClick={async () => {
-                if (!confirm('Êtes-vous sûr de vouloir désactiver les utilisateurs inactifs ? Cette action est irréversible.')) {
+                if (!confirm('Êtes-vous sûr de vouloir suspendre les utilisateurs inactifs ? Cette action est irréversible.')) {
                   return;
                 }
                 setInactivityLoading(true);
@@ -1098,7 +1098,7 @@ export default function AdminNotifications() {
                     loadData(); // Recharger les logs
                   }
                 } catch (error) {
-                  setInactivityResult({ success: false, error: 'Erreur lors de la désactivation' });
+                  setInactivityResult({ success: false, error: 'Erreur lors de la suspension' });
                 } finally {
                   setInactivityLoading(false);
                 }
@@ -1106,7 +1106,7 @@ export default function AdminNotifications() {
               disabled={inactivityLoading}
               className="px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
             >
-              {inactivityLoading ? '⏳ Désactivation...' : '🚫 Désactiver les utilisateurs inactifs'}
+              {inactivityLoading ? '⏳ suspension...' : '🚫 suspendre les utilisateurs inactifs'}
             </button>
           </div>
 
@@ -1124,8 +1124,8 @@ export default function AdminNotifications() {
                       <p>📊 Utilisateurs vérifiés: {inactivityResult.summary.totalUsersChecked}</p>
                       <p>⚠️ À avertir: {inactivityResult.summary.usersToWarn}</p>
                       <p>📧 Avertis: {inactivityResult.summary.warnedUsersCount}</p>
-                      <p>🚫 À désactiver: {inactivityResult.summary.usersToDeactivate}</p>
-                      <p>✅ Désactivés: {inactivityResult.summary.deactivatedUsersCount}</p>
+                      <p>🚫 À suspendre: {inactivityResult.summary.usersToDeactivate}</p>
+                      <p>✅ suspendus: {inactivityResult.summary.deactivatedUsersCount}</p>
                     </div>
                   )}
                   {inactivityResult.warnedUsers && inactivityResult.warnedUsers.length > 0 && (
@@ -1143,7 +1143,7 @@ export default function AdminNotifications() {
                   )}
                   {inactivityResult.deactivatedUsers && inactivityResult.deactivatedUsers.length > 0 && (
                     <div className="mt-2">
-                      <p className="text-xs font-medium text-green-800">Utilisateurs désactivés:</p>
+                      <p className="text-xs font-medium text-green-800">Utilisateurs suspendus:</p>
                       <ul className="text-xs text-green-700 list-disc list-inside">
                         {inactivityResult.deactivatedUsers.slice(0, 5).map((email: string) => (
                           <li key={email}>{email}</li>
@@ -1179,11 +1179,11 @@ export default function AdminNotifications() {
               </div>
               <div className="flex items-start space-x-2">
                 <span className="text-orange-600 mt-0.5">3.</span>
-                <span>Après 2 ans sans activité : compte automatiquement désactivé (is_active = false)</span>
+                <span>Après 2 ans sans activité : compte automatiquement suspendu (is_active = false)</span>
               </div>
               <div className="flex items-start space-x-2">
                 <span className="text-orange-600 mt-0.5">4.</span>
-                <span>Les utilisateurs peuvent réactiver leur compte via le lien dans l'email</span>
+                <span>Les utilisateurs peuvent restaurer l'accès leur compte via le lien dans l'email</span>
               </div>
             </div>
           </div>
@@ -1254,7 +1254,7 @@ export default function AdminNotifications() {
                         : 'text-green-700 bg-green-100 hover:bg-green-200'
                     } disabled:opacity-50`}
                   >
-                    {setting.is_enabled ? 'Désactiver' : 'Activer'}
+                    {setting.is_enabled ? 'suspendre' : 'accéder à'}
                   </button>
                 </div>
               </div>
@@ -1321,3 +1321,5 @@ export default function AdminNotifications() {
     </div>
   );
 }
+
+

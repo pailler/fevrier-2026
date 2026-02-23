@@ -41,12 +41,12 @@ export default function VoiceIsolationPage() {
   // Voice Isolation est un module payant (100 tokens)
   const isFreeModule = false;
 
-  // Fonction pour vérifier si un module est déjà activé
+  // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
     if (!user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-activation', {
+      const response = await fetch('/api/check-module-accès', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ export default function VoiceIsolationPage() {
         return result.isActivated || false;
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification d\'activation:', error);
+      console.error('Erreur lors de la vérification d\'accès:', error);
     }
     return false;
   }, [user?.id]);
@@ -110,7 +110,7 @@ export default function VoiceIsolationPage() {
     }
   }, [user?.id]);
 
-  // Vérifier si le module est déjà activé
+  // Vérifier si le module est déjà accessible
   useEffect(() => {
     const checkActivation = async () => {
       if (card?.id && user?.id) {
@@ -238,8 +238,8 @@ export default function VoiceIsolationPage() {
       "step": [
         {
           "@type": "HowToStep",
-          "name": "Activer l'application",
-          "text": "Activez l'application Isolation Vocale par IA avec 100 tokens depuis la page de l'application.",
+          "name": "Accéder à l'application",
+          "text": "Accédez à l'application Isolation Vocale par IA avec 100 tokens depuis la page de l'application.",
           "image": "https://iahome.fr/images/voice-isolation.jpg"
         },
         {
@@ -292,7 +292,7 @@ export default function VoiceIsolationPage() {
           "name": "Comment utiliser l'Isolation Vocale par IA ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour utiliser l'Isolation Vocale par IA, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via /voice-isolation. Uploadez votre fichier audio, choisissez la source à extraire (voix, batterie, basse, autres instruments ou toutes les sources), et l'IA génère automatiquement les fichiers séparés."
+            "text": "Pour utiliser l'Isolation Vocale par IA, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via /voice-isolation. Uploadez votre fichier audio, choisissez la source à extraire (voix, batterie, basse, autres instruments ou toutes les sources), et l'IA génère automatiquement les fichiers séparés."
           }
         },
         {
@@ -308,7 +308,7 @@ export default function VoiceIsolationPage() {
           "name": "L'Isolation Vocale par IA est-elle gratuite ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation de l'Isolation Vocale par IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : isolation vocale, séparation de batterie, extraction de basse, et isolation d'instruments."
+            "text": "L'accès de l'Isolation Vocale par IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : isolation vocale, séparation de batterie, extraction de basse, et isolation d'instruments."
           }
         },
         {
@@ -542,7 +542,7 @@ export default function VoiceIsolationPage() {
             <div className="space-y-6">
               {/* Boutons d'action */}
               {isAuthenticated && user ? (
-                // Bouton d'activation Voice Isolation (utilisateur connecté)
+                // Bouton d'accès Voice Isolation (utilisateur connecté)
                 <button 
                   onClick={async () => {
                     if (!isAuthenticated || !user) {
@@ -552,7 +552,7 @@ export default function VoiceIsolationPage() {
                     }
 
                     try {
-                      console.log('🔄 Activation Voice Isolation pour:', user.email);
+                      console.log('🔄 accès Voice Isolation pour:', user.email);
                       
                       const response = await fetch('/api/activate-voice-isolation', {
                         method: 'POST',
@@ -568,23 +568,42 @@ export default function VoiceIsolationPage() {
                       const result = await response.json();
 
                       if (result.success) {
-                        console.log('✅ Voice Isolation activé avec succès');
+                        console.log('✅ Voice Isolation accessible avec succès');
                         setAlreadyActivatedModules(prev => [...prev, card?.id || 'voice-isolation']);
-                        alert('Voice Isolation activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications.');
-                        router.push('/encours');
+                        alert('Voice Isolation accessible avec succès ! Vous pouvez maintenant y accéder depuis vos applications.');
+                        const tokenResponse = await fetch('/api/generate-access-token', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            userId: user.id,
+                            userEmail: user.email,
+                            moduleId: 'voice-isolation',
+                          }),
+                        });
+                        if (!tokenResponse.ok) {
+                          const tokenError = await tokenResponse.json().catch(() => ({ error: 'Erreur inconnue' }));
+                          throw new Error(tokenError.error || 'Erreur génération token');
+                        }
+                        const tokenData = await tokenResponse.json();
+                        if (!tokenData?.token) {
+                          throw new Error('Token d\'accès manquant');
+                        }
+                        window.open(`https://voice-isolation.iahome.fr?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
                       } else {
-                        console.error('❌ Erreur activation Voice Isolation:', result.error);
-                        alert(`Erreur lors de l'activation: ${result.error}`);
+                        console.error('❌ Erreur accès Voice Isolation:', result.error);
+                        alert(`Erreur lors de l'accès: ${result.error}`);
                       }
                     } catch (error) {
-                      console.error('❌ Erreur activation Voice Isolation:', error);
-                      alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                      console.error('❌ Erreur accès Voice Isolation:', error);
+                      alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                     }
                   }}
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">🎤</span>
-                  <span>Activer Voice Isolation (100 tokens)</span>
+                  <span>Accéder à Voice Isolation (100 tokens)</span>
                 </button>
               ) : (
                 // Message pour les utilisateurs non connectés
@@ -597,23 +616,53 @@ export default function VoiceIsolationPage() {
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">🔒</span>
-                  <span>Connectez-vous pour activer Voice Isolation (100 tokens)</span>
+                  <span>Connectez-vous pour accéder Voice Isolation (100 tokens)</span>
                 </button>
               )}
 
-              {/* Message si déjà activé */}
+              {/* Message si déjà accessible */}
               {alreadyActivatedModules.includes(card?.id || '') && (
                 <div className="w-3/4 mx-auto bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
                   <div className="flex items-center justify-center space-x-3 text-green-800">
                     <span className="text-2xl">✅</span>
                     <div className="text-center">
-                      <p className="font-semibold">Application déjà activée !</p>
+                      <p className="font-semibold">Accès direct disponible</p>
                       <p className="text-sm opacity-80">Vous pouvez accéder à cette application depuis vos applications</p>
                     </div>
                   </div>
                   <div className="mt-3 text-center">
                     <button
-                      onClick={() => router.push('/encours')}
+                      onClick={async () => {
+                        if (!user?.id || !user?.email) {
+                          router.push(`/login?redirect=${encodeURIComponent('/card/voice-isolation')}`);
+                          return;
+                        }
+
+                        try {
+                          const tokenResponse = await fetch('/api/generate-access-token', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              userId: user.id,
+                              userEmail: user.email,
+                              moduleId: 'voice-isolation',
+                            }),
+                          });
+                          if (!tokenResponse.ok) {
+                            const tokenError = await tokenResponse.json().catch(() => ({ error: 'Erreur inconnue' }));
+                            throw new Error(tokenError.error || 'Erreur génération token');
+                          }
+                          const tokenData = await tokenResponse.json();
+                          if (!tokenData?.token) {
+                            throw new Error('Token d\'accès manquant');
+                          }
+                          window.open(`https://voice-isolation.iahome.fr?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
+                        } catch (error) {
+                          alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                        }
+                      }}
                       className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
                     >
                       <span className="mr-2">📱</span>
@@ -691,7 +740,7 @@ export default function VoiceIsolationPage() {
         </div>
       </section>
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId="voice-isolation"
         moduleName="Voice Isolation"
@@ -705,3 +754,8 @@ export default function VoiceIsolationPage() {
     </div>
   );
 }
+
+
+
+
+

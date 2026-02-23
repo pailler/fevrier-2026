@@ -59,7 +59,7 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
             {/* Bouton Mes applis avec tokens pour mobile UNIQUEMENT - entre le logo et le menu */}
             <div className="flex md:hidden items-center space-x-3">
               <Link
-                href="/encours"
+                href="/account"
                 className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 font-bold px-4 py-2.5 rounded-lg text-lg hover:from-yellow-500 hover:to-yellow-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2"
               >
                 <span className="text-xl">📱</span>
@@ -100,7 +100,7 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
           <div className="hidden md:flex items-center space-x-4">
             <TokenBalance className="text-base font-bold" />
             <Link
-              href="/encours"
+              href="/account"
               className="bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors flex items-center space-x-1"
             >
               <span>📱</span>
@@ -187,7 +187,7 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
                   <TokenBalance className="text-base font-bold" />
                 </div>
                 <Link
-                  href="/encours"
+                  href="/account"
                   className="block px-4 py-2 text-white hover:bg-blue-500 transition-colors"
                 >
                   Mes applis
@@ -206,4 +206,5 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
     </header>
   );
 }
+
 

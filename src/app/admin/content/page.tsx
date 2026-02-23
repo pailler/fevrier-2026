@@ -202,7 +202,7 @@ export default function AdminContent() {
             type: 'page',
             status: 'published',
             created_at: new Date().toISOString(),
-            url: '/encours'
+            url: '/account'
           },
           {
             id: 'community',
@@ -467,3 +467,4 @@ export default function AdminContent() {
     </div>
   );
 }
+

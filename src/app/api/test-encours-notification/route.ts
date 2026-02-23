@@ -5,14 +5,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email, appName, userName } = body;
 
-    console.log('🧪 Test simulation page /encours pour:', { email, appName, userName });
+    console.log('🧪 Test simulation page /account pour:', { email, appName, userName });
 
-    // Simuler exactement ce qui se passe dans la page /encours
+    // Simuler exactement ce qui se passe dans la page /account
     if (email) {
       try {
         console.log('📧 Tentative d\'envoi de notification...');
         
-        // Import dynamique comme dans /encours
+        // Import dynamique comme dans /account
         const { NotificationService } = await import('../../../utils/notificationService');
         const notificationService = NotificationService.getInstance();
         
@@ -30,14 +30,14 @@ export async function POST(request: NextRequest) {
           ;
           return NextResponse.json({
             success: true,
-            message: 'Notification envoyée avec succès (simulation /encours)',
+            message: 'Notification envoyée avec succès (simulation /account)',
             debug: { email, appName, userName, timestamp: new Date().toISOString() }
           });
         } else {
           ;
           return NextResponse.json({
             success: false,
-            message: 'Échec de l\'envoi de la notification (simulation /encours)',
+            message: 'Échec de l\'envoi de la notification (simulation /account)',
             debug: { email, appName, userName, timestamp: new Date().toISOString() }
           });
         }
@@ -66,3 +66,4 @@ export async function POST(request: NextRequest) {
     }, { status: 500 });
   }
 }
+

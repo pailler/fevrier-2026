@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const token = url.searchParams.get('token');
     
     if (!token) {
-      return NextResponse.redirect('https://iahome.fr/encours?error=no_token', 302);
+      return NextResponse.redirect('https://iahome.fr/account?error=no_token', 302);
     }
 
     console.log('🔒 LibreSpeed Access Proxy: Vérification du token');
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     
     if (!tokenValidation.hasAccess) {
       console.log('❌ LibreSpeed Access: Token invalide ou expiré');
-      return NextResponse.redirect('https://iahome.fr/encours?error=invalid_token', 302);
+      return NextResponse.redirect('https://iahome.fr/account?error=invalid_token', 302);
     }
 
     // URL publique de LibreSpeed (accessible depuis le serveur en production)
@@ -108,6 +108,7 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('❌ LibreSpeed Access Proxy Error:', error);
-    return NextResponse.redirect('https://iahome.fr/encours?error=internal_error', 302);
+    return NextResponse.redirect('https://iahome.fr/account?error=internal_error', 302);
   }
 }
+

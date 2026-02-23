@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       .single();
 
     if (existingAccess) {
-      console.log('✅ PDF+ déjà activé, retour à /encours');
+      console.log('✅ PDF+ déjà activé, retour à /account');
       return NextResponse.json({ success: true, message: 'PDF+ déjà activé pour cet utilisateur.', alreadyActivated: true });
     }
 
@@ -107,4 +107,5 @@ export async function POST(request: Request) {
     }, { status: 500 });
   }
 }
+
 

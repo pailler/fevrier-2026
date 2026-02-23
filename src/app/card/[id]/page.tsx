@@ -103,12 +103,12 @@ export default function CardDetailPage() {
     return `€${modulePrice} par mois`;
   };
 
-  // Fonction pour vérifier si un module est déjà activé
+  // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
     if (!user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-activation', {
+      const response = await fetch('/api/check-module-accès', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ export default function CardDetailPage() {
         return result.isActivated || false;
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification d\'activation:', error);
+      console.error('Erreur lors de la vérification d\'accès:', error);
     }
     return false;
   }, [user?.id]);
@@ -321,7 +321,7 @@ export default function CardDetailPage() {
 
   // L'authentification est maintenant gérée par useCustomAuth
 
-  // Récupérer les abonnements de l'utilisateur et vérifier l'activation du module
+  // Récupérer les abonnements de l'utilisateur et vérifier l'accès du module
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user?.id) {
@@ -366,7 +366,7 @@ export default function CardDetailPage() {
 
         setUserSubscriptions(subscriptions);
 
-        // Vérifier si le module actuel est déjà activé dans user_applications
+        // Vérifier si le module actuel est déjà accessible dans user_applications
         if (card?.id) {
           setCheckingActivation(true);
           const isActivated = await checkModuleActivation(card.id);
@@ -893,14 +893,14 @@ export default function CardDetailPage() {
                       className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                       onClick={async () => {
                         if (!isAuthenticated || !user) {
-                          alert(`Connectez-vous pour activer ${card?.title || 'ce module'}`);
+                          alert(`Connectez-vous pour accéder ${card?.title || 'ce module'}`);
                           return;
                         }
 
-                        // Pour les modules essentiels, utiliser les APIs d'activation spécifiques
+                        // Pour les modules essentiels, utiliser les APIs d'accès spécifiques
                         const moduleId = params.id as string;
                         
-                        // Activation PDF
+                        // accès PDF
                         if (moduleId === 'pdf') {
                           try {
                             const response = await fetch('/api/activate-pdf', {
@@ -917,15 +917,15 @@ export default function CardDetailPage() {
                             const result = await response.json();
 
                             if (result.success) {
-                              alert('PDF+ activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications.');
-                              router.push('/encours');
+                              alert('PDF+ accessible avec succès ! Ouverture en cours...');
+                              await accessModuleWithJWT(card?.title || 'PDF+', moduleId);
                               return;
                             } else {
-                              alert(`Erreur lors de l'activation: ${result.error}`);
+                              alert(`Erreur lors de l'accès: ${result.error}`);
                               return;
                             }
                           } catch (error) {
-                            alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                            alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                             return;
                           }
                         }
@@ -946,8 +946,7 @@ export default function CardDetailPage() {
                             
                             if (response.ok) {
                               console.log('✅ Token premium généré pour', card.title);
-                              // Rediriger vers la page de transition
-                              router.push(`/encours?module=${encodeURIComponent(card.title)}`);
+                              await accessModuleWithJWT(card.title, moduleId);
                               return;
                             } else {
                               console.error('❌ Erreur génération token premium');
@@ -957,12 +956,11 @@ export default function CardDetailPage() {
                           }
                         }
 
-                        // En cas d'erreur, rediriger quand même vers /encours
-                        router.push(`/encours?module=${encodeURIComponent(card.title)}`);
+                        await accessModuleWithJWT(card.title, moduleId);
                       }}
                     >
                       <span className="text-xl">🆓</span>
-                      <span>Activer l'application {card.title}</span>
+                      <span>Accéder à l'application {card.title}</span>
                     </button>
                   </>
                 ) : (card.price === 0 || card.price === '0') && (!isAuthenticated || !user) && !isLibrespeed ? (
@@ -972,24 +970,24 @@ export default function CardDetailPage() {
                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
                   >
                     <span className="text-xl">🔒</span>
-                    <span>Connectez-vous pour activer {card?.title || 'Module'}</span>
+                    <span>Connectez-vous pour accéder {card?.title || 'Module'}</span>
                   </Link>
                 ) : (
                   // Boutons pour les modules payants
                   <div className="space-y-4">
-                    {/* Message si le module est déjà activé */}
+                    {/* Message si le module est déjà accessible */}
                     {alreadyActivatedModules.includes(card.id) && (
                       <div className="w-3/4 mx-auto bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
                         <div className="flex items-center justify-center space-x-3 text-green-800">
                           <span className="text-2xl">✅</span>
                           <div className="text-center">
-                            <p className="font-semibold">Application déjà activée !</p>
+                            <p className="font-semibold">Accès direct disponible</p>
                             <p className="text-sm opacity-80">Vous pouvez accéder à cette application depuis vos applications</p>
                           </div>
                         </div>
                         <div className="mt-3 text-center">
                           <button
-                            onClick={() => router.push('/encours')}
+                            onClick={() => accessModuleWithJWT(card.title, card.id)}
                             className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
                           >
                             <span className="mr-2">📱</span>
@@ -1000,7 +998,7 @@ export default function CardDetailPage() {
                     )}
 
                     
-                    {/* Bouton "Activer la sélection" pour les modules payants */}
+                    {/* Bouton "Accéder à la sélection" pour les modules payants */}
                     {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (
                       <button 
                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
@@ -1010,9 +1008,9 @@ export default function CardDetailPage() {
                             return;
                           }
 
-                          // Vérifier si le module est déjà activé avant de procéder au paiement
+                          // Vérifier si le module est déjà accessible avant de procéder au paiement
                           if (alreadyActivatedModules.includes(card.id)) {
-                            alert(`ℹ️ L'application ${card.title} est déjà activée ! Vous pouvez l'utiliser depuis vos applications.`);
+                            alert(`ℹ️ L'application ${card.title} est déjà accessible ! Vous pouvez l'utiliser depuis vos applications.`);
                             return;
                           }
 
@@ -1045,13 +1043,13 @@ export default function CardDetailPage() {
                               throw new Error('URL de session Stripe manquante.');
                             }
                           } catch (error) {
-                            console.error('Erreur lors de l\'activation:', error);
-                            alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                            console.error('Erreur lors de l\'accès:', error);
+                            alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                           }
                         }}
                       >
                         <span className="text-xl">⚡</span>
-                        <span>Activer {card.title}</span>
+                        <span>Accéder à {card.title}</span>
                       </button>
                     )}
 
@@ -1067,7 +1065,7 @@ export default function CardDetailPage() {
                           }
 
                           try {
-                            console.log('🔄 Activation Apprendre le Code aux enfants pour:', user.email);
+                            console.log('🔄 accès Apprendre le Code aux enfants pour:', user.email);
                             
                             const response = await fetch('/api/activate-code-learning', {
                               method: 'POST',
@@ -1083,24 +1081,24 @@ export default function CardDetailPage() {
                             const result = await response.json();
 
                             if (result.success) {
-                              console.log('✅ Apprendre le Code aux enfants activé avec succès');
+                              console.log('✅ Apprendre le Code aux enfants accessible avec succès');
                               setAlreadyActivatedModules(prev => [...prev, card.id]);
-                              alert('Apprendre le Code aux enfants activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. 10 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez.');
-                              router.push('/encours');
+                              alert('Apprendre le Code aux enfants accessible avec succès ! Ouverture en cours...');
+                              await accessModuleWithJWT(card.title, 'code-learning');
                             } else {
-                              console.error('❌ Erreur activation Apprendre le Code aux enfants:', result.error);
-                              alert(`Erreur lors de l'activation: ${result.error}`);
+                              console.error('❌ Erreur accès Apprendre le Code aux enfants:', result.error);
+                              alert(`Erreur lors de l'accès: ${result.error}`);
                             }
                           } catch (error) {
-                            console.error('❌ Erreur activation Apprendre le Code aux enfants:', error);
-                            alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                            console.error('❌ Erreur accès Apprendre le Code aux enfants:', error);
+                            alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                           }
                         }}
                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                       >
                         <span className="text-xl">⚡</span>
                         <span>
-                          {isAuthenticated && user ? `Activer Apprendre le Code aux enfants (10 tokens par accès)` : `Connectez-vous pour activer Apprendre le Code aux enfants (10 tokens par accès)`}
+                          {isAuthenticated && user ? `Accéder à Apprendre le Code aux enfants (10 tokens par accès)` : `Connectez-vous pour accéder Apprendre le Code aux enfants (10 tokens par accès)`}
                         </span>
                       </button>
                     )}
@@ -1116,7 +1114,7 @@ export default function CardDetailPage() {
                           }
 
                           try {
-                            console.log('🔄 Activation Apprendre Autrement pour:', user.email);
+                            console.log('🔄 accès Apprendre Autrement pour:', user.email);
                             
                             const response = await fetch('/api/activate-apprendre-autrement', {
                               method: 'POST',
@@ -1132,24 +1130,24 @@ export default function CardDetailPage() {
                             const result = await response.json();
 
                             if (result.success) {
-                              console.log('✅ Apprendre Autrement activé avec succès');
+                              console.log('✅ Apprendre Autrement accessible avec succès');
                               setAlreadyActivatedModules(prev => [...prev, card.id]);
-                              alert('Apprendre Autrement activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. 10 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez.');
-                              router.push('/encours');
+                              alert('Apprendre Autrement accessible avec succès ! Ouverture en cours...');
+                              await accessModuleWithJWT(card.title, 'apprendre-autrement');
                             } else {
-                              console.error('❌ Erreur activation Apprendre Autrement:', result.error);
-                              alert(`Erreur lors de l'activation: ${result.error}`);
+                              console.error('❌ Erreur accès Apprendre Autrement:', result.error);
+                              alert(`Erreur lors de l'accès: ${result.error}`);
                             }
                           } catch (error) {
-                            console.error('❌ Erreur activation Apprendre Autrement:', error);
-                            alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                            console.error('❌ Erreur accès Apprendre Autrement:', error);
+                            alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                           }
                         }}
                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                       >
                         <span className="text-xl">🌈</span>
                         <span>
-                          {isAuthenticated && user ? `Activer Apprendre Autrement (10 tokens par accès)` : `Connectez-vous pour activer Apprendre Autrement (10 tokens par accès)`}
+                          {isAuthenticated && user ? `Accéder à Apprendre Autrement (10 tokens par accès)` : `Connectez-vous pour accéder Apprendre Autrement (10 tokens par accès)`}
                         </span>
                       </button>
                     )}
@@ -1165,7 +1163,7 @@ export default function CardDetailPage() {
                           }
 
                           try {
-                            console.log('🔄 Activation LibreSpeed pour:', user.email);
+                            console.log('🔄 accès LibreSpeed pour:', user.email);
                             
                             const response = await fetch('/api/activate-librespeed-test', {
                               method: 'POST',
@@ -1181,38 +1179,38 @@ export default function CardDetailPage() {
                             const result = await response.json();
 
                             if (result.success) {
-                              console.log('✅ LibreSpeed activé avec succès');
+                              console.log('✅ LibreSpeed accessible avec succès');
                               setAlreadyActivatedModules(prev => [...prev, card.id]);
-                              alert('LibreSpeed activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
-                              router.push('/encours');
+                              alert('LibreSpeed accessible avec succès ! Ouverture en cours...');
+                              await accessModuleWithJWT(card.title, 'librespeed');
                             } else {
-                              console.error('❌ Erreur activation LibreSpeed:', result.error);
-                              alert(`Erreur lors de l'activation: ${result.error}`);
+                              console.error('❌ Erreur accès LibreSpeed:', result.error);
+                              alert(`Erreur lors de l'accès: ${result.error}`);
                             }
                           } catch (error) {
-                            console.error('❌ Erreur activation LibreSpeed:', error);
-                            alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                            console.error('❌ Erreur accès LibreSpeed:', error);
+                            alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                           }
                         }}
                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                       >
                         <span className="text-xl">⚡</span>
                         <span>
-                          {isAuthenticated && user ? `Activer LibreSpeed (10 tokens par accès)` : `Connectez-vous pour activer LibreSpeed (10 tokens par accès)`}
+                          {isAuthenticated && user ? `Accéder à LibreSpeed (10 tokens par accès)` : `Connectez-vous pour accéder LibreSpeed (10 tokens par accès)`}
                         </span>
                       </button>
                     )}
 
-                    {/* Bouton d'accès pour LibreSpeed déjà activé - SUPPRIMÉ */}
+                    {/* Bouton d'accès pour LibreSpeed déjà accessible - SUPPRIMÉ */}
 
                     {/* Bouton d'accès spécial pour MeTube */}
                     {isMetube && (
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           if (isAuthenticated && user) {
-                            // Utilisateur connecté : aller à la page de transition puis /encours
+                            // Utilisateur connecté : ouverture directe de MeTube
                             console.log('✅ Accès MeTube - Utilisateur connecté');
-                            router.push(`/encours?module=${encodeURIComponent(card.title)}`);
+                            await accessModuleWithJWT(card?.title || 'MeTube', 'metube');
                           } else {
                             // Utilisateur non connecté : aller à la page de connexion puis retour à MeTube
                             console.log('🔒 Accès MeTube - Redirection vers connexion');
@@ -1223,7 +1221,7 @@ export default function CardDetailPage() {
                       >
                         <span className="text-xl">🎥</span>
                         <span>
-                          {isAuthenticated && user ? `Activer ${card?.title || 'Module'}` : `Connectez-vous pour activer ${card?.title || 'Module'}`}
+                          {isAuthenticated && user ? `Accéder à ${card?.title || 'Module'}` : `Connectez-vous pour accéder ${card?.title || 'Module'}`}
                         </span>
                       </button>
                     )}
@@ -1231,7 +1229,7 @@ export default function CardDetailPage() {
                     {/* Bouton d'accès - visible seulement si l'utilisateur a accès au module (autres modules) */}
                     {/* Bouton d'accès pour les modules avec abonnement - SUPPRIMÉ */}
 
-                    {/* Boutons d'activation pour les modules gratuits */}
+                    {/* Boutons d'accès pour les modules gratuits */}
                     {isFreeModule && !alreadyActivatedModules.includes(card.id) && !isLibrespeed && !isMetube && (
                       <div className="space-y-4">
                         {isAuthenticated && user ? (
@@ -1253,27 +1251,24 @@ export default function CardDetailPage() {
                                   
                                   if (response.ok) {
                                     console.log(`✅ Token premium généré pour ${card.title}`);
-                                    // Rediriger vers la page de transition
-                                    router.push(`/encours?module=${encodeURIComponent(card.title)}`);
+                                    await accessModuleWithJWT(card.title, card.id);
                                   } else {
                                     console.error('❌ Erreur génération token premium');
-                                    // En cas d'erreur, rediriger quand même vers la page de transition
-                                    router.push(`/encours?module=${encodeURIComponent(card.title)}`);
+                                    await accessModuleWithJWT(card.title, card.id);
                                   }
                                 } catch (error) {
                                   console.error('❌ Erreur lors de la génération du token:', error);
-                                  // En cas d'erreur, rediriger quand même vers la page de transition
-                                  router.push(`/encours?module=${encodeURIComponent(card.title)}`);
+                                  await accessModuleWithJWT(card.title, card.id);
                                 }
                               } else {
-                                // Si pas connecté, rediriger vers la page de transition
-                                router.push(`/encours?module=${encodeURIComponent(card.title)}`);
+                                // Si pas connecté, rediriger vers la connexion
+                                router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
                               }
                             }}
                             className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                           >
                             <span className="text-xl">🆓</span>
-                            <span>Activer l'application {card.title}</span>
+                            <span>Accéder à l'application {card.title}</span>
                           </button>
                         ) : (
                           <Link 
@@ -1281,7 +1276,7 @@ export default function CardDetailPage() {
                             className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
                           >
                             <span className="text-xl">🔒</span>
-                            <span>Connectez-vous pour activer {card?.title || 'Module'}</span>
+                            <span>Connectez-vous pour accéder {card?.title || 'Module'}</span>
                           </Link>
                         )}
                       </div>
@@ -1332,15 +1327,15 @@ export default function CardDetailPage() {
               <div className="space-y-6">
                 {/* Boutons d'action */}
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     if (isAuthenticated && user) {
-                      // Utilisateur connecté : redirection directe vers /encours
+                      // Utilisateur connecté : ouverture directe de MeTube
                       console.log('✅ Accès MeTube - Utilisateur connecté');
-                      router.push('/encours');
+                      await accessModuleWithJWT(card?.title || 'MeTube', 'metube');
                     } else {
-                      // Utilisateur non connecté : redirection vers /encours
-                      console.log('🔒 Accès MeTube - Redirection vers /encours');
-                      router.push('/encours');
+                      // Utilisateur non connecté : redirection vers connexion
+                      console.log('🔒 Accès MeTube - Redirection vers connexion');
+                      router.push(`/login?redirect=${encodeURIComponent('/card/metube')}`);
                     }
                   }}
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
@@ -1403,7 +1398,7 @@ export default function CardDetailPage() {
                       }
 
                       try {
-                        console.log('🔄 Activation PsiTransfer pour:', user.email);
+                        console.log('🔄 accès PsiTransfer pour:', user.email);
                         
                         const response = await fetch('/api/activate-psitransfer', {
                           method: 'POST',
@@ -1419,29 +1414,29 @@ export default function CardDetailPage() {
                         const result = await response.json();
 
                         if (result.success) {
-                          console.log('✅ PsiTransfer activé avec succès');
+                          console.log('✅ PsiTransfer accessible avec succès');
                           setAlreadyActivatedModules(prev => [...prev, card.id]);
-                          alert('PsiTransfer activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
-                          router.push('/encours');
+                          alert('PsiTransfer accessible avec succès ! Ouverture en cours...');
+                          await accessModuleWithJWT(card.title, 'psitransfer');
                         } else {
-                          console.error('❌ Erreur activation PsiTransfer:', result.error);
-                          alert(`Erreur lors de l'activation: ${result.error}`);
+                          console.error('❌ Erreur accès PsiTransfer:', result.error);
+                          alert(`Erreur lors de l'accès: ${result.error}`);
                         }
                       } catch (error) {
-                        console.error('❌ Erreur activation PsiTransfer:', error);
-                        alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                        console.error('❌ Erreur accès PsiTransfer:', error);
+                        alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                       }
                     }}
                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                   >
                     <span className="text-xl">📁</span>
                     <span>
-                      {isAuthenticated && user ? `Activer PsiTransfer (10 tokens par accès)` : `Connectez-vous pour activer PsiTransfer (10 tokens par accès)`}
+                      {isAuthenticated && user ? `Accéder à PsiTransfer (10 tokens par accès)` : `Connectez-vous pour accéder PsiTransfer (10 tokens par accès)`}
                     </span>
                   </button>
                 )}
 
-                {/* Bouton d'accès pour PsiTransfer déjà activé - SUPPRIMÉ */}
+                {/* Bouton d'accès pour PsiTransfer déjà accessible - SUPPRIMÉ */}
 
                 {/* Informations sur PsiTransfer */}
                 <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
@@ -1875,3 +1870,7 @@ export default function CardDetailPage() {
     </div>
   );
 } 
+
+
+
+

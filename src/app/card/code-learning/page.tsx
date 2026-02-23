@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Breadcrumb from '../../../components/Breadcrumb';
-import Link from 'next/link';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
 
@@ -17,12 +16,12 @@ export default function CodeLearningCardPage() {
   const moduleId = 'code-learning';
   const isFreeModule = false; // Module payant : 10 tokens par accès
 
-  // Fonction pour vérifier si un module est déjà activé
+  // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
     if (!user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-activation', {
+      const response = await fetch('/api/check-module-accès', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,12 +37,12 @@ export default function CodeLearningCardPage() {
         return result.isActivated || false;
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification d\'activation:', error);
+      console.error('Erreur lors de la vérification d\'accès:', error);
     }
     return false;
   }, [user?.id]);
 
-  // Vérifier si le module est activé
+  // Vérifier si le module est accessible
   useEffect(() => {
     const checkActivation = async () => {
       if (user?.id && moduleId) {
@@ -60,6 +59,53 @@ export default function CodeLearningCardPage() {
   }, [user?.id, moduleId, checkModuleActivation]);
 
   const isModuleActivated = alreadyActivatedModules.includes(moduleId);
+
+  const openCodeLearningWithToken = async (options?: { manageLoading?: boolean }) => {
+    const manageLoading = options?.manageLoading ?? true;
+
+    if (!isAuthenticated || !user) {
+      router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}`)}`);
+      return;
+    }
+
+    if (manageLoading) {
+      setLoading(true);
+    }
+
+    try {
+      const tokenResponse = await fetch('/api/generate-access-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          moduleId,
+          userId: user.id,
+          userEmail: user.email,
+        }),
+      });
+
+      if (!tokenResponse.ok) {
+        const errorData = await tokenResponse.json().catch(() => ({ error: 'Erreur inconnue' }));
+        throw new Error(errorData.error || `Erreur HTTP ${tokenResponse.status}`);
+      }
+
+      const tokenData = await tokenResponse.json();
+      if (!tokenData?.token) {
+        throw new Error('Token d\'accès manquant');
+      }
+
+      const codeLearningUrl = `/code-learning?token=${encodeURIComponent(tokenData.token)}`;
+      window.open(codeLearningUrl, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      console.error('❌ Erreur ouverture Code Learning avec token:', error);
+      alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+    } finally {
+      if (manageLoading) {
+        setLoading(false);
+      }
+    }
+  };
 
   // Ajouter les données structurées JSON-LD pour le SEO
   useEffect(() => {
@@ -136,7 +182,7 @@ export default function CodeLearningCardPage() {
           "name": "Combien coûte l'application ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation d'Apprendre le Code aux Enfants coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activée, l'application est accessible depuis vos applications actives."
+            "text": "L'accès d'Apprendre le Code aux Enfants coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiate, l'application est accessible depuis vos applications."
           }
         },
         {
@@ -316,18 +362,18 @@ export default function CodeLearningCardPage() {
                   <div className="flex items-center justify-center space-x-3 text-green-800 mb-4">
                     <span className="text-2xl">✅</span>
                     <div className="text-center">
-                      <p className="font-semibold">Service déjà activé !</p>
-                      <p className="text-sm opacity-80">Pour y accéder, cliquez sur Mes Applis activées</p>
+                      <p className="font-semibold">Accès direct disponible</p>
+                      <p className="text-sm opacity-80">Pour y accéder, cliquez sur Mes applications</p>
                     </div>
                   </div>
                   <div className="mt-3 text-center">
-                    <Link
-                      href="/encours"
+                    <button
+                      onClick={() => openCodeLearningWithToken()}
                       className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
                     >
                       <span className="mr-2">📱</span>
-                      Aller à Mes Applications
-                    </Link>
+                      Ouvrir l'application
+                    </button>
                   </div>
                 </div>
               )}
@@ -337,7 +383,7 @@ export default function CodeLearningCardPage() {
                   <button
                     onClick={async () => {
                       if (isAuthenticated && user) {
-                        // Utilisateur connecté : activer code-learning via API
+                        // Utilisateur connecté : Accéder à code-learning via API
                         try {
                           setLoading(true);
                           const response = await fetch('/api/activate-code-learning', {
@@ -354,21 +400,21 @@ export default function CodeLearningCardPage() {
                           if (response.ok) {
                             const data = await response.json();
                             if (data.success) {
-                              console.log('✅ Code Learning activé avec succès');
+                              console.log('✅ Code Learning accessible avec succès');
                               setAlreadyActivatedModules(prev => [...prev, moduleId]);
-                              router.push('/encours'); // Redirect to /encours
+                              await openCodeLearningWithToken({ manageLoading: false });
                             } else {
-                              console.error('❌ Erreur activation Code Learning:', data.error);
-                              alert('Erreur lors de l\'activation: ' + (data.error || 'Erreur inconnue'));
+                              console.error('❌ Erreur accès Code Learning:', data.error);
+                              alert('Erreur lors de l\'accès: ' + (data.error || 'Erreur inconnue'));
                             }
                           } else {
                             const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
                             console.error('❌ Erreur réponse API:', response.status, errorData);
-                            alert('Erreur lors de l\'activation: ' + (errorData.error || 'Erreur inconnue'));
+                            alert('Erreur lors de l\'accès: ' + (errorData.error || 'Erreur inconnue'));
                           }
                         } catch (error) {
-                          console.error('❌ Erreur lors de l\'activation de Code Learning:', error);
-                          alert('Erreur lors de l\'activation');
+                          console.error('❌ Erreur lors de l\'accès de Code Learning:', error);
+                          alert('Erreur lors de l\'accès');
                         } finally {
                           setLoading(false);
                         }
@@ -388,13 +434,13 @@ export default function CodeLearningCardPage() {
                     {loading || checkingActivation ? (
                       <>
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                        <span>Activation en cours...</span>
+                        <span>Ouverture en cours...</span>
                       </>
                     ) : (
                       <>
                         <span className="text-xl">💻</span>
                         <span>
-                          {isAuthenticated && user ? 'Activez l\'apprentissage du code (10 tokens par accès)' : 'Connectez-vous pour activer (10 tokens par accès)'}
+                          {isAuthenticated && user ? 'Accédez à l\'apprentissage du code (10 tokens par accès)' : 'Connectez-vous pour accéder (10 tokens par accès)'}
                         </span>
                       </>
                     )}
@@ -495,9 +541,9 @@ export default function CodeLearningCardPage() {
                     <div className="flex items-start">
                       <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Activer l'application</h3>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à l'application</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Activez Apprendre le Code aux Enfants avec 10 tokens. Une fois activée, l'application est accessible depuis vos applications actives.
+                          Accédez à Apprendre le Code aux Enfants avec 10 tokens. L'accès est immédiate, l'application est accessible depuis vos applications.
                         </p>
                       </div>
                     </div>
@@ -642,7 +688,7 @@ export default function CodeLearningCardPage() {
                   <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Combien coûte l'application ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'activation d'Apprendre le Code aux Enfants coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activée, l'application est accessible depuis vos applications actives.
+                      L'accès d'Apprendre le Code aux Enfants coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiate, l'application est accessible depuis vos applications.
                     </p>
                   </div>
                   
@@ -667,7 +713,7 @@ export default function CodeLearningCardPage() {
         </div>
       </section>
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId={moduleId}
         moduleName="Apprendre le Code aux Enfants"
@@ -682,4 +728,9 @@ export default function CodeLearningCardPage() {
     </div>
   );
 }
+
+
+
+
+
 

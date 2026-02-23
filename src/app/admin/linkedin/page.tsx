@@ -378,7 +378,7 @@ export default function AdminLinkedIn() {
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
               <label htmlFor="is_active" className="ml-2 block text-sm text-gray-700">
-                Activer la publication automatique
+                accéder à la publication automatique
               </label>
             </div>
 
@@ -889,6 +889,7 @@ export default function AdminLinkedIn() {
     </div>
   );
 }
+
 
 
 

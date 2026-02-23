@@ -46,12 +46,12 @@ export default function Hunyuan3DPage() {
   // Hunyuan 3D est un module payant
   const isFreeModule = false;
 
-  // Fonction pour vérifier si un module est déjà activé
+  // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
     if (!session?.user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-activation', {
+      const response = await fetch('/api/check-module-accès', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ export default function Hunyuan3DPage() {
         return result.isActivated || false;
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification d\'activation:', error);
+      console.error('Erreur lors de la vérification d\'accès:', error);
     }
     return false;
   }, [session?.user?.id]);
@@ -80,32 +80,31 @@ export default function Hunyuan3DPage() {
     }
 
     try {
-      // Générer un JWT pour l'accès au module
-      const response = await fetch('/api/generate-module-jwt', {
+      // Générer un token d'accès (décompte tokens inclus)
+      const response = await fetch('/api/generate-access-token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          moduleId: moduleId,
+          moduleId,
           userId: session.user.id,
-          moduleUrl: moduleUrl
+          userEmail: session.user.email,
         }),
       });
 
       if (response.ok) {
         const { token } = await response.json();
-        const urlWithToken = `${moduleUrl}?token=${token}`;
+        const separator = moduleUrl.includes('?') ? '&' : '?';
+        const urlWithToken = `${moduleUrl}${separator}token=${encodeURIComponent(token)}`;
         window.open(urlWithToken, '_blank');
       } else {
-        console.error('Erreur lors de la génération du JWT');
-        // Fallback: ouvrir directement l'URL
-        window.open(moduleUrl, '_blank');
+        const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
+        throw new Error(errorData.error || 'Erreur lors de la génération du token d\'accès');
       }
     } catch (error) {
       console.error('Erreur:', error);
-      // Fallback: ouvrir directement l'URL
-      window.open(moduleUrl, '_blank');
+      alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
   }, [session?.user?.id]);
 
@@ -174,7 +173,7 @@ export default function Hunyuan3DPage() {
 
         setUserSubscriptions(subscriptionsMap);
 
-        // Vérifier si le module actuel est déjà activé
+        // Vérifier si le module actuel est déjà accessible
         if (card?.id) {
           setCheckingActivation(true);
           const isActivated = await checkModuleActivation(card.id);
@@ -256,7 +255,7 @@ export default function Hunyuan3DPage() {
           "name": "Comment générer un modèle 3D avec Hunyuan 3D ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour générer un modèle 3D avec Hunyuan 3D, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface, uploadez une image 2D, et l'IA génère automatiquement un modèle 3D détaillé avec textures et géométries précises. Vous pouvez ensuite exporter le modèle dans les formats standards (OBJ, STL, PLY)."
+            "text": "Pour générer un modèle 3D avec Hunyuan 3D, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface, uploadez une image 2D, et l'IA génère automatiquement un modèle 3D détaillé avec textures et géométries précises. Vous pouvez ensuite exporter le modèle dans les formats standards (OBJ, STL, PLY)."
           }
         },
         {
@@ -264,7 +263,7 @@ export default function Hunyuan3DPage() {
           "name": "Hunyuan 3D est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation du service Hunyuan 3D coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles."
+            "text": "L'accès du service Hunyuan 3D coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles."
           }
         },
         {
@@ -382,7 +381,7 @@ export default function Hunyuan3DPage() {
     try {
       setIsActivating(true);
       
-      // Appeler l'API pour activer le module Hunyuan 3D
+      // Appeler l'API pour Accéder à le module Hunyuan 3D
       const response = await fetch('/api/activate-hunyuan3d', {
         method: 'POST',
         headers: {
@@ -401,18 +400,18 @@ export default function Hunyuan3DPage() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Erreur lors de l\'activation du module');
+        throw new Error(result.error || 'Erreur lors de l\'accès du module');
       }
 
-      // Ajouter le module aux modules activés
+      // Ajouter le module aux modules accessibles
       setAlreadyActivatedModules(prev => [...prev, card.id]);
       
       // Rediriger vers la page de transition
-      router.push('/encours');
+      handleQuickAccess();
       
     } catch (error) {
-      console.error('Erreur lors de l\'activation du module:', error);
-      alert('Erreur lors de l\'activation du module. Veuillez réessayer.');
+      console.error('Erreur lors de l\'accès du module:', error);
+      alert('Erreur lors de l\'accès du module. Veuillez réessayer.');
     } finally {
       setIsActivating(false);
     }
@@ -426,8 +425,8 @@ export default function Hunyuan3DPage() {
 
     if (card?.url) {
       try {
-        // Générer un JWT pour l'accès au module
-        const response = await fetch('/api/generate-module-jwt', {
+        // Générer un token d'accès (décompte tokens inclus)
+        const response = await fetch('/api/generate-access-token', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -435,21 +434,22 @@ export default function Hunyuan3DPage() {
           body: JSON.stringify({
             moduleId: card.id,
             userId: session.user.id,
-            moduleUrl: card.url
+            userEmail: session.user.email,
           }),
         });
 
         if (response.ok) {
           const { token } = await response.json();
-          const urlWithToken = `${card.url}?token=${token}`;
+          const separator = card.url.includes('?') ? '&' : '?';
+          const urlWithToken = `${card.url}${separator}token=${encodeURIComponent(token)}`;
           window.open(urlWithToken, '_blank');
         } else {
-          console.error('Erreur lors de la génération du JWT');
-          alert('Erreur lors de la génération du token d\'accès.');
+          const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
+          throw new Error(errorData.error || 'Erreur lors de la génération du token d\'accès');
         }
       } catch (error) {
         console.error('Erreur inattendue lors de l\'accès au module:', error);
-        alert('Une erreur inattendue est survenue lors de l\'accès au module.');
+        alert(`Une erreur inattendue est survenue lors de l'accès au module: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
       }
     } else {
       alert('URL du module non disponible.');
@@ -470,11 +470,7 @@ export default function Hunyuan3DPage() {
 
   const handleQuickAccess = () => {
     if (card?.url) {
-      if (isFreeModule) {
-        window.open(card.url, '_blank');
-      } else {
-        accessModuleWithJWT(card.id, card.url);
-      }
+      accessModuleWithJWT(card.id, card.url);
     }
   };
 
@@ -662,19 +658,19 @@ export default function Hunyuan3DPage() {
             <div className="space-y-6">
               {/* Boutons d'action */}
               <div className="space-y-4">
-                {/* Message si le module est déjà activé */}
+                {/* Message si le module est déjà accessible */}
                 {alreadyActivatedModules.includes(card?.id || '') && (
                   <div className="w-3/4 mx-auto bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
                     <div className="flex items-center justify-center space-x-3 text-green-800">
                       <span className="text-2xl">✅</span>
                       <div className="text-center">
-                        <p className="font-semibold">Application déjà activée !</p>
+                        <p className="font-semibold">Accès direct disponible</p>
                         <p className="text-sm opacity-80">Vous pouvez accéder à cette application depuis vos applications</p>
                       </div>
                     </div>
                     <div className="mt-3 text-center">
                       <button
-                        onClick={() => router.push('/encours')}
+                        onClick={handleQuickAccess}
                         className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
                       >
                         <span className="mr-2">📱</span>
@@ -684,26 +680,26 @@ export default function Hunyuan3DPage() {
                   </div>
                 )}
 
-                {/* Bouton d'activation avec tokens */}
+                {/* Bouton d'accès avec tokens */}
                 {!alreadyActivatedModules.includes(card?.id || '') && (
                   <div className="w-3/4 mx-auto">
                     <ModuleActivationButton
                       moduleId={card?.id || 'hunyuan3d'}
                       moduleName={card?.title || 'Hunyuan 3D'}
                       moduleCost={100}
-                      moduleDescription={card?.description || 'Application Hunyuan 3D activée'}
+                      moduleDescription={card?.description || 'Application Hunyuan 3D accessible'}
                       onActivationSuccess={() => {
                         setAlreadyActivatedModules(prev => [...prev, card?.id || 'hunyuan3d']);
-                        alert(`✅ Application ${card?.title || 'Hunyuan 3D'} activée avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
+                        alert(`✅ Application ${card?.title || 'Hunyuan 3D'} accessible avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
                       }}
                       onActivationError={(error) => {
-                        console.error('Erreur activation:', error);
+                        console.error('Erreur accès:', error);
                       }}
                     />
                   </div>
                 )}
 
-                {/* Bouton d'accès direct si déjà activé */}
+                {/* Bouton d'accès direct si déjà accessible */}
                 {alreadyActivatedModules.includes(card?.id || '') && (
                   <div className="w-3/4 mx-auto">
                     <button
@@ -818,9 +814,9 @@ export default function Hunyuan3DPage() {
                     <div className="flex items-start">
                       <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Activer Hunyuan 3D</h3>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à Hunyuan 3D</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Activez Hunyuan 3D avec 100 tokens. Une fois activé, le service est accessible depuis vos applications actives.
+                          Accédez à Hunyuan 3D avec 100 tokens. L'accès est immédiat, le service est accessible depuis vos applications.
                         </p>
                       </div>
                     </div>
@@ -956,14 +952,14 @@ export default function Hunyuan3DPage() {
                   <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Comment générer un modèle 3D avec Hunyuan 3D ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Pour générer un modèle 3D avec Hunyuan 3D, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface, uploadez une image 2D, et l'IA génère automatiquement un modèle 3D détaillé avec textures et géométries précises. Vous pouvez ensuite exporter le modèle dans les formats standards (OBJ, STL, PLY).
+                      Pour générer un modèle 3D avec Hunyuan 3D, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface, uploadez une image 2D, et l'IA génère automatiquement un modèle 3D détaillé avec textures et géométries précises. Vous pouvez ensuite exporter le modèle dans les formats standards (OBJ, STL, PLY).
                     </p>
                   </div>
                   
                   <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-blue-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Hunyuan 3D est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'activation du service Hunyuan 3D coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles.
+                      L'accès du service Hunyuan 3D coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles.
                     </p>
                   </div>
                   
@@ -1267,7 +1263,7 @@ export default function Hunyuan3DPage() {
         </div>
       )}
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId={card?.id || 'hunyuan3d'}
         moduleName="Hunyuan 3D"
@@ -1290,4 +1286,9 @@ export default function Hunyuan3DPage() {
     </div>
   );
 }
+
+
+
+
+
 

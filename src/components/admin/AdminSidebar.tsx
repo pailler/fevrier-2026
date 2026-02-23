@@ -79,7 +79,7 @@ export default function AdminSidebar() {
 
             {/* Bouton Mes applis */}
             <Link
-              href="/encours"
+              href="/account"
               className="w-full bg-blue-600 text-white font-semibold px-3 py-2 rounded text-sm hover:bg-blue-700 transition-colors flex items-center justify-center space-x-1"
             >
               <span>📱</span>
@@ -101,7 +101,7 @@ export default function AdminSidebar() {
           <div className="flex flex-col items-center space-y-2">
             <TokenBalance className="text-sm" />
             <Link
-              href="/encours"
+              href="/account"
               className="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center hover:bg-blue-700 transition-colors"
               title="Mes applis"
             >
@@ -120,4 +120,5 @@ export default function AdminSidebar() {
     </div>
   );
 }
+
 

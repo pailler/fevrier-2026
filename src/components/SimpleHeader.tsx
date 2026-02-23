@@ -44,11 +44,11 @@ export default function SimpleHeader() {
               <span className="text-lg font-bold text-white">IAhome</span>
             </Link>
             
-            {/* Bouton "Mes applis activées" avec tokens pour mobile - VERSION 4.0.0 */}
+            {/* Bouton "Mes applis" avec tokens pour mobile - VERSION 4.0.0 */}
             {isAuthenticated && user && (
               <div className="flex md:hidden items-center space-x-1 relative z-0 mr-3" data-button-version="4.0.0">
                 <Link
-                  href="/encours"
+                  href="/account"
                   data-button-type="mes-applis-actives"
                   className="bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 text-white font-bold px-2.5 py-2 rounded-lg text-sm hover:from-green-600 hover:via-emerald-600 hover:to-green-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-1 relative"
                   onClick={(e) => {
@@ -62,7 +62,7 @@ export default function SimpleHeader() {
                   }}
                 >
                   <span className="text-base">📱</span>
-                  <span className="text-sm">Mes applis activées</span>
+                  <span className="text-sm">Mes applis</span>
                 </Link>
               </div>
             )}
@@ -169,7 +169,7 @@ export default function SimpleHeader() {
               <>
                 <TokenBalanceLink />
                 <Link
-                  href="/encours"
+                  href="/account"
                   className="hidden md:flex bg-white text-blue-600 font-semibold px-3 py-1 rounded text-sm hover:bg-blue-50 transition-colors items-center space-x-1"
                 >
                   <span>📱</span>
@@ -437,3 +437,6 @@ export default function SimpleHeader() {
     </header>
   );
 }
+
+
+

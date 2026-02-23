@@ -17,12 +17,12 @@ export default function AdministrationPage() {
   const moduleId = 'administration';
   const isFreeModule = false; // Module payant : 10 tokens par accès
 
-  // Fonction pour vérifier si un module est déjà activé
+  // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
     if (!user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-activation', {
+      const response = await fetch('/api/check-module-accès', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ export default function AdministrationPage() {
         return result.isActivated || false;
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification d\'activation:', error);
+      console.error('Erreur lors de la vérification d\'accès:', error);
     }
     return false;
   }, [user?.id]);
@@ -91,7 +91,7 @@ export default function AdministrationPage() {
           "name": "Comment accéder aux Services de l'Administration ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour accéder aux Services de l'Administration, activez d'abord le service avec 10 tokens. Une fois activé, le portail est accessible depuis vos applications actives. Vous pourrez alors naviguer par catégories ou utiliser la recherche pour trouver rapidement le service administratif dont vous avez besoin."
+            "text": "Pour accéder aux Services de l'Administration, accédez directement au service avec 10 tokens. L'accès est immédiat, le portail est accessible depuis vos applications. Vous pourrez alors naviguer par catégories ou utiliser la recherche pour trouver rapidement le service administratif dont vous avez besoin."
           }
         },
         {
@@ -107,7 +107,7 @@ export default function AdministrationPage() {
           "name": "Les Services de l'Administration sont-ils gratuits ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation du portail Services de l'Administration coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez accéder à tous les liens et services sans frais supplémentaires. Les liens pointent vers les sites officiels des administrations françaises."
+            "text": "L'accès du portail Services de l'Administration coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez accéder à tous les liens et services sans frais supplémentaires. Les liens pointent vers les sites officiels des administrations françaises."
           }
         },
         {
@@ -166,7 +166,7 @@ export default function AdministrationPage() {
     };
   }, []);
 
-  // Vérifier si le module est activé
+  // Vérifier si le module est accessible
   useEffect(() => {
     const checkActivation = async () => {
       if (user?.id && moduleId) {
@@ -349,13 +349,13 @@ export default function AdministrationPage() {
                   <div className="flex items-center justify-center space-x-3 text-green-800 mb-4">
                     <span className="text-2xl">✅</span>
                     <div className="text-center">
-                      <p className="font-semibold">Service déjà activé !</p>
-                      <p className="text-sm opacity-80">Pour y accéder, cliquez sur Mes Applis activées</p>
+                      <p className="font-semibold">Accès direct disponible</p>
+                      <p className="text-sm opacity-80">Pour y accéder, cliquez sur Mes applications</p>
                     </div>
                   </div>
                   <div className="mt-3 text-center">
                     <Link
-                      href="/encours"
+                      href="/administration"
                       className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
                     >
                       <span className="mr-2">📱</span>
@@ -370,7 +370,7 @@ export default function AdministrationPage() {
                   <button
                     onClick={async () => {
                       if (isAuthenticated && user) {
-                        // Utilisateur connecté : activer administration via API
+                        // Utilisateur connecté : Accéder à administration via API
                         try {
                           setLoading(true);
                           const response = await fetch('/api/activate-administration', {
@@ -387,22 +387,22 @@ export default function AdministrationPage() {
                           if (response.ok) {
                             const data = await response.json();
                             if (data.success) {
-                              console.log('✅ Services administratifs activés avec succès');
+                              console.log('✅ Services administratifs accessibles avec succès');
                               setAlreadyActivatedModules(prev => [...prev, moduleId]);
                               // Rediriger vers la page des modules actifs
-                              router.push('/encours');
+                              window.open('/administration', '_blank');
                             } else {
-                              console.error('❌ Erreur activation services administratifs:', data.error);
-                              alert('Erreur lors de l\'activation: ' + (data.error || 'Erreur inconnue'));
+                              console.error('❌ Erreur accès services administratifs:', data.error);
+                              alert('Erreur lors de l\'accès: ' + (data.error || 'Erreur inconnue'));
                             }
                           } else {
                             const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
                             console.error('❌ Erreur réponse API:', response.status, errorData);
-                            alert('Erreur lors de l\'activation: ' + (errorData.error || 'Erreur inconnue'));
+                            alert('Erreur lors de l\'accès: ' + (errorData.error || 'Erreur inconnue'));
                           }
                         } catch (error) {
-                          console.error('❌ Erreur lors de l\'activation des services administratifs:', error);
-                          alert('Erreur lors de l\'activation');
+                          console.error('❌ Erreur lors de l\'accès des services administratifs:', error);
+                          alert('Erreur lors de l\'accès');
                         } finally {
                           setLoading(false);
                         }
@@ -418,13 +418,13 @@ export default function AdministrationPage() {
                     {loading ? (
                       <>
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        <span>Activation en cours...</span>
+                        <span>Ouverture en cours...</span>
                       </>
                     ) : (
                       <>
                         <span className="text-xl">🏛️</span>
                         <span>
-                          {isAuthenticated && user ? 'Activez les services administratifs (10 tokens par accès)' : 'Connectez-vous pour activer (10 tokens par accès)'}
+                          {isAuthenticated && user ? 'Accédez à les services administratifs (10 tokens par accès)' : 'Connectez-vous pour accéder (10 tokens par accès)'}
                         </span>
                       </>
                     )}
@@ -520,9 +520,9 @@ export default function AdministrationPage() {
                     <div className="flex items-start">
                       <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Activer le portail</h3>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à le portail</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Activez le portail Services de l'Administration avec 10 tokens. Une fois activé, le portail est accessible depuis vos applications actives.
+                          Accédez à le portail Services de l'Administration avec 10 tokens. L'accès est immédiat, le portail est accessible depuis vos applications.
                         </p>
                       </div>
                     </div>
@@ -658,7 +658,7 @@ export default function AdministrationPage() {
                   <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Comment accéder aux Services de l'Administration ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Pour accéder aux Services de l'Administration, activez d'abord le service avec 10 tokens. Une fois activé, le portail est accessible depuis vos applications actives. Vous pourrez alors naviguer par catégories ou utiliser la recherche pour trouver rapidement le service administratif dont vous avez besoin.
+                      Pour accéder aux Services de l'Administration, accédez directement au service avec 10 tokens. L'accès est immédiat, le portail est accessible depuis vos applications. Vous pourrez alors naviguer par catégories ou utiliser la recherche pour trouver rapidement le service administratif dont vous avez besoin.
                     </p>
                   </div>
                   
@@ -672,7 +672,7 @@ export default function AdministrationPage() {
                   <div className="bg-gradient-to-r from-pink-50 to-red-50 p-6 rounded-2xl border-l-4 border-pink-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Les Services de l'Administration sont-ils gratuits ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'activation du portail Services de l'Administration coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez accéder à tous les liens et services sans frais supplémentaires. Les liens pointent vers les sites officiels des administrations françaises.
+                      L'accès du portail Services de l'Administration coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez accéder à tous les liens et services sans frais supplémentaires. Les liens pointent vers les sites officiels des administrations françaises.
                     </p>
                   </div>
                   
@@ -860,7 +860,7 @@ export default function AdministrationPage() {
           </div>
       </section>
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId={moduleId}
         moduleName="Administration"
@@ -875,3 +875,8 @@ export default function AdministrationPage() {
     </div>
   );
 }
+
+
+
+
+

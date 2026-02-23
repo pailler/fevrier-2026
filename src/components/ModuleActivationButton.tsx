@@ -11,6 +11,7 @@ interface ModuleActivationButtonProps {
   moduleName: string;
   moduleCost: number;
   moduleDescription?: string;
+  accessUrl?: string;
   className?: string;
   onActivationSuccess?: () => void;
   onActivationError?: (error: string) => void;
@@ -21,6 +22,7 @@ export default function ModuleActivationButton({
   moduleName,
   moduleCost,
   moduleDescription,
+  accessUrl,
   className = '',
   onActivationSuccess,
   onActivationError
@@ -30,6 +32,52 @@ export default function ModuleActivationButton({
   const { user, isAuthenticated } = useCustomAuth();
   const { tokens, refreshTokens } = useTokenContext();
   const router = useRouter();
+
+  const resolveModuleUrl = () => {
+    if (accessUrl) return accessUrl;
+    const normalizedModuleId = (moduleId || '').trim().toLowerCase();
+    const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const urlMap: Record<string, string> = isDevelopment
+      ? {
+          'photomaker': 'http://localhost:7881',
+          'birefnet': 'http://localhost:7882',
+          'animagine-xl': 'http://localhost:7883',
+          'florence-2': 'http://localhost:7884',
+          'home-assistant': 'http://localhost:8123',
+          'hunyuan3d': 'http://localhost:8888',
+          'stablediffusion': 'http://localhost:7880',
+          'meeting-reports': 'http://localhost:3050',
+          'whisper': 'http://localhost:8093',
+          'ruinedfooocus': 'http://localhost:7870',
+          'comfyui': 'http://localhost:8188',
+        }
+      : {
+          'photomaker': 'https://photomaker.iahome.fr',
+          'birefnet': 'https://birefnet.iahome.fr',
+          'animagine-xl': 'https://animaginexl.iahome.fr',
+          'florence-2': 'https://florence2.iahome.fr',
+          'home-assistant': 'https://homeassistant.iahome.fr',
+          'hunyuan3d': 'https://hunyuan3d.iahome.fr',
+          'stablediffusion': 'https://stablediffusion.iahome.fr',
+          'meeting-reports': 'https://meeting-reports.iahome.fr',
+          'whisper': 'https://whisper.iahome.fr',
+          'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
+          'comfyui': 'https://comfyui.iahome.fr',
+        };
+
+    if (urlMap[normalizedModuleId]) {
+      return urlMap[normalizedModuleId];
+    }
+
+    const subdomainAliases: Record<string, string> = {
+      'animagine-xl': 'animaginexl',
+      'florence-2': 'florence2',
+      'home-assistant': 'homeassistant',
+    };
+
+    const computedSubdomain = subdomainAliases[normalizedModuleId] || normalizedModuleId;
+    return computedSubdomain ? `https://${computedSubdomain}.iahome.fr` : '';
+  };
 
   const handleActivation = async () => {
     if (!isAuthenticated) {
@@ -52,51 +100,18 @@ export default function ModuleActivationButton({
     setError(null);
 
     try {
-      console.log(`🔄 Activation du module ${moduleName} (${moduleId}) pour ${user.email}`);
-
-      // Vérifier d'abord si le module est déjà activé
-      let checkResponse;
+      // Débiter les tokens et générer un token d'accès direct à l'application
+      let response;
       try {
-        checkResponse = await fetch('/api/check-module-activation', {
+        response = await fetch('/api/generate-access-token', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             moduleId: moduleId,
-            userId: user.id
-          }),
-        });
-
-        if (checkResponse.ok) {
-          const checkData = await checkResponse.json();
-          if (checkData.isActivated) {
-            setError('Application déjà activée');
-            onActivationError?.('Application déjà activée');
-            setIsLoading(false);
-            return;
-          }
-        }
-      } catch (checkErr) {
-        console.warn('⚠️ Erreur lors de la vérification d\'activation (continuons):', checkErr);
-        // On continue même si la vérification échoue
-      }
-
-      // Appeler l'API d'activation du module
-      let response;
-      try {
-        response = await fetch('/api/activate-module', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            moduleId,
-            moduleName,
             userId: user.id,
             userEmail: user.email,
-            moduleCost,
-            moduleDescription
           }),
         });
       } catch (fetchErr) {
@@ -105,7 +120,7 @@ export default function ModuleActivationButton({
           ? 'Erreur de connexion réseau. Vérifiez votre connexion internet.'
           : fetchErr instanceof Error ? fetchErr.message : 'Erreur réseau inconnue';
         
-        console.error(`❌ Erreur réseau lors de l'activation du module ${moduleName}:`, fetchErr);
+        console.error(`❌ Erreur réseau lors de l'accès direct à ${moduleName}:`, fetchErr);
         setError(networkError);
         onActivationError?.(networkError);
         setIsLoading(false);
@@ -125,8 +140,18 @@ export default function ModuleActivationButton({
       }
 
       const data = await response.json();
+      const token = data?.token;
+      if (!token) {
+        throw new Error('Token d\'accès manquant');
+      }
 
-      console.log(`✅ Module ${moduleName} activé avec succès`);
+      const targetUrl = resolveModuleUrl();
+      if (targetUrl) {
+        const separator = targetUrl.includes('?') ? '&' : '?';
+        window.open(`${targetUrl}${separator}token=${encodeURIComponent(token)}`, '_blank');
+      } else {
+        throw new Error(`URL d'accès introuvable pour le module ${moduleId}`);
+      }
       
       // Mettre à jour les tokens côté client
       try {
@@ -137,15 +162,10 @@ export default function ModuleActivationButton({
       
       // Notifier le succès
       onActivationSuccess?.();
-      
-      // Rediriger vers la page encours après un délai
-      setTimeout(() => {
-        router.push('/encours');
-      }, 1500);
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
-      console.error(`❌ Erreur activation module ${moduleName}:`, errorMessage, err);
+      console.error(`❌ Erreur accès module ${moduleName}:`, errorMessage, err);
       setError(errorMessage);
       onActivationError?.(errorMessage);
     } finally {
@@ -154,8 +174,8 @@ export default function ModuleActivationButton({
   };
 
   const getButtonText = () => {
-    if (isLoading) return 'Activation...';
-    return `Activer ${moduleName} (${moduleCost} tokens)`;
+    if (isLoading) return 'Ouverture...';
+    return `Accéder à ${moduleName} (${moduleCost} tokens)`;
   };
 
   const getButtonClass = () => {
@@ -176,7 +196,7 @@ export default function ModuleActivationButton({
         {isLoading ? (
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            <span>Activation...</span>
+            <span>Ouverture...</span>
           </div>
         ) : (
           <div className="flex items-center space-x-2">
@@ -197,7 +217,7 @@ export default function ModuleActivationButton({
           href="/login" 
           className="text-blue-600 hover:text-blue-800 text-sm text-center max-w-xs underline"
         >
-          Connectez-vous pour activer cette application
+          Connectez-vous pour accéder à cette application
         </Link>
       )}
       
@@ -209,3 +229,4 @@ export default function ModuleActivationButton({
     </div>
   );
 }
+

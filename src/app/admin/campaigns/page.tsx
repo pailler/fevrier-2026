@@ -1699,7 +1699,7 @@ export default function AdminCampaigns() {
                               onClick={() => handleUpdateCampaignStatus(campaign.id, 'active')}
                               className="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700"
                             >
-                              Activer
+                              accéder à
                             </button>
                           )}
                           {campaign.status === 'active' && (
@@ -1892,4 +1892,5 @@ export default function AdminCampaigns() {
     </div>
   );
 }
+
 

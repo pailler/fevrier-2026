@@ -349,7 +349,7 @@ export default function Home() {
                 {/* Bouton Mes applications - Visible seulement si connecté */}
                 {isAuthenticated && user && (
                   <Link 
-                    href="/encours" 
+                    href="/account" 
                     className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-800 font-semibold px-6 py-4 rounded-xl hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105 min-w-[160px]"
                   >
                     <span className="text-lg">📱</span>
@@ -532,3 +532,4 @@ export default function Home() {
     </div>
   );
 }
+

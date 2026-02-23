@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       return new NextResponse('Forbidden', { status: 403 });
     }
 
-    // Vérifier si le module apparaît dans /encours
+    // Vérifier si le module apparaît dans /account
     const isModuleActive = await checkModuleInEncours(sessionToken.value);
     
     if (!isModuleActive) {
@@ -78,9 +78,10 @@ async function checkLibreSpeedAccess(sessionToken: string): Promise<boolean> {
   return true;
 }
 
-// Fonction pour vérifier si le module apparaît dans /encours
+// Fonction pour vérifier si le module apparaît dans /account
 async function checkModuleInEncours(sessionToken: string): Promise<boolean> {
-  // TODO: Vérifier si le module LibreSpeed est actif et apparaît dans /encours
+  // TODO: Vérifier si le module LibreSpeed est actif et apparaît dans /account
   // Cela pourrait être une vérification de l'état du module
   return true;
 }
+

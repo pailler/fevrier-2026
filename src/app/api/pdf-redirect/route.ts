@@ -51,11 +51,11 @@ export async function GET(request: NextRequest) {
     
     // Aucun token trouvé - rediriger vers la page d'accueil (protection)
     console.log('🛡️ PDF: Accès direct bloqué, aucun token trouvé, redirection vers iahome.fr');
-    return NextResponse.redirect('https://iahome.fr/encours?error=direct_access_denied', 302);
+    return NextResponse.redirect('https://iahome.fr/account?error=direct_access_denied', 302);
 
   } catch (error) {
     console.error('❌ PDF Redirect Error:', error);
-    return NextResponse.redirect('https://iahome.fr/encours?error=internal_error', 302);
+    return NextResponse.redirect('https://iahome.fr/account?error=internal_error', 302);
   }
 }
 
@@ -69,4 +69,5 @@ export async function OPTIONS() {
     },
   });
 }
+
 

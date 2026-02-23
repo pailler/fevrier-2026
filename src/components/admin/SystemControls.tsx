@@ -100,7 +100,7 @@ export default function SystemControls({
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-gray-900">Paramètres système</h3>
         <div className="text-sm text-gray-500">
-          {Object.values(settings).filter(Boolean).length} / {Object.keys(settings).length} activés
+          {Object.values(settings).filter(Boolean).length} / {Object.keys(settings).length} accessibles
         </div>
       </div>
       
@@ -155,19 +155,19 @@ export default function SystemControls({
               }}
               className="px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-colors"
             >
-              Tout activer
+              Tout accéder à
             </button>
             <button
               onClick={() => {
                 Object.keys(settings).forEach(key => {
-                  if (key !== 'maintenanceMode') { // Ne pas désactiver le mode maintenance automatiquement
+                  if (key !== 'maintenanceMode') { // Ne pas suspendre le mode maintenance automatiquement
                     handleSettingChange(key, false);
                   }
                 });
               }}
               className="px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-colors"
             >
-              Tout désactiver
+              Tout suspendre
             </button>
           </div>
         </div>
@@ -175,3 +175,4 @@ export default function SystemControls({
     </div>
   );
 }
+

@@ -47,7 +47,7 @@ export default function SignUpSuccessPage() {
           setIsRedirecting(true);
           // Utiliser setTimeout pour éviter l'erreur de rendu
           setTimeout(() => {
-            router.push('/encours?message=Compte créé avec succès ! Bienvenue sur IAhome.');
+            router.push('/account?message=Compte créé avec succès ! Bienvenue sur IAhome.');
           }, 100);
           return 0;
         }
@@ -139,7 +139,7 @@ export default function SignUpSuccessPage() {
                   onClick={() => {
                     setIsRedirecting(true);
                     setTimeout(() => {
-                      router.push('/encours?message=Compte créé avec succès ! Bienvenue sur IAhome.');
+                      router.push('/account?message=Compte créé avec succès ! Bienvenue sur IAhome.');
                     }, 100);
                   }}
                   disabled={isRedirecting}
@@ -168,3 +168,4 @@ export default function SignUpSuccessPage() {
     </div>
   );
 }
+

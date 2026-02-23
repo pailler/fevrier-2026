@@ -46,12 +46,12 @@ export default function MeetingReportsPage() {
   // Meeting Reports est un module payant
   const isFreeModule = false;
 
-  // Fonction pour vérifier si un module est déjà activé
+  // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
     if (!session?.user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-activation', {
+      const response = await fetch('/api/check-module-accès', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ export default function MeetingReportsPage() {
         return result.isActivated || false;
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification d\'activation:', error);
+      console.error('Erreur lors de la vérification d\'accès:', error);
     }
     return false;
   }, [session?.user?.id]);
@@ -82,35 +82,32 @@ export default function MeetingReportsPage() {
     console.log(`🔗 Tentative d'accès au module ${moduleId} avec l'URL: ${moduleUrl}`);
 
     try {
-      // Générer un JWT pour l'accès au module
-      const response = await fetch('/api/generate-module-jwt', {
+      // Générer un token d'accès (décompte tokens inclus)
+      const response = await fetch('/api/generate-access-token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          moduleId: moduleId,
+          moduleId,
           userId: session.user.id,
-          moduleUrl: moduleUrl
+          userEmail: session.user.email,
         }),
       });
 
       if (response.ok) {
         const { token } = await response.json();
-        const urlWithToken = `${moduleUrl}?token=${token}`;
+        const separator = moduleUrl.includes('?') ? '&' : '?';
+        const urlWithToken = `${moduleUrl}${separator}token=${encodeURIComponent(token)}`;
         console.log(`✅ JWT généré, ouverture de: ${urlWithToken}`);
         window.open(urlWithToken, '_blank');
       } else {
-        console.error('❌ Erreur lors de la génération du JWT, fallback vers URL directe');
-        // Fallback: ouvrir directement l'URL
-        console.log(`🔗 Fallback: ouverture directe de ${moduleUrl}`);
-        window.open(moduleUrl, '_blank');
+        const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
+        throw new Error(errorData.error || 'Erreur lors de la génération du token d\'accès');
       }
     } catch (error) {
       console.error('❌ Erreur:', error);
-      // Fallback: ouvrir directement l'URL
-      console.log(`🔗 Fallback après erreur: ouverture directe de ${moduleUrl}`);
-      window.open(moduleUrl, '_blank');
+      alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
   }, [session?.user?.id]);
 
@@ -179,7 +176,7 @@ export default function MeetingReportsPage() {
 
         setUserSubscriptions(subscriptionsMap);
 
-        // Vérifier si le module actuel est déjà activé
+        // Vérifier si le module actuel est déjà accessible
         if (card?.id) {
           setCheckingActivation(true);
           const isActivated = await checkModuleActivation(card.id);
@@ -261,7 +258,7 @@ export default function MeetingReportsPage() {
           "name": "Comment utiliser Compte rendus IA ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour utiliser Compte rendus IA, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via meeting-reports.iahome.fr. Enregistrez vos réunions en temps réel avec le microphone intégré, ou uploadez des fichiers audio existants (MP3, WAV, WebM). L'IA transcrit automatiquement l'audio avec Whisper, puis génère un résumé intelligent avec GPT incluant les points clés, les décisions prises et les actions à suivre. Vous pouvez ensuite télécharger le rapport en PDF ou Markdown."
+            "text": "Pour utiliser Compte rendus IA, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via meeting-reports.iahome.fr. Enregistrez vos réunions en temps réel avec le microphone intégré, ou uploadez des fichiers audio existants (MP3, WAV, WebM). L'IA transcrit automatiquement l'audio avec Whisper, puis génère un résumé intelligent avec GPT incluant les points clés, les décisions prises et les actions à suivre. Vous pouvez ensuite télécharger le rapport en PDF ou Markdown."
           }
         },
         {
@@ -277,7 +274,7 @@ export default function MeetingReportsPage() {
           "name": "Compte rendus IA est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation de Compte rendus IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : enregistrement audio, transcription automatique, résumé intelligent, identification des intervenants, extraction des points clés, et export PDF/Markdown. Il n'y a pas de frais supplémentaires pour le traitement des réunions."
+            "text": "L'accès de Compte rendus IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : enregistrement audio, transcription automatique, résumé intelligent, identification des intervenants, extraction des points clés, et export PDF/Markdown. Il n'y a pas de frais supplémentaires pour le traitement des réunions."
           }
         },
         {
@@ -382,7 +379,7 @@ export default function MeetingReportsPage() {
     try {
       setIsActivating(true);
       
-      // Appeler l'API pour activer le module Meeting Reports
+      // Appeler l'API pour Accéder à le module Meeting Reports
       const response = await fetch('/api/activate-meeting-reports', {
         method: 'POST',
         headers: {
@@ -401,18 +398,18 @@ export default function MeetingReportsPage() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Erreur lors de l\'activation du module');
+        throw new Error(result.error || 'Erreur lors de l\'accès du module');
       }
 
-      // Ajouter le module aux modules activés
+      // Ajouter le module aux modules accessibles
       setAlreadyActivatedModules(prev => [...prev, card.id]);
       
       // Rediriger vers la page de transition
-      router.push('/encours');
+      handleQuickAccess();
       
     } catch (error) {
-      console.error('Erreur lors de l\'activation du module:', error);
-      alert('Erreur lors de l\'activation du module. Veuillez réessayer.');
+      console.error('Erreur lors de l\'accès du module:', error);
+      alert('Erreur lors de l\'accès du module. Veuillez réessayer.');
     } finally {
       setIsActivating(false);
     }
@@ -425,11 +422,7 @@ export default function MeetingReportsPage() {
     const meetingReportsUrl = isDevelopment ? 'http://localhost:3050' : 'https://meeting-reports.iahome.fr';
     const moduleUrl = card?.url || meetingReportsUrl;
     
-    if (isFreeModule) {
-      window.open(moduleUrl, '_blank');
-    } else {
-      accessModuleWithJWT(card?.id || 'meeting-reports', moduleUrl);
-    }
+    accessModuleWithJWT(card?.id || 'meeting-reports', moduleUrl);
   };
 
   const handleDemo = () => {
@@ -628,19 +621,19 @@ export default function MeetingReportsPage() {
             <div className="space-y-6">
               {/* Boutons d'action */}
               <div className="space-y-4">
-                {/* Message si le module est déjà activé */}
+                {/* Message si le module est déjà accessible */}
                 {alreadyActivatedModules.includes(card?.id || '') && (
                   <div className="w-3/4 mx-auto bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
                     <div className="flex items-center justify-center space-x-3 text-green-800">
                       <span className="text-2xl">✅</span>
                       <div className="text-center">
-                        <p className="font-semibold">Application déjà activée !</p>
+                        <p className="font-semibold">Accès direct disponible</p>
                         <p className="text-sm opacity-80">Vous pouvez accéder à cette application depuis vos applications</p>
                       </div>
                     </div>
                     <div className="mt-3 text-center">
                       <button
-                        onClick={() => router.push('/encours')}
+                        onClick={handleQuickAccess}
                         className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
                       >
                         <span className="mr-2">📱</span>
@@ -650,20 +643,20 @@ export default function MeetingReportsPage() {
                   </div>
                 )}
 
-                {/* Bouton d'activation avec tokens */}
+                {/* Bouton d'accès avec tokens */}
                 {!alreadyActivatedModules.includes(card?.id || '') && (
                   <div className="w-3/4 mx-auto">
                     <ModuleActivationButton
                       moduleId={card?.id || 'meeting-reports'}
                       moduleName={card?.title || 'Compte rendus IA'}
                       moduleCost={100}
-                      moduleDescription={card?.description || 'Application Compte rendus IA activée'}
+                      moduleDescription={card?.description || 'Application Compte rendus IA accessible'}
                       onActivationSuccess={() => {
                         setAlreadyActivatedModules(prev => [...prev, card?.id || 'meeting-reports']);
-                        alert(`✅ Application ${card?.title || 'Compte rendus IA'} activée avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
+                        alert(`✅ Application ${card?.title || 'Compte rendus IA'} accessible avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
                       }}
                       onActivationError={(error) => {
-                        console.error('Erreur activation:', error);
+                        console.error('Erreur accès:', error);
                       }}
                     />
                   </div>
@@ -680,12 +673,12 @@ export default function MeetingReportsPage() {
                       {isActivating ? (
                         <>
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                          <span>Activation...</span>
+                          <span>accès...</span>
                         </>
                       ) : (
                         <>
                           <span className="text-xl">⚡</span>
-                          <span>Activer {card?.title}</span>
+                          <span>Accéder à {card?.title}</span>
                         </>
                       )}
                     </button>
@@ -803,9 +796,9 @@ export default function MeetingReportsPage() {
                       <div className="flex items-start">
                         <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
                         <div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-2">Activer Compte rendus IA</h3>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à Compte rendus IA</h3>
                           <p className="text-gray-700 leading-relaxed">
-                            Activez Compte rendus IA avec 100 tokens. Une fois activé, le service est accessible depuis vos applications actives via meeting-reports.iahome.fr.
+                            Accédez à Compte rendus IA avec 100 tokens. L'accès est immédiat, le service est accessible depuis vos applications via meeting-reports.iahome.fr.
                           </p>
                         </div>
                       </div>
@@ -944,7 +937,7 @@ export default function MeetingReportsPage() {
                     <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-teal-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser Compte rendus IA ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        Pour utiliser Compte rendus IA, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via meeting-reports.iahome.fr. Enregistrez vos réunions en temps réel avec le microphone intégré, ou uploadez des fichiers audio existants (MP3, WAV, WebM). L'IA transcrit automatiquement l'audio avec Whisper, puis génère un résumé intelligent avec GPT incluant les points clés, les décisions prises et les actions à suivre. Vous pouvez ensuite télécharger le rapport en PDF ou Markdown.
+                        Pour utiliser Compte rendus IA, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via meeting-reports.iahome.fr. Enregistrez vos réunions en temps réel avec le microphone intégré, ou uploadez des fichiers audio existants (MP3, WAV, WebM). L'IA transcrit automatiquement l'audio avec Whisper, puis génère un résumé intelligent avec GPT incluant les points clés, les décisions prises et les actions à suivre. Vous pouvez ensuite télécharger le rapport en PDF ou Markdown.
                       </p>
                     </div>
                     
@@ -958,7 +951,7 @@ export default function MeetingReportsPage() {
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-blue-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Compte rendus IA est-il gratuit ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        L'activation de Compte rendus IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : enregistrement audio, transcription automatique, résumé intelligent, identification des intervenants, extraction des points clés, et export PDF/Markdown. Il n'y a pas de frais supplémentaires pour le traitement des réunions.
+                        L'accès de Compte rendus IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : enregistrement audio, transcription automatique, résumé intelligent, identification des intervenants, extraction des points clés, et export PDF/Markdown. Il n'y a pas de frais supplémentaires pour le traitement des réunions.
                       </p>
                     </div>
                     
@@ -1274,7 +1267,7 @@ export default function MeetingReportsPage() {
         </div>
       )}
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId={card?.id || 'meeting-reports'}
         moduleName="Meeting Reports"
@@ -1297,3 +1290,8 @@ export default function MeetingReportsPage() {
     </div>
   );
 }
+
+
+
+
+

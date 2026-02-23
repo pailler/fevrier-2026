@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
           // Vérifier que le module est bien ruinedfooocus
           if (gradioToken.moduleId !== 'ruinedfooocus') {
             console.log('❌ Token pour un autre module:', gradioToken.moduleId);
-            return NextResponse.redirect('https://iahome.fr/encours?error=invalid_module', 302);
+            return NextResponse.redirect('https://iahome.fr/account?error=invalid_module', 302);
           }
           
           // Vérifier l'accès utilisateur au module
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
           if (!canAccess) {
             const reason = await securityService.getAccessDenialReason(gradioToken.userId, 'ruinedfooocus');
             console.log('❌ Accès refusé:', reason);
-            return NextResponse.redirect(`https://iahome.fr/encours?error=access_denied&reason=${encodeURIComponent(reason)}`, 302);
+            return NextResponse.redirect(`https://iahome.fr/account?error=access_denied&reason=${encodeURIComponent(reason)}`, 302);
           }
           
           console.log('✅ Accès autorisé, redirection vers RuinedFooocus');
@@ -70,19 +70,19 @@ export async function GET(request: NextRequest) {
         // Vérifier que le module est bien ruinedfooocus
         if (decoded.moduleId && decoded.moduleId !== 'ruinedfooocus') {
           console.log('❌ Token pour un autre module:', decoded.moduleId);
-          return NextResponse.redirect('https://iahome.fr/encours?error=invalid_module', 302);
+          return NextResponse.redirect('https://iahome.fr/account?error=invalid_module', 302);
         }
         
         // Vérifier l'expiration
         if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
           console.log('❌ Token expiré');
-          return NextResponse.redirect('https://iahome.fr/encours?error=token_expired', 302);
+          return NextResponse.redirect('https://iahome.fr/account?error=token_expired', 302);
         }
         
         const userId = decoded.userId || decoded.user_id;
         if (!userId) {
           console.log('❌ Token sans userId');
-          return NextResponse.redirect('https://iahome.fr/encours?error=invalid_token', 302);
+          return NextResponse.redirect('https://iahome.fr/account?error=invalid_token', 302);
         }
         
         // Vérifier l'accès utilisateur au module
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
         if (!canAccess) {
           const reason = await securityService.getAccessDenialReason(userId, 'ruinedfooocus');
           console.log('❌ Accès refusé:', reason);
-          return NextResponse.redirect(`https://iahome.fr/encours?error=access_denied&reason=${encodeURIComponent(reason)}`, 302);
+          return NextResponse.redirect(`https://iahome.fr/account?error=access_denied&reason=${encodeURIComponent(reason)}`, 302);
         }
         
         console.log('✅ Accès autorisé, redirection vers RuinedFooocus');
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
       
       if (tokenError || !tokenData) {
         console.log('❌ Token non trouvé dans la base de données');
-        return NextResponse.redirect('https://iahome.fr/encours?error=invalid_token', 302);
+        return NextResponse.redirect('https://iahome.fr/account?error=invalid_token', 302);
       }
       
       // Vérifier l'expiration du token
@@ -127,18 +127,18 @@ export async function GET(request: NextRequest) {
         
         if (expirationDate <= now) {
           console.log('❌ Token expiré');
-          return NextResponse.redirect('https://iahome.fr/encours?error=token_expired', 302);
+          return NextResponse.redirect('https://iahome.fr/account?error=token_expired', 302);
         }
       }
       
-      // Vérifier que le module ruinedfooocus est visible dans /encours pour cet utilisateur
+      // Vérifier que le module ruinedfooocus est visible dans /account pour cet utilisateur
       const securityService = ModuleSecurityService.getInstance();
       const canAccess = await securityService.canAccessExternalApp(tokenData.created_by, 'ruinedfooocus');
       
       if (!canAccess) {
         const reason = await securityService.getAccessDenialReason(tokenData.created_by, 'ruinedfooocus');
         console.log('❌ Accès refusé:', reason);
-        return NextResponse.redirect(`https://iahome.fr/encours?error=access_denied&reason=${encodeURIComponent(reason)}`, 302);
+        return NextResponse.redirect(`https://iahome.fr/account?error=access_denied&reason=${encodeURIComponent(reason)}`, 302);
       }
       
       console.log('✅ Token valide et accès autorisé pour:', tokenData.created_by);
@@ -203,14 +203,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect('https://iahome.fr/login?error=invalid_session', 302);
     }
     
-    // Vérifier que le module ruinedfooocus est visible dans /encours pour cet utilisateur
+    // Vérifier que le module ruinedfooocus est visible dans /account pour cet utilisateur
     const securityService = ModuleSecurityService.getInstance();
     const canAccess = await securityService.canAccessExternalApp(session.user.id, 'ruinedfooocus');
     
     if (!canAccess) {
       const reason = await securityService.getAccessDenialReason(session.user.id, 'ruinedfooocus');
-      console.log('❌ Module non visible dans /encours:', reason);
-      return NextResponse.redirect(`https://iahome.fr/encours?error=module_not_visible&reason=${encodeURIComponent(reason)}`, 302);
+      console.log('❌ Module non visible dans /account:', reason);
+      return NextResponse.redirect(`https://iahome.fr/account?error=module_not_visible&reason=${encodeURIComponent(reason)}`, 302);
     }
     
     console.log('✅ Accès autorisé pour utilisateur:', session.user.email);
@@ -329,3 +329,4 @@ export async function OPTIONS() {
     },
   });
 }
+

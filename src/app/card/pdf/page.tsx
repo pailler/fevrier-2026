@@ -109,7 +109,7 @@ export default function PDFPage() {
           "name": "Est-ce gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'IA PDF de IA Home est accessible avec un système de tokens. 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Consultez la page d'activation pour connaître les détails de tarification et les options disponibles."
+            "text": "L'IA PDF de IA Home est accessible avec un système de tokens. 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Consultez la page d'accès pour connaître les détails de tarification et les options disponibles."
           }
         },
         {
@@ -344,7 +344,7 @@ export default function PDFPage() {
               <button
                 onClick={async () => {
                   if (isAuthenticated && user) {
-                    // Utilisateur connecté : activer PDF+ via API
+                    // Utilisateur connecté : Accéder à PDF+ via API
                     try {
                       const response = await fetch('/api/activate-pdf', {
                         method: 'POST',
@@ -360,20 +360,38 @@ export default function PDFPage() {
                       if (response.ok) {
                         const data = await response.json();
                         if (data.success) {
-                          console.log('✅ PDF+ activé avec succès');
-                          // Rediriger vers la page des modules actifs
-                          router.push('/encours');
+                          console.log('✅ PDF+ accessible avec succès');
+                          const tokenResponse = await fetch('/api/generate-access-token', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              userId: user.id,
+                              userEmail: user.email,
+                              moduleId: 'pdf',
+                            }),
+                          });
+                          if (!tokenResponse.ok) {
+                            const tokenError = await tokenResponse.json().catch(() => ({ error: 'Erreur inconnue' }));
+                            throw new Error(tokenError.error || 'Erreur génération token');
+                          }
+                          const tokenData = await tokenResponse.json();
+                          if (!tokenData?.token) {
+                            throw new Error('Token d\'accès manquant');
+                          }
+                          window.open(`https://pdf.iahome.fr?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
                         } else {
-                          console.error('❌ Erreur activation PDF+:', data.error);
-                          alert('Erreur lors de l\'activation de PDF+: ' + data.error);
+                          console.error('❌ Erreur accès PDF+:', data.error);
+                          alert('Erreur lors de l\'accès de PDF+: ' + data.error);
                         }
                       } else {
                         console.error('❌ Erreur réponse API:', response.status);
-                        alert('Erreur lors de l\'activation de PDF+');
+                        alert('Erreur lors de l\'accès de PDF+');
                       }
                     } catch (error) {
-                      console.error('❌ Erreur lors de l\'activation de PDF+:', error);
-                      alert('Erreur lors de l\'activation de PDF+');
+                      console.error('❌ Erreur lors de l\'accès de PDF+:', error);
+                      alert('Erreur lors de l\'accès de PDF+');
                     }
                   } else {
                     // Utilisateur non connecté : aller à la page de connexion puis retour à PDF+
@@ -385,7 +403,7 @@ export default function PDFPage() {
               >
                 <span className="text-xl">📄</span>
                 <span>
-                  {isAuthenticated && user ? 'Activez PDF+ (10 tokens par accès)' : 'Connectez-vous pour activer PDF+ (10 tokens par accès)'}
+                  {isAuthenticated && user ? 'Accédez à PDF+ (10 tokens par accès)' : 'Connectez-vous pour accéder PDF+ (10 tokens par accès)'}
                 </span>
               </button>
             </div>
@@ -627,7 +645,7 @@ export default function PDFPage() {
                   <div className="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-2xl border-l-4 border-red-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Est-ce gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'IA PDF de IA Home est accessible avec un système de tokens. 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Consultez la page d'activation pour connaître les détails de tarification et les options disponibles.
+                      L'IA PDF de IA Home est accessible avec un système de tokens. 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Consultez la page d'accès pour connaître les détails de tarification et les options disponibles.
                     </p>
                   </div>
                   
@@ -906,7 +924,7 @@ export default function PDFPage() {
          </div>
        )}
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId="pdf"
         moduleName="PDF Tools"
@@ -919,3 +937,8 @@ export default function PDFPage() {
     </div>
   );
 }
+
+
+
+
+

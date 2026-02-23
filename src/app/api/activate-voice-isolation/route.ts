@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
         price: 100,
         url: '/voice-isolation',
         image_url: '/images/voice-isolation.jpg',
-        is_visible: true, // Important : rendre le module visible dans /encours
+        is_visible: true, // Important : rendre le module visible dans /account
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -344,3 +344,4 @@ export async function POST(request: NextRequest) {
     }, { status: 500 });
   }
 }
+

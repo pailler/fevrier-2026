@@ -175,7 +175,7 @@ export default function PaymentSuccessPage() {
 
             <div className="space-y-4">
               <Link
-                href="/encours"
+                href="/account"
                 className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
               >
                 Voir mes tokens

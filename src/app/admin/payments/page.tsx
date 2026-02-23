@@ -175,12 +175,12 @@ const supabase = getSupabaseClient();
       if (!res.ok) {
         throw new Error(data.error || data.details || `Erreur ${res.status}`);
       }
-      setPromoMessage({ type: 'success', text: data.message || 'Code BIENVENUE10 activé.' });
+      setPromoMessage({ type: 'success', text: data.message || 'Code BIENVENUE10 accessible.' });
       loadPromoCodes();
     } catch (e) {
       setPromoMessage({
         type: 'error',
-        text: e instanceof Error ? e.message : "Erreur lors de l'activation",
+        text: e instanceof Error ? e.message : "Erreur lors de l'accès",
       });
     } finally {
       setActivating(false);
@@ -202,7 +202,7 @@ const supabase = getSupabaseClient();
       }
       setPromoMessage({
         type: 'success',
-        text: data.active ? `${data.code} activé` : `${data.code} désactivé`,
+        text: data.active ? `${data.code} accessible` : `${data.code} suspendu`,
       });
       loadPromoCodes();
     } catch (e) {
@@ -297,10 +297,10 @@ const supabase = getSupabaseClient();
               className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {activating
-                ? 'Activation...'
+                ? 'accès...'
                 : bienvenue10?.active
                   ? 'BIENVENUE10 déjà actif'
-                  : 'Activer le code BIENVENUE10 (-2€)'}
+                  : 'accéder à le code BIENVENUE10 (-2€)'}
             </button>
           </div>
           {promoMessage && (
@@ -320,7 +320,7 @@ const supabase = getSupabaseClient();
             </div>
           ) : promoCodes.length === 0 ? (
             <p className="text-gray-500 py-4">
-              Aucun code promo. Cliquez sur « Activer le code BIENVENUE10 » pour en créer un.
+              Aucun code promo. Cliquez sur « accéder à le code BIENVENUE10 » pour en créer un.
             </p>
           ) : (
             <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow">
@@ -365,7 +365,7 @@ const supabase = getSupabaseClient();
                           disabled={togglingId === p.id}
                           className="text-blue-600 hover:underline disabled:opacity-50"
                         >
-                          {togglingId === p.id ? '...' : p.active ? 'Désactiver' : 'Activer'}
+                          {togglingId === p.id ? '...' : p.active ? 'suspendre' : 'accéder à'}
                         </button>
                       </td>
                     </tr>
@@ -586,4 +586,7 @@ const supabase = getSupabaseClient();
     </div>
   );
 }
+
+
+
 

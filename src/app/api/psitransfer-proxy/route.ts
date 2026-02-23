@@ -23,7 +23,7 @@ function wrapWithIAHomeBanner(html: string): string {
               <span style="color: #c7d2fe;">•</span>
               <span style="background: rgba(255, 255, 255, 0.2); padding: 0.375rem 0.75rem; border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.3);">PsiTransfer</span>
             </div>
-            <a href="/encours" style="display: flex; align-items: center; gap: 0.5rem; color: white; font-weight: 600; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; transition: all 0.3s; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3);" onmouseover="this.style.background='rgba(255, 255, 255, 0.25)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.15)'; this.style.transform='translateY(0)'">
+            <a href="/account" style="display: flex; align-items: center; gap: 0.5rem; color: white; font-weight: 600; padding: 0.5rem 1rem; border-radius: 0.5rem; text-decoration: none; transition: all 0.3s; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3);" onmouseover="this.style.background='rgba(255, 255, 255, 0.25)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.15)'; this.style.transform='translateY(0)'">
               <span style="font-size: 1.1rem;">📱</span>
               <span>Mes applis</span>
             </a>
@@ -309,4 +309,5 @@ export async function OPTIONS(request: NextRequest) {
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
+
 

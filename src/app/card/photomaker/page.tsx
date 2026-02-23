@@ -71,12 +71,12 @@ export default function PhotoMakerPage() {
   // Vérifier si c'est un module gratuit
   const isFreeModule = false; // PhotoMaker est payant
 
-  // Fonction pour vérifier si un module est déjà activé
+  // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
     if (!session?.user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-activation', {
+      const response = await fetch('/api/check-module-accès', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -161,7 +161,7 @@ export default function PhotoMakerPage() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Récupérer les abonnements de l'utilisateur et vérifier l'activation du module
+  // Récupérer les abonnements de l'utilisateur et vérifier l'accès du module
   useEffect(() => {
     const fetchUserData = async () => {
       if (!session?.user?.id) {
@@ -204,7 +204,7 @@ export default function PhotoMakerPage() {
 
         setUserSubscriptions(subscriptions);
 
-        // Vérifier si le module actuel est déjà activé dans user_applications
+        // Vérifier si le module actuel est déjà accessible dans user_applications
         if (card?.id) {
           setCheckingActivation(true);
           const isActivated = await checkModuleActivation(card.id);
@@ -284,7 +284,7 @@ export default function PhotoMakerPage() {
           "name": "Comment utiliser PhotoMaker ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour utiliser PhotoMaker, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via photomaker.iahome.fr. Téléchargez une ou plusieurs photos de la personne que vous souhaitez personnaliser, entrez un prompt textuel détaillé, et PhotoMaker génère automatiquement des portraits personnalisés avec une fidélité d'identité exceptionnelle."
+            "text": "Pour utiliser PhotoMaker, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via photomaker.iahome.fr. Téléchargez une ou plusieurs photos de la personne que vous souhaitez personnaliser, entrez un prompt textuel détaillé, et PhotoMaker génère automatiquement des portraits personnalisés avec une fidélité d'identité exceptionnelle."
           }
         },
         {
@@ -300,7 +300,7 @@ export default function PhotoMakerPage() {
           "name": "PhotoMaker est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation de PhotoMaker coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : personnalisation rapide, fidélité d'identité impressionnante, pas d'entraînement LoRA requis, et génération de haute qualité."
+            "text": "L'accès de PhotoMaker coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : personnalisation rapide, fidélité d'identité impressionnante, pas d'entraînement LoRA requis, et génération de haute qualité."
           }
         },
         {
@@ -570,19 +570,19 @@ export default function PhotoMakerPage() {
             <div className="space-y-6">
               {/* Boutons d'action */}
               <div className="space-y-4">
-                {/* Message si le module est déjà activé */}
+                {/* Message si le module est déjà accessible */}
                 {alreadyActivatedModules.includes(card.id) && (
                   <div className="w-3/4 mx-auto bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
                     <div className="flex items-center justify-center space-x-3 text-green-800">
                       <span className="text-2xl">✅</span>
                       <div className="text-center">
-                        <p className="font-semibold">Application déjà activée !</p>
+                        <p className="font-semibold">Accès direct disponible</p>
                         <p className="text-sm opacity-80">Vous pouvez accéder à cette application depuis vos applications</p>
                       </div>
                     </div>
                     <div className="mt-3 text-center">
                       <button
-                        onClick={() => router.push('/encours')}
+                        onClick={() => accessModuleWithJWT(card.title, card.id)}
                         className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
                       >
                         <span className="mr-2">📱</span>
@@ -592,7 +592,7 @@ export default function PhotoMakerPage() {
                   </div>
                 )}
 
-{/* Bouton d'activation avec tokens */}
+{/* Bouton d'accès avec tokens */}
                 {!alreadyActivatedModules.includes(card.id) && (
                   <div className="w-3/4 mx-auto">
                     <ModuleActivationButton
@@ -602,16 +602,16 @@ export default function PhotoMakerPage() {
                       moduleDescription={card.description}
                       onActivationSuccess={() => {
                         setAlreadyActivatedModules(prev => [...prev, card.id]);
-                        alert(`✅ Application ${card.title} activée avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
+                        alert(`✅ Application ${card.title} accessible avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
                       }}
                       onActivationError={(error) => {
-                        console.error('Erreur activation:', error);
+                        console.error('Erreur accès:', error);
                       }}
                     />
                   </div>
                 )}
 
-                {/* Bouton "Payer et activer" pour les modules payants */}
+                {/* Bouton "Accéder maintenant" pour les modules payants */}
                 {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (
                   <button 
                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
@@ -621,9 +621,9 @@ export default function PhotoMakerPage() {
                         return;
                       }
 
-                      // Vérifier si le module est déjà activé avant de procéder au paiement
+                      // Vérifier si le module est déjà accessible avant de procéder au paiement
                       if (alreadyActivatedModules.includes(card.id)) {
-                        alert(`ℹ️ L'application ${card.title} est déjà activée ! Vous pouvez l'utiliser depuis vos applications.`);
+                        alert(`ℹ️ L'application ${card.title} est déjà accessible ! Vous pouvez l'utiliser depuis vos applications.`);
                         return;
                       }
 
@@ -637,7 +637,7 @@ export default function PhotoMakerPage() {
                             items: [card],
                             customerEmail: user?.email || '',
                             type: 'payment',
-                            testMode: false, // Mode production activé
+                            testMode: false, // Mode production accessible
                           }),
                         });
 
@@ -657,12 +657,12 @@ export default function PhotoMakerPage() {
                           throw new Error('URL de session Stripe manquante.');
                         }
                       } catch (error) {
-                        alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                        alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                       }
                     }}
                   >
                     <span className="text-xl">💳</span>
-                    <span>Payer et activer {card.title}</span>
+                    <span>Accéder maintenant {card.title}</span>
                   </button>
                 )}
               </div>
@@ -813,9 +813,9 @@ export default function PhotoMakerPage() {
                       <div className="flex items-start">
                         <div className="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
                         <div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-2">Activer PhotoMaker</h3>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à PhotoMaker</h3>
                           <p className="text-gray-700 leading-relaxed">
-                            Activez PhotoMaker avec 100 tokens. Une fois activé, le service est accessible depuis vos applications actives via photomaker.iahome.fr.
+                            Accédez à PhotoMaker avec 100 tokens. L'accès est immédiat, le service est accessible depuis vos applications via photomaker.iahome.fr.
                           </p>
                         </div>
                       </div>
@@ -954,7 +954,7 @@ export default function PhotoMakerPage() {
                     <div className="bg-gradient-to-r from-rose-50 to-red-50 p-6 rounded-2xl border-l-4 border-rose-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser PhotoMaker ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        Pour utiliser PhotoMaker, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via photomaker.iahome.fr. Téléchargez une ou plusieurs photos de la personne que vous souhaitez personnaliser, entrez un prompt textuel détaillé, et PhotoMaker génère automatiquement des portraits personnalisés avec une fidélité d'identité exceptionnelle.
+                        Pour utiliser PhotoMaker, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via photomaker.iahome.fr. Téléchargez une ou plusieurs photos de la personne que vous souhaitez personnaliser, entrez un prompt textuel détaillé, et PhotoMaker génère automatiquement des portraits personnalisés avec une fidélité d'identité exceptionnelle.
                       </p>
                     </div>
                     
@@ -968,7 +968,7 @@ export default function PhotoMakerPage() {
                     <div className="bg-gradient-to-r from-fuchsia-50 to-pink-50 p-6 rounded-2xl border-l-4 border-fuchsia-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">PhotoMaker est-il gratuit ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        L'activation de PhotoMaker coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : personnalisation rapide, fidélité d'identité impressionnante, pas d'entraînement LoRA requis, et génération de haute qualité.
+                        L'accès de PhotoMaker coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : personnalisation rapide, fidélité d'identité impressionnante, pas d'entraînement LoRA requis, et génération de haute qualité.
                       </p>
                     </div>
                     
@@ -1145,7 +1145,7 @@ export default function PhotoMakerPage() {
         </div>
       )}
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId={card?.id || 'photomaker'}
         moduleName="PhotoMaker"
@@ -1174,3 +1174,8 @@ export default function PhotoMakerPage() {
     </div>
   );
 }
+
+
+
+
+

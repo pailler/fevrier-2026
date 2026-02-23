@@ -61,14 +61,14 @@ export default function EmailPreviewPage() {
 
   const getDefaultTemplate = () => {
     return {
-      subject: 'Bienvenue sur IAHome ! Activez votre premier module et recevez 200 tokens bonus !',
+      subject: 'Bienvenue sur IAHome ! Accédez à votre premier module et recevez 200 tokens bonus !',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
           <div style="background-color: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <h1 style="color: #2563eb; margin-top: 0; font-size: 28px;">Bienvenue sur IAHome, {{user_name}} ! 🎉</h1>
             
             <p style="color: #374151; font-size: 16px; line-height: 1.6;">
-              Nous avons remarqué que vous vous êtes inscrit(e) récemment mais que vous n'avez pas encore activé de module.
+              Nous avons remarqué que vous vous êtes inscrit(e) récemment mais que vous n'avez pas encore accessible de module.
             </p>
             
             <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0; border-radius: 4px;">
@@ -76,12 +76,12 @@ export default function EmailPreviewPage() {
                 🎁 Offre spéciale : 200 tokens bonus !
               </p>
               <p style="color: #78350f; font-size: 14px; margin: 0;">
-                Activez votre premier module dans les <strong>3 prochains jours</strong> et recevez automatiquement <strong>200 tokens supplémentaires</strong> sur votre compte !
+                Accédez à votre premier module dans les <strong>3 prochains jours</strong> et recevez automatiquement <strong>200 tokens supplémentaires</strong> sur votre compte !
               </p>
             </div>
             
             <h2 style="color: #1f2937; font-size: 20px; margin-top: 32px; margin-bottom: 16px;">
-              📚 Comment activer votre premier module ? (4 étapes simples)
+              📚 Comment accéder à votre premier module ? (4 étapes simples)
             </h2>
             
             <div style="margin: 24px 0;">
@@ -124,10 +124,10 @@ export default function EmailPreviewPage() {
                   </div>
                   <div>
                     <p style="color: #1f2937; font-weight: 600; margin: 0 0 4px 0; font-size: 16px;">
-                      Cliquez sur "Activer" ou "Accéder"
+                      Cliquez sur "accéder à" ou "Accéder"
                     </p>
                     <p style="color: #6b7280; margin: 0; font-size: 14px;">
-                      Choisissez le module qui vous intéresse et cliquez sur le bouton d'activation. Les tokens nécessaires seront automatiquement débités de votre compte.
+                      Choisissez le module qui vous intéresse et cliquez sur le bouton d'accès. Les tokens nécessaires seront automatiquement débités de votre compte.
                     </p>
                   </div>
                 </div>
@@ -143,7 +143,7 @@ export default function EmailPreviewPage() {
                       Cliquez sur "Mes applis" dans la bannière
                     </p>
                     <p style="color: #6b7280; margin: 0; font-size: 14px;">
-                      Une fois le module activé, cliquez sur "Mes applis" dans la bannière en haut de la page pour accéder à toutes vos applications activées.
+                      Une fois le module accessible, cliquez sur "Mes applis" dans la bannière en haut de la page pour accéder à toutes vos applications accessibles.
                     </p>
                   </div>
                 </div>
@@ -158,7 +158,7 @@ export default function EmailPreviewPage() {
             
             <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 16px; margin: 24px 0; border-radius: 4px;">
               <p style="color: #065f46; font-size: 14px; margin: 0;">
-                <strong>💡 Astuce :</strong> Vous avez déjà reçu des tokens de bienvenue lors de votre inscription. Vous pouvez les utiliser pour activer votre premier module dès maintenant !
+                <strong>💡 Astuce :</strong> Vous avez déjà reçu des tokens de bienvenue lors de votre inscription. Vous pouvez les utiliser pour accéder à votre premier module dès maintenant !
               </p>
             </div>
             
@@ -175,7 +175,7 @@ export default function EmailPreviewPage() {
             
             <p style="color: #9ca3af; font-size: 12px; margin: 0; text-align: center;">
               Cet email a été envoyé automatiquement par IAHome.<br>
-              Vous avez reçu cet email car vous êtes inscrit(e) sur IAHome mais n'avez pas encore activé de module.
+              Vous avez reçu cet email car vous êtes inscrit(e) sur IAHome mais n'avez pas encore accessible de module.
             </p>
           </div>
         </div>
@@ -212,7 +212,7 @@ export default function EmailPreviewPage() {
                 Aperçu du modèle d'email
               </h1>
               <p className="text-gray-600">
-                Prévisualisation du mail "Sans module activé"
+                Prévisualisation du mail "Sans module accessible"
               </p>
             </div>
             <div className="flex items-center space-x-4">
@@ -295,4 +295,7 @@ export default function EmailPreviewPage() {
     </div>
   );
 }
+
+
+
 

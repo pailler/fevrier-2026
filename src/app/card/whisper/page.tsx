@@ -47,12 +47,12 @@ export default function WhisperPage() {
   // Whisper IA est un module payant
   const isFreeModule = false;
 
-  // Fonction pour vérifier si un module est déjà activé
+  // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
     if (!session?.user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-activation', {
+      const response = await fetch('/api/check-module-accès', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export default function WhisperPage() {
         return result.isActivated || false;
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification d\'activation:', error);
+      console.error('Erreur lors de la vérification d\'accès:', error);
     }
     return false;
   }, [session?.user?.id]);
@@ -81,32 +81,31 @@ export default function WhisperPage() {
     }
 
     try {
-      // Générer un JWT pour l'accès au module
-      const response = await fetch('/api/generate-module-jwt', {
+      // Générer un token d'accès (décompte tokens inclus)
+      const response = await fetch('/api/generate-access-token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          moduleId: moduleId,
+          moduleId,
           userId: session.user.id,
-          moduleUrl: moduleUrl
+          userEmail: session.user.email,
         }),
       });
 
       if (response.ok) {
         const { token } = await response.json();
-        const urlWithToken = `${moduleUrl}?token=${token}`;
+        const separator = moduleUrl.includes('?') ? '&' : '?';
+        const urlWithToken = `${moduleUrl}${separator}token=${encodeURIComponent(token)}`;
         window.open(urlWithToken, '_blank');
       } else {
-        console.error('Erreur lors de la génération du JWT');
-        // Fallback: ouvrir directement l'URL
-        window.open(moduleUrl, '_blank');
+        const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
+        throw new Error(errorData.error || 'Erreur lors de la génération du token d\'accès');
       }
     } catch (error) {
       console.error('Erreur:', error);
-      // Fallback: ouvrir directement l'URL
-      window.open(moduleUrl, '_blank');
+      alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
   }, [session?.user?.id]);
 
@@ -175,7 +174,7 @@ export default function WhisperPage() {
 
         setUserSubscriptions(subscriptionsMap);
 
-        // Vérifier si le module actuel est déjà activé
+        // Vérifier si le module actuel est déjà accessible
         if (card?.id) {
           setCheckingActivation(true);
           const isActivated = await checkModuleActivation(card.id);
@@ -257,7 +256,7 @@ export default function WhisperPage() {
           "name": "Comment utiliser Whisper IA ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour utiliser Whisper IA, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via whisper.iahome.fr. Uploadez vos fichiers audio, vidéo ou images, sélectionnez la langue si nécessaire, et l'IA génère automatiquement la transcription ou la reconnaissance de texte. Vous pouvez ensuite télécharger le résultat en format texte ou l'utiliser directement dans votre workflow."
+            "text": "Pour utiliser Whisper IA, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via whisper.iahome.fr. Uploadez vos fichiers audio, vidéo ou images, sélectionnez la langue si nécessaire, et l'IA génère automatiquement la transcription ou la reconnaissance de texte. Vous pouvez ensuite télécharger le résultat en format texte ou l'utiliser directement dans votre workflow."
           }
         },
         {
@@ -273,7 +272,7 @@ export default function WhisperPage() {
           "name": "Whisper IA est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation de Whisper IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : transcription audio/vidéo, reconnaissance de texte (OCR), support multilingue, et interface moderne. Il n'y a pas de frais supplémentaires pour le traitement des fichiers."
+            "text": "L'accès de Whisper IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : transcription audio/vidéo, reconnaissance de texte (OCR), support multilingue, et interface moderne. Il n'y a pas de frais supplémentaires pour le traitement des fichiers."
           }
         },
         {
@@ -378,7 +377,7 @@ export default function WhisperPage() {
     try {
       setIsActivating(true);
       
-      // Appeler l'API pour activer le module Whisper
+      // Appeler l'API pour Accéder à le module Whisper
       const response = await fetch('/api/activate-whisper', {
         method: 'POST',
         headers: {
@@ -397,18 +396,18 @@ export default function WhisperPage() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Erreur lors de l\'activation du module');
+        throw new Error(result.error || 'Erreur lors de l\'accès du module');
       }
 
-      // Ajouter le module aux modules activés
+      // Ajouter le module aux modules accessibles
       setAlreadyActivatedModules(prev => [...prev, card.id]);
       
       // Rediriger vers la page de transition
-      router.push('/encours');
+      handleQuickAccess();
       
     } catch (error) {
-      console.error('Erreur lors de l\'activation du module:', error);
-      alert('Erreur lors de l\'activation du module. Veuillez réessayer.');
+      console.error('Erreur lors de l\'accès du module:', error);
+      alert('Erreur lors de l\'accès du module. Veuillez réessayer.');
     } finally {
       setIsActivating(false);
     }
@@ -416,11 +415,7 @@ export default function WhisperPage() {
 
   const handleQuickAccess = () => {
     if (card?.url) {
-      if (isFreeModule) {
-        window.open(card.url, '_blank');
-      } else {
-        accessModuleWithJWT(card.id, card.url);
-      }
+      accessModuleWithJWT(card.id, card.url);
     }
   };
 
@@ -621,19 +616,19 @@ export default function WhisperPage() {
             <div className="space-y-6">
               {/* Boutons d'action */}
               <div className="space-y-4">
-                {/* Message si le module est déjà activé */}
+                {/* Message si le module est déjà accessible */}
                 {alreadyActivatedModules.includes(card?.id || '') && (
                   <div className="w-3/4 mx-auto bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
                     <div className="flex items-center justify-center space-x-3 text-green-800">
                       <span className="text-2xl">✅</span>
                       <div className="text-center">
-                        <p className="font-semibold">Application déjà activée !</p>
+                        <p className="font-semibold">Accès direct disponible</p>
                         <p className="text-sm opacity-80">Vous pouvez accéder à cette application depuis vos applications</p>
                       </div>
                     </div>
                     <div className="mt-3 text-center">
                       <button
-                        onClick={() => router.push('/encours')}
+                        onClick={handleQuickAccess}
                         className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
                       >
                         <span className="mr-2">📱</span>
@@ -643,20 +638,20 @@ export default function WhisperPage() {
                   </div>
                 )}
 
-                {/* Bouton d'activation avec tokens */}
+                {/* Bouton d'accès avec tokens */}
                 {!alreadyActivatedModules.includes(card?.id || '') && (
                   <div className="w-3/4 mx-auto">
                     <ModuleActivationButton
                       moduleId={card?.id || 'whisper'}
                       moduleName={card?.title || 'Whisper'}
                       moduleCost={100}
-                      moduleDescription={card?.description || 'Application Whisper activée'}
+                      moduleDescription={card?.description || 'Application Whisper accessible'}
                       onActivationSuccess={() => {
                         setAlreadyActivatedModules(prev => [...prev, card?.id || 'whisper']);
-                        alert(`✅ Application ${card?.title || 'Whisper'} activée avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
+                        alert(`✅ Application ${card?.title || 'Whisper'} accessible avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
                       }}
                       onActivationError={(error) => {
-                        console.error('Erreur activation:', error);
+                        console.error('Erreur accès:', error);
                       }}
                     />
                   </div>
@@ -673,12 +668,12 @@ export default function WhisperPage() {
                       {isActivating ? (
                         <>
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                          <span>Activation...</span>
+                          <span>accès...</span>
                         </>
                       ) : (
                         <>
                           <span className="text-xl">⚡</span>
-                          <span>Activer {card?.title}</span>
+                          <span>Accéder à {card?.title}</span>
                         </>
                       )}
                     </button>
@@ -796,9 +791,9 @@ export default function WhisperPage() {
                       <div className="flex items-start">
                         <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
                         <div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-2">Activer Whisper IA</h3>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à Whisper IA</h3>
                           <p className="text-gray-700 leading-relaxed">
-                            Activez Whisper IA avec 100 tokens. Une fois activé, le service est accessible depuis vos applications actives via whisper.iahome.fr.
+                            Accédez à Whisper IA avec 100 tokens. L'accès est immédiat, le service est accessible depuis vos applications via whisper.iahome.fr.
                           </p>
                         </div>
                       </div>
@@ -937,7 +932,7 @@ export default function WhisperPage() {
                     <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser Whisper IA ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        Pour utiliser Whisper IA, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via whisper.iahome.fr. Uploadez vos fichiers audio, vidéo ou images, sélectionnez la langue si nécessaire, et l'IA génère automatiquement la transcription ou la reconnaissance de texte. Vous pouvez ensuite télécharger le résultat en format texte ou l'utiliser directement dans votre workflow.
+                        Pour utiliser Whisper IA, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via whisper.iahome.fr. Uploadez vos fichiers audio, vidéo ou images, sélectionnez la langue si nécessaire, et l'IA génère automatiquement la transcription ou la reconnaissance de texte. Vous pouvez ensuite télécharger le résultat en format texte ou l'utiliser directement dans votre workflow.
                       </p>
                     </div>
                     
@@ -951,7 +946,7 @@ export default function WhisperPage() {
                     <div className="bg-gradient-to-r from-pink-50 to-rose-50 p-6 rounded-2xl border-l-4 border-pink-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Whisper IA est-il gratuit ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        L'activation de Whisper IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : transcription audio/vidéo, reconnaissance de texte (OCR), support multilingue, et interface moderne. Il n'y a pas de frais supplémentaires pour le traitement des fichiers.
+                        L'accès de Whisper IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : transcription audio/vidéo, reconnaissance de texte (OCR), support multilingue, et interface moderne. Il n'y a pas de frais supplémentaires pour le traitement des fichiers.
                       </p>
                     </div>
                     
@@ -1265,7 +1260,7 @@ export default function WhisperPage() {
         </div>
       )}
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId={card?.id || 'whisper'}
         moduleName="Whisper IA"
@@ -1288,3 +1283,7 @@ export default function WhisperPage() {
     </div>
   );
 }
+
+
+
+

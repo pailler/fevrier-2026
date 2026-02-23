@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       method: 'GET',
       headers: {
         'Host': 'librespeed.iahome.fr',
-        'Referer': 'https://iahome.fr/encours',
+        'Referer': 'https://iahome.fr/account',
         'Origin': 'https://iahome.fr',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
       }
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       method: 'GET',
       headers: {
         'Host': 'librespeed.iahome.fr',
-        'Referer': 'https://iahome.fr/encours',
+        'Referer': 'https://iahome.fr/account',
         'Origin': 'https://iahome.fr',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
       }
@@ -55,4 +55,5 @@ export async function GET(request: NextRequest) {
     }, { status: 500 });
   }
 }
+
 

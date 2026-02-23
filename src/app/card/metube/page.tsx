@@ -97,7 +97,7 @@ export default function MeTubePage() {
           "name": "Comment télécharger une vidéo YouTube avec MeTube ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour télécharger une vidéo YouTube avec MeTube, activez d'abord le service avec 10 tokens. Une fois activé, collez l'URL de la vidéo YouTube dans l'interface MeTube, choisissez la qualité et le format souhaités, puis lancez le téléchargement. La vidéo sera téléchargée sur vos serveurs de manière privée."
+            "text": "Pour télécharger une vidéo YouTube avec MeTube, accédez directement au service avec 10 tokens. L'accès est immédiat, collez l'URL de la vidéo YouTube dans l'interface MeTube, choisissez la qualité et le format souhaités, puis lancez le téléchargement. La vidéo sera téléchargée sur vos serveurs de manière privée."
           }
         },
         {
@@ -105,7 +105,7 @@ export default function MeTubePage() {
           "name": "MeTube est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "MeTube est un outil open-source et gratuit. L'activation du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez télécharger des vidéos YouTube sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking."
+            "text": "MeTube est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez télécharger des vidéos YouTube sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking."
           }
         },
         {
@@ -176,37 +176,39 @@ export default function MeTubePage() {
 
   // Fonction pour accéder au module avec JWT
   const accessModuleWithJWT = useCallback(async () => {
-    if (!user?.email) {
+    if (!user?.id || !user?.email) {
       return;
     }
 
     try {
-      const response = await fetch('/api/generate-module-access', {
+      const response = await fetch('/api/generate-access-token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          userId: user.id,
           userEmail: user.email,
           moduleId: 'metube',
-          moduleName: 'MeTube'
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        if (data.accessUrl) {
-          window.open(data.accessUrl, '_blank');
-        } else if (data.error) {
-          console.error('Erreur API:', data.error);
+        if (data?.token) {
+          window.open(`https://metube.iahome.fr?token=${encodeURIComponent(data.token)}`, '_blank');
+        } else {
+          throw new Error('Token d\'accès manquant');
         }
       } else {
-        console.error('Erreur de réponse API:', response.status);
+        const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
+        throw new Error(errorData.error || 'Erreur de réponse API');
       }
     } catch (error) {
       console.error('Erreur lors de l\'accès au module:', error);
+      alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
-  }, [user?.email]);
+  }, [user?.email, user?.id]);
 
 
   // Fonction pour ouvrir le modal iframe
@@ -364,7 +366,7 @@ export default function MeTubePage() {
               <button
                 onClick={async () => {
                   if (isAuthenticated && user) {
-                    // Utilisateur connecté : activer MeTube via API
+                    // Utilisateur connecté : Accéder à MeTube via API
                     try {
                       const response = await fetch('/api/activate-metube', {
                         method: 'POST',
@@ -380,21 +382,20 @@ export default function MeTubePage() {
                       if (response.ok) {
                         const data = await response.json();
                         if (data.success) {
-                          console.log('✅ MeTube activé avec succès');
+                          console.log('✅ MeTube accessible avec succès');
                           trackModuleActivation('metube', 'MeTube');
-                          // Rediriger vers la page des modules actifs
-                          router.push('/encours');
+                          await accessModuleWithJWT();
                         } else {
-                          console.error('❌ Erreur activation MeTube:', data.error);
-                          alert('Erreur lors de l\'activation de MeTube: ' + data.error);
+                          console.error('❌ Erreur accès MeTube:', data.error);
+                          alert('Erreur lors de l\'accès de MeTube: ' + data.error);
                         }
                       } else {
                         console.error('❌ Erreur réponse API:', response.status);
-                        alert('Erreur lors de l\'activation de MeTube');
+                        alert('Erreur lors de l\'accès de MeTube');
                       }
                     } catch (error) {
-                      console.error('❌ Erreur lors de l\'activation de MeTube:', error);
-                      alert('Erreur lors de l\'activation de MeTube');
+                      console.error('❌ Erreur lors de l\'accès de MeTube:', error);
+                      alert('Erreur lors de l\'accès de MeTube');
                     }
                   } else {
                     // Utilisateur non connecté : aller à la page de connexion puis retour à MeTube
@@ -406,7 +407,7 @@ export default function MeTubePage() {
               >
                 <span className="text-xl">🎥</span>
                 <span>
-                  {isAuthenticated && user ? 'Activez MeTube (10 tokens par accès)' : 'Connectez-vous pour activer MeTube (10 tokens par accès)'}
+                  {isAuthenticated && user ? 'Accédez à MeTube (10 tokens par accès)' : 'Connectez-vous pour accéder MeTube (10 tokens par accès)'}
                 </span>
               </button>
             </div>
@@ -526,9 +527,9 @@ export default function MeTubePage() {
                     <div className="flex items-start">
                       <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Activer MeTube</h3>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à MeTube</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Activez MeTube avec 10 tokens. Une fois activé, le service est accessible depuis vos applications actives.
+                          Accédez à MeTube avec 10 tokens. L'accès est immédiat, le service est accessible depuis vos applications.
                         </p>
                       </div>
                     </div>
@@ -664,14 +665,14 @@ export default function MeTubePage() {
                   <div className="bg-gradient-to-r from-pink-50 to-purple-50 p-6 rounded-2xl border-l-4 border-pink-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Comment télécharger une vidéo YouTube avec MeTube ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Pour télécharger une vidéo YouTube avec MeTube, activez d'abord le service avec 10 tokens. Une fois activé, collez l'URL de la vidéo YouTube dans l'interface MeTube, choisissez la qualité et le format souhaités, puis lancez le téléchargement. La vidéo sera téléchargée sur vos serveurs de manière privée.
+                      Pour télécharger une vidéo YouTube avec MeTube, accédez directement au service avec 10 tokens. L'accès est immédiat, collez l'URL de la vidéo YouTube dans l'interface MeTube, choisissez la qualité et le format souhaités, puis lancez le téléchargement. La vidéo sera téléchargée sur vos serveurs de manière privée.
                     </p>
                   </div>
                   
                   <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-purple-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">MeTube est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      MeTube est un outil open-source et gratuit. L'activation du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez télécharger des vidéos YouTube sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking.
+                      MeTube est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez télécharger des vidéos YouTube sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking.
                     </p>
                   </div>
                   
@@ -964,7 +965,7 @@ export default function MeTubePage() {
          </div>
        )}
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId="metube"
         moduleName="MeTube"
@@ -977,3 +978,8 @@ export default function MeTubePage() {
     </div>
   );
 }
+
+
+
+
+

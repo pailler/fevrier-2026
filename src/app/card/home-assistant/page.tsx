@@ -31,12 +31,12 @@ export default function HomeAssistantPage() {
     image: '/images/home-assistant-module.jpg',
   };
 
-  // Fonction pour vérifier si un module est déjà activé
+  // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
     if (!user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-activation', {
+      const response = await fetch('/api/check-module-accès', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,12 +52,47 @@ export default function HomeAssistantPage() {
         return result.isActivated || false;
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification de l\'activation:', error);
+      console.error('Erreur lors de la vérification de l\'accès:', error);
     }
     return false;
   }, [user?.id]);
 
-  // Charger les données du module Home Assistant et vérifier l'activation
+  const openHomeAssistantWithToken = useCallback(async () => {
+    if (!user?.id || !user?.email) {
+      router.push(`/login?redirect=${encodeURIComponent('/card/home-assistant')}`);
+      return;
+    }
+
+    const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const homeAssistantUrl = isDevelopment ? 'http://localhost:8123/' : 'https://homeassistant.iahome.fr';
+
+    const tokenResponse = await fetch('/api/generate-access-token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: user.id,
+        userEmail: user.email,
+        moduleId: 'home-assistant',
+      }),
+    });
+
+    if (!tokenResponse.ok) {
+      const tokenError = await tokenResponse.json().catch(() => ({ error: 'Erreur inconnue' }));
+      throw new Error(tokenError.error || 'Erreur génération token');
+    }
+
+    const tokenData = await tokenResponse.json();
+    if (!tokenData?.token) {
+      throw new Error('Token d\'accès manquant');
+    }
+
+    const separator = homeAssistantUrl.includes('?') ? '&' : '?';
+    window.open(`${homeAssistantUrl}${separator}token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
+  }, [router, user?.email, user?.id]);
+
+  // Charger les données du module Home Assistant et vérifier l'accès
   useEffect(() => {
     setCard(homeAssistantModule);
     setLoading(false);
@@ -112,7 +147,7 @@ export default function HomeAssistantPage() {
           "name": "Home Assistant est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Oui, Home Assistant est entièrement gratuit et open-source. Il n'y a aucun frais d'installation, aucun abonnement, et aucun coût caché. Vous avez juste besoin d'un Raspberry Pi ou d'un ordinateur pour l'héberger. Notre manuel et nos codes sont également fournis gratuitement après activation avec 100 tokens."
+            "text": "Oui, Home Assistant est entièrement gratuit et open-source. Il n'y a aucun frais d'installation, aucun abonnement, et aucun coût caché. Vous avez juste besoin d'un Raspberry Pi ou d'un ordinateur pour l'héberger. Notre manuel et nos codes sont également fournis gratuitement après accès avec 100 tokens."
           }
         },
         {
@@ -187,7 +222,7 @@ export default function HomeAssistantPage() {
     };
   }, []);
 
-  // Vérifier l'activation du module quand l'utilisateur est chargé
+  // Vérifier l'accès du module quand l'utilisateur est chargé
   useEffect(() => {
     const verifyActivation = async () => {
       if (user?.id && card?.id) {
@@ -344,7 +379,7 @@ export default function HomeAssistantPage() {
         </div>
       </section>
 
-      {/* Zone principale avec bouton d'activation */}
+      {/* Zone principale avec bouton d'accès */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Colonne 1 - Image/Présentation */}
@@ -374,7 +409,7 @@ export default function HomeAssistantPage() {
               {checkingActivation ? (
                 <div className="w-3/4 flex items-center justify-center py-4 px-6 text-gray-600">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-orange-600 mr-3"></div>
-                  <span>Vérification de l'activation...</span>
+                  <span>Vérification de l'accès...</span>
                 </div>
               ) : card && !alreadyActivatedModules.includes(card.id) && !alreadyActivatedModules.includes('home-assistant') ? (
                 <button
@@ -389,41 +424,17 @@ export default function HomeAssistantPage() {
 
                     setActivating(true);
                     try {
-                      console.log('🔄 Activation Home Assistant pour:', user.email);
-                      
-                      const response = await fetch('/api/activate-home-assistant', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                          userId: user.id,
-                          email: user.email
-                        }),
+                      console.log('🔄 accès Home Assistant pour:', user.email);
+                      await openHomeAssistantWithToken();
+                      setAlreadyActivatedModules(prev => {
+                        const updated = [...prev];
+                        if (!updated.includes('home-assistant')) updated.push('home-assistant');
+                        if (card?.id && !updated.includes(card.id)) updated.push(card.id);
+                        return updated;
                       });
-
-                      const result = await response.json();
-
-                      if (result.success) {
-                        console.log('✅ Home Assistant activé avec succès');
-                        setAlreadyActivatedModules(prev => {
-                          const updated = [...prev];
-                          if (!updated.includes('home-assistant')) updated.push('home-assistant');
-                          if (card?.id && !updated.includes(card.id)) updated.push(card.id);
-                          return updated;
-                        });
-                        // Rediriger vers /encours pour voir l'application activée
-                        // L'utilisateur pourra ensuite accéder à Home Assistant depuis la page /encours
-                        router.push('/encours?message=' + encodeURIComponent('Home Assistant activé avec succès !'));
-                      } else {
-                        console.error('❌ Erreur activation Home Assistant:', result);
-                        console.error('❌ Détails complets:', result.errorDetails);
-                        const errorMessage = result.error || result.errorDetails?.message || result.errorDetails?.details || result.errorDetails?.hint || 'Erreur inconnue';
-                        alert(`Erreur lors de l'activation: ${errorMessage}`);
-                      }
                     } catch (error) {
-                      console.error('❌ Erreur activation Home Assistant:', error);
-                      alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                      console.error('❌ Erreur accès Home Assistant:', error);
+                      alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                     } finally {
                       setActivating(false);
                     }
@@ -434,21 +445,34 @@ export default function HomeAssistantPage() {
                   {activating ? (
                     <>
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                      <span>Activation en cours...</span>
+                      <span>Ouverture en cours...</span>
                     </>
                   ) : (
                     <>
                       <span className="text-xl">🏠</span>
                       <span>
-                        {isAuthenticated && user ? 'Activer Home Assistant (100 tokens)' : 'Connectez-vous pour activer Home Assistant (100 tokens)'}
+                        {isAuthenticated && user ? 'Accéder à Home Assistant (100 tokens)' : 'Connectez-vous pour accéder Home Assistant (100 tokens)'}
                       </span>
                     </>
                   )}
                 </button>
               ) : (
                 <div className="w-3/4 text-center py-4 px-6 text-gray-600 bg-green-50 rounded-2xl border border-green-200">
-                  <p className="text-green-700 font-semibold">✅ Home Assistant déjà activé</p>
+                  <p className="text-green-700 font-semibold">✅ Home Assistant déjà accessible</p>
                   <p className="text-sm text-gray-600 mt-2">Vous pouvez y accéder depuis vos applications</p>
+                  <button
+                    onClick={async () => {
+                      try {
+                        await openHomeAssistantWithToken();
+                      } catch (error) {
+                        alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                      }
+                    }}
+                    className="mt-4 inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                  >
+                    <span className="mr-2">🏠</span>
+                    Ouvrir Home Assistant
+                  </button>
                 </div>
               )}
             </div>
@@ -666,7 +690,7 @@ export default function HomeAssistantPage() {
                   <div className="bg-gradient-to-r from-red-50 to-blue-50 p-6 rounded-2xl border-l-4 border-red-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Home Assistant est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Oui, Home Assistant est entièrement gratuit et open-source. Il n'y a aucun frais d'installation, aucun abonnement, et aucun coût caché. Vous avez juste besoin d'un Raspberry Pi ou d'un ordinateur pour l'héberger. Notre manuel et nos codes sont également fournis gratuitement après activation avec 100 tokens.
+                      Oui, Home Assistant est entièrement gratuit et open-source. Il n'y a aucun frais d'installation, aucun abonnement, et aucun coût caché. Vous avez juste besoin d'un Raspberry Pi ou d'un ordinateur pour l'héberger. Notre manuel et nos codes sont également fournis gratuitement après accès avec 100 tokens.
                     </p>
                   </div>
                   
@@ -912,7 +936,7 @@ export default function HomeAssistantPage() {
                         <span className="text-xl">⏱️</span>
                       </div>
                       <h5 className="font-bold text-gray-900 mb-2">Accès</h5>
-                      <p className="text-gray-700">Illimité après activation</p>
+                      <p className="text-gray-700">Illimité après accès</p>
                     </div>
                   </div>
                 </div>
@@ -947,7 +971,7 @@ export default function HomeAssistantPage() {
          </div>
        )}
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId="home-assistant"
         moduleName="Home Assistant"
@@ -962,4 +986,9 @@ export default function HomeAssistantPage() {
     </div>
   );
 }
+
+
+
+
+
 

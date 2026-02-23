@@ -49,12 +49,12 @@ export default function RuinedFooocusPage() {
   // Vérifier si c'est un module gratuit
   const isFreeModule = false; // RuinedFooocus est payant
 
-  // Fonction pour vérifier si un module est déjà activé
+  // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
     if (!session?.user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-activation', {
+      const response = await fetch('/api/check-module-accès', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ export default function RuinedFooocusPage() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Récupérer les abonnements de l'utilisateur et vérifier l'activation du module
+  // Récupérer les abonnements de l'utilisateur et vérifier l'accès du module
   useEffect(() => {
     const fetchUserData = async () => {
       if (!session?.user?.id) {
@@ -158,7 +158,7 @@ export default function RuinedFooocusPage() {
 
         setUserSubscriptions(subscriptions);
 
-        // Vérifier si le module actuel est déjà activé dans user_applications
+        // Vérifier si le module actuel est déjà accessible dans user_applications
         if (card?.id) {
           setCheckingActivation(true);
           const isActivated = await checkModuleActivation(card.id);
@@ -239,7 +239,7 @@ export default function RuinedFooocusPage() {
           "name": "Comment utiliser RuinedFooocus ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour utiliser RuinedFooocus, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via ruinedfooocus.iahome.fr. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis."
+            "text": "Pour utiliser RuinedFooocus, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via ruinedfooocus.iahome.fr. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis."
           }
         },
         {
@@ -255,7 +255,7 @@ export default function RuinedFooocusPage() {
           "name": "RuinedFooocus est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation de RuinedFooocus coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, support multi-plateformes, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images."
+            "text": "L'accès de RuinedFooocus coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, support multi-plateformes, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images."
           }
         },
         {
@@ -538,19 +538,19 @@ export default function RuinedFooocusPage() {
             <div className="space-y-6">
               {/* Boutons d'action */}
               <div className="space-y-4">
-                {/* Message si le module est déjà activé */}
+                {/* Message si le module est déjà accessible */}
                 {alreadyActivatedModules.includes(card.id) && (
                   <div className="w-3/4 mx-auto bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
                     <div className="flex items-center justify-center space-x-3 text-green-800">
                       <span className="text-2xl">✅</span>
                       <div className="text-center">
-                        <p className="font-semibold">Application déjà activée !</p>
+                        <p className="font-semibold">Accès direct disponible</p>
                         <p className="text-sm opacity-80">Vous pouvez accéder à cette application depuis vos applications</p>
                       </div>
                     </div>
                     <div className="mt-3 text-center">
                       <button
-                        onClick={() => router.push('/encours')}
+                        onClick={() => accessModuleWithJWT(card.title, card.id)}
                         className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
                       >
                         <span className="mr-2">📱</span>
@@ -560,7 +560,7 @@ export default function RuinedFooocusPage() {
                   </div>
                 )}
 
-{/* Bouton d'activation avec tokens */}
+{/* Bouton d'accès avec tokens */}
                 {!alreadyActivatedModules.includes(card.id) && (
                   <div className="w-3/4 mx-auto">
                     <ModuleActivationButton
@@ -570,16 +570,16 @@ export default function RuinedFooocusPage() {
                       moduleDescription={card.description}
                       onActivationSuccess={() => {
                         setAlreadyActivatedModules(prev => [...prev, card.id]);
-                        alert(`✅ Application ${card.title} activée avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
+                        alert(`✅ Application ${card.title} accessible avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
                       }}
                       onActivationError={(error) => {
-                        console.error('Erreur activation:', error);
+                        console.error('Erreur accès:', error);
                       }}
                     />
                   </div>
                 )}
 
-                {/* Bouton "Payer et activer" pour les modules payants */}
+                {/* Bouton "Accéder maintenant" pour les modules payants */}
                 {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (
                   <button 
                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
@@ -589,9 +589,9 @@ export default function RuinedFooocusPage() {
                         return;
                       }
 
-                      // Vérifier si le module est déjà activé avant de procéder au paiement
+                      // Vérifier si le module est déjà accessible avant de procéder au paiement
                       if (alreadyActivatedModules.includes(card.id)) {
-                        alert(`ℹ️ L'application ${card.title} est déjà activée ! Vous pouvez l'utiliser depuis vos applications.`);
+                        alert(`ℹ️ L'application ${card.title} est déjà accessible ! Vous pouvez l'utiliser depuis vos applications.`);
                         return;
                       }
 
@@ -605,7 +605,7 @@ export default function RuinedFooocusPage() {
                             items: [card],
                             customerEmail: user?.email || '',
                             type: 'payment',
-                            testMode: false, // Mode production activé
+                            testMode: false, // Mode production accessible
                           }),
                         });
 
@@ -625,12 +625,12 @@ export default function RuinedFooocusPage() {
                           throw new Error('URL de session Stripe manquante.');
                         }
                       } catch (error) {
-                        alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                        alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                       }
                     }}
                   >
                     <span className="text-xl">💳</span>
-                    <span>Payer et activer {card.title}</span>
+                    <span>Accéder maintenant {card.title}</span>
                   </button>
                 )}
               </div>
@@ -739,9 +739,9 @@ export default function RuinedFooocusPage() {
                       <div className="flex items-start">
                         <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
                         <div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-2">Activer RuinedFooocus</h3>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à RuinedFooocus</h3>
                           <p className="text-gray-700 leading-relaxed">
-                            Activez RuinedFooocus avec 100 tokens. Une fois activé, le service est accessible depuis vos applications actives via ruinedfooocus.iahome.fr.
+                            Accédez à RuinedFooocus avec 100 tokens. L'accès est immédiat, le service est accessible depuis vos applications via ruinedfooocus.iahome.fr.
                           </p>
                         </div>
                       </div>
@@ -880,7 +880,7 @@ export default function RuinedFooocusPage() {
                     <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser RuinedFooocus ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        Pour utiliser RuinedFooocus, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface via ruinedfooocus.iahome.fr. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis.
+                        Pour utiliser RuinedFooocus, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via ruinedfooocus.iahome.fr. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis.
                       </p>
                     </div>
                     
@@ -894,7 +894,7 @@ export default function RuinedFooocusPage() {
                     <div className="bg-gradient-to-r from-cyan-50 to-teal-50 p-6 rounded-2xl border-l-4 border-cyan-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">RuinedFooocus est-il gratuit ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        L'activation de RuinedFooocus coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, support multi-plateformes, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images.
+                        L'accès de RuinedFooocus coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, support multi-plateformes, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images.
                       </p>
                     </div>
                     
@@ -1280,7 +1280,7 @@ export default function RuinedFooocusPage() {
         </div>
       )}
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId={card?.id || 'ruinedfooocus'}
         moduleName="RuinedFooocus"
@@ -1309,3 +1309,8 @@ export default function RuinedFooocusPage() {
     </div>
   );
 }
+
+
+
+
+

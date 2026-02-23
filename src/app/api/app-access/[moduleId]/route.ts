@@ -14,17 +14,17 @@ export async function GET(
     const token = url.searchParams.get('token');
     
     if (!token) {
-      return NextResponse.redirect('https://iahome.fr/encours?error=no_token', 302);
+      return NextResponse.redirect('https://iahome.fr/account?error=no_token', 302);
     }
 
     // Vérifier rapidement le token (décodage Base64 JSON)
     try {
       const decoded = JSON.parse(atob(token));
       if (decoded.moduleId !== moduleId || decoded.exp * 1000 <= Date.now()) {
-        return NextResponse.redirect('https://iahome.fr/encours?error=invalid_token', 302);
+        return NextResponse.redirect('https://iahome.fr/account?error=invalid_token', 302);
       }
     } catch (e) {
-      return NextResponse.redirect('https://iahome.fr/encours?error=invalid_token', 302);
+      return NextResponse.redirect('https://iahome.fr/account?error=invalid_token', 302);
     }
 
     console.log(`🔗 ${moduleId} Access: Génération de la page avec iframe (proxy interne)`);
@@ -92,8 +92,9 @@ export async function GET(
 
   } catch (error) {
     console.error(`❌ ${params} Access Proxy Error:`, error);
-    return NextResponse.redirect('https://iahome.fr/encours?error=internal_error', 302);
+    return NextResponse.redirect('https://iahome.fr/account?error=internal_error', 302);
   }
 }
+
 
 

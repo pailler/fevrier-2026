@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     // Vérifier l'origine de la requête
     if (!referer?.includes('iahome.fr') && !origin?.includes('iahome.fr') && !host?.includes('iahome.fr')) {
       console.log('LibreSpeed Direct: Accès direct bloqué - redirection vers iahome.fr');
-      return NextResponse.redirect('https://iahome.fr/encours', 302);
+      return NextResponse.redirect('https://iahome.fr/account', 302);
     }
 
     // Récupérer les cookies de la requête
@@ -83,15 +83,15 @@ export async function GET(request: NextRequest) {
     
     if (!hasLibreSpeedAccess) {
       console.log('LibreSpeed Direct: Accès au module LibreSpeed refusé pour:', session.user.email);
-      return NextResponse.redirect('https://iahome.fr/encours', 302);
+      return NextResponse.redirect('https://iahome.fr/account', 302);
     }
 
-    // Vérifier si le module apparaît dans /encours
+    // Vérifier si le module apparaît dans /account
     const isModuleActive = await checkModuleInEncours(session.user.id);
     
     if (!isModuleActive) {
-      console.log('LibreSpeed Direct: Module LibreSpeed non actif dans /encours pour:', session.user.email);
-      return NextResponse.redirect('https://iahome.fr/encours', 302);
+      console.log('LibreSpeed Direct: Module LibreSpeed non actif dans /account pour:', session.user.email);
+      return NextResponse.redirect('https://iahome.fr/account', 302);
     }
     
     console.log('LibreSpeed Direct: Accès autorisé pour utilisateur:', session.user.email);
@@ -176,16 +176,17 @@ async function checkLibreSpeedAccess(userId: string): Promise<boolean> {
   }
 }
 
-// Fonction pour vérifier si le module apparaît dans /encours
+// Fonction pour vérifier si le module apparaît dans /account
 async function checkModuleInEncours(userId: string): Promise<boolean> {
   try {
-    // TODO: Implémenter la vérification réelle du module dans /encours
+    // TODO: Implémenter la vérification réelle du module dans /account
     // Cela pourrait être une vérification de l'état du module en base de données
     // Pour l'instant, on simule un module actif
-    console.log('LibreSpeed Direct: Vérification module dans /encours pour utilisateur:', userId);
+    console.log('LibreSpeed Direct: Vérification module dans /account pour utilisateur:', userId);
     return true;
   } catch (error) {
-    console.error('LibreSpeed Direct: Erreur vérification module /encours:', error);
+    console.error('LibreSpeed Direct: Erreur vérification module /account:', error);
     return false;
   }
 }
+

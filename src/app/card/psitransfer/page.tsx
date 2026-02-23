@@ -87,7 +87,7 @@ export default function PsiTransferPage() {
           "name": "Comment transférer un fichier avec PsiTransfer ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour transférer un fichier avec PsiTransfer, activez d'abord le service avec 10 tokens. Une fois activé, glissez-déposez vos fichiers dans l'interface ou sélectionnez-les. Choisissez la durée de vie du lien de partage et optionnellement un mot de passe. PsiTransfer génère un lien sécurisé que vous pouvez partager avec vos destinataires."
+            "text": "Pour transférer un fichier avec PsiTransfer, accédez directement au service avec 10 tokens. L'accès est immédiat, glissez-déposez vos fichiers dans l'interface ou sélectionnez-les. Choisissez la durée de vie du lien de partage et optionnellement un mot de passe. PsiTransfer génère un lien sécurisé que vous pouvez partager avec vos destinataires."
           }
         },
         {
@@ -95,7 +95,7 @@ export default function PsiTransferPage() {
           "name": "PsiTransfer est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "PsiTransfer est un outil open-source et gratuit. L'activation du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez transférer des fichiers sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking."
+            "text": "PsiTransfer est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez transférer des fichiers sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking."
           }
         },
         {
@@ -127,7 +127,7 @@ export default function PsiTransferPage() {
           "name": "Ai-je besoin de créer un compte pour utiliser PsiTransfer ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Non, PsiTransfer ne nécessite aucune inscription. Vous pouvez transférer des fichiers immédiatement après activation du service. C'est l'un des avantages principaux de PsiTransfer : simplicité et confidentialité sans compromis."
+            "text": "Non, PsiTransfer ne nécessite aucune inscription. Vous pouvez transférer des fichiers immédiatement après accès du service. C'est l'un des avantages principaux de PsiTransfer : simplicité et confidentialité sans compromis."
           }
         }
       ]
@@ -325,7 +325,7 @@ export default function PsiTransferPage() {
             <div className="space-y-6">
               {/* Boutons d'action */}
               {isAuthenticated && user ? (
-                // Bouton d'activation PsiTransfer (utilisateur connecté)
+                // Bouton d'accès PsiTransfer (utilisateur connecté)
                 <button 
                   onClick={async () => {
                     if (!isAuthenticated || !user) {
@@ -335,7 +335,7 @@ export default function PsiTransferPage() {
                     }
 
                     try {
-                      console.log('🔄 Activation PsiTransfer pour:', user.email);
+                      console.log('🔄 accès PsiTransfer pour:', user.email);
                       
                       const response = await fetch('/api/activate-psitransfer', {
                         method: 'POST',
@@ -351,22 +351,41 @@ export default function PsiTransferPage() {
                       const result = await response.json();
 
                       if (result.success) {
-                        console.log('✅ PsiTransfer activé avec succès');
-                        alert('PsiTransfer activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
-                        router.push('/encours');
+                        console.log('✅ PsiTransfer accessible avec succès');
+                        alert('PsiTransfer accessible avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
+                        const tokenResponse = await fetch('/api/generate-access-token', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            userId: user.id,
+                            userEmail: user.email,
+                            moduleId: 'psitransfer',
+                          }),
+                        });
+                        if (!tokenResponse.ok) {
+                          const tokenError = await tokenResponse.json().catch(() => ({ error: 'Erreur inconnue' }));
+                          throw new Error(tokenError.error || 'Erreur génération token');
+                        }
+                        const tokenData = await tokenResponse.json();
+                        if (!tokenData?.token) {
+                          throw new Error('Token d\'accès manquant');
+                        }
+                        window.open(`https://psitransfer.iahome.fr?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
                       } else {
-                        console.error('❌ Erreur activation PsiTransfer:', result.error);
-                        alert(`Erreur lors de l'activation: ${result.error}`);
+                        console.error('❌ Erreur accès PsiTransfer:', result.error);
+                        alert(`Erreur lors de l'accès: ${result.error}`);
                       }
                     } catch (error) {
-                      console.error('❌ Erreur activation PsiTransfer:', error);
-                      alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                      console.error('❌ Erreur accès PsiTransfer:', error);
+                      alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                     }
                   }}
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">📁</span>
-                  <span>Activer PsiTransfer (10 tokens par accès)</span>
+                  <span>Accéder à PsiTransfer (10 tokens par accès)</span>
                 </button>
               ) : (
                 // Message pour les utilisateurs non connectés
@@ -379,7 +398,7 @@ export default function PsiTransferPage() {
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">🔒</span>
-                  <span>Connectez-vous pour activer PsiTransfer (10 tokens par accès)</span>
+                  <span>Connectez-vous pour accéder PsiTransfer (10 tokens par accès)</span>
                 </button>
               )}
             </div>
@@ -471,9 +490,9 @@ export default function PsiTransferPage() {
                     <div className="flex items-start">
                       <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Activer PsiTransfer</h3>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à PsiTransfer</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Activez PsiTransfer avec 10 tokens. Une fois activé, le service est accessible depuis vos applications actives.
+                          Accédez à PsiTransfer avec 10 tokens. L'accès est immédiat, le service est accessible depuis vos applications.
                         </p>
                       </div>
                     </div>
@@ -614,14 +633,14 @@ export default function PsiTransferPage() {
                   <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-teal-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Comment transférer un fichier avec PsiTransfer ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Pour transférer un fichier avec PsiTransfer, activez d'abord le service avec 10 tokens. Une fois activé, glissez-déposez vos fichiers dans l'interface ou sélectionnez-les. Choisissez la durée de vie du lien de partage et optionnellement un mot de passe. PsiTransfer génère un lien sécurisé que vous pouvez partager avec vos destinataires.
+                      Pour transférer un fichier avec PsiTransfer, accédez directement au service avec 10 tokens. L'accès est immédiat, glissez-déposez vos fichiers dans l'interface ou sélectionnez-les. Choisissez la durée de vie du lien de partage et optionnellement un mot de passe. PsiTransfer génère un lien sécurisé que vous pouvez partager avec vos destinataires.
                     </p>
                   </div>
                   
                   <div className="bg-gradient-to-r from-cyan-50 to-blue-50 p-6 rounded-2xl border-l-4 border-cyan-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">PsiTransfer est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      PsiTransfer est un outil open-source et gratuit. L'activation du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez transférer des fichiers sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking.
+                      PsiTransfer est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez transférer des fichiers sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking.
                     </p>
                   </div>
                   
@@ -649,7 +668,7 @@ export default function PsiTransferPage() {
                   <div className="bg-gradient-to-r from-pink-50 to-red-50 p-6 rounded-2xl border-l-4 border-pink-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Ai-je besoin de créer un compte pour utiliser PsiTransfer ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Non, PsiTransfer ne nécessite aucune inscription. Vous pouvez transférer des fichiers immédiatement après activation du service. C'est l'un des avantages principaux de PsiTransfer : simplicité et confidentialité sans compromis.
+                      Non, PsiTransfer ne nécessite aucune inscription. Vous pouvez transférer des fichiers immédiatement après accès du service. C'est l'un des avantages principaux de PsiTransfer : simplicité et confidentialité sans compromis.
                     </p>
                   </div>
                 </div>
@@ -914,7 +933,7 @@ export default function PsiTransferPage() {
          </div>
        )}
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId="psitransfer"
         moduleName="PsiTransfer"
@@ -927,3 +946,8 @@ export default function PsiTransferPage() {
     </div>
   );
 }
+
+
+
+
+

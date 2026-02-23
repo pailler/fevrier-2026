@@ -61,12 +61,12 @@ export default function AdminPromoCodesPage() {
       if (!res.ok) {
         throw new Error(data.error || data.details || `Erreur ${res.status}`);
       }
-      setMessage({ type: 'success', text: data.message || 'Code BIENVENUE10 activé.' });
+      setMessage({ type: 'success', text: data.message || 'Code BIENVENUE10 accessible.' });
       await load();
     } catch (e) {
       setMessage({
         type: 'error',
-        text: e instanceof Error ? e.message : 'Erreur lors de l’activation',
+        text: e instanceof Error ? e.message : 'Erreur lors de l’accès',
       });
     } finally {
       setActivating(false);
@@ -88,7 +88,7 @@ export default function AdminPromoCodesPage() {
       }
       setMessage({
         type: 'success',
-        text: data.active ? `${data.code} activé` : `${data.code} désactivé`,
+        text: data.active ? `${data.code} accessible` : `${data.code} suspendu`,
       });
       await load();
     } catch (e) {
@@ -114,10 +114,10 @@ export default function AdminPromoCodesPage() {
           className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {activating
-            ? 'Activation...'
+            ? 'accès...'
             : bienvenue10?.active
               ? 'BIENVENUE10 déjà actif'
-              : 'Activer le code BIENVENUE10 (-2€)'}
+              : 'accéder à le code BIENVENUE10 (-2€)'}
         </button>
       </div>
 
@@ -136,7 +136,7 @@ export default function AdminPromoCodesPage() {
       {loading ? (
         <p className="text-gray-500">Chargement...</p>
       ) : list.length === 0 ? (
-        <p className="text-gray-500">Aucun code promo. Cliquez sur « Activer le code BIENVENUE10 » pour en créer un.</p>
+        <p className="text-gray-500">Aucun code promo. Cliquez sur « accéder à le code BIENVENUE10 » pour en créer un.</p>
       ) : (
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow">
           <table className="min-w-full divide-y divide-gray-200">
@@ -182,7 +182,7 @@ export default function AdminPromoCodesPage() {
                       disabled={togglingId === p.id}
                       className="text-blue-600 hover:underline disabled:opacity-50"
                     >
-                      {togglingId === p.id ? '...' : p.active ? 'Désactiver' : 'Activer'}
+                      {togglingId === p.id ? '...' : p.active ? 'suspendre' : 'accéder à'}
                     </button>
                   </td>
                 </tr>
@@ -198,3 +198,5 @@ export default function AdminPromoCodesPage() {
     </div>
   );
 }
+
+

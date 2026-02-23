@@ -97,7 +97,7 @@ export default function CodeLearningPage() {
             <p className="text-red-800 font-medium mb-2">⚠️ Erreur d'accès</p>
             <p className="text-red-600 mb-4">{tokenError}</p>
             <button
-              onClick={() => router.push('/encours')}
+              onClick={() => router.push('/account')}
               className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
             >
               Retour aux modules
@@ -470,4 +470,5 @@ function ExerciseModal({
     </div>
   );
 }
+
 

@@ -17,12 +17,12 @@ export default function AIDetectorCardPage() {
   const moduleId = 'ai-detector';
   const isFreeModule = false; // Module payant : 100 tokens par accès
 
-  // Fonction pour vérifier si un module est déjà activé
+  // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
     if (!user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-activation', {
+      const response = await fetch('/api/check-module-accès', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,12 +38,12 @@ export default function AIDetectorCardPage() {
         return result.isActivated || false;
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification d\'activation:', error);
+      console.error('Erreur lors de la vérification d\'accès:', error);
     }
     return false;
   }, [user?.id]);
 
-  // Vérifier si le module est activé
+  // Vérifier si le module est accessible
   useEffect(() => {
     const checkActivation = async () => {
       if (user?.id && moduleId) {
@@ -190,13 +190,13 @@ export default function AIDetectorCardPage() {
                     <div className="flex items-center justify-center space-x-3 text-green-800 mb-4">
                       <span className="text-2xl">✅</span>
                       <div className="text-center">
-                        <p className="font-semibold">Service déjà activé !</p>
-                        <p className="text-sm opacity-80">Pour y accéder, cliquez sur Mes Applis activées</p>
+                        <p className="font-semibold">Accès direct disponible</p>
+                        <p className="text-sm opacity-80">Pour y accéder, cliquez sur Mes applications</p>
                       </div>
                     </div>
                     <div className="mt-3 text-center">
                       <Link
-                        href="/encours"
+                        href="/ai-detector"
                         className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
                       >
                         <span className="mr-2">📱</span>
@@ -211,7 +211,7 @@ export default function AIDetectorCardPage() {
                     <button
                       onClick={async () => {
                         if (isAuthenticated && user) {
-                          // Utilisateur connecté : activer ai-detector via API
+                          // Utilisateur connecté : Accéder à ai-detector via API
                           try {
                             setLoading(true);
                             const response = await fetch('/api/activate-ai-detector', {
@@ -228,21 +228,21 @@ export default function AIDetectorCardPage() {
                             if (response.ok) {
                               const data = await response.json();
                               if (data.success) {
-                                console.log('✅ Détecteur IA activé avec succès');
+                                console.log('✅ Détecteur IA accessible avec succès');
                                 setAlreadyActivatedModules(prev => [...prev, moduleId]);
-                                router.push('/encours'); // Redirect to /encours
+                                window.open('/ai-detector', '_blank');
                               } else {
-                                console.error('❌ Erreur activation Détecteur IA:', data.error);
-                                alert('Erreur lors de l\'activation: ' + (data.error || 'Erreur inconnue'));
+                                console.error('❌ Erreur accès Détecteur IA:', data.error);
+                                alert('Erreur lors de l\'accès: ' + (data.error || 'Erreur inconnue'));
                               }
                             } else {
                               const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
                               console.error('❌ Erreur réponse API:', response.status, errorData);
-                              alert('Erreur lors de l\'activation: ' + (errorData.error || 'Erreur inconnue'));
+                              alert('Erreur lors de l\'accès: ' + (errorData.error || 'Erreur inconnue'));
                             }
                           } catch (error) {
-                            console.error('❌ Erreur lors de l\'activation du Détecteur IA:', error);
-                            alert('Erreur lors de l\'activation');
+                            console.error('❌ Erreur lors de l\'accès du Détecteur IA:', error);
+                            alert('Erreur lors de l\'accès');
                           } finally {
                             setLoading(false);
                           }
@@ -262,13 +262,13 @@ export default function AIDetectorCardPage() {
                       {loading || checkingActivation ? (
                         <>
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                          <span>Activation en cours...</span>
+                          <span>Ouverture en cours...</span>
                         </>
                       ) : (
                         <>
                           <span className="text-xl">🔍</span>
                           <span>
-                            {isAuthenticated && user ? 'Activez le Détecteur IA (100 tokens)' : 'Connectez-vous pour activer (100 tokens)'}
+                            {isAuthenticated && user ? 'Accédez à le Détecteur IA (100 tokens)' : 'Connectez-vous pour accéder (100 tokens)'}
                           </span>
                         </>
                       )}
@@ -281,7 +281,7 @@ export default function AIDetectorCardPage() {
         </div>
       </section>
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId={moduleId}
         moduleName="AI Detector"
@@ -296,4 +296,9 @@ export default function AIDetectorCardPage() {
     </div>
   );
 }
+
+
+
+
+
 

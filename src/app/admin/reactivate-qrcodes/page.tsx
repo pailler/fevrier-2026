@@ -42,14 +42,14 @@ export default function ReactivateQRCodesPage() {
         setMessage('✅ ' + data.message);
         await checkStatus(); // Rafraîchir le statut
         setTimeout(() => {
-          router.push('/encours');
+          router.push('/account');
         }, 2000);
       } else {
         setMessage('❌ Erreur: ' + data.error);
       }
     } catch (error) {
       console.error('Erreur:', error);
-      setMessage('❌ Erreur lors de la réactivation');
+      setMessage('❌ Erreur lors de la restauration d\'accès');
     } finally {
       setLoading(false);
     }
@@ -60,7 +60,7 @@ export default function ReactivateQRCodesPage() {
       <div className="max-w-2xl mx-auto">
         <div className="bg-white shadow rounded-lg p-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">
-            Réactivation QR Codes Dynamiques
+            restauration d'accès QR Codes Dynamiques
           </h1>
 
           {status && (
@@ -118,17 +118,17 @@ export default function ReactivateQRCodesPage() {
                 disabled={loading}
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >
-                {loading ? 'Réactivation...' : 'Réactiver QR Codes'}
+                {loading ? 'restauration d\'accès...' : 'restaurer l\'accès QR Codes'}
               </button>
             )}
           </div>
 
           <div className="mt-6 pt-6 border-t">
             <button
-              onClick={() => router.push('/encours')}
+              onClick={() => router.push('/account')}
               className="text-blue-600 hover:text-blue-800"
             >
-              ← Retour à /encours
+              ← Retour à /account
             </button>
           </div>
         </div>
@@ -136,6 +136,8 @@ export default function ReactivateQRCodesPage() {
     </div>
   );
 }
+
+
 
 
 

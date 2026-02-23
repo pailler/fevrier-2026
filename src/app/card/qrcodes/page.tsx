@@ -49,12 +49,12 @@ export default function QRCodesPage() {
   // Vérifier si c'est un module gratuit
   const isFreeModule = true; // QR Codes est gratuit
 
-  // Fonction pour vérifier si un module est déjà activé
+  // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
     if (!user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-activation', {
+      const response = await fetch('/api/check-module-accès', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,18 +86,39 @@ export default function QRCodesPage() {
     }
 
     try {
-      // Rediriger directement vers qrcodes via sous-domaine
-      const accessUrl = 'https://qrcodes.iahome.fr';
-      console.log('🔗 qrcodes: Accès direct à:', accessUrl);
-      window.open(accessUrl, '_blank');
+      const tokenResponse = await fetch('/api/generate-access-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          userEmail: user.email,
+          moduleId,
+        }),
+      });
+
+      if (!tokenResponse.ok) {
+        const errorData = await tokenResponse.json().catch(() => ({ error: 'Erreur inconnue' }));
+        throw new Error(errorData.error || 'Erreur génération token');
+      }
+
+      const tokenData = await tokenResponse.json();
+      if (!tokenData?.token) {
+        throw new Error('Token d\'accès manquant');
+      }
+
+      const accessUrl = `https://qrcodes.iahome.fr?token=${encodeURIComponent(tokenData.token)}`;
+      console.log('🔗 qrcodes: Accès direct tokenisé');
+      window.open(accessUrl, '_blank', 'noopener,noreferrer');
     } catch (error) {
       alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
-  }, [user, setIframeModal]);
+  }, [user?.email, user?.id]);
 
   // Utilisation du hook useCustomAuth pour la gestion de l'authentification
 
-  // Récupérer les abonnements de l'utilisateur et vérifier l'activation du module
+  // Récupérer les abonnements de l'utilisateur et vérifier l'accès du module
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user?.id) {
@@ -140,22 +161,22 @@ export default function QRCodesPage() {
 
         setUserSubscriptions(subscriptions);
 
-        // Vérifier si le module actuel est déjà activé dans user_applications
+        // Vérifier si le module actuel est déjà accessible dans user_applications
         if (card?.id) {
           setCheckingActivation(true);
-          console.log('🔍 Vérification activation QR Codes pour card.id:', card.id);
+          console.log('🔍 Vérification accès QR Codes pour card.id:', card.id);
           const isActivated = await checkModuleActivation(card.id);
-          console.log('🔍 Résultat vérification activation:', isActivated);
+          console.log('🔍 Résultat vérification accès:', isActivated);
           if (isActivated) {
             setAlreadyActivatedModules(prev => {
               const updated = [...prev];
               if (!updated.includes(card.id)) updated.push(card.id);
               if (!updated.includes('qrcodes')) updated.push('qrcodes');
-              console.log('✅ QR Codes détecté comme déjà activé, alreadyActivatedModules:', updated);
+              console.log('✅ QR Codes détecté comme déjà accessible, alreadyActivatedModules:', updated);
               return updated;
             });
           } else {
-            console.log('❌ QR Codes pas encore activé, alreadyActivatedModules:', alreadyActivatedModules);
+            console.log('❌ QR Codes pas encore accessible, alreadyActivatedModules:', alreadyActivatedModules);
           }
           setCheckingActivation(false);
         }
@@ -231,7 +252,7 @@ export default function QRCodesPage() {
           "name": "Comment créer un QR code dynamique ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour créer un QR code dynamique, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface de génération, entrez l'URL de destination, personnalisez les couleurs et le logo si souhaité, puis générez le code. Vous recevrez un token de gestion et une URL de gestion pour modifier le QR code ultérieurement."
+            "text": "Pour créer un QR code dynamique, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface de génération, entrez l'URL de destination, personnalisez les couleurs et le logo si souhaité, puis générez le code. Vous recevrez un token de gestion et une URL de gestion pour modifier le QR code ultérieurement."
           }
         },
         {
@@ -255,7 +276,7 @@ export default function QRCodesPage() {
           "name": "Les QR codes dynamiques sont-ils gratuits ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation du service QR codes dynamiques coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes."
+            "text": "L'accès du service QR codes dynamiques coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes."
           }
         },
         {
@@ -547,11 +568,11 @@ export default function QRCodesPage() {
             </div>
 
             <div className="space-y-6">
-              {/* Bouton d'activation spécial pour QR Codes - Modèle LibreSpeed */}
+              {/* Bouton d'accès spécial pour QR Codes - Modèle LibreSpeed */}
               {checkingActivation ? (
                 <div className="w-3/4 flex items-center justify-center py-4 px-6 text-gray-600">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
-                  <span>Vérification de l'activation...</span>
+                  <span>Vérification de l'accès...</span>
                 </div>
               ) : card && !alreadyActivatedModules.includes(card.id) && !alreadyActivatedModules.includes('qrcodes') ? (
                 <button
@@ -563,7 +584,7 @@ export default function QRCodesPage() {
                     }
 
                     try {
-                      console.log('🔄 Activation QR Codes pour:', user.email);
+                      console.log('🔄 accès QR Codes pour:', user.email);
                       
                       const response = await fetch('/api/activate-qrcodes', {
                         method: 'POST',
@@ -579,34 +600,34 @@ export default function QRCodesPage() {
                       const result = await response.json();
 
                       if (result.success) {
-                        console.log('✅ QR Codes activé avec succès');
+                        console.log('✅ QR Codes accessible avec succès');
                         setAlreadyActivatedModules(prev => {
                           const updated = [...prev];
                           if (!updated.includes('qrcodes')) updated.push('qrcodes');
                           if (card?.id && !updated.includes(card.id)) updated.push(card.id);
                           return updated;
                         });
-                        alert('QR Codes activé avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
-                        router.push('/encours');
+                        alert('QR Codes accessible avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
+                        await accessModuleWithJWT('QR Codes', 'qrcodes');
                       } else {
-                        console.error('❌ Erreur activation QR Codes:', result.error);
-                        alert(`Erreur lors de l'activation: ${result.error}`);
+                        console.error('❌ Erreur accès QR Codes:', result.error);
+                        alert(`Erreur lors de l'accès: ${result.error}`);
                       }
                     } catch (error) {
-                      console.error('❌ Erreur activation QR Codes:', error);
-                      alert(`Erreur lors de l'activation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                      console.error('❌ Erreur accès QR Codes:', error);
+                      alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                     }
                   }}
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">⚡</span>
                   <span>
-                    {isAuthenticated && user ? `Activer QR Codes (100 tokens)` : `Connectez-vous pour activer QR Codes (100 tokens)`}
+                    {isAuthenticated && user ? `Accéder à QR Codes (100 tokens)` : `Connectez-vous pour accéder QR Codes (100 tokens)`}
                   </span>
                 </button>
               ) : (
                 <div className="w-3/4 text-center py-4 px-6 text-gray-600">
-                  <p>QR Codes déjà activé</p>
+                  <p>QR Codes déjà accessible</p>
                 </div>
               )}
 
@@ -621,7 +642,7 @@ export default function QRCodesPage() {
                 </div>
               )}
 
-              {/* Bouton d'accès pour QR Codes déjà activé - SUPPRIMÉ (comme LibreSpeed) */}
+              {/* Bouton d'accès pour QR Codes déjà accessible - SUPPRIMÉ (comme LibreSpeed) */}
             </div>
           </div>
         </div>
@@ -711,9 +732,9 @@ export default function QRCodesPage() {
                     <div className="flex items-start">
                       <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Activer le service QR codes</h3>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder au service QR codes</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Activez le service QR codes dynamiques avec 100 tokens. Une fois activé, le service est accessible depuis vos applications actives.
+                          Accédez au service QR codes dynamiques avec 100 tokens. L'accès est immédiat, le service est accessible depuis vos applications.
                         </p>
                       </div>
                     </div>
@@ -849,7 +870,7 @@ export default function QRCodesPage() {
                   <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Comment créer un QR code dynamique ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Pour créer un QR code dynamique, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface de génération, entrez l'URL de destination, personnalisez les couleurs et le logo si souhaité, puis générez le code. Vous recevrez un token de gestion et une URL de gestion pour modifier le QR code ultérieurement.
+                      Pour créer un QR code dynamique, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface de génération, entrez l'URL de destination, personnalisez les couleurs et le logo si souhaité, puis générez le code. Vous recevrez un token de gestion et une URL de gestion pour modifier le QR code ultérieurement.
                     </p>
                   </div>
                   
@@ -870,7 +891,7 @@ export default function QRCodesPage() {
                   <div className="bg-gradient-to-r from-red-50 to-orange-50 p-6 rounded-2xl border-l-4 border-red-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Les QR codes dynamiques sont-ils gratuits ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'activation du service QR codes dynamiques coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Une fois activé, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes.
+                      L'accès du service QR codes dynamiques coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes.
                     </p>
                   </div>
                   
@@ -1298,7 +1319,7 @@ export default function QRCodesPage() {
          </div>
        )}
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId="qrcodes"
         moduleName="QR Codes Dynamiques"
@@ -1318,3 +1339,8 @@ export default function QRCodesPage() {
     </div>
   );
 }
+
+
+
+
+

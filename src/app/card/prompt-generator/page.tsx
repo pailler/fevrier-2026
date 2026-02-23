@@ -17,12 +17,12 @@ export default function PromptGeneratorCardPage() {
   const moduleId = 'prompt-generator';
   const isFreeModule = false; // Module payant : 100 tokens par accès
 
-  // Fonction pour vérifier si un module est déjà activé
+  // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
     if (!user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-activation', {
+      const response = await fetch('/api/check-module-accès', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ export default function PromptGeneratorCardPage() {
         return result.isActivated || false;
       }
     } catch (error) {
-      console.error('Erreur lors de la vérification d\'activation:', error);
+      console.error('Erreur lors de la vérification d\'accès:', error);
     }
     return false;
   }, [user?.id]);
@@ -92,7 +92,7 @@ export default function PromptGeneratorCardPage() {
           "name": "Comment utiliser le Générateur de prompts IA ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour utiliser le Générateur de prompts IA, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface, remplissez le formulaire intuitif avec vos paramètres (type de tâche, technique, langue, ton, créativité, longueur), et l'IA génère automatiquement un prompt optimisé. Vous pouvez ensuite copier le prompt en un clic et l'utiliser avec ChatGPT, Claude, Gemini ou tout autre modèle de langage."
+            "text": "Pour utiliser le Générateur de prompts IA, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface, remplissez le formulaire intuitif avec vos paramètres (type de tâche, technique, langue, ton, créativité, longueur), et l'IA génère automatiquement un prompt optimisé. Vous pouvez ensuite copier le prompt en un clic et l'utiliser avec ChatGPT, Claude, Gemini ou tout autre modèle de langage."
           }
         },
         {
@@ -108,7 +108,7 @@ export default function PromptGeneratorCardPage() {
           "name": "Le Générateur de prompts IA est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'activation du Générateur de prompts IA coûte 100 tokens par accès. Une fois activé, vous avez un accès illimité pendant 90 jours. Il n'y a pas de frais supplémentaires pour la génération de prompts."
+            "text": "L'accès du Générateur de prompts IA coûte 100 tokens par accès. L'accès est immédiat, vous avez un accès illimité pendant 90 jours. Il n'y a pas de frais supplémentaires pour la génération de prompts."
           }
         },
         {
@@ -167,7 +167,7 @@ export default function PromptGeneratorCardPage() {
     };
   }, []);
 
-  // Vérifier si le module est activé
+  // Vérifier si le module est accessible
   useEffect(() => {
     const checkActivation = async () => {
       if (user?.id && moduleId) {
@@ -417,7 +417,7 @@ export default function PromptGeneratorCardPage() {
                 <div className="bg-gradient-to-r from-pink-50 to-orange-50 p-6 rounded-2xl border-l-4 border-pink-500">
                   <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser le Générateur de prompts IA ?</h3>
                   <p className="text-gray-700 leading-relaxed">
-                    Pour utiliser le Générateur de prompts IA, activez d'abord le service avec 100 tokens. Une fois activé, accédez à l'interface, remplissez le formulaire intuitif avec vos paramètres (type de tâche, technique, langue, ton, créativité, longueur), et l'IA génère automatiquement un prompt optimisé. Vous pouvez ensuite copier le prompt en un clic et l'utiliser avec ChatGPT, Claude, Gemini ou tout autre modèle de langage.
+                    Pour utiliser le Générateur de prompts IA, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface, remplissez le formulaire intuitif avec vos paramètres (type de tâche, technique, langue, ton, créativité, longueur), et l'IA génère automatiquement un prompt optimisé. Vous pouvez ensuite copier le prompt en un clic et l'utiliser avec ChatGPT, Claude, Gemini ou tout autre modèle de langage.
                   </p>
                 </div>
                 
@@ -431,7 +431,7 @@ export default function PromptGeneratorCardPage() {
                 <div className="bg-gradient-to-r from-yellow-50 to-green-50 p-6 rounded-2xl border-l-4 border-yellow-500">
                   <h3 className="text-xl font-bold text-gray-900 mb-3">Le Générateur de prompts IA est-il gratuit ?</h3>
                   <p className="text-gray-700 leading-relaxed">
-                    L'activation du Générateur de prompts IA coûte 100 tokens par accès. Une fois activé, vous avez un accès illimité pendant 90 jours. Il n'y a pas de frais supplémentaires pour la génération de prompts.
+                    L'accès du Générateur de prompts IA coûte 100 tokens par accès. L'accès est immédiat, vous avez un accès illimité pendant 90 jours. Il n'y a pas de frais supplémentaires pour la génération de prompts.
                   </p>
                 </div>
                 
@@ -507,7 +507,7 @@ export default function PromptGeneratorCardPage() {
           
           {/* Colonne 2 - Accès */}
           <div className="space-y-8">
-            {/* Prix et activation */}
+            {/* Prix et accès */}
             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8">
               <div className="text-center mb-8">
                 <div className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
@@ -526,18 +526,47 @@ export default function PromptGeneratorCardPage() {
                   <div className="flex items-center justify-center space-x-3 text-green-800 mb-4">
                     <span className="text-2xl">✅</span>
                     <div className="text-center">
-                      <p className="font-semibold">Service déjà activé !</p>
-                      <p className="text-sm opacity-80">Pour y accéder, cliquez sur Mes Applis activées</p>
+                      <p className="font-semibold">Accès direct disponible</p>
+                      <p className="text-sm opacity-80">Pour y accéder, cliquez sur Mes applications</p>
                     </div>
                   </div>
                   <div className="mt-3 text-center">
-                    <Link
-                      href="/encours"
+                    <button
+                      onClick={async () => {
+                        if (!user?.id || !user?.email) {
+                          router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}`)}`);
+                          return;
+                        }
+                        try {
+                          const tokenResponse = await fetch('/api/generate-access-token', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              userId: user.id,
+                              userEmail: user.email,
+                              moduleId: 'prompt-generator',
+                            }),
+                          });
+                          if (!tokenResponse.ok) {
+                            const tokenError = await tokenResponse.json().catch(() => ({ error: 'Erreur inconnue' }));
+                            throw new Error(tokenError.error || 'Erreur génération token');
+                          }
+                          const tokenData = await tokenResponse.json();
+                          if (!tokenData?.token) {
+                            throw new Error('Token d\'accès manquant');
+                          }
+                          window.open(`https://prompt-generator.iahome.fr?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
+                        } catch (error) {
+                          alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                        }
+                      }}
                       className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
                     >
                       <span className="mr-2">📱</span>
                       Aller à Mes Applications
-                    </Link>
+                    </button>
                   </div>
                 </div>
               )}
@@ -547,69 +576,40 @@ export default function PromptGeneratorCardPage() {
                   <button
                     onClick={async () => {
                       if (isAuthenticated && user) {
-                        // Utilisateur connecté : activer prompt-generator via API
+                        // Utilisateur connecté : Accéder à prompt-generator via API
                         try {
                           setLoading(true);
-                          const response = await fetch('/api/activate-prompt-generator', {
+                          const tokenResponse = await fetch('/api/generate-access-token', {
                             method: 'POST',
                             headers: {
                               'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
                               userId: user.id,
-                              email: user.email
+                              userEmail: user.email,
+                              moduleId: 'prompt-generator',
                             }),
                           });
 
-                          if (response.ok) {
-                            const data = await response.json();
-                            if (data.success) {
-                              console.log('✅ Générateur de prompts activé avec succès');
-                              setAlreadyActivatedModules(prev => [...prev, moduleId]);
-                              // Attendre un peu avant la redirection pour que l'état soit mis à jour
-                              setTimeout(() => {
-                                try {
-                                  // Utiliser window.location.href pour éviter les problèmes avec router.push
-                                  if (typeof window !== 'undefined') {
-                                    window.location.href = '/encours';
-                                  } else {
-                                    try {
-                                      router.push('/encours');
-                                    } catch (err) {
-                                      console.error('❌ Erreur router.push:', err);
-                                    }
-                                  }
-                                } catch (redirectError) {
-                                  console.error('❌ Erreur lors de la redirection:', redirectError);
-                                  // Fallback : recharger la page si window est disponible
-                                  if (typeof window !== 'undefined') {
-                                    window.location.href = '/encours';
-                                  }
-                                  if (typeof window !== 'undefined') {
-                                    window.location.href = '/encours';
-                                  }
-                                }
-                              }, 500);
-                            } else {
-                              console.error('❌ Erreur activation Générateur de prompts:', data.error);
-                              alert('Erreur lors de l\'activation: ' + (data.error || 'Erreur inconnue'));
-                              setLoading(false);
-                            }
-                          } else {
-                            let errorData;
-                            try {
-                              errorData = await response.json();
-                            } catch (parseError) {
-                              errorData = { error: `Erreur HTTP ${response.status}: ${response.statusText}` };
-                            }
-                            console.error('❌ Erreur réponse API:', response.status, errorData);
-                            alert('Erreur lors de l\'activation: ' + (errorData.error || 'Erreur inconnue'));
-                            setLoading(false);
+                          if (!tokenResponse.ok) {
+                            const tokenError = await tokenResponse.json().catch(() => ({ error: 'Erreur inconnue' }));
+                            throw new Error(tokenError.error || 'Erreur génération token');
+                          }
+
+                          const tokenData = await tokenResponse.json();
+                          if (!tokenData?.token) {
+                            throw new Error('Token d\'accès manquant');
+                          }
+
+                          console.log('✅ Générateur de prompts accessible avec succès');
+                          setAlreadyActivatedModules(prev => [...prev, moduleId]);
+                          if (typeof window !== 'undefined') {
+                            window.open(`https://prompt-generator.iahome.fr?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
                           }
                         } catch (error) {
-                          console.error('❌ Erreur lors de l\'activation de Générateur de prompts:', error);
+                          console.error('❌ Erreur lors de l\'accès de Générateur de prompts:', error);
                           const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
-                          alert('Erreur lors de l\'activation: ' + errorMessage);
+                          alert('Erreur lors de l\'accès: ' + errorMessage);
                           setLoading(false);
                         }
                       } else {
@@ -628,13 +628,13 @@ export default function PromptGeneratorCardPage() {
                     {loading || checkingActivation ? (
                       <>
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                        <span>Activation en cours...</span>
+                        <span>Ouverture en cours...</span>
                       </>
                     ) : (
                       <>
                         <span className="text-xl">🚀</span>
                         <span>
-                          {isAuthenticated && user ? 'Activez Générateur de prompts (100 tokens)' : 'Connectez-vous pour activer (100 tokens)'}
+                          {isAuthenticated && user ? 'Accédez à Générateur de prompts (100 tokens)' : 'Connectez-vous pour accéder (100 tokens)'}
                         </span>
                       </>
                     )}
@@ -711,7 +711,7 @@ export default function PromptGeneratorCardPage() {
         </div>
       </div>
 
-      {/* Section d'activation en bas de page */}
+      {/* Section d'accès en bas de page */}
       <CardPageActivationSection
         moduleId={moduleId}
         moduleName="Prompt Generator"
@@ -726,4 +726,9 @@ export default function PromptGeneratorCardPage() {
     </div>
   );
 }
+
+
+
+
+
 

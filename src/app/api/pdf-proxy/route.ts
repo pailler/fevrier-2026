@@ -84,11 +84,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect('https://iahome.fr/login', 302);
     }
 
-    // Vérifier si le module apparaît dans /encours (vérification principale)
+    // Vérifier si le module apparaît dans /account (vérification principale)
     const isModuleInEncours = await checkPdfModuleInEncours(session.user.id);
     
     if (!isModuleInEncours) {
-      console.log('PDF Proxy: Module PDF non visible dans /encours pour:', session.user.email);
+      console.log('PDF Proxy: Module PDF non visible dans /account pour:', session.user.email);
       return NextResponse.redirect('https://iahome.fr/essentiels', 302);
     }
 
@@ -133,7 +133,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Fonction pour vérifier si le module PDF est dans /encours
+// Fonction pour vérifier si le module PDF est dans /account
 async function checkPdfModuleInEncours(userId: string): Promise<boolean> {
   try {
     const { data: userApps, error } = await supabase
@@ -153,10 +153,10 @@ async function checkPdfModuleInEncours(userId: string): Promise<boolean> {
       app.module_title?.toLowerCase().includes('pdf')
     );
 
-    console.log('PDF Proxy: Module PDF dans /encours:', hasPdf);
+    console.log('PDF Proxy: Module PDF dans /account:', hasPdf);
     return hasPdf || false;
   } catch (error) {
-    console.error('PDF Proxy: Erreur lors de la vérification du module dans /encours:', error);
+    console.error('PDF Proxy: Erreur lors de la vérification du module dans /account:', error);
     return false;
   }
 }

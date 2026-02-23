@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       
       if (tokenError || !tokenData) {
         ;
-        return NextResponse.redirect('https://iahome.fr/encours?error=invalid_token', 302);
+        return NextResponse.redirect('https://iahome.fr/account?error=invalid_token', 302);
       }
       
       // Vérifier l'expiration du token
@@ -38,18 +38,18 @@ export async function GET(request: NextRequest) {
         
         if (expirationDate <= now) {
           ;
-          return NextResponse.redirect('https://iahome.fr/encours?error=token_expired', 302);
+          return NextResponse.redirect('https://iahome.fr/account?error=token_expired', 302);
         }
       }
       
-      // Vérifier que le module psitransfer est visible dans /encours pour cet utilisateur
+      // Vérifier que le module psitransfer est visible dans /account pour cet utilisateur
       const securityService = ModuleSecurityService.getInstance();
       const canAccess = await securityService.canAccessExternalApp(tokenData.created_by, 'psitransfer');
       
       if (!canAccess) {
         const reason = await securityService.getAccessDenialReason(tokenData.created_by, 'psitransfer');
         console.log('❌ Accès refusé:', reason);
-        return NextResponse.redirect(`https://iahome.fr/encours?error=access_denied&reason=${encodeURIComponent(reason)}`, 302);
+        return NextResponse.redirect(`https://iahome.fr/account?error=access_denied&reason=${encodeURIComponent(reason)}`, 302);
       }
       
       console.log('✅ Token valide et accès autorisé pour:', tokenData.created_by);
@@ -112,14 +112,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect('https://iahome.fr/login?error=invalid_session', 302);
     }
     
-    // Vérifier que le module psitransfer est visible dans /encours pour cet utilisateur
+    // Vérifier que le module psitransfer est visible dans /account pour cet utilisateur
     const securityService = ModuleSecurityService.getInstance();
     const canAccess = await securityService.canAccessExternalApp(session.user.id, 'psitransfer');
     
     if (!canAccess) {
       const reason = await securityService.getAccessDenialReason(session.user.id, 'psitransfer');
-      console.log('❌ Module non visible dans /encours:', reason);
-      return NextResponse.redirect(`https://iahome.fr/encours?error=module_not_visible&reason=${encodeURIComponent(reason)}`, 302);
+      console.log('❌ Module non visible dans /account:', reason);
+      return NextResponse.redirect(`https://iahome.fr/account?error=module_not_visible&reason=${encodeURIComponent(reason)}`, 302);
     }
     
     console.log('✅ Accès autorisé pour utilisateur:', session.user.email);
@@ -133,4 +133,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect('https://iahome.fr/login?error=internal_error', 302);
   }
 }
+
 

@@ -1,27 +1,25 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 
 interface CardPageActivationSectionProps {
   moduleId: string;
   moduleName: string;
   tokenCost: number;
-  tokenUnit?: string; // "par accès, et utilisez l'application aussi longtemps que vous souhaitez"
-  apiEndpoint: string; // e.g., '/api/activate-code-learning'
-  gradientColors?: string; // e.g., 'from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
+  tokenUnit?: string;
+  apiEndpoint: string; // Conservé pour compatibilité avec les appels existants
+  gradientColors?: string;
   icon?: string;
-  isModuleActivated?: boolean; // Optionnel, sera vérifié automatiquement si non fourni
+  isModuleActivated?: boolean; // Conservé pour compatibilité
   onActivationSuccess?: () => void;
-  // Paramètres supplémentaires pour les endpoints qui nécessitent plus d'infos
   moduleTitle?: string;
   moduleDescription?: string;
   moduleCategory?: string;
   moduleUrl?: string;
-  // Fonction personnalisée pour construire le body de la requête
   customRequestBody?: (userId: string, email: string, moduleId: string) => any;
+  accessUrl?: string;
 }
 
 export default function CardPageActivationSection({
@@ -29,64 +27,74 @@ export default function CardPageActivationSection({
   moduleName,
   tokenCost,
   tokenUnit = 'par accès',
-  apiEndpoint,
+  apiEndpoint: _apiEndpoint,
   gradientColors = 'from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700',
   icon = '💻',
-  isModuleActivated: externalIsModuleActivated,
+  isModuleActivated: _isModuleActivated,
   onActivationSuccess,
-  moduleTitle,
-  moduleDescription,
-  moduleCategory,
+  moduleTitle: _moduleTitle,
+  moduleDescription: _moduleDescription,
+  moduleCategory: _moduleCategory,
   moduleUrl,
-  customRequestBody
+  customRequestBody: _customRequestBody,
+  accessUrl,
 }: CardPageActivationSectionProps) {
   const router = useRouter();
   const { user, isAuthenticated } = useCustomAuth();
   const [loading, setLoading] = useState(false);
-  const [isModuleActivated, setIsModuleActivated] = useState(externalIsModuleActivated || false);
-  const [checkingActivation, setCheckingActivation] = useState(false);
 
-  // Vérifier l'état d'activation si non fourni
-  const checkModuleActivation = useCallback(async (moduleId: string) => {
-    if (!user?.id || !moduleId) return false;
-    
-    try {
-      const response = await fetch('/api/check-module-activation', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          moduleId: moduleId,
-          userId: user.id
-        }),
-      });
+  const resolveModuleUrl = () => {
+    if (accessUrl) return accessUrl;
+    if (moduleUrl) return moduleUrl;
+    const normalizedModuleId = (moduleId || '').trim().toLowerCase();
+    const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const urlMap: Record<string, string> = isDevelopment
+      ? {
+          'photomaker': 'http://localhost:7881',
+          'birefnet': 'http://localhost:7882',
+          'animagine-xl': 'http://localhost:7883',
+          'florence-2': 'http://localhost:7884',
+          'home-assistant': 'http://localhost:8123',
+          'hunyuan3d': 'http://localhost:8888',
+          'stablediffusion': 'http://localhost:7880',
+          'meeting-reports': 'http://localhost:3050',
+          'whisper': 'http://localhost:8093',
+          'ruinedfooocus': 'http://localhost:7870',
+          'comfyui': 'http://localhost:8188',
+          'apprendre-autrement': 'http://localhost:9001',
+          'prompt-generator': 'http://localhost:3002',
+        }
+      : {
+          'photomaker': 'https://photomaker.iahome.fr',
+          'birefnet': 'https://birefnet.iahome.fr',
+          'animagine-xl': 'https://animaginexl.iahome.fr',
+          'florence-2': 'https://florence2.iahome.fr',
+          'home-assistant': 'https://homeassistant.iahome.fr',
+          'hunyuan3d': 'https://hunyuan3d.iahome.fr',
+          'stablediffusion': 'https://stablediffusion.iahome.fr',
+          'meeting-reports': 'https://meeting-reports.iahome.fr',
+          'whisper': 'https://whisper.iahome.fr',
+          'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
+          'comfyui': 'https://comfyui.iahome.fr',
+          'apprendre-autrement': 'https://apprendre-autrement.iahome.fr',
+          'prompt-generator': 'https://prompt-generator.iahome.fr',
+        };
 
-      if (response.ok) {
-        const result = await response.json();
-        return result.isActivated || false;
-      }
-    } catch (error) {
-      console.error('Erreur lors de la vérification d\'activation:', error);
+    if (urlMap[normalizedModuleId]) {
+      return urlMap[normalizedModuleId];
     }
-    return false;
-  }, [user?.id]);
 
-  useEffect(() => {
-    if (externalIsModuleActivated !== undefined) {
-      setIsModuleActivated(externalIsModuleActivated);
-    } else if (user?.id && moduleId) {
-      const checkActivation = async () => {
-        setCheckingActivation(true);
-        const isActivated = await checkModuleActivation(moduleId);
-        setIsModuleActivated(isActivated);
-        setCheckingActivation(false);
-      };
-      checkActivation();
-    }
-  }, [externalIsModuleActivated, user?.id, moduleId, checkModuleActivation]);
+    const subdomainAliases: Record<string, string> = {
+      'animagine-xl': 'animaginexl',
+      'florence-2': 'florence2',
+      'home-assistant': 'homeassistant',
+    };
 
-  const handleActivate = async () => {
+    const computedSubdomain = subdomainAliases[normalizedModuleId] || normalizedModuleId;
+    return computedSubdomain ? `https://${computedSubdomain}.iahome.fr` : '';
+  };
+
+  const handleDirectAccess = async () => {
     if (!isAuthenticated || !user) {
       router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}`)}`);
       return;
@@ -94,58 +102,41 @@ export default function CardPageActivationSection({
 
     try {
       setLoading(true);
-      
-      // Construire le body de la requête
-      let requestBody: any;
-      if (customRequestBody) {
-        requestBody = customRequestBody(user.id, user.email || '', moduleId);
-      } else if (moduleTitle) {
-        // Si moduleTitle est fourni, utiliser le format complet
-        requestBody = {
-          moduleId: moduleId,
-          userId: user.id,
-          moduleTitle: moduleTitle,
-          ...(moduleDescription && { moduleDescription }),
-          ...(moduleCategory && { moduleCategory }),
-          ...(moduleUrl && { moduleUrl })
-        };
-      } else {
-        // Format simple par défaut
-        requestBody = {
-          userId: user.id,
-          email: user.email
-        };
-      }
-      
-      const response = await fetch(apiEndpoint, {
+      const response = await fetch('/api/generate-access-token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({
+          moduleId,
+          userId: user.id,
+          userEmail: user.email,
+        }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          console.log(`✅ ${moduleName} activé avec succès`);
-          setIsModuleActivated(true);
-          if (onActivationSuccess) {
-            onActivationSuccess();
-          }
-          router.push('/encours');
-        } else {
-          console.error(`❌ Erreur activation ${moduleName}:`, data.error);
-          alert('Erreur lors de l\'activation: ' + (data.error || 'Erreur inconnue'));
-        }
-      } else {
+      if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
-        console.error('❌ Erreur réponse API:', response.status, errorData);
-        alert('Erreur lors de l\'activation: ' + (errorData.error || 'Erreur inconnue'));
+        throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
       }
+
+      const data = await response.json();
+      const token = data?.token;
+      if (!token) {
+        throw new Error('Token d\'accès manquant');
+      }
+
+      const targetUrl = resolveModuleUrl();
+      if (targetUrl) {
+        const separator = targetUrl.includes('?') ? '&' : '?';
+        window.open(`${targetUrl}${separator}token=${encodeURIComponent(token)}`, '_blank');
+      } else {
+        throw new Error(`URL d'accès introuvable pour le module ${moduleId}`);
+      }
+
+      onActivationSuccess?.();
     } catch (error) {
-      console.error(`❌ Erreur lors de l'activation de ${moduleName}:`, error);
-      alert('Erreur lors de l\'activation');
+      console.error(`❌ Erreur lors de l'accès à ${moduleName}:`, error);
+      alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     } finally {
       setLoading(false);
     }
@@ -156,13 +147,12 @@ export default function CardPageActivationSection({
       <div className="max-w-7xl mx-auto px-6">
         <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-white/50 p-8 sm:p-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            {/* Colonne 1 - Description */}
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Activez {moduleName}
+                Accès direct à {moduleName}
               </h2>
               <p className="text-lg text-gray-700 mb-6">
-                Accédez à {moduleName} et profitez de toutes ses fonctionnalités. L'activation est simple et rapide.
+                Ouvrez {moduleName} immédiatement via un token d'accès sécurisé.
               </p>
               <div className="flex items-center space-x-4">
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-200">
@@ -176,55 +166,31 @@ export default function CardPageActivationSection({
               </div>
             </div>
 
-            {/* Colonne 2 - Bouton d'activation */}
             <div className="flex justify-center">
-              {isModuleActivated ? (
-                <div className="w-full max-w-md bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 text-center">
-                  <div className="flex items-center justify-center space-x-3 text-green-800 mb-4">
-                    <span className="text-3xl">✅</span>
-                    <div>
-                      <p className="font-semibold text-lg">Service déjà activé !</p>
-                      <p className="text-sm opacity-80">Pour y accéder, cliquez sur Mes Applis activées</p>
-                    </div>
-                  </div>
-                  <Link
-                    href="/encours"
-                    className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
-                  >
-                    <span className="mr-2">📱</span>
-                    Aller à Mes Applications
-                  </Link>
-                </div>
-              ) : (
-                <div className="w-full max-w-md">
-                  <button
-                    onClick={handleActivate}
-                    disabled={loading || checkingActivation}
-                    className={`w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1
-                      ${loading || checkingActivation
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : `bg-gradient-to-r ${gradientColors} text-white`
-                      }`}
-                  >
-                    {loading || checkingActivation ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                        <span>Activation en cours...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-xl">{icon}</span>
-                        <span>
-                          {isAuthenticated && user 
-                            ? `Activer ${moduleName} (${tokenCost} tokens)` 
-                            : `Connectez-vous pour activer (${tokenCost} tokens)`
-                          }
-                        </span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
+              <div className="w-full max-w-md">
+                <button
+                  onClick={handleDirectAccess}
+                  disabled={loading}
+                  className={`w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1
+                    ${loading ? 'bg-gray-400 cursor-not-allowed' : `bg-gradient-to-r ${gradientColors} text-white`}`}
+                >
+                  {loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      <span>Ouverture en cours...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-xl">{icon}</span>
+                      <span>
+                        {isAuthenticated && user
+                          ? `Accéder à ${moduleName} (${tokenCost} tokens)`
+                          : `Connectez-vous pour accéder (${tokenCost} tokens)`}
+                      </span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -232,3 +198,4 @@ export default function CardPageActivationSection({
     </section>
   );
 }
+

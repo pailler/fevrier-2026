@@ -24,7 +24,7 @@ export default function PaymentCancelPage() {
           </Link>
           
           <Link 
-            href="/encours"
+            href="/account"
             className="inline-block w-full bg-gray-600 text-white py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors"
           >
             Mes applications
@@ -38,3 +38,4 @@ export default function PaymentCancelPage() {
     </div>
   );
 }
+

@@ -69,7 +69,7 @@ export default function AdminEvents() {
           });
         }
 
-        // 2. Événements applications (activation, utilisation)
+        // 2. Événements applications (accès, utilisation)
         const { data: userApps, error: userAppsError } = await supabase
           .from('user_applications')
           .select(`
@@ -109,12 +109,12 @@ export default function AdminEvents() {
             const module = modulesMap[app.module_id];
 
             if (profile && module) {
-              // Événement d'activation d'application
+              // Événement d'accès d'application
               allEvents.push({
                 id: `app_activated_${app.id}`,
                 type: 'application_created',
-                title: 'Application activée',
-                description: `${profile.full_name || profile.email} a activé l'application ${module.name}`,
+                title: 'application accessible',
+                description: `${profile.full_name || profile.email} a accédé à l'application ${module.name}`,
                 timestamp: app.created_at,
                 user: profile,
                 metadata: { module: module.name },
@@ -591,3 +591,5 @@ export default function AdminEvents() {
     </div>
   );
 }
+
+

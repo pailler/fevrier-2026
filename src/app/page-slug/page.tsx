@@ -92,7 +92,7 @@ export default function DynamicPage() {
     'protected-metube'
   ];
 
-  // Routes qui nécessitent une redirection vers /encours
+  // Routes qui nécessitent une redirection vers /account
   const redirectRoutes = [
     'token-generated',
     'encours',
@@ -104,7 +104,7 @@ export default function DynamicPage() {
   // Redirection immédiate pour certaines routes exclues uniquement
   useEffect(() => {
     if (redirectRoutes.includes(slug)) {
-      router.replace('/encours');
+      router.replace('/account');
     }
   }, [slug, router]);
 
@@ -300,4 +300,5 @@ export default function DynamicPage() {
     </div>
   );
 }
+
 
