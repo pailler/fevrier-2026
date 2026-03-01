@@ -270,11 +270,10 @@ export async function POST(request: NextRequest) {
       console.log('✅ Tokens consommés:', tokensToConsume, 'Restants:', newTokenCount, 'pour userId:', userId);
     }
 
-    // Enregistrer l'utilisation dans l'historique via user_applications et token_usage
+    // Enregistrer l'utilisation dans token_usage
     if (moduleId && moduleId !== 'test') {
       const now = new Date().toISOString();
       
-      // Enregistrer dans token_usage si la table existe
       try {
         const { error: tokenUsageError } = await supabase
           .from('token_usage')
@@ -295,24 +294,46 @@ export async function POST(request: NextRequest) {
       } catch (error) {
         console.log('ℹ️ Table token_usage non accessible:', error);
       }
-      
-      // Mettre à jour last_used_at pour l'historique
-      // NE PAS incrémenter usage_count ici car cela sera fait par /api/increment-module-access
-      // Cela évite la double incrémentation
-      const { error: historyError } = await supabase
-        .from('user_applications')
-        .update({
-          last_used_at: now
-          // usage_count sera incrémenté par /api/increment-module-access
-        })
-        .eq('user_id', actualUserId)
-        .eq('module_id', moduleId);
 
-      if (historyError) {
-        console.error('❌ Erreur enregistrement historique user_applications:', historyError);
-        // Ne pas faire échouer la requête pour une erreur d'historique
-      } else {
-        console.log('✅ Utilisation enregistrée dans user_applications (last_used_at mis à jour)');
+      // Mettre à jour user_applications (applis visitées) pour le nouveau système
+      try {
+        const modId = (moduleId || '').toString().trim();
+        const modTitle = (moduleName || moduleId).toString().trim();
+        const { data: existingApp } = await supabase
+          .from('user_applications')
+          .select('id, usage_count')
+          .eq('user_id', actualUserId)
+          .eq('module_id', modId)
+          .maybeSingle();
+
+        if (existingApp) {
+          const newUsageCount = (existingApp.usage_count || 0) + 1;
+          const { error: updateErr } = await supabase
+            .from('user_applications')
+            .update({
+              usage_count: newUsageCount,
+              last_used_at: now,
+              updated_at: now
+            })
+            .eq('id', existingApp.id);
+          if (updateErr) console.log('ℹ️ Mise à jour user_applications (visité):', updateErr.message);
+        } else {
+          const { error: insertErr } = await supabase
+            .from('user_applications')
+            .insert({
+              user_id: actualUserId,
+              module_id: modId,
+              module_title: modTitle,
+              usage_count: 1,
+              last_used_at: now,
+              is_active: false,
+              created_at: now,
+              updated_at: now
+            });
+          if (insertErr) console.log('ℹ️ Insert user_applications (visité):', insertErr.message);
+        }
+      } catch (err) {
+        console.log('ℹ️ user_applications (visité) non accessible:', err);
       }
     }
 

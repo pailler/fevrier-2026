@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
+import { getSupabaseUrl, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 
 const supabase = createClient(
   getSupabaseUrl(),
@@ -15,6 +15,15 @@ type UserApplication = {
   lastUsedAt: string | null;
   createdAt: string;
 };
+
+function chunkArray<T>(items: T[], chunkSize: number): T[][] {
+  if (!items.length) return [];
+  const chunks: T[][] = [];
+  for (let i = 0; i < items.length; i += chunkSize) {
+    chunks.push(items.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
 
 function normalizeModuleId(moduleId: string): string {
   const normalized = (moduleId || '').toString().toLowerCase().trim();
@@ -49,8 +58,6 @@ async function ensureHomeAssistantFor300Tokens(userId: string, tokens: number): 
   }
 
   const nowIso = new Date().toISOString();
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 30);
 
   const { data: existingApp, error: existingAppError } = await supabase
     .from('user_applications')
@@ -71,8 +78,7 @@ async function ensureHomeAssistantFor300Tokens(userId: string, tokens: number): 
         .from('user_applications')
         .update({
           is_active: true,
-          updated_at: nowIso,
-          expires_at: expiresAt.toISOString()
+          updated_at: nowIso
         })
         .eq('id', existingApp.id);
 
@@ -96,8 +102,6 @@ async function ensureHomeAssistantFor300Tokens(userId: string, tokens: number): 
       is_active: true,
       access_level: 'premium',
       usage_count: 0,
-      max_usage: null,
-      expires_at: expiresAt.toISOString(),
       created_at: nowIso,
       updated_at: nowIso
     });
@@ -110,9 +114,16 @@ async function ensureHomeAssistantFor300Tokens(userId: string, tokens: number): 
   return { inserted: true, reactivated: false };
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    ;
+    const supabaseUrl = getSupabaseUrl();
+    const serviceKey = getSupabaseServiceRoleKey();
+    if (!supabaseUrl || supabaseUrl.includes('example.supabase.co') || !serviceKey || serviceKey === 'REPLACE_WITH_REAL_VALUE') {
+      return NextResponse.json(
+        { error: 'Configuration Supabase manquante (NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)' },
+        { status: 500 }
+      );
+    }
 
     // Récupérer tous les profils utilisateurs
     const { data: profiles, error: profilesError } = await supabase
@@ -122,32 +133,40 @@ export async function GET(request: NextRequest) {
 
     if (profilesError) {
       console.error('❌ Erreur lors de la récupération des profils:', profilesError);
-      return NextResponse.json({ error: 'Erreur lors de la récupération des profils' }, { status: 500 });
+      return NextResponse.json(
+        {
+          error: 'Erreur lors de la récupération des profils',
+          details: profilesError.message,
+          code: profilesError.code,
+        },
+        { status: 500 }
+      );
     }
 
     const profileIds = (profiles || []).map((profile) => profile.id).filter(Boolean);
-
-    const { data: allApplications, error: appsError } = await supabase
-      .from('user_applications')
-      .select('user_id, module_id, module_title, usage_count, max_usage, expires_at, is_active, created_at, updated_at, last_used_at')
-      .in('user_id', profileIds);
-
-    if (appsError) {
-      console.warn('⚠️ user_applications indisponible:', appsError.message);
+    if (profileIds.length === 0) {
+      return NextResponse.json({
+        success: true,
+        users: [],
+        total: 0
+      });
     }
 
-    const appsByUser = new Map<string, any[]>();
-    for (const app of allApplications || []) {
-      if (!app.user_id) continue;
-      const list = appsByUser.get(app.user_id) || [];
-      list.push(app);
-      appsByUser.set(app.user_id, list);
-    }
+    const idChunks = chunkArray(profileIds, 100);
+    const allTokens: Array<{ user_id: string; tokens: number | null }> = [];
+    for (const idChunk of idChunks) {
+      const { data: tokenChunk, error: tokenChunkError } = await supabase
+        .from('user_tokens')
+        .select('user_id, tokens')
+        .in('user_id', idChunk);
 
-    const { data: allTokens } = await supabase
-      .from('user_tokens')
-      .select('user_id, tokens')
-      .in('user_id', profileIds);
+      if (tokenChunkError) {
+        console.warn('⚠️ user_tokens indisponible pour un lot:', tokenChunkError.message);
+        continue;
+      }
+
+      allTokens.push(...(tokenChunk || []));
+    }
 
     const tokensByUser = new Map<string, number>();
     for (const tokenRow of allTokens || []) {
@@ -169,9 +188,64 @@ export async function GET(request: NextRequest) {
       })
     );
 
+    // Recharger user_applications après l'auto-activation Home Assistant
+    // pour que la réponse reflète immédiatement les modules accessibles.
+    const allApplications: any[] = [];
+    for (const idChunk of idChunks) {
+      const { data: appsChunk, error: appsChunkError } = await supabase
+        .from('user_applications')
+        .select('user_id, module_id, module_title, usage_count, is_active, created_at, updated_at, last_used_at')
+        .in('user_id', idChunk);
+
+      if (appsChunkError) {
+        console.warn('⚠️ user_applications indisponible pour un lot:', appsChunkError.message);
+        continue;
+      }
+
+      allApplications.push(...(appsChunk || []));
+    }
+
+    const appsByUser = new Map<string, any[]>();
+    for (const app of allApplications) {
+      if (!app.user_id) continue;
+      const list = appsByUser.get(app.user_id) || [];
+      list.push(app);
+      appsByUser.set(app.user_id, list);
+    }
+
+    // Fallback: récupérer les modules depuis token_usage pour les visites historiques
+    const tokenUsageByUser = new Map<string, Array<{ moduleId: string; lastUsedAt: string }>>();
+    try {
+      for (const idChunk of idChunks) {
+        const { data: usageChunk } = await supabase
+          .from('token_usage')
+          .select('user_id, module_id, module_name, usage_date')
+          .in('user_id', idChunk);
+
+        if (usageChunk) {
+          for (const row of usageChunk) {
+            if (!row.user_id) continue;
+            const mid = normalizeModuleId(row.module_id || row.module_name || '');
+            if (!mid) continue;
+            const last = row.usage_date || new Date().toISOString();
+            const list = tokenUsageByUser.get(row.user_id) || [];
+            const existing = list.find((x) => x.moduleId === mid);
+            if (existing) {
+              if (new Date(last) > new Date(existing.lastUsedAt)) existing.lastUsedAt = last;
+            } else {
+              list.push({ moduleId: mid, lastUsedAt: last });
+            }
+            tokenUsageByUser.set(row.user_id, list);
+          }
+        }
+      }
+    } catch {
+      // token_usage peut être indisponible
+    }
+
     const usersWithApplications = profiles.map((profile) => {
       const rawApps = appsByUser.get(profile.id) || [];
-      const visitedApps: UserApplication[] = rawApps
+      const normalizedApps = rawApps
         .map((app) => {
           const moduleId = normalizeModuleId(app.module_id || app.module_title || '');
           if (!moduleId) return null;
@@ -186,31 +260,57 @@ export async function GET(request: NextRequest) {
             usageCount,
             maxUsage: app.max_usage || 0,
             expiresAt: app.expires_at || null,
-            // "Visité" = accès via bouton token, pas simple activation.
             lastUsedAt,
             createdAt: app.created_at || new Date().toISOString(),
           };
         })
         .filter((app): app is UserApplication => !!app)
-        .filter((app) => (app.usageCount || 0) > 0 || !!app.lastUsedAt)
         .sort(
           (a, b) =>
             (b.lastUsedAt ? new Date(b.lastUsedAt).getTime() : 0) -
             (a.lastUsedAt ? new Date(a.lastUsedAt).getTime() : 0)
         );
 
-      let lastLogin: Date | null = null;
-      if (visitedApps.length > 0 && visitedApps[0].lastUsedAt) {
-        lastLogin = new Date(visitedApps[0].lastUsedAt);
-      } else if (profile.updated_at) {
-        lastLogin = new Date(profile.updated_at);
-      } else {
-        lastLogin = new Date(profile.created_at);
+      // Applis actives (ancien système) : toutes les entrées user_applications
+      const activeApps = rawApps.map((app) => {
+        const moduleId = normalizeModuleId(app.module_id || app.module_title || '');
+        return moduleId ? { moduleId } : null;
+      }).filter((a): a is { moduleId: string } => !!a);
+      const activeModules = Array.from(new Set(activeApps.map((a) => a.moduleId)));
+
+      // "Visite réelle" (nouveau système) = usage_count > 0 ou last_used_at non nul.
+      let visitedApps = normalizedApps.filter((app) => (app.usageCount || 0) > 0 || !!app.lastUsedAt);
+      // Fallback token_usage : ajouter les modules consommés qui ne sont pas déjà dans visitedApps
+      const tokenUsageModules = tokenUsageByUser.get(profile.id) || [];
+      for (const tu of tokenUsageModules) {
+        if (visitedApps.some((a) => a.moduleId === tu.moduleId)) continue;
+        visitedApps = visitedApps.concat({
+          moduleId: tu.moduleId,
+          usageCount: 1,
+          maxUsage: 0,
+          expiresAt: null,
+          lastUsedAt: tu.lastUsedAt,
+          createdAt: tu.lastUsedAt
+        });
       }
+      visitedApps = visitedApps.sort(
+        (a, b) =>
+          (b.lastUsedAt ? new Date(b.lastUsedAt).getTime() : 0) -
+          (a.lastUsedAt ? new Date(a.lastUsedAt).getTime() : 0)
+      );
+      const visitedDates = visitedApps
+        .map((app) => app.lastUsedAt || ((app.usageCount || 0) > 0 ? app.createdAt : null))
+        .filter((date): date is string => !!date)
+        .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+      const lastVisitedAt = visitedDates[0] || null;
+
+      // L'activité affichée se base uniquement sur les visites réelles.
+      const lastLogin = lastVisitedAt ? new Date(lastVisitedAt) : null;
+      const statusReferenceDate = lastLogin || (profile.updated_at ? new Date(profile.updated_at) : new Date(profile.created_at));
 
       const now = new Date();
-      const daysSinceLastLogin = lastLogin
-        ? Math.floor((now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60 * 24))
+      const daysSinceLastLogin = statusReferenceDate
+        ? Math.floor((now.getTime() - statusReferenceDate.getTime()) / (1000 * 60 * 60 * 24))
         : null;
       const isAdmin = profile.role === 'admin';
 
@@ -221,6 +321,11 @@ export async function GET(request: NextRequest) {
         status = 'inactive';
       }
 
+      // Applis actives : objets complets depuis user_applications
+      const activeApplications = normalizedApps.filter((app) =>
+        activeModules.includes(app.moduleId)
+      );
+
       return {
         id: profile.id,
         email: profile.email,
@@ -229,9 +334,12 @@ export async function GET(request: NextRequest) {
         createdAt: profile.created_at,
         lastLogin: lastLogin?.toISOString() || null,
         status,
-        modules: visitedApps.map((app) => app.moduleId),
+        activeModules,
+        activeApplications,
+        modules: Array.from(new Set(visitedApps.map((app) => app.moduleId))),
         applications: visitedApps,
         tokens: tokensByUser.get(profile.id) || 0,
+        tokensRemaining: tokensByUser.get(profile.id) || 0,
       };
     });
 
@@ -244,8 +352,16 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    const details = error instanceof Error ? error.stack : String(error);
     console.error('❌ Erreur Admin Users API:', error);
-    return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Erreur interne du serveur',
+        ...(process.env.NODE_ENV === 'development' && { details: message, stack: details }),
+      },
+      { status: 500 }
+    );
   }
 }
 
