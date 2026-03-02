@@ -37,30 +37,25 @@ export async function GET(request: Request) {
       }, { status: 500 });
     }
 
-    const now = new Date();
-    const isExpired = userApp?.expires_at ? new Date(userApp.expires_at) <= now : false;
     const isActive = userApp?.is_active === true;
-    const needsReactivation = !userApp || !isActive || isExpired;
+    const needsReactivation = !userApp || !isActive;
 
     return NextResponse.json({
       success: true,
       exists: !!userApp,
       is_active: isActive,
-      is_expired: isExpired,
+      is_expired: false,
       needs_reactivation: needsReactivation,
       data: userApp ? {
         id: userApp.id,
         module_id: userApp.module_id,
         module_title: userApp.module_title,
         is_active: userApp.is_active,
-        expires_at: userApp.expires_at,
-        expires_at_date: userApp.expires_at ? new Date(userApp.expires_at).toISOString() : null,
         usage_count: userApp.usage_count || 0,
-        max_usage: userApp.max_usage,
         access_level: userApp.access_level,
         created_at: userApp.created_at
       } : null,
-      now: now.toISOString()
+      now: new Date().toISOString()
     });
 
   } catch (error) {
@@ -109,23 +104,17 @@ export async function POST(request: Request) {
       }, { status: 500 });
     }
 
-    const now = new Date();
-    const expiresAt = new Date(now);
-    expiresAt.setDate(expiresAt.getDate() + 90); // 90 jours
-
+    const now = new Date().toISOString();
     let result;
 
     if (existingAccess) {
-      // Réactiver l'accès existant
       const { data: reactivatedAccess, error: reactivateError } = await supabase
         .from('user_applications')
         .update({
           is_active: true,
           access_level: 'premium',
-          usage_count: 0, // Réinitialiser le compteur
-          max_usage: 50, // Quota de 50 utilisations
-          expires_at: expiresAt.toISOString(),
-          updated_at: now.toISOString()
+          usage_count: 0,
+          updated_at: now
         })
         .eq('id', existingAccess.id)
         .select()
@@ -142,7 +131,6 @@ export async function POST(request: Request) {
       result = reactivatedAccess;
       console.log('✅ QR Codes réactivé:', result.id);
     } else {
-      // Créer un nouvel accès
       const { data: newAccess, error: createError } = await supabase
         .from('user_applications')
         .insert([{
@@ -152,10 +140,8 @@ export async function POST(request: Request) {
           is_active: true,
           access_level: 'premium',
           usage_count: 0,
-          max_usage: 50,
-          expires_at: expiresAt.toISOString(),
-          created_at: now.toISOString(),
-          updated_at: now.toISOString()
+          created_at: now,
+          updated_at: now
         }])
         .select()
         .single();
@@ -180,9 +166,7 @@ export async function POST(request: Request) {
         module_id: result.module_id,
         module_title: result.module_title,
         is_active: result.is_active,
-        expires_at: result.expires_at,
-        usage_count: result.usage_count || 0,
-        max_usage: result.max_usage
+        usage_count: result.usage_count || 0
       }
     });
 

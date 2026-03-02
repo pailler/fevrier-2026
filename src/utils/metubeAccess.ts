@@ -46,28 +46,9 @@ export class MeTubeAccessService {
         .single();
 
       if (userAppError || !userApp) {
-        ;
         return {
           hasAccess: false,
           reason: 'Aucun accès MeTube trouvé pour votre compte'
-        };
-      }
-
-      // Vérifier l'expiration
-      if (userApp.expires_at && new Date(userApp.expires_at) <= new Date()) {
-        ;
-        return {
-          hasAccess: false,
-          reason: 'Votre accès MeTube a expiré'
-        };
-      }
-
-      // Vérifier la limite d'utilisation
-      if (userApp.usage_count >= userApp.max_usage) {
-        ;
-        return {
-          hasAccess: false,
-          reason: `Limite d'utilisation atteinte (${userApp.usage_count}/${userApp.max_usage})`
         };
       }
 

@@ -36,7 +36,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-L'application sera accessible sur `http://localhost:7860`
+L'application sera accessible sur `http://localhost:7885`
 
 ### Utilisation
 

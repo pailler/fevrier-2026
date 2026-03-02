@@ -133,7 +133,7 @@ export default function ApprendreAutrementCardPage() {
           "name": "Combien coûte l'application ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'accès d'Apprendre Autrement coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiate, l'application est accessible depuis vos applications."
+            "text": "L'accès d'Apprendre Autrement coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiate, l'application est accessible depuis vos applications."
           }
         },
         {
@@ -300,7 +300,7 @@ export default function ApprendreAutrementCardPage() {
                   <li>Système de progression avec récompenses</li>
                   <li>Encouragement vocal personnalisé</li>
                   <li>Paramètres d'accessibilité adaptables</li>
-                  <li>10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez</li>
+                  <li>Utilisez l'application aussi longtemps que vous souhaitez</li>
                 </ul>
               </div>
             </div>
@@ -308,17 +308,6 @@ export default function ApprendreAutrementCardPage() {
     
           {/* Colonne 2 - Accès */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8">
-            <div className="text-center mb-8">
-              <div className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                <div className="text-4xl font-bold mb-1">
-                  10 tokens
-                </div>
-                <div className="text-sm opacity-90">
-                  par accès
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-6">
               {isModuleActivated && (
                 <div className="w-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
@@ -685,7 +674,7 @@ export default function ApprendreAutrementCardPage() {
                   <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Combien coûte l'application ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'accès d'Apprendre Autrement coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiate, l'application est accessible depuis vos applications.
+                      L'accès d'Apprendre Autrement coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiate, l'application est accessible depuis vos applications.
                     </p>
                   </div>
                   
@@ -725,6 +714,7 @@ export default function ApprendreAutrementCardPage() {
     </div>
   );
 }
+
 
 
 

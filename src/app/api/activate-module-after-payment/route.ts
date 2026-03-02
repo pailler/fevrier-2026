@@ -138,64 +138,38 @@ export async function POST(request: NextRequest) {
       .eq('module_id', moduleId)
       .single();
 
-    const now = new Date();
-    const aiModules = ['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui', 'hunyuan3d', 'prompt-generator'];
-    const isAIModule = aiModules.some(id => moduleId.toLowerCase().includes(id));
-    
-    // Modules IA : 30 jours (1 mois), Modules essentiels : 90 jours (3 mois)
-    const expiresAt = new Date(now);
-    if (isAIModule) {
-      expiresAt.setDate(expiresAt.getDate() + 30); // 1 mois
-    } else {
-      expiresAt.setDate(expiresAt.getDate() + 90); // 3 mois
-    }
-
+    const now = new Date().toISOString();
     let activationData;
 
+    if (existingAccess && !accessError && existingAccess.is_active) {
+      return NextResponse.json({
+        success: true,
+        message: 'Application déjà activée',
+        moduleInfo: moduleData
+      });
+    }
+
     if (existingAccess && !accessError) {
-      // Vérifier si l'accès est actif et non expiré
-      const isActive = existingAccess.is_active;
-      const isExpired = existingAccess.expires_at ? new Date(existingAccess.expires_at) <= now : false;
-
-      if (isActive && !isExpired) {
-        console.log('✅ Module déjà activé pour l\'utilisateur');
-        return NextResponse.json({
-          success: true,
-          message: 'Application déjà activée',
-          moduleInfo: moduleData
-        });
-      }
-
-      // Si le module est expiré ou désactivé, le réactiver avec usage_count = 0
-      console.log('🔄 Réactivation du module (module expiré ou désactivé)');
       const { data: reactivatedAccess, error: reactivateError } = await supabase
         .from('user_applications')
         .update({
           is_active: true,
           access_level: 'paid',
-          usage_count: 0, // Réinitialiser le compteur d'utilisation
-          max_usage: 50, // Quota de 50 utilisations
-          expires_at: expiresAt.toISOString(),
-          updated_at: new Date().toISOString()
+          usage_count: 0,
+          updated_at: now
         })
         .eq('id', existingAccess.id)
         .select()
         .single();
 
       if (reactivateError) {
-        console.error('❌ Erreur lors de la réactivation du module:', reactivateError);
         return NextResponse.json(
           { success: false, error: 'Erreur lors de la réactivation du module' },
           { status: 500 }
         );
       }
-
       activationData = reactivatedAccess;
-      console.log('✅ Module réactivé avec succès:', activationData);
     } else {
-      // Créer un nouvel accès
-      console.log('🆕 Création d\'un nouvel accès pour le module');
-
       const { data: newAccess, error: activationError } = await supabase
         .from('user_applications')
         .insert([
@@ -206,8 +180,8 @@ export async function POST(request: NextRequest) {
             is_active: true,
             access_level: 'paid',
             usage_count: 0,
-            max_usage: 50, // Quota de 50 utilisations
-            expires_at: expiresAt.toISOString(),
+            created_at: now,
+            updated_at: now
           }
         ])
         .select()

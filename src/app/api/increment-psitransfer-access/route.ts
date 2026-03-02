@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     // 1. Rechercher l'accès PsiTransfer de l'utilisateur
     const { data: userApp, error: appError } = await supabase
       .from('user_applications')
-      .select('id, usage_count, max_usage, expires_at, module_id')
+      .select('id, usage_count, module_id')
       .eq('user_id', userId)
       .eq('module_id', 'psitransfer')
       .eq('is_active', true)
@@ -45,37 +45,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 2. Vérifier la date d'expiration
-    const currentDate = new Date();
-    const expiresAt = new Date(userApp.expires_at);
-    
-    if (expiresAt <= currentDate) {
-      console.log('❌ PsiTransfer Access: Module expiré');
-      return new NextResponse(JSON.stringify({
-        success: false,
-        error: 'Application PsiTransfer expirée'
-      }), {
-        status: 403,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    // 3. Vérifier la limite d'usage
     const currentUsage = userApp.usage_count || 0;
-    const maxUsage = userApp.max_usage;
 
-    if (maxUsage && currentUsage >= maxUsage) {
-      console.log('❌ PsiTransfer Access: Limite d\'usage atteinte:', currentUsage, '/', maxUsage);
-      return new NextResponse(JSON.stringify({
-        success: false,
-        error: 'Limite d\'usage atteinte'
-      }), {
-        status: 403,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    // 4. Vérifier et consommer 10 tokens
+    // Vérifier et consommer 10 tokens
     const { data: userTokens, error: tokensError } = await supabase
       .from('user_tokens')
       .select('tokens')
@@ -154,13 +126,12 @@ export async function POST(request: NextRequest) {
       return new NextResponse('Error updating usage count', { status: 500 });
     }
 
-    console.log('✅ PsiTransfer Access: Compteur incrémenté:', newUsageCount, '/', maxUsage);
+    console.log('✅ PsiTransfer Access: Compteur incrémenté:', newUsageCount);
     console.log('✅ PsiTransfer Access: 10 tokens consommés. Restants:', userTokens.tokens - 10);
 
     return new NextResponse(JSON.stringify({
       success: true,
       usage_count: updatedApp.usage_count,
-      max_usage: updatedApp.max_usage,
       last_accessed_at: updatedApp.last_accessed_at,
       tokens_consumed: 10,
       tokens_remaining: userTokens.tokens - 10

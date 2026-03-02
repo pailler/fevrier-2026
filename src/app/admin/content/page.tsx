@@ -18,7 +18,6 @@ interface ContentItem {
   views?: number;
   url?: string;
   usage_count?: number;
-  max_usage?: number;
   users?: number;
 }
 
@@ -64,8 +63,6 @@ export default function AdminContent() {
             module_id, 
             module_title,
             usage_count, 
-            max_usage, 
-            expires_at, 
             is_active, 
             created_at, 
             last_used_at,
@@ -81,7 +78,6 @@ export default function AdminContent() {
                 id: app.module_id,
                 title: app.module_title || app.module_id,
                 usage_count: 0,
-                max_usage: 0,
                 users: 0,
                 created_at: app.created_at,
                 last_used_at: app.last_used_at,
@@ -89,7 +85,6 @@ export default function AdminContent() {
               };
             }
             acc[app.module_id].usage_count += app.usage_count || 0;
-            acc[app.module_id].max_usage += app.max_usage || 0;
             acc[app.module_id].users++;
             if (app.last_used_at && (!acc[app.module_id].last_used_at || new Date(app.last_used_at) > new Date(acc[app.module_id].last_used_at))) {
               acc[app.module_id].last_used_at = app.last_used_at;
@@ -123,7 +118,6 @@ export default function AdminContent() {
               created_at: app.created_at,
               last_used_at: app.last_used_at,
               usage_count: app.usage_count,
-              max_usage: app.max_usage,
               users: app.users,
               url: `/card/${app.id}`
             });
@@ -431,7 +425,7 @@ export default function AdminContent() {
                       {item.usage_count !== undefined && (
                         <div className="flex items-center">
                           <span className="mr-1">📊</span>
-                          {item.usage_count}/{item.max_usage || '∞'} utilisations
+                          {item.usage_count} utilisations
                         </div>
                       )}
                     </div>

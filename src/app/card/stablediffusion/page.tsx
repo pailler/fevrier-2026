@@ -5,7 +5,7 @@ import { supabase } from '../../../utils/supabaseClient';
 import Link from 'next/link';
 import Image from 'next/image';
 import Breadcrumb from '../../../components/Breadcrumb';
-import ModuleActivationButton from '../../../components/ModuleActivationButton';
+import ModuleAccessButton from '../../../components/ModuleAccessButton';
 import YouTubeEmbed from '../../../components/YouTubeEmbed';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
 
@@ -43,38 +43,10 @@ export default function StableDiffusionPage() {
     title: ''
   });
   const [quickAccessAttempted, setQuickAccessAttempted] = useState(false);
-  const [alreadyActivatedModules, setAlreadyActivatedModules] = useState<string[]>([]);
-  const [checkingActivation, setCheckingActivation] = useState(false);
-
   // Vérifier si c'est un module gratuit
   const isFreeModule = false; // StableDiffusion est payant
 
-  // Fonction pour vérifier si un module est déjà accessible
-  const checkModuleActivation = useCallback(async (moduleId: string) => {
-    if (!session?.user?.id || !moduleId) return false;
-    
-    try {
-      const response = await fetch('/api/check-module-accès', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          moduleId: moduleId,
-          userId: session.user.id
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        return result.isActivated || false;
-      }
-    } catch (error) {
-      }
-    return false;
-  }, [session?.user?.id]);
-
-  // Fonction pour accéder aux modules avec JWT
+  // Fonction pour accéder aux modules
   const accessModuleWithJWT = useCallback(async (moduleTitle: string, moduleId: string) => {
     if (!session?.user?.id) {
       alert('Vous devez être connecté pour accéder aux modules');
@@ -143,11 +115,10 @@ export default function StableDiffusionPage() {
             const moduleKey = `module_${access.module_id}`;
             subscriptions[moduleKey] = {
               module_id: access.module_id,
-              access: {
+                access: {
                 id: access.id,
                 created_at: access.created_at,
                 access_level: access.access_level,
-                expires_at: access.expires_at,
                 is_active: access.is_active
               }
             };
@@ -158,23 +129,13 @@ export default function StableDiffusionPage() {
 
         setUserSubscriptions(subscriptions);
 
-        // Vérifier si le module actuel est déjà accessible dans user_applications
-        if (card?.id) {
-          setCheckingActivation(true);
-          const isActivated = await checkModuleActivation(card.id);
-          if (isActivated) {
-            setAlreadyActivatedModules(prev => [...prev, card.id]);
-          }
-          setCheckingActivation(false);
-        }
       } catch (error) {
         setUserSubscriptions({});
-        setCheckingActivation(false);
       }
     };
 
     fetchUserData();
-  }, [session?.user?.id, card?.id, checkModuleActivation]);
+  }, [session?.user?.id, card?.id]);
 
   // Charger les modules sélectionnés depuis le localStorage
   useEffect(() => {
@@ -255,7 +216,7 @@ export default function StableDiffusionPage() {
           "name": "Stable Diffusion est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'accès de Stable Diffusion coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images."
+            "text": "L'accès de Stable Diffusion coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images."
           }
         },
         {
@@ -514,74 +475,28 @@ export default function StableDiffusionPage() {
           
           {/* Colonne 2 - Système de boutons */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-            <div className="text-left mb-8">
-              <div className="w-3/4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                <div className="text-4xl font-bold mb-1">
-                  100 tokens
-                </div>
-                <div className="text-sm opacity-90">
-                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-6">
               {/* Boutons d'action */}
               <div className="space-y-4">
-                {/* Message si le module est déjà accessible */}
-                {alreadyActivatedModules.includes(card.id) && (
-                  <div className="w-3/4 mx-auto bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
-                    <div className="flex items-center justify-center space-x-3 text-green-800">
-                      <span className="text-2xl">✅</span>
-                      <div className="text-center">
-                        <p className="font-semibold">Accès direct disponible</p>
-                        <p className="text-sm opacity-80">Vous pouvez accéder à cette application depuis vos applications</p>
-                      </div>
-                    </div>
-                    <div className="mt-3 text-center">
-                      <button
-                        onClick={() => accessModuleWithJWT(card.title, card.id)}
-                        className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
-                      >
-                        <span className="mr-2">📱</span>
-                        Voir mes applications
-                      </button>
-                    </div>
-                  </div>
-                )}
+                {/* Bouton d'accès avec tokens */}
+                <div className="w-3/4 mx-auto">
+                  <ModuleAccessButton
+                    moduleId={card.id}
+                    moduleName={card.title}
+                    moduleCost={100}
+                    moduleDescription={card.description}
+                    onAccessSuccess={() => {}}
+                    onAccessError={(error) => console.error('Erreur accès:', error)}
+                  />
+                </div>
 
-{/* Bouton d'accès avec tokens */}
-                {!alreadyActivatedModules.includes(card.id) && (
-                  <div className="w-3/4 mx-auto">
-                    <ModuleActivationButton
-                      moduleId={card.id}
-                      moduleName={card.title}
-                      moduleCost={100}
-                      moduleDescription={card.description}
-                      onActivationSuccess={() => {
-                        setAlreadyActivatedModules(prev => [...prev, card.id]);
-                        alert(`✅ Application ${card.title} accessible avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
-                      }}
-                      onActivationError={(error) => {
-                        console.error('Erreur accès:', error);
-                      }}
-                    />
-                  </div>
-                )}
-
-                {/* Bouton "Accéder maintenant" pour les modules payants */}
-                {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (
+                {/* Bouton paiement Stripe pour modules payants */}
+                {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && (
                   <button 
                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                     onClick={async () => {
                       if (!session) {
                         window.location.href = '/login';
-                        return;
-                      }
-
-                      // Vérifier si le module est déjà accessible avant de procéder au paiement
-                      if (alreadyActivatedModules.includes(card.id)) {
-                        alert(`ℹ️ L'application ${card.title} est déjà accessible ! Vous pouvez l'utiliser depuis vos applications.`);
                         return;
                       }
 
@@ -841,7 +756,7 @@ export default function StableDiffusionPage() {
                           </tr>
                           <tr className="bg-white">
                             <td className="border border-gray-300 p-4 font-semibold">Prix</td>
-                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez</td>
                             <td className="border border-gray-300 p-4 text-center">⚠️ Abonnements mensuels souvent chers</td>
                           </tr>
                         </tbody>
@@ -884,7 +799,7 @@ export default function StableDiffusionPage() {
                     <div className="bg-gradient-to-r from-cyan-50 to-teal-50 p-6 rounded-2xl border-l-4 border-cyan-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Stable Diffusion est-il gratuit ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        L'accès de Stable Diffusion coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images.
+                        L'accès de Stable Diffusion coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images.
                       </p>
                     </div>
                     
@@ -1099,7 +1014,7 @@ export default function StableDiffusionPage() {
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez'}
+                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez'}
                         </p>
                       </div>
                     </div>
@@ -1187,30 +1102,16 @@ export default function StableDiffusionPage() {
         moduleId={card?.id || 'stablediffusion'}
         moduleName="Stable Diffusion"
         tokenCost={100}
-        tokenUnit="par accès, et utilisez l'application aussi longtemps que vous souhaitez"
-        apiEndpoint="/api/activate-module"
+        tokenUnit="par accès. Utilisez l'application aussi longtemps que vous souhaitez"
         gradientColors="from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
         icon="🎨"
-        isModuleActivated={alreadyActivatedModules.includes(card?.id || '')}
         moduleTitle={card?.title}
         moduleDescription={card?.description}
-        customRequestBody={(userId, email, moduleId) => ({
-          moduleId: moduleId,
-          moduleName: card?.title || 'Stable Diffusion',
-          userId: userId,
-          userEmail: email,
-          moduleCost: 100,
-          moduleDescription: card?.description
-        })}
-        onActivationSuccess={() => {
-          if (card?.id) {
-            setAlreadyActivatedModules(prev => [...prev, card.id]);
-          }
-        }}
       />
     </div>
   );
 }
+
 
 
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const ALERT_EMAIL = 'formateur_tic@hotmail.com';
+const ALERT_EMAIL = process.env.MONITOR_ALERT_EMAIL || process.env.RESEND_ALERT_EMAIL || 'formateur_tic@hotmail.com';
 const MONITOR_URL = 'http://localhost:3000';
 
 export async function GET(request: NextRequest) {

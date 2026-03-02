@@ -35,11 +35,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Créer l'accès module dans user_applications
-    // Hunyuan 3D est un module IA : 30 jours (1 mois)
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 30); // 1 mois
-
+    const now = new Date().toISOString();
     const { data: accessData, error: accessError } = await supabase
       .from('user_applications')
       .insert({
@@ -48,8 +44,8 @@ export async function POST(request: NextRequest) {
         module_title: moduleTitle,
         access_level: 'basic',
         is_active: true,
-        expires_at: expiresAt.toISOString(),
-        created_at: new Date().toISOString()
+        created_at: now,
+        updated_at: now
       })
       .select()
       .single();
@@ -65,8 +61,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Application Hunyuan 3D activée avec succès',
-      accessId: accessData.id,
-      expiresAt: expiresAt.toISOString()
+      accessId: accessData.id
     });
 
   } catch (error) {

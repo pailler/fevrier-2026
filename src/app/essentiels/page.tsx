@@ -31,7 +31,8 @@ export default function Essentiels() {
     'code-learning',
     'apprendre-autrement',
     'home-assistant',
-    'administration'
+    'administration',
+    'photobooth'
   ];
 
   // Vérification de l'authentification (optionnelle pour cette page)
@@ -57,11 +58,9 @@ export default function Essentiels() {
       try {
         const { data, error } = await supabase
           .from('user_applications')
-          .select(`
-            module_id,
-            expires_at
-          `)
-          .eq('user_id', user.id);
+          .select('module_id')
+          .eq('user_id', user.id)
+          .eq('is_active', true);
 
         if (error) {
           console.error('Erreur lors de la récupération des applications:', error);
@@ -70,8 +69,7 @@ export default function Essentiels() {
 
         const subscriptions: {[key: string]: boolean} = {};
         data?.forEach((sub: any) => {
-          const isExpired = sub.expires_at && new Date(sub.expires_at) < new Date();
-          subscriptions[sub.module_id] = !isExpired;
+          subscriptions[sub.module_id] = true;
         });
 
         setUserSubscriptions(subscriptions);
@@ -207,7 +205,8 @@ export default function Essentiels() {
       'home-assistant': 'home-assistant',
       'administration': 'administration',
       'voice-isolation': 'voice-isolation',
-      'photomaker': 'photomaker'
+      'photomaker': 'photomaker',
+      'photobooth': 'photobooth'
     };
 
     // Vérifier d'abord le mapping direct
@@ -267,6 +266,9 @@ export default function Essentiels() {
     }
     if (titleLower.includes('voice isolation') || titleLower.includes('voice-isolation') || titleLower.includes('isolation vocale')) {
       return 'voice-isolation';
+    }
+    if (titleLower.includes('photobooth') || titleLower.includes('photo booth')) {
+      return 'photobooth';
     }
 
     // Fallback: utiliser l'ID tel quel (peut-être déjà un slug valide)

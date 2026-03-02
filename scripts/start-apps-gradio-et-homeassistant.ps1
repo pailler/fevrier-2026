@@ -72,7 +72,10 @@ function Start-GradioApp {
     }
     try {
         $pythonExe = "python"
-        if ($Path -match "extensions-builtin" -and -not [string]::IsNullOrWhiteSpace($ForgePythonExe) -and (Test-Path $ForgePythonExe)) {
+        $venvPython = Join-Path $Path ".venv\Scripts\python.exe"
+        if (Test-Path $venvPython) {
+            $pythonExe = $venvPython
+        } elseif ($Path -match "extensions-builtin" -and -not [string]::IsNullOrWhiteSpace($ForgePythonExe) -and (Test-Path $ForgePythonExe)) {
             $pythonExe = $ForgePythonExe
         }
         $psi = New-Object System.Diagnostics.ProcessStartInfo

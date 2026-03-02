@@ -1,0 +1,13 @@
+services:
+  photobooth:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: photobooth-iahome
+    restart: unless-stopped
+    environment:
+      - PHOTOBOOTH_PORT=7885
+    ports:
+      - "7885:7885"
+    volumes:
+      - ./storage:/app/storage

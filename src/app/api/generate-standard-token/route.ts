@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     // Vérifier si un accès standard existe déjà pour cet utilisateur et ce module
     const { data: existingApplication, error: existingError } = await supabase
       .from('user_applications')
-      .select('id, expires_at')
+      .select('id')
       .eq('user_id', userId)
       .eq('module_title', moduleName)
       .eq('access_level', 'standard')
@@ -84,32 +84,14 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingApplication) {
-      // Si l'accès existe et n'est pas expiré, le retourner
-      if (new Date(existingApplication.expires_at) > new Date()) {
-        return NextResponse.json({
-          success: true,
-          application: existingApplication,
-          message: 'Existing access found'
-        });
-      }
+      return NextResponse.json({
+        success: true,
+        application: existingApplication,
+        message: 'Existing access found'
+      });
     }
 
-    // Créer une entrée dans user_applications pour l'accès standard
-    // Déterminer la durée d'expiration selon le type de module
-    const expiresAt = new Date();
-    const aiModules = ['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui', 'hunyuan3d', 'prompt-generator'];
-    const isAIModule = aiModules.some(id => module.title.toLowerCase().includes(id));
-    
-    // Modules IA : 30 jours (1 mois), Modules essentiels : 90 jours (3 mois)
-    if (isAIModule) {
-      expiresAt.setDate(expiresAt.getDate() + 30); // 1 mois
-    } else {
-      expiresAt.setDate(expiresAt.getDate() + 90); // 3 mois
-    }
-    
-    // Définir le quota d'utilisation à 20 pour tous les modules
-    const maxUsage = 20;
-
+    const now = new Date().toISOString();
     const { data: newApplication, error: insertError } = await supabase
       .from('user_applications')
       .insert({
@@ -118,9 +100,9 @@ export async function POST(request: NextRequest) {
         module_title: module.title,
         access_level: 'standard',
         is_active: true,
-        expires_at: expiresAt.toISOString(),
-        max_usage: maxUsage,
-        usage_count: 0
+        usage_count: 0,
+        created_at: now,
+        updated_at: now
       })
       .select()
       .single();

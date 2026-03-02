@@ -93,9 +93,7 @@ export default function VoiceIsolationPage() {
           accessData.forEach(access => {
             subscriptions[access.module_id] = {
               status: access.is_active ? 'active' : 'inactive',
-              expiresAt: access.expires_at,
-              usageCount: access.usage_count || 0,
-              maxUsage: access.max_usage || 20
+              usageCount: access.usage_count || 0
             };
           });
           setUserSubscriptions(subscriptions);
@@ -308,7 +306,7 @@ export default function VoiceIsolationPage() {
           "name": "L'Isolation Vocale par IA est-elle gratuite ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'accès de l'Isolation Vocale par IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : isolation vocale, séparation de batterie, extraction de basse, et isolation d'instruments."
+            "text": "L'accès de l'Isolation Vocale par IA coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : isolation vocale, séparation de batterie, extraction de basse, et isolation d'instruments."
           }
         },
         {
@@ -528,17 +526,6 @@ export default function VoiceIsolationPage() {
           
           {/* Colonne 2 - Système de boutons */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-            <div className="text-left mb-8">
-              <div className="w-3/4 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                <div className="text-4xl font-bold mb-1">
-                  100 tokens
-                </div>
-                <div className="text-sm opacity-90">
-                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-6">
               {/* Boutons d'action */}
               {isAuthenticated && user ? (
@@ -745,7 +732,7 @@ export default function VoiceIsolationPage() {
         moduleId="voice-isolation"
         moduleName="Voice Isolation"
         tokenCost={100}
-        tokenUnit="par accès, et utilisez l'application aussi longtemps que vous souhaitez"
+        tokenUnit="par accès. Utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-voice-isolation"
         gradientColors="from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
         icon="🎤"
@@ -754,6 +741,7 @@ export default function VoiceIsolationPage() {
     </div>
   );
 }
+
 
 
 

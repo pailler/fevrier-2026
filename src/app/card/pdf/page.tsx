@@ -109,7 +109,7 @@ export default function PDFPage() {
           "name": "Est-ce gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'IA PDF de IA Home est accessible avec un système de tokens. 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Consultez la page d'accès pour connaître les détails de tarification et les options disponibles."
+            "text": "L'IA PDF de IA Home est accessible avec un système de tokens. 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. Consultez la page d'accès pour connaître les détails de tarification et les options disponibles."
           }
         },
         {
@@ -328,17 +328,6 @@ export default function PDFPage() {
           
           {/* Colonne 2 - Système de boutons */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-            <div className="text-left mb-8">
-              <div className="w-3/4 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                <div className="text-4xl font-bold mb-1">
-                  10 tokens
-                </div>
-                <div className="text-sm opacity-90">
-                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-6">
               {/* Boutons d'action */}
               <button
@@ -396,7 +385,7 @@ export default function PDFPage() {
                   } else {
                     // Utilisateur non connecté : aller à la page de connexion puis retour à PDF+
                     console.log('🔒 Accès PDF+ - Redirection vers connexion');
-                    router.push(`/login?redirect=${encodeURIComponent('/card/pdf')}`);
+                    router.push(`/login?redirect=${encodeURIComponent('/card/pdf?openApp=1')}`);
                   }
                 }}
                 className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
@@ -645,7 +634,7 @@ export default function PDFPage() {
                   <div className="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-2xl border-l-4 border-red-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Est-ce gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'IA PDF de IA Home est accessible avec un système de tokens. 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. Consultez la page d'accès pour connaître les détails de tarification et les options disponibles.
+                      L'IA PDF de IA Home est accessible avec un système de tokens. 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. Consultez la page d'accès pour connaître les détails de tarification et les options disponibles.
                     </p>
                   </div>
                   
@@ -937,6 +926,7 @@ export default function PDFPage() {
     </div>
   );
 }
+
 
 
 

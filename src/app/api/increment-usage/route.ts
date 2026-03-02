@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     // Trouver l'application utilisateur pour ce module
     const { data: application, error: fetchError } = await supabase
       .from('user_applications')
-      .select('id, usage_count, max_usage, expires_at')
+      .select('id, usage_count')
       .eq('user_id', userId)
       .eq('module_id', moduleId)
       .eq('is_active', true)
@@ -31,26 +31,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Application not found' },
         { status: 404 }
-      );
-    }
-
-    // Vérifier si l'accès n'est pas expiré
-    if (application.expires_at) {
-      const expirationDate = new Date(application.expires_at);
-      const now = new Date();
-      if (expirationDate < now) {
-        return NextResponse.json(
-          { error: 'Access expired' },
-          { status: 403 }
-        );
-      }
-    }
-
-    // Vérifier si le quota n'est pas dépassé
-    if (application.max_usage && application.usage_count >= application.max_usage) {
-      return NextResponse.json(
-        { error: 'Usage quota exceeded' },
-        { status: 403 }
       );
     }
 
@@ -74,19 +54,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier si le quota est atteint (fin d'utilisation)
-    const isQuotaReached = application.max_usage && newUsageCount >= application.max_usage;
-    
-    if (isQuotaReached) {
-      console.log(`⚠️ Usage: Quota atteint pour module ${moduleId}, workflow doit être réinitialisé`);
-    }
-
     return NextResponse.json({
       success: true,
       usage_count: newUsageCount,
-      max_usage: application.max_usage,
-      message: 'Usage count updated successfully',
-      shouldResetWorkflow: isQuotaReached // Flag pour réinitialiser le workflow
+      message: 'Usage count updated successfully'
     });
 
   } catch (error) {

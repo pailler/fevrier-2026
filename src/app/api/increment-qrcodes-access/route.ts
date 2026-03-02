@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     // 1. Récupérer l'application utilisateur pour QR Codes
     const { data: userApp, error: appError } = await supabase
       .from('user_applications')
-      .select('id, usage_count, max_usage, expires_at')
+      .select('id, usage_count')
       .eq('user_id', userId)
       .eq('module_id', moduleId)
       .single();
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const { id: userAppId, usage_count: currentUsage, max_usage: maxUsage } = userApp;
+    const { id: userAppId, usage_count: currentUsage } = userApp;
 
     // 2. Vérifier et consommer les tokens
     const { data: userTokens, error: tokensError } = await supabase
@@ -123,24 +123,12 @@ export async function POST(request: Request) {
       });
     }
 
-    console.log('✅ QR Codes Access: Compteur incrémenté:', newUsageCount, '/', maxUsage);
-    console.log(`✅ QR Codes Access: ${tokensToConsume} tokens consommés. Restants:`, userTokens.tokens - tokensToConsume);
-
-    // Vérifier si le quota est atteint (fin d'utilisation)
-    const isQuotaReached = maxUsage && newUsageCount >= maxUsage;
-    
-    if (isQuotaReached) {
-      console.log('⚠️ QR Codes Access: Quota atteint, workflow doit être réinitialisé');
-    }
-
     return new NextResponse(JSON.stringify({
       success: true,
       usage_count: updatedApp.usage_count,
-      max_usage: updatedApp.max_usage,
       last_accessed_at: updatedApp.last_accessed_at,
       tokens_consumed: tokensToConsume,
-      tokens_remaining: userTokens.tokens - tokensToConsume,
-      shouldResetWorkflow: isQuotaReached // Flag pour réinitialiser le workflow
+      tokens_remaining: userTokens.tokens - tokensToConsume
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }

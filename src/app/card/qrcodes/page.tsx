@@ -146,11 +146,10 @@ export default function QRCodesPage() {
             const moduleKey = `module_${access.module_id}`;
             subscriptions[moduleKey] = {
               module_id: access.module_id,
-              access: {
+                access: {
                 id: access.id,
                 created_at: access.created_at,
                 access_level: access.access_level,
-                expires_at: access.expires_at,
                 is_active: access.is_active
               }
             };
@@ -276,7 +275,7 @@ export default function QRCodesPage() {
           "name": "Les QR codes dynamiques sont-ils gratuits ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'accès du service QR codes dynamiques coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes."
+            "text": "L'accès du service QR codes dynamiques coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes."
           }
         },
         {
@@ -359,7 +358,7 @@ export default function QRCodesPage() {
             requirements: [
               'Connexion internet',
               'Navigateur moderne',
-              '100 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
+              '100 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez'
             ],
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
@@ -397,7 +396,7 @@ export default function QRCodesPage() {
           requirements: [
             'Connexion internet',
             'Navigateur moderne',
-            '100 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
+            '100 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez'
           ],
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
@@ -556,17 +555,6 @@ export default function QRCodesPage() {
           
           {/* Colonne 2 - Système de boutons */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-            <div className="text-left mb-8">
-              <div className="w-3/4 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                <div className="text-4xl font-bold mb-1">
-                  100 tokens
-                </div>
-                <div className="text-sm opacity-90">
-                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-6">
               {/* Bouton d'accès spécial pour QR Codes - Modèle LibreSpeed */}
               {checkingActivation ? (
@@ -891,7 +879,7 @@ export default function QRCodesPage() {
                   <div className="bg-gradient-to-r from-red-50 to-orange-50 p-6 rounded-2xl border-l-4 border-red-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Les QR codes dynamiques sont-ils gratuits ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'accès du service QR codes dynamiques coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes.
+                      L'accès du service QR codes dynamiques coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes.
                     </p>
                   </div>
                   
@@ -1228,7 +1216,7 @@ export default function QRCodesPage() {
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez
+                          100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez
                         </p>
                       </div>
                     </div>
@@ -1339,6 +1327,7 @@ export default function QRCodesPage() {
     </div>
   );
 }
+
 
 
 

@@ -23,7 +23,8 @@ fi
 
 # Démarrer l'application
 echo "🚀 Lancement de l'application..."
-echo "📍 L'application sera accessible sur http://localhost:7860"
+export PHOTOBOOTH_PORT="${PHOTOBOOTH_PORT:-7885}"
+echo "📍 L'application sera accessible sur http://localhost:${PHOTOBOOTH_PORT}"
 echo ""
 
 python3 app.py

@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     
     const { data: userApp, error: appError } = await supabase
       .from('user_applications')
-      .select('id, usage_count, max_usage, expires_at, module_id')
+      .select('id, usage_count, module_id')
       .eq('user_id', userId)
       .eq('is_active', true)
       .like('module_id', '%librespeed%')
@@ -32,36 +32,7 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ LibreSpeed Access: Module trouvé:', userApp.module_id);
 
-    // Vérifier l'expiration
-    if (userApp.expires_at && new Date(userApp.expires_at) < new Date()) {
-      ;
-      return new NextResponse(JSON.stringify({
-        success: false,
-        error: 'Accès expiré',
-        message: 'Votre accès LibreSpeed a expiré. Veuillez le renouveler.'
-      }), {
-        status: 403,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
     const currentUsage = userApp.usage_count || 0;
-    const maxUsage = userApp.max_usage || 50; // Limite par défaut de 50
-    
-    // Vérifier si le quota est dépassé
-    if (currentUsage >= maxUsage) {
-      console.log('❌ LibreSpeed Access: Quota dépassé:', currentUsage, '/', maxUsage);
-      return new NextResponse(JSON.stringify({
-        success: false,
-        error: 'Quota dépassé',
-        current_usage: currentUsage,
-        max_usage: maxUsage,
-        message: `Vous avez atteint la limite de ${maxUsage} accès. Votre quota sera renouvelé le mois prochain.`
-      }), {
-        status: 403,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
 
     // Les tokens sont déjà consommés par le service de tokens principal
     // Cette API ne fait que incrémenter le compteur d'usage
@@ -84,7 +55,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse('Error updating usage count', { status: 500 });
     }
 
-    console.log('✅ LibreSpeed Access: Compteur incrémenté:', newUsageCount, '/', maxUsage);
+    console.log('✅ LibreSpeed Access: Compteur incrémenté:', newUsageCount);
 
     // Enregistrer l'accès dans les logs
     const { error: logError } = await supabase
@@ -106,7 +77,6 @@ export async function POST(request: NextRequest) {
     return new NextResponse(JSON.stringify({
       success: true,
       usage_count: updatedApp.usage_count,
-      max_usage: updatedApp.max_usage,
       last_accessed_at: updatedApp.last_accessed_at
     }), {
       status: 200,

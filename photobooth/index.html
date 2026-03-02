@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Photobooth Mariage</title>
+    <meta
+      name="description"
+      content="Photobooth mariage - rejoindre ou creer un evenement avec code PIN."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page management-page">
+      <div class="festive-bg">
+        <span class="deco deco-ring">💍</span>
+        <span class="deco deco-flower">🌸</span>
+        <span class="deco deco-heart">💚</span>
+        <span class="deco deco-confetti">✨</span>
+      </div>
+
+      <section id="auth-banner" class="auth-banner">
+      </section>
+
+      <section class="hero">
+        <div class="title-row">
+          <div class="logo-badge" aria-hidden="true">
+            <span class="camera-icon">💒</span>
+          </div>
+          <h1>Photobooth Mariage</h1>
+        </div>
+        <p class="subtitle">
+          Creez des souvenirs uniques avec des accessoires digitaux, des filtres
+          et partagez vos photos en un instant.
+        </p>
+        <p class="subtitle small">
+          La gestion des evenements est sur cette page. Le studio photobooth
+          s'ouvre sur une page dediee, optimisee mobile/tablette.
+        </p>
+
+        <div class="action-grid">
+          <button class="card card-join active" data-tab="join" type="button">
+            <div class="card-icon">↪</div>
+            <h2>Rejoindre un evenement</h2>
+            <p>J'ai un code a 4 chiffres</p>
+          </button>
+
+          <button class="card card-create" data-tab="create" type="button">
+            <div class="card-icon">+</div>
+            <h2>Creer un evenement</h2>
+            <p>Nouveau projet avec code PIN</p>
+          </button>
+        </div>
+      </section>
+
+      <section class="panel-wrapper">
+        <article id="panel-join" class="panel active">
+          <h3>↪ Rejoindre un evenement</h3>
+          <label for="event-code">Code evenement (4 chiffres)</label>
+          <input
+            id="event-code"
+            type="text"
+            maxlength="4"
+            placeholder="Ex : 6626"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+          />
+          <button id="verify-code" class="btn-primary" type="button">
+            Verifier le code
+          </button>
+          <p id="join-feedback" class="feedback"></p>
+        </article>
+
+        <article id="panel-create" class="panel">
+          <h3>＋ Creer un evenement</h3>
+          <label for="event-name">Nom de l'evenement</label>
+          <input
+            id="event-name"
+            type="text"
+            placeholder="Ex : Mariage Laura & Alex"
+            maxlength="80"
+          />
+
+          <label for="host-name">Prenom de l'organisateur</label>
+          <input
+            id="host-name"
+            type="text"
+            placeholder="Ex : Laura"
+            maxlength="40"
+          />
+
+          <button id="create-event" class="btn-primary" type="button">
+            Generer mon code PIN
+          </button>
+          <p id="create-feedback" class="feedback"></p>
+        </article>
+      </section>
+
+      <section class="features">
+        <h4>Inspire du meilleur des experiences photobooth modernes</h4>
+        <div class="feature-list">
+          <div class="feature">Parcours simple: creer ou rejoindre un evenement</div>
+          <div class="feature">Code PIN 4 chiffres pour l'acces invite</div>
+          <div class="feature">Session transmise au studio photobooth dedie</div>
+          <div class="feature">Compatible acces token IAHome</div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

@@ -42,11 +42,7 @@ export async function POST(request: Request) {
       });
     }
 
-    // 2. Créer l'accès sans consommation de tokens (activation gratuite)
-    const now = new Date();
-    const expiresAt = new Date(now);
-    expiresAt.setDate(expiresAt.getDate() + 30); // 1 mois (30 jours)
-
+    const now = new Date().toISOString();
     const { data: accessData, error: createAccessError } = await supabase
       .from('user_applications')
       .insert([{
@@ -54,12 +50,10 @@ export async function POST(request: Request) {
         module_id: moduleId,
         module_title: moduleTitle,
         is_active: true,
-        access_level: 'premium', // Accès premium
+        access_level: 'premium',
         usage_count: 0,
-        max_usage: null, // Pas de limite d'usage fixe pour l'activation
-        expires_at: expiresAt.toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        created_at: now,
+        updated_at: now
       }])
       .select()
       .single();
@@ -73,23 +67,12 @@ export async function POST(request: Request) {
     }
 
     console.log('✅ Accès QR Codes créé avec succès:', accessData.id);
-    console.log('📋 Détails de l\'accès créé:', {
-      id: accessData.id,
-      user_id: accessData.user_id,
-      module_id: accessData.module_id,
-      module_title: accessData.module_title,
-      is_active: accessData.is_active,
-      expires_at: accessData.expires_at,
-      created_at: accessData.created_at
-    });
-
     return NextResponse.json({
       success: true,
       message: 'QR Codes activé avec succès',
       accessId: accessData.id,
       moduleId: moduleId,
       moduleTitle: moduleTitle,
-      expiresAt: expiresAt.toISOString(),
       accessData: accessData
     });
 

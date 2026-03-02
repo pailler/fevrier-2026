@@ -30,61 +30,21 @@ export async function POST(req: NextRequest) {
         module_id: moduleId,
         access_level: 'basic',
         is_active: true,
-        usage_count: 0,
-        max_usage: 20
+        usage_count: 0
       };
-
-      // Déterminer la durée selon le type de module
-      const aiModules = ['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui', 'hunyuan3d', 'prompt-generator'];
-      const isAIModule = aiModules.includes(moduleId);
-      const expirationDays = isAIModule ? 30 : 90; // Modules IA : 30 jours, essentiels : 90 jours
       
-      // Configuration spécifique pour LibreSpeed
       if (moduleId === 'librespeed') {
-        moduleData = {
-          ...moduleData,
-          module_title: 'LibreSpeed',
-          access_level: 'premium',
-          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString() // 90 jours (3 mois)
-        };
+        moduleData = { ...moduleData, module_title: 'LibreSpeed', access_level: 'premium' };
       } else if (moduleId === 'metube') {
-        // Configuration spécifique pour MeTube
-        moduleData = {
-          ...moduleData,
-          module_title: 'MeTube',
-          access_level: 'premium',
-          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString() // 90 jours (3 mois)
-        };
+        moduleData = { ...moduleData, module_title: 'MeTube', access_level: 'premium' };
       } else if (moduleId === 'pdf') {
-        // Configuration spécifique pour PDF+
-        moduleData = {
-          ...moduleData,
-          module_title: 'PDF+',
-          access_level: 'premium',
-          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString() // 90 jours (3 mois)
-        };
+        moduleData = { ...moduleData, module_title: 'PDF+', access_level: 'premium' };
       } else if (moduleId === 'psitransfer') {
-        // Configuration spécifique pour PsiTransfer
-        moduleData = {
-          ...moduleData,
-          module_title: 'PsiTransfer',
-          access_level: 'premium',
-          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString() // 90 jours (3 mois)
-        };
+        moduleData = { ...moduleData, module_title: 'PsiTransfer', access_level: 'premium' };
       } else if (moduleId === 'qrcodes') {
-        // Configuration spécifique pour QR Codes
-        moduleData = {
-          ...moduleData,
-          module_title: 'QR Codes',
-          access_level: 'premium',
-          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString() // 90 jours (3 mois)
-        };
+        moduleData = { ...moduleData, module_title: 'QR Codes', access_level: 'premium' };
       } else {
-        // Configuration par défaut pour les autres modules
-        moduleData = {
-          ...moduleData,
-          module_title: 'Module'
-        };
+        moduleData = { ...moduleData, module_title: 'Module' };
       }
 
       const { data, error } = await supabase
@@ -109,35 +69,15 @@ export async function POST(req: NextRequest) {
       console.log('🔧 Mise à jour module existant:', { moduleId, userId });
       
       if (moduleId === 'librespeed') {
-        updateData = {
-          module_title: 'LibreSpeed',
-          access_level: 'premium',
-          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
-        };
+        updateData = { module_title: 'LibreSpeed', access_level: 'premium' };
       } else if (moduleId === 'metube') {
-        updateData = {
-          module_title: 'MeTube',
-          access_level: 'premium',
-          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
-        };
+        updateData = { module_title: 'MeTube', access_level: 'premium' };
       } else if (moduleId === 'pdf') {
-        updateData = {
-          module_title: 'PDF+',
-          access_level: 'premium',
-          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
-        };
+        updateData = { module_title: 'PDF+', access_level: 'premium' };
       } else if (moduleId === 'psitransfer') {
-        updateData = {
-          module_title: 'PsiTransfer',
-          access_level: 'premium',
-          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
-        };
+        updateData = { module_title: 'PsiTransfer', access_level: 'premium' };
       } else if (moduleId === 'qrcodes') {
-        updateData = {
-          module_title: 'QR Codes',
-          access_level: 'premium',
-          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
-        };
+        updateData = { module_title: 'QR Codes', access_level: 'premium' };
       }
       
       console.log('🔧 Données de mise à jour:', updateData);

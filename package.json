@@ -4,7 +4,9 @@
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
     "build": "next build",
     "dev": "next dev -p 3000",
-    "start": "next start"
+    "start": "next start",
+    "monitor": "node scripts/monitor-localhost.js",
+    "monitor:check": "node scripts/monitor-localhost.js --once"
   },
   "dependencies": {
     "@langchain/openai": "^0.2.7",

@@ -43,28 +43,17 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 3. Créer l'accès module
-    // Déterminer la durée d'expiration selon le type de module
-    const expiresAt = new Date();
-    const aiModules = ['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui', 'hunyuan3d', 'prompt-generator'];
-    const isAIModule = aiModules.some(id => moduleId.toLowerCase().includes(id));
-    
-    // Modules IA : 30 jours (1 mois), Modules essentiels : 90 jours (3 mois)
-    if (isAIModule) {
-      expiresAt.setDate(expiresAt.getDate() + 30); // 1 mois
-    } else {
-      expiresAt.setDate(expiresAt.getDate() + 90); // 3 mois
-    }
-
+    const now = new Date().toISOString();
     const { data: accessData, error: accessError } = await supabase
       .from('user_applications')
       .insert({
         user_id: user.id,
-        module_id: parseInt(moduleId),
+        module_id: parseInt(moduleId).toString(),
+        module_title: moduleTitle,
         access_level: 'basic',
         is_active: true,
-        expires_at: expiresAt.toISOString(),
-        created_at: new Date().toISOString()
+        created_at: now,
+        updated_at: now
       })
       .select()
       .single();
@@ -90,7 +79,7 @@ export async function POST(request: NextRequest) {
         max_usage: 1000,
         current_usage: 0,
         is_active: true,
-        expires_at: expiresAt.toISOString(),
+        expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
         created_at: new Date().toISOString()
       })
       .select()
@@ -125,8 +114,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Application activée avec succès',
       accessId: accessData.id,
-      tokenId: tokenData?.id,
-      expiresAt: expiresAt.toISOString()
+      tokenId: tokenData?.id
     });
 
   } catch (error) {

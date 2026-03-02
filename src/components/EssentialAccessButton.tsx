@@ -49,6 +49,9 @@ export default function EssentialAccessButton({
     'apprendre-autrement': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
       ? 'http://localhost:9001'
       : 'https://apprendre-autrement.iahome.fr',
+    'photobooth': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+      ? 'http://localhost:7885'
+      : 'https://photobooth.iahome.fr',
     // Détecteur de Contenu IA : sur le domaine principal
     'ai-detector': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
       ? 'http://localhost:3000/ai-detector'
@@ -94,30 +97,6 @@ export default function EssentialAccessButton({
       
       // Mettre à jour le contexte côté client
       await refreshTokens();
-
-      // Incrémenter le compteur d'accès
-      try {
-        const incrementResponse = await fetch('/api/increment-module-access', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userId: user.id,
-            userEmail: user.email,
-            moduleId: moduleId
-          })
-        });
-
-        if (incrementResponse.ok) {
-          const incrementData = await incrementResponse.json();
-          console.log(`✅ ${moduleTitle}: Compteur incrémenté:`, incrementData.usage_count);
-        } else {
-          console.warn(`⚠️ ${moduleTitle}: Erreur incrémentation compteur, continuons...`);
-        }
-      } catch (incrementError) {
-        console.warn(`⚠️ ${moduleTitle}: Erreur incrémentation compteur:`, incrementError);
-      }
 
       // Obtenir l'URL du sous-domaine pour ce module
       const moduleUrl = moduleSubdomains[moduleId];
@@ -230,7 +209,9 @@ export default function EssentialAccessButton({
         ) : (
           <>
             <span>🔧</span>
-            <span>Accéder à {moduleTitle} (10 tokens par accès)</span>
+            <span>
+              Accéder à {moduleTitle} ({moduleId === 'photobooth' ? 100 : 10} tokens par accès)
+            </span>
           </>
         )}
       </button>

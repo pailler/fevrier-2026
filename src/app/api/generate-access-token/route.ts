@@ -72,11 +72,13 @@ export async function POST(request: NextRequest) {
     }
 
     const newTokenCount = currentTokens - moduleCost;
+    const now = new Date().toISOString();
+
     const { error: tokenUpdateError } = await supabaseAdmin
       .from('user_tokens')
       .update({
         tokens: newTokenCount,
-        updated_at: new Date().toISOString(),
+        updated_at: now,
       })
       .eq('user_id', userId);
 
@@ -88,6 +90,57 @@ export async function POST(request: NextRequest) {
         },
         { status: 500 }
       );
+    }
+
+    // Enregistrer la visite dans user_applications pour "Applis visitées"
+    try {
+      const { data: existingApp } = await supabaseAdmin
+        .from('user_applications')
+        .select('id, usage_count')
+        .eq('user_id', userId)
+        .eq('module_id', normalizedModuleId)
+        .maybeSingle();
+
+      if (existingApp) {
+        await supabaseAdmin
+          .from('user_applications')
+          .update({
+            usage_count: (existingApp.usage_count || 0) + 1,
+            last_used_at: now,
+            updated_at: now,
+          })
+          .eq('id', existingApp.id);
+      } else {
+        const moduleTitle = normalizedModuleId.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+        await supabaseAdmin
+          .from('user_applications')
+          .insert({
+            user_id: userId,
+            module_id: normalizedModuleId,
+            module_title: moduleTitle,
+            usage_count: 1,
+            last_used_at: now,
+            is_active: false,
+            created_at: now,
+            updated_at: now,
+          });
+      }
+    } catch (usageErr) {
+      console.warn('⚠️ Enregistrement visite generate-access-token:', usageErr);
+    }
+
+    // Enregistrer dans token_usage pour l'historique des consommations
+    try {
+      await supabaseAdmin.from('token_usage').insert({
+        user_id: userId,
+        module_id: normalizedModuleId,
+        module_name: normalizedModuleId.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
+        tokens_consumed: moduleCost,
+        usage_date: now,
+        action_type: 'module_usage',
+      });
+    } catch {
+      // token_usage peut être indisponible
     }
 
     // Durée du token : 1 heure pour tous les utilisateurs
@@ -108,7 +161,10 @@ export async function POST(request: NextRequest) {
       exp: Math.floor(Date.now() / 1000) + tokenDurationSeconds
     };
 
-    const token = btoa(JSON.stringify(tokenPayload));
+    // Token Base64 URL-safe (+ et / remplacés) pour éviter corruption dans l'URL
+    const json = JSON.stringify(tokenPayload);
+    const base64 = Buffer.from(json, 'utf8').toString('base64');
+    const token = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 
     // Retourner l'URL du proxy sécurisé
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';

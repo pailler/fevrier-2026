@@ -18,15 +18,7 @@ export async function GET(request: NextRequest) {
     // Récupérer les modules depuis user_applications
     const { data: userModules, error: modulesError } = await supabase
       .from('user_applications')
-      .select(`
-        id,
-        module_id,
-        module_title,
-        access_level,
-        expires_at,
-        is_active,
-        created_at
-      `)
+      .select('id, module_id, module_title, access_level, is_active, created_at')
       .eq('user_id', userId)
       .eq('is_active', true)
       .order('created_at', { ascending: false });
@@ -69,22 +61,13 @@ export async function GET(request: NextRequest) {
 
     // Transformer les modules user_applications
     const transformedModules = (userModules || [])
-      .filter(access => {
-        if (!access || !access.id) return false;
-        if (!access.expires_at) return true;
-        try {
-          return new Date(access.expires_at) > new Date();
-        } catch (error) {
-          return true;
-        }
-      })
+      .filter(access => access && access.id)
       .map(access => ({
         id: access.id,
         type: 'module',
         module_id: access.module_id,
         title: access.module_title || `Module ${access.module_id}`,
         access_level: access.access_level || 'basic',
-        expires_at: access.expires_at,
         created_at: access.created_at
       }));
 

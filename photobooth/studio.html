@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Studio Photobooth Mariage</title>
+    <meta
+      name="description"
+      content="Studio photobooth responsive avec cadres festifs, filtres et galerie."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page studio-page">
+      <div class="festive-bg studio-decor">
+        <span class="deco deco-ring">💍</span>
+        <span class="deco deco-flower">🌸</span>
+        <span class="deco deco-heart">💚</span>
+        <span class="deco deco-confetti">✨</span>
+      </div>
+
+      <section id="auth-banner" class="auth-banner"></section>
+
+      <section class="studio active">
+        <div class="studio-header">
+          <div>
+            <h4>Studio Photobooth</h4>
+            <p id="studio-event-meta" class="studio-meta">Chargement de la session...</p>
+          </div>
+          <div class="header-actions">
+            <a id="back-to-events" class="btn-link" href="./index.html">Gestion des evenements</a>
+          </div>
+        </div>
+
+        <div class="studio-grid">
+          <article class="studio-card">
+            <div class="preview-stage wedding-stage">
+              <div class="frame-corner tl">💐</div>
+              <div class="frame-corner tr">💐</div>
+              <div class="frame-corner bl">🎉</div>
+              <div class="frame-corner br">🎉</div>
+              <video id="camera-feed" autoplay playsinline muted></video>
+              <canvas id="capture-layer"></canvas>
+              <div id="countdown-overlay" class="countdown"></div>
+            </div>
+
+            <div class="studio-actions">
+              <button id="start-camera" class="btn-secondary" type="button">
+                Activer la camera
+              </button>
+              <button id="capture-photo" class="btn-primary" type="button">
+                Prendre la photo
+              </button>
+            </div>
+
+            <p id="studio-feedback" class="feedback"></p>
+          </article>
+
+          <article class="studio-card controls-card">
+            <h5>Personnalisation</h5>
+
+            <label for="layout-select">Template</label>
+            <select id="layout-select">
+              <option value="single">Single (1 photo)</option>
+              <option value="strip">Strip (3 photos)</option>
+              <option value="grid">Collage (4 photos)</option>
+            </select>
+
+            <label for="timer-select">Countdown</label>
+            <select id="timer-select">
+              <option value="3">3 secondes</option>
+              <option value="5">5 secondes</option>
+              <option value="8">8 secondes</option>
+            </select>
+
+            <label for="filter-select">Filtre</label>
+            <select id="filter-select">
+              <option value="none">Aucun</option>
+              <option value="bw">Noir & blanc</option>
+              <option value="warm">Chaud</option>
+              <option value="cool">Froid</option>
+              <option value="vintage">Vintage</option>
+            </select>
+
+            <label for="prop-select">Accessoire digital</label>
+            <select id="prop-select">
+              <option value="none">Aucun</option>
+              <option value="glasses">Lunettes</option>
+              <option value="mustache">Moustache</option>
+              <option value="hat">Chapeau</option>
+              <option value="hearts">Coeurs</option>
+            </select>
+
+            <button id="download-last" class="btn-secondary" type="button">
+              Telecharger la derniere photo
+            </button>
+
+            <div class="qr-card">
+              <h6>QR code galerie</h6>
+              <img id="gallery-qr-image" alt="QR code vers galerie" />
+              <a id="gallery-link" target="_blank" rel="noopener noreferrer" href="#">
+                Ouvrir la galerie
+              </a>
+            </div>
+          </article>
+        </div>
+
+        <article class="studio-card gallery-card">
+          <div class="gallery-header">
+            <h5>Galerie de l'evenement</h5>
+            <span id="gallery-count">0 photo</span>
+          </div>
+          <div id="gallery-grid" class="gallery-grid"></div>
+        </article>
+      </section>
+    </main>
+
+    <script src="./studio.js"></script>
+  </body>
+</html>

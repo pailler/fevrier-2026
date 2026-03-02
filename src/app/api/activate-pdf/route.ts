@@ -26,10 +26,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: 'PDF+ déjà activé pour cet utilisateur.', alreadyActivated: true });
     }
 
-    // PDF+ est un module essentiel : 90 jours (3 mois)
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000); // 90 jours (3 mois)
-
+    const now = new Date().toISOString();
     const { data: accessData, error: createAccessError } = await supabase
       .from('user_applications')
       .insert([{
@@ -39,10 +36,8 @@ export async function POST(request: Request) {
         is_active: true,
         access_level: 'premium',
         usage_count: 0,
-        max_usage: null,
-        expires_at: expiresAt.toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        created_at: now,
+        updated_at: now
       }])
       .select()
       .single();

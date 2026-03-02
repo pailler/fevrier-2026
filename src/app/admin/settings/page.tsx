@@ -86,12 +86,11 @@ export default function AdminSettings() {
           module_id, 
           module_title,
           usage_count, 
-          max_usage, 
           is_active, 
           created_at, 
           last_used_at,
           user_id
-        `).eq('is_active', true),
+        `),
         supabase.from('payments').select('id, amount, currency, status, created_at, payment_method'),
         supabase.from('stripe_transactions').select('id, amount, token_amount, created_at'),
         supabase.from('blog_articles').select('id, title, status, published_at, created_at'),
@@ -99,7 +98,10 @@ export default function AdminSettings() {
       ]);
 
       const users = usersResult.data || [];
-      const userApps = userAppsResult.data || [];
+      const allUserApps = userAppsResult.data || [];
+      const userApps = allUserApps.filter(
+        app => (app.usage_count || 0) > 0 || !!app.last_used_at
+      );
       const payments = paymentsResult.data || [];
       const stripeTransactions = stripeTransactionsResult.data || [];
       const blogArticles = blogArticlesResult.data || [];

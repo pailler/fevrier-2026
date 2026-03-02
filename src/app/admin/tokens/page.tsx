@@ -38,152 +38,97 @@ export default function AdminTokens() {
       
       const supabase = getSupabaseClient();
 
-      // Essayer d'abord de récupérer depuis la table token_usage si elle existe
       let consumptions: TokenConsumption[] = [];
-      
+      const getTokenCost = (moduleId: string) => {
+        if (moduleId.includes('cogstudio') || moduleId.includes('stablediffusion') || moduleId.includes('ruinedfooocus') ||
+            moduleId.includes('hunyuan3d') || moduleId.includes('comfyui') || moduleId.includes('whisper')) return 100;
+        if (moduleId.includes('metube') || moduleId.includes('librespeed') || moduleId.includes('pdf') || moduleId.includes('psitransfer')) return 10;
+        if (moduleId.includes('qrcodes') || moduleId.includes('home-assistant') || moduleId.includes('homeassistant')) return 100;
+        return 10;
+      };
+
+      // 1. Récupérer depuis token_usage (alimenté par user-tokens-simple)
+      const tokenUsageIds = new Set<string>();
       try {
         const { data: tokenUsageData, error: tokenUsageError } = await supabase
           .from('token_usage')
-          .select(`
-            id,
-            user_id,
-            module_id,
-            module_name,
-            tokens_consumed,
-            usage_date,
-            action_type
-          `)
+          .select('id, user_id, module_id, module_name, tokens_consumed, usage_date, action_type')
           .order('usage_date', { ascending: false })
-          .limit(1000); // Limiter à 1000 pour les performances
-
-        if (!tokenUsageError && tokenUsageData && tokenUsageData.length > 0) {
-          console.log(`✅ ${tokenUsageData.length} consommations trouvées dans token_usage`);
-          
-          // Récupérer les profils utilisateurs
-          const userIds = [...new Set(tokenUsageData.map(t => t.user_id))];
-          const { data: profiles, error: profilesError } = await supabase
-            .from('profiles')
-            .select('id, email, full_name')
-            .in('id', userIds);
-
-          if (!profilesError && profiles) {
-            const profilesMap = {};
-            profiles.forEach(profile => {
-              profilesMap[profile.id] = profile;
-            });
-
-            consumptions = tokenUsageData.map(usage => {
-              const profile = profilesMap[usage.user_id];
-              return {
-                id: usage.id?.toString() || `${usage.user_id}-${usage.module_id}-${usage.usage_date}`,
-                user_id: usage.user_id,
-                user_email: profile?.email || 'Utilisateur inconnu',
-                user_name: profile?.full_name || profile?.email || 'Utilisateur inconnu',
-                module_id: usage.module_id,
-                module_name: usage.module_name || usage.module_id,
-                tokens_consumed: usage.tokens_consumed || 10,
-                consumed_at: usage.usage_date || new Date().toISOString(),
-                action_type: usage.action_type || 'module_usage',
-                description: `Utilisation de ${usage.module_name || usage.module_id}`
-              };
-            });
-          }
-        } else {
-          console.log('ℹ️ Table token_usage vide ou inexistante, utilisation de user_applications');
-        }
-      } catch (error) {
-        console.log('ℹ️ Table token_usage non accessible, utilisation de user_applications:', error);
-      }
-
-      // Si pas de données dans token_usage, utiliser user_applications comme fallback
-      if (consumptions.length === 0) {
-        // Récupérer les utilisations de modules pour calculer les consommations
-        const { data: usageData, error: usageError } = await supabase
-          .from('user_applications')
-          .select(`
-            user_id,
-            module_id,
-            usage_count,
-            last_used_at,
-            created_at
-          `)
-          .order('last_used_at', { ascending: false })
           .limit(1000);
 
-        if (!usageError && usageData) {
-          // Récupérer les profils utilisateurs
-          const userIds = [...new Set(usageData.map(u => u.user_id))];
-          const { data: profiles, error: profilesError } = await supabase
-            .from('profiles')
-            .select('id, email, full_name')
-            .in('id', userIds);
-
-          if (!profilesError && profiles) {
-            // Récupérer les modules
-            const moduleIds = [...new Set(usageData.map(u => u.module_id))];
-            const { data: modules, error: modulesError } = await supabase
-              .from('modules')
-              .select('id, name')
-              .in('id', moduleIds);
-
-            const profilesMap = {};
-            profiles.forEach(profile => {
-              profilesMap[profile.id] = profile;
+        if (!tokenUsageError && tokenUsageData && tokenUsageData.length > 0) {
+          console.log(`✅ ${tokenUsageData.length} consommations dans token_usage`);
+          const userIds = [...new Set(tokenUsageData.map(t => t.user_id))];
+          const { data: profiles } = await supabase.from('profiles').select('id, email, full_name').in('id', userIds);
+          const profilesMap: Record<string, { email: string; full_name: string }> = {};
+          (profiles || []).forEach(p => { profilesMap[p.id] = p; });
+          tokenUsageData.forEach(usage => {
+            const profile = profilesMap[usage.user_id];
+            consumptions.push({
+              id: usage.id?.toString() || `tu-${usage.user_id}-${usage.module_id}-${usage.usage_date}`,
+              user_id: usage.user_id,
+              user_email: profile?.email || 'Utilisateur inconnu',
+              user_name: profile?.full_name || profile?.email || 'Utilisateur inconnu',
+              module_id: usage.module_id,
+              module_name: usage.module_name || usage.module_id,
+              tokens_consumed: usage.tokens_consumed || 10,
+              consumed_at: usage.usage_date || new Date().toISOString(),
+              action_type: usage.action_type || 'module_usage',
+              description: `Utilisation de ${usage.module_name || usage.module_id}`
             });
-
-            const modulesMap = {};
-            if (!modulesError && modules) {
-              modules.forEach(module => {
-                modulesMap[module.id] = module;
-              });
-            }
-
-            // Calculer les coûts par module
-            const getTokenCost = (moduleId: string) => {
-              if (moduleId.includes('cogstudio') || 
-                  moduleId.includes('stablediffusion') || 
-                  moduleId.includes('ruinedfooocus') ||
-                  moduleId.includes('hunyuan3d') ||
-                  moduleId.includes('comfyui') ||
-                  moduleId.includes('whisper')) {
-                return 100; // Applications IA
-              } else if (moduleId.includes('metube') || moduleId.includes('librespeed') ||
-                         moduleId.includes('pdf') || moduleId.includes('psitransfer')) {
-                return 10; // Applications essentielles
-              } else if (moduleId.includes('qrcodes') || moduleId.includes('home-assistant') || moduleId.includes('homeassistant')) {
-                return 100; // QR Codes et Home Assistant (premium)
-              }
-              return 10; // Par défaut
-            };
-
-            // Créer les consommations basées sur les utilisations récentes
-            usageData.forEach(usage => {
-              const profile = profilesMap[usage.user_id];
-              const module = modulesMap[usage.module_id];
-              const tokenCost = getTokenCost(usage.module_id);
-              
-              if (profile && usage.usage_count > 0) {
-                // Créer une consommation pour la dernière utilisation
-                consumptions.push({
-                  id: `${usage.user_id}-${usage.module_id}-${usage.last_used_at || usage.created_at}`,
-                  user_id: usage.user_id,
-                  user_email: profile.email,
-                  user_name: profile.full_name || profile.email,
-                  module_id: usage.module_id,
-                  module_name: module?.name || usage.module_id,
-                  tokens_consumed: tokenCost,
-                  consumed_at: usage.last_used_at || usage.created_at,
-                  action_type: 'module_usage',
-                  description: `Utilisation de ${module?.name || usage.module_id}`
-                });
-              }
-            });
-          }
+            const d = usage.usage_date ? new Date(usage.usage_date).toISOString().slice(0, 10) : '';
+            tokenUsageIds.add(`${usage.user_id}|${usage.module_id}|${d}`);
+          });
         }
+      } catch (e) {
+        console.log('ℹ️ token_usage non accessible:', e);
       }
 
-      // Trier par date de consommation (plus récent en premier)
+      // 2. Toujours compléter avec user_applications (alimenté par increment-*, pdf-proxy, etc.)
+      // Ces usages ne sont pas dans token_usage mais sont réels
+      const { data: usageData, error: usageError } = await supabase
+        .from('user_applications')
+        .select('user_id, module_id, usage_count, last_used_at, created_at')
+        .order('last_used_at', { ascending: false })
+        .limit(1000);
+
+      if (!usageError && usageData && usageData.length > 0) {
+        const userIds = [...new Set(usageData.map(u => u.user_id))];
+        const { data: profiles } = await supabase.from('profiles').select('id, email, full_name').in('id', userIds);
+        const { data: modules } = await supabase.from('modules').select('id, name').in('id', [...new Set(usageData.map(u => u.module_id))]);
+        const profilesMap: Record<string, { email: string; full_name: string }> = {};
+        (profiles || []).forEach(p => { profilesMap[p.id] = p; });
+        const modulesMap: Record<string, { name: string }> = {};
+        (modules || []).forEach(m => { modulesMap[m.id] = m; });
+        let added = 0;
+        usageData.forEach(usage => {
+          if (!usage.usage_count) return;
+          const consumedAt = usage.last_used_at || usage.created_at;
+          if (!consumedAt) return;
+          const profile = profilesMap[usage.user_id];
+          if (!profile) return;
+          const d = new Date(consumedAt).toISOString().slice(0, 10);
+          if (tokenUsageIds.has(`${usage.user_id}|${usage.module_id}|${d}`)) return; // évite doublon
+          consumptions.push({
+            id: `ua-${usage.user_id}-${usage.module_id}-${consumedAt}`,
+            user_id: usage.user_id,
+            user_email: profile.email,
+            user_name: profile.full_name || profile.email,
+            module_id: usage.module_id,
+            module_name: modulesMap[usage.module_id]?.name || usage.module_id,
+            tokens_consumed: getTokenCost(usage.module_id),
+            consumed_at: consumedAt,
+            action_type: 'module_usage',
+            description: `Utilisation de ${modulesMap[usage.module_id]?.name || usage.module_id}`
+          });
+          added++;
+        });
+        if (added > 0) console.log(`✅ +${added} consommations depuis user_applications`);
+      }
+
+      // Trier par date (plus récent en premier) et limiter
       consumptions.sort((a, b) => new Date(b.consumed_at).getTime() - new Date(a.consumed_at).getTime());
+      consumptions = consumptions.slice(0, 1000);
 
       console.log(`✅ ${consumptions.length} consommations de tokens chargées`);
       setConsumptions(consumptions);
@@ -561,8 +506,8 @@ export default function AdminTokens() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredConsumptions.map((consumption) => (
-                <tr key={consumption.id} className="hover:bg-gray-50">
+              {filteredConsumptions.map((consumption, index) => (
+                <tr key={`consumption-${index}`} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-8 w-8">

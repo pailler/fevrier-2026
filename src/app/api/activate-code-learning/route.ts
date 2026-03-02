@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     // 2. Vérifier si l'utilisateur a déjà accès
     const { data: existingAccess, error: accessError } = await supabase
       .from('user_applications')
-      .select('id, is_active, usage_count, max_usage')
+      .select('id, is_active, usage_count')
       .eq('user_id', targetUserId)
       .eq('module_id', moduleId)
       .eq('is_active', true)
@@ -96,14 +96,10 @@ export async function POST(request: NextRequest) {
         message: 'Accès Apprendre le Code aux enfants déjà activé',
         accessId: existingAccess.id,
         usageCount: existingAccess.usage_count,
-        maxUsage: existingAccess.max_usage
       });
     }
 
-    // 3. Créer l'accès - 90 jours (3 mois)
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
-
+    const now = new Date().toISOString();
     const { data: accessData, error: createAccessError } = await supabase
       .from('user_applications')
       .insert([{
@@ -113,10 +109,8 @@ export async function POST(request: NextRequest) {
         is_active: true,
         access_level: 'premium',
         usage_count: 0,
-        max_usage: null,
-        expires_at: expiresAt.toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        created_at: now,
+        updated_at: now
       }])
       .select()
       .single();
@@ -136,7 +130,6 @@ export async function POST(request: NextRequest) {
       message: 'Apprendre le Code aux enfants activé avec succès',
       accessId: accessData.id,
       moduleId: moduleId,
-      expiresAt: expiresAt.toISOString()
     });
 
   } catch (error) {

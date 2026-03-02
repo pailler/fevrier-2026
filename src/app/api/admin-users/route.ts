@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
         // Récupérer les applications actives de l'utilisateur
         const { data: applications, error: appsError } = await supabase
           .from('user_applications')
-          .select('module_id, usage_count, max_usage, expires_at, is_active, created_at, last_used_at')
+          .select('module_id, usage_count, is_active, created_at, last_used_at')
           .eq('user_id', profile.id)
           .eq('is_active', true);
 
@@ -75,8 +75,6 @@ export async function GET(request: NextRequest) {
           applications: applications?.map(app => ({
             moduleId: app.module_id,
             usageCount: app.usage_count || 0,
-            maxUsage: app.max_usage || 0,
-            expiresAt: app.expires_at,
             lastUsedAt: app.last_used_at,
             createdAt: app.created_at
           })) || []

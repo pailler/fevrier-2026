@@ -402,14 +402,17 @@ if __name__ == "__main__":
     print("Demarrage de l'application d'animation de photos...")
     print("=" * 60)
     try:
+        # Le port 7885 est aligne avec le routage photobooth dans IAHome.
+        server_port = int(os.environ.get("PHOTOBOOTH_PORT", os.environ.get("GRADIO_SERVER_PORT", "7885")))
+        server_host = os.environ.get("GRADIO_SERVER_NAME", "0.0.0.0")
         demo = create_interface()
         print("\n[INFO] Interface creee avec succes")
         print("[INFO] Demarrage du serveur Gradio...")
-        print("[INFO] L'application sera accessible sur: http://localhost:7860")
+        print(f"[INFO] L'application sera accessible sur: http://localhost:{server_port}")
         print("=" * 60 + "\n")
         demo.launch(
-            server_name="0.0.0.0",
-            server_port=7860,
+            server_name=server_host,
+            server_port=server_port,
             share=False,
             show_error=True
         )

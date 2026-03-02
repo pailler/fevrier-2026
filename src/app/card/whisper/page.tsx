@@ -6,7 +6,7 @@ import { supabase } from '../../../utils/supabaseClient';
 import Breadcrumb from '../../../components/Breadcrumb';
 import WhisperLimits from '../../../components/WhisperLimits';
 import Link from 'next/link';
-import ModuleActivationButton from '../../../components/ModuleActivationButton';
+import ModuleAccessButton from '../../../components/ModuleAccessButton';
 import YouTubeEmbed from '../../../components/YouTubeEmbed';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
 
@@ -39,39 +39,11 @@ export default function WhisperPage() {
     title: ''
   });
   const [quickAccessAttempted, setQuickAccessAttempted] = useState(false);
-  const [alreadyActivatedModules, setAlreadyActivatedModules] = useState<string[]>([]);
-  const [checkingActivation, setCheckingActivation] = useState(false);
   const [showActivateButton, setShowActivateButton] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
 
   // Whisper IA est un module payant
   const isFreeModule = false;
-
-  // Fonction pour vérifier si un module est déjà accessible
-  const checkModuleActivation = useCallback(async (moduleId: string) => {
-    if (!session?.user?.id || !moduleId) return false;
-    
-    try {
-      const response = await fetch('/api/check-module-accès', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          moduleId: moduleId,
-          userId: session.user.id
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        return result.isActivated || false;
-      }
-    } catch (error) {
-      console.error('Erreur lors de la vérification d\'accès:', error);
-    }
-    return false;
-  }, [session?.user?.id]);
 
   // Fonction pour accéder aux modules avec JWT
   const accessModuleWithJWT = useCallback(async (moduleId: string, moduleUrl: string) => {
@@ -158,11 +130,10 @@ export default function WhisperPage() {
             subscriptionsMap[access.module_id] = {
               module_id: access.module_id,
               status: access.is_active ? 'active' : 'inactive',
-              access: {
+                access: {
                 id: access.id,
                 created_at: access.created_at,
                 access_level: access.access_level,
-                expires_at: access.expires_at,
                 is_active: access.is_active
               }
             };
@@ -173,25 +144,14 @@ export default function WhisperPage() {
         }
 
         setUserSubscriptions(subscriptionsMap);
-
-        // Vérifier si le module actuel est déjà accessible
-        if (card?.id) {
-          setCheckingActivation(true);
-          const isActivated = await checkModuleActivation(card.id);
-          if (isActivated) {
-            setAlreadyActivatedModules(prev => [...prev, card.id]);
-          }
-          setCheckingActivation(false);
-        }
       } catch (error) {
         console.log('Erreur lors du chargement des données utilisateur:', error);
         setUserSubscriptions({});
-        setCheckingActivation(false);
       }
     };
 
     fetchUserData();
-  }, [session?.user?.id, card?.id, checkModuleActivation]);
+  }, [session?.user?.id]);
 
   // Charger les modules sélectionnés
   useEffect(() => {
@@ -272,7 +232,7 @@ export default function WhisperPage() {
           "name": "Whisper IA est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'accès de Whisper IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : transcription audio/vidéo, reconnaissance de texte (OCR), support multilingue, et interface moderne. Il n'y a pas de frais supplémentaires pour le traitement des fichiers."
+            "text": "L'accès de Whisper IA coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : transcription audio/vidéo, reconnaissance de texte (OCR), support multilingue, et interface moderne. Il n'y a pas de frais supplémentaires pour le traitement des fichiers."
           }
         },
         {
@@ -399,9 +359,6 @@ export default function WhisperPage() {
         throw new Error(result.error || 'Erreur lors de l\'accès du module');
       }
 
-      // Ajouter le module aux modules accessibles
-      setAlreadyActivatedModules(prev => [...prev, card.id]);
-      
       // Rediriger vers la page de transition
       handleQuickAccess();
       
@@ -434,7 +391,6 @@ export default function WhisperPage() {
     return selectedCards.some(card => card.id === cardId);
   };
 
-  const isModuleActivated = alreadyActivatedModules.includes(card?.id || '');
   const hasActiveSubscription = userSubscriptions[card?.id || '']?.status === 'active';
 
   if (loading) {
@@ -602,63 +558,27 @@ export default function WhisperPage() {
           
           {/* Colonne 2 - Système de boutons */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-            <div className="text-left mb-8">
-              <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                <div className="text-4xl font-bold mb-1">
-                  100 tokens
-                </div>
-                <div className="text-sm opacity-90">
-                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-6">
               {/* Boutons d'action */}
               <div className="space-y-4">
-                {/* Message si le module est déjà accessible */}
-                {alreadyActivatedModules.includes(card?.id || '') && (
-                  <div className="w-3/4 mx-auto bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
-                    <div className="flex items-center justify-center space-x-3 text-green-800">
-                      <span className="text-2xl">✅</span>
-                      <div className="text-center">
-                        <p className="font-semibold">Accès direct disponible</p>
-                        <p className="text-sm opacity-80">Vous pouvez accéder à cette application depuis vos applications</p>
-                      </div>
-                    </div>
-                    <div className="mt-3 text-center">
-                      <button
-                        onClick={handleQuickAccess}
-                        className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
-                      >
-                        <span className="mr-2">📱</span>
-                        Voir mes applications
-                      </button>
-                    </div>
-                  </div>
-                )}
-
                 {/* Bouton d'accès avec tokens */}
-                {!alreadyActivatedModules.includes(card?.id || '') && (
-                  <div className="w-3/4 mx-auto">
-                    <ModuleActivationButton
-                      moduleId={card?.id || 'whisper'}
-                      moduleName={card?.title || 'Whisper'}
-                      moduleCost={100}
-                      moduleDescription={card?.description || 'Application Whisper accessible'}
-                      onActivationSuccess={() => {
-                        setAlreadyActivatedModules(prev => [...prev, card?.id || 'whisper']);
-                        alert(`✅ Application ${card?.title || 'Whisper'} accessible avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
-                      }}
-                      onActivationError={(error) => {
-                        console.error('Erreur accès:', error);
-                      }}
-                    />
-                  </div>
-                )}
+                <div className="w-3/4 mx-auto">
+                  <ModuleAccessButton
+                    moduleId={card?.id || 'whisper'}
+                    moduleName={card?.title || 'Whisper'}
+                    moduleCost={100}
+                    moduleDescription={card?.description || 'Application Whisper accessible'}
+                    onAccessSuccess={() => {
+                      alert(`✅ Application ${card?.title || 'Whisper'} accessible avec succès !`);
+                    }}
+                    onAccessError={(error) => {
+                      console.error('Erreur accès:', error);
+                    }}
+                  />
+                </div>
 
 
-                {!alreadyActivatedModules.includes(card?.id || '') && showActivateButton && (
+                {showActivateButton && (
                   <div className="w-3/4 space-y-3">
                     <button 
                       className="w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
@@ -903,7 +823,7 @@ export default function WhisperPage() {
                           </tr>
                           <tr className="bg-white">
                             <td className="border border-gray-300 p-4 font-semibold">Prix</td>
-                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez</td>
                             <td className="border border-gray-300 p-4 text-center">⚠️ Abonnements mensuels souvent chers</td>
                           </tr>
                         </tbody>
@@ -946,7 +866,7 @@ export default function WhisperPage() {
                     <div className="bg-gradient-to-r from-pink-50 to-rose-50 p-6 rounded-2xl border-l-4 border-pink-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Whisper IA est-il gratuit ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        L'accès de Whisper IA coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : transcription audio/vidéo, reconnaissance de texte (OCR), support multilingue, et interface moderne. Il n'y a pas de frais supplémentaires pour le traitement des fichiers.
+                        L'accès de Whisper IA coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : transcription audio/vidéo, reconnaissance de texte (OCR), support multilingue, et interface moderne. Il n'y a pas de frais supplémentaires pour le traitement des fichiers.
                       </p>
                     </div>
                     
@@ -1265,24 +1185,19 @@ export default function WhisperPage() {
         moduleId={card?.id || 'whisper'}
         moduleName="Whisper IA"
         tokenCost={100}
-        tokenUnit="par accès, et utilisez l'application aussi longtemps que vous souhaitez"
+        tokenUnit="par accès. Utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-whisper"
         gradientColors="from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
         icon="🎤"
-        isModuleActivated={alreadyActivatedModules.includes(card?.id || '')}
         moduleTitle={card?.title}
         moduleDescription={card?.description}
         moduleCategory={card?.category}
         moduleUrl={card?.url}
-        onActivationSuccess={() => {
-          if (card?.id) {
-            setAlreadyActivatedModules(prev => [...prev, card.id]);
-          }
-        }}
       />
     </div>
   );
 }
+
 
 
 

@@ -25,10 +25,8 @@ interface UserApplication {
   module_id: string;
   module_title: string;
   is_active: boolean;
-  expires_at: string | null;
   created_at: string;
   usage_count: number;
-  max_usage: number | null;
 }
 
 const MODULE_DESCRIPTIONS: Record<string, string> = {
@@ -137,14 +135,6 @@ export default function AccountPage() {
     }
   };
 
-  const getDaysRemaining = (expiresAt: string | null) => {
-    if (!expiresAt) return null;
-    const now = new Date();
-    const expiry = new Date(expiresAt);
-    const diff = expiry.getTime() - now.getTime();
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
-  };
-
   const resolveModuleUrl = useCallback((moduleId: string) => {
     const normalizedModuleId = (moduleId || '').trim().toLowerCase();
     const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
@@ -169,6 +159,7 @@ export default function AccountPage() {
           'psitransfer': 'http://localhost:8087',
           'pdf': 'http://localhost:8086',
           'voice-isolation': 'http://localhost:8100',
+          'photobooth': 'http://localhost:7885',
         }
       : {
           'photomaker': 'https://photomaker.iahome.fr',
@@ -190,6 +181,7 @@ export default function AccountPage() {
           'psitransfer': 'https://psitransfer.iahome.fr',
           'pdf': 'https://pdf.iahome.fr',
           'voice-isolation': 'https://voice-isolation.iahome.fr',
+          'photobooth': 'https://photobooth.iahome.fr',
         };
 
     if (urlMap[normalizedModuleId]) {
@@ -415,21 +407,10 @@ export default function AccountPage() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {applications.map((app) => {
-                    const daysRemaining = getDaysRemaining(app.expires_at);
-                    const isExpired = daysRemaining !== null && daysRemaining < 0;
-                    const isExpiringSoon = daysRemaining !== null && daysRemaining <= 7;
-                    
-                    return (
+                  {applications.map((app) => (
                       <div
                         key={app.id}
-                        className={`p-4 rounded-lg border ${
-                          isExpired
-                            ? 'bg-red-50 border-red-200'
-                            : isExpiringSoon
-                            ? 'bg-yellow-50 border-yellow-200'
-                            : 'bg-gray-50 border-gray-200'
-                        }`}
+                        className="p-4 rounded-lg border bg-gray-50 border-gray-200"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
@@ -438,18 +419,7 @@ export default function AccountPage() {
                               {MODULE_DESCRIPTIONS[app.module_id] || 'Application IA disponible avec acces direct tokenise.'}
                             </p>
                             <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                              <span>Utilisations: {app.usage_count}{app.max_usage ? ` / ${app.max_usage}` : ''}</span>
-                              {app.expires_at && (
-                                <span className={isExpired ? 'text-red-600' : isExpiringSoon ? 'text-yellow-600' : 'text-gray-600'}>
-                                  {isExpired 
-                                    ? 'Expiré' 
-                                    : daysRemaining === 0 
-                                    ? 'Expire aujourd\'hui'
-                                    : daysRemaining === 1
-                                    ? 'Expire demain'
-                                    : `${daysRemaining} jours restants`}
-                                </span>
-                              )}
+                              <span>Utilisations: {app.usage_count}</span>
                             </div>
                           </div>
                           <button
@@ -461,8 +431,7 @@ export default function AccountPage() {
                           </button>
                         </div>
                       </div>
-                    );
-                  })}
+                  ))}
                 </div>
               )}
             </div>

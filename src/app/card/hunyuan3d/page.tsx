@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '../../../utils/supabaseClient';
 import Breadcrumb from '../../../components/Breadcrumb';
 import Link from 'next/link';
-import ModuleActivationButton from '../../../components/ModuleActivationButton';
+import ModuleAccessButton from '../../../components/ModuleAccessButton';
 import YouTubeEmbed from '../../../components/YouTubeEmbed';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
 
@@ -38,39 +38,11 @@ export default function Hunyuan3DPage() {
     title: ''
   });
   const [quickAccessAttempted, setQuickAccessAttempted] = useState(false);
-  const [alreadyActivatedModules, setAlreadyActivatedModules] = useState<string[]>([]);
-  const [checkingActivation, setCheckingActivation] = useState(false);
   const [showActivateButton, setShowActivateButton] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
 
   // Hunyuan 3D est un module payant
   const isFreeModule = false;
-
-  // Fonction pour vérifier si un module est déjà accessible
-  const checkModuleActivation = useCallback(async (moduleId: string) => {
-    if (!session?.user?.id || !moduleId) return false;
-    
-    try {
-      const response = await fetch('/api/check-module-accès', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          moduleId: moduleId,
-          userId: session.user.id
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        return result.isActivated || false;
-      }
-    } catch (error) {
-      console.error('Erreur lors de la vérification d\'accès:', error);
-    }
-    return false;
-  }, [session?.user?.id]);
 
   // Fonction pour accéder aux modules avec JWT
   const accessModuleWithJWT = useCallback(async (moduleId: string, moduleUrl: string) => {
@@ -157,11 +129,10 @@ export default function Hunyuan3DPage() {
             subscriptionsMap[access.module_id] = {
               module_id: access.module_id,
               status: access.is_active ? 'active' : 'inactive',
-              access: {
+                access: {
                 id: access.id,
                 created_at: access.created_at,
                 access_level: access.access_level,
-                expires_at: access.expires_at,
                 is_active: access.is_active
               }
             };
@@ -172,25 +143,14 @@ export default function Hunyuan3DPage() {
         }
 
         setUserSubscriptions(subscriptionsMap);
-
-        // Vérifier si le module actuel est déjà accessible
-        if (card?.id) {
-          setCheckingActivation(true);
-          const isActivated = await checkModuleActivation(card.id);
-          if (isActivated) {
-            setAlreadyActivatedModules(prev => [...prev, card.id]);
-          }
-          setCheckingActivation(false);
-        }
       } catch (error) {
         console.log('Erreur lors du chargement des données utilisateur:', error);
         setUserSubscriptions({});
-        setCheckingActivation(false);
       }
     };
 
     fetchUserData();
-  }, [session?.user?.id, card?.id, checkModuleActivation]);
+  }, [session?.user?.id]);
 
   // Charger les modules sélectionnés
   useEffect(() => {
@@ -263,7 +223,7 @@ export default function Hunyuan3DPage() {
           "name": "Hunyuan 3D est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'accès du service Hunyuan 3D coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles."
+            "text": "L'accès du service Hunyuan 3D coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles."
           }
         },
         {
@@ -403,9 +363,6 @@ export default function Hunyuan3DPage() {
         throw new Error(result.error || 'Erreur lors de l\'accès du module');
       }
 
-      // Ajouter le module aux modules accessibles
-      setAlreadyActivatedModules(prev => [...prev, card.id]);
-      
       // Rediriger vers la page de transition
       handleQuickAccess();
       
@@ -489,7 +446,6 @@ export default function Hunyuan3DPage() {
     return selectedCards.some(card => card.id === cardId);
   };
 
-  const isModuleActivated = alreadyActivatedModules.includes(card?.id || '');
   const hasActiveSubscription = userSubscriptions[card?.id || '']?.status === 'active';
 
   if (loading) {
@@ -644,73 +600,24 @@ export default function Hunyuan3DPage() {
           
           {/* Colonne 2 - Système de boutons */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-            <div className="text-left mb-8">
-              <div className="w-3/4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                <div className="text-4xl font-bold mb-1">
-                  100 tokens
-                </div>
-                <div className="text-sm opacity-90">
-                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-6">
               {/* Boutons d'action */}
               <div className="space-y-4">
-                {/* Message si le module est déjà accessible */}
-                {alreadyActivatedModules.includes(card?.id || '') && (
-                  <div className="w-3/4 mx-auto bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-4">
-                    <div className="flex items-center justify-center space-x-3 text-green-800">
-                      <span className="text-2xl">✅</span>
-                      <div className="text-center">
-                        <p className="font-semibold">Accès direct disponible</p>
-                        <p className="text-sm opacity-80">Vous pouvez accéder à cette application depuis vos applications</p>
-                      </div>
-                    </div>
-                    <div className="mt-3 text-center">
-                      <button
-                        onClick={handleQuickAccess}
-                        className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
-                      >
-                        <span className="mr-2">📱</span>
-                        Voir mes applications
-                      </button>
-                    </div>
-                  </div>
-                )}
-
                 {/* Bouton d'accès avec tokens */}
-                {!alreadyActivatedModules.includes(card?.id || '') && (
-                  <div className="w-3/4 mx-auto">
-                    <ModuleActivationButton
-                      moduleId={card?.id || 'hunyuan3d'}
-                      moduleName={card?.title || 'Hunyuan 3D'}
-                      moduleCost={100}
-                      moduleDescription={card?.description || 'Application Hunyuan 3D accessible'}
-                      onActivationSuccess={() => {
-                        setAlreadyActivatedModules(prev => [...prev, card?.id || 'hunyuan3d']);
-                        alert(`✅ Application ${card?.title || 'Hunyuan 3D'} accessible avec succès ! Vous pouvez maintenant l'utiliser depuis vos applications.`);
-                      }}
-                      onActivationError={(error) => {
-                        console.error('Erreur accès:', error);
-                      }}
-                    />
-                  </div>
-                )}
-
-                {/* Bouton d'accès direct si déjà accessible */}
-                {alreadyActivatedModules.includes(card?.id || '') && (
-                  <div className="w-3/4 mx-auto">
-                    <button
-                      onClick={() => handleAccessClick(card!)}
-                      className="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300 shadow-lg"
-                    >
-                      <span className="mr-2">🚀</span>
-                      Accéder à {card?.title || 'Hunyuan 3D'}
-                    </button>
-                  </div>
-                )}
+                <div className="w-3/4 mx-auto">
+                  <ModuleAccessButton
+                    moduleId={card?.id || 'hunyuan3d'}
+                    moduleName={card?.title || 'Hunyuan 3D'}
+                    moduleCost={100}
+                    moduleDescription={card?.description || 'Application Hunyuan 3D accessible'}
+                    onAccessSuccess={() => {
+                      alert(`✅ Application ${card?.title || 'Hunyuan 3D'} accessible avec succès !`);
+                    }}
+                    onAccessError={(error) => {
+                      console.error('Erreur accès:', error);
+                    }}
+                  />
+                </div>
 
                 {/* Bouton de démo */}
                 {card?.demo_url && (
@@ -959,7 +866,7 @@ export default function Hunyuan3DPage() {
                   <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-blue-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Hunyuan 3D est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'accès du service Hunyuan 3D coûte 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles.
+                      L'accès du service Hunyuan 3D coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles.
                     </p>
                   </div>
                   
@@ -1182,7 +1089,7 @@ export default function Hunyuan3DPage() {
                 </div>
                 <div>
                   <h5 className="font-semibold text-gray-900">Prix</h5>
-                  <p className="text-gray-600 text-sm">100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez</p>
+                  <p className="text-gray-600 text-sm">100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez</p>
                 </div>
               </div>
               
@@ -1268,24 +1175,19 @@ export default function Hunyuan3DPage() {
         moduleId={card?.id || 'hunyuan3d'}
         moduleName="Hunyuan 3D"
         tokenCost={100}
-        tokenUnit="par accès, et utilisez l'application aussi longtemps que vous souhaitez"
+        tokenUnit="par accès. Utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-hunyuan3d"
         gradientColors="from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
         icon="🎭"
-        isModuleActivated={alreadyActivatedModules.includes(card?.id || '')}
         moduleTitle={card?.title}
         moduleDescription={card?.description}
         moduleCategory={card?.category}
         moduleUrl={card?.url}
-        onActivationSuccess={() => {
-          if (card?.id) {
-            setAlreadyActivatedModules(prev => [...prev, card.id]);
-          }
-        }}
       />
     </div>
   );
 }
+
 
 
 

@@ -31,6 +31,7 @@ const MODULE_URLS: Record<string, string> = {
   'administration': 'https://iahome.fr/administration',
   'voice-isolation': 'https://voice-isolation.iahome.fr',
   'photomaker': 'https://photomaker.iahome.fr',
+  'photobooth': 'https://photobooth.iahome.fr',
   // Applications IA (Gradio / sous-domaines)
   'animagine-xl': 'https://animaginexl.iahome.fr',
   'birefnet': 'https://birefnet.iahome.fr',
@@ -111,6 +112,9 @@ function getModuleSlug(moduleId: string, moduleTitle: string): string {
   }
   if (titleLower.includes('photomaker') || titleLower.includes('photo maker')) {
     return 'photomaker';
+  }
+  if (titleLower.includes('photobooth') || titleLower.includes('photo booth')) {
+    return 'photobooth';
   }
   if (titleLower.includes('apprendre autrement') || titleLower.includes('apprendre-autrement')) {
     return 'apprendre-autrement';

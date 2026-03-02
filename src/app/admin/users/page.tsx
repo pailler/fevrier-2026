@@ -10,8 +10,6 @@ const REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes
 interface UserApplication {
   moduleId: string;
   usageCount: number;
-  maxUsage: number;
-  expiresAt: string | null;
   lastUsedAt: string | null;
   createdAt: string;
 }

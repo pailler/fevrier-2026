@@ -1,0 +1,18 @@
+{
+  "events": [
+    {
+      "id": "bbc48241-421a-427a-a93c-74a33b0886ef",
+      "name": "Test Mariage",
+      "host": "Alex",
+      "pin": "3987",
+      "createdAt": "2026-02-26T21:43:48.581Z"
+    },
+    {
+      "id": "7ad7adc2-a61d-4072-879e-c57df43a140c",
+      "name": "test",
+      "host": "regis",
+      "pin": "3761",
+      "createdAt": "2026-02-26T23:00:10.812Z"
+    }
+  ]
+}

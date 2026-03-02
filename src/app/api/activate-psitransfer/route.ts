@@ -79,63 +79,43 @@ export async function POST(request: NextRequest) {
       console.log('✅ Module PsiTransfer trouvé:', moduleData.id);
     }
 
-    // 2. Vérifier si l'utilisateur a déjà un accès (actif ou expiré)
     const { data: existingAccess, error: accessError } = await supabase
       .from('user_applications')
-      .select('id, is_active, expires_at, usage_count')
+      .select('id, is_active, usage_count')
       .eq('user_id', userId)
       .eq('module_id', 'psitransfer')
       .single();
 
-    const now = new Date();
-    const expiresAt = new Date(now);
-    expiresAt.setDate(expiresAt.getDate() + 30); // 1 mois (30 jours)
-
+    const now = new Date().toISOString();
     let accessData;
 
+    if (existingAccess && existingAccess.is_active) {
+      return NextResponse.json({
+        success: true,
+        message: 'PsiTransfer déjà activé',
+        accessId: existingAccess.id,
+        moduleId: 'psitransfer'
+      });
+    }
+
     if (existingAccess) {
-      // Vérifier si l'accès est actif et non expiré
-      const isActive = existingAccess.is_active;
-      const isExpired = existingAccess.expires_at ? new Date(existingAccess.expires_at) <= now : false;
-
-      if (isActive && !isExpired) {
-        console.log('✅ PsiTransfer déjà activé pour l\'utilisateur');
-        return NextResponse.json({
-          success: true,
-          message: 'PsiTransfer déjà activé',
-          accessId: existingAccess.id,
-          moduleId: 'psitransfer',
-          expiresAt: existingAccess.expires_at
-        });
-      }
-
-      // Si le module est expiré ou désactivé, le réactiver avec usage_count = 0
-      console.log('🔄 Réactivation de PsiTransfer (module expiré ou désactivé)');
       const { data: reactivatedAccess, error: reactivateError } = await supabase
         .from('user_applications')
         .update({
           is_active: true,
           access_level: 'premium',
-          usage_count: 0, // Réinitialiser le compteur d'utilisation
-          expires_at: expiresAt.toISOString(),
-          updated_at: new Date().toISOString()
+          usage_count: 0,
+          updated_at: now
         })
         .eq('id', existingAccess.id)
         .select()
         .single();
 
       if (reactivateError) {
-        console.error('❌ Erreur réactivation accès:', reactivateError);
-        return NextResponse.json({ 
-          success: false, 
-          error: 'Erreur lors de la réactivation de l\'accès' 
-        }, { status: 500 });
+        return NextResponse.json({ success: false, error: 'Erreur lors de la réactivation de l\'accès' }, { status: 500 });
       }
-
       accessData = reactivatedAccess;
-      console.log('✅ Accès PsiTransfer réactivé avec succès:', accessData.id);
     } else {
-      // Créer un nouvel accès
       const { data: newAccess, error: createAccessError } = await supabase
         .from('user_applications')
         .insert([{
@@ -145,32 +125,23 @@ export async function POST(request: NextRequest) {
           is_active: true,
           access_level: 'premium',
           usage_count: 0,
-          max_usage: null,
-          expires_at: expiresAt.toISOString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          created_at: now,
+          updated_at: now
         }])
         .select()
         .single();
 
       if (createAccessError) {
-        console.error('❌ Erreur création accès:', createAccessError);
-        return NextResponse.json({ 
-          success: false, 
-          error: 'Erreur lors de la création de l\'accès' 
-        }, { status: 500 });
+        return NextResponse.json({ success: false, error: 'Erreur lors de la création de l\'accès' }, { status: 500 });
       }
-
       accessData = newAccess;
-      console.log('✅ Accès PsiTransfer créé avec succès:', accessData.id);
     }
 
     return NextResponse.json({
       success: true,
       message: 'PsiTransfer activé avec succès',
       accessId: accessData.id,
-      moduleId: 'psitransfer',
-      expiresAt: expiresAt.toISOString()
+      moduleId: 'psitransfer'
     });
 
   } catch (error) {

@@ -107,7 +107,7 @@ export default function AdministrationPage() {
           "name": "Les Services de l'Administration sont-ils gratuits ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'accès du portail Services de l'Administration coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez accéder à tous les liens et services sans frais supplémentaires. Les liens pointent vers les sites officiels des administrations françaises."
+            "text": "L'accès du portail Services de l'Administration coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez accéder à tous les liens et services sans frais supplémentaires. Les liens pointent vers les sites officiels des administrations françaises."
           }
         },
         {
@@ -306,7 +306,7 @@ export default function AdministrationPage() {
                   <li>Liens directs vers les sites officiels et applications mobiles</li>
                   <li>Services populaires mis en avant</li>
                   <li>Navigation par ancres pour accéder rapidement à une section</li>
-                  <li>10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez</li>
+                  <li>Utilisez l'application aussi longtemps que vous souhaitez</li>
                 </ul>
               </div>
               
@@ -332,17 +332,6 @@ export default function AdministrationPage() {
           
           {/* Colonne 2 - Accès */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8">
-            <div className="text-center mb-8">
-              <div className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                <div className="text-4xl font-bold mb-1">
-                  10 tokens
-                </div>
-                <div className="text-sm opacity-90">
-                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-6">
               {isModuleActivated && (
                 <div className="w-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
@@ -672,7 +661,7 @@ export default function AdministrationPage() {
                   <div className="bg-gradient-to-r from-pink-50 to-red-50 p-6 rounded-2xl border-l-4 border-pink-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Les Services de l'Administration sont-ils gratuits ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'accès du portail Services de l'Administration coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez accéder à tous les liens et services sans frais supplémentaires. Les liens pointent vers les sites officiels des administrations françaises.
+                      L'accès du portail Services de l'Administration coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez accéder à tous les liens et services sans frais supplémentaires. Les liens pointent vers les sites officiels des administrations françaises.
                     </p>
                   </div>
                   
@@ -865,7 +854,7 @@ export default function AdministrationPage() {
         moduleId={moduleId}
         moduleName="Administration"
         tokenCost={10}
-        tokenUnit="par accès, et utilisez l'application aussi longtemps que vous souhaitez"
+        tokenUnit="Utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-administration"
         gradientColors="from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
         icon="⚙️"
@@ -875,6 +864,7 @@ export default function AdministrationPage() {
     </div>
   );
 }
+
 
 
 

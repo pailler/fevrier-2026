@@ -24,7 +24,8 @@ try {
 
 # Démarrer l'application
 Write-Host "🚀 Lancement de l'application..." -ForegroundColor Cyan
-Write-Host "📍 L'application sera accessible sur http://localhost:7860" -ForegroundColor Green
+if (-not $env:PHOTOBOOTH_PORT) { $env:PHOTOBOOTH_PORT = "7885" }
+Write-Host "📍 L'application sera accessible sur http://localhost:$($env:PHOTOBOOTH_PORT)" -ForegroundColor Green
 Write-Host ""
 
 python app.py

@@ -54,30 +54,6 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
       // Mettre à jour le contexte côté client
       await refreshTokens();
 
-      // Incrémenter le compteur d'accès
-      try {
-        const incrementResponse = await fetch('/api/increment-module-access', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userId: user.id,
-            userEmail: user.email,
-            moduleId: moduleId
-          })
-        });
-
-        if (incrementResponse.ok) {
-          const incrementData = await incrementResponse.json();
-          console.log(`✅ ${moduleTitle}: Compteur incrémenté:`, incrementData.usage_count);
-        } else {
-          console.warn(`⚠️ ${moduleTitle}: Erreur incrémentation compteur, continuons...`);
-        }
-      } catch (incrementError) {
-        console.warn(`⚠️ ${moduleTitle}: Erreur incrémentation compteur:`, incrementError);
-      }
-
       // Générer un token d'accès
       const tokenResponse = await fetch('/api/generate-access-token', {
         method: 'POST',
@@ -122,6 +98,7 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'animagine-xl': 'animagine-xl', // Animagine XL -> animagine-xl
         'florence-2': 'florence-2', // Florence-2 -> florence-2
         'birefnet': 'birefnet', // BiRefNet -> birefnet
+        'photobooth': 'photobooth', // Photobooth -> photobooth
       };
       
       const moduleSubdomains: Record<string, string> = {
@@ -155,6 +132,8 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'florence-2': isDevelopment ? 'http://127.0.0.1:7884' : 'https://florence2.iahome.fr',
         // BiRefNet : sous-domaine comme les autres modules IA
         'birefnet': isDevelopment ? 'http://127.0.0.1:7882' : 'https://birefnet.iahome.fr',
+        // Photobooth : sous-domaine dedie
+        'photobooth': isDevelopment ? 'http://localhost:7885' : 'https://photobooth.iahome.fr',
       };
       
       // Convertir module_id numérique en slug si nécessaire

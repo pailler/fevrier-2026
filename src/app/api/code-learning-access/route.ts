@@ -53,14 +53,6 @@ export async function POST(request: NextRequest) {
       }, { status: 403 });
     }
 
-    // Vérifier l'expiration
-    if (access.expires_at && new Date(access.expires_at) < new Date()) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Accès expiré' 
-      }, { status: 403 });
-    }
-
     // Vérifier et consommer les tokens (10 tokens)
     const { data: userTokens, error: tokensError } = await supabase
       .from('user_tokens')

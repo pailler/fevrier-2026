@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from "next/link";
 import Breadcrumb from '../../../components/Breadcrumb';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
@@ -9,6 +9,7 @@ import CardPageActivationSection from '../../../components/CardPageActivationSec
 
 export default function PsiTransferPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
   const [card, setCard] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -37,6 +38,31 @@ export default function PsiTransferPage() {
     setCard(psitransferModule);
     setLoading(false);
   }, []);
+
+  // Accès direct après login (redirect avec openApp=1)
+  const [openAppHandled, setOpenAppHandled] = useState(false);
+  useEffect(() => {
+    if (openAppHandled || !isAuthenticated || !user) return;
+    const openApp = searchParams.get('openApp');
+    if (openApp !== '1') return;
+    setOpenAppHandled(true);
+    const openPsiTransfer = async () => {
+      try {
+        const res = await fetch('/api/activate-psitransfer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id, email: user.email }) });
+        const data = await res.json();
+        if (!data.success) return;
+        const tokenRes = await fetch('/api/generate-access-token', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id, userEmail: user.email, moduleId: 'psitransfer' }) });
+        const tokenData = await tokenRes.json();
+        if (tokenData?.token) {
+          window.open(`https://psitransfer.iahome.fr?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
+          window.history.replaceState({}, document.title, '/card/psitransfer');
+        }
+      } catch (e) {
+        console.error('Erreur accès PsiTransfer après login:', e);
+      }
+    };
+    setTimeout(openPsiTransfer, 800);
+  }, [isAuthenticated, user, searchParams, openAppHandled]);
 
   // Ajouter les données structurées JSON-LD pour le SEO
   useEffect(() => {
@@ -95,7 +121,7 @@ export default function PsiTransferPage() {
           "name": "PsiTransfer est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "PsiTransfer est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez transférer des fichiers sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking."
+            "text": "PsiTransfer est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez transférer des fichiers sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking."
           }
         },
         {
@@ -311,17 +337,6 @@ export default function PsiTransferPage() {
           
           {/* Colonne 2 - Système de boutons */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-            <div className="text-left mb-8">
-              <div className="w-3/4 bg-gradient-to-r from-green-600 to-teal-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                <div className="text-4xl font-bold mb-1">
-                  10 tokens
-                </div>
-                <div className="text-sm opacity-90">
-                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-6">
               {/* Boutons d'action */}
               {isAuthenticated && user ? (
@@ -330,7 +345,7 @@ export default function PsiTransferPage() {
                   onClick={async () => {
                     if (!isAuthenticated || !user) {
                       console.log('❌ Accès PsiTransfer - Utilisateur non connecté');
-                      router.push(`/login?redirect=${encodeURIComponent('/card/psitransfer')}`);
+                      router.push(`/login?redirect=${encodeURIComponent('/card/psitransfer?openApp=1')}`);
                       return;
                     }
 
@@ -393,7 +408,7 @@ export default function PsiTransferPage() {
                   onClick={() => {
                     // Utilisateur non connecté : aller à la page de connexion puis retour à PsiTransfer
                     console.log('🔒 Accès PsiTransfer - Redirection vers connexion');
-                    router.push(`/login?redirect=${encodeURIComponent('/card/psitransfer')}`);
+                    router.push(`/login?redirect=${encodeURIComponent('/card/psitransfer?openApp=1')}`);
                   }}
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
@@ -640,7 +655,7 @@ export default function PsiTransferPage() {
                   <div className="bg-gradient-to-r from-cyan-50 to-blue-50 p-6 rounded-2xl border-l-4 border-cyan-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">PsiTransfer est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      PsiTransfer est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez transférer des fichiers sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking.
+                      PsiTransfer est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez transférer des fichiers sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking.
                     </p>
                   </div>
                   
@@ -946,6 +961,7 @@ export default function PsiTransferPage() {
     </div>
   );
 }
+
 
 
 

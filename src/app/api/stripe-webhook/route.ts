@@ -391,20 +391,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     return;
   }
 
-  // Activer le module
-  // Déterminer la durée d'expiration selon le type de module
-  const now = new Date();
-  const aiModules = ['whisper', 'stablediffusion', 'ruinedfooocus', 'comfyui', 'hunyuan3d', 'prompt-generator'];
-  const isAIModule = aiModules.some(id => moduleId.toLowerCase().includes(id));
-  
-  // Modules IA : 30 jours (1 mois), Modules essentiels : 90 jours (3 mois)
-  const expiresAt = new Date(now);
-  if (isAIModule) {
-    expiresAt.setDate(expiresAt.getDate() + 30); // 1 mois
-  } else {
-    expiresAt.setDate(expiresAt.getDate() + 90); // 3 mois
-  }
-
+  const now = new Date().toISOString();
   const { data: activationData, error: activationError } = await supabase
     .from('user_applications')
     .insert([
@@ -415,8 +402,8 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         is_active: true,
         access_level: 'paid',
         usage_count: 0,
-        max_usage: 50,
-        expires_at: expiresAt.toISOString(),
+        created_at: now,
+        updated_at: now
       }
     ])
     .select()

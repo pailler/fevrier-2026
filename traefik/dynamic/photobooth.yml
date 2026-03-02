@@ -1,0 +1,45 @@
+# Configuration Traefik pour Photobooth
+# Route photobooth.iahome.fr vers le service sur port 7885
+# Pas de redirection si token présent - l'app gère elle-même la validation
+
+http:
+  serversTransports:
+    photobooth-transport:
+      forwardingTimeouts:
+        dialTimeout: "30s"
+        responseHeaderTimeout: "30s"
+        idleConnTimeout: "300s"
+  routers:
+    photobooth-acme:
+      rule: "Host(`photobooth.iahome.fr`) && PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["web"]
+      service: photobooth-service
+      priority: 1000
+
+    photobooth-main:
+      rule: "Host(`photobooth.iahome.fr`)"
+      entryPoints: ["web"]
+      service: photobooth-service
+      middlewares: ["security-headers@file"]
+      priority: 10
+
+    photobooth-https:
+      rule: "Host(`photobooth.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: photobooth-service
+      tls:
+        certResolver: letsencrypt
+      middlewares: ["security-headers@file"]
+      priority: 10
+
+  services:
+    photobooth-service:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:7885"
+        passHostHeader: true
+        serversTransport: photobooth-transport
+        healthCheck:
+          path: "/health"
+          interval: "30s"
+          timeout: "5s"

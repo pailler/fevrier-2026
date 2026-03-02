@@ -8,9 +8,7 @@ interface UserPermission {
   moduleId: string;
   moduleTitle: string;
   isActive: boolean;
-  expiresAt: string | null;
   usageCount: number;
-  maxUsage: number;
   accessType: string;
 }
 
@@ -46,9 +44,7 @@ export default function UserPermissionsManager({
           module_id,
           module_title,
           is_active,
-          expires_at,
           usage_count,
-          max_usage,
           access_type,
           created_at
         `)
@@ -63,9 +59,7 @@ export default function UserPermissionsManager({
         moduleId: app.module_id,
         moduleTitle: app.module_title,
         isActive: app.is_active,
-        expiresAt: app.expires_at,
         usageCount: app.usage_count || 0,
-        maxUsage: app.max_usage || 0,
         accessType: app.access_type || 'standard'
       }));
 
@@ -85,21 +79,9 @@ export default function UserPermissionsManager({
     return permission?.isActive === true;
   };
 
-  const isExpired = (moduleId: string): boolean => {
-    const permission = permissions.find(p => p.moduleId === moduleId);
-    if (!permission?.expiresAt) return false;
-    
-    const now = new Date();
-    const expiresAt = new Date(permission.expiresAt);
-    return now > expiresAt;
-  };
+  const isExpired = (_moduleId: string): boolean => false;
 
-  const isQuotaExceeded = (moduleId: string): boolean => {
-    const permission = permissions.find(p => p.moduleId === moduleId);
-    if (!permission) return true;
-    
-    return permission.maxUsage > 0 && permission.usageCount >= permission.maxUsage;
-  };
+  const isQuotaExceeded = (_moduleId: string): boolean => false;
 
   const getQuotaInfo = (moduleId: string) => {
     const permission = permissions.find(p => p.moduleId === moduleId);
@@ -107,30 +89,13 @@ export default function UserPermissionsManager({
 
     return {
       usageCount: permission.usageCount,
-      maxUsage: permission.maxUsage,
-      isUnlimited: permission.maxUsage === 0,
-      percentage: permission.maxUsage > 0 ? (permission.usageCount / permission.maxUsage) * 100 : 0
+      maxUsage: 0,
+      isUnlimited: true,
+      percentage: 0
     };
   };
 
-  const getTimeRemaining = (moduleId: string): string | null => {
-    const permission = permissions.find(p => p.moduleId === moduleId);
-    if (!permission?.expiresAt) return null;
-
-    const now = new Date();
-    const expiresAt = new Date(permission.expiresAt);
-    const diffMs = expiresAt.getTime() - now.getTime();
-
-    if (diffMs <= 0) return 'Expiré';
-
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-    if (days > 0) return `${days}j ${hours}h`;
-    if (hours > 0) return `${hours}h ${minutes}m`;
-    return `${minutes}m`;
-  };
+  const getTimeRemaining = (_moduleId: string): string | null => null;
 
   const getAccessStatus = (moduleId: string): 'active' | 'expired' | 'quota_exceeded' | 'inactive' => {
     if (!hasPermission(moduleId)) return 'inactive';
@@ -261,21 +226,9 @@ export function useUserPermissions() {
     return permission?.isActive === true;
   };
 
-  const isExpired = (moduleId: string): boolean => {
-    const permission = permissions.find(p => p.moduleId === moduleId);
-    if (!permission?.expiresAt) return false;
-    
-    const now = new Date();
-    const expiresAt = new Date(permission.expiresAt);
-    return now > expiresAt;
-  };
+  const isExpired = (_moduleId: string): boolean => false;
 
-  const isQuotaExceeded = (moduleId: string): boolean => {
-    const permission = permissions.find(p => p.moduleId === moduleId);
-    if (!permission) return true;
-    
-    return permission.maxUsage > 0 && permission.usageCount >= permission.maxUsage;
-  };
+  const isQuotaExceeded = (_moduleId: string): boolean => false;
 
   const getAccessStatus = (moduleId: string): 'active' | 'expired' | 'quota_exceeded' | 'inactive' => {
     if (!hasPermission(moduleId)) return 'inactive';

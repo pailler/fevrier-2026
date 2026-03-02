@@ -192,17 +192,6 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Accès trouvé:', access.id);
 
-    // Vérifier l'expiration de l'accès
-    if (access.expires_at && new Date(access.expires_at) < new Date()) {
-      return NextResponse.json(
-        { error: 'Accès expiré' },
-        { 
-          status: 403,
-          headers: corsHeaders
-        }
-      );
-    }
-
     console.log(`✅ Token validé pour ${moduleId}, utilisateur: ${userEmail || userId}`);
 
     return NextResponse.json({

@@ -49,32 +49,17 @@ export class LibreSpeedAccessService {
       // 1. Vérifier que l'utilisateur a LibreSpeed activé
       const { data: userAccess, error: accessError } = await supabase
         .from('user_applications')
-        .select('id, is_active, expires_at')
+        .select('id, is_active')
         .eq('user_id', userId)
         .eq('module_id', 'librespeed')
         .eq('is_active', true)
         .single();
 
       if (accessError || !userAccess) {
-        ;
         return {
           hasAccess: false,
           reason: 'LibreSpeed non activé pour votre compte'
         };
-      }
-
-      // 2. Vérifier l'expiration
-      if (userAccess.expires_at) {
-        const expirationDate = new Date(userAccess.expires_at);
-        const now = new Date();
-        
-        if (expirationDate <= now) {
-          ;
-          return {
-            hasAccess: false,
-            reason: 'Votre accès LibreSpeed a expiré'
-          };
-        }
       }
 
       ;

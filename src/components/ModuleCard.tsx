@@ -191,6 +191,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       return '/images/stablediffusion.jpg';
     }
     
+    if (titleLower.includes('photobooth') || titleLower.includes('photo booth') || idLower === 'photobooth') {
+      return '/images/module-visuals/photobooth-module.svg';
+    }
+    
     if (titleLower.includes('photo') || titleLower.includes('image')) {
       return '/images/iaphoto.jpg';
     }

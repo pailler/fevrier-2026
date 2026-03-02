@@ -115,7 +115,29 @@ try {
         }
     }
 } catch {
-    Write-Host "   Purge Cloudflare non effectuée: $($_.Exception.Message)" -ForegroundColor DarkYellow
+    $exceptionMessage = $_.Exception.Message
+    $apiMessage = $null
+
+    if ($_.ErrorDetails -and $_.ErrorDetails.Message) {
+        try {
+            $errorPayload = $_.ErrorDetails.Message | ConvertFrom-Json -ErrorAction Stop
+            if ($errorPayload -and $errorPayload.message) {
+                $apiMessage = $errorPayload.message
+            }
+        } catch {
+            # Le corps d'erreur n'est pas du JSON exploitable, on conserve le message d'exception.
+        }
+    }
+
+    Write-Host "   Purge Cloudflare non effectuée: $exceptionMessage" -ForegroundColor DarkYellow
+    if ($apiMessage) {
+        Write-Host "   Réponse API: $apiMessage" -ForegroundColor DarkYellow
+    }
+
+    if (($apiMessage -match "CLOUDFLARE_API_TOKEN") -or ($apiMessage -match "CLOUDFLARE_ZONE_ID")) {
+        Write-Host "   Astuce: définir CLOUDFLARE_API_TOKEN et CLOUDFLARE_ZONE_ID dans .env.production.local puis recréer iahome-app" -ForegroundColor Gray
+    }
+
     Write-Host "   Vous pouvez purger manuellement: https://dash.cloudflare.com > Caching > Purge Everything" -ForegroundColor Gray
 }
 

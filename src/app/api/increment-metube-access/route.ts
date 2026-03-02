@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   try {
     const { data: userApp, error: appError } = await supabase
       .from('user_applications')
-      .select('id, usage_count, max_usage, expires_at')
+      .select('id, usage_count')
       .eq('user_id', userId)
       .eq('module_id', moduleId)
       .single();
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const { id: userAppId, usage_count: currentUsage, max_usage: maxUsage } = userApp;
+    const { id: userAppId, usage_count: currentUsage } = userApp;
 
     const { data: userTokens, error: tokensError } = await supabase
       .from('user_tokens')
@@ -119,13 +119,12 @@ export async function POST(request: Request) {
       });
     }
 
-    console.log('✅ MeTube Access: Compteur incrémenté:', newUsageCount, '/', maxUsage);
+    console.log('✅ MeTube Access: Compteur incrémenté:', newUsageCount);
     console.log(`✅ MeTube Access: ${tokensToConsume} tokens consommés. Restants:`, userTokens.tokens - tokensToConsume);
 
     return new NextResponse(JSON.stringify({
       success: true,
       usage_count: updatedApp.usage_count,
-      max_usage: updatedApp.max_usage,
       last_accessed_at: updatedApp.last_accessed_at,
       tokens_consumed: tokensToConsume,
       tokens_remaining: userTokens.tokens - tokensToConsume

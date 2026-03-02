@@ -14,8 +14,6 @@ interface Application {
   lastUpdate: string;
   version: string;
   usageCount: number;
-  maxUsage: number;
-  expiresAt: string;
   isActive: boolean;
   createdAt: string;
   lastUsedAt: string;
@@ -25,8 +23,6 @@ interface Application {
     email: string;
     fullName: string;
     usageCount: number;
-    maxUsage: number;
-    expiresAt: string;
     lastUsedAt: string;
     createdAt: string;
   }>;
@@ -178,17 +174,18 @@ export default function AdminApplications() {
           id,
           module_id, 
           usage_count, 
-          max_usage, 
-          expires_at, 
           is_active, 
           created_at, 
           last_used_at,
           user_id
-        `)
-        .eq('is_active', true);
+        `);
 
-      const userIds = [...new Set((usageData || []).map(app => app.user_id))];
-      const moduleIds = [...new Set((usageData || []).map(app => app.module_id))];
+      const visitedUsageData = (usageData || []).filter(
+        app => (app.usage_count || 0) > 0 || !!app.last_used_at
+      );
+
+      const userIds = [...new Set(visitedUsageData.map(app => app.user_id))];
+      const moduleIds = [...new Set(visitedUsageData.map(app => app.module_id))];
 
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
@@ -220,12 +217,11 @@ export default function AdminApplications() {
         console.error('❌ Erreur lors de la récupération des statistiques d\'usage:', usageError);
       }
 
-      const applicationStats = (usageData || []).reduce((acc, app) => {
+      const applicationStats = visitedUsageData.reduce((acc, app) => {
         if (!acc[app.module_id]) {
           acc[app.module_id] = {
             users: 0,
             totalUsage: 0,
-            totalMaxUsage: 0,
             lastUsedAt: null,
             createdAt: null,
             activeUsers: []
@@ -233,7 +229,6 @@ export default function AdminApplications() {
         }
         acc[app.module_id].users++;
         acc[app.module_id].totalUsage += app.usage_count || 0;
-        acc[app.module_id].totalMaxUsage += app.max_usage || 0;
         if (app.last_used_at && (!acc[app.module_id].lastUsedAt || new Date(app.last_used_at) > new Date(acc[app.module_id].lastUsedAt))) {
           acc[app.module_id].lastUsedAt = app.last_used_at;
         }
@@ -249,8 +244,6 @@ export default function AdminApplications() {
             email: profile.email,
             fullName: profile.full_name || profile.email,
             usageCount: app.usage_count || 0,
-            maxUsage: app.max_usage || 0,
-            expiresAt: app.expires_at,
             lastUsedAt: app.last_used_at,
             createdAt: app.created_at
           });
@@ -270,7 +263,6 @@ export default function AdminApplications() {
         const stats = applicationStats[moduleId] || {
           users: 0,
           totalUsage: 0,
-          totalMaxUsage: 0,
           lastUsedAt: null,
           createdAt: null,
           activeUsers: []
@@ -366,8 +358,6 @@ export default function AdminApplications() {
           lastUpdate: stats.lastUsedAt || stats.createdAt || new Date().toISOString(),
           version: '1.0.0',
           usageCount: stats.totalUsage,
-          maxUsage: stats.totalMaxUsage,
-          expiresAt: '2025-12-31',
           isActive: true,
           createdAt: stats.createdAt || moduleData?.created_at || new Date().toISOString(),
           lastUsedAt: stats.lastUsedAt || null,
@@ -1146,7 +1136,7 @@ export default function AdminApplications() {
                               <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-3">
                                   <h4 className="text-sm font-medium text-gray-700">
-                                    Utilisateurs actifs ({application.activeUsers.length})
+                                    Utilisateurs ayant visite ({application.activeUsers.length})
                                   </h4>
                                   {selectedUsers[application.id] && selectedUsers[application.id].size > 0 && (
                                     <span className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full">
@@ -1185,11 +1175,11 @@ export default function AdminApplications() {
                                 </div>
                               </div>
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                {application.activeUsers.map((user) => {
+                                {application.activeUsers.map((user, idx) => {
                                   const isSelected = selectedUsers[application.id]?.has(user.id) || false;
                                   return (
                                     <div 
-                                      key={user.id} 
+                                      key={`${application.id}-user-${idx}`} 
                                       className={`bg-gray-50 rounded-lg p-3 border-2 transition-all ${
                                         isSelected 
                                           ? 'border-blue-500 bg-blue-50' 
@@ -1235,7 +1225,7 @@ export default function AdminApplications() {
                             <div className="mt-4">
                               <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                                 <p className="text-sm text-gray-500 text-center">
-                                  Aucun utilisateur actif pour cette application
+                                  Aucun utilisateur n'a visite cette application
                                 </p>
                               </div>
                             </div>

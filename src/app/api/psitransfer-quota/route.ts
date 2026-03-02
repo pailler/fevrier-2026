@@ -17,24 +17,23 @@ export async function POST(request: NextRequest) {
     // Récupérer l'accès utilisateur pour PSitransfer
     const { data: userAccess, error: accessError } = await supabase
       .from('user_applications')
-      .select('id, usage_count, max_usage')
+      .select('id, usage_count')
       .eq('user_id', userId)
       .eq('module_id', 'psitransfer')
       .eq('is_active', true)
       .single();
 
     if (accessError || !userAccess) {
-      ;
       return NextResponse.json(
         { error: 'Aucun accès PSitransfer trouvé' },
         { status: 404 }
       );
     }
 
-    // Convertir la taille du fichier en Go
+    // Convertir la taille du fichier en Go - pas de quota sur user_applications
     const fileSizeGB = fileSize / (1024 * 1024 * 1024);
-    const currentUsageGB = 0; // Pas de quota_used dans la table
-    const maxUsageGB = userAccess.max_usage || 10; // 10 Go par défaut
+    const currentUsageGB = 0;
+    const maxUsageGB = 100; // 100 Go par défaut (quota illimité en pratique)
 
     if (action === 'check') {
       // Vérifier si l'ajout du fichier dépasserait le quota

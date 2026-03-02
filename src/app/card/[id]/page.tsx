@@ -65,6 +65,8 @@ export default function CardDetailPage() {
   
   // Vérifier si c'est le module hunyuan3d pour appliquer un style spécial
   const isHunyuan3d = Boolean(card?.title?.toLowerCase().includes('hunyuan') || card?.id === 'hunyuan3d');
+  // Vérifier si c'est le module photobooth pour appliquer un workflow essentiel
+  const isPhotobooth = Boolean(card?.title?.toLowerCase().includes('photobooth') || card?.id === 'photobooth');
   
   // Debug MeTube
   console.log('🔍 DEBUG METUBE:', {
@@ -96,7 +98,7 @@ export default function CardDetailPage() {
     // Vérifier si le module a un coût en tokens défini
     const tokenCost = TOKEN_COSTS[moduleId as keyof typeof TOKEN_COSTS];
     if (tokenCost) {
-      return `${tokenCost} tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez`;
+      return `${tokenCost} tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez`;
     }
     
     // Fallback: utiliser le prix tel quel (pour compatibilité avec les anciens modules)
@@ -129,7 +131,7 @@ export default function CardDetailPage() {
     return false;
   }, [user?.id]);
 
-  // Fonction pour accéder aux modules avec JWT
+  // Fonction pour accéder aux modules avec JWT - ouvre l'application directement avec token (mode connecté)
   const accessModuleWithJWT = useCallback(async (moduleTitle: string, moduleId: string) => {
     if (!user?.id) {
       alert('Vous devez être connecté pour accéder aux modules');
@@ -142,56 +144,9 @@ export default function CardDetailPage() {
     }
 
     try {
-      // Gestion spéciale pour Metube avec lien direct
-      if (moduleTitle.toLowerCase().includes('metube') || moduleTitle.toLowerCase().includes('me tube')) {
-        console.log('🔑 Accès direct à Metube via iframe');
-        const metubeUrl = 'https://metube.iahome.fr';
-        console.log('🔗 URL d\'accès Metube directe:', metubeUrl);
-        setIframeModal({
-          isOpen: true,
-          url: metubeUrl,
-          title: moduleTitle
-        });
-        return;
-      }
-
-      // Gestion spéciale pour PDF avec lien direct
-      if (moduleTitle.toLowerCase().includes('pdf') || moduleTitle.toLowerCase().includes('pdf+')) {
-        console.log('🔑 Accès direct à PDF via iframe');
-        const pdfUrl = 'https://pdf.iahome.fr';
-        console.log('🔗 URL d\'accès PDF directe:', pdfUrl);
-        setIframeModal({
-          isOpen: true,
-          url: pdfUrl,
-          title: moduleTitle
-        });
-        return;
-      }
-
-      // Gestion spéciale pour LibreSpeed avec lien direct
-      if (moduleTitle.toLowerCase().includes('librespeed') || moduleTitle.toLowerCase().includes('speed')) {
-        console.log('🔑 Accès direct à LibreSpeed via iframe');
-        const librespeedUrl = 'https://librespeed.iahome.fr';
-        console.log('🔗 URL d\'accès LibreSpeed directe:', librespeedUrl);
-        setIframeModal({
-          isOpen: true,
-          url: librespeedUrl,
-          title: moduleTitle
-        });
-        return;
-      }
-
-      // Pour les autres modules, utiliser le système JWT existant
-      console.log('🔍 Génération du token JWT pour:', moduleTitle);
-      
-      const expirationHours = moduleTitle.toLowerCase() === 'ruinedfooocus' ? 12 : undefined;
-      
-      // Rediriger directement vers l'application via sous-domaines
-      // En développement : utiliser localhost si disponible
-      // En production : utiliser les sous-domaines publics
+      // Modules internes sans token (administration)
       const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-      
-      const applicationUrls = {
+      const applicationUrls: Record<string, string> = {
         'librespeed': 'https://librespeed.iahome.fr',
         'metube': 'https://metube.iahome.fr',
         'whisper': 'https://whisper.iahome.fr',
@@ -201,123 +156,67 @@ export default function CardDetailPage() {
         'stablediffusion': 'https://stablediffusion.iahome.fr',
         'comfyui': 'https://comfyui.iahome.fr',
         'code-learning': '/code-learning',
-        // Meeting Reports : localhost:3050 en dev, meeting-reports.iahome.fr en prod
         'meeting-reports': isDevelopment ? 'http://localhost:3050' : 'https://meeting-reports.iahome.fr',
         'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
         'cogstudio': 'https://cogstudio.iahome.fr',
-        // Home Assistant : localhost:8123 en dev, homeassistant.iahome.fr en prod
         'home-assistant': isDevelopment ? 'http://localhost:8123' : 'https://homeassistant.iahome.fr',
-        // Générateur de prompts : utiliser directement l'URL de production (via Traefik)
         'prompt-generator': 'https://prompt-generator.iahome.fr',
-        // Apprendre Autrement : redirection directe vers l'application (racine)
         'apprendre-autrement': isDevelopment ? 'http://localhost:9001' : 'https://apprendre-autrement.iahome.fr',
-        // Administration : page interne
+        'photobooth': isDevelopment ? 'http://localhost:7885' : 'https://photobooth.iahome.fr',
         'administration': '/administration',
-        // Détecteur de Contenu IA : sur le domaine principal
         'ai-detector': isDevelopment ? 'http://localhost:3000/ai-detector' : 'https://iahome.fr/ai-detector',
+        'hunyuan3d': isDevelopment ? 'http://localhost:8888' : 'https://hunyuan3d.iahome.fr',
+        'photomaker': isDevelopment ? 'http://localhost:7881' : 'https://photomaker.iahome.fr',
+        'animagine-xl': isDevelopment ? 'http://localhost:7883' : 'https://animaginexl.iahome.fr',
+        'florence-2': isDevelopment ? 'http://localhost:7884' : 'https://florence2.iahome.fr',
+        'birefnet': isDevelopment ? 'http://localhost:7882' : 'https://birefnet.iahome.fr',
       };
 
       const accessUrl = applicationUrls[moduleId];
-      
       if (!accessUrl) {
         throw new Error(`URL d'accès non configurée pour ${moduleId}`);
       }
-      
-      console.log(`🔗 ${moduleTitle}: Accès direct à:`, accessUrl);
-      
-      // Générer le token d'accès
+
+      // Administration : page interne, redirection sans token
+      if (moduleId === 'administration') {
+        window.location.href = accessUrl;
+        return;
+      }
+
+      // Générer le token d'accès (consomme des tokens, authentifie l'utilisateur pour l'app)
       const tokenResponse = await fetch('/api/generate-access-token', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          userEmail: user.email,
-          moduleId: moduleId
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, userEmail: user.email, moduleId }),
       });
 
       if (!tokenResponse.ok) {
-        throw new Error('Erreur génération token');
+        const errData = await tokenResponse.json().catch(() => ({}));
+        throw new Error(errData.error || 'Erreur génération token');
       }
 
       const tokenData = await tokenResponse.json();
-      
-      // Pour les modules qui doivent s'ouvrir dans un nouvel onglet
-      if (moduleId === 'code-learning' || moduleId === 'apprendre-autrement' || moduleId === 'administration') {
-        // Ajouter le token à l'URL pour apprendre-autrement
-        if (moduleId === 'apprendre-autrement' && tokenData?.token) {
-          const urlWithToken = `${accessUrl}?token=${encodeURIComponent(tokenData.token)}`;
-          window.open(urlWithToken, '_blank', 'noopener,noreferrer');
-        } else if (moduleId === 'code-learning' && tokenData?.token) {
-          const urlWithToken = `${accessUrl}?token=${encodeURIComponent(tokenData.token)}`;
-          window.open(urlWithToken, '_blank', 'noopener,noreferrer');
-        } else {
-          window.open(accessUrl, '_blank', 'noopener,noreferrer');
-        }
-      } else if (accessUrl.startsWith('/')) {
-        // Pour les autres routes internes (commençant par /), rediriger dans le même onglet
-        window.location.href = accessUrl;
-      } else {
-        window.open(accessUrl, '_blank');
-      }
-      return;
-      
-      const moduleUrls: { [key: string]: string } = {
-        'stablediffusion': '/api/gradio-proxy?service=stablediffusion',
-        'comfyui': '/api/gradio-proxy?service=comfyui',
-        'ruinedfooocus': '/api/gradio-secure', // Garde l'ancien système pour RuinedFooocus
-        'librespeed': '/api/gradio-proxy?service=librespeed',
-        'whisper': '/api/gradio-proxy?service=whisper',
-        'whisper-video': '/api/gradio-proxy?service=whisper-video',
-        'whisper-ocr': '/api/gradio-proxy?service=whisper-ocr',
-        'whisper-documents': '/api/gradio-proxy?service=whisper-documents',
-        'metube': '/api/gradio-proxy?service=metube',
-        'ia metube': '/api/gradio-proxy?service=metube',
-        'psitransfer': '/api/gradio-proxy?service=psitransfer',
-        'qrcodes': '/api/gradio-proxy?service=qrcodes',
-        'pdf': '/api/gradio-proxy?service=stirling-pdf',
-        'pdf+': '/api/gradio-proxy?service=stirling-pdf',
-        'iaphoto': '/api/gradio-proxy?service=stablediffusion', 
-        'cogstudio': '/api/gradio-proxy?service=cogstudio',
-        'meeting-reports': 'https://meeting-reports.iahome.fr',
-        'photomaker': 'https://photomaker.iahome.fr',
-        'animagine-xl': '/api/secure-proxy?module=animagine-xl',
-        'florence-2': '/api/secure-proxy?module=florence-2',
-        'birefnet': '/api/secure-proxy?module=birefnet'
-      };
+      const token = tokenData?.token;
 
-      const normalizedName = (moduleTitle || '').toLowerCase().replace(/\s+/g, '');
-      let baseUrl = moduleUrls[normalizedName];
-      
-      if (!baseUrl) {
-        const titleKey = (moduleTitle || '').toLowerCase().replace(/\s+/g, '');
-        baseUrl = moduleUrls[titleKey];
+      // Routes internes avec token (code-learning, ai-detector)
+      if (accessUrl.startsWith('/')) {
+        if (token) {
+          window.open(`${accessUrl}?token=${encodeURIComponent(token)}`, '_blank', 'noopener,noreferrer');
+        } else {
+          window.location.href = accessUrl;
+        }
+        return;
       }
-      
-      if (!baseUrl && ((moduleTitle || '').toLowerCase().includes('librespeed'))) {
-        baseUrl = 'https://librespeed.iahome.fr';
-      }
-      
-      if (!baseUrl) {
-        baseUrl = 'https://metube.iahome.fr';
-      }
-      
-      const isProxyModule = baseUrl.startsWith('/api/');
-      const finalAccessUrl = isProxyModule ? baseUrl : baseUrl;
-      console.log('🔗 URL d\'accès:', finalAccessUrl);
-      
-      setIframeModal({
-        isOpen: true,
-        url: finalAccessUrl,
-        title: moduleTitle
-      });
+
+      // Toutes les apps externes : ouvrir directement l'application avec token (mode connecté)
+      const separator = accessUrl.includes('?') ? '&' : '?';
+      const urlWithToken = token ? `${accessUrl}${separator}token=${encodeURIComponent(token)}` : accessUrl;
+      window.open(urlWithToken, '_blank', 'noopener,noreferrer');
     } catch (error) {
       console.error('❌ Erreur lors de l\'accès:', error);
       alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
-  }, [user, token, setIframeModal]);
+  }, [user]);
 
   // L'authentification est maintenant gérée par useCustomAuth
 
@@ -354,7 +253,6 @@ export default function CardDetailPage() {
                 id: access.id,
                 created_at: access.created_at,
                 access_level: access.access_level,
-                expires_at: access.expires_at,
                 is_active: access.is_active
               }
             };
@@ -423,7 +321,7 @@ export default function CardDetailPage() {
           const librespeedCard = {
             id: 'librespeed',
             title: 'LibreSpeed',
-            description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision. Coûte 10 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez.',
+            description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision. Coûte 10 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez.',
             subtitle: 'Test de vitesse internet complet - 10 tokens par accès, utilisez aussi longtemps que vous souhaitez',
             category: 'WEB TOOLS',
             price: 10,
@@ -433,7 +331,7 @@ export default function CardDetailPage() {
               'Interface moderne et intuitive',
               'Résultats détaillés',
               'Compatible tous navigateurs',
-              '10 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
+              '10 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez'
             ],
             requirements: [
               'Connexion internet stable',
@@ -496,7 +394,7 @@ export default function CardDetailPage() {
               'Chiffrement end-to-end',
               'Partage par lien temporaire',
               'Interface simple et intuitive',
-              '10 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
+              '10 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez'
             ],
             requirements: [
               'Connexion internet stable',
@@ -541,26 +439,29 @@ export default function CardDetailPage() {
     fetchCardDetails();
   }, [params.id, router]);
 
-  // Gérer l'accès rapide
+  // Gérer l'accès rapide après login (redirect avec openApp=1 ou quick_access=true)
   useEffect(() => {
     const handleQuickAccess = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const quickAccess = urlParams.get('quick_access');
-      
-      if (quickAccess === 'true' && card && isAuthenticated && user && !quickAccessAttempted) {
+      const openApp = urlParams.get('openApp');
+
+      const shouldOpenApp = (openApp === '1' || quickAccess === 'true') && card && isAuthenticated && user && !quickAccessAttempted;
+
+      if (shouldOpenApp) {
         setQuickAccessAttempted(true);
-        
-        if (card.price === 0 || card.price === '0') {
-          console.log('🚀 Accès rapide demandé pour:', card.title);
-          
+        const isFree = card.price === 0 || card.price === '0';
+
+        if (openApp === '1' || isFree) {
+          console.log('🚀 Accès direct à l\'application après login:', card.title);
           setTimeout(async () => {
             try {
               await accessModuleWithJWT(card.title, card.id);
               window.history.replaceState({}, document.title, window.location.pathname);
             } catch (error) {
-              console.error('Erreur lors de l\'accès rapide:', error);
+              console.error('Erreur lors de l\'accès direct:', error);
             }
-          }, 1000);
+          }, 800);
         }
       }
     };
@@ -862,28 +763,6 @@ export default function CardDetailPage() {
             
             {/* Colonne 2 - Système de boutons */}
             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-              <div className="text-left mb-8">
-                <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                  <div className="text-4xl font-bold mb-1">
-                    {card.price === 0 || card.price === '0' ? 
-                      (isFreeModule ? '10 tokens' : 'Free') : 
-                      card.id === 'qrcodes' ? '100 tokens' :
-                      card.id === 'photomaker' ? '100 tokens' :
-                      card.id === 'animagine-xl' ? '100 tokens' :
-                      card.id === 'florence-2' ? '100 tokens' :
-                      card.id === 'birefnet' ? '100 tokens' :
-                      `${card.price} tokens`
-                    }
-                  </div>
-                  <div className="text-sm opacity-90">
-                    {card.price === 0 || card.price === '0' ? 
-                      (isFreeModule ? 'par accès, et utilisez l\'application aussi longtemps que vous souhaitez' : 'Gratuit') : 
-                      'par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
-                    }
-                  </div>
-                </div>
-              </div>
-
               <div className="space-y-6">
                 {/* Boutons d'action */}
                 {(card.price === 0 || card.price === '0') && isAuthenticated && user && !isLibrespeed ? (
@@ -999,7 +878,7 @@ export default function CardDetailPage() {
 
                     
                     {/* Bouton "Accéder à la sélection" pour les modules payants */}
-                    {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && (
+                    {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && !isPhotobooth && (
                       <button 
                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                         onClick={async () => {
@@ -1053,6 +932,49 @@ export default function CardDetailPage() {
                       </button>
                     )}
 
+                    {/* Bouton d'accès spécial pour Photobooth */}
+                    {isPhotobooth && !alreadyActivatedModules.includes(card.id) && (
+                      <button
+                        onClick={async () => {
+                          if (!isAuthenticated || !user) {
+                            router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}?openApp=1`)}`);
+                            return;
+                          }
+
+                          try {
+                            const response = await fetch('/api/activate-photobooth', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({
+                                userId: user.id,
+                                email: user.email,
+                              }),
+                            });
+
+                            const result = await response.json();
+
+                            if (result.success) {
+                              setAlreadyActivatedModules(prev => [...prev, card.id]);
+                              alert('Photobooth accessible avec succès ! Ouverture en cours...');
+                              await accessModuleWithJWT(card.title, 'photobooth');
+                            } else {
+                              alert(`Erreur lors de l'accès: ${result.error}`);
+                            }
+                          } catch (error) {
+                            alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+                          }
+                        }}
+                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                      >
+                        <span className="text-xl">📸</span>
+                        <span>
+                          {isAuthenticated && user ? `Accéder à Photobooth (100 tokens par accès)` : `Connectez-vous pour accéder Photobooth (100 tokens par accès)`}
+                        </span>
+                      </button>
+                    )}
+
 
                     {/* Bouton d'accès spécial pour Apprendre le Code aux enfants */}
                     {isCodeLearning && !alreadyActivatedModules.includes(card.id) && (
@@ -1060,7 +982,7 @@ export default function CardDetailPage() {
                         onClick={async () => {
                           if (!isAuthenticated || !user) {
                             console.log('❌ Accès Apprendre le Code aux enfants - Utilisateur non connecté');
-                            router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
+                            router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}?openApp=1`)}`);
                             return;
                           }
 
@@ -1109,7 +1031,7 @@ export default function CardDetailPage() {
                         onClick={async () => {
                           if (!isAuthenticated || !user) {
                             console.log('❌ Accès Apprendre Autrement - Utilisateur non connecté');
-                            router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
+                            router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}?openApp=1`)}`);
                             return;
                           }
 
@@ -1158,7 +1080,7 @@ export default function CardDetailPage() {
                         onClick={async () => {
                           if (!isAuthenticated || !user) {
                             console.log('❌ Accès LibreSpeed - Utilisateur non connecté');
-                            router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
+                            router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}?openApp=1`)}`);
                             return;
                           }
 
@@ -1214,7 +1136,7 @@ export default function CardDetailPage() {
                           } else {
                             // Utilisateur non connecté : aller à la page de connexion puis retour à MeTube
                             console.log('🔒 Accès MeTube - Redirection vers connexion');
-                            router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
+                            router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}?openApp=1`)}`);
                           }
                         }}
                         className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
@@ -1262,7 +1184,7 @@ export default function CardDetailPage() {
                                 }
                               } else {
                                 // Si pas connecté, rediriger vers la connexion
-                                router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
+                                router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}?openApp=1`)}`);
                               }
                             }}
                             className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
@@ -1302,28 +1224,6 @@ export default function CardDetailPage() {
             
             {/* Colonne 2 - Système de boutons */}
             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-              <div className="text-left mb-8">
-                <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                  <div className="text-4xl font-bold mb-1">
-                    {card.price === 0 || card.price === '0' ? 
-                      (isFreeModule ? '10 tokens' : 'Free') : 
-                      card.id === 'qrcodes' ? '100 tokens' :
-                      card.id === 'photomaker' ? '100 tokens' :
-                      card.id === 'animagine-xl' ? '100 tokens' :
-                      card.id === 'florence-2' ? '100 tokens' :
-                      card.id === 'birefnet' ? '100 tokens' :
-                      `${card.price} tokens`
-                    }
-                  </div>
-                  <div className="text-sm opacity-90">
-                    {card.price === 0 || card.price === '0' ? 
-                      (isFreeModule ? 'par accès, et utilisez l\'application aussi longtemps que vous souhaitez' : 'Gratuit') : 
-                      'par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
-                    }
-                  </div>
-                </div>
-              </div>
-
               <div className="space-y-6">
                 {/* Boutons d'action */}
                 <button
@@ -1335,7 +1235,7 @@ export default function CardDetailPage() {
                     } else {
                       // Utilisateur non connecté : redirection vers connexion
                       console.log('🔒 Accès MeTube - Redirection vers connexion');
-                      router.push(`/login?redirect=${encodeURIComponent('/card/metube')}`);
+                      router.push(`/login?redirect=${encodeURIComponent('/card/metube?openApp=1')}`);
                     }
                   }}
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
@@ -1364,28 +1264,6 @@ export default function CardDetailPage() {
             
             {/* Colonne 2 - Système de boutons */}
             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-              <div className="text-left mb-8">
-                <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                  <div className="text-4xl font-bold mb-1">
-                    {card.price === 0 || card.price === '0' ? 
-                      (isFreeModule ? '10 tokens' : 'Free') : 
-                      card.id === 'qrcodes' ? '100 tokens' :
-                      card.id === 'photomaker' ? '100 tokens' :
-                      card.id === 'animagine-xl' ? '100 tokens' :
-                      card.id === 'florence-2' ? '100 tokens' :
-                      card.id === 'birefnet' ? '100 tokens' :
-                      `${card.price} tokens`
-                    }
-                  </div>
-                  <div className="text-sm opacity-90">
-                    {card.price === 0 || card.price === '0' ? 
-                      (isFreeModule ? 'par accès, et utilisez l\'application aussi longtemps que vous souhaitez' : 'Gratuit') : 
-                      'par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
-                    }
-                  </div>
-                </div>
-              </div>
-
               <div className="space-y-6">
                 {/* Boutons d'action pour PsiTransfer */}
                 {!alreadyActivatedModules.includes(card.id) && (
@@ -1393,7 +1271,7 @@ export default function CardDetailPage() {
                     onClick={async () => {
                       if (!isAuthenticated || !user) {
                         console.log('❌ Accès PsiTransfer - Utilisateur non connecté');
-                        router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}`)}`);
+                        router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}?openApp=1`)}`);
                         return;
                       }
 
@@ -1471,16 +1349,6 @@ export default function CardDetailPage() {
             
             {/* Colonne 2 - Système de boutons */}
             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-              <div className="text-left mb-8">
-                <div className="w-3/4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                  <div className="text-4xl font-bold mb-1">
-                    100 tokens
-                  </div>
-                  <div className="text-sm opacity-90">
-                    par accès, et utilisez l'application aussi longtemps que vous souhaitez
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -1499,27 +1367,6 @@ export default function CardDetailPage() {
             
             {/* Colonne 2 - Informations du module */}
             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-              <div className="text-left mb-8">
-                <div className="w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                  <div className="text-4xl font-bold mb-1">
-                    {card.price === 0 || card.price === '0' ? 
-                      (isFreeModule ? '10 tokens' : 'Free') : 
-                      card.id === 'qrcodes' ? '100 tokens' :
-                      card.id === 'photomaker' ? '100 tokens' :
-                      card.id === 'animagine-xl' ? '100 tokens' :
-                      card.id === 'florence-2' ? '100 tokens' :
-                      card.id === 'birefnet' ? '100 tokens' :
-                      `${card.price} tokens`
-                    }
-                  </div>
-                  <div className="text-sm opacity-90">
-                    {card.price === 0 || card.price === '0' ? 
-                      (isFreeModule ? 'par accès, et utilisez l\'application aussi longtemps que vous souhaitez' : 'Gratuit') : 
-                      'par accès, et utilisez l\'application aussi longtemps que vous souhaitez'
-                    }
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

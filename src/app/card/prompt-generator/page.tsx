@@ -509,17 +509,6 @@ export default function PromptGeneratorCardPage() {
           <div className="space-y-8">
             {/* Prix et accès */}
             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8">
-              <div className="text-center mb-8">
-                <div className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                  <div className="text-4xl font-bold mb-1">
-                    100 tokens
-                  </div>
-                  <div className="text-sm opacity-90">
-                    par accès
-                  </div>
-                </div>
-              </div>
-
               <div className="space-y-6">
               {isModuleActivated && (
                 <div className="w-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">

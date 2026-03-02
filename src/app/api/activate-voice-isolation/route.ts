@@ -194,94 +194,68 @@ export async function POST(request: NextRequest) {
       console.log('✅ Module Voice Isolation trouvé:', moduleData.id);
     }
 
-    // 4. Vérifier si l'utilisateur a déjà un accès (actif ou expiré)
     const { data: existingAccess, error: accessError } = await supabase
       .from('user_applications')
-      .select('id, is_active, expires_at, usage_count')
+      .select('id, is_active, usage_count')
       .eq('user_id', targetUserId)
       .eq('module_id', 'voice-isolation')
       .single();
 
-    const now = new Date();
-    const expiresAt = new Date(now);
-    expiresAt.setDate(expiresAt.getDate() + 30); // 1 mois (30 jours)
-
+    const now = new Date().toISOString();
     let accessData;
 
-    if (existingAccess) {
-      // Vérifier si l'accès est actif et non expiré
-      const isActive = existingAccess.is_active;
-      const isExpired = existingAccess.expires_at ? new Date(existingAccess.expires_at) <= now : false;
-
-      if (isActive && !isExpired) {
-        console.log('✅ Voice Isolation déjà activé pour l\'utilisateur');
-        // Rembourser les tokens car l'application est déjà activée (via API)
-        await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/user-tokens-simple`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userId: targetUserId,
-            tokensToConsume: -requiredTokens, // Remboursement
-            moduleId: 'voice-isolation',
-            moduleName: 'Isolation Vocale par IA',
-            action: 'voice-isolation.refund',
-            description: 'Remboursement - Déjà activé'
-          })
-        }).catch(() => {});
-        return NextResponse.json({
-          success: true,
-          message: 'Voice Isolation déjà activé',
-          accessId: existingAccess.id,
+    if (existingAccess && existingAccess.is_active) {
+      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/user-tokens-simple`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: targetUserId,
+          tokensToConsume: -requiredTokens,
           moduleId: 'voice-isolation',
-          expiresAt: existingAccess.expires_at,
-          tokensRefunded: true
-        });
-      }
+          moduleName: 'Isolation Vocale par IA',
+          action: 'voice-isolation.refund',
+          description: 'Remboursement - Déjà activé'
+        })
+      }).catch(() => {});
+      return NextResponse.json({
+        success: true,
+        message: 'Voice Isolation déjà activé',
+        accessId: existingAccess.id,
+        moduleId: 'voice-isolation',
+        tokensRefunded: true
+      });
+    }
 
-      // Si le module est expiré ou désactivé, le réactiver avec usage_count = 0
-      console.log('🔄 Réactivation de Voice Isolation (module expiré ou désactivé)');
+    if (existingAccess) {
       const { data: reactivatedAccess, error: reactivateError } = await supabase
         .from('user_applications')
         .update({
           is_active: true,
           access_level: 'premium',
-          usage_count: 0, // Réinitialiser le compteur d'utilisation
-          expires_at: expiresAt.toISOString(),
-          updated_at: new Date().toISOString()
+          usage_count: 0,
+          updated_at: now
         })
         .eq('id', existingAccess.id)
         .select()
         .single();
 
       if (reactivateError) {
-        console.error('❌ Erreur réactivation accès:', reactivateError);
-        // Rembourser les tokens en cas d'erreur (via API)
         await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/user-tokens-simple`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             userId: targetUserId,
-            tokensToConsume: -requiredTokens, // Remboursement
+            tokensToConsume: -requiredTokens,
             moduleId: 'voice-isolation',
             moduleName: 'Isolation Vocale par IA',
             action: 'voice-isolation.refund',
             description: 'Remboursement - Erreur réactivation'
           })
         }).catch(() => {});
-        return NextResponse.json({ 
-          success: false, 
-          error: 'Erreur lors de la réactivation de l\'accès' 
-        }, { status: 500 });
+        return NextResponse.json({ success: false, error: 'Erreur lors de la réactivation de l\'accès' }, { status: 500 });
       }
-
       accessData = reactivatedAccess;
-      console.log('✅ Accès Voice Isolation réactivé avec succès:', accessData.id);
     } else {
-      // Créer un nouvel accès
       const { data: newAccess, error: createAccessError } = await supabase
         .from('user_applications')
         .insert([{
@@ -291,10 +265,8 @@ export async function POST(request: NextRequest) {
           is_active: true,
           access_level: 'premium',
           usage_count: 0,
-          max_usage: null,
-          expires_at: expiresAt.toISOString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          created_at: now,
+          updated_at: now
         }])
         .select()
         .single();
@@ -331,7 +303,6 @@ export async function POST(request: NextRequest) {
       message: 'Voice Isolation activé avec succès',
       accessId: accessData.id,
       moduleId: 'voice-isolation',
-      expiresAt: expiresAt.toISOString(),
       tokensConsumed: requiredTokens,
       remainingTokens: newTokenBalance
     });

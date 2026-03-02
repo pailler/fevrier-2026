@@ -62,11 +62,7 @@ export async function POST(request: NextRequest) {
           .single();
 
         if (!existing) {
-          // Créer l'application avec expiration selon le type de module
-          // Les modules gratuits dans init-user-applications sont tous des modules essentiels : 90 jours (3 mois)
-          const expiresAt = new Date();
-          expiresAt.setDate(expiresAt.getDate() + 90); // 90 jours (3 mois)
-          
+          const now = new Date().toISOString();
           const { error: insertError } = await supabase
             .from('user_applications')
             .insert([{
@@ -75,9 +71,9 @@ export async function POST(request: NextRequest) {
               module_title: module.title,
               access_level: 'standard',
               is_active: true,
-              expires_at: expiresAt.toISOString(), // Expire dans 90 jours
               usage_count: 0,
-              max_usage: module.maxUsage
+              created_at: now,
+              updated_at: now
             }]);
 
           if (insertError) {

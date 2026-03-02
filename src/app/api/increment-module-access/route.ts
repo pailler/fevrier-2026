@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     
     const { data: userApp, error: appError } = await supabase
       .from('user_applications')
-      .select('id, usage_count, max_usage, expires_at, module_id')
+      .select('id, usage_count, module_id')
       .eq('user_id', userId)
       .eq('is_active', true)
       .like('module_id', `%${moduleId}%`)
@@ -30,26 +30,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse(`${moduleId} not activated for user`, { status: 403 });
     }
 
-    console.log('✅ Module Access: Module trouvé:', userApp.module_id);
-
-    // Vérifier l'expiration
-    if (userApp.expires_at && new Date(userApp.expires_at) < new Date()) {
-      ;
-      return new NextResponse(JSON.stringify({
-        success: false,
-        error: 'Accès expiré',
-        message: `Votre accès ${moduleId} a expiré. Veuillez le renouveler.`
-      }), {
-        status: 403,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
     const currentUsage = userApp.usage_count || 0;
-    const maxUsage = userApp.max_usage || 50; // Limite par défaut de 50 (affichage uniquement)
-    
-    // Plus de vérification de quota - le système de tokens gère les limites
-    ;
 
     // Incrémenter le compteur dans user_applications et mettre à jour last_used_at
     const newUsageCount = currentUsage + 1;
@@ -69,7 +50,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse('Error updating usage count', { status: 500 });
     }
 
-    console.log('✅ Module Access: Compteur incrémenté:', newUsageCount, '/', maxUsage);
+    console.log('✅ Module Access: Compteur incrémenté:', newUsageCount);
 
     // Enregistrer l'accès dans les logs
     const { error: logError } = await supabase
@@ -91,7 +72,6 @@ export async function POST(request: NextRequest) {
     return new NextResponse(JSON.stringify({
       success: true,
       usage_count: updatedApp.usage_count,
-      max_usage: updatedApp.max_usage,
       last_accessed_at: updatedApp.last_accessed_at
     }), {
       status: 200,

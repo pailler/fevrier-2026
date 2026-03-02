@@ -22,7 +22,7 @@ export default function LibreSpeedCardPage() {
     id: 'librespeed',
     title: 'LibreSpeed',
     subtitle: 'Test de vitesse internet complet - 10 tokens par accès, utilisez aussi longtemps que vous souhaitez',
-    description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision. Coûte 10 tokens par accès, et utilisez l\'application aussi longtemps que vous souhaitez.',
+    description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision. Coûte 10 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez.',
     category: 'WEB TOOLS',
     price: '10 tokens',
     image: '/images/librespeed.jpg',
@@ -129,7 +129,7 @@ export default function LibreSpeedCardPage() {
           "name": "LibreSpeed est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "LibreSpeed est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez effectuer des tests de vitesse sans frais supplémentaires."
+            "text": "LibreSpeed est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez effectuer des tests de vitesse sans frais supplémentaires."
           }
         },
         {
@@ -309,7 +309,7 @@ export default function LibreSpeedCardPage() {
                   <li>Interface moderne et intuitive</li>
                   <li>Résultats détaillés</li>
                   <li>Compatible tous navigateurs</li>
-                  <li>10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez</li>
+                  <li>Utilisez l'application aussi longtemps que vous souhaitez</li>
                 </ul>
               </div>
             </div>
@@ -317,17 +317,6 @@ export default function LibreSpeedCardPage() {
           
           {/* Colonne 2 - Accès */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8">
-            <div className="text-center mb-8">
-              <div className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                <div className="text-4xl font-bold mb-1">
-                  10 tokens
-                </div>
-                <div className="text-sm opacity-90">
-                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-6">
               {isModuleActivated && (
                 <div className="w-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
@@ -342,7 +331,7 @@ export default function LibreSpeedCardPage() {
                     <button
                       onClick={async () => {
                         if (!user?.id || !user?.email) {
-                          router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}`)}`);
+                          router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}?openApp=1`)}`);
                           return;
                         }
                         try {
@@ -439,7 +428,7 @@ export default function LibreSpeedCardPage() {
                         }
                       } else {
                         console.log('🔒 Accès LibreSpeed - Redirection vers connexion');
-                        router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}`)}`);
+                        router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}?openApp=1`)}`);
                       }
                     }}
                     disabled={loading || checkingActivation}
@@ -678,7 +667,7 @@ export default function LibreSpeedCardPage() {
                   <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-2xl border-l-4 border-purple-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">LibreSpeed est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      LibreSpeed est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez effectuer des tests de vitesse sans frais supplémentaires.
+                      LibreSpeed est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez effectuer des tests de vitesse sans frais supplémentaires.
                     </p>
                   </div>
                   
@@ -722,7 +711,7 @@ export default function LibreSpeedCardPage() {
         moduleId={moduleId}
         moduleName="LibreSpeed"
         tokenCost={10}
-        tokenUnit="par accès, et utilisez l'application aussi longtemps que vous souhaitez"
+        tokenUnit="Utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-librespeed-test"
         gradientColors="from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
         icon="⚡"
@@ -732,6 +721,7 @@ export default function LibreSpeedCardPage() {
     </div>
   );
 }
+
 
 
 

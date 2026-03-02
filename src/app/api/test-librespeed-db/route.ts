@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
     // 4. Vérifier les accès utilisateur
     const { data: userAccess, error: accessError } = await supabase
       .from('user_applications')
-      .select('id, user_id, module_id, module_title, is_active, usage_count, max_usage')
+      .select('id, user_id, module_id, module_title, is_active, usage_count')
       .or('module_id.eq.librespeed,module_title.ilike.%librespeed%')
       .limit(10);
 

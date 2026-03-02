@@ -29,10 +29,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, message: 'MeTube déjà activé pour cet utilisateur.' });
     }
 
-    // MeTube est un module essentiel : 90 jours (3 mois)
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000); // 90 jours (3 mois)
-
+    const now = new Date().toISOString();
     const { data: accessData, error: createAccessError } = await supabase
       .from('user_applications')
       .insert([{
@@ -42,10 +39,8 @@ export async function POST(request: NextRequest) {
         is_active: true,
         access_level: 'premium',
         usage_count: 0,
-        max_usage: null,
-        expires_at: expiresAt.toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        created_at: now,
+        updated_at: now
       }])
       .select()
       .single();
@@ -64,8 +59,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'MeTube activé avec succès',
       accessId: accessData.id,
-      moduleId: moduleId,
-      expiresAt: expiresAt.toISOString()
+      moduleId: moduleId
     });
 
   } catch (error) {

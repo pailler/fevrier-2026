@@ -145,6 +145,27 @@ export const subdomainsConfig: SubdomainInfo[] = [
     ]
   },
   {
+    subdomain: 'photobooth.iahome.fr',
+    url: 'https://photobooth.iahome.fr',
+    title: 'Photobooth Mariage - Photos Instantanées Événement | IA Home',
+    description: 'Créez un photobooth mariage ou événement en ligne avec galerie privée, captures instantanées et partage simplifié. Une expérience photo festive accessible depuis le navigateur.',
+    keywords: ['photobooth', 'photobooth mariage', 'photobooth événement', 'borne photo en ligne', 'photos événement', 'galerie privée'],
+    category: 'media',
+    icon: '📸',
+    features: [
+      'Prise de photo instantanée',
+      'Galerie événement privée',
+      'Partage simplifié des clichés',
+      'Interface responsive',
+      'Accès sécurisé par token'
+    ],
+    useCases: [
+      'Animer un mariage avec un espace photo',
+      'Créer un photobooth pour un anniversaire',
+      'Collecter les photos d\'un événement professionnel'
+    ]
+  },
+  {
     subdomain: 'meeting-reports.iahome.fr',
     url: 'https://meeting-reports.iahome.fr',
     title: 'Meeting Reports - Analyse et Transcription de Réunions | IA Home',

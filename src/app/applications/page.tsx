@@ -53,13 +53,9 @@ export default function Home() {
       try {
         const { data, error } = await supabase
           .from('user_applications')
-          .select(`
-            module_id,
-            expires_at
-          `)
+          .select('module_id')
           .eq('user_id', user.id)
-          .eq('is_active', true)
-          .gt('expires_at', new Date().toISOString());
+          .eq('is_active', true);
         
         if (!error && data) {
           const subscriptions: {[key: string]: boolean} = {};
@@ -212,7 +208,7 @@ export default function Home() {
 
 
   // Modules essentiels à exclure de la page applications (affichés dans la page essentiels)
-  const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'code-learning', 'apprendre-autrement', 'home-assistant', 'administration'];
+  const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'code-learning', 'apprendre-autrement', 'home-assistant', 'administration', 'photobooth'];
   // Modules masqués de la liste (page et fichiers conservés, seul l'affichage dans la liste est désactivé)
   const hiddenFromListing = ['hunyuan3d'];
   const isHiddenModule = (module: { id?: string | number; title?: string }) => {

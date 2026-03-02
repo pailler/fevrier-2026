@@ -10,8 +10,6 @@ const supabase = createClient(
 type UserApplication = {
   moduleId: string;
   usageCount: number;
-  maxUsage: number;
-  expiresAt: string | null;
   lastUsedAt: string | null;
   createdAt: string;
 };
@@ -39,15 +37,23 @@ function normalizeModuleId(moduleId: string): string {
     '10': 'comfyui',
     '11': 'cogstudio',
     'animaginexl': 'animagine-xl',
+    'animagine-xl': 'animagine-xl',
     'xhisper': 'whisper',
     'photo-maker': 'photomaker',
+    'photomaker': 'photomaker',
     'codelearning': 'code-learning',
+    'code-learning': 'code-learning',
     'homeassistant': 'home-assistant',
     'home_assistant': 'home-assistant',
     'home-assistant': 'home-assistant',
     'domotisezvotrehabitat': 'home-assistant',
     'photobooth-mariage': 'photobooth',
     'photoboothmariage': 'photobooth',
+    'meetingreports': 'meeting-reports',
+    'meeting-reports': 'meeting-reports',
+    'voiceisolation': 'voice-isolation',
+    'voice-isolation': 'voice-isolation',
+    'florence2': 'florence-2',
   };
   return aliases[normalized] || aliases[compact] || normalized;
 }
@@ -214,7 +220,7 @@ export async function GET() {
     }
 
     // Fallback: récupérer les modules depuis token_usage pour les visites historiques
-    const tokenUsageByUser = new Map<string, Array<{ moduleId: string; lastUsedAt: string }>>();
+    const tokenUsageByUser = new Map<string, Array<{ moduleId: string; lastUsedAt: string; usageCount: number }>>();
     try {
       for (const idChunk of idChunks) {
         const { data: usageChunk } = await supabase
@@ -232,8 +238,9 @@ export async function GET() {
             const existing = list.find((x) => x.moduleId === mid);
             if (existing) {
               if (new Date(last) > new Date(existing.lastUsedAt)) existing.lastUsedAt = last;
+              existing.usageCount = (existing.usageCount || 1) + 1;
             } else {
-              list.push({ moduleId: mid, lastUsedAt: last });
+              list.push({ moduleId: mid, lastUsedAt: last, usageCount: 1 });
             }
             tokenUsageByUser.set(row.user_id, list);
           }
@@ -241,6 +248,27 @@ export async function GET() {
       }
     } catch {
       // token_usage peut être indisponible
+    }
+
+    // Source supplémentaire : user_applications avec usage_count > 0 OU last_used_at (même logique que la page Tokens)
+    // Garantit que toute consommation visible dans l'historique Tokens apparaît en "applis visitées"
+    const consumedByUser = new Map<string, Array<{ moduleId: string; lastUsedAt: string; usageCount: number }>>();
+    for (const app of allApplications) {
+      const hasUsage = (app.usage_count || 0) > 0 || app.last_used_at || app.last_accessed_at;
+      if (!app.user_id || !hasUsage) continue;
+      const mid = normalizeModuleId(app.module_id || app.module_title || '');
+      if (!mid) continue;
+      const last = app.last_used_at || app.last_accessed_at || app.created_at || new Date().toISOString();
+      const count = app.usage_count || (hasUsage ? 1 : 0);
+      const list = consumedByUser.get(app.user_id) || [];
+      const existing = list.find((x) => x.moduleId === mid);
+      if (existing) {
+        if (new Date(last) > new Date(existing.lastUsedAt)) existing.lastUsedAt = last;
+        existing.usageCount = Math.max(existing.usageCount || 0, count);
+      } else {
+        list.push({ moduleId: mid, lastUsedAt: last, usageCount: count });
+      }
+      consumedByUser.set(app.user_id, list);
     }
 
     const usersWithApplications = profiles.map((profile) => {
@@ -258,8 +286,6 @@ export async function GET() {
           return {
             moduleId,
             usageCount,
-            maxUsage: app.max_usage || 0,
-            expiresAt: app.expires_at || null,
             lastUsedAt,
             createdAt: app.created_at || new Date().toISOString(),
           };
@@ -278,20 +304,29 @@ export async function GET() {
       }).filter((a): a is { moduleId: string } => !!a);
       const activeModules = Array.from(new Set(activeApps.map((a) => a.moduleId)));
 
-      // "Visite réelle" (nouveau système) = usage_count > 0 ou last_used_at non nul.
-      let visitedApps = normalizedApps.filter((app) => (app.usageCount || 0) > 0 || !!app.lastUsedAt);
-      // Fallback token_usage : ajouter les modules consommés qui ne sont pas déjà dans visitedApps
+      // "Visites réelles" = union de (1) user_applications avec usage_count > 0, (2) token_usage
+      // Utiliser consumedByUser (même logique que la page Tokens) pour garantir la cohérence
+      const consumed = consumedByUser.get(profile.id) || [];
+      let visitedApps: UserApplication[] = consumed.map((c) => ({
+        moduleId: c.moduleId,
+        usageCount: c.usageCount,
+        lastUsedAt: c.lastUsedAt,
+        createdAt: c.lastUsedAt
+      }));
+      // Compléter avec token_usage (consommations qui ne passent pas par user_applications)
       const tokenUsageModules = tokenUsageByUser.get(profile.id) || [];
       for (const tu of tokenUsageModules) {
         if (visitedApps.some((a) => a.moduleId === tu.moduleId)) continue;
         visitedApps = visitedApps.concat({
           moduleId: tu.moduleId,
-          usageCount: 1,
-          maxUsage: 0,
-          expiresAt: null,
+          usageCount: tu.usageCount || 1,
           lastUsedAt: tu.lastUsedAt,
           createdAt: tu.lastUsedAt
         });
+      }
+      // Fallback : si rien dans consumed ni token_usage, garder normalizedApps (last_used_at sans usage_count)
+      if (visitedApps.length === 0) {
+        visitedApps = normalizedApps.filter((app) => (app.usageCount || 0) > 0 || !!app.lastUsedAt);
       }
       visitedApps = visitedApps.sort(
         (a, b) =>

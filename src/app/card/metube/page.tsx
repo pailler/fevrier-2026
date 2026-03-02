@@ -105,7 +105,7 @@ export default function MeTubePage() {
           "name": "MeTube est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "MeTube est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez télécharger des vidéos YouTube sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking."
+            "text": "MeTube est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez télécharger des vidéos YouTube sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking."
           }
         },
         {
@@ -350,17 +350,6 @@ export default function MeTubePage() {
           
           {/* Colonne 2 - Système de boutons */}
           <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-            <div className="text-left mb-8">
-              <div className="w-3/4 bg-gradient-to-r from-red-600 to-pink-600 text-white px-6 py-4 rounded-2xl shadow-lg mb-4">
-                <div className="text-4xl font-bold mb-1">
-                  10 tokens
-                </div>
-                <div className="text-sm opacity-90">
-                  par accès, et utilisez l'application aussi longtemps que vous souhaitez
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-6">
               {/* Boutons d'action */}
               <button
@@ -400,7 +389,7 @@ export default function MeTubePage() {
                   } else {
                     // Utilisateur non connecté : aller à la page de connexion puis retour à MeTube
                     console.log('🔒 Accès MeTube - Redirection vers connexion');
-                    router.push(`/login?redirect=${encodeURIComponent('/card/metube')}`);
+                    router.push(`/login?redirect=${encodeURIComponent('/card/metube?openApp=1')}`);
                   }
                 }}
                 className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
@@ -672,7 +661,7 @@ export default function MeTubePage() {
                   <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-purple-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">MeTube est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      MeTube est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez télécharger des vidéos YouTube sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking.
+                      MeTube est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez télécharger des vidéos YouTube sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking.
                     </p>
                   </div>
                   
@@ -978,6 +967,7 @@ export default function MeTubePage() {
     </div>
   );
 }
+
 
 
 

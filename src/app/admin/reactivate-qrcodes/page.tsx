@@ -80,16 +80,10 @@ export default function ReactivateQRCodesPage() {
                   {status.is_expired ? '❌ Oui' : '✅ Non'}
                 </div>
                 {status.data && (
-                  <>
-                    <div>
-                      <span className="font-medium">Date d'expiration:</span>{' '}
-                      {status.data.expires_at ? new Date(status.data.expires_at).toLocaleString('fr-FR') : 'Aucune'}
-                    </div>
-                    <div>
-                      <span className="font-medium">Utilisation:</span>{' '}
-                      {status.data.usage_count || 0} / {status.data.max_usage || '∞'}
-                    </div>
-                  </>
+                  <div>
+                    <span className="font-medium">Utilisation:</span>{' '}
+                    {status.data.usage_count || 0}
+                  </div>
                 )}
               </div>
             </div>

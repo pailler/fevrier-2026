@@ -72,7 +72,7 @@ export class ModuleSecurityService {
       // 3. Vérifier que l'utilisateur a un accès actif au module
       const { data: userAccess, error: accessError } = await supabase
         .from('user_applications')
-        .select('id, is_active, module_title, expires_at')
+        .select('id, is_active, module_title')
         .eq('user_id', userId)
         .eq('module_id', moduleData.id)
         .eq('is_active', true)
@@ -89,24 +89,7 @@ export class ModuleSecurityService {
         };
       }
 
-      // 4. Vérifier que l'accès n'est pas expiré
-      if (userAccess.expires_at) {
-        const expirationDate = new Date(userAccess.expires_at);
-        const now = new Date();
-        
-        if (expirationDate <= now) {
-          console.log(`❌ ModuleSecurityService: Accès expiré pour ${moduleIdentifier}`);
-          return {
-            isVisible: true,
-            hasAccess: false,
-            moduleId: moduleData.id,
-            moduleTitle: moduleData.title,
-            reason: `Accès expiré pour ${moduleIdentifier}`
-          };
-        }
-      }
-
-      // 5. Vérifier les tokens d'accès créés manuellement
+      // 4. Vérifier les tokens d'accès créés manuellement
       const { data: tokenAccess, error: tokenError } = await supabase
         .from('access_tokens')
         .select('id, is_active, expires_at, module_name')
