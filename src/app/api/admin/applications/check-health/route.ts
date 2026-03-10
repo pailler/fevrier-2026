@@ -27,6 +27,7 @@ const MODULE_URLS: Record<string, string> = {
   'prompt-generator': 'https://prompt-generator.iahome.fr',
   'apprendre-autrement': 'https://apprendre-autrement.iahome.fr',
   'ai-detector': 'https://iahome.fr/ai-detector',
+  'sentinelle-numerique': 'https://iahome.fr/sentinelle-numerique',
   'code-learning': 'https://iahome.fr/code-learning',
   'administration': 'https://iahome.fr/administration',
   'voice-isolation': 'https://voice-isolation.iahome.fr',
@@ -121,6 +122,9 @@ function getModuleSlug(moduleId: string, moduleTitle: string): string {
   }
   if (titleLower.includes('ai detector') || titleLower.includes('ai-detector') || titleLower.includes('détecteur')) {
     return 'ai-detector';
+  }
+  if (titleLower.includes('sentinelle') || titleLower.includes('sentinelle numérique')) {
+    return 'sentinelle-numerique';
   }
   if (titleLower.includes('code learning') || titleLower.includes('code-learning')) {
     return 'code-learning';

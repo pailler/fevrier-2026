@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       if (currentTokens < requiredTokens) {
         return NextResponse.json({ 
           success: false, 
-          error: `Tokens insuffisants. Vous avez ${currentTokens} tokens, ${requiredTokens} tokens sont requis.` 
+          error: `Crédits insuffisants. Vous avez ${currentTokens} crédits, ${requiredTokens} crédits sont requis.` 
         }, { status: 400 });
       }
     }
@@ -84,10 +84,10 @@ export async function POST(request: NextRequest) {
     const currentTokens = tokensData.tokensRemaining || tokensData.tokens || 0;
 
     if (currentTokens < requiredTokens) {
-      console.log(`❌ Tokens insuffisants: ${currentTokens} < ${requiredTokens}`);
+      console.log(`❌ Crédits insuffisants: ${currentTokens} < ${requiredTokens}`);
       return NextResponse.json({ 
         success: false, 
-        error: `Tokens insuffisants. Vous avez ${currentTokens} tokens, ${requiredTokens} tokens sont requis.` 
+        error: `Crédits insuffisants. Vous avez ${currentTokens} crédits, ${requiredTokens} crédits sont requis.` 
       }, { status: 400 });
     }
 

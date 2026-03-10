@@ -9,6 +9,7 @@ export const TOKEN_COSTS = {
   'prompt-generator': 100,
   'ai-detector': 100,
   'ia-generator': 100, // Alias pour ai-detector
+  'sentinelle-numerique': 10, // Sentinelle Numérique -> 10 tokens (cybersécurité, fin de vie numérique)
   'photomaker': 100, // PhotoMaker -> 100 tokens
   'photobooth': 100, // Photobooth -> 100 tokens
   'animagine-xl': 100, // Animagine XL -> 100 tokens
@@ -49,6 +50,8 @@ const MODULE_ID_ALIASES: { [key: string]: keyof typeof TOKEN_COSTS } = {
   'iagenerator': 'ai-detector',
   'ai-detector': 'ai-detector',
   'aidetector': 'ai-detector',
+  'sentinelle-numerique': 'sentinelle-numerique',
+  'sentinellenumerique': 'sentinelle-numerique',
 };
 
 export class TokenActionService {
@@ -129,7 +132,7 @@ export class TokenActionService {
           success: false,
           tokensConsumed: 0,
           tokensRemaining: 0,
-          reason: errorData.message || 'Plus de tokens ? Rechargez',
+          reason: errorData.message || 'Plus de crédits ? Rechargez',
           pricingUrl: errorData.pricingUrl || 'https://iahome.fr/pricing2'
         };
       }

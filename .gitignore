@@ -54,10 +54,12 @@ build/
 
 # Cache centralisé des modèles IA (volumineux)
 ai-models-cache/
+models-cache/
 
 # Fichiers d'environnement
 .env.local
 .env.production.local
+env.production.local
 .env.development.local
 essentiels/env.production.local
 docs/CONFIGURATION_STRIPE_KEYS.md

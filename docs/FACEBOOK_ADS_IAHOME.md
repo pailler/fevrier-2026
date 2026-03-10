@@ -36,7 +36,7 @@ IA Home - Tout-en-un IA
 ❌ Fini de jongler entre 10 services différents
 ✅ Transcription, génération d'images, PDF, QR codes... Tout est là !
 
-🎁 200 tokens OFFERTS pour tester
+🎁 200 crédits OFFERTS pour tester
 💰 Payez uniquement ce que vous utilisez (à partir de 4,99€)
 🌍 100% français, 100% RGPD
 
@@ -67,8 +67,8 @@ Il était temps de créer une alternative française :
 ✅ QR codes dynamiques
 ✅ Et bien plus...
 
-💡 Système de tokens : payez uniquement ce que vous utilisez
-🎁 200 tokens offerts pour tester
+💡 Système de crédits : payez uniquement ce que vous utilisez
+🎁 200 crédits offerts pour tester
 
 Découvrez iahome.fr - La plateforme IA française complète
 
@@ -94,18 +94,18 @@ Inciter à l'inscription et à l'essai
 
 ---
 
-### 📝 TEXTE PUBLICITAIRE 2.1 : Focus "200 tokens offerts"
+### 📝 TEXTE PUBLICITAIRE 2.1 : Focus "200 crédits offerts"
 
 **Titre :**
 ```
-200 tokens GRATUITS à tester
+200 crédits GRATUITS à tester
 ```
 
 **Texte principal :**
 ```
 🎁 Testez iahome.fr sans dépenser un centime !
 
-200 tokens offerts = 
+200 crédits offerts = 
 ✅ 2 heures de transcription audio
 ✅ 2 images générées par IA
 ✅ 20 opérations PDF
@@ -144,16 +144,16 @@ Testez maintenant : iahome.fr
 
 iahome.fr propose des prix transparents et dégressifs :
 
-📊 Pack Starter : 4,99€ = 1000 tokens
-📊 Pack Pro : 19,99€ = 5000 tokens (économisez 20%)
-📊 Pack Business : 49,99€ = 15000 tokens (économisez 30%)
+📊 Pack Starter : 4,99€ = 1000 crédits
+📊 Pack Pro : 19,99€ = 5000 crédits (économisez 20%)
+📊 Pack Business : 49,99€ = 15000 crédits (économisez 30%)
 
 Exemples de coûts :
 • Transcription 1h : 0,49€ - 1,99€
 • Image générée : 0,10€ - 0,20€
 • Traitement PDF : 0,05€ - 0,10€
 
-🎁 200 tokens offerts pour commencer
+🎁 200 crédits offerts pour commencer
 
 Comparez et économisez : iahome.fr
 
@@ -204,7 +204,7 @@ Une seule plateforme pour :
 ✅ Créer des QR codes
 ✅ Et bien plus...
 
-🎁 200 tokens offerts pour tester
+🎁 200 crédits offerts pour tester
 
 Découvrez : iahome.fr
 
@@ -240,7 +240,7 @@ Avec iahome.fr, l'IA devient accessible à tous :
 
 ✅ 100% web (pas d'installation)
 ✅ Prix transparents (à partir de 4,99€)
-✅ 200 tokens offerts
+✅ 200 crédits offerts
 
 Découvrez : iahome.fr
 
@@ -292,7 +292,7 @@ Pour les professionnels qui veulent gagner du temps :
 • Créateurs de contenu
 
 💰 Tarifs dégressifs à partir de 4,99€
-🎁 200 tokens offerts pour tester
+🎁 200 crédits offerts pour tester
 
 Découvrez iahome.fr - La plateforme IA pour professionnels
 
@@ -327,7 +327,7 @@ Total : ~19€/mois au lieu de 50-150€
 ✅ Pas d'abonnement obligatoire
 ✅ Tarifs transparents
 
-🎁 200 tokens offerts pour tester
+🎁 200 crédits offerts pour tester
 
 Testez maintenant : iahome.fr
 
@@ -375,7 +375,7 @@ Gagnez des heures sur votre workflow :
 💡 Exemple : Transcrivez une vidéo de 1h en 2 minutes
 💰 Coût : Moins de 2€
 
-🎁 200 tokens offerts pour tester
+🎁 200 crédits offerts pour tester
 
 Rejoignez les créateurs qui utilisent déjà iahome.fr
 
@@ -418,7 +418,7 @@ iahome.fr vous permet de :
 ✅ Pratiquer avec des exemples concrets
 ✅ Apprendre à votre rythme
 
-🎁 200 tokens offerts pour commencer
+🎁 200 crédits offerts pour commencer
 💰 Prix accessibles (à partir de 4,99€)
 
 Formations et tutoriels inclus :
@@ -467,7 +467,7 @@ Tous vos outils IA. Un seul site.
 ✅ QR codes
 ✅ + 10 outils
 
-🎁 200 tokens GRATUITS
+🎁 200 crédits GRATUITS
 💰 À partir de 4,99€
 
 Pas d'installation. Tout dans le navigateur.
@@ -508,7 +508,7 @@ Vous avez visité iahome.fr ?
 
 N'attendez plus ! Profitez de :
 
-🎁 200 tokens OFFERTS
+🎁 200 crédits OFFERTS
 ✅ Testez tous nos services gratuitement
 ✅ Pas besoin de carte bancaire
 ✅ Inscription en 2 minutes
@@ -642,10 +642,10 @@ Revenez maintenant : iahome.fr
    - Design simple et clair
    - Texte : "À partir de 4,99€"
 
-3. **Image "200 tokens offerts"**
+3. **Image "200 crédits offerts"**
    - Design accrocheur avec le nombre "200"
    - Couleurs vives
-   - Texte : "200 tokens GRATUITS"
+   - Texte : "200 crédits GRATUITS"
 
 4. **Image "Services"**
    - Carrousel avec une image par service

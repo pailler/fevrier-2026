@@ -23,13 +23,16 @@ const captureCtx = captureLayer ? captureLayer.getContext("2d") : null;
 
 const SESSION_EVENT_KEY = "photobooth_current_event";
 const MODULE_ID = "photobooth";
+const INACTIVITY_MS = 60 * 1000; // 1 minute
 
 let hasValidAccess = false;
+let inactivityTimer = null;
 let currentEvent = null;
 let mediaStream = null;
 let lastCaptureDataUrl = "";
 let isCapturing = false;
 let currentPhotos = [];
+let isCameraFullscreen = false;
 
 function setFeedback(message = "", type = "") {
   studioFeedback.textContent = message;
@@ -285,6 +288,64 @@ function snapSingleFrame() {
   return tempCanvas;
 }
 
+function composeShotFullscreenFormat(snap) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const viewportRatio = vw / vh;
+  const maxLongEdge = 1920;
+  let outW, outH;
+  if (vw >= vh) {
+    outW = Math.min(vw, maxLongEdge);
+    outH = Math.round(outW / viewportRatio);
+  } else {
+    outH = Math.min(vh, maxLongEdge);
+    outW = Math.round(outH * viewportRatio);
+  }
+  const output = document.createElement("canvas");
+  output.width = outW;
+  output.height = outH;
+  const ctx = output.getContext("2d");
+  const snapW = snap.width;
+  const snapH = snap.height;
+  const snapRatio = snapW / snapH;
+  let sx = 0, sy = 0, sW = snapW, sH = snapH;
+  if (snapRatio > viewportRatio) {
+    sW = Math.round(snapH * viewportRatio);
+    sx = Math.round((snapW - sW) / 2);
+  } else {
+    sH = Math.round(snapW / viewportRatio);
+    sy = Math.round((snapH - sH) / 2);
+  }
+  ctx.drawImage(snap, sx, sy, sW, sH, 0, 0, outW, outH);
+  return output;
+}
+
+function composeShotFullscreenFormat(snap) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const viewportRatio = vw / vh;
+  const snapRatio = snap.width / snap.height;
+  const maxEdge = 1920;
+  let outW, outH;
+  if (viewportRatio >= 1) {
+    outW = Math.min(vw, maxEdge);
+    outH = Math.round(outW / viewportRatio);
+  } else {
+    outH = Math.min(vh, maxEdge);
+    outW = Math.round(outH * viewportRatio);
+  }
+  const output = document.createElement("canvas");
+  output.width = outW;
+  output.height = outH;
+  const ctx = output.getContext("2d");
+  const drawW = snapRatio >= viewportRatio ? outW : Math.round(outH * snapRatio);
+  const drawH = snapRatio >= viewportRatio ? Math.round(outW / snapRatio) : outH;
+  const sx = (snap.width - drawW) / 2;
+  const sy = (snap.height - drawH) / 2;
+  ctx.drawImage(snap, sx, sy, drawW, drawH, 0, 0, outW, outH);
+  return output;
+}
+
 function composeShots(shots, layout, eventData) {
   const output = document.createElement("canvas");
   const ctx = output.getContext("2d");
@@ -334,6 +395,42 @@ function composeShots(shots, layout, eventData) {
   ctx.strokeStyle = "#10b981";
   ctx.lineWidth = 10;
   ctx.strokeRect(8, 8, output.width - 16, output.height - 16);
+  return output;
+}
+
+/** Compose une photo au format plein écran (ratio viewport). */
+function composeShotFullscreenFormat(snap) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const viewportRatio = vw / vh;
+  const maxEdge = 1920;
+  let outW, outH;
+  if (vw >= vh) {
+    outW = Math.min(vw, maxEdge);
+    outH = Math.round(outW / viewportRatio);
+  } else {
+    outH = Math.min(vh, maxEdge);
+    outW = Math.round(outH * viewportRatio);
+  }
+  const output = document.createElement("canvas");
+  output.width = outW;
+  output.height = outH;
+  const ctx = output.getContext("2d");
+  const snapW = snap.width;
+  const snapH = snap.height;
+  const snapRatio = snapW / snapH;
+  let sx = 0, sy = 0, sW = snapW, sH = snapH;
+  if (snapRatio > viewportRatio) {
+    sW = snapH * viewportRatio;
+    sx = (snapW - sW) / 2;
+  } else {
+    sH = snapW / viewportRatio;
+    sy = (snapH - sH) / 2;
+  }
+  ctx.drawImage(snap, sx, sy, sW, sH, 0, 0, outW, outH);
+  ctx.strokeStyle = "#10b981";
+  ctx.lineWidth = Math.max(2, Math.floor(Math.min(outW, outH) / 200));
+  ctx.strokeRect(4, 4, outW - 8, outH - 8);
   return output;
 }
 
@@ -462,26 +559,139 @@ async function setupEventSession() {
   }
 }
 
-function configureBackLink() {
+function getChoicePageUrl() {
+  const eventId = getCurrentEventId();
   const token = readTokenFromUrl();
-  if (!token) return;
   const url = new URL("./index.html", window.location.href);
-  url.searchParams.set("token", token);
-  backToEvents.href = url.toString();
+  if (eventId) url.searchParams.set("eventId", eventId);
+  if (token) url.searchParams.set("token", token);
+  return url.toString();
+}
+
+function goBackToChoice() {
+  window.location.href = getChoicePageUrl();
+}
+
+function resetInactivityTimer() {
+  if (inactivityTimer) clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(goBackToChoice, INACTIVITY_MS);
+}
+
+function setupInactivityListener() {
+  const events = ["click", "touchstart", "touchmove", "scroll", "keydown"];
+  events.forEach((ev) => document.addEventListener(ev, resetInactivityTimer, { passive: true }));
+  resetInactivityTimer();
+}
+
+function configureBackLink() {
+  backToEvents.href = getChoicePageUrl();
+  backToEvents.addEventListener("click", (e) => {
+    e.preventDefault();
+    goBackToChoice();
+  });
 }
 
 hasValidAccess = validateAccessToken();
 configureBackLink();
 setupEventSession();
+setupInactivityListener();
 
 filterSelect.addEventListener("change", applyPreviewFilter);
 startCameraBtn.addEventListener("click", startCamera);
-captureBtn.addEventListener("click", captureSequence);
+captureBtn.addEventListener("click", handleCaptureButtonClick);
+
+const cameraZone = document.getElementById("camera-zone");
+
+function enterCameraFullscreen() {
+  if (isCameraFullscreen) return;
+  isCameraFullscreen = true;
+  document.body.classList.add("camera-zone-fullscreen");
+  // Afficher le flux camera en direct, pas la derniere photo
+  if (captureLayer && captureCtx) {
+    ensureCaptureLayerSize();
+    captureCtx.clearRect(0, 0, captureLayer.width, captureLayer.height);
+  }
+}
+
+function exitCameraFullscreen() {
+  if (!isCameraFullscreen) return;
+  isCameraFullscreen = false;
+  document.body.classList.remove("camera-zone-fullscreen");
+}
+
+async function handleCaptureButtonClick() {
+  if (!hasValidAccess) return;
+  if (!mediaStream) {
+    setFeedback("Active d'abord la camera.", "error");
+    return;
+  }
+  if (!currentEvent) {
+    setFeedback("Aucun evenement selectionne.", "error");
+    return;
+  }
+  enterCameraFullscreen();
+  await captureFromFullscreen(8);
+}
+
+async function captureFromFullscreen(countdownSeconds = 3) {
+  if (!hasValidAccess || !currentEvent || !mediaStream || isCapturing) return;
+  isCapturing = true;
+  try {
+    await runCountdown(countdownSeconds);
+    const snap = snapSingleFrame();
+    const output = composeShotFullscreenFormat(snap);
+    const dataUrl = output.toDataURL("image/jpeg", 0.92);
+    lastCaptureDataUrl = dataUrl;
+    await uploadEventPhoto(currentEvent.id, dataUrl);
+    if (captureLayer && captureCtx) {
+      captureLayer.width = output.width;
+      captureLayer.height = output.height;
+      captureCtx.clearRect(0, 0, output.width, output.height);
+      captureCtx.drawImage(output, 0, 0);
+    }
+    await refreshGallery();
+    setFeedback("Photo enregistree.", "success");
+  } catch {
+    setFeedback("Erreur pendant la capture.", "error");
+  } finally {
+    isCapturing = false;
+    exitCameraFullscreen();
+  }
+}
+
+function handleCameraZoneInteraction(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  if (!hasValidAccess) return;
+  if (!mediaStream) {
+    setFeedback("Active d'abord la camera.", "error");
+    return;
+  }
+  if (!currentEvent) {
+    setFeedback("Aucun evenement selectionne.", "error");
+    return;
+  }
+  if (isCapturing) return;
+  if (isCameraFullscreen) {
+    captureFromFullscreen();
+  } else {
+    enterCameraFullscreen();
+  }
+}
+
+if (cameraZone) {
+  cameraZone.addEventListener("click", handleCameraZoneInteraction);
+  cameraZone.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    handleCameraZoneInteraction(e);
+  }, { passive: false });
+}
 
 downloadLastBtn.addEventListener("click", () => {
   if (!lastCaptureDataUrl || !currentEvent) {
     setFeedback("Aucune photo a telecharger pour le moment.", "error");
     return;
   }
-  downloadDataUrl(lastCaptureDataUrl, `${currentEvent.name}-latest.png`);
+  const ext = lastCaptureDataUrl.startsWith("data:image/jpeg") ? "jpg" : "png";
+  downloadDataUrl(lastCaptureDataUrl, `${currentEvent.name}-latest.${ext}`);
 });

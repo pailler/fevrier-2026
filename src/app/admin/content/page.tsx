@@ -124,7 +124,7 @@ export default function AdminContent() {
           });
         }
 
-        // 3. Tokens utilisateur depuis user_tokens
+        // 3. Crédits utilisateur depuis user_tokens
         const { data: tokens, error: tokensError } = await supabase
           .from('user_tokens')
           .select('user_id, tokens, package_name, created_at, updated_at')
@@ -159,7 +159,7 @@ export default function AdminContent() {
               updated_at: tokenGroup.updated_at,
               users: tokenGroup.users,
               usage_count: tokenGroup.total_tokens,
-              url: '/tokens'
+              url: '/crédits'
             });
           });
         }

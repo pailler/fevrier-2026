@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '../../../utils/supabaseClient';
 
 /**
- * API pour créditer les tokens d'abonnement (REMPLACEMENT, pas addition)
- * Utilisé pour corriger les abonnements où les tokens n'ont pas été crédités
+ * API pour créditer les crédits d'abonnement (REMPLACEMENT, pas addition)
+ * Utilisé pour corriger les abonnements où les crédits n'ont pas été crédités
  */
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
     if (!userEmail || !tokens) {
       return NextResponse.json(
-        { error: 'Email et tokens requis' },
+        { error: 'Email et crédits requis' },
         { status: 400 }
       );
     }
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
           tokens: tokens,
           stripe_subscription_id: subscriptionId || null,
           package_type: packageType || 'subscription_monthly',
-          description: `Correction abonnement - ${tokens} tokens (crédit manuel)`,
+          description: `Correction abonnement - ${tokens} crédits (crédit manuel)`,
           created_at: new Date().toISOString()
         });
 
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `${tokens} tokens crédités (remplacement)`,
+      message: `${tokens} crédits attribués (remplacement)`,
       previousTokens,
       newTokens: tokens,
       userEmail

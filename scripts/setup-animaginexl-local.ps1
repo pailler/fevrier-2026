@@ -83,6 +83,14 @@ Write-Host "`nDemarrage de Animagine XL sur http://localhost:7883 ..." -Foregrou
 Write-Host "   (Premier demarrage : telechargement des modeles, peut prendre plusieurs minutes)" -ForegroundColor Gray
 
 Set-Location $AnimagineXLDir
+
+# Cache Hugging Face - evite de retelecharger les modeles a chaque demarrage
+$ModelsCache = Join-Path $ProjectRoot "models-cache"
+if (-not (Test-Path $ModelsCache)) { New-Item -ItemType Directory -Path $ModelsCache -Force | Out-Null }
+$env:HF_HOME = $ModelsCache
+$env:HF_HUB_CACHE = Join-Path $ModelsCache "hub"
+$env:TRANSFORMERS_CACHE = Join-Path $ModelsCache "transformers"
+
 $env:GRADIO_SERVER_PORT = "7883"
 $env:GRADIO_SERVER_NAME = "0.0.0.0"
 

@@ -8,7 +8,7 @@
       name="description"
       content="Studio photobooth responsive avec cadres festifs, filtres et galerie."
     />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=4" />
   </head>
   <body>
     <main class="page studio-page">
@@ -28,13 +28,18 @@
             <p id="studio-event-meta" class="studio-meta">Chargement de la session...</p>
           </div>
           <div class="header-actions">
-            <a id="back-to-events" class="btn-link" href="./index.html">Gestion des evenements</a>
+            <a id="back-to-events" class="btn-link" href="./index.html">← Retour</a>
           </div>
         </div>
 
         <div class="studio-grid">
           <article class="studio-card">
-            <div class="preview-stage wedding-stage">
+            <div class="camera-activate-row">
+              <button id="start-camera" class="btn-secondary btn-activate-camera" type="button">
+                Activer la camera
+              </button>
+            </div>
+            <div id="camera-zone" class="preview-stage wedding-stage" role="button" tabindex="0" aria-label="Zone camera - toucher pour plein ecran, toucher a nouveau pour prendre la photo">
               <div class="frame-corner tl">💐</div>
               <div class="frame-corner tr">💐</div>
               <div class="frame-corner bl">🎉</div>
@@ -42,14 +47,13 @@
               <video id="camera-feed" autoplay playsinline muted></video>
               <canvas id="capture-layer"></canvas>
               <div id="countdown-overlay" class="countdown"></div>
+              <div id="fullscreen-hint" class="fullscreen-hint">Appuyez pour prendre la photo</div>
             </div>
 
             <div class="studio-actions">
-              <button id="start-camera" class="btn-secondary" type="button">
-                Activer la camera
-              </button>
-              <button id="capture-photo" class="btn-primary" type="button">
-                Prendre la photo
+              <button id="capture-photo" class="btn-capture" type="button">
+                <span class="btn-capture-icon">📸</span>
+                Vous êtes prêts ? Alors Cliquez !
               </button>
             </div>
 
@@ -115,6 +119,6 @@
       </section>
     </main>
 
-    <script src="./studio.js"></script>
+    <script src="./studio.js?v=5"></script>
   </body>
 </html>

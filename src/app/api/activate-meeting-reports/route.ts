@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     // Vérifier si l'utilisateur a suffisamment de tokens (100 tokens requis)
     if (user.tokens < 100) {
       return NextResponse.json(
-        { error: 'Tokens insuffisants. 100 tokens requis pour activer ce module.' },
+        { error: 'Crédits insuffisants. 100 crédits requis pour activer ce module.' },
         { status: 400 }
       );
     }
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
         .eq('id', activation.id);
 
       return NextResponse.json(
-        { error: 'Erreur lors de la déduction des tokens' },
+        { error: 'Erreur lors de la déduction des crédits' },
         { status: 500 }
       );
     }

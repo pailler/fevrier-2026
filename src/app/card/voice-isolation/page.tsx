@@ -38,7 +38,7 @@ export default function VoiceIsolationPage() {
   const [alreadyActivatedModules, setAlreadyActivatedModules] = useState<string[]>([]);
   const [checkingActivation, setCheckingActivation] = useState(false);
 
-  // Voice Isolation est un module payant (100 tokens)
+  // Voice Isolation est un module payant (100 crédits)
   const isFreeModule = false;
 
   // Fonction pour vérifier si un module est déjà accessible
@@ -237,7 +237,7 @@ export default function VoiceIsolationPage() {
         {
           "@type": "HowToStep",
           "name": "Accéder à l'application",
-          "text": "Accédez à l'application Isolation Vocale par IA avec 100 tokens depuis la page de l'application.",
+          "text": "Accédez à l'application Isolation Vocale par IA avec 100 crédits depuis la page de l'application.",
           "image": "https://iahome.fr/images/voice-isolation.jpg"
         },
         {
@@ -290,7 +290,7 @@ export default function VoiceIsolationPage() {
           "name": "Comment utiliser l'Isolation Vocale par IA ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour utiliser l'Isolation Vocale par IA, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via /voice-isolation. Uploadez votre fichier audio, choisissez la source à extraire (voix, batterie, basse, autres instruments ou toutes les sources), et l'IA génère automatiquement les fichiers séparés."
+            "text": "Pour utiliser l'Isolation Vocale par IA, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via /voice-isolation. Uploadez votre fichier audio, choisissez la source à extraire (voix, batterie, basse, autres instruments ou toutes les sources), et l'IA génère automatiquement les fichiers séparés."
           }
         },
         {
@@ -306,7 +306,7 @@ export default function VoiceIsolationPage() {
           "name": "L'Isolation Vocale par IA est-elle gratuite ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'accès de l'Isolation Vocale par IA coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : isolation vocale, séparation de batterie, extraction de basse, et isolation d'instruments."
+            "text": "L'accès de l'Isolation Vocale par IA coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : isolation vocale, séparation de batterie, extraction de basse, et isolation d'instruments."
           }
         },
         {
@@ -590,7 +590,7 @@ export default function VoiceIsolationPage() {
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">🎤</span>
-                  <span>Accéder à Voice Isolation (100 tokens)</span>
+                  <span>Accéder à Voice Isolation (100 crédits)</span>
                 </button>
               ) : (
                 // Message pour les utilisateurs non connectés
@@ -603,7 +603,7 @@ export default function VoiceIsolationPage() {
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">🔒</span>
-                  <span>Connectez-vous pour accéder Voice Isolation (100 tokens)</span>
+                  <span>Connectez-vous pour accéder Voice Isolation (100 crédits)</span>
                 </button>
               )}
 

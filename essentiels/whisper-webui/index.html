@@ -350,6 +350,9 @@
             margin-top: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             display: none;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
         }
 
         .result-area.show {
@@ -376,6 +379,11 @@
             color: #333;
             white-space: pre-wrap;
             word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow-x: auto;
+            max-height: 60vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .loading {
@@ -509,6 +517,37 @@
             .file-info {
                 flex-direction: column;
                 text-align: center;
+            }
+
+            /* Résultats responsive mobile */
+            .result-area {
+                padding: 16px;
+                margin-top: 20px;
+                border-radius: 12px;
+                max-width: 100vw;
+                box-sizing: border-box;
+            }
+
+            .result-title {
+                font-size: 1.25rem;
+            }
+
+            .result-content {
+                padding: 16px;
+                font-size: 1rem;
+                max-height: 50vh;
+                min-height: 120px;
+            }
+
+            .container {
+                padding: 20px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .result-content {
+                font-size: 0.95rem;
+                padding: 12px;
             }
         }
     </style>

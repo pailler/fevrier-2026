@@ -190,7 +190,7 @@ async function getCompleteContextData(message: string, userId: string) {
 
     // statsText est maintenant défini conditionnellement ci-dessus
 
-    const pricingText = `Tarifs: Système de tokens. Modules: 10-100 tokens. Paiement Stripe.`;
+    const pricingText = `Tarifs: Système de crédits. Modules: 10-100 crédits. Paiement Stripe.`;
 
     return {
       modules: modulesText,

@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         console.log('❌ LibreSpeed Access: Utilisateur sans tokens pour userId:', userId);
         return NextResponse.json({
           hasAccess: false,
-          error: 'Tokens insuffisants',
+          error: 'Crédits insuffisants',
           currentTokens: 0,
           requiredTokens: 10,
           message: 'Vous devez acheter des tokens pour utiliser ce service'
@@ -37,10 +37,10 @@ export async function POST(request: NextRequest) {
 
       // Vérifier si l'utilisateur a assez de tokens (10 tokens requis)
       if (currentTokens < 10) {
-        console.log('❌ LibreSpeed Access: Tokens insuffisants pour userId:', userId);
+        console.log('❌ LibreSpeed Access: Crédits insuffisants pour userId:', userId);
         return NextResponse.json({
           hasAccess: false,
-          error: 'Tokens insuffisants',
+          error: 'Crédits insuffisants',
           currentTokens: currentTokens,
           requiredTokens: 10
         });

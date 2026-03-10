@@ -33,10 +33,13 @@ export async function GET() {
     let domainsTest = null;
     try {
       const domains = await resend.domains.list();
+      const domainsList = domains.data && typeof domains.data === 'object' && 'data' in domains.data
+        ? (domains.data as { data?: unknown[] }).data
+        : Array.isArray(domains.data) ? domains.data : [];
       domainsTest = {
         success: true,
         domains: domains.data,
-        count: Array.isArray(domains.data) ? domains.data.length : 0
+        count: Array.isArray(domainsList) ? domainsList.length : 0
       };
     } catch (error) {
       domainsTest = {
@@ -135,9 +138,12 @@ export async function POST(request: NextRequest) {
 
     const resend = new Resend(apiKey);
     
+    // Format from: "IAHome <noreply@iahome.fr>" pour meilleure délivrabilité
+    const fromFormatted = fromEmail?.includes('<') ? fromEmail : `IAHome <${fromEmail || 'noreply@iahome.fr'}>`;
+
     // Envoyer un email de test réel
     const result = await resend.emails.send({
-      from: fromEmail || 'noreply@iahome.fr',
+      from: fromFormatted,
       to: email,
       subject: 'Test de configuration Resend - IAHome',
       html: `

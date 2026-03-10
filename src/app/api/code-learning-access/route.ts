@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     if (userTokens.tokens < 10) {
       return NextResponse.json({ 
         success: false, 
-        error: 'Tokens insuffisants. 10 tokens requis.' 
+        error: 'Crédits insuffisants. 10 crédits requis.' 
       }, { status: 403 });
     }
 

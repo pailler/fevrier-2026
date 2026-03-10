@@ -4,7 +4,7 @@
 
 **Titre suggéré :**
 ```
-J'ai créé une plateforme IA française avec tous les outils essentiels (transcription, images, PDF, etc.) - 200 tokens offerts pour tester
+J'ai créé une plateforme IA française avec tous les outils essentiels (transcription, images, PDF, etc.) - 200 crédits offerts pour tester
 ```
 
 **Contenu du post :**
@@ -46,15 +46,15 @@ Et surtout, la plupart sont soit chers, soit en anglais, soit nécessitent des i
 **Pourquoi c'est différent :**
 
 ✅ **100% web** - Aucune installation, tout fonctionne dans le navigateur
-✅ **Système de tokens** - Payez uniquement ce que vous utilisez (à partir de 4,99€)
-✅ **200 tokens offerts** - Pour tester sans dépenser un centime
+✅ **Système de crédits** - Payez uniquement ce que vous utilisez (à partir de 4,99€)
+✅ **200 crédits offerts** - Pour tester sans dépenser un centime
 ✅ **100% français** - Interface, support et conformité RGPD
 ✅ **Prix transparents** - Tarifs dégressifs, pas d'abonnement caché
 
 **Exemples de prix :**
-- Transcription d'une réunion de 1h : ~100 tokens (0,49€ - 1,99€ selon le pack)
-- Génération d'images : ~100 tokens par image
-- Traitement PDF : ~10 tokens par opération
+- Transcription d'une réunion de 1h : ~100 crédits (0,49€ - 1,99€ selon le pack)
+- Génération d'images : ~100 crédits par image
+- Traitement PDF : ~10 crédits par opération
 
 **Mon objectif :**
 
@@ -64,7 +64,7 @@ Créer une alternative française, accessible et abordable aux grandes plateform
 
 👉 **https://iahome.fr**
 
-Vous avez 200 tokens offerts à l'inscription pour tester tous les services. Pas besoin de carte bancaire pour commencer.
+Vous avez 200 crédits offerts à l'inscription pour tester tous les services. Pas besoin de carte bancaire pour commencer.
 
 **Feedback bienvenu !**
 
@@ -103,16 +103,16 @@ La plateforme utilise un système de sous-domaines pour chaque service :
 - `pdf.iahome.fr` → Outils PDF (Stirling PDF)
 - etc.
 
-Chaque service est isolé mais partage le même système d'authentification et de tokens.
+Chaque service est isolé mais partage le même système d'authentification et de crédits.
 
-**Système de tokens :**
+**Système de crédits :**
 
-J'ai implémenté un système de tokens dégressif :
-- Pack Starter : 4,99€ pour 1000 tokens
-- Pack Pro : 19,99€ pour 5000 tokens
-- Pack Business : 49,99€ pour 15000 tokens
+J'ai implémenté un système de crédits dégressif :
+- Pack Starter : 4,99€ pour 1000 crédits
+- Pack Pro : 19,99€ pour 5000 crédits
+- Pack Business : 49,99€ pour 15000 crédits
 
-Les tokens sont consommés selon l'usage (transcription = ~100 tokens/heure, génération image = ~100 tokens/image).
+Les crédits sont consommés selon l'usage (transcription = ~100 crédits/heure, génération image = ~100 crédits/image).
 
 **Sécurité :**
 
@@ -136,7 +136,7 @@ Les tokens sont consommés selon l'usage (transcription = ~100 tokens/heure, gé
 **Points techniques intéressants :**
 
 - Système de protection des sous-domaines avec middleware Next.js
-- Gestion des tokens avec consommation en temps réel
+- Gestion des crédits avec consommation en temps réel
 - Webhooks Stripe pour les paiements
 - Queue system pour les tâches longues (transcription)
 - Dashboard admin pour monitoring
@@ -179,7 +179,7 @@ Chaque service coûtait entre 10-30€/mois, souvent en anglais, et nécessitait
 Une plateforme unique qui regroupe :
 - 8+ outils IA (transcription, génération d'images, etc.)
 - 7+ services essentiels (PDF, QR codes, transfert fichiers, etc.)
-- Système de tokens (pay-as-you-go)
+- Système de crédits (pay-as-you-go)
 - Interface 100% française
 
 **Développement :**
@@ -187,11 +187,11 @@ Une plateforme unique qui regroupe :
 - **Stack** : Next.js, TypeScript, Supabase, Docker
 - **Temps** : ~6 mois de développement à temps partiel
 - **Coûts** : Infrastructure auto-hébergée (~50€/mois)
-- **Prix** : À partir de 4,99€ pour 1000 tokens
+- **Prix** : À partir de 4,99€ pour 1000 crédits
 
 **Premiers retours :**
 
-- ✅ Les utilisateurs apprécient le système de tokens (pas d'abonnement)
+- ✅ Les utilisateurs apprécient le système de crédits (pas d'abonnement)
 - ✅ L'interface française est un vrai plus
 - ✅ La simplicité d'utilisation (tout dans le navigateur)
 - ⚠️ Besoin de plus de documentation
@@ -210,7 +210,7 @@ Pour l'instant, je couvre à peine mes coûts. L'objectif est d'atteindre 100 ut
 
 **Pour tester :**
 
-👉 **https://iahome.fr** - 200 tokens offerts à l'inscription
+👉 **https://iahome.fr** - 200 crédits offerts à l'inscription
 
 **Questions pour vous :**
 

@@ -16,6 +16,7 @@ interface UserApplication {
 
 interface User {
   id: string;
+  userNumber?: number;
   email: string;
   fullName: string;
   role: string;
@@ -84,7 +85,8 @@ export default function AdminUsers() {
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         user.fullName.toLowerCase().includes(searchTerm.toLowerCase());
+                         user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (user.userNumber != null && String(user.userNumber).includes(searchTerm));
     return matchesSearch;
   });
 
@@ -217,7 +219,7 @@ export default function AdminUsers() {
 
   const handleSaveTokens = async (userId: string, newTokens: number) => {
     if (newTokens < 0) {
-      alert('Le nombre de tokens ne peut pas être négatif');
+      alert('Le nombre de crédits ne peut pas être négatif');
       return;
     }
 
@@ -461,6 +463,9 @@ export default function AdminUsers() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
+                  N°
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Utilisateur
                 </th>
@@ -484,6 +489,9 @@ export default function AdminUsers() {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
+                    {user.userNumber ?? '—'}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
@@ -603,7 +611,7 @@ export default function AdminUsers() {
                         <button
                           onClick={() => handleAddTokens(user)}
                           className="text-xs text-blue-600 hover:text-blue-800 font-medium"
-                          title="Ajouter des tokens"
+                          title="Ajouter des crédits"
                         >
                           + Ajouter
                         </button>
@@ -681,7 +689,7 @@ export default function AdminUsers() {
         />
       )}
 
-      {/* Modal d'ajout de tokens */}
+      {/* Modal d'ajout de crédits */}
       {addingTokensUser && (
         <AddTokensModal
           user={addingTokensUser}

@@ -195,8 +195,8 @@ export default function AdminEvents() {
             allEvents.push({
               id: `token_purchase_${transaction.session_id}`,
               type: 'token_purchased',
-              title: 'Tokens achetés',
-              description: `${transaction.user_email} a acheté ${transaction.tokens_purchased} tokens (${transaction.package_type})`,
+              title: 'Crédits achetés',
+              description: `${transaction.user_email} a acheté ${transaction.tokens_purchased} crédits (${transaction.package_type})`,
               timestamp: transaction.created_at,
               metadata: { 
                 tokens: transaction.tokens_purchased, 
@@ -450,7 +450,7 @@ export default function AdminEvents() {
       'application_created': 'Application',
       'application_used': 'Utilisation',
       'payment_received': 'Paiement',
-      'token_purchased': 'Tokens',
+      'token_purchased': 'Crédits',
       'module_activated': 'Module',
       'module_deactivated': 'Module',
       'token_consumed': 'Consommation',
@@ -479,7 +479,7 @@ export default function AdminEvents() {
     { value: 'notification_sent', label: 'Notifications', count: events.filter(e => e.type === 'notification_sent').length },
     { value: 'quota_exceeded', label: 'Quota', count: events.filter(e => e.type === 'quota_exceeded').length },
     { value: 'payment_received', label: 'Paiements', count: events.filter(e => e.type === 'payment_received').length },
-    { value: 'token_purchased', label: 'Tokens', count: events.filter(e => e.type === 'token_purchased').length },
+    { value: 'token_purchased', label: 'Crédits', count: events.filter(e => e.type === 'token_purchased').length },
   ];
 
   if (loading) {

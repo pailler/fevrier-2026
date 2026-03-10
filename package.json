@@ -3,10 +3,11 @@
   "scripts": {
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
     "build": "next build",
-    "dev": "next dev -p 3000",
+    "dev": "next dev -p 3001",
     "start": "next start",
     "monitor": "node scripts/monitor-localhost.js",
-    "monitor:check": "node scripts/monitor-localhost.js --once"
+    "monitor:check": "node scripts/monitor-localhost.js --once",
+    "redeploy": "powershell -ExecutionPolicy Bypass -File ./scripts/redeploy-prod-full.ps1"
   },
   "dependencies": {
     "@langchain/openai": "^0.2.7",

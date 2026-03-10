@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         console.log('❌ LibreSpeed: Utilisateur sans tokens:', userEmail);
         return new NextResponse(JSON.stringify({
           success: false,
-          error: 'Tokens insuffisants',
+          error: 'Crédits insuffisants',
           currentTokens: 0,
           requiredTokens: 10,
           message: 'Vous devez acheter des tokens pour utiliser ce service'
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       if (currentTokens < 10) {
         return new NextResponse(JSON.stringify({
           success: false,
-          error: 'Tokens insuffisants',
+          error: 'Crédits insuffisants',
           currentTokens: currentTokens,
           requiredTokens: 10
         }), { 
@@ -81,8 +81,8 @@ export async function POST(request: NextRequest) {
         console.error('Erreur lors de la mise à jour des tokens:', updateError);
         return new NextResponse(JSON.stringify({
           success: false,
-          error: 'Plus de tokens ? Rechargez',
-          message: 'Plus de tokens ? Rechargez',
+          error: 'Plus de crédits ? Rechargez',
+          message: 'Plus de crédits ? Rechargez',
           pricingUrl: 'https://iahome.fr/pricing2'
         }), { 
           status: 500,

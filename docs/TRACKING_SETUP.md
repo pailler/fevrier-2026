@@ -44,9 +44,9 @@ NEXT_PUBLIC_FACEBOOK_PIXEL_ID=1234567890123456
 - **Sign Up** : Inscription d'un nouvel utilisateur
 - **Complete Registration** (Facebook) : Inscription complétée
 
-### Achat de tokens
+### Achat de crédits
 
-- **Purchase** : Achat d'un pack de tokens
+- **Purchase** : Achat d'un pack de crédits
 - **Purchase** (Facebook) : Conversion avec valeur monétaire
 
 ## Utilisation dans le code

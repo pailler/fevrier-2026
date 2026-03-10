@@ -53,7 +53,7 @@ export async function GET() {
   }
 }
 
-/** POST: créer ou activer le code BIENVENUE10 (2€ de réduction) */
+/** POST: créer ou activer les codes promo BIENVENUE10 / BIENVENUE2026 (20 % de remise) */
 export async function POST(request: NextRequest) {
   try {
     if (!process.env.STRIPE_SECRET_KEY?.trim()) {
@@ -65,6 +65,51 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json().catch(() => ({}));
     const { action = 'ensure_bienvenue10', code, amount_off, percent_off } = body;
+
+    const ensurePromo = async (CODE: string, PERCENT_OFF: number) => {
+      const { data: existing } = await stripe.promotionCodes.list({ limit: 100 });
+      const matching = existing.filter((p) => (p.code || '').toUpperCase() === CODE);
+
+      for (const p of matching) {
+        if (p.active && p.coupon) {
+          const coupon = typeof p.coupon === 'object' ? p.coupon : await stripe.coupons.retrieve(p.coupon as string);
+          if (coupon && 'percent_off' in coupon && coupon.percent_off === PERCENT_OFF) {
+            return { ok: true, message: `Le code ${CODE} (${PERCENT_OFF} % de remise) est déjà actif.`, promotion_code_id: p.id, code: p.code };
+          }
+        }
+      }
+
+      const inactiveCode = matching.find((p) => !p.active);
+      if (inactiveCode) {
+        const coupon = typeof inactiveCode.coupon === 'object' ? inactiveCode.coupon : await stripe.coupons.retrieve(inactiveCode.coupon as string);
+        if (coupon && 'percent_off' in coupon && coupon.percent_off === PERCENT_OFF) {
+          const updated = await stripe.promotionCodes.update(inactiveCode.id, { active: true });
+          return { ok: true, message: `Code ${CODE} (${PERCENT_OFF} %) réactivé.`, promotion_code_id: updated.id, code: updated.code };
+        }
+      }
+
+      let couponId: string | null = null;
+      const couponsList = await stripe.coupons.list({ limit: 100 });
+      const couponMatch = couponsList.data.find(
+        (c) => (c as Stripe.Coupon).percent_off === PERCENT_OFF && c.duration === 'once' && !c.redeem_by
+      );
+      if (couponMatch) {
+        couponId = couponMatch.id;
+      } else {
+        const coupon = await stripe.coupons.create({
+          percent_off: PERCENT_OFF,
+          duration: 'once',
+          name: `Promo ${CODE} -${PERCENT_OFF}%`,
+        });
+        couponId = coupon.id;
+      }
+
+      const promotionCode = await stripe.promotionCodes.create({
+        coupon: couponId,
+        code: CODE,
+      });
+      return { ok: true, message: `Code ${CODE} créé et activé (${PERCENT_OFF} % de remise).`, promotion_code_id: promotionCode.id, code: promotionCode.code };
+    };
 
     if (action === 'ensure_bienvenue10') {
       const CODE = 'BIENVENUE10';
@@ -129,6 +174,11 @@ export async function POST(request: NextRequest) {
         promotion_code_id: promotionCode.id,
         code: promotionCode.code,
       });
+    }
+
+    if (action === 'ensure_bienvenue2026') {
+      const result = await ensurePromo('BIENVENUE2026', 20);
+      return NextResponse.json(result);
     }
 
     if (action === 'create' && code) {

@@ -354,7 +354,8 @@ export default function LibreSpeedCardPage() {
                           if (!tokenData?.token) {
                             throw new Error('Token d\'accès manquant');
                           }
-                          window.open(`https://librespeed.iahome.fr?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
+                          const baseUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:8085' : 'https://librespeed.iahome.fr';
+                          window.open(`${baseUrl}?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
                         } catch (error) {
                           alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                         }
@@ -410,7 +411,8 @@ export default function LibreSpeedCardPage() {
                               if (!tokenData?.token) {
                                 throw new Error('Token d\'accès manquant');
                               }
-                              window.open(`https://librespeed.iahome.fr?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
+                              const baseUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:8085' : 'https://librespeed.iahome.fr';
+                              window.open(`${baseUrl}?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
                             } else {
                               console.error('❌ Erreur accès LibreSpeed:', data.error);
                               alert('Erreur lors de l\'accès: ' + (data.error || 'Erreur inconnue'));

@@ -26,6 +26,15 @@ if (Test-Path $ConfigFile) {
     . $ConfigFile
 }
 
+# Cache Hugging Face pour BiRefNet, Animagine XL - evite les telechargements repetes
+$ProjectRootForCache = if ($ProjectRoot) { $ProjectRoot } else { Split-Path -Parent $PSScriptRoot }
+$DefaultModelsCache = Join-Path $ProjectRootForCache "models-cache"
+if (-not $ModelsCachePath) { $ModelsCachePath = $DefaultModelsCache }
+if (-not (Test-Path $ModelsCachePath)) { New-Item -ItemType Directory -Path $ModelsCachePath -Force | Out-Null }
+$env:HF_HOME = $ModelsCachePath
+$env:HF_HUB_CACHE = Join-Path $ModelsCachePath "hub"
+$env:TRANSFORMERS_CACHE = Join-Path $ModelsCachePath "transformers"
+
 # Ports (doivent correspondre a Traefik / secure-proxy)
 $PortHomeAssistant = 8123
 $PortPhotomaker   = 7881

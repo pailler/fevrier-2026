@@ -13,7 +13,7 @@
 │  TÉLÉCHARGEZ YOUTUBE            │
 │      GRATUITEMENT               │
 │                                 │
-│  ✅ 100 tokens offerts          │
+│  ✅ 100 crédits offerts          │
 │  ✅ Sans logiciel               │
 │  ✅ Sans publicité              │
 │                                 │
@@ -35,7 +35,7 @@
 MeTube vous permet de télécharger n'importe quelle vidéo YouTube en MP4, MP3, ou autres formats.
 
 ✨ Pourquoi choisir MeTube ?
-✅ 100 tokens offerts à l'inscription
+✅ 100 crédits offerts à l'inscription
 ✅ Sans logiciel à installer
 ✅ Sans publicité
 ✅ 100% Privé et sécurisé
@@ -79,7 +79,7 @@ Contrairement aux autres services, MeTube :
 ✅ Fonctionne sur VOS serveurs
 ✅ Open-source et transparent
 
-100 tokens offerts pour tester gratuitement.
+100 crédits offerts pour tester gratuitement.
 
 👉 Découvrez MeTube : iahome.fr/card/metube
 ```
@@ -158,7 +158,7 @@ Contrairement aux autres services, MeTube :
 [3-6s]   : [Capture MeTube] "MeTube vous permet de le faire gratuitement"
 [6-10s]  : [Démo rapide] "Collez l'URL, choisissez le format, téléchargez"
 [10-15s] : [Avantages] "Sans logiciel, sans publicité, 100% privé"
-[15-20s] : [Offre] "100 tokens offerts pour commencer"
+[15-20s] : [Offre] "100 crédits offerts pour commencer"
 [20-25s] : [CTA] "Essayez maintenant sur iahome.fr"
 [25-30s] : [Logo] "MeTube - Téléchargeur YouTube privé"
 ```

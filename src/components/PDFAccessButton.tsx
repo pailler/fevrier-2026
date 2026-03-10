@@ -32,13 +32,13 @@ export default function PDFAccessButton({
             : 'bg-blue-600 hover:bg-blue-700'
           }`}
       >
-        {isLoading ? '⏳ Ouverture...' : '📄 Accéder à PDF+ (10 tokens par accès)'}
+        {isLoading ? '⏳ Ouverture...' : '📄 Accéder à PDF+ (10 crédits par accès)'}
       </button>
       {error && (
         <p className="text-red-500 text-sm">
-          {error.includes('Rechargez') || error.includes('tokens') ? (
+          {error.includes('Rechargez') || error.includes('tokens') || error.includes('crédits') ? (
             <>
-              Plus de tokens ?{' '}
+              Plus de crédits ?{' '}
               <a 
                 href="https://iahome.fr/pricing2" 
                 target="_blank" 

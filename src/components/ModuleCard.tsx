@@ -55,7 +55,9 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       'voice-isolation': 'voice-isolation',
       'photomaker': 'photomaker',
       'animagine-xl': 'animagine-xl',
-      'animaginexl': 'animagine-xl'
+      'animaginexl': 'animagine-xl',
+      'sentinelle-numerique': 'sentinelle-numerique',
+      'sentinellenumerique': 'sentinelle-numerique'
     };
 
     // Vérifier d'abord le mapping direct
@@ -116,6 +118,9 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     if (titleLower.includes('prompt') || titleLower.includes('générateur de prompts') || titleLower.includes('prompt-generator')) {
       return 'prompt-generator';
     }
+    if (titleLower.includes('sentinelle') || titleLower.includes('sentinelle numérique')) {
+      return 'sentinelle-numerique';
+    }
     if (titleLower.includes('voice isolation') || titleLower.includes('voice-isolation') || titleLower.includes('isolation vocale')) {
       return 'voice-isolation';
     }
@@ -163,13 +168,13 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       // Vérifier si le prix est 0, null, undefined ou NaN
       if (numericPrice === 0 || numericPrice === null || numericPrice === undefined || isNaN(numericPrice)) return 'Gratuit';
       
-      // Formater le prix en tokens
-      return `${numericPrice} tokens`;
+      // Formater le prix en crédits
+      return `${numericPrice} crédits`;
     } catch (error) {
       // Fallback simple
       const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
       if (numericPrice === 0 || numericPrice === null || numericPrice === undefined || isNaN(numericPrice)) return 'Gratuit';
-      return `${numericPrice} tokens`;
+      return `${numericPrice} crédits`;
     }
   };
 
@@ -192,7 +197,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     }
     
     if (titleLower.includes('photobooth') || titleLower.includes('photo booth') || idLower === 'photobooth') {
-      return '/images/module-visuals/photobooth-module.svg';
+      return '/images/photobooth.png';
     }
     
     if (titleLower.includes('photo') || titleLower.includes('image')) {
@@ -230,6 +235,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     
     if (titleLower.includes('animagine') || titleLower.includes('animaginexl') || titleLower.includes('animagine-xl') || idLower === 'animagine-xl' || idLower === 'animaginexl') {
       return '/images/animagine-xl.jpg'; // Image HD de style manga
+    }
+    
+    if (titleLower.includes('sentinelle') || idLower === 'sentinelle-numerique' || idLower === 'sentinellenumerique') {
+      return '/images/sentinelle-numerique.jpg';
     }
     
     // Image par défaut pour tous les autres modules
@@ -332,6 +341,12 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   
   // Vérifier si c'est le module Détecteur de Contenu IA pour appliquer un style spécial
   const isAIDetector = module.title.toLowerCase().includes('détecteur') || module.title.toLowerCase().includes('detecteur') || module.title.toLowerCase().includes('ai detector') || module.title.toLowerCase().includes('contenu ia') || module.id === 'ai-detector';
+
+  // Vérifier si c'est le module Sentinelle Numérique (cybersécurité, fin de vie numérique)
+  const isSentinelleNumerique = module.title.toLowerCase().includes('sentinelle') || module.title.toLowerCase().includes('sentinelle numérique') || module.id === 'sentinelle-numerique' || module.id === 'sentinellenumerique';
+
+  // Vérifier si c'est le module Photobooth (mariage, événement)
+  const isPhotobooth = module.title.toLowerCase().includes('photobooth') || module.title.toLowerCase().includes('photo booth') || module.id === 'photobooth';
   
   // Debug temporaire pour Home Assistant - LOG TRÈS VISIBLE
   if (module.id === 'home-assistant' || module.title.toLowerCase().includes('home') || module.title.toLowerCase().includes('domotisez')) {
@@ -398,14 +413,18 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                     ? '/images/photomaker.jpg'
                     : isFlorence2
                       ? '/images/florence-2.jpg'
-                      : isAIDetector
-                        ? '/images/iapasia.jpg'
-                        : '/images/animagine-xl.jpg';
+                      : isSentinelleNumerique
+                        ? '/images/sentinelle-numerique.jpg'
+                        : isAIDetector
+                          ? '/images/iapasia.jpg'
+                          : isPhotobooth
+                            ? '/images/photobooth.png'
+                            : '/images/animagine-xl.jpg';
 
     // Déterminer les badges selon le type de module (style Claid.ai : badge violet "New")
     const getBadgeLabel = () => {
       if (isStableDiffusion || isComfyUI || isAnimagineXL) return { text: 'Top seller', show: true };
-      if (isRuinedFooocus || isCogStudio || isMeetingReports || isHunyuan3D) return { text: 'New', show: true };
+      if (isRuinedFooocus || isCogStudio || isMeetingReports || isHunyuan3D || isSentinelleNumerique) return { text: 'New', show: true };
       return { text: null, show: false };
     };
     
@@ -413,7 +432,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     
     return (
       <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 group">
-        <Link href={`/card/${moduleSlug}`} className="block">
+        <Link href={`/card/${moduleSlug}`} prefetch={false} className="block">
           {/* Zone visuelle - style Claid.ai avec image illustrative */}
           <div className="relative h-56 overflow-hidden bg-gray-50">
             {/* Image de fond - style Claid.ai (images dédiées par module, sinon animagine-xl.jpg) */}
@@ -441,7 +460,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
 
         {/* Contenu - style Claid.ai épuré */}
         <div className="p-6">
-          <Link href={`/card/${moduleSlug}`} className="block group">
+          <Link href={`/card/${moduleSlug}`} prefetch={false} className="block group">
             {/* Titre avec badge - style Claid.ai */}
             <div className="flex items-center gap-2 mb-3">
               <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
@@ -456,7 +475,9 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             
             {/* Description - style Claid.ai (texte gris, concis) */}
             <p className="text-gray-700 text-sm mb-6 line-clamp-3 leading-relaxed">
-              {module.subtitle || module.description}
+              {isSentinelleNumerique
+                ? "Cybersécurité personnelle et processus de fin de vie numérique: audit sécurité, plan de transmission et actions post-événement."
+                : (module.subtitle || module.description)}
             </p>
           </Link>
 
@@ -466,12 +487,13 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               <span className={`text-base font-semibold ${
                 isFree ? 'text-green-600' : 'text-gray-700'
               }`}>
-                {formatPrice(module.price)}
+                {isSentinelleNumerique ? '10 crédits' : formatPrice(module.price)}
               </span>
             </div>
             
             <Link
               href={`/card/${moduleSlug}`}
+              prefetch={false}
               className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1 group/btn"
             >
               <span>Explore</span>
@@ -486,10 +508,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   }
 
   return (
-    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isAnimagineXL ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isIAPhoto ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isIATube ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isStirlingPDF ? 'ring-2 ring-gray-500 ring-opacity-50' : ''} ${isMeetingReports ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isHunyuan3D ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCodeLearning ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isApprendreAutrement ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isHomeAssistant ? 'ring-2 ring-orange-500 ring-opacity-50' : ''} ${isAdministration ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPromptGenerator ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isAIDetector ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''}`}>
+    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 ${isLibrespeed ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPsitransfer ? 'ring-2 ring-green-500 ring-opacity-50' : ''} ${isPdfPlus ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isMeTube ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCogStudio ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isComfyUI ? 'ring-2 ring-teal-500 ring-opacity-50' : ''} ${isStableDiffusion ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isRuinedFooocus ? 'ring-2 ring-violet-500 ring-opacity-50' : ''} ${isAnimagineXL ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isQRCodes ? 'ring-2 ring-slate-500 ring-opacity-50' : ''} ${isWhisper ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isIAPhoto ? 'ring-2 ring-pink-500 ring-opacity-50' : ''} ${isIATube ? 'ring-2 ring-red-500 ring-opacity-50' : ''} ${isStirlingPDF ? 'ring-2 ring-gray-500 ring-opacity-50' : ''} ${isMeetingReports ? 'ring-2 ring-emerald-500 ring-opacity-50' : ''} ${isHunyuan3D ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isCodeLearning ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isApprendreAutrement ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isHomeAssistant ? 'ring-2 ring-orange-500 ring-opacity-50' : ''} ${isAdministration ? 'ring-2 ring-blue-500 ring-opacity-50' : ''} ${isPromptGenerator ? 'ring-2 ring-purple-500 ring-opacity-50' : ''} ${isAIDetector ? 'ring-2 ring-indigo-500 ring-opacity-50' : ''} ${isSentinelleNumerique ? 'ring-2 ring-teal-500 ring-opacity-50' : ''}`}>
       
       {/* Image du module - Cliquable */}
-      <Link href={`/card/${moduleSlug}`} className="block">
+      <Link href={`/card/${moduleSlug}`} prefetch={false} className="block">
         <div 
           className={`relative h-48 cursor-pointer group overflow-hidden ${
             isAnimagineXL ? '' :
@@ -503,8 +525,9 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             isApprendreAutrement ? 'bg-gradient-to-br from-purple-500 via-pink-600 to-orange-500' : 
             isPromptGenerator ? 'bg-gradient-to-br from-purple-500 via-pink-600 to-orange-500' : 
             isHomeAssistant ? 'bg-gradient-to-br from-orange-400 via-red-500 to-blue-600' : 
-            isAdministration ? 'bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600' : 
-            isMeTube ? 'bg-gradient-to-br from-red-500 via-pink-600 to-purple-600' : 
+            isAdministration ? 'bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600' :
+            isSentinelleNumerique ? 'bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-600' :
+            isMeTube ? 'bg-gradient-to-br from-red-500 via-pink-600 to-purple-600' :
             isLibrespeed ? 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600' : 
             'bg-gradient-to-br from-blue-50 to-indigo-100'
           }`} 
@@ -2378,7 +2401,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
 
       {/* Contenu du module */}
       <div className="p-6">
-        <Link href={`/card/${moduleSlug}`} className="block group">
+        <Link href={`/card/${moduleSlug}`} prefetch={false} className="block group">
           {/* Titre du module - affiché pour tous les modules */}
           <h3 className="text-3xl sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
             {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isAnimagineXL ? "Génération d'anime et manga par IA" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : isHunyuan3D ? "Hunyuan 3D - Génération 3D par IA" : isCodeLearning ? "Apprendre le Code aux enfants" : isApprendreAutrement ? "Apprendre Autrement" : isPromptGenerator ? "Générateur de prompts" : isHomeAssistant ? "Domotisez votre habitat" : isAdministration ? "Services de l'Administration" : isAIDetector ? "Détecteur de Contenu IA" : module.title}
@@ -2405,6 +2428,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
           {/* Bouton voir les détails */}
           <Link
             href={`/card/${moduleSlug}`}
+            prefetch={false}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 text-sm"
           >
             <span>Voir les détails</span>

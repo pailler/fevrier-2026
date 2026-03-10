@@ -12,7 +12,7 @@ export default function TokenBalanceLink({ className = '', showIcon = true }: To
     <Link
       href="/pricing2"
       className={`inline-flex items-center space-x-2 ${className}`}
-      title="Acheter des tokens"
+      title="Acheter des crédits"
     >
       <TokenBalance showIcon={showIcon} linkToPricing={false} />
     </Link>

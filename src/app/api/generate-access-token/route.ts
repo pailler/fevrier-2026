@@ -20,6 +20,7 @@ function normalizeModuleId(moduleId: string): string {
     homeassistant: 'home-assistant',
     ia_generator: 'ai-detector',
     iagenerator: 'ai-detector',
+    sentinellenumerique: 'sentinelle-numerique',
   };
   return aliases[raw] || raw;
 }
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
     if (currentTokens < moduleCost) {
       return NextResponse.json(
         {
-          error: `Tokens insuffisants (${currentTokens}/${moduleCost})`,
+          error: `Crédits insuffisants (${currentTokens}/${moduleCost})`,
           code: 'INSUFFICIENT_TOKENS',
           tokensRemaining: currentTokens,
           tokensRequired: moduleCost,

@@ -113,7 +113,7 @@ export default function PsiTransferPage() {
           "name": "Comment transférer un fichier avec PsiTransfer ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour transférer un fichier avec PsiTransfer, accédez directement au service avec 10 tokens. L'accès est immédiat, glissez-déposez vos fichiers dans l'interface ou sélectionnez-les. Choisissez la durée de vie du lien de partage et optionnellement un mot de passe. PsiTransfer génère un lien sécurisé que vous pouvez partager avec vos destinataires."
+            "text": "Pour transférer un fichier avec PsiTransfer, accédez directement au service avec 10 crédits. L'accès est immédiat, glissez-déposez vos fichiers dans l'interface ou sélectionnez-les. Choisissez la durée de vie du lien de partage et optionnellement un mot de passe. PsiTransfer génère un lien sécurisé que vous pouvez partager avec vos destinataires."
           }
         },
         {
@@ -121,7 +121,7 @@ export default function PsiTransferPage() {
           "name": "PsiTransfer est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "PsiTransfer est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez transférer des fichiers sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking."
+            "text": "PsiTransfer est un outil open-source et gratuit. L'accès du service coûte 10 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez transférer des fichiers sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking."
           }
         },
         {
@@ -367,7 +367,7 @@ export default function PsiTransferPage() {
 
                       if (result.success) {
                         console.log('✅ PsiTransfer accessible avec succès');
-                        alert('PsiTransfer accessible avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
+                        alert('PsiTransfer accessible avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les crédits seront consommés lors de l\'utilisation.');
                         const tokenResponse = await fetch('/api/generate-access-token', {
                           method: 'POST',
                           headers: {
@@ -400,7 +400,7 @@ export default function PsiTransferPage() {
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">📁</span>
-                  <span>Accéder à PsiTransfer (10 tokens par accès)</span>
+                  <span>Accéder à PsiTransfer (10 crédits par accès)</span>
                 </button>
               ) : (
                 // Message pour les utilisateurs non connectés
@@ -413,7 +413,7 @@ export default function PsiTransferPage() {
                   className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <span className="text-xl">🔒</span>
-                  <span>Connectez-vous pour accéder PsiTransfer (10 tokens par accès)</span>
+                  <span>Connectez-vous pour accéder PsiTransfer (10 crédits par accès)</span>
                 </button>
               )}
             </div>
@@ -507,7 +507,7 @@ export default function PsiTransferPage() {
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à PsiTransfer</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Accédez à PsiTransfer avec 10 tokens. L'accès est immédiat, le service est accessible depuis vos applications.
+                          Accédez à PsiTransfer avec 10 crédits. L'accès est immédiat, le service est accessible depuis vos applications.
                         </p>
                       </div>
                     </div>
@@ -648,14 +648,14 @@ export default function PsiTransferPage() {
                   <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-teal-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Comment transférer un fichier avec PsiTransfer ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Pour transférer un fichier avec PsiTransfer, accédez directement au service avec 10 tokens. L'accès est immédiat, glissez-déposez vos fichiers dans l'interface ou sélectionnez-les. Choisissez la durée de vie du lien de partage et optionnellement un mot de passe. PsiTransfer génère un lien sécurisé que vous pouvez partager avec vos destinataires.
+                      Pour transférer un fichier avec PsiTransfer, accédez directement au service avec 10 crédits. L'accès est immédiat, glissez-déposez vos fichiers dans l'interface ou sélectionnez-les. Choisissez la durée de vie du lien de partage et optionnellement un mot de passe. PsiTransfer génère un lien sécurisé que vous pouvez partager avec vos destinataires.
                     </p>
                   </div>
                   
                   <div className="bg-gradient-to-r from-cyan-50 to-blue-50 p-6 rounded-2xl border-l-4 border-cyan-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">PsiTransfer est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      PsiTransfer est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez transférer des fichiers sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking.
+                      PsiTransfer est un outil open-source et gratuit. L'accès du service coûte 10 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez transférer des fichiers sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking.
                     </p>
                   </div>
                   

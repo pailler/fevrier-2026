@@ -26,7 +26,7 @@ export default function AddTokensModal({ user, isOpen, onClose, onSuccess }: Add
     
     const tokens = parseInt(tokensToAdd, 10);
     if (isNaN(tokens) || tokens <= 0) {
-      setError('Veuillez entrer un nombre de tokens valide (supérieur à 0)');
+      setError('Veuillez entrer un nombre de crédits valide (supérieur à 0)');
       return;
     }
 
@@ -48,7 +48,7 @@ export default function AddTokensModal({ user, isOpen, onClose, onSuccess }: Add
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Erreur lors de l\'ajout des tokens');
+        throw new Error(data.error || 'Erreur lors de l\'ajout des crédits');
       }
 
       // Succès
@@ -57,8 +57,8 @@ export default function AddTokensModal({ user, isOpen, onClose, onSuccess }: Add
       onSuccess();
       onClose();
     } catch (error) {
-      console.error('Erreur lors de l\'ajout des tokens:', error);
-      setError(error instanceof Error ? error.message : 'Erreur lors de l\'ajout des tokens');
+      console.error('Erreur lors de l\'ajout des crédits:', error);
+      setError(error instanceof Error ? error.message : 'Erreur lors de l\'ajout des crédits');
     } finally {
       setIsLoading(false);
     }
@@ -69,7 +69,7 @@ export default function AddTokensModal({ user, isOpen, onClose, onSuccess }: Add
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
-        <h2 className="text-xl font-bold mb-4">Ajouter des tokens</h2>
+        <h2 className="text-xl font-bold mb-4">Ajouter des crédits</h2>
         
         <div className="mb-4 p-3 bg-gray-50 rounded-lg">
           <p className="text-sm text-gray-600">Utilisateur</p>
@@ -77,7 +77,7 @@ export default function AddTokensModal({ user, isOpen, onClose, onSuccess }: Add
           <p className="text-sm text-gray-500">{user.email}</p>
           {user.tokens !== undefined && (
             <p className="text-sm text-gray-600 mt-2">
-              Tokens actuels: <span className="font-semibold text-blue-600">{user.tokens}</span>
+              Crédits actuels: <span className="font-semibold text-blue-600">{user.tokens}</span>
             </p>
           )}
         </div>
@@ -91,7 +91,7 @@ export default function AddTokensModal({ user, isOpen, onClose, onSuccess }: Add
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nombre de tokens à ajouter
+              Nombre de crédits à ajouter
             </label>
             <input
               type="number"
@@ -104,7 +104,7 @@ export default function AddTokensModal({ user, isOpen, onClose, onSuccess }: Add
               disabled={isLoading}
             />
             <p className="text-xs text-gray-500 mt-1">
-              Entrez le nombre de tokens à ajouter au solde actuel
+              Entrez le nombre de crédits à ajouter au solde actuel
             </p>
           </div>
           
@@ -145,7 +145,7 @@ export default function AddTokensModal({ user, isOpen, onClose, onSuccess }: Add
                   Ajout...
                 </>
               ) : (
-                'Ajouter les tokens'
+                'Ajouter les crédits'
               )}
             </button>
           </div>

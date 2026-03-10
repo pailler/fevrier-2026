@@ -62,7 +62,7 @@ export default function PhotoboothPage() {
         <div className="bg-white/95 rounded-2xl border border-gray-200 p-8 shadow-lg">
           <h3 className="text-2xl font-bold text-gray-900 mb-4">Comment acceder</h3>
           <p className="text-gray-700 mb-4">
-            L&apos;acces a Photobooth suit le workflow habituel IAHome: connexion, verification des tokens, generation
+            L&apos;acces a Photobooth suit le workflow habituel IAHome: connexion, vérification des crédits, generation
             de token d&apos;acces puis ouverture de l&apos;application.
           </p>
           <p className="text-gray-700">
@@ -81,7 +81,7 @@ export default function PhotoboothPage() {
         tokenCost={100}
         tokenUnit="par acces. Utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-module"
-        accessUrl="https://photobooth.iahome.fr"
+        accessUrl={typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:7885' : 'https://photobooth.iahome.fr'}
         gradientColors="from-fuchsia-600 to-pink-600 hover:from-fuchsia-700 hover:to-pink-700"
         icon="📸"
       />

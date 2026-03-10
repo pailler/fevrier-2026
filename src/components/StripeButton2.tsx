@@ -8,9 +8,11 @@ interface StripeButton2Props {
   children: React.ReactNode;
   /** ID du code promo Stripe (ex. prom_xxx) pour appliquer la réduction au checkout */
   promotionCodeId?: string | null;
+  /** Code promo brut (ex. BIENVENUE10) : si fourni et promotionCodeId absent, on valide au clic avant le checkout */
+  promoCodeToValidate?: string | null;
 }
 
-export default function StripeButton2({ packageType, className, children, promotionCodeId }: StripeButton2Props) {
+export default function StripeButton2({ packageType, className, children, promotionCodeId, promoCodeToValidate }: StripeButton2Props) {
   const [isLoading, setIsLoading] = useState(false);
   const { user, isAuthenticated } = useCustomAuth();
 
@@ -24,7 +26,23 @@ export default function StripeButton2({ packageType, className, children, promot
     setIsLoading(true);
 
     try {
-      console.log('🔄 Début du paiement:', { packageType, userId: user?.id, userEmail: user?.email });
+      // Si code promo saisi mais pas encore validé, le valider automatiquement
+      let effectivePromoId = promotionCodeId;
+      const codeToValidate = promoCodeToValidate?.trim().toUpperCase();
+      if (!effectivePromoId && codeToValidate) {
+        const res = await fetch(`/api/stripe/validate-promo?code=${encodeURIComponent(codeToValidate)}`);
+        const data = await res.json();
+        if (data.valid && data.promotion_code_id) {
+          effectivePromoId = data.promotion_code_id;
+        } else {
+          // Code invalide : informer l'utilisateur avant de continuer
+          alert(data.error || `Le code promo ${codeToValidate} est invalide ou expiré. Vous pouvez continuer sans réduction ou saisir un autre code.`);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      console.log('🔄 Début du paiement:', { packageType, userId: user?.id, userEmail: user?.email, promotionCodeId: effectivePromoId });
 
       const response = await fetch('/api/stripe/create-checkout-session-v2', {
         method: 'POST',
@@ -35,7 +53,7 @@ export default function StripeButton2({ packageType, className, children, promot
           packageType,
           userId: user?.id,
           userEmail: user?.email,
-          ...(promotionCodeId && { promotion_code_id: promotionCodeId }),
+          ...(effectivePromoId && { promotion_code_id: effectivePromoId }),
         }),
       });
 

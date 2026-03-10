@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
             <h2 style="color: #2563eb;">Bienvenue sur IAHome !</h2>
             <p>Bonjour {{user_name}},</p>
             <p>Votre compte a été créé avec succès. Vous pouvez maintenant accéder à tous nos modules.</p>
-            <p>Vous disposez maintenant de <strong>400 tokens</strong> gratuits pour découvrir nos modules d'intelligence artificielle.</p>
+            <p>Vous disposez maintenant de <strong>400 crédits</strong> gratuits pour découvrir nos modules d'intelligence artificielle.</p>
             <p>Merci de nous faire confiance !</p>
             <hr>
             <p style="color: #666; font-size: 12px;">
@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
             <p><strong>Utilisateur:</strong> {{user_name}} ({{user_email}})</p>
             <p><strong>Application:</strong> {{module_name}} ({{module_id}})</p>
             <p><strong>Date d'activation:</strong> {{activation_date}}</p>
-            <p><strong>Méthode:</strong> {{activation_method || 'Tokens'}}</p>
+            <p><strong>Méthode:</strong> {{activation_method || 'Crédits'}}</p>
             <hr>
             <p style="color: #666; font-size: 12px;">
               Cet email a été envoyé automatiquement par IAHome.

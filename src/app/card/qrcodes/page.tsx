@@ -108,7 +108,8 @@ export default function QRCodesPage() {
         throw new Error('Token d\'accès manquant');
       }
 
-      const accessUrl = `https://qrcodes.iahome.fr?token=${encodeURIComponent(tokenData.token)}`;
+      const baseUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:7006' : 'https://qrcodes.iahome.fr';
+      const accessUrl = `${baseUrl}?token=${encodeURIComponent(tokenData.token)}`;
       console.log('🔗 qrcodes: Accès direct tokenisé');
       window.open(accessUrl, '_blank', 'noopener,noreferrer');
     } catch (error) {

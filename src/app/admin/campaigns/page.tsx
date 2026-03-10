@@ -75,7 +75,7 @@ const facebookTemplates: CampaignTemplate[] = [
   {
     id: 'metube-gratuit',
     name: 'MeTube - Focus Gratuit',
-    description: 'Campagne axée sur l\'offre gratuite (100 tokens offerts) pour maximiser les inscriptions',
+    description: 'Campagne axée sur l\'offre gratuite (100 crédits offerts) pour maximiser les inscriptions',
     format: 'image',
     budget: {
       daily: 10,
@@ -101,7 +101,7 @@ const facebookTemplates: CampaignTemplate[] = [
     creative: {
       type: 'Image 1080x1080px',
       specifications: 'Format carré, couleurs vives (rouge/blanc), texte clair',
-      text: '🎥 Téléchargez vos vidéos YouTube préférées GRATUITEMENT\n\n✅ 100 tokens offerts à l\'inscription\n✅ Sans logiciel à installer\n✅ Sans publicité\n✅ 100% Privé et sécurisé',
+      text: '🎥 Téléchargez vos vidéos YouTube préférées GRATUITEMENT\n\n✅ 100 crédits offerts à l\'inscription\n✅ Sans logiciel à installer\n✅ Sans publicité\n✅ 100% Privé et sécurisé',
       cta: 'Essayer maintenant'
     },
     duration: '30 jours minimum',
@@ -181,7 +181,7 @@ const facebookTemplates: CampaignTemplate[] = [
     creative: {
       type: 'Vidéo 30 secondes',
       specifications: 'Format MP4, 1080p, ratio 1:1 ou 16:9, sous-titres recommandés',
-      text: '🎥 Découvrez MeTube en action\n\nRegardez comment télécharger vos vidéos YouTube en quelques clics.\n\n✅ Simple et rapide\n✅ 100 tokens offerts\n✅ Sans logiciel',
+      text: '🎥 Découvrez MeTube en action\n\nRegardez comment télécharger vos vidéos YouTube en quelques clics.\n\n✅ Simple et rapide\n✅ 100 crédits offerts\n✅ Sans logiciel',
       cta: 'Regarder la démo'
     },
     duration: '30 jours minimum',
@@ -261,7 +261,7 @@ const facebookTemplates: CampaignTemplate[] = [
     creative: {
       type: 'Image 1080x1080px',
       specifications: 'Format carré, design épuré, icônes simples, texte minimal',
-      text: '📹 Téléchargez YouTube en 1 CLIC\n\n✅ Collez l\'URL YouTube\n✅ Choisissez le format\n✅ Téléchargez !\n\n100 tokens offerts pour commencer.',
+      text: '📹 Téléchargez YouTube en 1 CLIC\n\n✅ Collez l\'URL YouTube\n✅ Choisissez le format\n✅ Téléchargez !\n\n100 crédits offerts pour commencer.',
       cta: 'Essayer maintenant'
     },
     duration: '30 jours minimum',

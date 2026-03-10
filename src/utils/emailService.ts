@@ -10,6 +10,12 @@ export interface EmailData {
   from?: string;
 }
 
+/** Formate l'email expéditeur pour Resend : "IAHome <noreply@iahome.fr>" améliore la délivrabilité. */
+function formatFromEmail(email: string | undefined): string {
+  const addr = email || 'noreply@iahome.fr';
+  return addr.includes('<') ? addr : `IAHome <${addr}>`;
+}
+
 export class EmailService {
   private static instance: EmailService;
   private resend: Resend | null = null;
@@ -17,6 +23,18 @@ export class EmailService {
 
   constructor() {
     this.initializeResend();
+  }
+
+  /** Format from: "IAHome <email@domain>" pour meilleure délivrabilité */
+  private getFromEmail(): string {
+    const raw = process.env.RESEND_FROM_EMAIL || 'noreply@iahome.fr';
+    return raw.includes('<') ? raw : `IAHome <${raw}>`;
+  }
+
+  /** Normalise le format from: "IAHome <noreply@iahome.fr>" pour meilleure délivrabilité */
+  private formatFromEmail(email: string | undefined): string {
+    const addr = email || 'noreply@iahome.fr';
+    return addr.includes('<') ? addr : `IAHome <${addr}>`;
   }
 
   private initializeResend() {
@@ -80,7 +98,10 @@ export class EmailService {
         return false;
       }
 
-      const { to, subject, html, from = process.env.RESEND_FROM_EMAIL || 'IAHome <noreply@iahome.fr>' } = emailData;
+      const rawFrom = process.env.RESEND_FROM_EMAIL || 'IAHome <noreply@iahome.fr>';
+      const from = rawFrom.includes('<') ? rawFrom : `IAHome <${rawFrom}>`;
+      const { to, subject, html, from: fromOverride } = emailData;
+      const fromFinal = fromOverride || from;
       
       console.log('📧 Tentative d\'envoi d\'email:', {
         to,
@@ -176,7 +197,7 @@ export class EmailService {
         html = html.replace(new RegExp(placeholder, 'g'), templateData[key] || '');
       });
 
-      // Pièce jointe inline pour le visuel iahome (relance offres) — affichage garanti même si le client bloque les images externes
+      // Pièce jointe inline pour le visuel iahome (relance offres)
       const attachments: { content: string; filename: string; contentId?: string }[] = [];
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://iahome.fr';
       if (eventType === 'relance_offres_iahome') {
@@ -190,11 +211,10 @@ export class EmailService {
               contentId: 'iahome-visuel',
             });
           } else {
-            // Fallback : image hébergée (si fichier absent en build serverless)
             html = html.replace(/src="cid:iahome-visuel"/g, `src="${baseUrl}/images/email-visuel-iahome.png"`);
           }
         } catch (attachErr) {
-          console.warn('⚠️ Visuel iahome non attaché (image introuvable):', attachErr);
+          console.warn('⚠️ Visuel iahome non attaché:', attachErr);
           html = html.replace(/src="cid:iahome-visuel"/g, `src="${baseUrl}/images/email-visuel-iahome.png"`);
         }
       }

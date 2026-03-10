@@ -136,7 +136,7 @@ export default function Pricing2Page() {
                 value={promoInput}
                 onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
                 onKeyDown={(e) => e.key === 'Enter' && applyPromo()}
-                placeholder="ex. BIENVENUE10"
+                placeholder="ex. BIENVENUE2026"
                 className="flex-1 px-3 py-2 rounded border border-white/30 bg-white/10 text-white placeholder-white/60 focus:ring-2 focus:ring-white/50 focus:border-white"
               />
               <button
@@ -159,7 +159,7 @@ export default function Pricing2Page() {
               </p>
             )}
             <p className="mt-1 text-center text-white/80 text-xs">
-              BIENVENUE10 : 20% de remise sur tous les tarifs
+              BIENVENUE2026 : 20% de remise sur tous les tarifs
             </p>
           </div>
 
@@ -170,7 +170,7 @@ export default function Pricing2Page() {
                 🎯 Abonnement (Recommandé)
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Accès complet à toutes les applications avec tokens mensuels récurrents.
+                Accès complet à toutes les applications avec crédits mensuels récurrents.
               </p>
             </div>
 
@@ -213,6 +213,7 @@ export default function Pricing2Page() {
                 <StripeButton2 
                   packageType="subscription_monthly"
                   promotionCodeId={promotionCodeId}
+                  promoCodeToValidate={promoInput}
                   className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-2 rounded-lg font-medium transition-colors text-sm"
                 >
                   S'abonner
@@ -264,6 +265,7 @@ export default function Pricing2Page() {
                 <StripeButton2 
                   packageType="subscription_yearly"
                   promotionCodeId={promotionCodeId}
+                  promoCodeToValidate={promoInput}
                   className="block w-full bg-green-600 hover:bg-green-700 text-white text-center px-4 py-2 rounded-lg font-medium transition-colors text-sm"
                 >
                   S'abonner
@@ -325,6 +327,7 @@ export default function Pricing2Page() {
                 <StripeButton2 
                   packageType="pack_standard"
                   promotionCodeId={promotionCodeId}
+                  promoCodeToValidate={promoInput}
                   className="block w-full bg-gray-600 hover:bg-gray-700 text-white text-center px-4 py-2 rounded-lg font-medium transition-colors text-sm"
                 >
                   Acheter

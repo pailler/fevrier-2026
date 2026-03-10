@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
     
     const { filename, size, type } = parsedBody;
     
+    const CHUNK_SIZE = 20 * 1024 * 1024; // 20MB - aligné avec le client (limite Cloudflare ~100MB)
     const sessionId = uuidv4();
     const sessionData = {
       sessionId,
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
       type,
       chunks: new Map(),
       createdAt: new Date(),
-      totalChunks: Math.ceil(size / (50 * 1024 * 1024)) // 50MB par chunk pour gros fichiers
+      totalChunks: Math.ceil(size / CHUNK_SIZE)
     };
     
     uploadSessions.set(sessionId, sessionData);
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       sessionId,
       totalChunks: sessionData.totalChunks,
-      chunkSize: 50 * 1024 * 1024
+      chunkSize: CHUNK_SIZE
     }, {
       headers: {
         'Access-Control-Allow-Origin': '*',

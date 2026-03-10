@@ -29,10 +29,10 @@ export default function VoiceIsolationAccessButton({
       const tokenService = TokenActionServiceClient.getInstance();
       const balance = await tokenService.getUserTokenBalance(user.id);
 
-      const moduleCost = 100; // Voice Isolation coûte 100 tokens
+      const moduleCost = 100; // Voice Isolation coûte 100 crédits
 
       if (!balance || balance < moduleCost) {
-        const reason = `Tokens insuffisants. Solde actuel: ${balance || 0} token(s). ${moduleCost} tokens requis.`;
+        const reason = `Crédits insuffisants. Solde actuel: ${balance || 0} crédit(s). ${moduleCost} crédits requis.`;
         setError(reason);
         onAccessDenied?.(reason);
         setIsLoading(false);
@@ -48,7 +48,7 @@ export default function VoiceIsolationAccessButton({
       );
 
       if (!consumeResult.success) {
-        const reason = consumeResult.reason || 'Erreur lors de la consommation des tokens';
+        const reason = consumeResult.reason || 'Erreur lors de la consommation des crédits';
         setError(reason);
         onAccessDenied?.(reason);
         setIsLoading(false);
@@ -123,7 +123,7 @@ export default function VoiceIsolationAccessButton({
         ) : (
           <>
             <span className="mr-2">🎤</span>
-            <span>Accéder à l'Isolation Vocale (100 tokens)</span>
+            <span>Accéder à l'Isolation Vocale (100 crédits)</span>
           </>
         )}
       </button>

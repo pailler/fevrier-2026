@@ -159,11 +159,11 @@ export async function POST(request: NextRequest) {
       console.error('❌ Utilisateur sans tokens pour consommation:', userId);
       return NextResponse.json(
         { 
-          error: 'Tokens insuffisants',
+          error: 'Crédits insuffisants',
           currentTokens: 0,
           requiredTokens: tokensToConsume,
           insufficient: true,
-          message: 'Vous devez acheter des tokens pour utiliser ce service'
+          message: 'Vous devez acheter des crédits pour utiliser ce service'
         },
         { status: 400 }
       );
@@ -174,10 +174,10 @@ export async function POST(request: NextRequest) {
 
     // Vérifier si l'utilisateur a assez de tokens
     if (currentTokens < tokensToConsume) {
-      console.log('❌ Tokens insuffisants:', currentTokens, '<', tokensToConsume, 'pour userId:', userId);
+      console.log('❌ Crédits insuffisants:', currentTokens, '<', tokensToConsume, 'pour userId:', userId);
       return NextResponse.json(
         { 
-          error: 'Tokens insuffisants',
+          error: 'Crédits insuffisants',
           currentTokens: currentTokens,
           requiredTokens: tokensToConsume,
           insufficient: true
@@ -228,10 +228,10 @@ export async function POST(request: NextRequest) {
       
       // Vérifier à nouveau si l'utilisateur a assez de tokens
       if (recheckCurrentTokens < tokensToConsume) {
-        console.log('❌ Tokens insuffisants après revérification:', recheckCurrentTokens, '<', tokensToConsume);
+        console.log('❌ Crédits insuffisants après revérification:', recheckCurrentTokens, '<', tokensToConsume);
         return NextResponse.json(
           { 
-            error: 'Tokens insuffisants',
+            error: 'Crédits insuffisants',
             currentTokens: recheckCurrentTokens,
             requiredTokens: tokensToConsume,
             insufficient: true
@@ -255,8 +255,8 @@ export async function POST(request: NextRequest) {
         console.error('❌ Erreur lors de la deuxième tentative de mise à jour:', retryError);
         return NextResponse.json(
           { 
-            error: 'Plus de tokens ? Rechargez',
-            message: 'Plus de tokens ? Rechargez',
+            error: 'Plus de crédits ? Rechargez',
+            message: 'Plus de crédits ? Rechargez',
             pricingUrl: 'https://iahome.fr/pricing2'
           },
           { status: 500 }

@@ -44,7 +44,7 @@ export default function SimpleHeader() {
               <span className="text-lg font-bold text-white">IAhome</span>
             </Link>
             
-            {/* Bouton "Mes applis" avec tokens pour mobile - VERSION 4.0.0 */}
+            {/* Bouton "Mes applis" avec crédits pour mobile - VERSION 4.0.0 */}
             {isAuthenticated && user && (
               <div className="flex md:hidden items-center space-x-1 relative z-0 mr-3" data-button-version="4.0.0">
                 <Link
@@ -141,7 +141,7 @@ export default function SimpleHeader() {
               >
                 Blog
               </Link>
-              {/* Affichage des tokens après Blog */}
+              {/* Affichage des crédits après Blog */}
               {isAuthenticated && user && !tokensLoading && (
                 <div className="flex items-center space-x-1 px-2 py-1 rounded-md bg-white/10 border border-white/20">
                   <span className="text-sm">🪙</span>
@@ -234,7 +234,7 @@ export default function SimpleHeader() {
               </div>
             )}
             
-            {/* Affichage des tokens pour mobile */}
+            {/* Affichage des crédits pour mobile */}
             {isAuthenticated && user && (
               <TokenBalanceLink className="text-yellow-300 font-bold text-xl hover:text-yellow-200 transition-colors" showIcon={true} />
             )}
@@ -386,7 +386,7 @@ export default function SimpleHeader() {
                     </div>
                   </div>
                   
-                  {/* Affichage des tokens */}
+                  {/* Affichage des crédits */}
                   <div className="px-4 py-2 mb-2">
                     <TokenBalance className="text-white" />
                   </div>

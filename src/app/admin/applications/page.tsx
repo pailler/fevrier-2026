@@ -280,51 +280,51 @@ export default function AdminApplications() {
         if (moduleId.includes('cogstudio') || moduleId.includes('stablediffusion') || moduleId.includes('ruinedfooocus')) {
           tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Application d'intelligence artificielle pour la génération d'images. Coût: ${tokenCost} tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez.`;
+          description = `Application d'intelligence artificielle pour la génération d'images. Coût: ${tokenCost} crédits par accès, et utilisez l'application aussi longtemps que vous souhaitez.`;
         } else if (moduleId.includes('metube') || moduleId.includes('librespeed')) {
           tokenCost = 10;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
           if (moduleId.includes('metube')) {
-            description = `Téléchargeur de vidéos YouTube. Coût: ${tokenCost} tokens par téléchargement.`;
+            description = `Téléchargeur de vidéos YouTube. Coût: ${tokenCost} crédits par téléchargement.`;
           } else {
-            description = `Test de vitesse de connexion internet. Coût: ${tokenCost} tokens par test.`;
+            description = `Test de vitesse de connexion internet. Coût: ${tokenCost} crédits par test.`;
           }
         } else if (moduleId.includes('pdf') || moduleId.includes('psitransfer')) {
           tokenCost = 10;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
           if (moduleId.includes('pdf')) {
-            description = `Convertisseur de documents PDF. Coût: ${tokenCost} tokens par conversion.`;
+            description = `Convertisseur de documents PDF. Coût: ${tokenCost} crédits par conversion.`;
           } else {
-            description = `Service de transfert de fichiers sécurisé. Coût: ${tokenCost} tokens par transfert.`;
+            description = `Service de transfert de fichiers sécurisé. Coût: ${tokenCost} crédits par transfert.`;
           }
         } else if (moduleId.includes('code-learning')) {
           tokenCost = 10;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Application d'apprentissage du code pour enfants. Coût: ${tokenCost} tokens par accès.`;
+          description = `Application d'apprentissage du code pour enfants. Coût: ${tokenCost} crédits par accès.`;
         } else if (moduleId.includes('qrcodes')) {
           tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Générateur de codes QR dynamiques. Coût: ${tokenCost} tokens par génération.`;
+          description = `Générateur de codes QR dynamiques. Coût: ${tokenCost} crédits par génération.`;
         } else if (moduleId.includes('home-assistant') || moduleId.includes('homeassistant')) {
           tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Manuel utilisateur ultra complet pour domotiser votre habitat. Coût: ${tokenCost} tokens par accès.`;
+          description = `Manuel utilisateur ultra complet pour domotiser votre habitat. Coût: ${tokenCost} crédits par accès.`;
         } else if (moduleId.includes('administration')) {
           tokenCost = 10;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Portail centralisé pour accéder rapidement aux principaux services de l'administration française. Coût: ${tokenCost} tokens par accès.`;
+          description = `Portail centralisé pour accéder rapidement aux principaux services de l'administration française. Coût: ${tokenCost} crédits par accès.`;
         } else if (moduleId.includes('prompt-generator')) {
           tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Générateur de prompts optimisés pour ChatGPT et autres modèles de langage. Coût: ${tokenCost} tokens par accès.`;
+          description = `Générateur de prompts optimisés pour ChatGPT et autres modèles de langage. Coût: ${tokenCost} crédits par accès.`;
         } else if (moduleId.includes('ai-detector') || moduleId.includes('detecteur')) {
           tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Détecteur de contenu généré par IA. Analyse les documents texte, PDF, DOCX et images. Coût: ${tokenCost} tokens par accès.`;
+          description = `Détecteur de contenu généré par IA. Analyse les documents texte, PDF, DOCX et images. Coût: ${tokenCost} crédits par accès.`;
         } else {
           tokenCost = 10;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Application utilitaire. Coût: ${tokenCost} tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez.`;
+          description = `Application utilitaire. Coût: ${tokenCost} crédits par accès, et utilisez l'application aussi longtemps que vous souhaitez.`;
         }
 
         // Utiliser le nom du module depuis modulesData si disponible, sinon utiliser la logique de fallback
@@ -1045,7 +1045,7 @@ export default function AdminApplications() {
                             </div>
                             <div className="flex items-center">
                               <span className="mr-1">🪙</span>
-                              {(application as any).tokenCost} tokens/utilisation
+                              {(application as any).tokenCost} crédits/utilisation
                             </div>
                             <div className="flex items-center">
                               <span className="mr-1">💰</span>

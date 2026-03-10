@@ -15,7 +15,7 @@ export default function ApprendreAutrementCardPage() {
   const [checkingActivation, setCheckingActivation] = useState(false);
 
   const moduleId = 'apprendre-autrement';
-  const isFreeModule = false; // Module payant : 10 tokens par accès
+  const isFreeModule = false; // Module payant : 10 crédits par accès
 
   // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
@@ -133,7 +133,7 @@ export default function ApprendreAutrementCardPage() {
           "name": "Combien coûte l'application ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'accès d'Apprendre Autrement coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiate, l'application est accessible depuis vos applications."
+            "text": "L'accès d'Apprendre Autrement coûte 10 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiate, l'application est accessible depuis vos applications."
           }
         },
         {
@@ -440,7 +440,7 @@ export default function ApprendreAutrementCardPage() {
                       <>
                         <span className="text-xl">🌈</span>
                         <span>
-                          {isAuthenticated && user ? 'Accédez à Apprendre Autrement (10 tokens par accès)' : 'Connectez-vous pour accéder (10 tokens par accès)'}
+                          {isAuthenticated && user ? 'Accédez à Apprendre Autrement (10 crédits par accès)' : 'Connectez-vous pour accéder (10 crédits par accès)'}
                         </span>
                       </>
                     )}
@@ -529,7 +529,7 @@ export default function ApprendreAutrementCardPage() {
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à l'application</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Accédez à Apprendre Autrement avec 10 tokens. L'accès est immédiate, l'application est accessible depuis vos applications.
+                          Accédez à Apprendre Autrement avec 10 crédits. L'accès est immédiate, l'application est accessible depuis vos applications.
                         </p>
                       </div>
                     </div>
@@ -674,7 +674,7 @@ export default function ApprendreAutrementCardPage() {
                   <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Combien coûte l'application ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'accès d'Apprendre Autrement coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiate, l'application est accessible depuis vos applications.
+                      L'accès d'Apprendre Autrement coûte 10 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiate, l'application est accessible depuis vos applications.
                     </p>
                   </div>
                   

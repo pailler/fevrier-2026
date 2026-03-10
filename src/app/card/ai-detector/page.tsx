@@ -118,7 +118,7 @@ export default function AIDetectorCardPage() {
                     <li>Détection d'images générées par IA</li>
                     <li>Scores détaillés avec analyse phrase par phrase</li>
                     <li>Détection du style IA (ChatGPT, Claude, etc.)</li>
-                    <li>100 tokens par accès</li>
+                    <li>100 crédits par accès</li>
                   </ul>
                 </div>
               </div>
@@ -176,7 +176,7 @@ export default function AIDetectorCardPage() {
                     ) : (
                       <>
                         <span className="text-xl">🔍</span>
-                        <span>{isAuthenticated && user ? 'Accéder au Détecteur IA (100 tokens)' : 'Connectez-vous pour accéder (100 tokens)'}</span>
+                        <span>{isAuthenticated && user ? 'Accéder au Détecteur IA (100 crédits)' : 'Connectez-vous pour accéder (100 crédits)'}</span>
                       </>
                     )}
                   </button>

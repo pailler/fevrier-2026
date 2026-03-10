@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     if (tokenBalance < 100) {
       return NextResponse.json({
         success: false,
-        error: `Solde de tokens insuffisant. Vous avez ${tokenBalance} tokens, mais 100 tokens sont requis pour activer cette application.`,
+        error: `Solde de crédits insuffisant. Vous avez ${tokenBalance} crédits, mais 100 crédits sont requis pour activer cette application.`,
         requiredTokens: 100,
         currentBalance: tokenBalance,
         pricingUrl: 'https://iahome.fr/pricing2'
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
       if (recheckBalance < 100) {
         return NextResponse.json({
           success: false,
-          error: `Solde de tokens insuffisant. Vous avez ${recheckBalance} tokens, mais 100 tokens sont requis.`,
+          error: `Solde de crédits insuffisant. Vous avez ${recheckBalance} crédits, mais 100 crédits sont requis.`,
           requiredTokens: 100,
           currentBalance: recheckBalance,
           pricingUrl: 'https://iahome.fr/pricing2'

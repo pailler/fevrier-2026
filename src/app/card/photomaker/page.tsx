@@ -39,7 +39,7 @@ export default function PhotoMakerPage() {
     subtitle: 'Personnalisation de photos réalistes par IA via Stacked ID Embedding',
     description: 'PhotoMaker est une technologie révolutionnaire développée par Tencent ARC Lab qui permet de personnaliser des photos réalistes via Stacked ID Embedding. Créez des portraits personnalisés en quelques secondes sans entraînement LoRA supplémentaire, avec une fidélité d\'identité impressionnante, diversité et contrôle textuel.',
     category: 'AI GENERATION',
-    price: '100 tokens',
+    price: '100 crédits',
     image_url: '/images/photomaker.jpg',
     github_url: 'https://github.com/TencentARC/PhotoMaker',
     features: [
@@ -200,7 +200,7 @@ export default function PhotoMakerPage() {
           "name": "Comment utiliser PhotoMaker ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour utiliser PhotoMaker, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via photomaker.iahome.fr. Téléchargez une ou plusieurs photos de la personne que vous souhaitez personnaliser, entrez un prompt textuel détaillé, et PhotoMaker génère automatiquement des portraits personnalisés avec une fidélité d'identité exceptionnelle."
+            "text": "Pour utiliser PhotoMaker, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via photomaker.iahome.fr. Téléchargez une ou plusieurs photos de la personne que vous souhaitez personnaliser, entrez un prompt textuel détaillé, et PhotoMaker génère automatiquement des portraits personnalisés avec une fidélité d'identité exceptionnelle."
           }
         },
         {
@@ -216,7 +216,7 @@ export default function PhotoMakerPage() {
           "name": "PhotoMaker est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'accès de PhotoMaker coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : personnalisation rapide, fidélité d'identité impressionnante, pas d'entraînement LoRA requis, et génération de haute qualité."
+            "text": "L'accès de PhotoMaker coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : personnalisation rapide, fidélité d'identité impressionnante, pas d'entraînement LoRA requis, et génération de haute qualité."
           }
         },
         {
@@ -689,7 +689,7 @@ export default function PhotoMakerPage() {
                         <div>
                           <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à PhotoMaker</h3>
                           <p className="text-gray-700 leading-relaxed">
-                            Accédez à PhotoMaker avec 100 tokens. L'accès est immédiat, le service est accessible depuis vos applications via photomaker.iahome.fr.
+                            Accédez à PhotoMaker avec 100 crédits. L'accès est immédiat, le service est accessible depuis vos applications via photomaker.iahome.fr.
                           </p>
                         </div>
                       </div>
@@ -799,7 +799,7 @@ export default function PhotoMakerPage() {
                           </tr>
                           <tr className="bg-white">
                             <td className="border border-gray-300 p-4 font-semibold">Prix</td>
-                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez</td>
                             <td className="border border-gray-300 p-4 text-center">⚠️ Coûts d'entraînement souvent élevés</td>
                           </tr>
                         </tbody>
@@ -828,7 +828,7 @@ export default function PhotoMakerPage() {
                     <div className="bg-gradient-to-r from-rose-50 to-red-50 p-6 rounded-2xl border-l-4 border-rose-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser PhotoMaker ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        Pour utiliser PhotoMaker, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via photomaker.iahome.fr. Téléchargez une ou plusieurs photos de la personne que vous souhaitez personnaliser, entrez un prompt textuel détaillé, et PhotoMaker génère automatiquement des portraits personnalisés avec une fidélité d'identité exceptionnelle.
+                        Pour utiliser PhotoMaker, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via photomaker.iahome.fr. Téléchargez une ou plusieurs photos de la personne que vous souhaitez personnaliser, entrez un prompt textuel détaillé, et PhotoMaker génère automatiquement des portraits personnalisés avec une fidélité d'identité exceptionnelle.
                       </p>
                     </div>
                     
@@ -842,7 +842,7 @@ export default function PhotoMakerPage() {
                     <div className="bg-gradient-to-r from-fuchsia-50 to-pink-50 p-6 rounded-2xl border-l-4 border-fuchsia-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">PhotoMaker est-il gratuit ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        L'accès de PhotoMaker coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : personnalisation rapide, fidélité d'identité impressionnante, pas d'entraînement LoRA requis, et génération de haute qualité.
+                        L'accès de PhotoMaker coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : personnalisation rapide, fidélité d'identité impressionnante, pas d'entraînement LoRA requis, et génération de haute qualité.
                       </p>
                     </div>
                     
@@ -936,7 +936,7 @@ export default function PhotoMakerPage() {
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez'}
+                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 crédits par accès. Utilisez l\'application aussi longtemps que vous souhaitez'}
                         </p>
                       </div>
                     </div>

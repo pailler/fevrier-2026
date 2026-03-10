@@ -616,9 +616,14 @@ function AuthCallbackContent() {
           console.log('🔍 URL complète:', window.location.href);
           console.log('🔍 Search params complets:', window.location.search);
           
-          // Récupérer le paramètre redirect de l'URL (mais l'ignorer si c'est localhost en production)
-          const redirectParam = searchParams.get('redirect');
-          console.log('🔍 Paramètre redirect de l\'URL:', redirectParam);
+          // Récupérer l'URL de redirection : sessionStorage (OAuth) > paramètre URL > page d'accueil
+          // sessionStorage est utilisé car le paramètre redirect n'est pas préservé lors du flux OAuth Google
+          const storedRedirect = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('auth_redirect') : null;
+          const redirectParam = storedRedirect || searchParams.get('redirect');
+          if (storedRedirect) {
+            sessionStorage.removeItem('auth_redirect');
+          }
+          console.log('🔍 Paramètre redirect (sessionStorage ou URL):', redirectParam);
           
           // Vérifier TOUS les paramètres de l'URL
           const allParams = new URLSearchParams(window.location.search);

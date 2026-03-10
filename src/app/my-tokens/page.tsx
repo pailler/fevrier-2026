@@ -69,11 +69,11 @@ export default function MyTokensPage() {
         setUserTokens(data);
         fetchTokenUsage(userId);
       } else {
-        setError(data.error || 'Erreur lors du chargement des tokens');
+        setError(data.error || 'Erreur lors du chargement des crédits');
       }
     } catch (error) {
       console.error('Erreur lors du chargement des tokens:', error);
-      setError('Erreur lors du chargement des tokens');
+      setError('Erreur lors du chargement des crédits');
     } finally {
       setLoading(false);
     }
@@ -113,9 +113,9 @@ export default function MyTokensPage() {
   };
 
   const getTokenStatusText = (tokens: number) => {
-    if (tokens === 0) return 'Aucun token disponible';
-    if (tokens < 50) return 'Tokens faibles';
-    return 'Tokens disponibles';
+    if (tokens === 0) return 'Aucun crédit disponible';
+    if (tokens < 50) return 'Crédits faibles';
+    return 'Crédits disponibles';
   };
 
   // Contrôles d'accès
@@ -153,12 +153,12 @@ export default function MyTokensPage() {
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-20">
         <Breadcrumb items={[
           { label: 'Accueil', href: '/' },
-          { label: 'Mes Tokens', href: '/my-tokens' }
+          { label: 'Mes crédits', href: '/my-tokens' }
         ]} />
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Mes Tokens</h1>
-          <p className="text-gray-600">Gérez vos tokens et consultez votre historique d'utilisation</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Mes crédits</h1>
+          <p className="text-gray-600">Gérez vos crédits et consultez votre historique d'utilisation</p>
         </div>
 
         {error && (
@@ -180,7 +180,7 @@ export default function MyTokensPage() {
         {/* Carte principale des tokens */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Vos Tokens</h2>
+            <h2 className="text-xl font-semibold text-gray-900">Vos crédits</h2>
             <Link
               href="/pricing2"
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -188,7 +188,7 @@ export default function MyTokensPage() {
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Acheter des tokens
+              Acheter des crédits
             </Link>
           </div>
 
@@ -240,7 +240,7 @@ export default function MyTokensPage() {
                     {userTokens?.isActive ? 'Actif' : 'Inactif'}
                   </p>
                   <p className="text-sm text-purple-600 mt-1">
-                    {userTokens?.isActive ? 'Tokens utilisables' : 'Tokens non disponibles'}
+                    {userTokens?.isActive ? 'Crédits utilisables' : 'Crédits non disponibles'}
                   </p>
                 </div>
                 <div className="text-4xl text-purple-400">
@@ -260,7 +260,7 @@ export default function MyTokensPage() {
               <div className="text-4xl text-gray-400 mb-4">📊</div>
               <p className="text-gray-500">Aucune utilisation enregistrée</p>
               <p className="text-sm text-gray-400 mt-2">
-                Vos utilisations de tokens apparaîtront ici
+                Vos utilisations de crédits apparaîtront ici
               </p>
             </div>
           ) : (
@@ -272,7 +272,7 @@ export default function MyTokensPage() {
                       Module
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Tokens consommés
+                      Crédits consommés
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Date d'utilisation
@@ -292,7 +292,7 @@ export default function MyTokensPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                          -{usage.tokens_consumed} tokens
+                          -{usage.tokens_consumed} crédits
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -308,12 +308,12 @@ export default function MyTokensPage() {
 
         {/* Informations sur les tokens */}
         <div className="bg-blue-50 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-3">Comment utiliser vos tokens ?</h3>
+          <h3 className="text-lg font-semibold text-blue-900 mb-3">Comment utiliser vos crédits ?</h3>
           <div className="space-y-2 text-blue-800">
-            <p>• Les tokens sont automatiquement débités lors de l'utilisation des modules payants</p>
-            <p>• Chaque module consomme un nombre différent de tokens selon sa complexité</p>
-            <p>• Vous pouvez acheter des tokens supplémentaires à tout moment</p>
-            <p>• Les tokens n'expirent pas et restent disponibles dans votre compte</p>
+            <p>• Les crédits sont automatiquement débités lors de l'utilisation des modules payants</p>
+            <p>• Chaque module consomme un nombre différent de crédits selon sa complexité</p>
+            <p>• Vous pouvez acheter des crédits supplémentaires à tout moment</p>
+            <p>• Les crédits n'expirent pas et restent disponibles dans votre compte</p>
             <p>• Consultez l'historique ci-dessus pour voir vos utilisations récentes</p>
           </div>
         </div>

@@ -61,7 +61,7 @@ export default function EmailPreviewPage() {
 
   const getDefaultTemplate = () => {
     return {
-      subject: 'Bienvenue sur IAHome ! Accédez à votre premier module et recevez 200 tokens bonus !',
+      subject: 'Bienvenue sur IAHome ! Accédez à votre premier module et recevez 200 crédits bonus !',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
           <div style="background-color: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -73,10 +73,10 @@ export default function EmailPreviewPage() {
             
             <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0; border-radius: 4px;">
               <p style="color: #92400e; font-size: 18px; font-weight: bold; margin: 0 0 8px 0;">
-                🎁 Offre spéciale : 200 tokens bonus !
+                🎁 Offre spéciale : 200 crédits bonus !
               </p>
               <p style="color: #78350f; font-size: 14px; margin: 0;">
-                Accédez à votre premier module dans les <strong>3 prochains jours</strong> et recevez automatiquement <strong>200 tokens supplémentaires</strong> sur votre compte !
+                Accédez à votre premier module dans les <strong>3 prochains jours</strong> et recevez automatiquement <strong>200 crédits supplémentaires</strong> sur votre compte !
               </p>
             </div>
             

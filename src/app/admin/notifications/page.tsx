@@ -191,29 +191,46 @@ export default function AdminNotifications() {
     }
   };
 
+  const parseEmails = (text: string): string[] => {
+    return text
+      .split(/[\n,;]+/)
+      .map((e) => e.trim().toLowerCase())
+      .filter((e) => e && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+  };
+
   const sendTestNotificationByType = async () => {
-    if (!selectedTestEventType || !testNotificationEmail) {
+    const emails = parseEmails(testNotificationEmail);
+    if (!selectedTestEventType || emails.length === 0) {
       setTestNotificationResult({
         success: false,
-        message: 'Veuillez sélectionner une notification et saisir une adresse email.'
+        message: 'Veuillez sélectionner une notification et saisir au moins une adresse email valide.'
       });
       return;
     }
     setTestNotificationSending(true);
     setTestNotificationResult(null);
     try {
-      const response = await fetch('/api/admin/send-test-notification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          eventType: selectedTestEventType,
-          email: testNotificationEmail,
-          userName: testNotificationUserName || undefined
-        })
-      });
-      const data = await response.json();
-      if (data.success) {
-        setTestNotificationResult({ success: true, message: `Email envoyé avec succès à ${data.email}` });
+      const results: { email: string; success: boolean; error?: string }[] = [];
+      for (const email of emails) {
+        const response = await fetch('/api/admin/send-test-notification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventType: selectedTestEventType,
+            email,
+            userName: testNotificationUserName || undefined
+          })
+        });
+        const data = await response.json();
+        results.push({ email, success: data.success, error: data.error });
+      }
+      const ok = results.filter((r) => r.success).length;
+      const fail = results.filter((r) => !r.success);
+      if (fail.length === 0) {
+        setTestNotificationResult({
+          success: true,
+          message: ok === 1 ? `Email envoyé avec succès à ${emails[0]}` : `${ok} emails envoyés avec succès.`
+        });
         loadData();
         setTimeout(() => {
           setTestNotificationEmail('');
@@ -221,7 +238,11 @@ export default function AdminNotifications() {
           setTestNotificationResult(null);
         }, 4000);
       } else {
-        setTestNotificationResult({ success: false, message: data.error || 'Erreur lors de l\'envoi' });
+        const failedList = fail.map((f) => `${f.email}: ${f.error || 'erreur'}`).join(' ; ');
+        setTestNotificationResult({
+          success: false,
+          message: ok > 0 ? `${ok} envoyé(s), ${fail.length} échec(s): ${failedList}` : failedList
+        });
       }
     } catch (error) {
       console.error('❌ Envoi test notification:', error);
@@ -559,9 +580,9 @@ export default function AdminNotifications() {
 
       {/* Test d'envoi : choix de la notification */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Envoyer un email de test</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Envoyer des emails de test</h2>
         <p className="text-sm text-gray-600 mb-4">
-          Choisissez le type de notification à envoyer, puis l'adresse email de test. L'email reçu sera le vrai contenu du template (sujet et corps).
+          Choisissez le type de notification, puis une ou plusieurs adresses email (séparées par des virgules ou des retours à la ligne). Chaque destinataire recevra le contenu du template (sujet et corps).
         </p>
         {!settings.some((s) => s.event_type === 'relance_offres_iahome') && (
           <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
@@ -622,15 +643,15 @@ export default function AdminNotifications() {
           </div>
           <div>
             <label htmlFor="test-notification-email" className="block text-sm font-medium text-gray-700 mb-1">
-              Adresse email *
+              Adresse(s) email * (une par ligne ou séparées par des virgules)
             </label>
-            <input
+            <textarea
               id="test-notification-email"
-              type="email"
               value={testNotificationEmail}
               onChange={(e) => setTestNotificationEmail(e.target.value)}
-              placeholder="exemple@email.com"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400"
+              placeholder={"exemple@email.com\nautre@email.com\nou email1@test.com, email2@test.com"}
+              rows={4}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400 resize-y"
             />
           </div>
           <div>
@@ -658,11 +679,11 @@ export default function AdminNotifications() {
             disabled={!selectedTestEventType || !testNotificationEmail || testNotificationSending}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
-            {testNotificationSending ? 'Envoi en cours...' : 'Envoyer l\'email de test'}
+            {testNotificationSending ? 'Envoi en cours...' : 'Envoyer mail'}
           </button>
         </div>
         <p className="mt-3 text-xs text-gray-500">
-          Test Resend brut (sans template) : utilisez le champ email ci-dessous puis le bouton « Envoyer test » dans la section Configuration Resend si besoin.
+          Test Resend brut (sans template) : utilisez le champ email ci-dessous puis le bouton « Envoyer mail » dans la section Configuration Resend si besoin.
         </p>
         <div className="flex space-x-4 mt-2">
           <input
@@ -677,7 +698,7 @@ export default function AdminNotifications() {
             disabled={!testEmail || testSending}
             className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
           >
-            {testSending ? 'Envoi...' : 'Envoyer test'}
+            {testSending ? 'Envoi...' : 'Envoyer mail'}
           </button>
         </div>
       </div>
@@ -694,7 +715,7 @@ export default function AdminNotifications() {
                 Envoyer le mail "Sans module accessible"
               </h2>
               <p className="text-sm text-gray-600">
-                Mail de bienvenue avec tutoriel et offre de 200 tokens bonus
+                Mail de bienvenue avec tutoriel et offre de 200 crédits bonus
               </p>
             </div>
           </div>
@@ -769,7 +790,7 @@ export default function AdminNotifications() {
               </div>
               <div className="flex items-start space-x-2">
                 <span className="text-blue-600 mt-0.5">✓</span>
-                <span className="text-sm text-gray-700">200 tokens bonus (3 jours)</span>
+                <span className="text-sm text-gray-700">200 crédits bonus (3 jours)</span>
               </div>
               <div className="flex items-start space-x-2">
                 <span className="text-blue-600 mt-0.5">✓</span>

@@ -350,20 +350,39 @@
             margin-top: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             display: none;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
         }
 
         .result-area.show {
             display: block;
         }
 
+        .result-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
         .result-title {
             font-size: 1.5rem;
             font-weight: 600;
-            margin-bottom: 20px;
             color: #333;
             display: flex;
             align-items: center;
             gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
         }
 
         .result-content {
@@ -376,6 +395,11 @@
             color: #333;
             white-space: pre-wrap;
             word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow-x: auto;
+            max-height: 60vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .loading {
@@ -510,6 +534,55 @@
                 flex-direction: column;
                 text-align: center;
             }
+
+            /* Résultats responsive mobile */
+            .result-area {
+                padding: 16px;
+                margin-top: 20px;
+                margin-left: -4px;
+                margin-right: -4px;
+                border-radius: 12px;
+                max-width: 100vw;
+                box-sizing: border-box;
+            }
+
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .result-title {
+                font-size: 1.25rem;
+            }
+
+            .result-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .btn-copy {
+                padding: 10px 16px;
+                font-size: 0.95rem;
+            }
+
+            .result-content {
+                padding: 16px;
+                font-size: 1rem;
+                max-height: 50vh;
+                min-height: 120px;
+            }
+
+            .container {
+                padding: 20px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .result-content {
+                font-size: 0.95rem;
+                padding: 12px;
+            }
         }
     </style>
 </head>
@@ -608,12 +681,20 @@
 
         <section aria-label="Résultats de transcription" id="results">
             <div class="result-area" id="resultArea">
-            <h2 class="result-title">
-                    <i class="fas fa-file-text"></i>
-                    Résultat de la transcription
-            </h2>
-            <div class="result-content" id="resultContent"></div>
-        </div>
+                <div class="result-header">
+                    <h2 class="result-title">
+                        <i class="fas fa-file-text"></i>
+                        Résultat de la transcription
+                    </h2>
+                    <div class="result-actions">
+                        <button type="button" class="btn btn-copy" id="copyBtn" onclick="copyTranscriptionToClipboard()" title="Copier le texte">
+                            <i class="fas fa-copy"></i>
+                            <span class="btn-copy-text">Copier</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="result-content" id="resultContent"></div>
+            </div>
         </section>
 
         <section class="supported-formats" id="features" aria-label="Formats de fichiers supportés">
@@ -767,6 +848,21 @@
             
             resultContent.textContent = content;
             resultArea.classList.add('show');
+        }
+
+        function copyTranscriptionToClipboard() {
+            const text = resultContent?.textContent?.trim();
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('copyBtn');
+                const span = btn?.querySelector('.btn-copy-text');
+                if (span) {
+                    span.textContent = 'Copié !';
+                    setTimeout(() => { span.textContent = 'Copier'; }, 2000);
+                }
+            }).catch(() => {
+                alert('Impossible de copier le texte');
+            });
         }
 
         // File input handling

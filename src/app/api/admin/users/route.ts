@@ -131,11 +131,12 @@ export async function GET() {
       );
     }
 
-    // Récupérer tous les profils utilisateurs
-    const { data: profiles, error: profilesError } = await supabase
+    // Récupérer tous les profils utilisateurs (ordre: plus ancien inscrit en premier, pour numérotation 1..N)
+    const { data: profilesRaw, error: profilesError } = await supabase
       .from('profiles')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: true });
+    const profiles = (profilesRaw || []).slice().reverse(); // plus récent en premier pour l'affichage
 
     if (profilesError) {
       console.error('❌ Erreur lors de la récupération des profils:', profilesError);
@@ -271,7 +272,8 @@ export async function GET() {
       consumedByUser.set(app.user_id, list);
     }
 
-    const usersWithApplications = profiles.map((profile) => {
+    const totalUsers = profiles.length;
+    const usersWithApplications = profiles.map((profile, index) => {
       const rawApps = appsByUser.get(profile.id) || [];
       const normalizedApps = rawApps
         .map((app) => {
@@ -361,8 +363,12 @@ export async function GET() {
         activeModules.includes(app.moduleId)
       );
 
+      // Numéro d'inscription : 1 = plus ancien inscrit, N = plus récent
+      const userNumber = totalUsers - index;
+
       return {
         id: profile.id,
+        userNumber,
         email: profile.email,
         fullName: profile.full_name || profile.email,
         role: profile.role || 'user',

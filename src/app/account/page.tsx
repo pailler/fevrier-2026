@@ -439,11 +439,11 @@ export default function AccountPage() {
 
           {/* Colonne latérale - Statistiques */}
           <div className="space-y-6">
-            {/* Carte Tokens */}
+            {/* Carte Crédits */}
             <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg p-6 text-white">
               <h2 className="text-xl font-bold mb-4 flex items-center">
                 <span className="mr-2">🪙</span>
-                Mes tokens
+                Mes crédits
               </h2>
               {tokensLoading ? (
                 <div className="text-center py-4">
@@ -454,12 +454,12 @@ export default function AccountPage() {
                   <div className="text-4xl font-bold mb-2">
                     {tokens !== null ? tokens.toLocaleString() : '0'}
                   </div>
-                  <p className="text-blue-100 text-sm mb-4">tokens disponibles</p>
+                  <p className="text-blue-100 text-sm mb-4">crédits disponibles</p>
                   <Link
                     href="/pricing2"
                     className="block w-full text-center px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 font-semibold transition-colors"
                   >
-                    Acheter des tokens
+                    Acheter des crédits
                   </Link>
                 </>
               )}
@@ -510,7 +510,7 @@ export default function AccountPage() {
                   href="/pricing2"
                   className="block w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-center font-medium transition-colors"
                 >
-                  Acheter des tokens
+                  Acheter des crédits
                 </Link>
               </div>
             </div>
@@ -522,7 +522,7 @@ export default function AccountPage() {
                 Zone dangereuse
               </h2>
               <p className="text-gray-600 text-sm mb-4">
-                La suppression de votre compte est définitive. Toutes vos données (profil, applications, tokens) seront supprimées.
+                La suppression de votre compte est définitive. Toutes vos données (profil, applications, crédits) seront supprimées.
               </p>
               <button
                 type="button"

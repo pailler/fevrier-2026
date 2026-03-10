@@ -23,7 +23,7 @@ export default function Header() {
   const isInIframe = useIframeDetection();
 
   // Pages où le Header ne doit pas être affiché
-  const PAGES_WITHOUT_HEADER = ['/code-learning', '/administration', '/ai-detector'];
+  const PAGES_WITHOUT_HEADER = ['/code-learning', '/administration', '/ai-detector', '/sentinelle-numerique'];
   
   // Vérifier si le Header doit être masqué
   const shouldHideHeader = pathname && PAGES_WITHOUT_HEADER.some(page => 
@@ -207,7 +207,10 @@ export default function Header() {
     
     // Vérifier si l'utilisateur est connecté
     if (!user?.id) {
-      router.push('/login');
+      const redirect = pathname && !['/login', '/signup'].includes(pathname)
+        ? `?redirect=${encodeURIComponent(pathname)}`
+        : '';
+      router.push(`/login${redirect}`);
       return null;
     }
     
@@ -264,7 +267,10 @@ export default function Header() {
                     e.preventDefault();
                     e.stopPropagation();
                     await signOut();
-                    router.push('/login');
+                    const redirect = pathname && !['/login', '/signup'].includes(pathname)
+                      ? `?redirect=${encodeURIComponent(pathname)}`
+                      : '';
+                    router.push(`/login${redirect}`);
                   } catch (error) {
                     console.error('Erreur lors de la déconnexion:', error);
                   }
@@ -276,7 +282,9 @@ export default function Header() {
             ) : (
               <div className="flex items-center space-x-3">
                 <Link 
-                  href="/login" 
+                  href={pathname && !['/login', '/signup'].includes(pathname) 
+                    ? `/login?redirect=${encodeURIComponent(pathname)}` 
+                    : '/login'} 
                   className="text-blue-100 hover:text-white text-sm font-medium transition-colors"
                 >
                   Se connecter
@@ -318,7 +326,7 @@ export default function Header() {
               <span className="text-lg sm:text-xl font-bold text-white">IAhome</span>
             </Link>
             
-            {/* Bouton "Mes applis" avec tokens - Desktop et Mobile - VERSION 4.0.0 */}
+            {/* Bouton "Mes applis" avec crédits - Desktop et Mobile - VERSION 4.0.0 */}
             {isAuthenticated && user && (
               <div className="flex items-center space-x-1 md:space-x-3 flex-shrink-0 relative z-0 mr-3 md:mr-0" data-button-version="4.0.0">
                 <Link
@@ -415,7 +423,7 @@ export default function Header() {
               >
                 Blog
               </Link>
-              {/* Affichage des tokens après Blog */}
+              {/* Affichage des crédits après Blog */}
               {isAuthenticated && user && !tokensLoading && (
                 <div className="flex items-center space-x-1 px-2 py-1 rounded-md bg-white/10 border border-white/20">
                   <span className="text-sm">🪙</span>
@@ -441,7 +449,7 @@ export default function Header() {
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated && (
               <>
-                {/* Le bouton "Mes applis" est maintenant près du logo, on garde juste les tokens ici si besoin */}
+                {/* Le bouton "Mes applis" est maintenant près du logo, on garde juste les crédits ici si besoin */}
               </>
             )}
             
@@ -557,7 +565,7 @@ export default function Header() {
                 >
                   Blog
                 </Link>
-                {/* Affichage des tokens après Blog (mobile menu) */}
+                {/* Affichage des crédits après Blog (mobile menu) */}
                 {isAuthenticated && user && !tokensLoading && (
                   <div className="px-4 py-2 flex items-center space-x-2 text-white">
                     <span className="text-base">🪙</span>
@@ -666,7 +674,10 @@ export default function Header() {
                           e.stopPropagation();
                           setIsMobileMenuOpen(false);
                           await signOut();
-                          router.push('/login');
+                          const redirect = pathname && !['/login', '/signup'].includes(pathname)
+                            ? `?redirect=${encodeURIComponent(pathname)}`
+                            : '';
+                          router.push(`/login${redirect}`);
                         } catch (error) {
                           console.error('Erreur lors de la déconnexion:', error);
                           // Fermer le menu même en cas d'erreur

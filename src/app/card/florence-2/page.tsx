@@ -39,7 +39,7 @@ export default function Florence2Page() {
     subtitle: 'Modèle vision-language unifié pour multiples tâches de vision par ordinateur',
     description: 'Florence-2 est un modèle vision-language révolutionnaire développé par Microsoft qui permet d\'exécuter plus de 10 tâches de vision par ordinateur avec un seul modèle. Entraîné sur le dataset FLD-5B (5,4 milliards d\'annotations sur 126 millions d\'images), Florence-2 peut effectuer du captioning, de la détection d\'objets, de la segmentation, de l\'OCR et bien plus encore, le tout avec un modèle compact de 0,23B ou 0,77B paramètres.',
     category: 'AI VISION',
-    price: '100 tokens',
+    price: '100 crédits',
     image_url: '/images/florence-2.jpg',
     github_url: 'https://github.com/anyantudre/Florence-2-Vision-Language-Model',
     features: [
@@ -200,7 +200,7 @@ export default function Florence2Page() {
           "name": "Comment utiliser Florence-2 ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour utiliser Florence-2, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via florence2.iahome.fr. Florence-2 utilise des prompts textuels spécifiques pour chaque tâche (comme <CAPTION>, <OD> pour object detection, <OCR>, etc.) et génère les résultats correspondants."
+            "text": "Pour utiliser Florence-2, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via florence2.iahome.fr. Florence-2 utilise des prompts textuels spécifiques pour chaque tâche (comme <CAPTION>, <OD> pour object detection, <OCR>, etc.) et génère les résultats correspondants."
           }
         },
         {
@@ -216,7 +216,7 @@ export default function Florence2Page() {
           "name": "Florence-2 est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'accès de Florence-2 coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : captioning, détection d'objets, segmentation, OCR, et toutes les autres tâches supportées par le modèle."
+            "text": "L'accès de Florence-2 coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : captioning, détection d'objets, segmentation, OCR, et toutes les autres tâches supportées par le modèle."
           }
         },
         {
@@ -478,7 +478,7 @@ export default function Florence2Page() {
             <div className="space-y-6">
               {/* Boutons d'action */}
               <div className="space-y-4">
-                {/* Bouton d'accès avec tokens */}
+                {/* Bouton d'accès avec crédits */}
                 <div className="w-3/4 mx-auto">
                   <ModuleAccessButton
                     moduleId={card.id}
@@ -692,7 +692,7 @@ export default function Florence2Page() {
                         <div>
                           <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à Florence-2</h3>
                           <p className="text-gray-700 leading-relaxed">
-                            Accédez à Florence-2 avec 100 tokens. L'accès est immédiat, le service est accessible depuis vos applications via florence2.iahome.fr.
+                            Accédez à Florence-2 avec 100 crédits. L'accès est immédiat, le service est accessible depuis vos applications via florence2.iahome.fr.
                           </p>
                         </div>
                       </div>
@@ -802,7 +802,7 @@ export default function Florence2Page() {
                           </tr>
                           <tr className="bg-white">
                             <td className="border border-gray-300 p-4 font-semibold">Prix</td>
-                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez</td>
                             <td className="border border-gray-300 p-4 text-center">⚠️ Coûts variables</td>
                           </tr>
                         </tbody>
@@ -831,7 +831,7 @@ export default function Florence2Page() {
                     <div className="bg-gradient-to-r from-cyan-50 to-teal-50 p-6 rounded-2xl border-l-4 border-cyan-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser Florence-2 ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        Pour utiliser Florence-2, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via florence2.iahome.fr. Florence-2 utilise des prompts textuels spécifiques pour chaque tâche (comme &lt;CAPTION&gt; pour les légendes, &lt;OD&gt; pour la détection d'objets, &lt;OCR&gt; pour l'extraction de texte, etc.) et génère les résultats correspondants.
+                        Pour utiliser Florence-2, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via florence2.iahome.fr. Florence-2 utilise des prompts textuels spécifiques pour chaque tâche (comme &lt;CAPTION&gt; pour les légendes, &lt;OD&gt; pour la détection d'objets, &lt;OCR&gt; pour l'extraction de texte, etc.) et génère les résultats correspondants.
                       </p>
                     </div>
                     
@@ -845,7 +845,7 @@ export default function Florence2Page() {
                     <div className="bg-gradient-to-r from-blue-50 to-sky-50 p-6 rounded-2xl border-l-4 border-blue-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Florence-2 est-il gratuit ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        L'accès de Florence-2 coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : captioning, détection d'objets, segmentation, OCR, et toutes les autres tâches supportées par le modèle.
+                        L'accès de Florence-2 coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : captioning, détection d'objets, segmentation, OCR, et toutes les autres tâches supportées par le modèle.
                       </p>
                     </div>
                     
@@ -939,7 +939,7 @@ export default function Florence2Page() {
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez'}
+                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 crédits par accès. Utilisez l\'application aussi longtemps que vous souhaitez'}
                         </p>
                       </div>
                     </div>

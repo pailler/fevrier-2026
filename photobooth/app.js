@@ -2,6 +2,7 @@ const tabs = document.querySelectorAll(".card");
 const panels = {
   join: document.getElementById("panel-join"),
   create: document.getElementById("panel-create"),
+  choice: document.getElementById("panel-choice"),
 };
 
 const page = document.querySelector(".page");
@@ -14,6 +15,7 @@ const EVENTS_KEY = "photobooth_events";
 const SESSION_EVENT_KEY = "photobooth_current_event";
 const MODULE_ID = "photobooth";
 let hasValidAccess = false;
+let currentJoinEvent = null;
 
 function setFeedback(node, message = "", type = "") {
   node.textContent = message;
@@ -151,6 +153,33 @@ function openStudio(eventData) {
   window.location.href = url.toString();
 }
 
+function openGallery(eventData) {
+  sessionStorage.setItem(SESSION_EVENT_KEY, JSON.stringify(eventData));
+  const currentToken = readTokenFromUrl();
+  const url = new URL("./gallery.html", window.location.href);
+  url.searchParams.set("eventId", eventData.id);
+  if (currentToken) url.searchParams.set("token", currentToken);
+  window.location.href = url.toString();
+}
+
+function showChoicePanel(eventData) {
+  currentJoinEvent = eventData;
+  panels.join.classList.remove("active");
+  panels.create.classList.remove("active");
+  panels.choice.classList.add("active");
+  document.body.classList.add("choice-fullscreen");
+  document.getElementById("choice-event-name").textContent = eventData.name;
+  document.getElementById("choice-event-meta").textContent = `PIN ${eventData.pin} • Organise par ${eventData.host}`;
+}
+
+function showJoinPanel() {
+  currentJoinEvent = null;
+  panels.choice.classList.remove("active");
+  panels.create.classList.remove("active");
+  panels.join.classList.add("active");
+  document.body.classList.remove("choice-fullscreen");
+}
+
 async function createEvent(name, host) {
   const response = await fetch("/api/events", {
     method: "POST",
@@ -175,7 +204,28 @@ async function findEventByPin(pin) {
   return data.event;
 }
 
+async function findEventById(eventId) {
+  const response = await fetch(`/api/events/${encodeURIComponent(eventId)}`);
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.error || "Evenement introuvable.");
+  }
+  const data = await response.json();
+  return data.event;
+}
+
+async function restoreChoicePanelFromUrl() {
+  const url = new URL(window.location.href);
+  const eventId = url.searchParams.get("eventId");
+  if (!eventId || !hasValidAccess) return;
+  try {
+    const eventData = await findEventById(eventId);
+    showChoicePanel(eventData);
+  } catch { /* ignorer si evenement invalide */ }
+}
+
 hasValidAccess = validateAccessToken();
+restoreChoicePanelFromUrl();
 
 tabs.forEach((tab) => {
   tab.addEventListener("click", () => showTab(tab.dataset.tab));
@@ -202,12 +252,9 @@ document.getElementById("verify-code").addEventListener("click", () => {
 
   try {
     const eventData = await findEventByPin(code);
-    setFeedback(
-      joinFeedback,
-      `Code valide. Redirection vers le studio "${eventData.name}"...`,
-      "success"
-    );
-    setTimeout(() => openStudio(eventData), 300);
+    setFeedback(joinFeedback, "Code valide !", "success");
+    showChoicePanel(eventData);
+    joinInput.value = "";
   } catch (error) {
     setFeedback(
       joinFeedback,
@@ -217,6 +264,16 @@ document.getElementById("verify-code").addEventListener("click", () => {
   }
   })();
 });
+
+document.getElementById("btn-take-photo").addEventListener("click", () => {
+  if (currentJoinEvent) openStudio(currentJoinEvent);
+});
+
+document.getElementById("btn-gallery").addEventListener("click", () => {
+  if (currentJoinEvent) openGallery(currentJoinEvent);
+});
+
+document.getElementById("choice-back").addEventListener("click", showJoinPanel);
 
 document.getElementById("create-event").addEventListener("click", () => {
   (async () => {

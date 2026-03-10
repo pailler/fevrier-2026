@@ -47,9 +47,9 @@ export default function UnifiedModuleButton({
       </button>
       {error && (
         <p className="text-red-500 text-sm">
-          {error.includes('Rechargez') || error.includes('tokens') ? (
+          {error.includes('Rechargez') || error.includes('tokens') || error.includes('crédits') ? (
             <>
-              Plus de tokens ?{' '}
+              Plus de crédits ?{' '}
               <a 
                 href="https://iahome.fr/pricing2" 
                 target="_blank" 

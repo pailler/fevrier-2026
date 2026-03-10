@@ -109,7 +109,7 @@ export default function PDFPage() {
           "name": "Est-ce gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'IA PDF de IA Home est accessible avec un système de tokens. 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. Consultez la page d'accès pour connaître les détails de tarification et les options disponibles."
+            "text": "L'IA PDF de IA Home est accessible avec un système de crédits. 10 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. Consultez la page d'accès pour connaître les détails de tarification et les options disponibles."
           }
         },
         {
@@ -392,7 +392,7 @@ export default function PDFPage() {
               >
                 <span className="text-xl">📄</span>
                 <span>
-                  {isAuthenticated && user ? 'Accédez à PDF+ (10 tokens par accès)' : 'Connectez-vous pour accéder PDF+ (10 tokens par accès)'}
+                  {isAuthenticated && user ? 'Accédez à PDF+ (10 crédits par accès)' : 'Connectez-vous pour accéder PDF+ (10 crédits par accès)'}
                 </span>
               </button>
             </div>
@@ -634,7 +634,7 @@ export default function PDFPage() {
                   <div className="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-2xl border-l-4 border-red-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Est-ce gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'IA PDF de IA Home est accessible avec un système de tokens. 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. Consultez la page d'accès pour connaître les détails de tarification et les options disponibles.
+                      L'IA PDF de IA Home est accessible avec un système de crédits. 10 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. Consultez la page d'accès pour connaître les détails de tarification et les options disponibles.
                     </p>
                   </div>
                   

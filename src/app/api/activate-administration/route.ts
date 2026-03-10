@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     if (currentTokens < moduleCost) {
       return NextResponse.json({ 
         success: false, 
-        error: `Tokens insuffisants. Vous avez ${currentTokens} tokens, ${moduleCost} tokens sont requis.` 
+        error: `Crédits insuffisants. Vous avez ${currentTokens} crédits, ${moduleCost} crédits sont requis.` 
       }, { status: 400 });
     }
 

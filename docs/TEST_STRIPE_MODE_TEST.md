@@ -1,6 +1,6 @@
 # Guide de Test - Gestion des Tokens avec Stripe Mode Test
 
-Ce guide explique comment tester la gestion des tokens avec Stripe en mode test.
+Ce guide explique comment tester la gestion des crédits avec Stripe en mode test.
 
 ## 📋 Prérequis
 
@@ -52,7 +52,7 @@ STRIPE_FORCE_TEST_PRICE=true
 
 ### Test 1 : Abonnement Mensuel (Mode Test)
 
-**Objectif** : Vérifier que les tokens sont crédités lors d'un abonnement mensuel en mode test.
+**Objectif** : Vérifier que les crédits sont crédités lors d'un abonnement mensuel en mode test.
 
 **Étapes** :
 
@@ -67,7 +67,7 @@ STRIPE_FORCE_TEST_PRICE=true
 5. **Complétez le paiement**
 6. **Vérifiez** :
    - Redirection vers `/payment-success`
-   - Les tokens sont crédités (3000 tokens)
+   - Les crédits sont crédités (3000 crédits)
    - La transaction est enregistrée dans `user_credit_transactions`
 
 **Vérification dans les logs** :
@@ -75,13 +75,13 @@ STRIPE_FORCE_TEST_PRICE=true
 ✅ ===== CHECKOUT SESSION COMPLETED =====
 ✅ Session de paiement complétée: cs_test_...
 ✅ ===== TOKENS CRÉDITÉS AVEC SUCCÈS =====
-✅ 3000 tokens crédités pour regispailler@gmail.com (abonnement initial)
+✅ 3000 crédits crédités pour regispailler@gmail.com (abonnement initial)
 ```
 
 **Vérification dans Supabase** :
 ```sql
--- Vérifier les tokens
-SELECT * FROM user_tokens 
+-- Vérifier les crédits
+SELECT * FROM user_crédits 
 WHERE user_id = (SELECT id FROM profiles WHERE email = 'regispailler@gmail.com');
 
 -- Vérifier les transactions
@@ -94,41 +94,41 @@ ORDER BY created_at DESC;
 
 ### Test 2 : Abonnement Annuel (Mode Test)
 
-**Objectif** : Vérifier que les tokens sont crédités lors d'un abonnement annuel en mode test.
+**Objectif** : Vérifier que les crédits sont crédités lors d'un abonnement annuel en mode test.
 
 **Étapes** : Identiques au Test 1, mais sélectionnez l'abonnement annuel.
 
 **Vérification** :
-- 3000 tokens crédités (quota mensuel)
+- 3000 crédits crédités (quota mensuel)
 - Transaction enregistrée avec `package_type = 'subscription_yearly'`
 
 ---
 
 ### Test 3 : Pack Standard (Achat Unique - Mode Test)
 
-**Objectif** : Vérifier que les tokens sont ajoutés (pas remplacés) lors d'un achat unique.
+**Objectif** : Vérifier que les crédits sont ajoutés (pas remplacés) lors d'un achat unique.
 
 **Étapes** :
 
-1. **Notez le nombre de tokens actuels** de l'utilisateur
+1. **Notez le nombre de crédits actuels** de l'utilisateur
 2. **Allez sur** `/pricing2`
 3. **Cliquez sur** "Acheter" pour le Pack Standard
 4. **Complétez le paiement** avec la carte de test
 5. **Vérifiez** :
-   - Les tokens sont **ajoutés** (pas remplacés)
-   - Si l'utilisateur avait 1000 tokens, il devrait avoir 4000 tokens (1000 + 3000)
+   - Les crédits sont **ajoutés** (pas remplacés)
+   - Si l'utilisateur avait 1000 crédits, il devrait avoir 4000 crédits (1000 + 3000)
 
 **Vérification dans les logs** :
 ```
 ✅ ===== TOKENS CRÉDITÉS AVEC SUCCÈS (ACHAT UNIQUE) =====
-✅ 3000 tokens ajoutés (Total: 4000)
+✅ 3000 crédits ajoutés (Total: 4000)
 ```
 
 ---
 
 ### Test 4 : Renouvellement d'Abonnement (Mode Test)
 
-**Objectif** : Vérifier que les tokens sont remplacés (pas ajoutés) lors d'un renouvellement.
+**Objectif** : Vérifier que les crédits sont remplacés (pas ajoutés) lors d'un renouvellement.
 
 **Étapes** :
 
@@ -139,14 +139,14 @@ ORDER BY created_at DESC;
    - Sélectionnez `invoice.payment_succeeded`
    - Cliquez sur **"Send test webhook"**
 4. **Vérifiez** :
-   - Les tokens sont **remplacés** par 3000 (pas ajoutés)
-   - Si l'utilisateur avait 500 tokens, il devrait avoir 3000 tokens (pas 3500)
+   - Les crédits sont **remplacés** par 3000 (pas ajoutés)
+   - Si l'utilisateur avait 500 crédits, il devrait avoir 3000 crédits (pas 3500)
 
 **Vérification dans les logs** :
 ```
 ✅ Paiement d'abonnement réussi: in_test_...
 🔄 Mise à jour quota mensuel (REMPLACEMENT):
-   Tokens précédents: 500 → Nouveaux tokens: 3000 (REMPLACEMENT)
+   Tokens précédents: 500 → Nouveaux crédits: 3000 (REMPLACEMENT)
 ✅ ===== TOKENS CRÉDITÉS AVEC SUCCÈS (RENOUVELLEMENT) =====
 ```
 
@@ -170,10 +170,10 @@ Les logs doivent afficher :
 📧 Email client: regispailler@gmail.com
 📦 Package type: subscription_monthly
 💰 Montant: 0.50€
-🔄 Crédit tokens abonnement initial (REMPLACEMENT):
-   Tokens précédents: 0 → Nouveaux tokens: 3000 (REMPLACEMENT)
+🔄 Crédit crédits abonnement initial (REMPLACEMENT):
+   Tokens précédents: 0 → Nouveaux crédits: 3000 (REMPLACEMENT)
 ✅ ===== TOKENS CRÉDITÉS AVEC SUCCÈS =====
-✅ 3000 tokens crédités pour regispailler@gmail.com (abonnement initial)
+✅ 3000 crédits crédités pour regispailler@gmail.com (abonnement initial)
 ✅ Transaction enregistrée dans user_credit_transactions (checkout)
 ```
 
@@ -203,12 +203,12 @@ Les logs doivent afficher :
 1. Vérifiez que `STRIPE_WEBHOOK_SECRET` correspond au secret du webhook de test
 2. Vérifiez que vous utilisez le bon secret (test vs production)
 
-### Problème : Les tokens ne sont pas crédités
+### Problème : Les crédits ne sont pas crédités
 
 **Solution** :
 1. Vérifiez les logs du serveur pour voir les erreurs
 2. Vérifiez que l'utilisateur existe dans Supabase avec l'email correct
-3. Vérifiez que la table `user_tokens` existe et est accessible
+3. Vérifiez que la table `user_crédits` existe et est accessible
 4. Utilisez le script `scripts/verify-stripe-session.ps1` pour vérifier manuellement
 
 ---
@@ -221,10 +221,10 @@ Les logs doivent afficher :
 .\scripts\verify-stripe-session.ps1 -SessionId 'cs_test_...'
 ```
 
-### Script 2 : Créditer manuellement des tokens
+### Script 2 : Créditer manuellement des crédits
 
 ```powershell
-.\scripts\credit-tokens-subscription.ps1 -Email 'regispailler@gmail.com' -Tokens 3000 -PackageType 'subscription_monthly'
+.\scripts\credit-crédits-subscription.ps1 -Email 'regispailler@gmail.com' -Tokens 3000 -PackageType 'subscription_monthly'
 ```
 
 ---

@@ -84,6 +84,7 @@ export async function POST(request: NextRequest) {
       packageType, 
       userId, 
       userEmail,
+      promotion_code_id: promotion_code_id || '(aucun)',
       userEmailType: typeof userEmail,
       userEmailLength: userEmail?.length,
       userEmailTrimmed: userEmail?.trim()
@@ -126,7 +127,8 @@ export async function POST(request: NextRequest) {
         .substring(0, 500); // Limiter la longueur
     };
 
-    const discounts = promotion_code_id && typeof promotion_code_id === 'string' && promotion_code_id.startsWith('prom_')
+    // Stripe promotion code IDs start with "promo_" (not "prom_")
+    const discounts = promotion_code_id && typeof promotion_code_id === 'string' && promotion_code_id.startsWith('promo_')
       ? [{ promotion_code: promotion_code_id }]
       : undefined;
 
@@ -154,7 +156,7 @@ export async function POST(request: NextRequest) {
         mode: 'subscription',
         success_url: `${baseUrl}/payment-success?package=${packageType}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/pricing2?canceled=true`,
-        ...(discounts && { discounts }),
+        ...(discounts ? { discounts } : { allow_promotion_codes: true }),
         metadata: {
           userId: cleanMetadataValue(userId),
           userEmail: cleanMetadataValue(userEmail),
@@ -206,7 +208,7 @@ export async function POST(request: NextRequest) {
         mode: 'payment',
         success_url: `${baseUrl}/payment-success?package=${packageType}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/pricing2?canceled=true`,
-        ...(discounts && { discounts }),
+        ...(discounts ? { discounts } : { allow_promotion_codes: true }),
         metadata: {
           userId: cleanMetadataValue(userId),
           userEmail: cleanMetadataValue(userEmail),

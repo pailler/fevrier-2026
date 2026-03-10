@@ -24,7 +24,7 @@ export default function MarketingPage() {
     {
       icon: '💰',
       title: 'Offres Transparentes',
-      description: 'Système de tokens dégressif. Plus vous achetez, plus vous économisez. À partir de 4,99€.'
+      description: 'Système de crédits dégressif. Plus vous achetez, plus vous économisez. À partir de 4,99€.'
     },
     {
       icon: '🔒',
@@ -43,8 +43,8 @@ export default function MarketingPage() {
     },
     {
       icon: '🎁',
-      title: '200 tokens offerts',
-      description: '200 tokens offerts pour tout nouvel utilisateur. Commencez à utiliser nos services immédiatement sans dépenser un centime.'
+      title: '200 crédits offerts',
+      description: '200 crédits offerts pour tout nouvel utilisateur. Commencez à utiliser nos services immédiatement sans dépenser un centime.'
     }
   ];
 
@@ -283,7 +283,7 @@ export default function MarketingPage() {
                 </div>
               </div>
               <p className="text-gray-700 mb-4 italic">
-                "J'ai testé plusieurs solutions IA et IA Home est de loin la meilleure. Les outils PDF sont parfaits pour traiter mes documents, et le système de tokens est très flexible. Je ne peux plus m'en passer !"
+                "J'ai testé plusieurs solutions IA et IA Home est de loin la meilleure. Les outils PDF sont parfaits pour traiter mes documents, et le système de crédits est très flexible. Je ne peux plus m'en passer !"
               </p>
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-3">

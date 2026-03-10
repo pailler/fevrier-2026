@@ -216,7 +216,7 @@ export default function WhisperPage() {
           "name": "Comment utiliser Whisper IA ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pour utiliser Whisper IA, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via whisper.iahome.fr. Uploadez vos fichiers audio, vidéo ou images, sélectionnez la langue si nécessaire, et l'IA génère automatiquement la transcription ou la reconnaissance de texte. Vous pouvez ensuite télécharger le résultat en format texte ou l'utiliser directement dans votre workflow."
+            "text": "Pour utiliser Whisper IA, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via whisper.iahome.fr. Uploadez vos fichiers audio, vidéo ou images, sélectionnez la langue si nécessaire, et l'IA génère automatiquement la transcription ou la reconnaissance de texte. Vous pouvez ensuite télécharger le résultat en format texte ou l'utiliser directement dans votre workflow."
           }
         },
         {
@@ -232,7 +232,7 @@ export default function WhisperPage() {
           "name": "Whisper IA est-il gratuit ?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "L'accès de Whisper IA coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : transcription audio/vidéo, reconnaissance de texte (OCR), support multilingue, et interface moderne. Il n'y a pas de frais supplémentaires pour le traitement des fichiers."
+            "text": "L'accès de Whisper IA coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : transcription audio/vidéo, reconnaissance de texte (OCR), support multilingue, et interface moderne. Il n'y a pas de frais supplémentaires pour le traitement des fichiers."
           }
         },
         {
@@ -713,7 +713,7 @@ export default function WhisperPage() {
                         <div>
                           <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à Whisper IA</h3>
                           <p className="text-gray-700 leading-relaxed">
-                            Accédez à Whisper IA avec 100 tokens. L'accès est immédiat, le service est accessible depuis vos applications via whisper.iahome.fr.
+                            Accédez à Whisper IA avec 100 crédits. L'accès est immédiat, le service est accessible depuis vos applications via whisper.iahome.fr.
                           </p>
                         </div>
                       </div>
@@ -823,7 +823,7 @@ export default function WhisperPage() {
                           </tr>
                           <tr className="bg-white">
                             <td className="border border-gray-300 p-4 font-semibold">Prix</td>
-                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez</td>
                             <td className="border border-gray-300 p-4 text-center">⚠️ Abonnements mensuels souvent chers</td>
                           </tr>
                         </tbody>
@@ -852,7 +852,7 @@ export default function WhisperPage() {
                     <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser Whisper IA ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        Pour utiliser Whisper IA, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via whisper.iahome.fr. Uploadez vos fichiers audio, vidéo ou images, sélectionnez la langue si nécessaire, et l'IA génère automatiquement la transcription ou la reconnaissance de texte. Vous pouvez ensuite télécharger le résultat en format texte ou l'utiliser directement dans votre workflow.
+                        Pour utiliser Whisper IA, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via whisper.iahome.fr. Uploadez vos fichiers audio, vidéo ou images, sélectionnez la langue si nécessaire, et l'IA génère automatiquement la transcription ou la reconnaissance de texte. Vous pouvez ensuite télécharger le résultat en format texte ou l'utiliser directement dans votre workflow.
                       </p>
                     </div>
                     
@@ -866,7 +866,7 @@ export default function WhisperPage() {
                     <div className="bg-gradient-to-r from-pink-50 to-rose-50 p-6 rounded-2xl border-l-4 border-pink-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Whisper IA est-il gratuit ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        L'accès de Whisper IA coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : transcription audio/vidéo, reconnaissance de texte (OCR), support multilingue, et interface moderne. Il n'y a pas de frais supplémentaires pour le traitement des fichiers.
+                        L'accès de Whisper IA coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : transcription audio/vidéo, reconnaissance de texte (OCR), support multilingue, et interface moderne. Il n'y a pas de frais supplémentaires pour le traitement des fichiers.
                       </p>
                     </div>
                     

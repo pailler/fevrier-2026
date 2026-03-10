@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       console.log('❌ Activation module: Utilisateur sans tokens:', userEmail);
       return NextResponse.json(
         { 
-          error: 'Tokens insuffisants',
+          error: 'Crédits insuffisants',
           currentTokens: 0,
           requiredTokens: moduleCost,
           insufficient: true,
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     if (currentTokens < moduleCost) {
       return NextResponse.json(
         { 
-          error: 'Tokens insuffisants',
+          error: 'Crédits insuffisants',
           currentTokens: currentTokens,
           requiredTokens: moduleCost,
           insufficient: true
@@ -98,8 +98,8 @@ export async function POST(request: NextRequest) {
       console.error('Erreur lors de la mise à jour des tokens:', updateError);
       return NextResponse.json(
         { 
-          error: 'Plus de tokens ? Rechargez',
-          message: 'Plus de tokens ? Rechargez',
+          error: 'Plus de crédits ? Rechargez',
+          message: 'Plus de crédits ? Rechargez',
           pricingUrl: 'https://iahome.fr/pricing2'
         },
         { status: 500 }

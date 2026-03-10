@@ -187,6 +187,31 @@ const supabase = getSupabaseClient();
     }
   };
 
+  const handleActivateBienvenue2026 = async () => {
+    setActivating(true);
+    setPromoMessage(null);
+    try {
+      const res = await fetch('/api/admin/promo-codes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'ensure_bienvenue2026' }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || data.details || `Erreur ${res.status}`);
+      }
+      setPromoMessage({ type: 'success', text: data.message || 'Code BIENVENUE2026 accessible.' });
+      loadPromoCodes();
+    } catch (e) {
+      setPromoMessage({
+        type: 'error',
+        text: e instanceof Error ? e.message : "Erreur lors de l'accès",
+      });
+    } finally {
+      setActivating(false);
+    }
+  };
+
   const handleTogglePromoActive = async (id: string, currentActive: boolean) => {
     setTogglingId(id);
     setPromoMessage(null);
@@ -216,6 +241,7 @@ const supabase = getSupabaseClient();
   };
 
   const bienvenue10 = promoCodes.find((p) => (p.code || '').toUpperCase() === 'BIENVENUE10');
+  const bienvenue2026 = promoCodes.find((p) => (p.code || '').toUpperCase() === 'BIENVENUE2026');
   const filteredPayments = payments.filter(payment => 
     filterStatus === 'all' || payment.status === filterStatus
   );
@@ -290,18 +316,32 @@ const supabase = getSupabaseClient();
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <h2 className="text-lg font-semibold text-gray-900">Codes promo Stripe</h2>
-            <button
-              type="button"
-              onClick={handleActivateBienvenue10}
-              disabled={activating || bienvenue10?.active === true}
-              className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {activating
-                ? 'accès...'
-                : bienvenue10?.active
-                  ? 'BIENVENUE10 déjà actif'
-                  : 'accéder à le code BIENVENUE10 (-2€)'}
-            </button>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={handleActivateBienvenue10}
+                disabled={activating || bienvenue10?.active === true}
+                className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {activating
+                  ? 'accès...'
+                  : bienvenue10?.active
+                    ? 'BIENVENUE10 déjà actif'
+                    : 'BIENVENUE10 (-20%)'}
+              </button>
+              <button
+                type="button"
+                onClick={handleActivateBienvenue2026}
+                disabled={activating || bienvenue2026?.active === true}
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {activating
+                  ? 'accès...'
+                  : bienvenue2026?.active
+                    ? 'BIENVENUE2026 déjà actif'
+                    : 'BIENVENUE2026 (-20%)'}
+              </button>
+            </div>
           </div>
           {promoMessage && (
             <div
@@ -320,7 +360,7 @@ const supabase = getSupabaseClient();
             </div>
           ) : promoCodes.length === 0 ? (
             <p className="text-gray-500 py-4">
-              Aucun code promo. Cliquez sur « accéder à le code BIENVENUE10 » pour en créer un.
+              Aucun code promo. Cliquez sur « BIENVENUE10 » ou « BIENVENUE2026 » pour en créer un.
             </p>
           ) : (
             <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow">
@@ -375,7 +415,7 @@ const supabase = getSupabaseClient();
             </div>
           )}
           <p className="text-sm text-gray-500">
-            Les codes sont gérés dans Stripe. BIENVENUE10 applique une réduction de 2€ (ex. 9,90€ → 7,90€).
+            Les codes sont gérés dans Stripe. BIENVENUE10 et BIENVENUE2026 appliquent 20% de remise (ex. 9,90€ → 7,90€).
           </p>
         </div>
       ) : (

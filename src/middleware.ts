@@ -19,9 +19,6 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hostname = request.headers.get('host') || '';
   const xForwardedHost = request.headers.get('x-forwarded-host') || '';
-  
-  // Log pour debug
-  console.log('🔍 Middleware appelé - Hostname:', hostname, 'X-Forwarded-Host:', xForwardedHost, 'Pathname:', pathname);
 
   // Protection LibreSpeed : Si accès via librespeed.iahome.fr
   // Avec Redirect Rules Cloudflare, cette protection est déjà gérée par Redirect Rules

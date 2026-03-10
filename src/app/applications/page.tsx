@@ -1,6 +1,16 @@
 'use client';
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+
+/** Mélange Fisher-Yates pour afficher les apps dans un ordre aléatoire */
+function shuffleArray<T>(array: T[]): T[] {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
 import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
@@ -138,17 +148,36 @@ export default function Home() {
         } else {
           // Modules chargés avec succès
           
+          // Module Sentinelle Numérique (à afficher même si absent de la DB)
+          const sentinelleModule = {
+            id: 'sentinelle-numerique',
+            title: 'Sentinelle Numérique',
+            subtitle: 'Cybersécurité personnelle et processus de fin de vie numérique',
+            description: 'Cybersécurité personnelle et processus de fin de vie numérique: audit sécurité, plan de transmission et actions post-événement.',
+            category: 'Cybersécurité',
+            price: 10,
+            image_url: '/images/sentinelle-numerique.jpg',
+          };
+          const allModules = modulesData || [];
+          const hasSentinelle = allModules.some((m: any) => (m.id || '').toString().toLowerCase().includes('sentinelle'));
+          const modulesToProcess = hasSentinelle ? allModules : [sentinelleModule, ...allModules];
+
           // Traiter les modules avec la structure simple
-          const modulesWithRoles = (modulesData || []).map(module => {
+          const modulesWithRoles = modulesToProcess.map((module: any) => {
             // Utiliser la catégorie directement depuis la table modules
             const primaryCategory = module.category || 'Non classé';
+            const isSentinelle = (module.id || '').toString().toLowerCase().includes('sentinelle');
             
             return {
               ...module,
+              // Forcer l'image Sentinelle Numérique (public/images/sentinelle-numerique.png)
+              ...(isSentinelle && { image_url: '/images/sentinelle-numerique.jpg' }),
               // Catégorie principale
               category: primaryCategory,
               // Catégories multiples (utiliser la même catégorie pour compatibilité)
               categories: [primaryCategory],
+              // Sentinelle Numérique: prix fixe 10 tokens
+              price: isSentinelle ? 10 : module.price,
               // Ajouter des données aléatoires seulement pour l'affichage (pas stockées en DB)
               role: getRandomRole(),
               usage_count: Math.floor(Math.random() * 1000) + 1,
@@ -208,7 +237,7 @@ export default function Home() {
 
 
   // Modules essentiels à exclure de la page applications (affichés dans la page essentiels)
-  const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'code-learning', 'apprendre-autrement', 'home-assistant', 'administration', 'photobooth'];
+  const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'code-learning', 'apprendre-autrement', 'home-assistant', 'administration', 'photobooth', 'sentinelle-numerique'];
   // Modules masqués de la liste (page et fichiers conservés, seul l'affichage dans la liste est désactivé)
   const hiddenFromListing = ['hunyuan3d'];
   const isHiddenModule = (module: { id?: string | number; title?: string }) => {
@@ -251,6 +280,12 @@ export default function Home() {
   // Afficher toutes les applications sur la première page (pas de pagination active)
   // Pour rétablir la pagination, remplacer filteredModules par currentModules ci-dessous
   const currentModules = filteredModules; // Afficher toutes les applications
+
+  // Mélanger l'ordre des applications pour un affichage aléatoire (une fois par ensemble de résultats)
+  const displayedModules = useMemo(
+    () => shuffleArray([...currentModules]),
+    [currentModules.map(m => m.id).sort().join(',')]
+  );
   
   // Calculer les indices pour la pagination (pour référence future)
   const indexOfLastModule = currentPage * modulesPerPage;
@@ -415,13 +450,13 @@ export default function Home() {
                   <div className="col-span-full text-left py-12">
                     <div className="text-gray-500">Aucun template trouvé pour "{search}"</div>
                   </div>
-                ) : currentModules.length === 0 ? (
+                ) : displayedModules.length === 0 ? (
                   <div className="col-span-full text-left py-12">
-                    <div className="text-gray-500">Aucun module à afficher (currentModules vide)</div>
+                    <div className="text-gray-500">Aucun module à afficher</div>
                     <div className="text-sm text-gray-400 mt-2">Total modules: {filteredModules.length}</div>
                   </div>
                 ) : (
-                  currentModules.map((module) => (
+                  displayedModules.map((module) => (
                     <ModuleCard
                       key={module.id}
                       module={module}

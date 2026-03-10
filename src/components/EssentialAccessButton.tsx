@@ -24,12 +24,13 @@ export default function EssentialAccessButton({
   const { refreshTokens } = useTokenContext();
 
   // Mapping des modules vers leurs sous-domaines publics
+  const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
   const moduleSubdomains: Record<string, string> = {
-    'librespeed': 'https://librespeed.iahome.fr',
+    'librespeed': isDev ? 'http://localhost:8085' : 'https://librespeed.iahome.fr',
     'metube': 'https://metube.iahome.fr',
     'pdf': 'https://pdf.iahome.fr',
     'psitransfer': 'https://psitransfer.iahome.fr',
-    'qrcodes': 'https://qrcodes.iahome.fr',
+    'qrcodes': isDev ? 'http://localhost:7006' : 'https://qrcodes.iahome.fr',
     'whisper': 'https://whisper.iahome.fr',
     'stablediffusion': 'https://stablediffusion.iahome.fr',
     'comfyui': 'https://comfyui.iahome.fr',
@@ -86,7 +87,7 @@ export default function EssentialAccessButton({
       
       if (!consumeResult.success) {
         console.log(`🪙 ${moduleTitle}: Échec consommation tokens:`, consumeResult.reason);
-        const errorMessage = consumeResult.reason || 'Plus de tokens ? Rechargez';
+        const errorMessage = consumeResult.reason || 'Plus de crédits ? Rechargez';
         setError(errorMessage);
         onAccessDenied?.(errorMessage);
         return;
@@ -193,24 +194,24 @@ export default function EssentialAccessButton({
         ) : moduleId === 'administration' ? (
           <>
             <span>🏛️</span>
-            <span>Accéder aux services administratifs (10 tokens par accès)</span>
+            <span>Accéder aux services administratifs (10 crédits par accès)</span>
           </>
         ) : moduleId === 'apprendre-autrement' ? (
           <>
             <span>🌈</span>
             <span>Accéder à Apprendre Autrement</span>
-            <span className="text-xs opacity-90">(10 tokens par accès)</span>
+            <span className="text-xs opacity-90">(10 crédits par accès)</span>
           </>
         ) : moduleId === 'code-learning' ? (
           <>
             <span>💻</span>
-            <span>Accéder à Apprendre le Code (10 tokens par accès)</span>
+            <span>Accéder à Apprendre le Code (10 crédits par accès)</span>
           </>
         ) : (
           <>
             <span>🔧</span>
             <span>
-              Accéder à {moduleTitle} ({moduleId === 'photobooth' ? 100 : 10} tokens par accès)
+              Accéder à {moduleTitle} ({moduleId === 'photobooth' ? 100 : 10} crédits par accès)
             </span>
           </>
         )}
@@ -218,9 +219,9 @@ export default function EssentialAccessButton({
 
       {error && (
         <p className="text-red-500 text-sm">
-          {error.includes('Rechargez') || error.includes('tokens') ? (
+          {error.includes('Rechargez') || error.includes('tokens') || error.includes('crédits') ? (
             <>
-              Plus de tokens ?{' '}
+              Plus de crédits ?{' '}
               <a 
                 href="https://iahome.fr/pricing2" 
                 target="_blank" 

@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
         event_type: 'user_no_module_activated',
         name: 'Utilisateur sans module activé',
         is_enabled: true,
-        email_template_subject: 'Bienvenue sur IAHome ! Activez votre premier module et recevez 200 tokens bonus !',
+        email_template_subject: 'Bienvenue sur IAHome ! Activez votre premier module et recevez 200 crédits bonus !',
         email_template_body: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.05);">
             <div style="background-color: #2563eb; color: #ffffff; padding: 20px; text-align: center;">
@@ -63,11 +63,11 @@ export async function POST(request: NextRequest) {
                 </ol>
               </div>
               <h3 style="color: #f97316; font-size: 20px; margin-top: 25px; margin-bottom: 15px;">
-                🎁 Offre Spéciale : 200 Tokens Bonus !
+                🎁 Offre Spéciale : 200 Crédits Bonus !
               </h3>
               <p style="font-size: 16px; color: #333333; line-height: 1.5;">
                 Pour vous aider à démarrer, activez votre tout premier module dans les <strong>3 prochains jours</strong>
-                et nous vous offrirons <strong>200 tokens supplémentaires</strong> sur votre compte !
+                et nous vous offrirons <strong>200 crédits supplémentaires</strong> sur votre compte !
                 C'est le moment idéal pour explorer la puissance de l'IA.
               </p>
               <p style="font-size: 16px; color: #333333; line-height: 1.5; margin-top: 20px;">

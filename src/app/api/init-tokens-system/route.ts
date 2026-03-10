@@ -3,7 +3,7 @@ import { supabase } from '../../../utils/supabaseClient';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔧 Initialisation de la gestion des tokens...');
+    console.log('🔧 Initialisation de la gestion des crédits...');
 
     // Créer une table user_tokens qui référence profiles
     // Note: Cette approche utilise des requêtes SQL directes via Supabase
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       ;
       return NextResponse.json({
         success: true,
-        message: 'Colonne tokens déjà disponible',
+        message: 'Colonne crédits déjà disponible',
         approach: 'column_exists'
       });
     }
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('❌ Erreur initialisation tokens:', error);
     return NextResponse.json(
-      { error: 'Erreur interne du serveur' },
+        { error: 'Erreur initialisation crédits' },
       { status: 500 }
     );
   }

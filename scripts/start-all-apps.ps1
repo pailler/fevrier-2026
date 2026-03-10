@@ -25,6 +25,14 @@ if (Test-Path $ConfigFile) {
 # SkipGradioApps : -SkipGradioApps en ligne de commande OU $SkipGradioApps dans config
 $script:SkipGradioApps = $CmdLineSkipGradio -or ($null -ne (Get-Variable -Name "SkipGradioApps" -Scope 0 -ErrorAction SilentlyContinue) -and [bool]$SkipGradioApps)
 
+# Cache Hugging Face pour BiRefNet, Animagine XL, Florence-2 - evite les telechargements repetes
+$DefaultModelsCache = Join-Path $ProjectRoot "models-cache"
+if (-not $ModelsCachePath) { $ModelsCachePath = $DefaultModelsCache }
+if (-not (Test-Path $ModelsCachePath)) { New-Item -ItemType Directory -Path $ModelsCachePath -Force | Out-Null }
+$env:HF_HOME = $ModelsCachePath
+$env:HF_HUB_CACHE = Join-Path $ModelsCachePath "hub"
+$env:TRANSFORMERS_CACHE = Join-Path $ModelsCachePath "transformers"
+
 # Chemins par defaut pour les apps Gradio (surchargeables via apps-hosts.config.ps1)
 if (-not $PhotomakerPath)   { $PhotomakerPath   = Join-Path $ProjectRoot "gradio-apps\photomaker" }
 if (-not $BirefnetPath)     { $BirefnetPath     = Join-Path $ProjectRoot "gradio-apps\birefnet" }

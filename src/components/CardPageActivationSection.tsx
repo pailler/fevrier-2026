@@ -2,7 +2,7 @@
 
 /**
  * Redirection vers CardPageAccessSection.
- * Le système d'activation n'existe plus - accès direct par tokens uniquement.
+ * Le système d'activation n'existe plus - accès direct par crédits uniquement.
  */
 import CardPageAccessSection from './CardPageAccessSection';
 

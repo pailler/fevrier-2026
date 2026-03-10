@@ -42,7 +42,7 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
       
       if (!consumeResult.success) {
         console.log(`🪙 ${moduleTitle}: Échec consommation tokens:`, consumeResult.reason);
-        const errorMessage = consumeResult.reason || 'Plus de tokens ? Rechargez';
+        const errorMessage = consumeResult.reason || 'Plus de crédits ? Rechargez';
         setError(errorMessage);
         onAccessDenied?.(errorMessage);
         return;
@@ -99,14 +99,15 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'florence-2': 'florence-2', // Florence-2 -> florence-2
         'birefnet': 'birefnet', // BiRefNet -> birefnet
         'photobooth': 'photobooth', // Photobooth -> photobooth
+        'sentinelle-numerique': 'sentinelle-numerique', // Sentinelle Numérique
       };
       
       const moduleSubdomains: Record<string, string> = {
-        'librespeed': 'https://librespeed.iahome.fr',
+        'librespeed': isDevelopment ? 'http://localhost:8085' : 'https://librespeed.iahome.fr',
         'metube': 'https://metube.iahome.fr',
         'pdf': 'https://pdf.iahome.fr',
         'psitransfer': 'https://psitransfer.iahome.fr',
-        'qrcodes': 'https://qrcodes.iahome.fr',
+        'qrcodes': isDevelopment ? 'http://localhost:7006' : 'https://qrcodes.iahome.fr',
         'whisper': 'https://whisper.iahome.fr',
         'stablediffusion': 'https://stablediffusion.iahome.fr',
         'comfyui': 'https://comfyui.iahome.fr',
@@ -124,6 +125,8 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'apprendre-autrement': isDevelopment ? 'http://localhost:9001' : 'https://apprendre-autrement.iahome.fr',
         // Détecteur de Contenu IA : sur le domaine principal
         'ai-detector': isDevelopment ? 'http://localhost:3000/ai-detector' : 'https://iahome.fr/ai-detector',
+        // Sentinelle Numérique : même backend que ai-detector
+        'sentinelle-numerique': isDevelopment ? 'http://localhost:3000/sentinelle-numerique' : 'https://iahome.fr/sentinelle-numerique',
         // PhotoMaker : sous-domaine comme les autres modules IA
         'photomaker': isDevelopment ? 'http://localhost:7881' : 'https://photomaker.iahome.fr',
         // Animagine XL : sous-domaine comme les autres modules IA (port 7881)

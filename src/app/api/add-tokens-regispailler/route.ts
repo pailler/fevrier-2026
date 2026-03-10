@@ -3,7 +3,7 @@ import { supabase } from '../../../utils/supabaseClient';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔧 Ajout de tokens pour regispailler...');
+    console.log('🔧 Ajout de crédits pour regispailler...');
 
     const userId = '77e8d61e-dbec-49fe-bd5a-517fc495c84a';
     
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Tokens ajoutés avec succès',
+      message: 'Crédits ajoutés avec succès',
       tokens: insertData[0]?.tokens || 20
     });
 

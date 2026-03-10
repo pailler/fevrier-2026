@@ -38,9 +38,12 @@ export default function ModuleAccessButton({
     const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
     const urlMap: Record<string, string> = isDevelopment
       ? {
+          'librespeed': 'http://localhost:8085',
+          'qrcodes': 'http://localhost:7006',
           'photomaker': 'http://localhost:7881',
           'birefnet': 'http://localhost:7882',
           'animagine-xl': 'http://localhost:7883',
+          'sentinelle-numerique': 'http://localhost:3000/sentinelle-numerique',
           'florence-2': 'http://localhost:7884',
           'home-assistant': 'http://localhost:8123',
           'hunyuan3d': 'http://localhost:8888',
@@ -51,10 +54,13 @@ export default function ModuleAccessButton({
           'comfyui': 'http://localhost:8188',
           'photobooth': 'http://localhost:7885',
         }
-      : {
+        : {
+          'librespeed': 'https://librespeed.iahome.fr',
+          'qrcodes': 'https://qrcodes.iahome.fr',
           'photomaker': 'https://photomaker.iahome.fr',
           'birefnet': 'https://birefnet.iahome.fr',
           'animagine-xl': 'https://animaginexl.iahome.fr',
+          'sentinelle-numerique': 'https://iahome.fr/sentinelle-numerique',
           'florence-2': 'https://florence2.iahome.fr',
           'home-assistant': 'https://homeassistant.iahome.fr',
           'hunyuan3d': 'https://hunyuan3d.iahome.fr',
@@ -92,8 +98,8 @@ export default function ModuleAccessButton({
     }
 
     if (tokens === null || tokens < moduleCost) {
-      setError(`Tokens insuffisants. Requis: ${moduleCost}, Disponible: ${tokens || 0}`);
-      onAccessError?.(`Tokens insuffisants: ${tokens || 0}/${moduleCost}`);
+      setError(`Crédits insuffisants. Requis: ${moduleCost}, Disponible: ${tokens || 0}`);
+      onAccessError?.(`Crédits insuffisants: ${tokens || 0}/${moduleCost}`);
       return;
     }
 
@@ -173,7 +179,7 @@ export default function ModuleAccessButton({
         ) : (
           <div className="flex items-center space-x-2">
             <span>🔓</span>
-            <span>Accéder à {moduleName} ({moduleCost} tokens)</span>
+            <span>Accéder à {moduleName} ({moduleCost} crédits)</span>
           </div>
         )}
       </button>
@@ -192,7 +198,7 @@ export default function ModuleAccessButton({
       
       {isAuthenticated && tokens !== null && tokens < moduleCost && (
         <div className="text-red-600 text-sm text-center max-w-xs">
-          Tokens insuffisants ({tokens}/{moduleCost})
+          Crédits insuffisants ({tokens}/{moduleCost})
         </div>
       )}
     </div>

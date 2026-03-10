@@ -49,7 +49,7 @@ export class TokenActionServiceClient {
           success: false,
           tokensConsumed: 0,
           tokensRemaining: 0,
-          reason: errorData.message || 'Plus de tokens ? Rechargez',
+          reason: errorData.message || 'Plus de crédits ? Rechargez',
           pricingUrl: errorData.pricingUrl || 'https://iahome.fr/pricing2'
         };
       }
@@ -84,6 +84,7 @@ export class TokenActionServiceClient {
       'prompt-generator': 100,
       'ai-detector': 100,
       'ia-generator': 100, // Alias pour ai-detector
+      'sentinelle-numerique': 10,
       'photomaker': 100, // PhotoMaker -> 100 tokens
       'photobooth': 100, // Photobooth -> 100 tokens
       'animagine-xl': 100, // Animagine XL -> 100 tokens

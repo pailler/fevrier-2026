@@ -1,15 +1,23 @@
 'use client';
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+
+/** Mélange Fisher-Yates pour afficher les apps dans un ordre aléatoire */
+function shuffleArray<T>(array: T[]): T[] {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
 import { supabase } from "../../utils/supabaseClient";
-import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import { useCustomAuth } from '../../hooks/useCustomAuth';
 import Breadcrumb from '../../components/Breadcrumb';
 import ModuleCard from '../../components/ModuleCard';
 
 export default function Essentiels() {
-  const router = useRouter();
   const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
   const [role, setRole] = useState<string | null>(null);
   const [selectedModules, setSelectedModules] = useState<any[]>([]);
@@ -32,7 +40,8 @@ export default function Essentiels() {
     'apprendre-autrement',
     'home-assistant',
     'administration',
-    'photobooth'
+    'photobooth',
+    'sentinelle-numerique'
   ];
 
   // Vérification de l'authentification (optionnelle pour cette page)
@@ -123,13 +132,28 @@ export default function Essentiels() {
         }
 
         // Filtrer pour ne garder que les modules essentiels (exclure whisper)
-        const essentialModulesData = data?.filter(module => 
+        let essentialModulesData = data?.filter(module => 
           (essentialModules.includes(module.id) ||
           essentialModules.some(essentialId => 
             module.title.toLowerCase().includes(essentialId.toLowerCase()) ||
             module.title.toLowerCase().includes(essentialId.replace('-', ' '))
           )) && module.id !== 'whisper'
         ) || [];
+
+        // Sentinelle Numérique : ajouter si absent de la DB
+        const hasSentinelle = essentialModulesData.some((m: any) => (m.id || '').toString().toLowerCase().includes('sentinelle'));
+        if (!hasSentinelle) {
+          const sentinelleModule = {
+            id: 'sentinelle-numerique',
+            title: 'Sentinelle Numérique',
+            subtitle: 'Cybersécurité personnelle et processus de fin de vie numérique',
+            description: 'Cybersécurité personnelle et processus de fin de vie numérique: audit sécurité, plan de transmission et actions post-événement.',
+            category: 'Cybersécurité',
+            price: 10,
+            image_url: '/images/sentinelle-numerique.jpg',
+          };
+          essentialModulesData = [sentinelleModule, ...essentialModulesData];
+        }
 
         // Debug: vérifier si Home Assistant est dans les modules
         const homeAssistantModule = essentialModulesData.find(m => m.id === 'home-assistant' || m.title.toLowerCase().includes('domotisez'));
@@ -172,118 +196,6 @@ export default function Essentiels() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Fonction pour mapper les IDs de modules vers les slugs corrects pour les routes
-  const getModuleSlug = (moduleId: string, moduleTitle: string): string => {
-    // Mapping des IDs numériques et textuels vers les slugs corrects
-    const moduleIdMapping: { [key: string]: string } = {
-      // IDs numériques
-      '1': 'pdf',
-      '2': 'metube',
-      '3': 'librespeed',
-      '4': 'psitransfer',
-      '5': 'qrcodes',
-      '7': 'stablediffusion',
-      '8': 'ruinedfooocus',
-      '10': 'comfyui',
-      '11': 'cogstudio',
-      // IDs textuels (garder tels quels s'ils sont déjà corrects)
-      'librespeed': 'librespeed',
-      'metube': 'metube',
-      'psitransfer': 'psitransfer',
-      'qrcodes': 'qrcodes',
-      'pdf': 'pdf',
-      'pdf+': 'pdf',
-      'stablediffusion': 'stablediffusion',
-      'ruinedfooocus': 'ruinedfooocus',
-      'comfyui': 'comfyui',
-      'cogstudio': 'cogstudio',
-      'code-learning': 'code-learning',
-      'apprendre-autrement': 'apprendre-autrement',
-      'meeting-reports': 'meeting-reports',
-      'hunyuan3d': 'hunyuan3d',
-      'whisper': 'whisper',
-      'home-assistant': 'home-assistant',
-      'administration': 'administration',
-      'voice-isolation': 'voice-isolation',
-      'photomaker': 'photomaker',
-      'photobooth': 'photobooth'
-    };
-
-    // Vérifier d'abord le mapping direct
-    if (moduleIdMapping[moduleId]) {
-      return moduleIdMapping[moduleId];
-    }
-
-    // Si pas de mapping, essayer de trouver par titre
-    const titleLower = moduleTitle.toLowerCase();
-    if (titleLower.includes('librespeed') || titleLower.includes('speed')) {
-      return 'librespeed';
-    }
-    if (titleLower.includes('metube') || titleLower.includes('me tube')) {
-      return 'metube';
-    }
-    if (titleLower.includes('psitransfer') || titleLower.includes('psi transfer')) {
-      return 'psitransfer';
-    }
-    if (titleLower.includes('qrcode') || titleLower.includes('qr code')) {
-      return 'qrcodes';
-    }
-    if (titleLower.includes('pdf')) {
-      return 'pdf';
-    }
-    if (titleLower.includes('code learning') || titleLower.includes('code-learning')) {
-      return 'code-learning';
-    }
-    if (titleLower.includes('apprendre autrement') || titleLower.includes('apprendre-autrement')) {
-      return 'apprendre-autrement';
-    }
-    if (titleLower.includes('stable diffusion')) {
-      return 'stablediffusion';
-    }
-    if (titleLower.includes('ruinedfooocus') || titleLower.includes('ruined fooocus')) {
-      return 'ruinedfooocus';
-    }
-    if (titleLower.includes('comfyui') || titleLower.includes('comfy ui')) {
-      return 'comfyui';
-    }
-    if (titleLower.includes('cogstudio') || titleLower.includes('cog studio')) {
-      return 'cogstudio';
-    }
-    if (titleLower.includes('meeting reports') || titleLower.includes('meeting-reports')) {
-      return 'meeting-reports';
-    }
-    if (titleLower.includes('hunyuan') || titleLower.includes('hunyuan3d')) {
-      return 'hunyuan3d';
-    }
-    if (titleLower.includes('whisper')) {
-      return 'whisper';
-    }
-    if (titleLower.includes('home assistant') || titleLower.includes('home-assistant') || titleLower.includes('domotique')) {
-      return 'home-assistant';
-    }
-    if (titleLower.includes('administration') || titleLower.includes('services administratifs')) {
-      return 'administration';
-    }
-    if (titleLower.includes('voice isolation') || titleLower.includes('voice-isolation') || titleLower.includes('isolation vocale')) {
-      return 'voice-isolation';
-    }
-    if (titleLower.includes('photobooth') || titleLower.includes('photo booth')) {
-      return 'photobooth';
-    }
-
-    // Fallback: utiliser l'ID tel quel (peut-être déjà un slug valide)
-    return moduleId;
-  };
-
-  // Fonction pour gérer l'accès aux modules
-  const handleModuleAccess = async (moduleId: string, moduleTitle: string) => {
-    // Obtenir le slug correct pour le lien
-    const moduleSlug = getModuleSlug(moduleId, moduleTitle);
-    // Rediriger directement vers la page détaillée du module, même en mode déconnecté
-    const moduleUrl = `/card/${moduleSlug}`;
-    router.push(moduleUrl);
-  };
-
   // Filtrer les modules selon la recherche
   const filteredModules = modules.filter(module => {
     const matchesSearch = !search || 
@@ -295,6 +207,12 @@ export default function Essentiels() {
 
     return matchesSearch;
   });
+
+  // Mélanger l'ordre des applications pour un affichage aléatoire (une fois par ensemble de résultats)
+  const displayedModules = useMemo(
+    () => shuffleArray([...filteredModules]),
+    [filteredModules.map(m => m.id).sort().join(',')]
+  );
 
   if (loading) {
     return (
@@ -408,19 +326,18 @@ export default function Essentiels() {
           <div className="w-full">
 
         {/* Grille des modules */}
-        {filteredModules.length === 0 ? (
+        {displayedModules.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-500">Aucune application essentielle trouvée</div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredModules.map((module) => (
-              <div key={module.id} onClick={() => handleModuleAccess(module.id, module.title)}>
-                <ModuleCard
-                  module={module}
-                  userEmail={user?.email}
-                />
-              </div>
+            {displayedModules.map((module) => (
+              <ModuleCard
+                key={module.id}
+                module={module}
+                userEmail={user?.email}
+              />
             ))}
           </div>
         )}

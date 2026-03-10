@@ -16,6 +16,10 @@ Version CPU uniquement (installation plus légère, sans CUDA) :
 
 Le script réinstalle PyTorch et torchvision dans le venv de chaque app Gradio.
 
+## Cache des modèles
+
+Les scripts utilisent `iahome/models-cache`. Les modèles ne sont téléchargés qu'une fois. Pour changer : décommentez `$ModelsCachePath` dans `scripts/apps-hosts.config.ps1`.
+
 ## 2. Lancer les apps IA en parallèle
 
 ```powershell

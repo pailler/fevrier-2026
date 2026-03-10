@@ -43,7 +43,8 @@ export default function LibreSpeedButton({ className = '', children }: LibreSpee
         
         if (data.success) {
           // Rediriger vers LibreSpeed avec le token
-          window.location.href = `https://librespeed.iahome.fr/?token=${data.token}`;
+          const baseUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:8085' : 'https://librespeed.iahome.fr';
+          window.location.href = `${baseUrl}/?token=${data.token}`;
         } else {
           console.error('Erreur génération token:', data.error);
           alert('Erreur: ' + data.error);

@@ -55,10 +55,10 @@ export async function POST(request: Request) {
     }
 
     if (userTokens.tokens < tokensToConsume) {
-      console.log('❌ MeTube Access: Tokens insuffisants:', userTokens.tokens);
+      console.log('❌ MeTube Access: Crédits insuffisants:', userTokens.tokens);
       return new NextResponse(JSON.stringify({
         success: false,
-        error: 'Tokens insuffisants',
+        error: 'Crédits insuffisants',
         message: `${tokensToConsume} tokens requis pour utiliser MeTube. Tokens disponibles: ${userTokens.tokens}`
       }), {
         status: 400,
@@ -78,8 +78,8 @@ export async function POST(request: Request) {
       console.error('❌ MeTube Access: Erreur consommation tokens:', updateTokensError);
       return new NextResponse(JSON.stringify({
         success: false,
-        error: 'Plus de tokens ? Rechargez',
-        message: 'Plus de tokens ? Rechargez',
+        error: 'Plus de crédits ? Rechargez',
+        message: 'Plus de crédits ? Rechargez',
         pricingUrl: 'https://iahome.fr/pricing2'
       }), {
         status: 500,

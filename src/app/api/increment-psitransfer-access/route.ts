@@ -66,11 +66,11 @@ export async function POST(request: NextRequest) {
     }
 
     if (userTokens.tokens < 10) {
-      console.log('❌ PsiTransfer Access: Tokens insuffisants:', userTokens.tokens);
+      console.log('❌ PsiTransfer Access: Crédits insuffisants:', userTokens.tokens);
       return new NextResponse(JSON.stringify({
         success: false,
-        error: 'Tokens insuffisants',
-        message: '10 tokens requis pour utiliser PsiTransfer. Tokens disponibles: ' + userTokens.tokens
+        error: 'Crédits insuffisants',
+        message: '10 crédits requis pour utiliser PsiTransfer. Crédits disponibles: ' + userTokens.tokens
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -90,8 +90,8 @@ export async function POST(request: NextRequest) {
       console.error('❌ PsiTransfer Access: Erreur consommation tokens:', updateTokensError);
       return new NextResponse(JSON.stringify({
         success: false,
-        error: 'Plus de tokens ? Rechargez',
-        message: 'Plus de tokens ? Rechargez',
+        error: 'Plus de crédits ? Rechargez',
+        message: 'Plus de crédits ? Rechargez',
         pricingUrl: 'https://iahome.fr/pricing2'
       }), {
         status: 500,
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('✅ PsiTransfer Access: Compteur incrémenté:', newUsageCount);
-    console.log('✅ PsiTransfer Access: 10 tokens consommés. Restants:', userTokens.tokens - 10);
+    console.log('✅ PsiTransfer Access: 10 crédits consommés. Restants:', userTokens.tokens - 10);
 
     return new NextResponse(JSON.stringify({
       success: true,

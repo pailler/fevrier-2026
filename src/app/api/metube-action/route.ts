@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
     if (currentTokens < requiredTokens) {
       return NextResponse.json(
         { 
-          error: 'Tokens insuffisants',
-          reason: `Tokens insuffisants. Requis: ${requiredTokens}, Disponible: ${currentTokens}`,
+          error: 'Crédits insuffisants',
+          reason: `Crédits insuffisants. Requis: ${requiredTokens}, Disponible: ${currentTokens}`,
           tokensRequired: requiredTokens,
           tokensRemaining: currentTokens
         },

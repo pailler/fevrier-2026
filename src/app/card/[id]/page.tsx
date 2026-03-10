@@ -147,11 +147,11 @@ export default function CardDetailPage() {
       // Modules internes sans token (administration)
       const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
       const applicationUrls: Record<string, string> = {
-        'librespeed': 'https://librespeed.iahome.fr',
+        'librespeed': isDevelopment ? 'http://localhost:8085' : 'https://librespeed.iahome.fr',
         'metube': 'https://metube.iahome.fr',
         'whisper': 'https://whisper.iahome.fr',
         'psitransfer': 'https://psitransfer.iahome.fr',
-        'qrcodes': 'https://qrcodes.iahome.fr',
+        'qrcodes': isDevelopment ? 'http://localhost:7006' : 'https://qrcodes.iahome.fr',
         'pdf': 'https://pdf.iahome.fr',
         'stablediffusion': 'https://stablediffusion.iahome.fr',
         'comfyui': 'https://comfyui.iahome.fr',
@@ -165,6 +165,7 @@ export default function CardDetailPage() {
         'photobooth': isDevelopment ? 'http://localhost:7885' : 'https://photobooth.iahome.fr',
         'administration': '/administration',
         'ai-detector': isDevelopment ? 'http://localhost:3000/ai-detector' : 'https://iahome.fr/ai-detector',
+        'sentinelle-numerique': isDevelopment ? 'http://localhost:3000/sentinelle-numerique' : 'https://iahome.fr/sentinelle-numerique',
         'hunyuan3d': isDevelopment ? 'http://localhost:8888' : 'https://hunyuan3d.iahome.fr',
         'photomaker': isDevelopment ? 'http://localhost:7881' : 'https://photomaker.iahome.fr',
         'animagine-xl': isDevelopment ? 'http://localhost:7883' : 'https://animaginexl.iahome.fr',
@@ -306,7 +307,7 @@ export default function CardDetailPage() {
       console.log('🔧 Chargement carte pour:', params.id);
 
       // Liste des modules qui ont des pages spécifiques
-      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'cogstudio', 'ruinedfooocus', 'whisper', 'meeting-reports', 'psitransfer', 'hunyuan3d', 'photomaker', 'animagine-xl', 'florence-2', 'birefnet'];
+      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'cogstudio', 'ruinedfooocus', 'whisper', 'meeting-reports', 'psitransfer', 'hunyuan3d', 'photomaker', 'animagine-xl', 'florence-2', 'birefnet', 'sentinelle-numerique'];
       
       // Si c'est un module avec une page spécifique, charger la page spécifique
       if (specificPages.includes(params.id as string)) {
