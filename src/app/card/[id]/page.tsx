@@ -770,7 +770,7 @@ export default function CardDetailPage() {
                   // Bouton d'accès gratuit pour les modules gratuits (uniquement si connecté, sauf LibreSpeed)
                   <>
                     <button 
-                      className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                      className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                       onClick={async () => {
                         if (!isAuthenticated || !user) {
                           alert(`Connectez-vous pour accéder ${card?.title || 'ce module'}`);
@@ -839,18 +839,28 @@ export default function CardDetailPage() {
                         await accessModuleWithJWT(card.title, moduleId);
                       }}
                     >
-                      <span className="text-xl">🆓</span>
-                      <span>Accéder à l'application {card.title}</span>
+                      <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                        <polyline points="10 17 15 12 10 7" />
+                        <line x1="15" y1="12" x2="3" y2="12" />
+                      </svg>
+                      <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">Accéder à l'application {card.title}</span>
+                      <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">Accès gratuit</span>
                     </button>
                   </>
                 ) : (card.price === 0 || card.price === '0') && (!isAuthenticated || !user) && !isLibrespeed ? (
                   // Message pour les modules gratuits quand l'utilisateur n'est pas connecté (sauf LibreSpeed)
                   <Link 
                     href="/login"
-                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
+                    className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
                   >
-                    <span className="text-xl">🔒</span>
-                    <span>Connectez-vous pour accéder {card?.title || 'Module'}</span>
+                    <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                      <polyline points="10 17 15 12 10 7" />
+                      <line x1="15" y1="12" x2="3" y2="12" />
+                    </svg>
+                    <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">Connectez-vous pour accéder</span>
+                    <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">{card?.title || 'Module'}</span>
                   </Link>
                 ) : (
                   // Boutons pour les modules payants
@@ -868,10 +878,14 @@ export default function CardDetailPage() {
                         <div className="mt-3 text-center">
                           <button
                             onClick={() => accessModuleWithJWT(card.title, card.id)}
-                            className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                            className="inline-flex flex-col items-center gap-1 px-6 py-3 bg-[#16a34a] hover:bg-[#15803d] text-white rounded-2xl transition-colors font-semibold shadow-lg"
                           >
-                            <span className="mr-2">📱</span>
-                            Voir mes applications
+                            <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                              <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                              <polyline points="10 17 15 12 10 7" />
+                              <line x1="15" y1="12" x2="3" y2="12" />
+                            </svg>
+                            <span>Voir mes applications</span>
                           </button>
                         </div>
                       </div>
@@ -881,7 +895,7 @@ export default function CardDetailPage() {
                     {/* Bouton "Accéder à la sélection" pour les modules payants */}
                     {isCardSelected(card.id) && card.price !== 0 && card.price !== '0' && !alreadyActivatedModules.includes(card.id) && !isPhotobooth && (
                       <button 
-                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                        className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                         onClick={async () => {
                           if (!isAuthenticated || !user) {
                             window.location.href = '/login';
@@ -928,8 +942,13 @@ export default function CardDetailPage() {
                           }
                         }}
                       >
-                        <span className="text-xl">⚡</span>
-                        <span>Accéder à {card.title}</span>
+                        <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                          <polyline points="10 17 15 12 10 7" />
+                          <line x1="15" y1="12" x2="3" y2="12" />
+                        </svg>
+                        <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">Accéder à {card.title}</span>
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">Activer l'accès</span>
                       </button>
                     )}
 
@@ -967,12 +986,15 @@ export default function CardDetailPage() {
                             alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                           }
                         }}
-                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-fuchsia-600 to-pink-600 hover:from-fuchsia-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                        className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                       >
-                        <span className="text-xl">📸</span>
-                        <span>
-                          {isAuthenticated && user ? `Accéder à Photobooth (100 tokens par accès)` : `Connectez-vous pour accéder Photobooth (100 tokens par accès)`}
-                        </span>
+                        <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                          <polyline points="10 17 15 12 10 7" />
+                          <line x1="15" y1="12" x2="3" y2="12" />
+                        </svg>
+                        <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accéder à Photobooth' : 'Connectez-vous pour accéder'}</span>
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">100 tokens par accès</span>
                       </button>
                     )}
 
@@ -1017,12 +1039,15 @@ export default function CardDetailPage() {
                             alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                           }
                         }}
-                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                        className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                       >
-                        <span className="text-xl">⚡</span>
-                        <span>
-                          {isAuthenticated && user ? `Accéder à Apprendre le Code aux enfants (10 tokens par accès)` : `Connectez-vous pour accéder Apprendre le Code aux enfants (10 tokens par accès)`}
-                        </span>
+                        <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                          <polyline points="10 17 15 12 10 7" />
+                          <line x1="15" y1="12" x2="3" y2="12" />
+                        </svg>
+                        <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accéder à Apprendre le Code aux enfants' : 'Connectez-vous pour accéder'}</span>
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 tokens par accès</span>
                       </button>
                     )}
 
@@ -1066,12 +1091,15 @@ export default function CardDetailPage() {
                             alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                           }
                         }}
-                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                        className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                       >
-                        <span className="text-xl">🌈</span>
-                        <span>
-                          {isAuthenticated && user ? `Accéder à Apprendre Autrement (10 tokens par accès)` : `Connectez-vous pour accéder Apprendre Autrement (10 tokens par accès)`}
-                        </span>
+                        <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                          <polyline points="10 17 15 12 10 7" />
+                          <line x1="15" y1="12" x2="3" y2="12" />
+                        </svg>
+                        <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accéder à Apprendre Autrement' : 'Connectez-vous pour accéder'}</span>
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 tokens par accès</span>
                       </button>
                     )}
 
@@ -1115,12 +1143,15 @@ export default function CardDetailPage() {
                             alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                           }
                         }}
-                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                        className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                       >
-                        <span className="text-xl">⚡</span>
-                        <span>
-                          {isAuthenticated && user ? `Accéder à LibreSpeed (10 tokens par accès)` : `Connectez-vous pour accéder LibreSpeed (10 tokens par accès)`}
-                        </span>
+                        <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                          <polyline points="10 17 15 12 10 7" />
+                          <line x1="15" y1="12" x2="3" y2="12" />
+                        </svg>
+                        <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accéder à LibreSpeed' : 'Connectez-vous pour accéder'}</span>
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 tokens par accès</span>
                       </button>
                     )}
 
@@ -1140,12 +1171,15 @@ export default function CardDetailPage() {
                             router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}?openApp=1`)}`);
                           }
                         }}
-                        className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                        className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                       >
-                        <span className="text-xl">🎥</span>
-                        <span>
-                          {isAuthenticated && user ? `Accéder à ${card?.title || 'Module'}` : `Connectez-vous pour accéder ${card?.title || 'Module'}`}
-                        </span>
+                        <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                          <polyline points="10 17 15 12 10 7" />
+                          <line x1="15" y1="12" x2="3" y2="12" />
+                        </svg>
+                        <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? `Accéder à ${card?.title || 'Module'}` : 'Connectez-vous pour accéder'}</span>
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">{card?.title || 'Module'}</span>
                       </button>
                     )}
 
@@ -1188,18 +1222,28 @@ export default function CardDetailPage() {
                                 router.push(`/login?redirect=${encodeURIComponent(`/card/${card.id}?openApp=1`)}`);
                               }
                             }}
-                            className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                            className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                           >
-                            <span className="text-xl">🆓</span>
-                            <span>Accéder à l'application {card.title}</span>
+                            <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                              <polyline points="10 17 15 12 10 7" />
+                              <line x1="15" y1="12" x2="3" y2="12" />
+                            </svg>
+                            <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">Accéder à l'application {card.title}</span>
+                            <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">Accès gratuit</span>
                           </button>
                         ) : (
                           <Link 
                             href="/login"
-                            className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
+                            className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
                           >
-                            <span className="text-xl">🔒</span>
-                            <span>Connectez-vous pour accéder {card?.title || 'Module'}</span>
+                            <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                              <polyline points="10 17 15 12 10 7" />
+                              <line x1="15" y1="12" x2="3" y2="12" />
+                            </svg>
+                            <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">Connectez-vous pour accéder</span>
+                            <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">{card?.title || 'Module'}</span>
                           </Link>
                         )}
                       </div>
@@ -1239,12 +1283,15 @@ export default function CardDetailPage() {
                       router.push(`/login?redirect=${encodeURIComponent('/card/metube?openApp=1')}`);
                     }
                   }}
-                  className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
-                  <span className="text-xl">🎥</span>
-                  <span>
-                    {isAuthenticated && user ? 'Mes applis' : 'Connectez-vous pour accéder'}
-                  </span>
+                  <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                    <polyline points="10 17 15 12 10 7" />
+                    <line x1="15" y1="12" x2="3" y2="12" />
+                  </svg>
+                  <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Mes applis' : 'Connectez-vous pour accéder'}</span>
+                  <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">Accès à MeTube</span>
                 </button>
               </div>
             </div>
@@ -1306,12 +1353,15 @@ export default function CardDetailPage() {
                         alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                       }
                     }}
-                    className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                    className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                   >
-                    <span className="text-xl">📁</span>
-                    <span>
-                      {isAuthenticated && user ? `Accéder à PsiTransfer (10 tokens par accès)` : `Connectez-vous pour accéder PsiTransfer (10 tokens par accès)`}
-                    </span>
+                    <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                      <polyline points="10 17 15 12 10 7" />
+                      <line x1="15" y1="12" x2="3" y2="12" />
+                    </svg>
+                    <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accéder à PsiTransfer' : 'Connectez-vous pour accéder'}</span>
+                    <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 tokens par accès</span>
                   </button>
                 )}
 
@@ -1680,7 +1730,7 @@ export default function CardDetailPage() {
                 onClick={() => setIframeModal({isOpen: false, url: '', title: ''})}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>

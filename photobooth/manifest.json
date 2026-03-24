@@ -1,0 +1,11 @@
+{
+  "name": "Photobooth Mariage",
+  "short_name": "Photobooth",
+  "description": "Photobooth mariage - studio photo festif pour vos événements",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#07c24f",
+  "background_color": "#edf6ea"
+}

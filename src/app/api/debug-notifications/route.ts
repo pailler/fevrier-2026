@@ -1,11 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { NotificationService } from '../../../utils/notificationService';
 import { EmailService } from '../../../utils/emailService';
-import { Resend } from 'resend';
+
+type ResendTestDebug = {
+  success: boolean;
+  error?: string | null;
+  emailId?: string | null;
+  message?: string;
+  fromFormatted?: string;
+  note?: string;
+};
 
 export async function GET() {
   try {
-    const debug = {
+    const debug: {
+      timestamp: string;
+      environment: string | undefined;
+      resend: {
+        apiKeyConfigured: boolean;
+        apiKeyLength: number;
+        apiKeyPrefix: string;
+        fromEmailConfigured: boolean;
+        fromEmail: string;
+      };
+      services: {
+        emailServiceInitialized: boolean;
+        notificationServiceInitialized: boolean;
+      };
+      resendTest: ResendTestDebug;
+      notificationSettings: any[];
+      recentLogs: any[];
+    } = {
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV,
       
@@ -27,8 +52,8 @@ export async function GET() {
       // Test Resend direct
       resendTest: {
         success: false,
-        error: null as string | null,
-        emailId: null as string | null
+        error: null,
+        emailId: null,
       },
       
       // Paramètres de notification
@@ -43,22 +68,22 @@ export async function GET() {
       const emailService = EmailService.getInstance();
       debug.services.emailServiceInitialized = !!emailService;
       
-      // Test direct avec Resend
+      // Test config Resend (pas d'envoi réel en GET - utiliser POST avec email pour tester)
       if (process.env.RESEND_API_KEY) {
-        const resend = new Resend(process.env.RESEND_API_KEY);
-        const testResult = await resend.emails.send({
-          from: process.env.RESEND_FROM_EMAIL || 'noreply@iahome.fr',
-          to: 'test@example.com',
-          subject: 'Test Diagnostic IAHome',
-          html: '<p>Test de diagnostic</p>'
-        });
-        
-        if (testResult.error) {
-          debug.resendTest.error = testResult.error.message || 'Erreur Resend';
-        } else {
-          debug.resendTest.success = true;
-          debug.resendTest.emailId = testResult.data?.id;
-        }
+        const rawFrom = process.env.RESEND_FROM_EMAIL || 'noreply@iahome.fr';
+        const fromFormatted = rawFrom.includes('<') ? rawFrom : `IAHome <${rawFrom}>`;
+        debug.resendTest = {
+          success: true,
+          message: 'Config OK - Utilisez POST avec votre email pour tester l\'envoi réel',
+          fromFormatted,
+          note: 'Resend rejette test@example.com - utiliser un email réel'
+        };
+      } else {
+        debug.resendTest = {
+          success: false,
+          error: 'RESEND_API_KEY manquant',
+          emailId: null,
+        };
       }
     } catch (error) {
       debug.resendTest.error = error instanceof Error ? error.message : 'Erreur inconnue';

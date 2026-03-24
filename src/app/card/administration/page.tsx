@@ -345,10 +345,14 @@ export default function AdministrationPage() {
                   <div className="mt-3 text-center">
                     <Link
                       href="/administration"
-                      className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
+                      className="inline-flex flex-col items-center gap-1 px-6 py-3 bg-[#16a34a] hover:bg-[#15803d] text-white rounded-2xl transition-colors font-semibold shadow-lg"
                     >
-                      <span className="mr-2">📱</span>
-                      Aller à Mes Applications
+                      <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                        <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                        <polyline points="10 17 15 12 10 7" />
+                        <line x1="15" y1="12" x2="3" y2="12" />
+                      </svg>
+                      <span>Aller à Mes Applications</span>
                     </Link>
                   </div>
                 </div>
@@ -402,19 +406,22 @@ export default function AdministrationPage() {
                       }
                     }}
                     disabled={loading || checkingActivation}
-                    className="w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="w-full font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     {loading ? (
                       <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        <span>Ouverture en cours...</span>
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                        <span className="font-semibold text-base sm:text-lg">Ouverture en cours...</span>
                       </>
                     ) : (
                       <>
-                        <span className="text-xl">🏛️</span>
-                        <span>
-                          {isAuthenticated && user ? 'Accédez à les services administratifs (10 tokens par accès)' : 'Connectez-vous pour accéder (10 tokens par accès)'}
-                        </span>
+                        <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                          <polyline points="10 17 15 12 10 7" />
+                          <line x1="15" y1="12" x2="3" y2="12" />
+                        </svg>
+                        <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accédez aux services administratifs' : 'Connectez-vous pour accéder'}</span>
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 tokens par accès</span>
                       </>
                     )}
                   </button>

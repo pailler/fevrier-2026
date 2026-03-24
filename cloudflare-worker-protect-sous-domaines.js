@@ -14,7 +14,13 @@ addEventListener('fetch', event => {
 async function handleRequest(request) {
   const url = new URL(request.url);
   const method = request.method;
-  
+  const hostname = url.hostname;
+
+  // photobooth.iahome.fr : accès direct autorisé (sans restriction token)
+  if (hostname === 'photobooth.iahome.fr') {
+    return fetch(request);
+  }
+
   // ============================================
   // FIX CRITIQUE : Laisser passer les uploads et API EN PREMIER
   // ============================================

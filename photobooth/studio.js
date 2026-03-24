@@ -105,28 +105,15 @@ function setLockedMode(locked, message, type = "error") {
   authBanner.className = "auth-banner";
   if (type) authBanner.classList.add(type);
   authBanner.textContent = message;
+  authBanner.style.display = message ? "" : "none";
 }
 
 function validateAccessToken() {
   const rawToken = readTokenFromUrl();
-  const localRuntime = isLocalRuntime();
-
-  if (!rawToken && localRuntime) {
-    setLockedMode(
-      false,
-      "Mode local detecte: acces autorise sans token (developpement).",
-      "ok"
-    );
-    return true;
-  }
 
   if (!rawToken) {
-    setLockedMode(
-      true,
-      "Acces refuse: token manquant. Ouvre Photobooth depuis IAHome.",
-      "error"
-    );
-    return false;
+    setLockedMode(false, "", "");
+    return true;
   }
 
   const payload = parseJwtPayload(rawToken);
@@ -251,16 +238,31 @@ function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function runCountdown(seconds) {
+async function runCountdown(seconds, countdownAudio) {
   countdownOverlay.classList.add("active");
-  for (let value = seconds; value >= 1; value -= 1) {
-    countdownOverlay.textContent = String(value);
-    await wait(1000);
+  try {
+    for (let value = seconds; value >= 1; value -= 1) {
+      countdownOverlay.textContent = String(value);
+      await wait(1000);
+    }
+    countdownOverlay.textContent = "📸";
+    await wait(350);
+  } finally {
+    if (countdownAudio) {
+      countdownAudio.pause();
+      countdownAudio.currentTime = 0;
+    }
+    countdownOverlay.classList.remove("active");
+    countdownOverlay.textContent = "";
   }
-  countdownOverlay.textContent = "📸";
-  await wait(350);
-  countdownOverlay.classList.remove("active");
-  countdownOverlay.textContent = "";
+}
+
+function startCountdownAudio(seconds) {
+  var src = seconds === 3 ? "/sounds/countdown2.mp3" : "/sounds/countdown.mp3";
+  var audio = new Audio(src);
+  audio.volume = 0.9;
+  audio.play().catch(function () {});
+  return audio;
 }
 
 function ensureCaptureLayerSize() {
@@ -512,7 +514,7 @@ async function captureSequence() {
     const shots = [];
     setFeedback("Capture en cours...", "");
     for (let index = 0; index < shotCount; index += 1) {
-      await runCountdown(timerValue);
+      await runCountdown(timerValue, null);
       const snap = snapSingleFrame();
       shots.push(snap);
       setFeedback(`Prise ${index + 1}/${shotCount} capturee.`, "success");
@@ -569,7 +571,12 @@ function getChoicePageUrl() {
 }
 
 function goBackToChoice() {
-  window.location.href = getChoicePageUrl();
+  var url = getChoicePageUrl();
+  if (typeof window.navigateInApp === "function") {
+    window.navigateInApp(url);
+  } else {
+    window.location.href = url;
+  }
 }
 
 function resetInactivityTimer() {
@@ -585,10 +592,6 @@ function setupInactivityListener() {
 
 function configureBackLink() {
   backToEvents.href = getChoicePageUrl();
-  backToEvents.addEventListener("click", (e) => {
-    e.preventDefault();
-    goBackToChoice();
-  });
 }
 
 hasValidAccess = validateAccessToken();
@@ -629,15 +632,19 @@ async function handleCaptureButtonClick() {
     setFeedback("Aucun evenement selectionne.", "error");
     return;
   }
+  var countdown = Number(timerSelect?.value) || 8;
+  var countdownAudio = startCountdownAudio(countdown);
   enterCameraFullscreen();
-  await captureFromFullscreen(8);
+  await captureFromFullscreen(countdown, countdownAudio);
 }
 
-async function captureFromFullscreen(countdownSeconds = 3) {
+async function captureFromFullscreen(countdownSeconds, countdownAudio) {
   if (!hasValidAccess || !currentEvent || !mediaStream || isCapturing) return;
+  countdownSeconds = countdownSeconds ?? 8;
   isCapturing = true;
   try {
-    await runCountdown(countdownSeconds);
+    await runCountdown(countdownSeconds, countdownAudio);
+    await wait(3000);
     const snap = snapSingleFrame();
     const output = composeShotFullscreenFormat(snap);
     const dataUrl = output.toDataURL("image/jpeg", 0.92);
@@ -672,10 +679,13 @@ function handleCameraZoneInteraction(e) {
     return;
   }
   if (isCapturing) return;
+  var countdown = Number(timerSelect?.value) || 8;
+  var countdownAudio = startCountdownAudio(countdown);
   if (isCameraFullscreen) {
-    captureFromFullscreen();
+    captureFromFullscreen(countdown, countdownAudio);
   } else {
     enterCameraFullscreen();
+    captureFromFullscreen(countdown, countdownAudio);
   }
 }
 

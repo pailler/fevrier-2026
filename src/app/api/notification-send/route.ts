@@ -49,12 +49,16 @@ export async function POST(request: NextRequest) {
     // Instancier Resend à l'intérieur de la fonction
     const resend = new Resend(process.env.RESEND_API_KEY);
 
+    // Formater from: "IAHome <noreply@iahome.fr>" pour Resend (requis pour domaine personnalisé)
+    const rawFrom = process.env.RESEND_FROM_EMAIL || 'noreply@iahome.fr';
+    const from = rawFrom.includes('<') ? rawFrom : `IAHome <${rawFrom}>`;
+
     // Préparer l'email
     const emailData = {
       to: userEmail,
       subject: setting.email_template_subject,
       html: setting.email_template_body,
-      from: process.env.RESEND_FROM_EMAIL || 'IAHome <noreply@iahome.fr>'
+      from
     };
 
     // Envoyer l'email

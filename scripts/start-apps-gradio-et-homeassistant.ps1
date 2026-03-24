@@ -96,9 +96,10 @@ function Start-GradioApp {
         $oldPyPath = $env:PYTHONPATH
         $oldGradioPort = $env:GRADIO_SERVER_PORT
         $oldGradioServerName = $env:GRADIO_SERVER_NAME
+        # Toujours definir le port Gradio (app.py et forge_app.py)
+        $env:GRADIO_SERVER_PORT = $Port
+        $env:GRADIO_SERVER_NAME = "0.0.0.0"
         if ($useGradioPort) {
-            $env:GRADIO_SERVER_PORT = $Port
-            $env:GRADIO_SERVER_NAME = "0.0.0.0"
             if ($Path -match "extensions-builtin") {
                 $forgeRoot = (Split-Path (Split-Path $Path -Parent) -Parent)
                 if (Test-Path (Join-Path $forgeRoot "spaces.py")) {

@@ -142,7 +142,8 @@ const categoryColors = {
     'templates-automations': { primary: '#16a085', light: '#d5f4e6', border: '#138d75' },
     'hyper-design': { primary: '#9333ea', light: '#f3e8ff', border: '#7c3aed' },
     'gauge-card-pro': { primary: '#ff6b35', light: '#ffe5de', border: '#e55a2b' },
-    'picture-entity-plus': { primary: '#00bcd4', light: '#e0f7fa', border: '#0097a7' }
+    'picture-entity-plus': { primary: '#00bcd4', light: '#e0f7fa', border: '#0097a7' },
+    'hacs-populaires': { primary: '#ff9800', light: '#fff3e0', border: '#f57c00' }
 };
 
 // Mapping des icônes par catégorie
@@ -161,7 +162,8 @@ const categoryIcons = {
     'templates-automations': '🔧',
     'hyper-design': '💎',
     'gauge-card-pro': '📊',
-    'picture-entity-plus': '🖼️'
+    'picture-entity-plus': '🖼️',
+    'hacs-populaires': '⭐'
 };
 
 // Charger les données
@@ -690,6 +692,11 @@ const cardTypeSources = {
         name: 'Banner Card',
         url: 'https://github.com/nervetattoo/banner-card',
         hacs: 'banner-card'
+    },
+    'custom:flex-cells-card': {
+        name: 'Flex Cells Card',
+        url: 'https://github.com/michalowskil/flex-cells-card',
+        hacs: 'flex-cells-card'
     },
     'custom:weather-chart-card': {
         name: 'Weather Chart Card',

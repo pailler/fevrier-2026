@@ -98,28 +98,15 @@ function setLockedMode(locked, message, type = "error") {
   authBanner.className = "auth-banner";
   if (type) authBanner.classList.add(type);
   authBanner.textContent = message;
+  authBanner.style.display = message ? "" : "none";
 }
 
 function validateAccessToken() {
   const rawToken = readTokenFromUrl();
-  const localRuntime = isLocalRuntime();
-
-  if (!rawToken && localRuntime) {
-    setLockedMode(
-      false,
-      "Mode local detecte: acces autorise sans token (developpement).",
-      "ok"
-    );
-    return true;
-  }
 
   if (!rawToken) {
-    setLockedMode(
-      true,
-      "Acces refuse: token manquant. Ouvre Photobooth depuis IAHome.",
-      "error"
-    );
-    return false;
+    setLockedMode(false, "", "");
+    return true;
   }
 
   const payload = parseJwtPayload(rawToken);
@@ -144,13 +131,21 @@ function validateAccessToken() {
   return true;
 }
 
+function navigateTo(url) {
+  if (typeof window.navigateInApp === "function") {
+    window.navigateInApp(url);
+  } else {
+    window.location.href = url;
+  }
+}
+
 function openStudio(eventData) {
   sessionStorage.setItem(SESSION_EVENT_KEY, JSON.stringify(eventData));
   const currentToken = readTokenFromUrl();
   const url = new URL("./studio.html", window.location.href);
   url.searchParams.set("eventId", eventData.id);
   if (currentToken) url.searchParams.set("token", currentToken);
-  window.location.href = url.toString();
+  navigateTo(url.toString());
 }
 
 function openGallery(eventData) {
@@ -159,7 +154,7 @@ function openGallery(eventData) {
   const url = new URL("./gallery.html", window.location.href);
   url.searchParams.set("eventId", eventData.id);
   if (currentToken) url.searchParams.set("token", currentToken);
-  window.location.href = url.toString();
+  navigateTo(url.toString());
 }
 
 function showChoicePanel(eventData) {
@@ -169,7 +164,18 @@ function showChoicePanel(eventData) {
   panels.choice.classList.add("active");
   document.body.classList.add("choice-fullscreen");
   document.getElementById("choice-event-name").textContent = eventData.name;
-  document.getElementById("choice-event-meta").textContent = `PIN ${eventData.pin} • Organise par ${eventData.host}`;
+  document.getElementById("choice-event-meta").textContent = "PIN " + eventData.pin + " • Organise par " + eventData.host;
+  var token = readTokenFromUrl();
+  var studioUrl = new URL("./studio.html", window.location.href);
+  studioUrl.searchParams.set("eventId", eventData.id);
+  if (token) studioUrl.searchParams.set("token", token);
+  var galleryUrl = new URL("./gallery.html", window.location.href);
+  galleryUrl.searchParams.set("eventId", eventData.id);
+  if (token) galleryUrl.searchParams.set("token", token);
+  var btnPhoto = document.getElementById("btn-take-photo");
+  var btnGallery = document.getElementById("btn-gallery");
+  if (btnPhoto) btnPhoto.href = studioUrl.toString();
+  if (btnGallery) btnGallery.href = galleryUrl.toString();
 }
 
 function showJoinPanel() {
@@ -227,99 +233,84 @@ async function restoreChoicePanelFromUrl() {
 hasValidAccess = validateAccessToken();
 restoreChoicePanelFromUrl();
 
-tabs.forEach((tab) => {
-  tab.addEventListener("click", () => showTab(tab.dataset.tab));
-});
+var cardJoin = document.getElementById("card-join");
+var cardCreate = document.getElementById("card-create");
+if (cardJoin && cardCreate) {
+  var u = new URL(window.location.href);
+  var p = new URLSearchParams(u.search);
+  p.set("tab", "join");
+  cardJoin.href = u.pathname + "?" + p.toString();
+  p.set("tab", "create");
+  cardCreate.href = u.pathname + "?" + p.toString();
+}
+
+var urlTab = new URL(window.location.href).searchParams.get("tab");
+if (urlTab === "join" || urlTab === "create") showTab(urlTab);
+
+function addTapHandler(container, selector, handler) {
+  function handle(e) {
+    var el = e.target.closest(selector);
+    if (!el) return;
+    e.preventDefault();
+    handler(el, e);
+  }
+  container.addEventListener("click", handle);
+}
 
 joinInput.addEventListener("input", () => {
   joinInput.value = joinInput.value.replace(/\D/g, "").slice(0, 4);
 });
 
-document.getElementById("verify-code").addEventListener("click", () => {
-  (async () => {
+function onVerifyCode() {
   if (!hasValidAccess) {
     setFeedback(joinFeedback, "Acces refuse. Verifiez que vous avez ouvert Photobooth depuis IAHome avec un token valide.", "error");
     return;
   }
-
-  const code = joinInput.value.trim();
+  var code = joinInput.value.trim();
   setFeedback(joinFeedback, "");
-
   if (!/^\d{4}$/.test(code)) {
     setFeedback(joinFeedback, "Le code doit contenir exactement 4 chiffres.", "error");
     return;
   }
-
-  try {
-    const eventData = await findEventByPin(code);
+  findEventByPin(code).then(function (eventData) {
     setFeedback(joinFeedback, "Code valide !", "success");
     showChoicePanel(eventData);
     joinInput.value = "";
-  } catch (error) {
-    setFeedback(
-      joinFeedback,
-      String(error.message || "Code non trouve. Verifie le PIN."),
-      "error"
-    );
-  }
-  })();
-});
+  }).catch(function (error) {
+    setFeedback(joinFeedback, String(error.message || "Code non trouve. Verifie le PIN."), "error");
+  });
+}
 
-document.getElementById("btn-take-photo").addEventListener("click", () => {
-  if (currentJoinEvent) openStudio(currentJoinEvent);
-});
+var panelJoin = document.getElementById("panel-join");
+if (panelJoin) addTapHandler(panelJoin, "#verify-code", onVerifyCode);
 
-document.getElementById("btn-gallery").addEventListener("click", () => {
-  if (currentJoinEvent) openGallery(currentJoinEvent);
-});
 
-document.getElementById("choice-back").addEventListener("click", showJoinPanel);
-
-document.getElementById("create-event").addEventListener("click", () => {
-  (async () => {
+function onCreateEvent() {
   if (!hasValidAccess) {
     setFeedback(createFeedback, "Acces refuse. Verifiez que vous avez ouvert Photobooth depuis IAHome avec un token valide.", "error");
     return;
   }
-
-  const eventName = document.getElementById("event-name").value.trim();
-  const hostName = document.getElementById("host-name").value.trim();
+  var eventName = document.getElementById("event-name").value.trim();
+  var hostName = document.getElementById("host-name").value.trim();
   setFeedback(createFeedback, "");
-
   if (eventName.length < 3) {
     setFeedback(createFeedback, "Ajoute un nom d'evenement (min. 3 caracteres).", "error");
     return;
   }
-
   if (hostName.length < 2) {
-    setFeedback(
-      createFeedback,
-      "Ajoute le prenom de l'organisateur (min. 2 caracteres).",
-      "error"
-    );
+    setFeedback(createFeedback, "Ajoute le prenom de l'organisateur (min. 2 caracteres).", "error");
     return;
   }
-
-  try {
-    const created = await createEvent(eventName, hostName);
-    localStorage.setItem(
-      EVENTS_KEY,
-      JSON.stringify([created])
-    );
-    setFeedback(
-      createFeedback,
-      `Evenement cree. PIN ${created.pin}. Redirection vers le studio...`,
-      "success"
-    );
+  createEvent(eventName, hostName).then(function (created) {
+    localStorage.setItem(EVENTS_KEY, JSON.stringify([created]));
+    setFeedback(createFeedback, "Evenement cree. PIN " + created.pin + ". Redirection vers le studio...", "success");
     document.getElementById("event-name").value = "";
     document.getElementById("host-name").value = "";
-    setTimeout(() => openStudio(created), 300);
-  } catch (error) {
-    setFeedback(
-      createFeedback,
-      String(error.message || "Impossible de creer l'evenement."),
-      "error"
-    );
-  }
-  })();
-});
+    setTimeout(function () { openStudio(created); }, 300);
+  }).catch(function (error) {
+    setFeedback(createFeedback, String(error.message || "Impossible de creer l'evenement."), "error");
+  });
+}
+
+var panelCreate = document.getElementById("panel-create");
+if (panelCreate) addTapHandler(panelCreate, "#create-event", onCreateEvent);

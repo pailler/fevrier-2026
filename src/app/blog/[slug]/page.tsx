@@ -5,6 +5,7 @@ import Link from "next/link";
 import Breadcrumb from "../../../components/Breadcrumb";
 import { useParams } from "next/navigation";
 import { getArticleImage } from "../../../utils/articleImageGenerator";
+import { getBlogCategoryLabelFr } from "../../../utils/blogCategoryLabels";
 
 interface BlogArticle {
   id: string;
@@ -170,7 +171,7 @@ export default function BlogArticlePage() {
             <header className="mb-8">
               <div className="flex items-center mb-4">
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                  {article.category.charAt(0).toUpperCase() + article.category.slice(1)}
+                  {getBlogCategoryLabelFr(article.category)}
                 </span>
                 <span className="ml-3 text-sm text-gray-500">
                   {article.read_time} min de lecture

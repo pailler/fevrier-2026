@@ -587,10 +587,15 @@ export default function VoiceIsolationPage() {
                       alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                     }
                   }}
-                  className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
-                  <span className="text-xl">🎤</span>
-                  <span>Accéder à Voice Isolation (100 crédits)</span>
+                  <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                    <polyline points="10 17 15 12 10 7" />
+                    <line x1="15" y1="12" x2="3" y2="12" />
+                  </svg>
+                  <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">Accéder à Voice Isolation</span>
+                  <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">100 crédits par accès</span>
                 </button>
               ) : (
                 // Message pour les utilisateurs non connectés
@@ -600,10 +605,15 @@ export default function VoiceIsolationPage() {
                     console.log('🔒 Accès Voice Isolation - Redirection vers connexion');
                     router.push(`/login?redirect=${encodeURIComponent('/card/voice-isolation')}`);
                   }}
-                  className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
-                  <span className="text-xl">🔒</span>
-                  <span>Connectez-vous pour accéder Voice Isolation (100 crédits)</span>
+                  <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                    <polyline points="10 17 15 12 10 7" />
+                    <line x1="15" y1="12" x2="3" y2="12" />
+                  </svg>
+                  <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">Connectez-vous pour accéder</span>
+                  <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">100 crédits par accès</span>
                 </button>
               )}
 
@@ -650,10 +660,14 @@ export default function VoiceIsolationPage() {
                           alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                         }
                       }}
-                      className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                      className="inline-flex flex-col items-center gap-1 px-6 py-3 bg-[#16a34a] hover:bg-[#15803d] text-white rounded-2xl transition-colors font-semibold shadow-lg"
                     >
-                      <span className="mr-2">📱</span>
-                      Voir mes applications
+                      <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                        <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                        <polyline points="10 17 15 12 10 7" />
+                        <line x1="15" y1="12" x2="3" y2="12" />
+                      </svg>
+                      <span>Voir mes applications</span>
                     </button>
                   </div>
                 </div>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hi3DGen — Image vers 3D</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Hi3DGen — Image vers 3D</h1>
+      <p>Générez un modèle 3D à partir d'une image. Haute fidélité géométrique grâce à Hi3DGen.</p>
+    </header>
+
+    <main>
+      <section class="upload-zone" id="uploadZone">
+        <div id="previewArea">
+          <div id="placeholder">
+            <p>Glissez une image ici ou cliquez pour sélectionner</p>
+            <label for="fileInput" class="btn btn-primary">Choisir une image</label>
+            <input type="file" id="fileInput" accept="image/*" hidden>
+          </div>
+          <div id="imagePreview" class="hidden">
+            <img id="previewImg" src="" alt="Aperçu">
+            <p id="fileName"></p>
+            <button type="button" id="changeImage" class="btn btn-text">Changer d'image</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="actions">
+        <button type="button" id="generateBtn" class="btn btn-primary btn-large" disabled>
+          Générer le modèle 3D
+        </button>
+      </section>
+
+      <div id="error" class="message error hidden"></div>
+      <div id="loading" class="message loading hidden">
+        <span class="spinner"></span>
+        Génération en cours (2–5 min)...
+      </div>
+      <div id="result" class="result hidden">
+        <h3>Modèle 3D généré</h3>
+        <p>Téléchargez le fichier GLB pour l'utiliser dans Blender, Unity, etc.</p>
+        <a id="downloadLink" href="#" download="hi3dgen-output.glb" class="btn btn-success">
+          Télécharger le fichier GLB
+        </a>
+      </div>
+    </main>
+
+    <footer>
+      <p>Mode <strong>standalone</strong> : Hi3DGen. GPU requis.</p>
+      <p><a href="/api/check" target="_blank">Vérifier le serveur</a> — <a href="/api/check-deps" target="_blank">Diagnostic dépendances</a></p>
+    </footer>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

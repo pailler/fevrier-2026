@@ -165,22 +165,27 @@ export default function ModuleAccessButton({
       <button
         onClick={handleAccess}
         disabled={isLoading || !isAuthenticated || (tokens !== null && tokens < moduleCost)}
-        className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+        className={`w-full font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 shadow-lg ${
           isLoading || !isAuthenticated || (tokens !== null && tokens < moduleCost)
             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg'
+            : 'bg-[#16a34a] hover:bg-[#15803d] text-white hover:shadow-xl transform hover:-translate-y-1'
         }`}
       >
         {isLoading ? (
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            <span>Ouverture...</span>
-          </div>
+          <>
+            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <span className="font-semibold text-base sm:text-lg">Ouverture...</span>
+          </>
         ) : (
-          <div className="flex items-center space-x-2">
-            <span>🔓</span>
-            <span>Accéder à {moduleName} ({moduleCost} crédits)</span>
-          </div>
+          <>
+            <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+              <polyline points="10 17 15 12 10 7" />
+              <line x1="15" y1="12" x2="3" y2="12" />
+            </svg>
+            <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">Accéder à {moduleName}</span>
+            <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">{moduleCost} crédits par accès</span>
+          </>
         )}
       </button>
       

@@ -392,12 +392,15 @@ export default function MeTubePage() {
                     router.push(`/login?redirect=${encodeURIComponent('/card/metube?openApp=1')}`);
                   }
                 }}
-                className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
-                <span className="text-xl">🎥</span>
-                <span>
-                  {isAuthenticated && user ? 'Accédez à MeTube (10 tokens par accès)' : 'Connectez-vous pour accéder MeTube (10 tokens par accès)'}
-                </span>
+                <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                  <polyline points="10 17 15 12 10 7" />
+                  <line x1="15" y1="12" x2="3" y2="12" />
+                </svg>
+                <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accédez à MeTube' : 'Connectez-vous pour accéder'}</span>
+                <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 tokens par accès</span>
               </button>
             </div>
           </div>

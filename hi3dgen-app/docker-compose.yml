@@ -1,0 +1,28 @@
+# Hi3DGen Docker — GPU requis
+# Lancer: docker compose up --build
+# Interface: http://localhost:8095
+
+services:
+  hi3dgen:
+    build: .
+    image: hi3dgen-app:latest
+    ports:
+      - "8095:8095"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    environment:
+      - PORT=8095
+      - TORCH_COMPILE_DISABLE=1
+      - TORCHDYNAMO_DISABLE=1
+      - TORCHDYNAMO_DISABLE=1
+      - TORCHDYNAMO_DISABLE=1
+      - TORCHDYNAMO_DISABLE=1
+      - TORCHDYNAMO_DISABLE=1
+      - TORCHDYNAMO_DISABLE=1
+    volumes:
+      - ./tmp:/app/tmp

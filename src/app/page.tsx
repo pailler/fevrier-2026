@@ -163,10 +163,15 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Link 
                     href="/account" 
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
+                    className="bg-[#16a34a] hover:bg-[#15803d] text-white px-8 py-6 rounded-2xl font-semibold transition-colors inline-flex flex-col items-center justify-center gap-2 shadow-lg hover:shadow-xl"
                   >
-                    <span className="mr-2">📱</span>
-                    Acces à mes applis
+                    <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                      <polyline points="10 17 15 12 10 7" />
+                      <line x1="15" y1="12" x2="3" y2="12" />
+                    </svg>
+                    <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">Accès à mes applis</span>
+                    <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">Gérer vos applications activées</span>
                   </Link>
                 </div>
               </div>

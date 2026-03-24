@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Script vidéo YouTube — Nouveautés IA Home (5 min)</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 2rem;
+            color: #333;
+        }
+        @media print {
+            body { padding: 1rem; }
+            h2 { page-break-after: avoid; }
+            .segment { page-break-inside: avoid; }
+        }
+        h1 {
+            font-size: 1.5rem;
+            border-bottom: 2px solid #333;
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .meta { color: #666; font-size: 0.9rem; margin-bottom: 2rem; }
+        h2 {
+            font-size: 1.15rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #1a1a1a;
+        }
+        .segment { margin-bottom: 1.2rem; }
+        p { margin: 0.5rem 0; }
+        ul { margin: 0.5rem 0; padding-left: 1.5rem; }
+        li { margin: 0.25rem 0; }
+        strong { font-weight: 600; }
+        hr { border: none; border-top: 1px solid #ccc; margin: 1.5rem 0; }
+        .action { color: #0066cc; font-style: italic; }
+        .checklist li { list-style: none; padding-left: 0; }
+        .checklist li::before { content: "☐ "; }
+    </style>
+</head>
+<body>
+    <h1>Script vidéo YouTube — Nouveautés IA Home (5 min)</h1>
+    <p class="meta"><strong>Durée cible :</strong> 5 minutes &nbsp;|&nbsp; <strong>Format :</strong> Face caméra, démonstration plateforme + démos approfondies</p>
+    <hr>
+
+    <div class="segment">
+        <h2>1. Introduction et accès gratuit (0:00 – 0:45)</h2>
+        <p><strong>Bonjour à tous !</strong></p>
+        <p>Dans cette vidéo, je vous présente les dernières nouveautés de la plateforme IA Home pour Home Assistant. Et avant d'entrer dans le vif du sujet : un petit rappel important.</p>
+        <p><strong>Les ressources Home Assistant — manuels, codes Lovelace, automatisations — sont accessibles gratuitement.</strong> En vous inscrivant, vous recevez des crédits offerts. Ces crédits vous permettent d'accéder à tout le contenu : le manuel complet, les centaines de codes prêts à l'emploi, les automatisations, et l'application de recherche de codes. IA Home permet aussi l'accès à d'autres ressources indispensables : QR codes dynamiques, outils IA (détection de texte généré par IA, transcription audio Whisper, analyse de PDF), transferts de fichiers sans cloud (PsiTransfer), et bien d'autres. Rien à payer si vous restez dans le cadre des crédits offerts.</p>
+        <p><strong>Petit rappel pour les débutants :</strong> une <strong>carte</strong> est un bloc visuel de votre tableau de bord — un bouton, une jauge, un graphique — qui affiche ou contrôle vos appareils. Une <strong>automatisation</strong> est une règle qui exécute des actions toute seule selon des conditions : par exemple allumer la lumière au coucher du soleil, ou envoyer une alerte si une porte reste ouverte.</p>
+        <p>On commence par les nouveautés, puis je vous fais une démo détaillée de deux éléments : l'automatisation « réveil progressif » et la carte Flex Cells Card.</p>
+    </div>
+    <hr>
+
+    <div class="segment">
+        <h2>2. Tour d'horizon des nouveautés (0:45 – 1:30)</h2>
+        <p><strong>Les nouveautés de ces derniers mois :</strong></p>
+        <ul>
+            <li><strong>Nouveaux codes d'automatisation</strong> : simulation de présence, extinction en absence, mode nuit, escalier temporisé, bienvenue à la maison, antigel en absence, alertes humidité, porte ouverte, et d'autres encore.</li>
+            <li><strong>Nouvelle section « Cartes HACS populaires »</strong> avec des cartes bien notées par la communauté, comme Layout Card, Flex Cells Card, Entity Progress Card, Lumina Energy Card, Compact Power Card.</li>
+            <li><strong>Section ressources</strong> sur la page Home Assistant : liens utiles pour les utilisateurs et les développeurs — documentation officielle, HACS, forum, API, GitHub.</li>
+            <li><strong>Corrections et améliorations</strong> générales de l'interface.</li>
+        </ul>
+        <p>On passe maintenant aux deux démos approfondies.</p>
+    </div>
+    <hr>
+
+    <div class="segment">
+        <h2>3. Démo 1 — Automatisation « Réveil progressif » (1:30 – 3:00)</h2>
+        <p><strong>L'automatisation « réveil progressif »</strong>, ou simulation d'aube, consiste à faire monter progressivement la luminosité d'une lampe le matin, sur environ 30 minutes, pour un réveil plus doux.</p>
+        <p class="action">[Afficher l'application de recherche de codes]</p>
+        <ul>
+            <li>On va dans les <strong>Templates & Automatisations</strong>.</li>
+            <li>On cherche « réveil ».</li>
+            <li>On ouvre la carte <strong>« Réveil progressif (simulation aube) »</strong>.</li>
+        </ul>
+        <p class="action">[Montrer le code YAML]</p>
+        <p>L'idée :</p>
+        <ul>
+            <li>Un <strong>déclencheur</strong> à heure fixe, par exemple 6 h 30.</li>
+            <li>Une <strong>séquence répétée</strong> : à chaque minute, on augmente la luminosité de 3 % avec une transition douce.</li>
+            <li>Sur 30 minutes, ça donne une montée progressive de 0 à environ 90 %.</li>
+        </ul>
+        <p><strong>À adapter chez vous :</strong></p>
+        <ul>
+            <li>L'heure de réveil dans le trigger.</li>
+            <li>L'entité de la lumière de la chambre.</li>
+            <li>Si vous utilisez un <code>input_datetime</code> pour l'heure, vous remplacez l'heure fixe par cette entité.</li>
+        </ul>
+        <p class="action">[Montrer rapidement le chemin dans Home Assistant si possible : Paramètres → Automatisations → Créer une automatisation → Modifier en YAML]</p>
+        <p>Ça change vraiment le réveil, surtout l'hiver.</p>
+    </div>
+    <hr>
+
+    <div class="segment">
+        <h2>4. Démo 2 — Flex Cells Card (3:00 – 4:30)</h2>
+        <p><strong>La Flex Cells Card</strong> est une carte HACS qui permet de créer des tableaux personnalisés avec des colonnes de texte, d'icônes et d'entités.</p>
+        <p class="action">[Afficher la carte dans l'application]</p>
+        <ul>
+            <li>Section <strong>Cartes HACS Populaires (2026)</strong>.</li>
+            <li>On choisit <strong>Flex Cells Card — Tableaux flexibles (2026)</strong>.</li>
+        </ul>
+        <p class="action">[Montrer le code YAML]</p>
+        <p>Structure typique :</p>
+        <ul>
+            <li>Une <strong>ligne d'en-tête</strong> avec les titres : Pièce, Température, Humidité.</li>
+            <li>Une ou plusieurs <strong>lignes de données</strong> : une cellule texte (Salon), puis deux cellules entité (température, humidité).</li>
+        </ul>
+        <p><strong>Atouts pour les débutants :</strong></p>
+        <ul>
+            <li>Éditeur visuel intégré : pas besoin de tout saisir en YAML.</li>
+            <li>Tri par colonne.</li>
+            <li>Colonnes responsives.</li>
+            <li>Règles dynamiques (couleurs selon des seuils, par exemple).</li>
+        </ul>
+        <p><strong>À personnaliser :</strong></p>
+        <ul>
+            <li>Remplacer <code>sensor.temperature_salon</code> et <code>sensor.humidite_salon</code> par vos propres entités.</li>
+            <li>Ajouter d'autres pièces ou lignes en copiant le bloc <code>cells</code>.</li>
+            <li>Après installation via HACS, le code se colle dans une carte « Code éditeur » du tableau de bord Lovelace.</li>
+        </ul>
+    </div>
+    <hr>
+
+    <div class="segment">
+        <h2>5. Conclusion (4:30 – 5:00)</h2>
+        <p><strong>En résumé :</strong></p>
+        <p>Les ressources Home Assistant sur IA Home restent accessibles avec les crédits offerts à l'inscription. Les nouveautés incluent de nombreuses automatisations, la section HACS avec des cartes comme Flex Cells Card, et plus de liens utiles. L'automatisation « réveil progressif » et la Flex Cells Card sont deux bons points de départ pour améliorer votre tableau de bord.</p>
+        <p><strong>N'hésitez pas à vous abonner à la chaîne pour ne pas manquer les prochaines vidéos.</strong> À bientôt !</p>
+    </div>
+    <hr>
+
+    <div class="segment">
+        <h2>Notes pour le tournage</h2>
+        <ul>
+            <li><strong>Préparer les onglets</strong> : page d'accueil IA Home, section automatisations, section HACS, code du réveil progressif, code Flex Cells Card.</li>
+            <li><strong>Parler à un rythme posé</strong> : ~140–150 mots/min pour tenir ~5 min.</li>
+            <li><strong>Montrer l'écran</strong> au moment des démos (partage d'écran ou écran visible).</li>
+            <li><strong>Relire le script</strong> une fois avant de tourner pour s'en détacher et parler naturellement.</li>
+        </ul>
+    </div>
+    <hr>
+
+    <div class="segment">
+        <h2>Checklist avant tournage</h2>
+        <ul class="checklist">
+            <li>Connexion à IA Home fonctionnelle</li>
+            <li>Recherche « réveil » testée</li>
+            <li>Carte Flex Cells Card affichée</li>
+            <li>Exemple d'entités à personnaliser noté</li>
+            <li>Durée testée (repassage du script à voix haute)</li>
+        </ul>
+    </div>
+
+    <script>
+        // Instructions pour l'impression PDF
+        console.log('%cPour créer le PDF : Ctrl+P (ou Cmd+P) puis "Enregistrer au format PDF"', 'color: #0066cc; font-size: 14px; font-weight: bold;');
+    </script>
+</body>
+</html>

@@ -170,21 +170,26 @@ export default function CardPageAccessSection({
                 <button
                   onClick={handleDirectAccess}
                   disabled={loading}
-                  className={`w-full font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1
-                    ${loading ? 'bg-gray-400 cursor-not-allowed' : `bg-gradient-to-r ${gradientColors} text-white`}`}
+                  className={`w-full font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1
+                    ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#16a34a] hover:bg-[#15803d] text-white'}`}
                 >
                   {loading ? (
                     <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      <span>Ouverture en cours...</span>
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                      <span className="font-semibold text-base sm:text-lg">Ouverture en cours...</span>
                     </>
                   ) : (
                     <>
-                      <span className="text-xl">{icon}</span>
-                      <span>
-                        {isAuthenticated && user
-                          ? `Accéder à ${moduleName} (${tokenCost} tokens)`
-                          : `Connectez-vous pour accéder (${tokenCost} tokens)`}
+                      <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
+                        <polyline points="10 17 15 12 10 7" />
+                        <line x1="15" y1="12" x2="3" y2="12" />
+                      </svg>
+                      <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">
+                        {isAuthenticated && user ? `Accéder à ${moduleName}` : `Connectez-vous pour accéder`}
+                      </span>
+                      <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">
+                        {tokenCost} tokens {tokenUnit}
                       </span>
                     </>
                   )}

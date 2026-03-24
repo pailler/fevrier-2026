@@ -11,9 +11,10 @@ if (-not (Test-Path (Join-Path $ProjectRoot "package.json"))) {
 }
 Set-Location $ProjectRoot
 
-# Parametre optionnel : -SkipGradioApps pour ignorer PhotoMaker/BiRefNet/Florence-2/Animagine XL
-# Utile si erreur torchvision _C.pyd (incompatibilite PyTorch/torchvision)
-param([switch]$SkipGradioApps)
+# Parametres optionnels :
+# -SkipGradioApps : ignorer PhotoMaker/BiRefNet/Florence-2/Animagine XL
+# -PhotoMakerOnly : demarrer uniquement PhotoMaker (utilise par start-photomaker.ps1)
+param([switch]$SkipGradioApps, [switch]$PhotoMakerOnly)
 $CmdLineSkipGradio = $SkipGradioApps.IsPresent
 
 # Charger la config des apps Gradio si elle existe
@@ -25,13 +26,20 @@ if (Test-Path $ConfigFile) {
 # SkipGradioApps : -SkipGradioApps en ligne de commande OU $SkipGradioApps dans config
 $script:SkipGradioApps = $CmdLineSkipGradio -or ($null -ne (Get-Variable -Name "SkipGradioApps" -Scope 0 -ErrorAction SilentlyContinue) -and [bool]$SkipGradioApps)
 
-# Cache Hugging Face pour BiRefNet, Animagine XL, Florence-2 - evite les telechargements repetes
+# Cache Hugging Face pour BiRefNet, Animagine XL, Florence-2, PhotoMaker - evite les telechargements repetes
+# (PhotoMakerOnly utilise ~/.cache/huggingface par defaut pour les modeles deja telecharges)
 $DefaultModelsCache = Join-Path $ProjectRoot "models-cache"
 if (-not $ModelsCachePath) { $ModelsCachePath = $DefaultModelsCache }
 if (-not (Test-Path $ModelsCachePath)) { New-Item -ItemType Directory -Path $ModelsCachePath -Force | Out-Null }
-$env:HF_HOME = $ModelsCachePath
-$env:HF_HUB_CACHE = Join-Path $ModelsCachePath "hub"
-$env:TRANSFORMERS_CACHE = Join-Path $ModelsCachePath "transformers"
+if (-not $PhotoMakerOnly) {
+    $env:HF_HOME = $ModelsCachePath
+    $env:HF_HUB_CACHE = Join-Path $ModelsCachePath "hub"
+    $env:TRANSFORMERS_CACHE = Join-Path $ModelsCachePath "transformers"
+}
+
+# Eviter erreur "localhost is not accessible" pour apps Gradio (proxy Windows)
+$env:NO_PROXY = "localhost,127.0.0.1,::1"
+$env:no_proxy = $env:NO_PROXY
 
 # Chemins par defaut pour les apps Gradio (surchargeables via apps-hosts.config.ps1)
 if (-not $PhotomakerPath)   { $PhotomakerPath   = Join-Path $ProjectRoot "gradio-apps\photomaker" }
@@ -124,18 +132,22 @@ function Start-GradioApp {
     }
     $appPy = Join-Path $Path "app.py"
     $forgeAppPy = Join-Path $Path "forge_app.py"
+    $venvPython = Join-Path $Path ".venv\Scripts\python.exe"
+    $pythonExe = if (Test-Path $venvPython) { $venvPython } else { "python" }
     $scriptArg = ""
     if (Test-Path $forgeAppPy) {
         $scriptArg = "forge_app.py --port $Port --listen"
     } elseif (Test-Path $appPy) {
-        $scriptArg = "app.py --port $Port"
+        $scriptArg = "app.py"
     } else {
         Write-Host "  [SKIP] $Name : ni app.py ni forge_app.py." -ForegroundColor DarkGray
         return
     }
     try {
+        $env:GRADIO_SERVER_PORT = $Port
+        $env:GRADIO_SERVER_NAME = "0.0.0.0"
         $psi = New-Object System.Diagnostics.ProcessStartInfo
-        $psi.FileName = "python"
+        $psi.FileName = $pythonExe
         $psi.Arguments = $scriptArg
         $psi.WorkingDirectory = $Path
         $psi.UseShellExecute = $true
@@ -219,11 +231,21 @@ function Ensure-DockerNetwork {
 # ========== DEMARRAGE ==========
 Write-Host "`n========================================" -ForegroundColor Cyan
 Write-Host "  Demarrage des applications iahome" -ForegroundColor Cyan
+if ($PhotoMakerOnly) {
+    Write-Host "  Mode : PhotoMaker uniquement (port $PortPhotomaker)" -ForegroundColor Yellow
+}
 Write-Host "  Projet : $ProjectRoot" -ForegroundColor Gray
 if ($script:SkipGradioApps) {
     Write-Host "  [INFO] Apps Gradio (PhotoMaker, BiRefNet...) : IGNOREES" -ForegroundColor Yellow
 }
 Write-Host "========================================`n" -ForegroundColor Cyan
+
+if ($PhotoMakerOnly) {
+    Write-Host "6. PhotoMaker :$PortPhotomaker ..." -ForegroundColor Yellow
+    Start-GradioApp -Name "PhotoMaker" -Path $PhotomakerPath -Port $PortPhotomaker
+    Write-Host "`n  PhotoMaker : http://localhost:$PortPhotomaker`n" -ForegroundColor White
+    exit 0
+}
 
 # 1. Reseaux Docker
 Write-Host "0. Reseaux Docker..." -ForegroundColor Yellow

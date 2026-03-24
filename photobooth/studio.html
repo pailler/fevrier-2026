@@ -2,13 +2,17 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="./manifest.json" />
     <title>Studio Photobooth Mariage</title>
     <meta
       name="description"
       content="Studio photobooth responsive avec cadres festifs, filtres et galerie."
     />
     <link rel="stylesheet" href="./styles.css?v=4" />
+    <script src="./stay-standalone.js"></script>
   </head>
   <body>
     <main class="page studio-page">
@@ -35,8 +39,8 @@
         <div class="studio-grid">
           <article class="studio-card">
             <div class="camera-activate-row">
-              <button id="start-camera" class="btn-secondary btn-activate-camera" type="button">
-                Activer la camera
+              <button id="start-camera" class="btn-capture btn-activate-camera" type="button">
+                Etape 1 : cliquez ici et préparez-vous pour la photo
               </button>
             </div>
             <div id="camera-zone" class="preview-stage wedding-stage" role="button" tabindex="0" aria-label="Zone camera - toucher pour plein ecran, toucher a nouveau pour prendre la photo">
@@ -47,13 +51,12 @@
               <video id="camera-feed" autoplay playsinline muted></video>
               <canvas id="capture-layer"></canvas>
               <div id="countdown-overlay" class="countdown"></div>
-              <div id="fullscreen-hint" class="fullscreen-hint">Appuyez pour prendre la photo</div>
             </div>
 
             <div class="studio-actions">
               <button id="capture-photo" class="btn-capture" type="button">
                 <span class="btn-capture-icon">📸</span>
-                Vous êtes prêts ? Alors Cliquez !
+                Etape 2 : Prêt ? cliquez pour le compte à rebours de 8 secondes
               </button>
             </div>
 
@@ -73,8 +76,7 @@
             <label for="timer-select">Countdown</label>
             <select id="timer-select">
               <option value="3">3 secondes</option>
-              <option value="5">5 secondes</option>
-              <option value="8">8 secondes</option>
+              <option value="8" selected>8 secondes</option>
             </select>
 
             <label for="filter-select">Filtre</label>
@@ -102,7 +104,7 @@
             <div class="qr-card">
               <h6>QR code galerie</h6>
               <img id="gallery-qr-image" alt="QR code vers galerie" />
-              <a id="gallery-link" target="_blank" rel="noopener noreferrer" href="#">
+              <a id="gallery-link" href="#">
                 Ouvrir la galerie
               </a>
             </div>

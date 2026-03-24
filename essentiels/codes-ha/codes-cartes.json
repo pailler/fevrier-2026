@@ -362,6 +362,102 @@
       ]
     },
     {
+      "id": "flex-cells",
+      "name": "Flex Cells Card",
+      "description": "Tableaux flexibles avec icônes, texte ou entités. Configurable via l'éditeur visuel intégré.",
+      "codes": [
+        {
+          "id": "flex-cells-basic",
+          "name": "Flex Cells Card - Basique",
+          "description": "Tableau simple avec icônes, texte et entités. Remplacez les entités par les vôtres.",
+          "tags": [
+            "flex-cells",
+            "tableau",
+            "entités",
+            "icônes"
+          ],
+          "code": "type: custom:flex-cells-card\ncolumn_count: 4\nheader_from_first_row: true\nzebra: true\nrows:\n  - cells:\n    - type: icon\n      value: mdi:thermometer\n      align: left\n    - type: string\n      value: Salon\n      align: left\n    - type: entity\n      value: sensor.salon_temperature\n      align: right\n      use_entity_unit: true\n    - type: entity\n      value: sensor.salon_humidity\n      align: right\n      use_entity_unit: true\n  - cells:\n    - type: icon\n      value: mdi:lightbulb\n      align: left\n    - type: string\n      value: Cuisine\n      align: left\n    - type: entity\n      value: light.cuisine\n      align: right\n    - type: string\n      value: \"\"\n      align: right\ncell_padding:\n  top: 4\n  right: 8\n  bottom: 4\n  left: 8"
+        },
+        {
+          "id": "flex-cells-temperature",
+          "name": "Flex Cells Card - Température/Humidité",
+          "description": "Tableau températures et humidité par pièce avec séparateurs et tri.",
+          "tags": [
+            "flex-cells",
+            "température",
+            "humidité",
+            "salle"
+          ],
+          "code": "type: custom:flex-cells-card\ncolumn_count: 4\nheader_from_first_row: true\nzebra: true\nrows:\n  - cells:\n    - type: string\n      value: \"\"\n    - type: string\n      value: Pièce\n    - type: string\n      value: Température\n    - type: string\n      value: Humidité\n  - cells:\n    - type: icon\n      value: mdi:sofa-outline\n    - type: string\n      value: Salon\n    - type: entity\n      value: sensor.salon_temperature\n      use_entity_unit: true\n      precision: 1\n    - type: entity\n      value: sensor.salon_humidity\n      use_entity_unit: true\n      precision: 1\n  - cells:\n    - type: icon\n      value: mdi:fridge-outline\n    - type: string\n      value: Cuisine\n    - type: entity\n      value: sensor.cuisine_temperature\n      use_entity_unit: true\n    - type: entity\n      value: sensor.cuisine_humidity\n      use_entity_unit: true\n  - cells:\n    - type: icon\n      value: mdi:bed-outline\n    - type: string\n      value: Chambre\n    - type: entity\n      value: sensor.chambre_temperature\n      use_entity_unit: true\n    - type: entity\n      value: sensor.chambre_humidity\n      use_entity_unit: true\ncell_padding:\n  top: 4\n  right: 8\n  bottom: 4\n  left: 8"
+        },
+        {
+          "id": "flex-cells-lights",
+          "name": "Flex Cells Card - Éclairage",
+          "description": "Contrôle des lumières avec icône, nom et toggle. Cliquez sur l'icône pour allumer/éteindre.",
+          "tags": [
+            "flex-cells",
+            "éclairage",
+            "lumières",
+            "toggle"
+          ],
+          "code": "type: custom:flex-cells-card\ncolumn_count: 3\nrows:\n  - cells:\n    - type: entity\n      value: light.salon\n      entity_display: icon\n      tap_action:\n        action: toggle\n    - type: string\n      value: Salon\n    - type: entity\n      value: light.salon\n  - cells:\n    - type: entity\n      value: light.cuisine\n      entity_display: icon\n      tap_action:\n        action: toggle\n    - type: string\n      value: Cuisine\n    - type: entity\n      value: light.cuisine\n  - cells:\n    - type: entity\n      value: light.chambre\n      entity_display: icon\n      tap_action:\n        action: toggle\n    - type: string\n      value: Chambre\n    - type: entity\n      value: light.chambre\ncell_padding:\n  top: 6\n  right: 8\n  bottom: 6\n  left: 8"
+        },
+        {
+          "id": "flex-cells-batteries",
+          "name": "Flex Cells Card - Batteries",
+          "description": "Tableau d'état des batteries avec icône dynamique selon le niveau de charge.",
+          "tags": [
+            "flex-cells",
+            "batterie",
+            "capteurs",
+            "charge"
+          ],
+          "code": "type: custom:flex-cells-card\ncolumn_count: 3\nrows:\n  - cells:\n    - type: entity\n      value: sensor.telephone_battery\n      entity_display: icon\n    - type: string\n      value: Téléphone\n    - type: entity\n      value: sensor.telephone_battery\n      use_entity_unit: true\n  - cells:\n    - type: entity\n      value: sensor.tablette_battery\n      entity_display: icon\n    - type: string\n      value: Tablette\n    - type: entity\n      value: sensor.tablette_battery\n      use_entity_unit: true\n  - cells:\n    - type: entity\n      value: sensor.volet_battery\n      entity_display: icon\n    - type: string\n      value: Volet roulant\n    - type: entity\n      value: sensor.volet_battery\n      use_entity_unit: true\ncell_padding:\n  top: 4\n  right: 8\n  bottom: 4\n  left: 8"
+        },
+        {
+          "id": "flex-cells-media",
+          "name": "Flex Cells Card - Lecteur Média",
+          "description": "Contrôle d'un lecteur média avec icône, informations et actions.",
+          "tags": [
+            "flex-cells",
+            "média",
+            "musique",
+            "lecteur"
+          ],
+          "code": "type: custom:flex-cells-card\ncolumn_count: 3\nrows:\n  - cells:\n    - type: entity\n      value: media_player.salon\n      entity_display: icon\n      tap_action:\n        action: toggle\n    - type: entity\n      value: media_player.salon\n      attribute: media_title\n    - type: entity\n      value: media_player.salon\n  - cells:\n    - type: icon\n      value: mdi:volume-high\n    - type: string\n      value: Volume\n    - type: entity\n      value: media_player.salon\n      attribute: volume_level\n      use_entity_unit: false\ncell_padding:\n  top: 6\n  right: 8\n  bottom: 6\n  left: 8"
+        },
+        {
+          "id": "flex-cells-simple-icons",
+          "name": "Flex Cells Card - Icônes et Texte",
+          "description": "Grille simple avec icônes et texte statique. Idéal pour des infos rapides.",
+          "tags": [
+            "flex-cells",
+            "icônes",
+            "texte",
+            "grille"
+          ],
+          "code": "type: custom:flex-cells-card\ncolumn_count: 2\nrows:\n  - cells:\n    - type: icon\n      value: mdi:weather-sunny\n      align: center\n    - type: string\n      value: Ensoleillé\n      align: center\n  - cells:\n    - type: icon\n      value: mdi:thermometer\n      align: center\n    - type: entity\n      value: weather.home\n      attribute: temperature\n      align: center\n  - cells:\n    - type: icon\n      value: mdi:water-percent\n      align: center\n    - type: entity\n      value: weather.home\n      attribute: humidity\n      align: center\ncell_padding:\n  top: 8\n  right: 12\n  bottom: 8\n  left: 12"
+        },
+        {
+          "id": "flex-cells-temp-humidity-styled",
+          "name": "Flex Cells Card - Température/Humidité avec styles",
+          "description": "Tableau salon, cuisine, chambre, salle de bain, balcon. Icône verte pour le balcon, texte rouge et température bleue pour la salle de bain (température élevée).",
+          "tags": [
+            "flex-cells",
+            "température",
+            "humidité",
+            "salon",
+            "cuisine",
+            "chambre",
+            "salle de bain",
+            "balcon",
+            "styles"
+          ],
+          "code": "type: custom:flex-cells-card\ncolumn_count: 4\nheader_from_first_row: true\nzebra: true\nrows:\n  - cells:\n    - type: string\n      value: \"\"\n      align: left\n    - type: string\n      value: Pièce\n      align: left\n    - type: string\n      value: Température\n      align: right\n    - type: string\n      value: Humidité\n      align: right\n  - cells:\n    - type: icon\n      value: mdi:sofa-outline\n      align: left\n    - type: string\n      value: Salon\n      align: left\n    - type: entity\n      value: sensor.salon_temperature\n      align: right\n      use_entity_unit: true\n      precision: 1\n    - type: entity\n      value: sensor.salon_humidity\n      align: right\n      use_entity_unit: true\n      precision: 1\n  - cells:\n    - type: icon\n      value: mdi:fridge-outline\n      align: left\n    - type: string\n      value: Cuisine\n      align: left\n    - type: entity\n      value: sensor.cuisine_temperature\n      align: right\n      use_entity_unit: true\n      precision: 1\n    - type: entity\n      value: sensor.cuisine_humidity\n      align: right\n      use_entity_unit: true\n      precision: 1\n  - cells:\n    - type: icon\n      value: mdi:bed-outline\n      align: left\n    - type: string\n      value: Chambre\n      align: left\n    - type: entity\n      value: sensor.chambre_temperature\n      align: right\n      use_entity_unit: true\n      precision: 1\n    - type: entity\n      value: sensor.chambre_humidity\n      align: right\n      use_entity_unit: true\n      precision: 1\n  - cells:\n    - type: icon\n      value: mdi:shower-head\n      align: left\n    - type: string\n      value: Salle de bain\n      align: left\n      style:\n        color: red\n    - type: entity\n      value: sensor.salle_de_bain_temperature\n      align: right\n      use_entity_unit: true\n      precision: 1\n      dyn_color:\n        - entity: sensor.salle_de_bain_temperature\n          attr: \"\"\n          op: \">=\"\n          val: \"27\"\n          fg: \"#2196f3\"\n    - type: entity\n      value: sensor.salle_de_bain_humidity\n      align: right\n      use_entity_unit: true\n      precision: 1\n  - cells:\n    - type: icon\n      value: mdi:balcony\n      align: left\n      style:\n        color: \"#1eeb40\"\n    - type: string\n      value: Balcon\n      align: left\n    - type: entity\n      value: sensor.balcon_temperature\n      align: right\n      use_entity_unit: true\n      precision: 1\n    - type: entity\n      value: sensor.balcon_humidity\n      align: right\n      use_entity_unit: true\n      precision: 1\ncell_padding:\n  top: 4\n  right: 8\n  bottom: 4\n  left: 8"
+        }
+      ]
+    },
+    {
       "id": "weather",
       "name": "Cartes Météo",
       "description": "Cartes pour afficher les informations météorologiques",
@@ -1023,6 +1119,158 @@
             "sun"
           ],
           "code": "automation:\n- id: lumieres_coucher_soleil\n  alias: Lumières au coucher du soleil\n  trigger:\n    - platform: sun\n      event: sunset\n      offset: '-00:30:00'\n  action:\n    - service: light.turn_on\n      target:\n        entity_id:\n          - light.salon\n          - light.couloir\n      data:\n        brightness_pct: 60"
+        },
+        {
+          "id": "automation-simulation-presence",
+          "name": "Automation - Simulation de présence",
+          "description": "Allume des lumières aléatoirement le soir quand personne n'est à la maison (dissuasion cambriolage)",
+          "tags": [
+            "automatisation",
+            "présence",
+            "sécurité",
+            "simulation",
+            "absence"
+          ],
+          "code": "automation:\n- id: simulation_presence\n  alias: Simulation de présence\n  description: Allume des lumières aléatoirement en soirée quand personne à la maison\n  mode: single\n  trigger:\n    - platform: time_pattern\n      hours: '18,19,20,21,22,23'\n      minutes: '/15'\n  condition:\n    - condition: state\n      entity_id: group.family\n      state: 'not_home'\n    - condition: sun\n      after: sunset\n      before: sunrise\n  action:\n    - choose:\n      - conditions:\n        - condition: template\n          value_template: \"{{ range(1, 4) | random == 1 }}\"\n        action:\n          - service: light.turn_on\n            target:\n              entity_id:\n                - light.salon\n                - light.chambre\n                - light.bureau\n            data:\n              brightness_pct: \"{{ range(30, 80) | random }}\"\n    - delay:\n        hours: \"{{ range(1, 3) | random }}\"\n        minutes: \"{{ range(0, 59) | random }}\"\n    - service: light.turn_off\n      target:\n        entity_id:\n          - light.salon\n          - light.chambre\n          - light.bureau"
+        },
+        {
+          "id": "automation-extinction-absence",
+          "name": "Automation - Extinction des lumières en absence",
+          "description": "Éteint toutes les lumières lorsqu'aucun occupant n'est à la maison",
+          "tags": [
+            "automatisation",
+            "présence",
+            "absence",
+            "lumière",
+            "économie"
+          ],
+          "code": "automation:\n- id: extinction_absence\n  alias: Extinction des lumières en absence\n  description: Éteint les lumières quand tout le monde quitte la maison\n  mode: single\n  trigger:\n    - platform: state\n      entity_id: group.family\n      to: 'not_home'\n      for:\n        minutes: 5\n  action:\n    - service: light.turn_off\n      target:\n        entity_id:\n          - light.salon\n          - light.couloir\n          - light.chambre\n          - light.cuisine"
+        },
+        {
+          "id": "automation-reveil-progressif",
+          "name": "Automation - Réveil progressif (simulation aube)",
+          "description": "Lumière qui s'allume progressivement sur 30 min pour un réveil en douceur",
+          "tags": [
+            "automatisation",
+            "réveil",
+            "lumière",
+            "confort",
+            "progressive"
+          ],
+          "code": "automation:\n- id: reveil_progressif\n  alias: Réveil progressif\n  description: Lumière progressive sur 30 minutes pour un réveil en douceur\n  mode: single\n  trigger:\n    - platform: time\n      at: '06:30:00'\n  action:\n    - repeat:\n        sequence:\n          - service: light.turn_on\n            target:\n              entity_id: light.chambre\n            data:\n              brightness_pct: '{{ repeat.index * 3 }}'\n              transition: 120\n          - delay:\n              minutes: 1\n        count: 33"
+        },
+        {
+          "id": "automation-mode-nuit",
+          "name": "Automation - Mode nuit (extinction générale)",
+          "description": "Éteint les lumières et active le mode nuit à une heure définie",
+          "tags": [
+            "automatisation",
+            "mode nuit",
+            "extinction",
+            "sommeil"
+          ],
+          "code": "automation:\n- id: mode_nuit\n  alias: Mode nuit\n  description: Extinction générale et activation du mode nuit\n  mode: single\n  trigger:\n    - platform: time\n      at: '23:00:00'\n  action:\n    - service: light.turn_off\n      target:\n        entity_id:\n          - light.salon\n          - light.couloir\n          - light.bureau\n    - service: input_boolean.turn_off\n      target:\n        entity_id: input_boolean.mode_veille\n    - service: input_boolean.turn_on\n      target:\n        entity_id: input_boolean.mode_nuit"
+        },
+        {
+          "id": "automation-escalier-temporise",
+          "name": "Automation - Éclairage escalier temporisé",
+          "description": "Allume la lumière de l'escalier à la détection de mouvement, extinction après 2 minutes",
+          "tags": [
+            "automatisation",
+            "présence",
+            "lumière",
+            "escalier",
+            "temporisé"
+          ],
+          "code": "automation:\n- id: escalier_temporise\n  alias: Éclairage escalier temporisé\n  mode: restart\n  trigger:\n    - platform: state\n      entity_id:\n        - binary_sensor.mouvement_escalier_haut\n        - binary_sensor.mouvement_escalier_bas\n      to: 'on'\n  action:\n    - service: light.turn_on\n      target:\n        entity_id: light.escalier\n      data:\n        brightness_pct: 70\n    - delay:\n        minutes: 2\n    - service: light.turn_off\n      target:\n        entity_id: light.escalier"
+        },
+        {
+          "id": "automation-mode-depart",
+          "name": "Automation - Mode départ (tout éteindre)",
+          "description": "Scénario départ : éteint lumières, baisse le chauffage et active l'alarme",
+          "tags": [
+            "automatisation",
+            "départ",
+            "sécurité",
+            "économie"
+          ],
+          "code": "automation:\n- id: mode_depart\n  alias: Mode départ\n  description: Tout éteindre et sécuriser en quittant la maison\n  mode: single\n  trigger:\n    - platform: state\n      entity_id: input_boolean.mode_depart\n      to: 'on'\n  action:\n    - service: light.turn_off\n      target:\n        entity_id: group.lights\n    - service: climate.set_temperature\n      target:\n        entity_id: climate.maison\n      data:\n        temperature: 16\n    - service: alarm_control_panel.alarm_arm_away\n      target:\n        entity_id: alarm_control_panel.maison"
+        },
+        {
+          "id": "automation-alerte-porte-ouverte",
+          "name": "Automation - Alerte porte/entrée ouverte trop longtemps",
+          "description": "Notification si la porte d'entrée reste ouverte plus de 5 minutes",
+          "tags": [
+            "automatisation",
+            "porte",
+            "alerte",
+            "sécurité"
+          ],
+          "code": "automation:\n- id: alerte_porte_ouverte\n  alias: Alerte porte ouverte trop longtemps\n  description: Notification si la porte d'entrée reste ouverte\n  mode: single\n  trigger:\n    - platform: state\n      entity_id: binary_sensor.porte_entree\n      to: 'on'\n      for:\n        minutes: 5\n  action:\n    - service: notify.mobile_app_votre_telephone\n      data:\n        title: \"🚪 Porte d'entrée ouverte\"\n        message: \"La porte d'entrée est ouverte depuis plus de 5 minutes\"\n        data:\n          priority: normal"
+        },
+        {
+          "id": "automation-lumiere-temperature-couleur",
+          "name": "Automation - Couleur de lumière selon l'heure",
+          "description": "Lumière froide le matin/journée, chaude le soir pour le confort circadien",
+          "tags": [
+            "automatisation",
+            "lumière",
+            "couleur",
+            "heure",
+            "confort"
+          ],
+          "code": "automation:\n- id: lumiere_temperature_couleur\n  alias: Température de couleur selon l'heure\n  description: Lumière froide le jour, chaude le soir\n  mode: single\n  trigger:\n    - platform: time_pattern\n      hours: '/3'\n  action:\n    - choose:\n      - conditions:\n        - condition: sun\n          after: sunrise\n          before_offset: '-01:00:00'\n          after_offset: '02:00:00'\n        action:\n          - service: light.turn_on\n            target:\n              entity_id: light.salon\n            data:\n              kelvin: 4000\n      - conditions:\n        - condition: sun\n          after: sunset\n          before: sunrise\n        action:\n          - service: light.turn_on\n            target:\n              entity_id: light.salon\n            data:\n              kelvin: 2700"
+        },
+        {
+          "id": "automation-bienvenue-retour",
+          "name": "Automation - Bienvenue à la maison",
+          "description": "Allume les lumières et prépare la maison au premier occupant qui revient",
+          "tags": [
+            "automatisation",
+            "retour",
+            "présence",
+            "accueil"
+          ],
+          "code": "automation:\n- id: bienvenue_retour\n  alias: Bienvenue à la maison\n  description: Allumer les lumières à l'arrivée du premier occupant\n  mode: single\n  trigger:\n    - platform: state\n      entity_id: group.family\n      from: 'not_home'\n      to: 'home'\n  condition:\n    - condition: sun\n      after: sunset\n  action:\n    - service: light.turn_on\n      target:\n        entity_id:\n          - light.couloir\n          - light.salon\n      data:\n        brightness_pct: 50"
+        },
+        {
+          "id": "automation-antigel-absence",
+          "name": "Automation - Antigel en absence (chauffage minimal)",
+          "description": "Baisse le chauffage à 12°C quand personne à la maison en hiver pour éviter le gel",
+          "tags": [
+            "automatisation",
+            "chauffage",
+            "absence",
+            "antigel",
+            "économie"
+          ],
+          "code": "automation:\n- id: antigel_absence\n  alias: Antigel en absence\n  description: Chauffage minimal quand tout le monde est parti\n  mode: single\n  trigger:\n    - platform: state\n      entity_id: group.family\n      to: 'not_home'\n      for:\n        minutes: 30\n  condition:\n    - condition: numeric_state\n      entity_id: sensor.temperature_exterieure\n      below: 5\n  action:\n    - service: climate.set_temperature\n      target:\n        entity_id: climate.maison\n      data:\n        temperature: 12"
+        },
+        {
+          "id": "automation-heures-creuses-lave-linge",
+          "name": "Automation - Lancer le lave-linge aux heures creuses",
+          "description": "Rappel ou démarrage automatique du lave-linge pendant les heures creuses (économie)",
+          "tags": [
+            "automatisation",
+            "heures creuses",
+            "machine",
+            "économie",
+            "énergie"
+          ],
+          "code": "automation:\n- id: lave_linge_heures_creuses\n  alias: Lave-linge aux heures creuses\n  description: Démarrage ou rappel pendant les heures creuses\n  mode: single\n  trigger:\n    - platform: time\n      at:\n        - '02:00:00'\n        - '12:30:00'\n  action:\n    - service: notify.mobile_app_votre_telephone\n      data:\n        title: \"🧺 Heures creuses\"\n        message: \"Pensez à lancer le lave-linge pour économiser l'électricité !\"\n        data:\n          priority: low"
+        },
+        {
+          "id": "automation-alerte-humidite",
+          "name": "Automation - Alerte humidité excessive (fuite)",
+          "description": "Notification si l'humidité dépasse un seuil (détection fuite, condensation)",
+          "tags": [
+            "automatisation",
+            "humidité",
+            "alerte",
+            "fuite",
+            "air"
+          ],
+          "code": "automation:\n- id: alerte_humidite\n  alias: Alerte humidité excessive\n  description: Notification si humidité trop élevée (risque fuite)\n  mode: single\n  trigger:\n    - platform: numeric_state\n      entity_id:\n        - sensor.humidite_salle_de_bain\n        - sensor.humidite_cave\n      above: 80\n      for:\n        minutes: 10\n  action:\n    - service: notify.mobile_app_votre_telephone\n      data:\n        title: \"💧 Humidité élevée\"\n        message: \"{{ state_attr(trigger.entity_id, 'friendly_name') }} : {{ states(trigger.entity_id) }}% - Vérifier risque de fuite\"\n        data:\n          priority: high"
         },
         {
           "id": "template-sensor-derniere-mise-a-jour",
@@ -2519,6 +2767,79 @@
             "nouveauté"
           ],
           "code": "alias: \"Exemple Automatisation Avancée 2025.5\"\ndescription: \"Utilise les nouvelles fonctionnalités de l'éditeur\"\ntrigger:\n# Nouveaux types de déclencheurs disponibles :\n- platform: state\n  entity_id: sensor.temperature_salon\n  above: 25\n  for:\n    minutes: 10\n- platform: numeric_state\n  entity_id: sensor.humidite_salon\n  above: 70\n  below: 90\ncondition:\n# Nouvelles conditions disponibles :\n- condition: and\n  conditions:\n    - condition: state\n      entity_id: person.regis\n      state: home\n    - condition: time\n      after: \"08:00:00\"\n      before: \"22:00:00\"\naction:\n# Nouvelles actions disponibles :\n- service: climate.set_temperature\n  target:\n    entity_id: climate.salon\n  data:\n    temperature: 22\n- delay:\n    seconds: 5\n- service: notify.mobile_app_telephone\n  data:\n    title: \"Climatisation ajustée\"\n    message: \"La température a été réduite à 22°C\"\n# Nouvelles options de répétition et boucles\n- repeat:\n    count: 3\n    sequence:\n      - service: light.turn_on\n        target:\n          entity_id: light.salon\n        data:\n          brightness_pct: 50"
+        }
+      ]
+    },
+    {
+      "id": "hacs-populaires",
+      "name": "Cartes HACS Populaires (2026)",
+      "description": "Cartes custom bien notées par la communauté Home Assistant, à installer via HACS",
+      "codes": [
+        {
+          "id": "layout-card-2026",
+          "name": "Layout Card - Organisation des vues (2026)",
+          "description": "Contrôle avancé du placement des cartes : Masonry, Horizontal, Vertical, Grid. ThomasLoven, 1200+ étoiles GitHub.",
+          "tags": [
+            "hacs",
+            "layout",
+            "grille",
+            "masonry",
+            "organisation",
+            "dashboard"
+          ],
+          "code": "type: custom:layout-card\nlayout_type: custom:masonry-layout\nlayout:\n  width: 300\n  max_cols: 10\ncards:\n  - type: entities\n    entities:\n      - light.salon\n    title: Lumières\n  - type: entities\n    entities:\n      - sensor.temperature_salon\n    title: Température"
+        },
+        {
+          "id": "flex-cells-card-2026",
+          "name": "Flex Cells Card - Tableaux flexibles (2026)",
+          "description": "Tableaux configurables avec éditeur visuel : icônes, texte, entités, contrôles. Colonnes responsives, tri dynamique.",
+          "tags": [
+            "hacs",
+            "flex",
+            "tableau",
+            "éditeur",
+            "entités"
+          ],
+          "code": "type: custom:flex-cells-card\nrows:\n  - header:\n    - type: string\n      value: Pièce\n    - type: string\n      value: Température\n    - type: string\n      value: Humidité\n    cells:\n    - type: string\n      value: Salon\n    - type: entity\n      value: sensor.temperature_salon\n    - type: entity\n      value: sensor.humidite_salon"
+        },
+        {
+          "id": "entity-progress-card-2026",
+          "name": "Entity Progress Card - Barre de progression (2026)",
+          "description": "Barre de progression moderne pour entités (batterie, humidité, etc.). Intégration Tile/Mushroom, thèmes dynamiques.",
+          "tags": [
+            "hacs",
+            "progress",
+            "barre",
+            "pourcentage",
+            "batterie"
+          ],
+          "code": "type: custom:entity-progress-card\nentity: sensor.batterie_telephone\nname: Batterie téléphone\nmin_value: 0\nmax_value: 100\nbar_size: medium\nlayout: horizontal"
+        },
+        {
+          "id": "lumina-energy-card-2026",
+          "name": "Lumina Energy Card - Dashboard énergie 3D (2026)",
+          "description": "Tableau de bord énergie ultra-moderne 3D : maison, batterie, solaire, recharge véhicule électrique. Interface drag-and-drop.",
+          "tags": [
+            "hacs",
+            "énergie",
+            "solaire",
+            "batterie",
+            "3D"
+          ],
+          "code": "type: custom:lumina-energy-card\nentities:\n  grid_consumption: sensor.puissance_grid\n  home_consumption: sensor.puissance_maison\n  solar_production: sensor.puissance_solaire\n  battery_charge: sensor.batterie_soc\n  battery_power: sensor.puissance_batterie"
+        },
+        {
+          "id": "compact-power-card-2026",
+          "name": "Compact Power Card - Suivi puissance (2026)",
+          "description": "Carte compacte pour PV, réseau, batterie, consommation. Couleurs dynamiques, seuils personnalisables, compatible Sections UI.",
+          "tags": [
+            "hacs",
+            "puissance",
+            "solaire",
+            "batterie",
+            "compact"
+          ],
+          "code": "type: custom:compact-power-card\nentities:\n  grid: sensor.puissance_grid\n  solar: sensor.puissance_solaire\n  battery: sensor.puissance_batterie\n  home: sensor.puissance_maison\nlabels:\n  grid: Réseau\n  solar: Solaire\n  battery: Batterie\n  home: Maison"
         }
       ]
     },

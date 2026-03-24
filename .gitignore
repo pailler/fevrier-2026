@@ -58,6 +58,7 @@ models-cache/
 
 # Fichiers d'environnement
 .env.local
+.env.production
 .env.production.local
 env.production.local
 .env.development.local
@@ -117,3 +118,7 @@ meeting-reports/uploads/*.FLAC
 *.sqlite-wal
 *.db
 docker-services/essentiels/n8n/data/*.sqlite*
+
+# Hi3DGen — environnement Python local (ne pas versionner)
+hi3dgen-app/venv/
+hi3dgen-app/**/__pycache__/

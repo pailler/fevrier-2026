@@ -1,8 +1,17 @@
 # Configuration Traefik pour Photobooth
 # Route photobooth.iahome.fr vers le service sur port 7885
-# Pas de redirection si token présent - l'app gère elle-même la validation
+# Accès direct autorisé (sans token). CSP permissive pour permettre l'exécution des scripts.
 
 http:
+  middlewares:
+    photobooth-headers:
+      headers:
+        customResponseHeaders:
+          Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+          X-Content-Type-Options: "nosniff"
+          X-Frame-Options: "SAMEORIGIN"
+          Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self';"
+
   serversTransports:
     photobooth-transport:
       forwardingTimeouts:
@@ -20,7 +29,7 @@ http:
       rule: "Host(`photobooth.iahome.fr`)"
       entryPoints: ["web"]
       service: photobooth-service
-      middlewares: ["security-headers@file"]
+      middlewares: ["photobooth-headers"]
       priority: 10
 
     photobooth-https:
@@ -29,7 +38,7 @@ http:
       service: photobooth-service
       tls:
         certResolver: letsencrypt
-      middlewares: ["security-headers@file"]
+      middlewares: ["photobooth-headers"]
       priority: 10
 
   services:

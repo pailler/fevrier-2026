@@ -20,6 +20,11 @@ export async function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') || '';
   const xForwardedHost = request.headers.get('x-forwarded-host') || '';
 
+  // Hi3DGen : sur localhost:8095, la racine affiche directement l'app Image→3D (Hi3DGen)
+  if ((hostname === 'localhost:8095' || hostname === '127.0.0.1:8095') && (pathname === '/' || pathname === '')) {
+    return NextResponse.redirect(new URL('/card/hi3dgen', request.url), 302);
+  }
+
   // Protection LibreSpeed : Si accès via librespeed.iahome.fr
   // Avec Redirect Rules Cloudflare, cette protection est déjà gérée par Redirect Rules
   // Le middleware ne fait que vérifier le token et laisser passer si valide

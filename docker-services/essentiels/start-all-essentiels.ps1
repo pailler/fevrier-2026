@@ -1,6 +1,11 @@
 # Script pour démarrer tous les services essentiels
+# Utilise le docker-compose principal pour librespeed, qrcodes, metube, n8n
+# (noms de conteneurs cohérents avec Traefik : librespeed-iahome, qrcodes-iahome)
 Write-Host "🚀 Démarrage de tous les services essentiels" -ForegroundColor Cyan
 Write-Host "=============================================" -ForegroundColor Cyan
+
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+Set-Location $scriptDir
 
 # Vérifier si Docker est en cours d'exécution
 Write-Host "`n1. Vérification de Docker..." -ForegroundColor Yellow
@@ -17,87 +22,55 @@ try {
     exit 1
 }
 
-# Vérifier si le réseau iahome-network existe
-Write-Host "`n2. Vérification du réseau iahome-network..." -ForegroundColor Yellow
-try {
-    $networkExists = docker network ls --filter name=iahome-network --format "{{.Name}}" 2>$null
-    if ($networkExists -eq "iahome-network") {
-        Write-Host "   ✅ Réseau iahome-network trouvé" -ForegroundColor Green
+# Vérifier/créer les réseaux requis
+Write-Host "`n2. Vérification des réseaux Docker..." -ForegroundColor Yellow
+foreach ($network in @("iahome-network", "iahome_iahome-network")) {
+    docker network inspect $network 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "   ✅ Réseau $network trouvé" -ForegroundColor Green
     } else {
-        Write-Host "   ⚠️  Création du réseau iahome-network..." -ForegroundColor Yellow
-        docker network create iahome-network
+        Write-Host "   ⚠️  Création du réseau $network..." -ForegroundColor Yellow
+        docker network create $network
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "   ✅ Réseau iahome-network créé" -ForegroundColor Green
+            Write-Host "   ✅ Réseau $network créé" -ForegroundColor Green
         } else {
-            Write-Host "   ❌ Erreur lors de la création du réseau" -ForegroundColor Red
+            Write-Host "   ❌ Erreur lors de la création de $network" -ForegroundColor Red
             exit 1
         }
     }
-} catch {
-    Write-Host "   ❌ Erreur lors de la vérification du réseau" -ForegroundColor Red
-    exit 1
 }
 
-# Arrêter les anciens containers
-Write-Host "`n3. Arrêt des anciens containers..." -ForegroundColor Yellow
-$oldContainers = @("librespeed-iahome", "metube-iahome", "stirling-pdf-iahome", "psitransfer-iahome", "qrcodes-iahome")
-foreach ($container in $oldContainers) {
-    $containerExists = docker ps -a --filter name=$container --format "{{.Names}}" 2>$null
-    if ($containerExists -eq $container) {
-        Write-Host "   🛑 Arrêt de $container..." -ForegroundColor Yellow
-        docker stop $container 2>$null
-        docker rm $container 2>$null
-        Write-Host "   ✅ $container arrêté et supprimé" -ForegroundColor Green
-    }
-}
-
-# Démarrer LibreSpeed
-Write-Host "`n4. Démarrage de LibreSpeed..." -ForegroundColor Yellow
-docker-compose -f librespeed/docker-compose.yml up -d
+# Démarrer les services du compose principal (librespeed, qrcodes, metube, n8n)
+# Conteneurs : librespeed-iahome, qrcodes-iahome, metube-iahome, n8n-iahome
+# Tous avec restart: unless-stopped, compatibles Traefik
+Write-Host "`n3. Démarrage des services principaux (LibreSpeed, QR Codes, MeTube, n8n)..." -ForegroundColor Yellow
+docker compose -f docker-compose.yml up -d
 if ($LASTEXITCODE -eq 0) {
-    Write-Host "   ✅ LibreSpeed démarré" -ForegroundColor Green
+    Write-Host "   ✅ Services principaux démarrés" -ForegroundColor Green
 } else {
-    Write-Host "   ❌ Erreur LibreSpeed" -ForegroundColor Red
+    Write-Host "   ❌ Erreur au démarrage des services principaux" -ForegroundColor Red
 }
 
-# Démarrer MeTube
-Write-Host "`n5. Démarrage de MeTube..." -ForegroundColor Yellow
-docker-compose -f metube/docker-compose.yml up -d
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "   ✅ MeTube démarré" -ForegroundColor Green
-} else {
-    Write-Host "   ❌ Erreur MeTube" -ForegroundColor Red
-}
-
-# Démarrer PDF
-Write-Host "`n6. Démarrage de PDF..." -ForegroundColor Yellow
-docker-compose -f pdf/docker-compose.yml up -d
+# Démarrer Stirling PDF (non inclus dans le compose principal)
+Write-Host "`n4. Démarrage de Stirling PDF..." -ForegroundColor Yellow
+docker compose -f pdf/docker-compose.yml up -d
 if ($LASTEXITCODE -eq 0) {
     Write-Host "   ✅ PDF démarré" -ForegroundColor Green
 } else {
     Write-Host "   ❌ Erreur PDF" -ForegroundColor Red
 }
 
-# Démarrer PsiTransfer
-Write-Host "`n7. Démarrage de PsiTransfer..." -ForegroundColor Yellow
-docker-compose -f ../../essentiels/psitransfer/docker-compose.yml up -d
+# Démarrer PsiTransfer (dans essentiels/)
+Write-Host "`n5. Démarrage de PsiTransfer..." -ForegroundColor Yellow
+docker compose -f ../../essentiels/psitransfer/docker-compose.yml up -d
 if ($LASTEXITCODE -eq 0) {
     Write-Host "   ✅ PsiTransfer démarré" -ForegroundColor Green
 } else {
     Write-Host "   ❌ Erreur PsiTransfer" -ForegroundColor Red
 }
 
-# Démarrer QR Codes
-Write-Host "`n8. Démarrage de QR Codes..." -ForegroundColor Yellow
-docker-compose -f qrcodes/docker-compose.yml up -d
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "   ✅ QR Codes démarré" -ForegroundColor Green
-} else {
-    Write-Host "   ❌ Erreur QR Codes" -ForegroundColor Red
-}
-
 # Vérifier le statut final
-Write-Host "`n9. Vérification du statut final..." -ForegroundColor Yellow
+Write-Host "`n6. Vérification du statut final..." -ForegroundColor Yellow
 Start-Sleep -Seconds 5
 
 try {
@@ -114,3 +87,4 @@ Write-Host "   📺 MeTube: https://metube.iahome.fr" -ForegroundColor Cyan
 Write-Host "   📄 PDF: https://pdf.iahome.fr" -ForegroundColor Cyan
 Write-Host "   📁 PsiTransfer: https://psitransfer.iahome.fr" -ForegroundColor Cyan
 Write-Host "   📱 QR Codes: https://qrcodes.iahome.fr" -ForegroundColor Cyan
+Write-Host "   ⚡ n8n: http://localhost:5678" -ForegroundColor Cyan

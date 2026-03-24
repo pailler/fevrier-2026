@@ -2,13 +2,17 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="./manifest.json" />
     <title>Photobooth Mariage</title>
     <meta
       name="description"
       content="Photobooth mariage - rejoindre ou creer un evenement avec code PIN."
     />
     <link rel="stylesheet" href="./styles.css" />
+    <script src="./stay-standalone.js"></script>
   </head>
   <body>
     <main class="page management-page">
@@ -39,17 +43,17 @@
         </p>
 
         <div class="action-grid">
-          <button class="card card-join active" data-tab="join" type="button">
-            <div class="card-icon">↪</div>
-            <h2>Rejoindre un evenement</h2>
-            <p>J'ai un code a 4 chiffres</p>
-          </button>
+          <a href="?tab=join" class="card card-join active" data-tab="join" id="card-join">
+            <span class="card-icon">↪</span>
+            <span class="card-title">Rejoindre un evenement</span>
+            <span class="card-desc">J'ai un code a 4 chiffres</span>
+          </a>
 
-          <button class="card card-create" data-tab="create" type="button">
-            <div class="card-icon">+</div>
-            <h2>Creer un evenement</h2>
-            <p>Nouveau projet avec code PIN</p>
-          </button>
+          <a href="?tab=create" class="card card-create" data-tab="create" id="card-create">
+            <span class="card-icon">+</span>
+            <span class="card-title">Creer un evenement</span>
+            <span class="card-desc">Nouveau projet avec code PIN</span>
+          </a>
         </div>
       </section>
 
@@ -75,18 +79,18 @@
           <h3 id="choice-event-name">Choisissez votre action</h3>
           <p id="choice-event-meta" class="choice-meta"></p>
           <div class="choice-buttons">
-            <button id="btn-take-photo" class="choice-btn choice-btn-photo" type="button">
+            <a id="btn-take-photo" class="choice-btn choice-btn-photo" href="./studio.html">
               <span class="choice-btn-icon">📸</span>
               <span class="choice-btn-label">Prendre une photo</span>
               <span class="choice-btn-desc">Studio photobooth</span>
-            </button>
-            <button id="btn-gallery" class="choice-btn choice-btn-gallery" type="button">
+            </a>
+            <a id="btn-gallery" class="choice-btn choice-btn-gallery" href="./gallery.html">
               <span class="choice-btn-icon">🖼️</span>
               <span class="choice-btn-label">Voir la galerie</span>
               <span class="choice-btn-desc">Photos de l'evenement</span>
-            </button>
+            </a>
           </div>
-          <button id="choice-back" class="btn-link choice-back" type="button">← Changer de code</button>
+          <a id="choice-back" class="btn-link choice-back" href="./index.html">← Changer de code</a>
         </article>
 
         <article id="panel-create" class="panel">

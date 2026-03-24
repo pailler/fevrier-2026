@@ -18,6 +18,7 @@ Application web photobooth inspiree d'une experience event moderne:
   - export PNG
 - QR code automatique vers la galerie evenement
 - Acces par token `?token=...` (workflow IAHome)
+- **Son du compte à rebours** : placez `countdown.mp3` dans `sounds/` pour un décompte audio festif (voir `sounds/README.md`)
 
 ## Lancer en local (sans Docker)
 

@@ -1,0 +1,9 @@
+venv/
+tmp/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+*.md
+build-custom-rasterizer*
+.env

@@ -44,7 +44,10 @@ export default function Error({
           Une erreur est survenue
         </h2>
         <p style={{ color: '#4b5563', marginBottom: 24 }}>
-          {error?.message || 'Erreur inattendue.'}
+          {(() => {
+            const msg = error instanceof Error ? error.message : (typeof error === 'string' ? error : '');
+            return msg && !msg.startsWith('[object ') ? msg : 'Erreur inattendue.';
+          })()}
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <button

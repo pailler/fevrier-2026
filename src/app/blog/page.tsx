@@ -6,6 +6,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Breadcrumb from '../../components/Breadcrumb';
 import { getArticleImage } from '../../utils/articleImageGenerator';
+import {
+  BLOG_CATEGORY_FILTER_ORDER,
+  getBlogCategoryLabelFr,
+} from '../../utils/blogCategoryLabels';
 
 interface BlogArticle {
   id: string;
@@ -115,12 +119,10 @@ export default function BlogPage() {
 
   const categories = [
     { value: 'all', label: 'Tous' },
-    { value: 'resources', label: 'Resources' },
-    { value: 'community', label: 'Community' },
-    { value: 'pricing2', label: 'Pricing' },
-    { value: 'enterprise', label: 'Enterprise' },
-    { value: 'product', label: 'Product' },
-    { value: 'examples', label: 'Examples' }
+    ...BLOG_CATEGORY_FILTER_ORDER.map((value) => ({
+      value,
+      label: getBlogCategoryLabelFr(value),
+    })),
   ];
 
   const formatDate = (dateString: string) => {
@@ -289,7 +291,9 @@ export default function BlogPage() {
         {filteredArticles.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-500 mb-4">
-              {categoryFilter === 'all' ? 'Aucun article disponible' : `Aucun article dans la catégorie "${categoryFilter}"`}
+              {categoryFilter === 'all'
+                ? 'Aucun article disponible'
+                : `Aucun article dans la catégorie « ${getBlogCategoryLabelFr(categoryFilter)} »`}
             </div>
             {isAdmin ? (
               <button
@@ -344,7 +348,7 @@ export default function BlogPage() {
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {article.category.charAt(0).toUpperCase() + article.category.slice(1)}
+                        {getBlogCategoryLabelFr(article.category)}
                       </span>
                       <span className="ml-2 text-sm text-gray-500">
                         {article.read_time} min de lecture

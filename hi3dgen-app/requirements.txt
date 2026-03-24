@@ -1,0 +1,37 @@
+# Hi3DGen standalone — sans ComfyUI
+# Nécessite: Python 3.10+, NVIDIA GPU 16Go+, CUDA 12.x
+
+# Core
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9
+
+# ML / Hi3DGen (torch avec CUDA - requis pour custom_rasterizer_kernel)
+# Installer d'abord: pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+easydict>=1.13
+omegaconf>=2.3.0
+torch>=2.4.0
+torchvision>=0.19.0
+transformers>=4.46.0
+diffusers>=0.35.0
+accelerate>=1.2.0
+huggingface-hub>=0.36.0
+
+# Image
+Pillow>=10.4.0
+numpy>=1.24.0
+opencv-python-headless>=4.10.0
+scipy>=1.14.0
+
+# 3D
+xatlas>=0.0.9
+trimesh>=4.5.0
+pyvista>=0.44.0
+pymeshfix>=0.17.0
+pymeshlab>=2023.12
+
+# Hi3DGen pipeline (backend)
+trellis-3d-python>=0.1.20
+
+# Optionnel — xformers pour accélération
+# xformers  # décommenter si compatible avec votre CUDA
