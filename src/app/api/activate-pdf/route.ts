@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
     if (existingAccess) {
       console.log('✅ PDF+ déjà activé, retour à /account');
-      return NextResponse.json({ success: true, message: 'PDF+ déjà activé pour cet utilisateur.', alreadyActivated: true });
+      return NextResponse.json({ success: true, message: 'PDF+ déjà enregistré sur ce compte.', alreadyActivated: true });
     }
 
     const now = new Date().toISOString();

@@ -46,7 +46,7 @@ export class LibreSpeedAccessService {
     try {
       console.log('🔍 LibreSpeed: Vérification accès pour:', { userId, userEmail });
 
-      // 1. Vérifier que l'utilisateur a LibreSpeed activé
+      // 1. Vérifier que l'utilisateur a une entrée LibreSpeed sur le compte
       const { data: userAccess, error: accessError } = await supabase
         .from('user_applications')
         .select('id, is_active')
@@ -58,7 +58,7 @@ export class LibreSpeedAccessService {
       if (accessError || !userAccess) {
         return {
           hasAccess: false,
-          reason: 'LibreSpeed non activé pour votre compte'
+          reason: 'LibreSpeed non disponible sur votre compte'
         };
       }
 
@@ -88,7 +88,7 @@ export class LibreSpeedAccessService {
 
       // Générer un token aléatoire
       const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 heure (60 minutes)
+      const expiresAt = new Date('2100-01-01T00:00:00.000Z');
 
       // Enregistrer le token dans la table librespeed_tokens
       const { error: insertError } = await supabase
@@ -142,22 +142,8 @@ export class LibreSpeedAccessService {
         ;
         return {
           hasAccess: false,
-          reason: 'Token invalide ou expiré'
+          reason: 'Token invalide'
         };
-      }
-
-      // Vérifier l'expiration
-      if (tokenData.expires_at) {
-        const expirationDate = new Date(tokenData.expires_at);
-        const now = new Date();
-        
-        if (expirationDate <= now) {
-          ;
-          return {
-            hasAccess: false,
-            reason: 'Token expiré'
-          };
-        }
       }
 
       // Marquer le token comme utilisé

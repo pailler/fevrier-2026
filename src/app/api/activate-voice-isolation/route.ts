@@ -214,12 +214,12 @@ export async function POST(request: NextRequest) {
           moduleId: 'voice-isolation',
           moduleName: 'Isolation Vocale par IA',
           action: 'voice-isolation.refund',
-          description: 'Remboursement - Déjà activé'
+          description: 'Remboursement - Déjà enregistré'
         })
       }).catch(() => {});
       return NextResponse.json({
         success: true,
-        message: 'Voice Isolation déjà activé',
+        message: 'Voice Isolation déjà enregistré sur ce compte',
         accessId: existingAccess.id,
         moduleId: 'voice-isolation',
         tokensRefunded: true
@@ -300,7 +300,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Voice Isolation activé avec succès',
+      message: 'Accès à Voice Isolation ouvert sur votre compte',
       accessId: accessData.id,
       moduleId: 'voice-isolation',
       tokensConsumed: requiredTokens,

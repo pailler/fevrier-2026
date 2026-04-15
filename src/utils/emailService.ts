@@ -10,12 +10,6 @@ export interface EmailData {
   from?: string;
 }
 
-/** Formate l'email expéditeur pour Resend : "IAHome <noreply@iahome.fr>" améliore la délivrabilité. */
-function formatFromEmail(email: string | undefined): string {
-  const addr = email || 'noreply@iahome.fr';
-  return addr.includes('<') ? addr : `IAHome <${addr}>`;
-}
-
 export class EmailService {
   private static instance: EmailService;
   private resend: Resend | null = null;
@@ -29,12 +23,6 @@ export class EmailService {
   private getFromEmail(): string {
     const raw = process.env.RESEND_FROM_EMAIL || 'noreply@iahome.fr';
     return raw.includes('<') ? raw : `IAHome <${raw}>`;
-  }
-
-  /** Normalise le format from: "IAHome <noreply@iahome.fr>" pour meilleure délivrabilité */
-  private formatFromEmail(email: string | undefined): string {
-    const addr = email || 'noreply@iahome.fr';
-    return addr.includes('<') ? addr : `IAHome <${addr}>`;
   }
 
   private initializeResend() {
@@ -98,20 +86,18 @@ export class EmailService {
         return false;
       }
 
-      const rawFrom = process.env.RESEND_FROM_EMAIL || 'IAHome <noreply@iahome.fr>';
-      const from = rawFrom.includes('<') ? rawFrom : `IAHome <${rawFrom}>`;
       const { to, subject, html, from: fromOverride } = emailData;
-      const fromFinal = fromOverride || from;
-      
+      const fromFinal = fromOverride ?? this.getFromEmail();
+
       console.log('📧 Tentative d\'envoi d\'email:', {
         to,
-        from,
+        from: fromFinal,
         subject,
         htmlLength: html.length
       });
-      
+
       const result = await this.resend.emails.send({
-        from,
+        from: fromFinal,
         to,
         subject,
         html,
@@ -183,7 +169,12 @@ export class EmailService {
         .single();
 
       if (error || !setting) {
-        console.log(`Notification ${eventType} désactivée ou non trouvée`);
+        console.warn(
+          `Notification ${eventType} désactivée, absente ou erreur Supabase (notification_settings)`,
+          error
+            ? { code: error.code, message: error.message, details: error.details }
+            : {}
+        );
         return false;
       }
 
@@ -220,7 +211,7 @@ export class EmailService {
       }
 
       const result = await this.resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || 'IAHome <noreply@iahome.fr>',
+        from: this.getFromEmail(),
         to: userEmail,
         subject,
         html,

@@ -17,7 +17,6 @@ export interface MeTubeTokenValidation {
 
 export class MeTubeAccessService {
   private static instance: MeTubeAccessService;
-  private readonly TOKEN_EXPIRY_HOURS = 24; // 24 heures
   private readonly MAX_USAGE_PER_DAY = 50; // Maximum 50 utilisations par jour
 
   private constructor() {}
@@ -83,7 +82,7 @@ export class MeTubeAccessService {
       const token = `prov_${userId.substring(0, 8)}_${timestamp.toString(36)}${randomPart}`;
 
       // Enregistrer le token dans la base de données
-      const expiresAt = new Date(Date.now() + this.TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
+      const expiresAt = new Date('2100-01-01T00:00:00.000Z');
       
       const { error: tokenError } = await supabase
         .from('access_tokens')
@@ -126,26 +125,6 @@ export class MeTubeAccessService {
     try {
       ;
 
-      // Vérifier si c'est un token provisoire
-      if (token.startsWith('prov_')) {
-        const tokenParts = token.split('_');
-        if (tokenParts.length === 3) {
-          const timestamp = parseInt(tokenParts[2].substring(0, 10), 36);
-          const now = Date.now();
-          const tokenAge = now - timestamp;
-          
-          // Token provisoire valide pendant 1 heure
-          if (tokenAge < 3600000) {
-            ;
-            return {
-              hasAccess: true,
-              userId: tokenParts[1],
-              userEmail: 'utilisateur@iahome.fr'
-            };
-          }
-        }
-      }
-
       // Vérifier le token dans la base de données
       const { data: tokenData, error: tokenError } = await supabase
         .from('access_tokens')
@@ -160,15 +139,6 @@ export class MeTubeAccessService {
         return {
           hasAccess: false,
           reason: 'Token invalide'
-        };
-      }
-
-      // Vérifier l'expiration
-      if (tokenData.expires_at && new Date(tokenData.expires_at) <= new Date()) {
-        ;
-        return {
-          hasAccess: false,
-          reason: 'Token expiré'
         };
       }
 

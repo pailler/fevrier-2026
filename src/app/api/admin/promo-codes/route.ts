@@ -53,7 +53,7 @@ export async function GET() {
   }
 }
 
-/** POST: créer ou activer les codes promo BIENVENUE10 / BIENVENUE2026 (20 % de remise) */
+/** POST: créer ou activer le code promo BIENVENUE10 (20 % de remise) */
 export async function POST(request: NextRequest) {
   try {
     if (!process.env.STRIPE_SECRET_KEY?.trim()) {
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     const { action = 'ensure_bienvenue10', code, amount_off, percent_off } = body;
 
     const ensurePromo = async (CODE: string, PERCENT_OFF: number) => {
-      const { data: existing } = await stripe.promotionCodes.list({ limit: 100 });
+      const { data: existing } = await stripe.promotionCodes.list({ code: CODE, limit: 30 });
       const matching = existing.filter((p) => (p.code || '').toUpperCase() === CODE);
 
       for (const p of matching) {
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
       const CODE = 'BIENVENUE10';
       const PERCENT_OFF = 20; // 20 % de remise
 
-      const { data: existing } = await stripe.promotionCodes.list({ limit: 100 });
+      const { data: existing } = await stripe.promotionCodes.list({ code: CODE, limit: 30 });
       const matching = existing.filter((p) => (p.code || '').toUpperCase() === CODE);
 
       // Vérifier si un code actif existe déjà avec 20 % de remise
@@ -176,8 +176,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    /** @deprecated Utiliser ensure_bienvenue10 — alias pour anciens clients / scripts. */
     if (action === 'ensure_bienvenue2026') {
-      const result = await ensurePromo('BIENVENUE2026', 20);
+      const result = await ensurePromo('BIENVENUE10', 20);
       return NextResponse.json(result);
     }
 

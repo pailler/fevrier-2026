@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     const accessData = await validateAccessToken(token);
     if (!accessData) {
       return NextResponse.json(
-        { error: 'Token invalide ou expiré' },
+        { error: 'Token invalide' },
         { status: 403 }
       );
     }

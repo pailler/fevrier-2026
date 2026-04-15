@@ -8,6 +8,7 @@ import Breadcrumb from '../../../components/Breadcrumb';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
 import { TOKEN_COSTS } from '../../../utils/tokenActionService';
 import { getAppLinks } from '../../../utils/appUsefulLinks';
+import { getHunyuan3dAppUrl } from '../../../utils/hunyuan3dAppUrl';
 import YouTubeEmbed from '../../../components/YouTubeEmbed';
 // import { NotificationServiceClient } from '../../../utils/notificationServiceClient';
 // import AuthorizedAccessButton from '../../../components/AuthorizedAccessButton';
@@ -166,11 +167,12 @@ export default function CardDetailPage() {
         'administration': '/administration',
         'ai-detector': isDevelopment ? 'http://localhost:3000/ai-detector' : 'https://iahome.fr/ai-detector',
         'sentinelle-numerique': isDevelopment ? 'http://localhost:3000/sentinelle-numerique' : 'https://iahome.fr/sentinelle-numerique',
-        'hunyuan3d': isDevelopment ? 'http://localhost:8888' : 'https://hunyuan3d.iahome.fr',
+        'hunyuan3d': getHunyuan3dAppUrl(),
         'photomaker': isDevelopment ? 'http://localhost:7881' : 'https://photomaker.iahome.fr',
         'animagine-xl': isDevelopment ? 'http://localhost:7883' : 'https://animaginexl.iahome.fr',
         'florence-2': isDevelopment ? 'http://localhost:7884' : 'https://florence2.iahome.fr',
         'birefnet': isDevelopment ? 'http://localhost:7882' : 'https://birefnet.iahome.fr',
+        'musetalk': isDevelopment ? 'http://localhost:7886' : 'https://musetalk.iahome.fr',
       };
 
       const accessUrl = applicationUrls[moduleId];
@@ -307,7 +309,7 @@ export default function CardDetailPage() {
       console.log('🔧 Chargement carte pour:', params.id);
 
       // Liste des modules qui ont des pages spécifiques
-      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'cogstudio', 'ruinedfooocus', 'whisper', 'meeting-reports', 'psitransfer', 'hunyuan3d', 'photomaker', 'animagine-xl', 'florence-2', 'birefnet', 'sentinelle-numerique'];
+      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'cogstudio', 'ruinedfooocus', 'whisper', 'meeting-reports', 'psitransfer', 'hunyuan3d', 'photomaker', 'animagine-xl', 'florence-2', 'birefnet', 'musetalk', 'sentinelle-numerique'];
       
       // Si c'est un module avec une page spécifique, charger la page spécifique
       if (specificPages.includes(params.id as string)) {
@@ -407,6 +409,31 @@ export default function CardDetailPage() {
           };
           setCard(psitransferCard);
           console.log('✅ PsiTransfer chargé avec succès');
+          setLoading(false);
+          return;
+        }
+
+        // Cog Studio — l’id en base est souvent numérique ; l’URL /card/cogstudio ne doit pas dépendre du SELECT Supabase
+        if (params.id === 'cogstudio') {
+          const cogstudioCard = {
+            id: 'cogstudio',
+            title: 'Cog Studio',
+            description:
+              'Générez des vidéos IA à partir de vos idées. Accès sécurisé avec vos crédits IAHome vers l’application Cog Studio.',
+            subtitle: 'Vidéos générées par intelligence artificielle',
+            category: 'MEDIA TOOLS',
+            price: 10,
+            image_url: '/images/cogstudio.jpg',
+            features: [
+              'Génération vidéo assistée par IA',
+              'Interface dédiée sur cogstudio.iahome.fr',
+              '10 tokens par accès, utilisation selon vos crédits',
+            ],
+            requirements: ['Compte IAHome', 'Crédits disponibles', 'Navigateur moderne'],
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+          setCard(cogstudioCard as Card);
           setLoading(false);
           return;
         }

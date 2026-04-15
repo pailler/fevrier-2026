@@ -73,31 +73,6 @@ export default function AdminPromoCodesPage() {
     }
   };
 
-  const handleActivateBienvenue2026 = async () => {
-    setActivating(true);
-    setMessage(null);
-    try {
-      const res = await fetch('/api/admin/promo-codes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'ensure_bienvenue2026' }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data.error || data.details || `Erreur ${res.status}`);
-      }
-      setMessage({ type: 'success', text: data.message || 'Code BIENVENUE2026 accessible.' });
-      await load();
-    } catch (e) {
-      setMessage({
-        type: 'error',
-        text: e instanceof Error ? e.message : 'Erreur lors de l\'accès',
-      });
-    } finally {
-      setActivating(false);
-    }
-  };
-
   const handleToggleActive = async (id: string, currentActive: boolean) => {
     setTogglingId(id);
     setMessage(null);
@@ -127,7 +102,6 @@ export default function AdminPromoCodesPage() {
   };
 
   const bienvenue10 = list.find((p) => (p.code || '').toUpperCase() === 'BIENVENUE10');
-  const bienvenue2026 = list.find((p) => (p.code || '').toUpperCase() === 'BIENVENUE2026');
 
   return (
     <div className="space-y-6">
@@ -145,18 +119,6 @@ export default function AdminPromoCodesPage() {
               : bienvenue10?.active
                 ? 'BIENVENUE10 déjà actif'
                 : 'BIENVENUE10 (-20%)'}
-          </button>
-          <button
-            type="button"
-            onClick={handleActivateBienvenue2026}
-            disabled={activating || (bienvenue2026?.active === true)}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {activating
-              ? 'accès...'
-              : bienvenue2026?.active
-                ? 'BIENVENUE2026 déjà actif'
-                : 'BIENVENUE2026 (-20%)'}
           </button>
         </div>
       </div>
@@ -176,7 +138,7 @@ export default function AdminPromoCodesPage() {
       {loading ? (
         <p className="text-gray-500">Chargement...</p>
       ) : list.length === 0 ? (
-        <p className="text-gray-500">Aucun code promo. Cliquez sur « accéder à BIENVENUE10 » ou « accéder à BIENVENUE2026 » pour en créer un.</p>
+        <p className="text-gray-500">Aucun code promo. Cliquez sur « BIENVENUE10 (-20 %) » pour en créer un.</p>
       ) : (
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow">
           <table className="min-w-full divide-y divide-gray-200">
@@ -233,7 +195,7 @@ export default function AdminPromoCodesPage() {
       )}
 
       <p className="text-sm text-gray-500">
-        Les codes sont gérés dans Stripe. BIENVENUE10 et BIENVENUE2026 appliquent 20% de remise (ex. 9,90€ → 7,90€).
+        Les codes sont gérés dans Stripe. Le code <strong>BIENVENUE10</strong> applique 20&nbsp;% de remise (ex. 9,90&nbsp;€ → 7,90&nbsp;€).
       </p>
     </div>
   );

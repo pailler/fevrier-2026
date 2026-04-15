@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
+import { getAdminSignupNotificationRecipients } from '@/utils/adminEmails';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -135,19 +136,21 @@ export async function POST(request: NextRequest) {
       // Ne pas faire échouer la création du compte pour l'email
     }
 
-    // Envoyer une notification à l'admin
+    // Envoyer une notification à chaque admin
     console.log('📧 Tentative d\'envoi de notification admin pour:', email);
     try {
       const { EmailService } = await import('../../../../utils/emailService');
       const emailService = EmailService.getInstance();
-      
-      const adminResult = await emailService.sendNotificationEmail('admin_user_signup', 'formateur_tic@hotmail.com', {
+      const adminPayload = {
         user_name: fullName,
         user_email: email,
         signup_date: new Date().toLocaleDateString('fr-FR'),
         signup_time: new Date().toLocaleTimeString('fr-FR')
-      });
-      console.log('📧 Résultat email admin:', adminResult);
+      };
+      for (const adminEmail of getAdminSignupNotificationRecipients()) {
+        const adminResult = await emailService.sendNotificationEmail('admin_user_signup', adminEmail, adminPayload);
+        console.log('📧 Résultat email admin', adminEmail, ':', adminResult);
+      }
     } catch (emailError) {
       console.error('❌ Erreur lors de l\'envoi de la notification admin:', emailError);
       // Ne pas faire échouer la création du compte pour l'email admin

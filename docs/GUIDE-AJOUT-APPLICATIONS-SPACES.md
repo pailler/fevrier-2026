@@ -88,6 +88,7 @@ L'application doit être une application Gradio accessible sur un port spécifiq
 - **Florence-2** : Port `7884`
 - **Animagine XL** : Port `7883`
 - **PhotoMaker** : Port `7881`
+- **MuseTalk** : Port `7886`
 
 #### 2.2 Configurer le port dans l'application
 

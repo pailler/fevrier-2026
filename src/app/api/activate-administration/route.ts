@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       console.log('✅ Administration déjà activé');
       return NextResponse.json({ 
         success: true, 
-        message: 'Administration déjà activé pour cet utilisateur.', 
+        message: 'Administration déjà enregistrée pour ce compte.',
         alreadyActivated: true 
       });
     }
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: 'Administration activé avec succès',
+      message: 'Accès Administration ouvert sur le compte',
       accessId: accessData.id,
       tokensRemaining: newTokenCount
     });
@@ -138,7 +138,7 @@ export async function POST(request: Request) {
     
     return NextResponse.json({
       success: false,
-      error: 'Erreur lors de l\'activation de Administration',
+      error: 'Erreur lors de l\'ouverture d\'accès Administration',
       details: errorMessage
     }, { status: 500 });
   }

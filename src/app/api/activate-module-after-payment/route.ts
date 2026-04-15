@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
     if (existingAccess && !accessError && existingAccess.is_active) {
       return NextResponse.json({
         success: true,
-        message: 'Application déjà activée',
+        message: 'Cette appli est déjà enregistrée sur votre compte',
         moduleInfo: moduleData
       });
     }
@@ -276,7 +276,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Application activée avec succès',
+      message: 'Accès ouvert sur votre compte',
       moduleInfo: moduleData,
       activationData: activationData
     });

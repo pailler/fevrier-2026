@@ -35,6 +35,9 @@ $env:HF_HOME = $ModelsCachePath
 $env:HF_HUB_CACHE = Join-Path $ModelsCachePath "hub"
 $env:TRANSFORMERS_CACHE = Join-Path $ModelsCachePath "transformers"
 
+# URL publique Gradio PhotoMaker (optionnel ; surchargeable via apps-hosts.config.ps1)
+if (-not $PhotoMakerGradioRootUrl) { $PhotoMakerGradioRootUrl = "" }
+
 # Ports (doivent correspondre a Traefik / secure-proxy)
 $PortHomeAssistant = 8123
 $PortPhotomaker   = 7881
@@ -96,9 +99,13 @@ function Start-GradioApp {
         $oldPyPath = $env:PYTHONPATH
         $oldGradioPort = $env:GRADIO_SERVER_PORT
         $oldGradioServerName = $env:GRADIO_SERVER_NAME
+        $oldGradioRootPath = $env:GRADIO_ROOT_PATH
         # Toujours definir le port Gradio (app.py et forge_app.py)
         $env:GRADIO_SERVER_PORT = $Port
         $env:GRADIO_SERVER_NAME = "0.0.0.0"
+        if ($Name -eq "PhotoMaker" -and $PhotoMakerGradioRootUrl) {
+            $env:GRADIO_ROOT_PATH = $PhotoMakerGradioRootUrl.Trim().TrimEnd('/')
+        }
         if ($useGradioPort) {
             if ($Path -match "extensions-builtin") {
                 $forgeRoot = (Split-Path (Split-Path $Path -Parent) -Parent)
@@ -112,9 +119,14 @@ function Start-GradioApp {
         $env:PYTHONPATH = $oldPyPath
         $env:GRADIO_SERVER_PORT = $oldGradioPort
         if ($null -ne $oldGradioServerName) { $env:GRADIO_SERVER_NAME = $oldGradioServerName } else { Remove-Item Env:GRADIO_SERVER_NAME -ErrorAction SilentlyContinue }
+        if ($null -ne $oldGradioRootPath) { $env:GRADIO_ROOT_PATH = $oldGradioRootPath } else { Remove-Item Env:GRADIO_ROOT_PATH -ErrorAction SilentlyContinue }
         Write-Host "  [OK]   $Name demarre (port $Port, PID $($p.Id))." -ForegroundColor Green
         return $p
     } catch {
+        if ($null -ne $oldPyPath) { $env:PYTHONPATH = $oldPyPath } else { Remove-Item Env:PYTHONPATH -ErrorAction SilentlyContinue }
+        if ($null -ne $oldGradioPort) { $env:GRADIO_SERVER_PORT = $oldGradioPort } else { Remove-Item Env:GRADIO_SERVER_PORT -ErrorAction SilentlyContinue }
+        if ($null -ne $oldGradioServerName) { $env:GRADIO_SERVER_NAME = $oldGradioServerName } else { Remove-Item Env:GRADIO_SERVER_NAME -ErrorAction SilentlyContinue }
+        if ($null -ne $oldGradioRootPath) { $env:GRADIO_ROOT_PATH = $oldGradioRootPath } else { Remove-Item Env:GRADIO_ROOT_PATH -ErrorAction SilentlyContinue }
         Write-Host "  [ERREUR] $Name : $($_.Exception.Message)" -ForegroundColor Red
         return $null
     }

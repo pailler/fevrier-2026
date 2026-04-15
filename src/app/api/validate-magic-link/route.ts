@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     
     if (!magicLinkData) {
       return NextResponse.json(
-        { error: 'Magic link invalide ou expiré' },
+        { error: 'Magic link invalide' },
         { status: 403 }
       );
     }

@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       console.log('✅ QR Codes déjà activé pour cet utilisateur:', existingAccess.id);
       return NextResponse.json({ 
         success: true, 
-        message: 'QR Codes déjà activé pour cet utilisateur.',
+        message: 'QR Codes déjà enregistré sur ce compte.',
         accessId: existingAccess.id,
         alreadyActivated: true
       });

@@ -122,3 +122,10 @@ docker-services/essentiels/n8n/data/*.sqlite*
 # Hi3DGen — environnement Python local (ne pas versionner)
 hi3dgen-app/venv/
 hi3dgen-app/**/__pycache__/
+
+# Gradio apps — venvs locaux
+gradio-apps/**/.venv/
+
+# Artefacts build / runtime local
+tsconfig.tsbuildinfo
+homeassistant.pid

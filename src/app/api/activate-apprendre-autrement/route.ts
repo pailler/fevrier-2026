@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     if (existingAccess) {
       return NextResponse.json({
         success: true,
-        message: 'Accès Apprendre Autrement déjà activé',
+        message: 'Apprendre Autrement déjà enregistré sur ce compte',
         accessId: existingAccess.id,
         usageCount: existingAccess.usage_count,
       });

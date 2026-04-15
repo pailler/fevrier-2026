@@ -1,10 +1,25 @@
 'use client';
 
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import Breadcrumb from '../../../components/Breadcrumb';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
 
+const PHOTOBOOTH_DISCOVER_CANONICAL =
+  'https://iahome.fr/photobooth-decouverte.html';
+
 export default function PhotoboothPage() {
+  const [photoboothAppUrl, setPhotoboothAppUrl] = useState('https://photobooth.iahome.fr');
+  /** Même valeur SSR + 1er rendu client → pas d’écart d’hydratation ; puis origine réelle (localhost, preview, etc.). */
+  const [discoverPageHref, setDiscoverPageHref] = useState(PHOTOBOOTH_DISCOVER_CANONICAL);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+      setPhotoboothAppUrl('http://localhost:7885');
+    }
+    if (typeof window !== 'undefined') {
+      setDiscoverPageHref(`${window.location.origin}/photobooth-decouverte.html`);
+    }
+  }, []);
   const moduleData = {
     id: 'photobooth',
     title: 'Photobooth',
@@ -39,7 +54,18 @@ export default function PhotoboothPage() {
                 {moduleData.category}
               </span>
               <p className="text-xl text-pink-100 mb-6">{moduleData.description}</p>
-              <p className="text-pink-100">{moduleData.subtitle}</p>
+              <p className="text-pink-100 mb-6">{moduleData.subtitle}</p>
+              <a
+                href={discoverPageHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 px-6 py-3 rounded-full bg-white text-fuchsia-800 font-bold text-base shadow-lg hover:bg-pink-50 hover:shadow-xl transition-all border-2 border-white/80"
+              >
+                <span>Vous avez testé la borne en invité·e ?</span>
+                <span className="text-fuchsia-600 font-semibold text-sm sm:text-base">
+                  Découvrir l&apos;offre Photobooth →
+                </span>
+              </a>
             </div>
 
             <div className="bg-white/90 rounded-2xl p-8 shadow-2xl border border-white/50">
@@ -58,30 +84,13 @@ export default function PhotoboothPage() {
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-6 py-10">
-        <div className="bg-white/95 rounded-2xl border border-gray-200 p-8 shadow-lg">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">Comment acceder</h3>
-          <p className="text-gray-700 mb-4">
-            L&apos;acces a Photobooth suit le workflow habituel IAHome: connexion, vérification des crédits, generation
-            de token d&apos;acces puis ouverture de l&apos;application.
-          </p>
-          <p className="text-gray-700">
-            Besoin d&apos;aide ? Consultez vos applications depuis{' '}
-            <Link href="/account" className="text-fuchsia-700 hover:text-fuchsia-900 font-medium underline">
-              Mon compte
-            </Link>
-            .
-          </p>
-        </div>
-      </section>
-
       <CardPageActivationSection
         moduleId="photobooth"
         moduleName="Photobooth"
         tokenCost={100}
         tokenUnit="par acces. Utilisez l'application aussi longtemps que vous souhaitez"
         apiEndpoint="/api/activate-module"
-        accessUrl={typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:7885' : 'https://photobooth.iahome.fr'}
+        accessUrl={photoboothAppUrl}
         gradientColors="from-fuchsia-600 to-pink-600 hover:from-fuchsia-700 hover:to-pink-700"
         icon="📸"
       />

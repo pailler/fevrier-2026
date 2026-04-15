@@ -95,7 +95,7 @@ export function trackModuleActivation(moduleId: string, moduleName: string) {
   trackGoogleEvent('activate_module', 'engagement', moduleName);
   trackFacebookEvent('ViewContent', {
     content_name: moduleName,
-    content_category: 'Module Activation',
+    content_category: 'App access',
     content_ids: [moduleId],
   });
 }

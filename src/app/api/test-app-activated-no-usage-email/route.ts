@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const userEmail = email;
     const name = userName || userEmail.split('@')[0] || 'Utilisateur';
 
-    console.log(`📧 Test d'envoi du mail "appli activée sans utilisation" à ${userEmail}`);
+    console.log(`📧 Test d'envoi du mail "appli sans utilisation après ouverture d'accès" à ${userEmail}`);
 
     // Utiliser une instance serveur sans auth pour éviter les conflits GoTrueClient
     const supabase = createClient(
@@ -55,19 +55,19 @@ export async function POST(request: NextRequest) {
     // Utiliser upsert pour créer ou mettre à jour la notification
     console.log('🔧 Création/mise à jour du type de notification app_activated_no_usage...');
     
-    // TEMPLATE DISTINCT pour "Appli activée sans utilisation" - différent de "Sans application activée"
+    // TEMPLATE DISTINCT pour appli visitée mais peu utilisée
     const notificationData = {
       event_type: 'app_activated_no_usage',
-      name: 'Application activée sans utilisation',
+      name: 'Appli ouverte sans utilisation récente',
       is_enabled: true,
-      email_template_subject: 'Votre application vous attend ! Découvrez-la maintenant',
+      email_template_subject: 'Votre appli vous attend ! Découvrez-la maintenant',
       email_template_body: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
               <div style="background-color: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 <h1 style="color: #7c3aed; margin-top: 0; font-size: 28px;">Bonjour {{user_name}} ! 👋</h1>
                 
                 <p style="color: #374151; font-size: 16px; line-height: 1.6;">
-                  Nous avons remarqué que vous avez activé une application sur IAHome, mais que vous ne l'avez pas encore utilisée.
+                  Nous avons remarqué que vous avez ouvert l'accès à une appli sur IAHome, mais que vous ne l'avez pas encore vraiment utilisée.
                 </p>
                 
                 <div style="background-color: #f3e8ff; border-left: 4px solid #7c3aed; padding: 16px; margin: 24px 0; border-radius: 4px;">
@@ -75,12 +75,12 @@ export async function POST(request: NextRequest) {
                     💡 Votre application vous attend !
                   </p>
                   <p style="color: #581c87; font-size: 14px; margin: 0;">
-                    Votre application est déjà activée et prête à être utilisée. Découvrez toutes ses fonctionnalités et commencez à en profiter dès maintenant !
+                    L'accès est ouvert sur votre compte (via vos crédits). Découvrez ses fonctionnalités et commencez à en profiter dès maintenant !
                   </p>
                 </div>
                 
                 <h2 style="color: #1f2937; font-size: 20px; margin-top: 32px; margin-bottom: 16px;">
-                  🚀 Comment utiliser votre application activée ? (3 étapes simples)
+                  🚀 Comment utiliser votre appli ? (3 étapes simples)
                 </h2>
                 
                 <div style="margin: 24px 0;">
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
                           Accédez à "Mes applis"
                         </p>
                         <p style="color: #6b7280; margin: 0; font-size: 14px;">
-                          Cliquez sur <a href="https://iahome.fr/applications" style="color: #7c3aed; text-decoration: none; font-weight: 600;">"Mes applis"</a> dans la bannière en haut de la page pour voir toutes vos applications activées.
+                          Cliquez sur <a href="https://iahome.fr/applications" style="color: #7c3aed; text-decoration: none; font-weight: 600;">"Mes applis"</a> dans la bannière en haut de la page pour voir les applis que vous avez visitées.
                         </p>
                       </div>
                     </div>
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
                           Sélectionnez votre application
                         </p>
                         <p style="color: #6b7280; margin: 0; font-size: 14px;">
-                          Cliquez sur l'application que vous avez activée. Vous accéderez directement à son interface et pourrez commencer à l'utiliser immédiatement.
+                          Choisissez l'appli concernée. Vous accéderez à son interface avec l'accès ouvert via vos crédits.
                         </p>
                       </div>
                     </div>
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
                 
                 <div style="background-color: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px; margin: 24px 0; border-radius: 4px;">
                   <p style="color: #166534; font-size: 14px; margin: 0;">
-                    <strong>💡 Rappel :</strong> Votre application est déjà activée ! Vous n'avez plus qu'à l'utiliser. Aucune activation supplémentaire n'est nécessaire.
+                    <strong>💡 Rappel :</strong> L'accès est déjà ouvert sur votre compte. Il vous suffit d'utiliser l'appli ; vos crédits ont déjà servi à ouvrir cet accès.
                   </p>
                 </div>
                 
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
                 
                 <p style="color: #9ca3af; font-size: 12px; margin: 0; text-align: center;">
                   Cet email a été envoyé automatiquement par IAHome.<br>
-                  Vous avez reçu cet email car vous avez activé une application sur IAHome mais ne l'avez pas encore utilisée.
+                  Vous avez reçu cet email car vous avez ouvert l'accès à une appli sur IAHome mais ne l'avez pas encore vraiment utilisée.
                 </p>
               </div>
             </div>

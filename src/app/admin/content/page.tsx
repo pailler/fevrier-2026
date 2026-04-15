@@ -192,7 +192,7 @@ export default function AdminContent() {
           },
           {
             id: 'encours',
-            title: 'Mes Applications Actives',
+            title: 'Mon compte — applis visitées',
             type: 'page',
             status: 'published',
             created_at: new Date().toISOString(),

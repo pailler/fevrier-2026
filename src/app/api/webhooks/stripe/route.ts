@@ -283,6 +283,34 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     return;
   }
 
+  if (packageType === 'photobooth_personalized' || packageType === 'prestation_marketing') {
+    const label =
+      packageType === 'prestation_marketing'
+        ? 'Prestation développement sur mesure — commande'
+        : 'Photobooth personnalisé — commande';
+    console.log(`📦 Paiement produit (${packageType}) — enregistrement transaction uniquement`);
+    try {
+      const { error: transactionError } = await supabase.from('user_credit_transactions').insert({
+        user_id: userData.id,
+        transaction_type: 'product_purchase',
+        amount: (session.amount_total || 0) / 100,
+        tokens: 0,
+        stripe_invoice_id: session.id,
+        package_type: packageType,
+        description: label,
+        created_at: new Date().toISOString(),
+      });
+      if (transactionError) {
+        console.error('❌ Erreur enregistrement transaction produit:', transactionError);
+      } else {
+        console.log('✅ Transaction produit enregistrée');
+      }
+    } catch (e) {
+      console.error('❌ Erreur transaction produit:', e);
+    }
+    return;
+  }
+
   // Gérer l'achat de tokens (pack standard ou ancien système)
   if (paymentType === 'token_purchase' || packageType === 'pack_standard') {
     const tokenPackage = session.metadata?.tokenPackage || packageType || 'pack_standard';

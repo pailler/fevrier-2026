@@ -153,11 +153,11 @@ export default function Home() {
                     <span className="text-white font-bold text-lg">📱</span>
                   </div>
                   <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
-                    Mes applications activées
+                    Vos applis et vos crédits
                   </h2>
                 </div>
                 <p className="text-lg text-gray-600 mb-6">
-                  Gérez vos applications essentielles ou vos outils d'intelligence artificielle en un seul endroit.
+                  Retrouvez les services que vous avez ouverts avec vos crédits, et parcourez le catalogue pour en découvrir d&apos;autres.
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-3">
@@ -170,8 +170,8 @@ export default function Home() {
                       <polyline points="10 17 15 12 10 7" />
                       <line x1="15" y1="12" x2="3" y2="12" />
                     </svg>
-                    <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">Accès à mes applis</span>
-                    <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">Gérer vos applications activées</span>
+                    <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">Mon compte — applis visitées</span>
+                    <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">Crédits, historique et accès aux services</span>
                   </Link>
                 </div>
               </div>

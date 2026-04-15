@@ -43,6 +43,7 @@ export const appUsefulLinks: AppLinks = {
     { label: 'Documentation', url: 'https://github.com/lllyasviel/Fooocus#readme', icon: '📚' },
   ],
   'hunyuan3d': [
+    { label: 'Application Hi3DGen', url: 'https://iahome.fr/card/hi3dgen', icon: '🎲' },
     { label: 'GitHub Tencent', url: 'https://github.com/Tencent/Hunyuan3D', icon: '🔗' },
     { label: 'Documentation', url: 'https://github.com/Tencent/Hunyuan3D#readme', icon: '📚' },
   ],

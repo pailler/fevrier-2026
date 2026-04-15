@@ -30,18 +30,7 @@ export async function GET(request: NextRequest) {
         ;
         return NextResponse.redirect('https://iahome.fr/account?error=invalid_token', 302);
       }
-      
-      // Vérifier l'expiration du token
-      if (tokenData.expires_at) {
-        const expirationDate = new Date(tokenData.expires_at);
-        const now = new Date();
-        
-        if (expirationDate <= now) {
-          ;
-          return NextResponse.redirect('https://iahome.fr/account?error=token_expired', 302);
-        }
-      }
-      
+
       // Vérifier que le module psitransfer est visible dans /account pour cet utilisateur
       const securityService = ModuleSecurityService.getInstance();
       const canAccess = await securityService.canAccessExternalApp(tokenData.created_by, 'psitransfer');

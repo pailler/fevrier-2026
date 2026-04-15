@@ -158,6 +158,37 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Prestation / Photobooth : enregistrer la transaction si le webhook n'est pas encore passé
+    const pkg = session.metadata?.packageType;
+    const isProductPayment =
+      pkg === 'photobooth_personalized' || pkg === 'prestation_marketing';
+    if (session.mode === 'payment' && isProductPayment && !hasTransaction) {
+      const desc =
+        pkg === 'prestation_marketing'
+          ? 'Prestation développement — commande (vérification manuelle)'
+          : 'Photobooth personnalisé — commande (vérification manuelle)';
+      const { error: insertErr } = await supabase.from('user_credit_transactions').insert({
+        user_id: userData.id,
+        transaction_type: 'product_purchase',
+        amount: (session.amount_total || 0) / 100,
+        tokens: 0,
+        stripe_invoice_id: session.id,
+        package_type: pkg,
+        description: desc,
+        created_at: new Date().toISOString(),
+      });
+      if (insertErr) {
+        console.error('❌ verify-session produit insert:', insertErr);
+      }
+      return NextResponse.json({
+        verified: true,
+        action: 'product_recorded',
+        user_email: customerEmail,
+        amount_total: (session.amount_total || 0) / 100,
+        package_type: pkg,
+      });
+    }
+
     return NextResponse.json({
       verified: true,
       action: 'already_processed',

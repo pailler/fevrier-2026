@@ -1,8 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
+import { getSupabaseUrl, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 
-// Durée maximale de session : 1 heure pour tous les utilisateurs (même admin)
-const TOKEN_DURATION_MS = 60 * 60 * 1000; // 60 minutes (1 heure)
+const AUTO_TOKEN_EXPIRES_AT = new Date('2100-01-01T00:00:00.000Z');
 
 const supabase = createClient(
   getSupabaseUrl(),
@@ -20,11 +19,8 @@ export interface SessionToken {
 export class SessionManager {
   // Générer automatiquement un token d'accès pour un utilisateur connecté
   static async generateAutoToken(userId: string, moduleName: string, userEmail?: string): Promise<string> {
-    // Durée du token : 1 heure pour tous les utilisateurs
-    const tokenDuration = TOKEN_DURATION_MS;
-    
     const token = crypto.randomUUID();
-    const expiresAt = new Date(Date.now() + tokenDuration);
+    const expiresAt = AUTO_TOKEN_EXPIRES_AT;
     
     // Stocker le token dans Supabase
     await supabase
@@ -52,10 +48,9 @@ export class SessionManager {
       .single();
     
     if (error || !data) return null;
-    
+
     const expiresAt = new Date(data.expires_at);
-    if (expiresAt < new Date()) return null;
-    
+
     return {
       token: data.token,
       userId: data.user_id,

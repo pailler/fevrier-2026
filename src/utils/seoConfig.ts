@@ -45,9 +45,19 @@ export const seoConfig = {
   
   pages: {
     home: {
-      title: "IA Home - Plateforme d'Intelligence Artificielle | Formation IA & Outils IA",
-      description: "Découvrez l'IA avec IA Home : formations interactives, outils Whisper, Stable Diffusion, ComfyUI. Apprenez l'intelligence artificielle à votre rythme avec nos modules pratiques et nos cours adaptés à tous les niveaux.",
-      keywords: ["intelligence artificielle", "formation IA", "outils IA", "Whisper", "Stable Diffusion", "ComfyUI"],
+      title: "IAHome — plateforme IA française | transcription, images, PDF, domotique",
+      description:
+        "Tous vos outils d'intelligence artificielle au même endroit : Whisper, Stable Diffusion, PDF+IA, Home Assistant, QR codes. Interface en français, crédits transparents.",
+      keywords: [
+        "plateforme IA France",
+        "outils IA en ligne",
+        "transcription IA",
+        "génération images IA",
+        "PDF IA",
+        "Home Assistant",
+        "IA française",
+        "RGPD",
+      ],
       priority: 1.0,
       changefreq: "daily"
     },
@@ -59,9 +69,19 @@ export const seoConfig = {
       changefreq: "weekly"
     },
     applications: {
-      title: "Applications IA | Outils Intelligence Artificielle - IA Home",
-      description: "Explorez nos applications d'intelligence artificielle : Whisper pour la transcription, Stable Diffusion pour l'image, ComfyUI pour l'automatisation. Des outils IA professionnels à votre portée.",
-      keywords: ["applications IA", "outils IA", "Whisper", "Stable Diffusion", "ComfyUI", "transcription", "génération d'images"],
+      title: "Applications IA et services — tout-en-un | IAHome",
+      description:
+        "Whisper, images IA, PDF, domotique, QR codes et plus : une plateforme française, un compte, des crédits pour ouvrir les services.",
+      keywords: [
+        "applications IA",
+        "plateforme IA France",
+        "Whisper",
+        "Stable Diffusion",
+        "ComfyUI",
+        "transcription",
+        "génération d'images",
+        "accès applications crédits",
+      ],
       priority: 0.9,
       changefreq: "weekly"
     },

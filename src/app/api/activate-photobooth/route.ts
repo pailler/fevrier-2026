@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     if (existingAccess) {
       return NextResponse.json({
         success: true,
-        message: 'Photobooth déjà activé pour cet utilisateur.',
+        message: 'Photobooth déjà enregistré sur ce compte.',
         accessId: existingAccess.id,
         alreadyActivated: true,
       });

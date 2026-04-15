@@ -12,7 +12,7 @@ if (-not (Test-Path (Join-Path $ProjectRoot "package.json"))) {
 Set-Location $ProjectRoot
 
 # Parametres optionnels :
-# -SkipGradioApps : ignorer PhotoMaker/BiRefNet/Florence-2/Animagine XL
+# -SkipGradioApps : ignorer PhotoMaker/BiRefNet/Florence-2/Animagine XL/MuseTalk
 # -PhotoMakerOnly : demarrer uniquement PhotoMaker (utilise par start-photomaker.ps1)
 param([switch]$SkipGradioApps, [switch]$PhotoMakerOnly)
 $CmdLineSkipGradio = $SkipGradioApps.IsPresent
@@ -26,7 +26,7 @@ if (Test-Path $ConfigFile) {
 # SkipGradioApps : -SkipGradioApps en ligne de commande OU $SkipGradioApps dans config
 $script:SkipGradioApps = $CmdLineSkipGradio -or ($null -ne (Get-Variable -Name "SkipGradioApps" -Scope 0 -ErrorAction SilentlyContinue) -and [bool]$SkipGradioApps)
 
-# Cache Hugging Face pour BiRefNet, Animagine XL, Florence-2, PhotoMaker - evite les telechargements repetes
+# Cache Hugging Face pour BiRefNet, Animagine XL, Florence-2, PhotoMaker, MuseTalk - evite les telechargements repetes
 # (PhotoMakerOnly utilise ~/.cache/huggingface par defaut pour les modeles deja telecharges)
 $DefaultModelsCache = Join-Path $ProjectRoot "models-cache"
 if (-not $ModelsCachePath) { $ModelsCachePath = $DefaultModelsCache }
@@ -46,6 +46,7 @@ if (-not $PhotomakerPath)   { $PhotomakerPath   = Join-Path $ProjectRoot "gradio
 if (-not $BirefnetPath)     { $BirefnetPath     = Join-Path $ProjectRoot "gradio-apps\birefnet" }
 if (-not $Florence2Path)    { $Florence2Path    = Join-Path $ProjectRoot "gradio-apps\florence-2" }
 if (-not $AnimagineXLPath)  { $AnimagineXLPath  = Join-Path $ProjectRoot "gradio-apps\animagine-xl" }
+if (-not $MuseTalkPath)      { $MuseTalkPath      = Join-Path $ProjectRoot "gradio-apps\musetalk" }
 
 # Ports standard
 $PortIahome         = 3000
@@ -56,6 +57,7 @@ $PortBirefnet      = 7882
 $PortAnimagineXL   = 7883
 $PortFlorence2     = 7884
 $PortPhotobooth    = 7885
+$PortMuseTalk      = 7886
 $PortHomeAssistant = 8123
 $PortVoiceIsolation= 8100
 
@@ -69,12 +71,16 @@ $PathCodesHa        = Join-Path $ProjectRoot "essentiels\codes-ha"
 $ParentDir            = Split-Path $ProjectRoot -Parent
 $DockerMeetingReports = Join-Path $ProjectRoot "meeting-reports"
 $DockerPdf            = Join-Path $ProjectRoot "docker-services\essentiels\pdf"
+# Stack unifie : librespeed + qrcodes + metube + n8n (ports exposes : 8085, 7006, 8081, 5678)
+$DockerEssentielsRoot = Join-Path $ProjectRoot "docker-services\essentiels"
+$DockerEssentielsCompose = Join-Path $DockerEssentielsRoot "docker-compose.yml"
+# Fallback si pas de compose parent (install partielle)
 $DockerLibrespeed     = if (Test-Path (Join-Path $ProjectRoot "docker-services\essentiels\librespeed")) { Join-Path $ProjectRoot "docker-services\essentiels\librespeed" } else { Join-Path $ProjectRoot "essentiels\librespeed" }
 $DockerMetube         = Join-Path $ProjectRoot "docker-services\essentiels\metube"
 $DockerVoiceIsolation = Join-Path $ParentDir "voice-isolation-service"
 $DockerWhisper        = Join-Path $ParentDir "whisper-service"
 $DockerPsitransfer    = Join-Path $ProjectRoot "essentiels\psitransfer"
-$DockerQrcodes        = Join-Path $ProjectRoot "docker-services\essentiels\qrcodes"
+$DockerQrcodes        = if (Test-Path (Join-Path $ProjectRoot "docker-services\essentiels\qrcodes")) { Join-Path $ProjectRoot "docker-services\essentiels\qrcodes" } else { Join-Path $ProjectRoot "essentiels\qrcodes" }
 
 function Test-PortInUse {
     param([int]$Port)
@@ -117,7 +123,7 @@ function Start-NpmDev {
 }
 
 function Start-GradioApp {
-    param([string]$Name, [string]$Path, [int]$Port)
+    param([string]$Name, [string]$Path, [int]$Port, [string]$ExtraPyArgs = "")
     if ($script:SkipGradioApps) {
         Write-Host "  [SKIP] $Name : apps Gradio desactivees (erreur torchvision ?)." -ForegroundColor DarkGray
         return
@@ -138,7 +144,11 @@ function Start-GradioApp {
     if (Test-Path $forgeAppPy) {
         $scriptArg = "forge_app.py --port $Port --listen"
     } elseif (Test-Path $appPy) {
-        $scriptArg = "app.py"
+        if ($ExtraPyArgs -and $ExtraPyArgs.Trim().Length -gt 0) {
+            $scriptArg = "app.py $($ExtraPyArgs.Trim())"
+        } else {
+            $scriptArg = "app.py"
+        }
     } else {
         Write-Host "  [SKIP] $Name : ni app.py ni forge_app.py." -ForegroundColor DarkGray
         return
@@ -146,6 +156,10 @@ function Start-GradioApp {
     try {
         $env:GRADIO_SERVER_PORT = $Port
         $env:GRADIO_SERVER_NAME = "0.0.0.0"
+        $oldGradioRootPath = $env:GRADIO_ROOT_PATH
+        if ($Name -eq "PhotoMaker" -and $PhotoMakerGradioRootUrl) {
+            $env:GRADIO_ROOT_PATH = $PhotoMakerGradioRootUrl.Trim().TrimEnd('/')
+        }
         $psi = New-Object System.Diagnostics.ProcessStartInfo
         $psi.FileName = $pythonExe
         $psi.Arguments = $scriptArg
@@ -153,8 +167,12 @@ function Start-GradioApp {
         $psi.UseShellExecute = $true
         $psi.CreateNoWindow = $false
         $p = [System.Diagnostics.Process]::Start($psi)
+        if ($null -ne $oldGradioRootPath) { $env:GRADIO_ROOT_PATH = $oldGradioRootPath }
+        else { Remove-Item Env:GRADIO_ROOT_PATH -ErrorAction SilentlyContinue }
         Write-Host "  [OK]   $Name demarre (port $Port, PID $($p.Id))." -ForegroundColor Green
     } catch {
+        if ($null -ne $oldGradioRootPath) { $env:GRADIO_ROOT_PATH = $oldGradioRootPath }
+        else { Remove-Item Env:GRADIO_ROOT_PATH -ErrorAction SilentlyContinue }
         Write-Host "  [ERREUR] $Name : $($_.Exception.Message)" -ForegroundColor Red
     }
 }
@@ -183,7 +201,7 @@ function Start-HomeAssistant {
 }
 
 function Start-DockerCompose {
-    param([string]$Name, [string]$Path)
+    param([string]$Name, [string]$Path, [string[]]$Services = $null)
     if (-not (Test-Path $Path)) {
         Write-Host "  [SKIP] $Name : dossier introuvable." -ForegroundColor DarkGray
         return
@@ -199,11 +217,17 @@ function Start-DockerCompose {
     }
     try {
         Push-Location $Path
-        docker compose up -d 2>&1 | Out-Null
+        if ($Services -and $Services.Count -gt 0) {
+            $dockerArgs = @("compose", "up", "-d") + $Services
+            $out = & docker @dockerArgs 2>&1
+        } else {
+            $out = docker compose up -d 2>&1
+        }
         if ($LASTEXITCODE -eq 0) {
             Write-Host "  [OK]   $Name demarre (Docker)." -ForegroundColor Green
         } else {
-            Write-Host "  [WARN] $Name : erreur docker compose." -ForegroundColor Yellow
+            Write-Host "  [WARN] $Name : erreur docker compose (code $LASTEXITCODE)." -ForegroundColor Yellow
+            if ($out) { Write-Host $out -ForegroundColor DarkGray }
         }
     } catch {
         Write-Host "  [ERREUR] $Name : $($_.Exception.Message)" -ForegroundColor Red
@@ -212,19 +236,20 @@ function Start-DockerCompose {
     }
 }
 
-# Creer le reseau Docker iahome-network si necessaire pour les services
+# Creer les reseaux Docker externes attendus par docker-services/essentiels (qrcodes, metube, etc.)
 function Ensure-DockerNetwork {
     if (Get-Command docker -ErrorAction SilentlyContinue) {
-        $net = docker network ls -q -f "name=iahome-network" 2>$null
-        if (-not $net) {
-            docker network create iahome-network 2>$null
-            Write-Host "  [OK]   Reseau Docker iahome-network cree." -ForegroundColor Green
+        function Ensure-OneNetwork([string]$NetName) {
+            docker network inspect $NetName 2>$null | Out-Null
+            if ($LASTEXITCODE -ne 0) {
+                docker network create $NetName 2>$null
+                Write-Host "  [OK]   Reseau Docker $NetName cree." -ForegroundColor Green
+            }
         }
-        $whisperNet = docker network ls -q -f "name=whisper-network" 2>$null
-        if (-not $whisperNet) {
-            docker network create whisper-network 2>$null
-            Write-Host "  [OK]   Reseau Docker whisper-network cree." -ForegroundColor Green
-        }
+        Ensure-OneNetwork "iahome-network"
+        # Requis par le service qrcodes du compose parent (external: true)
+        Ensure-OneNetwork "iahome_iahome-network"
+        Ensure-OneNetwork "whisper-network"
     }
 }
 
@@ -284,18 +309,29 @@ Start-GradioApp -Name "Florence-2" -Path $Florence2Path -Port $PortFlorence2
 Write-Host "`n9. Animagine XL :$PortAnimagineXL ..." -ForegroundColor Yellow
 Start-GradioApp -Name "Animagine XL" -Path $AnimagineXLPath -Port $PortAnimagineXL
 
-# 10. Services Docker
-Write-Host "`n10. Meeting Reports (Docker) ..." -ForegroundColor Yellow
+Write-Host "`n10. MuseTalk :$PortMuseTalk ..." -ForegroundColor Yellow
+Start-GradioApp -Name "MuseTalk" -Path $MuseTalkPath -Port $PortMuseTalk -ExtraPyArgs "--port $PortMuseTalk --ip 0.0.0.0 --use_float16"
+
+# 11. Services Docker
+Write-Host "`n11. Meeting Reports (Docker) ..." -ForegroundColor Yellow
 Start-DockerCompose -Name "Meeting Reports" -Path $DockerMeetingReports
 
-Write-Host "`n11. Stirling PDF (Docker) ..." -ForegroundColor Yellow
+Write-Host "`n12. Stirling PDF (Docker) ..." -ForegroundColor Yellow
 Start-DockerCompose -Name "Stirling PDF" -Path $DockerPdf
 
-Write-Host "`n12. LibreSpeed (Docker) ..." -ForegroundColor Yellow
-Start-DockerCompose -Name "LibreSpeed" -Path $DockerLibrespeed
-
-Write-Host "`n13. MeTube (Docker) ..." -ForegroundColor Yellow
-Start-DockerCompose -Name "MeTube" -Path $DockerMetube
+# LibreSpeed, QR codes, MeTube, n8n : un seul compose parent (Metube seul n'expose pas les ports en local)
+Write-Host "`n13. Essentiels Docker (LibreSpeed, QR codes, MeTube, n8n) ..." -ForegroundColor Yellow
+if (Test-Path $DockerEssentielsCompose) {
+    Start-DockerCompose -Name "Essentiels (LibreSpeed, QR codes, MeTube, n8n)" -Path $DockerEssentielsRoot -Services @("librespeed", "qrcodes", "metube", "n8n")
+} else {
+    Write-Host "  [INFO] Compose parent introuvable : demarrage par dossiers separes." -ForegroundColor DarkGray
+    Write-Host "`n13a. LibreSpeed (Docker) ..." -ForegroundColor Yellow
+    Start-DockerCompose -Name "LibreSpeed" -Path $DockerLibrespeed
+    Write-Host "`n13b. MeTube (Docker) ..." -ForegroundColor Yellow
+    Start-DockerCompose -Name "MeTube" -Path $DockerMetube
+    Write-Host "`n13c. QR Codes (Docker) ..." -ForegroundColor Yellow
+    Start-DockerCompose -Name "QR Codes" -Path $DockerQrcodes
+}
 
 Write-Host "`n14. Voice Isolation (Docker) ..." -ForegroundColor Yellow
 Start-DockerCompose -Name "Voice Isolation" -Path $DockerVoiceIsolation
@@ -306,14 +342,11 @@ Start-DockerCompose -Name "Whisper Service" -Path $DockerWhisper
 Write-Host "`n16. PsiTransfer (Docker) ..." -ForegroundColor Yellow
 Start-DockerCompose -Name "PsiTransfer" -Path $DockerPsitransfer
 
-Write-Host "`n17. QR Codes (Docker) ..." -ForegroundColor Yellow
-Start-DockerCompose -Name "QR Codes" -Path $DockerQrcodes
-
-# 18. Meeting Reports frontend en mode dev (si pas Docker)
+# 17. Meeting Reports frontend en mode dev (si pas Docker)
 if (-not (Test-PortInUse -Port $PortMeetingReports)) {
     $mrFrontend = Join-Path $DockerMeetingReports "frontend"
     if (Test-Path (Join-Path $mrFrontend "package.json")) {
-        Write-Host "`n18. Meeting Reports Frontend (npm) :$PortMeetingReports ..." -ForegroundColor Yellow
+        Write-Host "`n17. Meeting Reports Frontend (npm) :$PortMeetingReports ..." -ForegroundColor Yellow
         try {
             $psi = New-Object System.Diagnostics.ProcessStartInfo
             $psi.FileName = "cmd"
@@ -342,8 +375,12 @@ Write-Host @"
     - Photobooth      : http://localhost:$PortPhotobooth
     - Home Assistant  : http://localhost:$PortHomeAssistant
     - PhotoMaker      : http://localhost:$PortPhotomaker
-    - LibreSpeed      : http://localhost:8083 (Docker)
-    - Stirling PDF   : http://localhost:8086 (Docker)
+    - MuseTalk        : http://localhost:$PortMuseTalk (lip-sync video, GPU)
+    - LibreSpeed      : http://localhost:8085 (Docker, stack essentiels)
+    - QR codes        : http://localhost:7006 (Docker)
+    - MeTube          : http://localhost:8081 (Docker)
+    - n8n             : http://localhost:5678 (Docker, auth admin/admin par defaut)
+    - Stirling PDF    : http://localhost:8086 (Docker)
     - Voice Isolation : http://localhost:$PortVoiceIsolation (Docker)
     - Meeting Reports : http://localhost:$PortMeetingReports
     - PsiTransfer      : (via proxy iahome)

@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       console.log('✅ Home Assistant déjà activé pour cet utilisateur:', existingAccess.id);
       return NextResponse.json({ 
         success: true, 
-        message: 'Home Assistant déjà activé pour cet utilisateur.',
+        message: 'Home Assistant déjà enregistré sur ce compte.',
         accessId: existingAccess.id,
         alreadyActivated: true
       });

@@ -9,12 +9,21 @@ http:
         dialTimeout: "30s"
         responseHeaderTimeout: "30s"
         idleConnTimeout: "90s"
+  middlewares:
+    # Gradio utilise X-Forwarded-Host / X-Forwarded-Proto pour construire config.root (appels /info, WS file d'attente)
+    photomaker-proxy-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-Host: "photomaker.iahome.fr"
+          X-Forwarded-For: "127.0.0.1"
+          X-Real-IP: "127.0.0.1"
   routers:
     photomaker-main:
       rule: "Host(`photomaker.iahome.fr`)"
       entryPoints: ["web"]
       service: photomaker-service
-      middlewares: ["security-headers@file"]
+      middlewares: ["security-headers@file", "photomaker-proxy-headers@file"]
       priority: 10
     photomaker-https:
       rule: "Host(`photomaker.iahome.fr`)"
@@ -22,7 +31,7 @@ http:
       service: photomaker-service
       tls:
         certResolver: letsencrypt
-      middlewares: ["security-headers@file"]
+      middlewares: ["security-headers@file", "photomaker-proxy-headers@file"]
       priority: 10
   services:
     photomaker-service:

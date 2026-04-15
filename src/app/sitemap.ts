@@ -67,6 +67,37 @@ async function getFormationArticles() {
   }
 }
 
+/** Fiches produit / services (routes réelles sous /card/...) */
+const CARD_SLUGS = [
+  'administration',
+  'ai-detector',
+  'animagine-xl',
+  'apprendre-autrement',
+  'birefnet',
+  'code-learning',
+  'comfyui',
+  'cogstudio',
+  'florence-2',
+  'hi3dgen',
+  'home-assistant',
+  'hunyuan3d',
+  'librespeed',
+  'meeting-reports',
+  'metube',
+  'musetalk',
+  'pdf',
+  'photobooth',
+  'photomaker',
+  'prompt-generator',
+  'psitransfer',
+  'qrcodes',
+  'ruinedfooocus',
+  'sentinelle-numerique',
+  'stablediffusion',
+  'voice-isolation',
+  'whisper',
+] as const
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://iahome.fr'
   const currentDate = new Date().toISOString()
@@ -87,10 +118,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
+      url: `${baseUrl}/about`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
       url: `${baseUrl}/applications`,
       lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/modules`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.85,
     },
     {
       url: `${baseUrl}/formation`,
@@ -140,64 +183,63 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.9,
     },
-    // Pages d'applications spécifiques
     {
-      url: `${baseUrl}/applications/whisper`,
+      url: `${baseUrl}/code-learning`,
       lastModified: currentDate,
       changeFrequency: 'weekly',
-      priority: 0.8,
+      priority: 0.75,
     },
     {
-      url: `${baseUrl}/applications/stable-diffusion`,
+      url: `${baseUrl}/ai-detector`,
       lastModified: currentDate,
       changeFrequency: 'weekly',
-      priority: 0.8,
+      priority: 0.75,
     },
     {
-      url: `${baseUrl}/applications/comfyui`,
+      url: `${baseUrl}/sentinelle-numerique`,
       lastModified: currentDate,
       changeFrequency: 'weekly',
-      priority: 0.8,
+      priority: 0.75,
     },
-    // Pages de formation
     {
-      url: `${baseUrl}/formation/debutant`,
+      url: `${baseUrl}/photobooth`,
       lastModified: currentDate,
       changeFrequency: 'weekly',
-      priority: 0.8,
+      priority: 0.75,
     },
     {
-      url: `${baseUrl}/formation/intermediaire`,
+      url: `${baseUrl}/administration`,
       lastModified: currentDate,
       changeFrequency: 'weekly',
-      priority: 0.8,
+      priority: 0.75,
     },
+    // Pages légales (routes réelles : /terms, /privacy, /cookies)
     {
-      url: `${baseUrl}/formation/avance`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    // Pages légales
-    {
-      url: `${baseUrl}/mentions-legales`,
+      url: `${baseUrl}/terms`,
       lastModified: currentDate,
       changeFrequency: 'yearly',
       priority: 0.3,
     },
     {
-      url: `${baseUrl}/politique-confidentialite`,
+      url: `${baseUrl}/privacy`,
       lastModified: currentDate,
       changeFrequency: 'yearly',
       priority: 0.3,
     },
     {
-      url: `${baseUrl}/cgv`,
+      url: `${baseUrl}/cookies`,
       lastModified: currentDate,
       changeFrequency: 'yearly',
-      priority: 0.3,
+      priority: 0.25,
     },
   ]
+
+  const cardPages: MetadataRoute.Sitemap = CARD_SLUGS.map((slug) => ({
+    url: `${baseUrl}/card/${slug}`,
+    lastModified: currentDate,
+    changeFrequency: 'weekly' as const,
+    priority: 0.75,
+  }))
 
   // Pages dynamiques - Articles de blog
   const blogSitemapEntries: MetadataRoute.Sitemap = blogPosts.map((post) => ({
@@ -224,6 +266,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   // Combiner toutes les pages
-  return [...staticPages, ...blogSitemapEntries, ...pagesSitemapEntries, ...formationSitemapEntries]
+  return [
+    ...staticPages,
+    ...cardPages,
+    ...blogSitemapEntries,
+    ...pagesSitemapEntries,
+    ...formationSitemapEntries,
+  ]
 }
 

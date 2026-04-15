@@ -36,7 +36,7 @@ export class NotificationService {
   }
 
   /**
-   * Envoyer une notification d'activation de module
+   * Envoyer une notification d'ouverture d'accès à une appli
    */
   async sendModuleActivatedNotification(userEmail: string, userName: string, moduleName: string): Promise<boolean> {
     return this.emailService.sendNotificationEmail('module_activated', userEmail, {
@@ -84,7 +84,7 @@ export class NotificationService {
   }
 
   /**
-   * Envoyer une notification aux utilisateurs sans module activé
+   * Envoyer une notification aux utilisateurs sans appli visitée
    */
   async sendNoModuleActivatedNotification(userEmail: string, userName: string): Promise<boolean> {
     return this.emailService.sendNotificationEmail('user_no_module_activated', userEmail, {

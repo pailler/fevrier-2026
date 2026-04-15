@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TokenActionServiceClient } from '../utils/tokenActionServiceClient';
 import { useTokenContext } from '../contexts/TokenContext';
+import { getHunyuan3dAppUrl } from '../utils/hunyuan3dAppUrl';
 
 interface UseModuleAccessOptions {
   user: any;
@@ -98,6 +99,7 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'animagine-xl': 'animagine-xl', // Animagine XL -> animagine-xl
         'florence-2': 'florence-2', // Florence-2 -> florence-2
         'birefnet': 'birefnet', // BiRefNet -> birefnet
+        'musetalk': 'musetalk',
         'photobooth': 'photobooth', // Photobooth -> photobooth
         'sentinelle-numerique': 'sentinelle-numerique', // Sentinelle Numérique
       };
@@ -115,8 +117,8 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'meeting-reports': isDevelopment ? 'http://localhost:3050' : 'https://meeting-reports.iahome.fr',
         'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
         'cogstudio': 'https://cogstudio.iahome.fr',
-        // Hunyuan 3D : localhost:8888 en dev, hunyuan3d.iahome.fr en prod
-        'hunyuan3d': isDevelopment ? 'http://localhost:8888' : 'https://hunyuan3d.iahome.fr',
+        // Hunyuan 3D (carte) → app Image→3D Hi3DGen sur le domaine principal
+        'hunyuan3d': getHunyuan3dAppUrl(),
         // Home Assistant : localhost:8123 en dev, homeassistant.iahome.fr en prod
         'home-assistant': isDevelopment ? 'http://localhost:8123' : 'https://homeassistant.iahome.fr',
         // Générateur de prompts : utiliser directement l'URL de production (via Traefik)
@@ -135,6 +137,7 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'florence-2': isDevelopment ? 'http://127.0.0.1:7884' : 'https://florence2.iahome.fr',
         // BiRefNet : sous-domaine comme les autres modules IA
         'birefnet': isDevelopment ? 'http://127.0.0.1:7882' : 'https://birefnet.iahome.fr',
+        'musetalk': isDevelopment ? 'http://127.0.0.1:7886' : 'https://musetalk.iahome.fr',
         // Photobooth : sous-domaine dedie
         'photobooth': isDevelopment ? 'http://localhost:7885' : 'https://photobooth.iahome.fr',
       };

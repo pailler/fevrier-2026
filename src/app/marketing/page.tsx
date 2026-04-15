@@ -24,7 +24,7 @@ export default function MarketingPage() {
     {
       icon: '💰',
       title: 'Offres Transparentes',
-      description: 'Système de crédits dégressif. Plus vous achetez, plus vous économisez. À partir de 4,99€.'
+      description: 'Système de crédits dégressif. Plus vous achetez, plus vous économisez.'
     },
     {
       icon: '🔒',
@@ -708,19 +708,6 @@ export default function MarketingPage() {
               </div>
             </div>
           </div>
-
-          {/* CTA */}
-          <div className="text-center mt-12">
-            <p className="text-xl text-gray-700 mb-6 font-semibold">
-              Vous avez un projet spécifique ? Discutons-en ensemble !
-            </p>
-            <Link
-              href="/contact"
-              className="inline-block bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg"
-            >
-              📧 Demander un Devis Gratuit
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -762,14 +749,9 @@ export default function MarketingPage() {
       {/* Pricing CTA */}
       <section className="py-20 bg-gradient-to-br from-blue-600 to-indigo-700 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold mb-10">
             Prêt à Commencer ?
           </h2>
-          <p className="text-xl mb-8 text-blue-100">
-            Rejoignez des milliers d'utilisateurs qui font confiance à IA Home pour leurs besoins en IA.
-            <br />
-            Commencez dès aujourd'hui à partir de 4,99€.
-          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/pricing2"

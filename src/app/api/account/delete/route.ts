@@ -1,19 +1,35 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { getSupabaseUrl, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
+import type { User } from '@supabase/supabase-js';
+import { getSupabaseUrl, getSupabaseServiceRoleKey, getSupabaseAnonKey } from '@/utils/supabaseConfig';
 import { EmailService } from '@/utils/emailService';
 
 const ADMIN_EMAIL = 'formateur_tic@hotmail.com';
 
-export async function POST() {
-  try {
-    const supabaseAuth = createRouteHandlerClient({ cookies });
-    const { data: { session }, error: sessionError } = await supabaseAuth.auth.getSession();
-    const user = session?.user;
+/** Session côté client = surtout localStorage (useCustomAuth) ; les cookies SSR peuvent être absents. */
+async function resolveUser(request: NextRequest): Promise<User | null> {
+  const authHeader = request.headers.get('authorization');
+  if (authHeader?.startsWith('Bearer ')) {
+    const jwt = authHeader.slice(7).trim();
+    if (jwt) {
+      const supabaseAnon = createClient(getSupabaseUrl(), getSupabaseAnonKey());
+      const { data: { user }, error } = await supabaseAnon.auth.getUser(jwt);
+      if (!error && user) return user;
+    }
+  }
+  const supabaseAuth = createRouteHandlerClient({ cookies });
+  const { data: { session }, error: sessionError } = await supabaseAuth.auth.getSession();
+  if (!sessionError && session?.user) return session.user;
+  return null;
+}
 
-    if (sessionError || !user) {
+export async function POST(request: NextRequest) {
+  try {
+    const user = await resolveUser(request);
+
+    if (!user) {
       return NextResponse.json(
         { success: false, error: 'Non authentifié' },
         { status: 401 }

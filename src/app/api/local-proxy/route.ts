@@ -99,20 +99,11 @@ export async function GET(request: NextRequest) {
     
     if (!tokenData) {
       return NextResponse.json(
-        { error: 'Token invalide ou expiré' },
+        { error: 'Token invalide' },
         { status: 401 }
       );
     }
-    
-    // Vérifier si le token n'a pas expiré
-    const now = Math.floor(Date.now() / 1000);
-    if (tokenData.expiresAt < now) {
-      return NextResponse.json(
-        { error: 'Token expiré' },
-        { status: 401 }
-      );
-    }
-    
+
     // Vérifier l'IP (optionnel)
         const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0] ||
                     request.headers.get('x-real-ip') ||
@@ -215,20 +206,11 @@ export async function POST(request: NextRequest) {
     
     if (!tokenData) {
       return NextResponse.json(
-        { error: 'Token invalide ou expiré' },
+        { error: 'Token invalide' },
         { status: 401 }
       );
     }
-    
-    // Vérifier si le token n'a pas expiré
-    const now = Math.floor(Date.now() / 1000);
-    if (tokenData.expiresAt < now) {
-      return NextResponse.json(
-        { error: 'Token expiré' },
-        { status: 401 }
-      );
-    }
-    
+
     // Construire l'URL cible
     const targetUrl = new URL(targetPath, tokenData.targetUrl);
     

@@ -2,7 +2,7 @@
 
 /**
  * Redirection vers ModuleAccessButton.
- * Le système d'activation n'existe plus - accès par tokens uniquement.
+ * Accès aux applis par consommation de crédits (tokens).
  */
 import ModuleAccessButton from './ModuleAccessButton';
 

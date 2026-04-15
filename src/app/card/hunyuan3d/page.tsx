@@ -8,6 +8,7 @@ import Link from 'next/link';
 import ModuleAccessButton from '../../../components/ModuleAccessButton';
 import YouTubeEmbed from '../../../components/YouTubeEmbed';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
+import { getHunyuan3dAppUrl } from '../../../utils/hunyuan3dAppUrl';
 
 interface Card {
   id: string;
@@ -311,6 +312,8 @@ export default function Hunyuan3DPage() {
           if (!data.youtube_url || data.youtube_url.trim() === '') {
             data.youtube_url = 'https://www.youtube.com/embed/CP2cDFgbs8s?autoplay=0&rel=0&modestbranding=1';
           }
+          // App opérationnelle : Hi3DGen sur le domaine principal (remplace hunyuan3d.iahome.fr)
+          data.url = getHunyuan3dAppUrl();
           setCard(data);
         }
       } catch (error) {

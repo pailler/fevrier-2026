@@ -55,7 +55,17 @@ function buildBaseUrl(req) {
 }
 
 app.use("/storage", express.static(STORAGE_ROOT));
-app.use(express.static(__dirname));
+app.use(
+  express.static(__dirname, {
+    setHeaders(res, filePath) {
+      if (/\.html$/i.test(filePath)) {
+        res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+        res.setHeader("Pragma", "no-cache");
+        res.setHeader("Expires", "0");
+      }
+    },
+  })
+);
 
 app.post("/api/events", (req, res) => {
   const name = String(req.body?.name || "").trim();
@@ -182,6 +192,31 @@ app.get("/api/events/:eventId/qrcode", async (req, res) => {
   });
 
   return res.json({ galleryUrl: galleryUrl.toString(), qrDataUrl });
+});
+
+const OFFER_QR_MEDIA = new Set(["pin", "token", "organic"]);
+
+app.get("/api/offer-qr.png", async (req, res) => {
+  const medium = OFFER_QR_MEDIA.has(String(req.query.medium || ""))
+    ? String(req.query.medium)
+    : "pin";
+  const url =
+    "https://iahome.fr/pricing2?promo=BIENVENUE10&utm_source=photobooth_guest&utm_medium=" +
+    medium;
+  try {
+    const buf = await QRCode.toBuffer(url, {
+      type: "png",
+      width: 240,
+      margin: 2,
+      errorCorrectionLevel: "M",
+      color: { dark: "#065f46ff", light: "#ffffffff" },
+    });
+    res.type("png");
+    res.set("Cache-Control", "public, max-age=86400");
+    res.send(buf);
+  } catch (err) {
+    res.status(500).type("text").send("QR generation failed");
+  }
 });
 
 app.get("/health", (_req, res) => {

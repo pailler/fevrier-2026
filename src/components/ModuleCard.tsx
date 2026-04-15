@@ -338,6 +338,8 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   
   // Vérifier si c'est le module Florence-2 pour appliquer un style spécial
   const isFlorence2 = module.title.toLowerCase().includes('florence-2') || module.title.toLowerCase().includes('florence 2') || module.title.toLowerCase().includes('florence2') || module.id === 'florence-2';
+
+  const isMuseTalk = module.title.toLowerCase().includes('musetalk') || module.title.toLowerCase().includes('muse talk') || module.id === 'musetalk';
   
   // Vérifier si c'est le module Détecteur de Contenu IA pour appliquer un style spécial
   const isAIDetector = module.title.toLowerCase().includes('détecteur') || module.title.toLowerCase().includes('detecteur') || module.title.toLowerCase().includes('ai detector') || module.title.toLowerCase().includes('contenu ia') || module.id === 'ai-detector';
@@ -413,13 +415,15 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                     ? '/images/photomaker.jpg'
                     : isFlorence2
                       ? '/images/florence-2.jpg'
-                      : isSentinelleNumerique
-                        ? '/images/sentinelle-numerique.jpg'
-                        : isAIDetector
-                          ? '/images/iapasia.jpg'
-                          : isPhotobooth
-                            ? '/images/photobooth.png'
-                            : '/images/animagine-xl.jpg';
+                      : isMuseTalk
+                        ? '/images/musetalk.jpg'
+                        : isSentinelleNumerique
+                          ? '/images/sentinelle-numerique.jpg'
+                          : isAIDetector
+                            ? '/images/iapasia.jpg'
+                            : isPhotobooth
+                              ? '/images/photobooth.png'
+                              : '/images/animagine-xl.jpg';
 
     // Déterminer les badges selon le type de module (style Claid.ai : badge violet "New")
     const getBadgeLabel = () => {

@@ -3,8 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 import { LibreSpeedAccessService } from '../../../utils/librespeedAccess';
 import ModuleSecurityService from '../../../utils/moduleSecurityService';
-import { checkSessionDuration } from '../../../utils/sessionDurationCheck';
-
+import { getHunyuan3dAppUrl } from '@/utils/hunyuan3dAppUrl';
 const supabase = createClient(
   getSupabaseUrl(),
   getSupabaseAnonKey()
@@ -21,9 +20,10 @@ const MODULE_URLS: { [key: string]: string } = {
   'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
   'comfyui': 'https://comfyui.iahome.fr',
   'cogstudio': 'https://cogstudio.iahome.fr',
-  'hunyuan3d': 'https://hunyuan3d.iahome.fr',
+  'hunyuan3d': getHunyuan3dAppUrl(),
   'photomaker': 'https://photomaker.iahome.fr',
   'birefnet': 'https://birefnet.iahome.fr',
+  'musetalk': 'https://musetalk.iahome.fr',
   'florence-2': 'https://florence2.iahome.fr',
   'animagine-xl': 'https://animaginexl.iahome.fr',
 };
@@ -73,13 +73,7 @@ export async function GET(request: NextRequest) {
           ;
           return NextResponse.redirect('https://iahome.fr/account?error=invalid_token', 302);
         }
-        
-        // Vérifier l'expiration
-        if (tokenData.expires_at && new Date(tokenData.expires_at) <= new Date()) {
-          ;
-          return NextResponse.redirect('https://iahome.fr/account?error=token_expired', 302);
-        }
-        
+
         // Vérifier l'accès au module
         const securityService = ModuleSecurityService.getInstance();
         const canAccess = await securityService.canAccessExternalApp(tokenData.created_by, moduleId);

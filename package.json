@@ -4,6 +4,7 @@
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
     "build": "next build",
     "dev": "next dev -p 3000",
+    "dev:clean": "node scripts/clean-next-cache.mjs && next dev -p 3000",
     "hi3dgen": "next dev -p 8095",
     "start": "next start",
     "monitor": "node scripts/monitor-localhost.js",

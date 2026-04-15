@@ -1,7 +1,6 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
 
 interface BreadcrumbItem {
   label: string;
@@ -14,13 +13,8 @@ interface BreadcrumbProps {
 }
 
 export default function Breadcrumb({ items = [], showHome = true }: BreadcrumbProps) {
-  const pathname = usePathname();
-  const [isMounted, setIsMounted] = useState(false);
-  
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-  
+  const pathname = usePathname() || '';
+
   // Générer automatiquement les items si aucun n'est fourni
   const generateBreadcrumbItems = (): BreadcrumbItem[] => {
     const segments = pathname.split('/').filter(Boolean);
@@ -109,12 +103,8 @@ export default function Breadcrumb({ items = [], showHome = true }: BreadcrumbPr
     
     return breadcrumbItems;
   };
-  
-  // Ne pas rendre le composant côté serveur pour éviter les problèmes d'hydratation
-  if (!isMounted) {
-    return null;
-  }
-  
+
+  // Rendu identique SSR / client : éviter return null puis nav (décalait l’arbre → hydration failed)
   const breadcrumbItems = items.length > 0 ? items : generateBreadcrumbItems();
   
   if (breadcrumbItems.length <= 1) {

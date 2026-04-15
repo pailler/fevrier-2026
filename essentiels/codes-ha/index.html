@@ -40,6 +40,7 @@
         <!-- Menu principal -->
         <nav class="top-menu" aria-label="Navigation principale">
             <a href="#accueil" class="top-menu-btn">Accueil</a>
+            <a href="#section-ressources" class="top-menu-btn">Ressources utiles</a>
             <a href="#section-tableaux" class="top-menu-btn">Manuels HA</a>
             <a href="#section-codes" class="top-menu-btn">Codes prêts à l'emploi</a>
             <a href="#section-cartes" class="top-menu-btn">Cartes à installer</a>
@@ -77,6 +78,92 @@
                     <h3 class="accueil-card-title">Configs</h3>
                     <p class="accueil-card-desc">Dépôts GitHub de configurations complètes : inspirez-vous et récupérez du YAML prêt à l'emploi.</p>
                 </a>
+                <a href="#section-ressources" class="accueil-card accueil-card-ressources">
+                    <span class="accueil-card-icon">🔗</span>
+                    <h3 class="accueil-card-title">Ressources utiles</h3>
+                    <p class="accueil-card-desc">Documentation officielle, HACS, forum, API et liens pour utilisateurs et développeurs.</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section Ressources utiles (liens officiels et communauté) -->
+        <section id="section-ressources" class="page-section section-ressources-wrapper">
+            <header class="section-banner">
+                <h2 class="section-banner__title">Ressources utiles</h2>
+                <p class="section-banner__subtitle">Liens officiels et communautaires pour aller plus loin</p>
+            </header>
+            <p class="section-ressources-intro">Documentation Home Assistant, intégrations, HACS, forum, API REST, Lovelace et dépôt core — pour les utilisateurs comme pour les développeurs.</p>
+            <div class="ressources-columns">
+                <div class="ressources-panel ressources-panel--users">
+                    <h3 class="ressources-panel__title"><span class="ressources-panel__emoji" aria-hidden="true">👥</span> Pour les utilisateurs</h3>
+                    <ul class="ressources-link-list">
+                        <li>
+                            <a href="https://www.home-assistant.io/docs/" target="_blank" rel="noopener noreferrer" class="ressources-link">
+                                <span class="ressources-link__icon" aria-hidden="true">📖</span>
+                                <span class="ressources-link__text"><strong>Documentation officielle</strong><span class="ressources-link__sub">Guides, tutoriels et référence</span></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.home-assistant.io/integrations/" target="_blank" rel="noopener noreferrer" class="ressources-link">
+                                <span class="ressources-link__icon" aria-hidden="true">🔌</span>
+                                <span class="ressources-link__text"><strong>Intégrations</strong><span class="ressources-link__sub">2000+ appareils et services</span></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://hacs.xyz/" target="_blank" rel="noopener noreferrer" class="ressources-link">
+                                <span class="ressources-link__icon" aria-hidden="true">🎨</span>
+                                <span class="ressources-link__text"><strong>HACS</strong><span class="ressources-link__sub">Community Store — cartes et intégrations</span></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://community.home-assistant.io/" target="_blank" rel="noopener noreferrer" class="ressources-link">
+                                <span class="ressources-link__icon" aria-hidden="true">💬</span>
+                                <span class="ressources-link__text"><strong>Forum communautaire</strong><span class="ressources-link__sub">Entraide et partage</span></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.home-assistant.io/join-the-community/" target="_blank" rel="noopener noreferrer" class="ressources-link">
+                                <span class="ressources-link__icon" aria-hidden="true">🎧</span>
+                                <span class="ressources-link__text"><strong>Discord &amp; Reddit</strong><span class="ressources-link__sub">Communauté active</span></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="ressources-panel ressources-panel--devs">
+                    <h3 class="ressources-panel__title"><span class="ressources-panel__emoji" aria-hidden="true">⚙️</span> Pour les développeurs</h3>
+                    <ul class="ressources-link-list">
+                        <li>
+                            <a href="https://developers.home-assistant.io/" target="_blank" rel="noopener noreferrer" class="ressources-link">
+                                <span class="ressources-link__icon" aria-hidden="true">🛠️</span>
+                                <span class="ressources-link__text"><strong>Developer Documentation</strong><span class="ressources-link__sub">Intégrations et custom components</span></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.home-assistant.io/docs/api/rest/" target="_blank" rel="noopener noreferrer" class="ressources-link">
+                                <span class="ressources-link__icon" aria-hidden="true">🔗</span>
+                                <span class="ressources-link__text"><strong>API REST</strong><span class="ressources-link__sub">HTTP / WebSocket</span></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.home-assistant.io/lovelace/" target="_blank" rel="noopener noreferrer" class="ressources-link">
+                                <span class="ressources-link__icon" aria-hidden="true">📱</span>
+                                <span class="ressources-link__text"><strong>Lovelace (dashboards)</strong><span class="ressources-link__sub">Cartes et YAML</span></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/home-assistant/core" target="_blank" rel="noopener noreferrer" class="ressources-link">
+                                <span class="ressources-link__icon" aria-hidden="true">🐙</span>
+                                <span class="ressources-link__text"><strong>GitHub — code source</strong><span class="ressources-link__sub">Core Home Assistant</span></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://developers.home-assistant.io/docs/creating_integration_manifest/" target="_blank" rel="noopener noreferrer" class="ressources-link">
+                                <span class="ressources-link__icon" aria-hidden="true">📦</span>
+                                <span class="ressources-link__text"><strong>Publier une intégration</strong><span class="ressources-link__sub">Manifeste et HACS</span></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </section>
 

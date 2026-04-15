@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from 'next/navigation';
+import { loginUrlWithReturn } from '../../utils/loginRedirect';
 import Link from "next/link";
 import { NotificationServiceClient } from "../../utils/notificationServiceClient";
 // import AuthorizedAccessButton from "../../components/AuthorizedAccessButton";
@@ -59,7 +60,7 @@ export default function ModulesPage() {
   // Rediriger si pas connecté
   useEffect(() => {
     if (!session) {
-      router.push('/login');
+      router.push(loginUrlWithReturn('/modules', { toString: () => '' }));
     }
   }, [session, router]);
 
@@ -125,7 +126,7 @@ export default function ModulesPage() {
                 className="text-gray-700 font-medium px-3 py-1 rounded hover:bg-gray-100 text-sm" 
                 onClick={async () => { 
                   await supabase.auth.signOut(); 
-                  router.push('/login'); 
+                  router.push(loginUrlWithReturn('/modules', { toString: () => '' })); 
                 }}
               >
                 Se déconnecter
@@ -172,7 +173,7 @@ export default function ModulesPage() {
               
               {/* Bouton d'accès supprimé - Les utilisateurs peuvent accéder via les sous-domaines */}
               <div className="w-full bg-green-100 text-green-800 font-medium py-3 px-4 rounded-lg text-center">
-                ✅ Application activée - Accès via sous-domaine
+                ✅ Accès via sous-domaine — ouverture avec vos crédits depuis la fiche de l&apos;appli
               </div>
             </div>
           ))}

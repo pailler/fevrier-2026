@@ -532,7 +532,7 @@ export default function HomeAssistantPage() {
                   <div className="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-2xl border border-red-200">
                     <h3 className="text-2xl font-bold text-red-900 mb-4">Création de dashboards professionnels</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Apprenez à créer des tableaux de bord élégants avec des centaines de codes Lovelace prêts à l'emploi : Button Card, Mushroom Cards, Flex Cells Card, Weather Chart, et bien d'autres.
+                      Apprenez à créer des tableaux de bord élégants avec des centaines de codes Lovelace prêts à l'emploi : Button Card, Mushroom Cards, Weather Chart, et bien d'autres.
                     </p>
                   </div>
                   
@@ -707,7 +707,7 @@ export default function HomeAssistantPage() {
                   <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-purple-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Qu'est-ce qu'un code Lovelace ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Les codes Lovelace sont des configurations de cartes pour créer des dashboards personnalisés dans Home Assistant. Nous fournissons des centaines de codes prêts à l'emploi (Button Card, Mushroom Cards, Flex Cells Card, Weather Chart, etc.) que vous pouvez copier-coller directement dans votre configuration.
+                      Les codes Lovelace sont des configurations de cartes pour créer des dashboards personnalisés dans Home Assistant. Nous fournissons des centaines de codes prêts à l'emploi (Button Card, Mushroom Cards, Weather Chart, etc.) que vous pouvez copier-coller directement dans votre configuration.
                     </p>
                   </div>
                   
@@ -727,186 +727,14 @@ export default function HomeAssistantPage() {
                 </div>
               </div>
 
-              {/* H2 - Flex Cells Card */}
-              <div className="mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Flex Cells Card</h2>
-                <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-teal-500 mb-6">
-                  <p className="text-lg leading-relaxed text-gray-800 mb-4">
-                    <strong>Flex Cells Card</strong> est une carte Lovelace permettant de créer des mises en page tabulaires flexibles avec icônes, texte ou entités. Entièrement configurable depuis un éditeur visuel (sans documentation requise), elle supporte les règles dynamiques, le tri par colonnes, les actions par cellule (clic, maintien, double-clic) et l&apos;affichage conditionnel des couleurs.
-                  </p>
-                  <div className="flex flex-wrap gap-3 mb-4">
-                    <a
-                      href="https://community.home-assistant.io/t/new-lovelace-card-flex-cells-card/919780"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-medium transition-colors"
-                    >
-                      Forum Home Assistant
-                    </a>
-                    <a
-                      href="https://github.com/michalowskil/flex-cells-card"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-xl font-medium transition-colors"
-                    >
-                      GitHub
-                    </a>
-                  </div>
-                  <p className="text-gray-700">
-                    Plusieurs exemples de cette carte (température/humidité, éclairage, batteries, lecteur média) sont disponibles dans l&apos;<strong>application de recherche de codes</strong> après accès à Home Assistant.
-                  </p>
-                </div>
-              </div>
-
-              {/* H2 - Ressources utiles pour utilisateurs et développeurs */}
-              <div className="mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Ressources utiles</h2>
-                <p className="text-lg text-gray-700 mb-8">
-                  Découvrez les liens officiels et communautaires pour approfondir vos connaissances et développer vos propres intégrations.
-                </p>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {/* Ressources utilisateurs */}
-                  <div className="bg-gradient-to-br from-orange-50 to-amber-50 p-6 rounded-2xl border border-orange-200 shadow-lg">
-                    <h3 className="text-2xl font-bold text-orange-900 mb-4 flex items-center">
-                      <span className="text-3xl mr-2">👥</span>
-                      Pour les utilisateurs
-                    </h3>
-                    <div className="space-y-3">
-                      <a 
-                        href="https://www.home-assistant.io/docs/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-3 p-3 bg-white hover:bg-orange-100 rounded-xl transition-colors border border-orange-200"
-                      >
-                        <span className="text-2xl">📖</span>
-                        <div>
-                          <p className="font-semibold text-gray-900">Documentation officielle</p>
-                          <p className="text-sm text-gray-600">Guides, tutoriels et référence complète en français</p>
-                        </div>
-                      </a>
-                      <a 
-                        href="https://www.home-assistant.io/integrations/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-3 p-3 bg-white hover:bg-orange-100 rounded-xl transition-colors border border-orange-200"
-                      >
-                        <span className="text-2xl">🔌</span>
-                        <div>
-                          <p className="font-semibold text-gray-900">Intégrations</p>
-                          <p className="text-sm text-gray-600">Base de compatibilité (2000+ appareils)</p>
-                        </div>
-                      </a>
-                      <a 
-                        href="https://hacs.xyz/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-3 p-3 bg-white hover:bg-orange-100 rounded-xl transition-colors border border-orange-200"
-                      >
-                        <span className="text-2xl">🎨</span>
-                        <div>
-                          <p className="font-semibold text-gray-900">HACS</p>
-                          <p className="text-sm text-gray-600">Home Assistant Community Store – cartes et intégrations communautaires</p>
-                        </div>
-                      </a>
-                      <a 
-                        href="https://community.home-assistant.io/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-3 p-3 bg-white hover:bg-orange-100 rounded-xl transition-colors border border-orange-200"
-                      >
-                        <span className="text-2xl">💬</span>
-                        <div>
-                          <p className="font-semibold text-gray-900">Forum communautaire</p>
-                          <p className="text-sm text-gray-600">Entraide, partage d&apos;idées et solutions</p>
-                        </div>
-                      </a>
-                      <a 
-                        href="https://www.home-assistant.io/join-the-community/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-3 p-3 bg-white hover:bg-orange-100 rounded-xl transition-colors border border-orange-200"
-                      >
-                        <span className="text-2xl">🎧</span>
-                        <div>
-                          <p className="font-semibold text-gray-900">Discord & Reddit</p>
-                          <p className="text-sm text-gray-600">Communauté active et réactive</p>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                  
-                  {/* Ressources développeurs */}
-                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200 shadow-lg">
-                    <h3 className="text-2xl font-bold text-blue-900 mb-4 flex items-center">
-                      <span className="text-3xl mr-2">⚙️</span>
-                      Pour les développeurs
-                    </h3>
-                    <div className="space-y-3">
-                      <a 
-                        href="https://developers.home-assistant.io/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-3 p-3 bg-white hover:bg-blue-100 rounded-xl transition-colors border border-blue-200"
-                      >
-                        <span className="text-2xl">🛠️</span>
-                        <div>
-                          <p className="font-semibold text-gray-900">Developer Documentation</p>
-                          <p className="text-sm text-gray-600">Créer des intégrations et custom components</p>
-                        </div>
-                      </a>
-                      <a 
-                        href="https://www.home-assistant.io/docs/api/rest/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-3 p-3 bg-white hover:bg-blue-100 rounded-xl transition-colors border border-blue-200"
-                      >
-                        <span className="text-2xl">🔗</span>
-                        <div>
-                          <p className="font-semibold text-gray-900">API REST</p>
-                          <p className="text-sm text-gray-600">Contrôler Home Assistant par HTTP/WebSocket</p>
-                        </div>
-                      </a>
-                      <a 
-                        href="https://www.home-assistant.io/lovelace/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-3 p-3 bg-white hover:bg-blue-100 rounded-xl transition-colors border border-blue-200"
-                      >
-                        <span className="text-2xl">📱</span>
-                        <div>
-                          <p className="font-semibold text-gray-900">Lovelace (Dashboards)</p>
-                          <p className="text-sm text-gray-600">Documentation des cartes et configurations YAML</p>
-                        </div>
-                      </a>
-                      <a 
-                        href="https://github.com/home-assistant/core" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-3 p-3 bg-white hover:bg-blue-100 rounded-xl transition-colors border border-blue-200"
-                      >
-                        <span className="text-2xl">🐙</span>
-                        <div>
-                          <p className="font-semibold text-gray-900">GitHub – Code source</p>
-                          <p className="text-sm text-gray-600">Contribuer ou explorer le code de Home Assistant</p>
-                        </div>
-                      </a>
-                      <a 
-                        href="https://developers.home-assistant.io/docs/creating_integration_manifest/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-3 p-3 bg-white hover:bg-blue-100 rounded-xl transition-colors border border-blue-200"
-                      >
-                        <span className="text-2xl">📦</span>
-                        <div>
-                          <p className="font-semibold text-gray-900">Publier une intégration</p>
-                          <p className="text-sm text-gray-600">Guide pour ajouter des intégrations à HACS</p>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <p className="text-lg text-gray-700 mb-8 max-w-3xl">
+                Les liens utiles (documentation officielle, HACS, forum, API, Lovelace, etc.) se trouvent dans l&apos;application{' '}
+                <strong>Ressources Home Assistant</strong> sur{' '}
+                <a href="https://homeassistant.iahome.fr/#section-ressources" target="_blank" rel="noopener noreferrer" className="text-orange-600 hover:text-orange-800 font-semibold underline">
+                  homeassistant.iahome.fr
+                </a>
+                {' '}(menu <em>Ressources utiles</em>), une fois que vous y accédez depuis le bouton ci-dessus.
+              </p>
 
               {/* Description principale */}
               <div className="text-center max-w-5xl mx-auto mb-8">
@@ -955,7 +783,7 @@ export default function HomeAssistantPage() {
                     <div className="space-y-4 text-gray-700">
                       <p className="text-lg leading-relaxed">
                         <strong>Cartes Lovelace :</strong> Des centaines de codes de cartes personnalisées (Button Card,
-                        Mushroom Cards, Flex Cells Card, Banner Card, Weather Chart, etc.) que vous pouvez copier-coller directement dans
+                        Mushroom Cards, Banner Card, Weather Chart, etc.) que vous pouvez copier-coller directement dans
                         votre configuration.
                       </p>
                       <p className="text-lg leading-relaxed">

@@ -162,11 +162,11 @@ const nextConfig: NextConfig = {
           // CORS headers retirés - gérés par les routes API individuelles
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self' https://iahome.fr https://*.iahome.fr; connect-src 'self' https://iahome.fr https://*.iahome.fr wss://iahome.fr wss://www.iahome.fr http://localhost:8003 http://localhost:7960 https://hunyuan3d.iahome.fr https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io wss://*.supabase.co wss://*.supabase.io https://*.cloudflareaccess.com https://cloudflare.com https://*.cloudflare.com https://www.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://stats.g.doubleclick.net https://*.doubleclick.net https://connect.facebook.net https://www.facebook.com https://*.facebook.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://iahome.fr https://*.iahome.fr https://iahome.fr/_next/static/ https://*.iahome.fr/_next/static/ https://iahome.fr/cdn-cgi/ https://*.cloudflare.com https://*.cloudflareaccess.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; img-src 'self' data: https://iahome.fr https://*.iahome.fr https: https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' data: https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; worker-src 'self' blob: https://iahome.fr https://*.iahome.fr; frame-src 'self' https: https://*.cloudflareaccess.com https://hunyuan3d.iahome.fr https://www.youtube.com https://www.youtube-nocookie.com https://youtube.com https://youtube-nocookie.com; frame-ancestors 'self'; report-uri /api/csp-report;"
+            value: "default-src 'self' https://iahome.fr https://*.iahome.fr; connect-src 'self' https://iahome.fr https://*.iahome.fr wss://iahome.fr wss://www.iahome.fr http://localhost:8003 http://localhost:7960 https://hunyuan3d.iahome.fr https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io wss://*.supabase.co wss://*.supabase.io https://*.cloudflareaccess.com https://cloudflare.com https://*.cloudflare.com https://www.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://stats.g.doubleclick.net https://*.doubleclick.net https://connect.facebook.net https://www.facebook.com https://*.facebook.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://iahome.fr https://*.iahome.fr https://iahome.fr/_next/static/ https://*.iahome.fr/_next/static/ https://iahome.fr/cdn-cgi/ https://*.cloudflare.com https://*.cloudflareaccess.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; img-src 'self' data: blob: https://iahome.fr https://*.iahome.fr https: https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' data: https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; worker-src 'self' blob: https://iahome.fr https://*.iahome.fr; frame-src 'self' https: https://*.cloudflareaccess.com https://hunyuan3d.iahome.fr https://www.youtube.com https://www.youtube-nocookie.com https://youtube.com https://youtube-nocookie.com; frame-ancestors 'self'; report-uri /api/csp-report;"
           },
           {
             key: 'Content-Security-Policy-Report-Only',
-            value: "default-src 'self' https://iahome.fr https://*.iahome.fr; connect-src 'self' https://iahome.fr https://*.iahome.fr wss://iahome.fr wss://www.iahome.fr http://localhost:8003 http://localhost:7960 https://hunyuan3d.iahome.fr https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io wss://*.supabase.co wss://*.supabase.io https://*.cloudflareaccess.com https://cloudflare.com https://*.cloudflare.com https://www.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://stats.g.doubleclick.net https://*.doubleclick.net https://connect.facebook.net https://www.facebook.com https://*.facebook.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://iahome.fr https://*.iahome.fr https://iahome.fr/_next/static/ https://*.iahome.fr/_next/static/ https://iahome.fr/cdn-cgi/ https://*.cloudflare.com https://*.cloudflareaccess.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; img-src 'self' data: https://iahome.fr https://*.iahome.fr https: https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' data: https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; worker-src 'self' blob: https://iahome.fr https://*.iahome.fr; frame-src 'self' https: https://*.cloudflareaccess.com https://hunyuan3d.iahome.fr https://www.youtube.com https://www.youtube-nocookie.com https://youtube.com https://youtube-nocookie.com; frame-ancestors 'self'; report-uri /api/csp-report;"
+            value: "default-src 'self' https://iahome.fr https://*.iahome.fr; connect-src 'self' https://iahome.fr https://*.iahome.fr wss://iahome.fr wss://www.iahome.fr http://localhost:8003 http://localhost:7960 https://hunyuan3d.iahome.fr https://xemtoyzcihmncbrlsmhr.supabase.co https://*.supabase.co https://*.supabase.io wss://*.supabase.co wss://*.supabase.io https://*.cloudflareaccess.com https://cloudflare.com https://*.cloudflare.com https://www.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://stats.g.doubleclick.net https://*.doubleclick.net https://connect.facebook.net https://www.facebook.com https://*.facebook.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://iahome.fr https://*.iahome.fr https://iahome.fr/_next/static/ https://*.iahome.fr/_next/static/ https://iahome.fr/cdn-cgi/ https://*.cloudflare.com https://*.cloudflareaccess.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; img-src 'self' data: blob: https://iahome.fr https://*.iahome.fr https: https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' data: https://iahome.fr https://*.iahome.fr https://*.cloudflareaccess.com https://*.cloudflare.com; worker-src 'self' blob: https://iahome.fr https://*.iahome.fr; frame-src 'self' https: https://*.cloudflareaccess.com https://hunyuan3d.iahome.fr https://www.youtube.com https://www.youtube-nocookie.com https://youtube.com https://youtube-nocookie.com; frame-ancestors 'self'; report-uri /api/csp-report;"
           },
           {
             key: 'Cache-Control',
@@ -196,6 +196,10 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Type',
             value: 'text/css; charset=utf-8'
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow'
           }
         ]
       },
@@ -261,6 +265,10 @@ const nextConfig: NextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable'
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow'
           }
         ]
       },
@@ -380,7 +388,16 @@ const nextConfig: NextConfig = {
   
   async redirects() {
     return [
+      { source: '/cancel', destination: '/payment-cancel', permanent: true },
       { source: '/pricing', destination: '/pricing2', permanent: true },
+      // Anciennes URLs du sitemap (pages inexistantes) → pages légales réelles
+      { source: '/mentions-legales', destination: '/terms', permanent: true },
+      { source: '/politique-confidentialite', destination: '/privacy', permanent: true },
+      { source: '/cgv', destination: '/terms', permanent: true },
+      // Anciennes fiches « applications » (pas de routes imbriquées) → fiches /card
+      { source: '/applications/whisper', destination: '/card/whisper', permanent: true },
+      { source: '/applications/stable-diffusion', destination: '/card/stablediffusion', permanent: true },
+      { source: '/applications/comfyui', destination: '/card/comfyui', permanent: true },
     ];
   },
 

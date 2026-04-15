@@ -33,7 +33,7 @@ export default function NotificationExample() {
       return;
     }
     await notifyModuleActivated(email, moduleName, userName || 'Utilisateur de test');
-    alert('Notification d\'activation de module envoyée');
+    alert('Notification d\'ouverture d\'accès appli envoyée');
   };
 
   const handleTestUserLogout = async () => {
@@ -79,7 +79,7 @@ export default function NotificationExample() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Nom du module (pour activation)
+            Nom de l'appli (test accès)
           </label>
           <input
             type="text"
@@ -109,7 +109,7 @@ export default function NotificationExample() {
             onClick={handleTestModuleActivated}
             className="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
           >
-            Test Activation Module
+            Test accès appli
           </button>
 
           <button

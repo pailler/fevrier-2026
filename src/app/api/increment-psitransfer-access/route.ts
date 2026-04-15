@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       console.error('❌ PsiTransfer Access: Module non trouvé ou inactif:', appError);
       return new NextResponse(JSON.stringify({
         success: false,
-        error: 'Application PsiTransfer non activée'
+        error: 'PsiTransfer : aucun accès enregistré pour ce compte'
       }), {
         status: 404,
         headers: { 'Content-Type': 'application/json' }

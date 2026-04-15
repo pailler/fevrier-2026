@@ -156,7 +156,7 @@ export default function AdminDashboard() {
       value: stats.totalModules.toString(),
       icon: '🧩',
       color: 'bg-purple-500',
-      change: `${stats.activeApplications} applications actives`,
+      change: `${stats.activeApplications} entrées compte (applis)`,
       changeType: 'positive' as const,
     },
     {

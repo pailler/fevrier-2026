@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
+import { getAdminSignupNotificationRecipients } from '@/utils/adminEmails';
 
 const supabase = createClient(
   getSupabaseUrl(),
@@ -96,18 +97,20 @@ export async function POST(request: NextRequest) {
         console.error('Erreur lors de l\'envoi de l\'email de bienvenue:', emailError);
       }
 
-      // Envoyer une notification à l'admin
+      // Envoyer une notification à chaque admin
       try {
         const { EmailService } = await import('../../../../utils/emailService');
         const emailService = EmailService.getInstance();
-        
-        await emailService.sendNotificationEmail('admin_user_signup', 'formateur_tic@hotmail.com', {
+        const adminPayload = {
           user_name: name || email,
           user_email: email,
           signup_date: new Date().toLocaleDateString('fr-FR'),
           signup_time: new Date().toLocaleTimeString('fr-FR'),
           signup_method: 'OAuth'
-        });
+        };
+        for (const adminEmail of getAdminSignupNotificationRecipients()) {
+          await emailService.sendNotificationEmail('admin_user_signup', adminEmail, adminPayload);
+        }
       } catch (emailError) {
         console.error('Erreur lors de l\'envoi de la notification admin:', emailError);
       }

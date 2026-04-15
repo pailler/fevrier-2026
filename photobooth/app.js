@@ -176,6 +176,16 @@ function showChoicePanel(eventData) {
   var btnGallery = document.getElementById("btn-gallery");
   if (btnPhoto) btnPhoto.href = studioUrl.toString();
   if (btnGallery) btnGallery.href = galleryUrl.toString();
+  revealChoiceGuestOffer(!!token);
+}
+
+function revealChoiceGuestOffer(hasTokenInUrl) {
+  document.body.classList.add("choice-with-guest-offer");
+  var bottom = document.getElementById("choice-guest-bottom");
+  if (bottom) bottom.removeAttribute("hidden");
+  var medium = hasTokenInUrl ? "token" : "pin";
+  var qr = document.getElementById("choice-offer-qr");
+  if (qr) qr.src = "/api/offer-qr.png?medium=" + encodeURIComponent(medium);
 }
 
 function showJoinPanel() {
@@ -184,6 +194,9 @@ function showJoinPanel() {
   panels.create.classList.remove("active");
   panels.join.classList.add("active");
   document.body.classList.remove("choice-fullscreen");
+  document.body.classList.remove("choice-with-guest-offer");
+  var bottom = document.getElementById("choice-guest-bottom");
+  if (bottom) bottom.setAttribute("hidden", "");
 }
 
 async function createEvent(name, host) {
@@ -231,6 +244,24 @@ async function restoreChoicePanelFromUrl() {
 }
 
 hasValidAccess = validateAccessToken();
+
+var GUEST_OFFER_URL_TOKEN =
+  "https://iahome.fr/pricing2?promo=BIENVENUE10&utm_source=photobooth_guest&utm_medium=token";
+
+/** Bandeaux invites : affiches dans showChoicePanel (PIN ou eventId). Hero : texte renforce si token. */
+function applyHeroGuestOfferIfToken() {
+  if (!readTokenFromUrl() || !hasValidAccess) return;
+  var heroOffer = document.querySelector(".btn-offer-photobooth");
+  if (heroOffer) {
+    heroOffer.href = GUEST_OFFER_URL_TOKEN;
+    heroOffer.innerHTML =
+      "Vous souhaitez le même Photobooth personnalisé pour vos événements ? " +
+      "Profitez du code promo <strong>BIENVENUE10</strong> pour une réduction de 20&nbsp;%<br>" +
+      "<span class=\"btn-offer-sub\">Decouvrir l'offre et les conditions</span>";
+  }
+}
+
+applyHeroGuestOfferIfToken();
 restoreChoicePanelFromUrl();
 
 var cardJoin = document.getElementById("card-join");
@@ -259,6 +290,12 @@ function addTapHandler(container, selector, handler) {
 
 joinInput.addEventListener("input", () => {
   joinInput.value = joinInput.value.replace(/\D/g, "").slice(0, 4);
+});
+
+joinInput.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter") return;
+  e.preventDefault();
+  onVerifyCode();
 });
 
 function onVerifyCode() {

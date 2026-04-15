@@ -34,22 +34,7 @@ export async function POST(request: NextRequest) {
       ;
       return new NextResponse(JSON.stringify({
         success: false,
-        error: 'Token invalide ou expiré'
-      }), {
-        status: 403,
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        }
-      });
-    }
-
-    // Vérifier l'expiration
-    if (tokenData.expires_at && new Date(tokenData.expires_at) < new Date()) {
-      ;
-      return new NextResponse(JSON.stringify({
-        success: false,
-        error: 'Token expiré'
+        error: 'Token invalide'
       }), {
         status: 403,
         headers: {
@@ -71,7 +56,7 @@ export async function POST(request: NextRequest) {
     if (appError || !userApp) {
       return new NextResponse(JSON.stringify({
         success: false,
-        error: 'Application LibreSpeed non activée'
+        error: 'LibreSpeed : aucun accès enregistré pour ce compte'
       }), {
         status: 403,
         headers: {

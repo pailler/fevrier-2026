@@ -3,25 +3,32 @@ import type { Metadata } from 'next'
 const baseUrl = 'https://iahome.fr'
 
 export const metadata: Metadata = {
-  title: 'Blog IA – Articles et actualités IA | IAHome',
-  description: 'Articles sur l\'intelligence artificielle : outils IA, baromètres, applications, bonnes pratiques. Blog IAHome – ressources et actualités IA en français.',
+  title: 'Blog IA — guides, tutoriels et actualités | IAHome',
+  description:
+    'Articles et guides sur l’intelligence artificielle : outils (transcription, images, PDF), baromètres, usages concrets et SEO. Ressources IA en français par IAHome.',
   keywords: [
     'blog IA',
     'articles intelligence artificielle',
+    'guides IA',
+    'tutoriel Whisper',
+    'tutoriel Stable Diffusion',
     'actualités IA',
     'outils IA',
+    'plateforme IA France',
     'ressources IA',
     'baromètres IA',
     'applications IA',
     'IAHome blog',
     'formation IA',
+    'référencement IA',
   ],
   alternates: {
     canonical: `${baseUrl}/blog`,
   },
   openGraph: {
-    title: 'Blog IA – Articles et actualités IA | IAHome',
-    description: 'Articles sur l\'intelligence artificielle : outils IA, baromètres, applications, bonnes pratiques. Blog IAHome.',
+    title: 'Blog IA — guides, tutoriels et actualités | IAHome',
+    description:
+      'Guides et articles sur l’IA : outils, usages et actualité. Blog IAHome en français.',
     url: `${baseUrl}/blog`,
     siteName: 'IA Home',
     locale: 'fr_FR',
@@ -29,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Blog IA – Articles et actualités IA | IAHome',
-    description: 'Articles sur l\'intelligence artificielle : outils IA, baromètres, applications. Blog IAHome.',
+    title: 'Blog IA — guides et actualités | IAHome',
+    description: 'Guides, tutoriels et veille sur l’intelligence artificielle. Blog IAHome.',
   },
   robots: {
     index: true,

@@ -51,7 +51,13 @@ function AuthCallbackContent() {
           try {
             sessionStorage.removeItem('session_expired_redirected');
             Object.keys(sessionStorage).forEach(key => {
-              if (key.includes('auth') && !key.startsWith('sb-') && !key.includes('supabase')) {
+              if (
+                key === 'auth_redirect' ||
+                (key.startsWith('sb-') || key.includes('supabase'))
+              ) {
+                return;
+              }
+              if (key.includes('auth')) {
                 sessionStorage.removeItem(key);
               }
             });

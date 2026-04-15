@@ -27,7 +27,7 @@ export default function UnifiedModuleButton({
     tokenCost: 10
   });
 
-  // Ne pas afficher le bouton si le module est déjà activé
+  // Ne pas afficher le bouton si l’accès est déjà ouvert pour ce module
   if (isAlreadyActivated) {
     return null;
   }

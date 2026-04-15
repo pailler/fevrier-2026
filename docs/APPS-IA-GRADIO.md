@@ -1,4 +1,4 @@
-# Démarrer les apps IA (Animagine XL, Florence-2, BiRefNet)
+# Démarrer les apps IA (Animagine XL, Florence-2, BiRefNet, MuseTalk)
 
 ## 1. Corriger l’erreur torchvision _C.pyd
 
@@ -30,6 +30,7 @@ Démarre en parallèle :
 - **Animagine XL** → http://localhost:7883
 - **Florence-2**   → http://localhost:7884
 - **BiRefNet**     → http://localhost:7882
+- **MuseTalk**     → http://localhost:7886 (lip-sync vidéo ; GPU + poids requis, voir `scripts/setup-musetalk-local.ps1`)
 
 ## 3. Si l’erreur persiste : passer à Python 3.11
 

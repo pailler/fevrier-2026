@@ -272,10 +272,10 @@ export const subdomainsConfig: SubdomainInfo[] = [
     ]
   },
   {
-    subdomain: 'hunyuan3d.iahome.fr',
-    url: 'https://hunyuan3d.iahome.fr',
-    title: 'Hunyuan 3D - Génération 3D par IA | IA Home',
-    description: 'Générez des modèles 3D à partir d\'images avec l\'intelligence artificielle. Créez des objets 3D réalistes et détaillés pour vos projets.',
+    subdomain: 'iahome.fr',
+    url: 'https://iahome.fr/card/hi3dgen',
+    title: 'Hunyuan 3D / Hi3DGen - Image vers 3D | IA Home',
+    description: 'Générez des modèles 3D à partir d\'images (Hi3DGen sur iahome.fr). Créez des objets 3D réalistes et détaillés pour vos projets.',
     keywords: ['hunyuan 3d', 'génération 3d', 'ia 3d', 'modèle 3d', 'création 3d', 'image to 3d'],
     category: 'ai',
     icon: '🎲',

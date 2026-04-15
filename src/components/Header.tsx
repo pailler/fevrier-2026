@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { loginUrlWithReturn } from '../utils/loginRedirect';
 import Link from 'next/link';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import { isAdminUser } from '../utils/sessionDurationCheck';
@@ -16,6 +17,8 @@ const HEADER_VERSION = '4.0.0';
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const loginHref = loginUrlWithReturn(pathname, searchParams);
   const { user, isAuthenticated, loading, signOut } = useCustomAuth();
   const { tokens, isLoading: tokensLoading } = useTokenContext();
   const [role, setRole] = useState<string | null>(null);
@@ -207,10 +210,7 @@ export default function Header() {
     
     // Vérifier si l'utilisateur est connecté
     if (!user?.id) {
-      const redirect = pathname && !['/login', '/signup'].includes(pathname)
-        ? `?redirect=${encodeURIComponent(pathname)}`
-        : '';
-      router.push(`/login${redirect}`);
+      router.push(loginHref);
       return null;
     }
     
@@ -267,10 +267,7 @@ export default function Header() {
                     e.preventDefault();
                     e.stopPropagation();
                     await signOut();
-                    const redirect = pathname && !['/login', '/signup'].includes(pathname)
-                      ? `?redirect=${encodeURIComponent(pathname)}`
-                      : '';
-                    router.push(`/login${redirect}`);
+                    router.push(loginHref);
                   } catch (error) {
                     console.error('Erreur lors de la déconnexion:', error);
                   }
@@ -282,9 +279,7 @@ export default function Header() {
             ) : (
               <div className="flex items-center space-x-3">
                 <Link 
-                  href={pathname && !['/login', '/signup'].includes(pathname) 
-                    ? `/login?redirect=${encodeURIComponent(pathname)}` 
-                    : '/login'} 
+                  href={loginHref}
                   className="text-blue-100 hover:text-white text-sm font-medium transition-colors"
                 >
                   Se connecter
@@ -332,7 +327,7 @@ export default function Header() {
                 <Link
                   href="/account" 
                   data-active={pathname === '/account' || pathname?.startsWith('/account/') ? 'true' : 'false'}
-                  data-button-type="mes-applis-actives"
+                  data-button-type="mes-applis-compte"
                   className="group relative bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 text-white font-bold px-2.5 py-2 md:px-5 md:py-3 rounded-lg md:rounded-2xl text-sm md:text-base hover:from-green-600 hover:via-emerald-600 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 flex items-center space-x-1 md:space-x-3 border-2 border-white/20 hover:border-white/40 animate-pulse-subtle"
                   title="Cliquez pour accéder à vos applications"
                   onClick={(e) => {
@@ -674,10 +669,7 @@ export default function Header() {
                           e.stopPropagation();
                           setIsMobileMenuOpen(false);
                           await signOut();
-                          const redirect = pathname && !['/login', '/signup'].includes(pathname)
-                            ? `?redirect=${encodeURIComponent(pathname)}`
-                            : '';
-                          router.push(`/login${redirect}`);
+                          router.push(loginHref);
                         } catch (error) {
                           console.error('Erreur lors de la déconnexion:', error);
                           // Fermer le menu même en cas d'erreur

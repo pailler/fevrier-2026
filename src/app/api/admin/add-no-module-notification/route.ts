@@ -32,16 +32,16 @@ export async function POST(request: NextRequest) {
       .from('notification_settings')
       .insert({
         event_type: 'user_no_module_activated',
-        name: 'Utilisateur sans module activé',
+        name: 'Utilisateur sans appli visitée',
         is_enabled: true,
-        email_template_subject: 'Activez votre premier module et recevez 200 tokens bonus !',
+        email_template_subject: 'Ouvrez une première appli avec vos crédits et recevez 200 tokens bonus !',
         email_template_body: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
             <div style="background-color: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
               <h1 style="color: #2563eb; margin-top: 0; font-size: 28px;">Bienvenue sur IAHome, {{user_name}} ! 🎉</h1>
               
               <p style="color: #374151; font-size: 16px; line-height: 1.6;">
-                Nous avons remarqué que vous vous êtes inscrit(e) récemment mais que vous n'avez pas encore activé de module.
+                Nous avons remarqué que vous vous êtes inscrit(e) récemment mais que vous n'avez pas encore visité d'appli.
               </p>
               
               <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0; border-radius: 4px;">
@@ -49,12 +49,12 @@ export async function POST(request: NextRequest) {
                   🎁 Offre spéciale : 200 tokens bonus !
                 </p>
                 <p style="color: #78350f; font-size: 14px; margin: 0;">
-                  Activez votre premier module dans les <strong>3 prochains jours</strong> et recevez automatiquement <strong>200 tokens supplémentaires</strong> sur votre compte !
+                  Ouvrez votre première appli dans les <strong>3 prochains jours</strong> et recevez automatiquement <strong>200 tokens supplémentaires</strong> sur votre compte !
                 </p>
               </div>
               
               <h2 style="color: #1f2937; font-size: 20px; margin-top: 32px; margin-bottom: 16px;">
-                📚 Comment activer votre premier module ? (3 étapes simples)
+                📚 Comment ouvrir votre première appli ? (3 étapes simples)
               </h2>
               
               <div style="margin: 24px 0;">
@@ -97,10 +97,10 @@ export async function POST(request: NextRequest) {
                     </div>
                     <div>
                       <p style="color: #1f2937; font-weight: 600; margin: 0 0 4px 0; font-size: 16px;">
-                        Cliquez sur "Activer" ou "Accéder"
+                        Ouvrez l'accès à une appli
                       </p>
                       <p style="color: #6b7280; margin: 0; font-size: 14px;">
-                        Choisissez le module qui vous intéresse et cliquez sur le bouton d'activation. Les tokens nécessaires seront automatiquement débités de votre compte.
+                        Choisissez l'appli qui vous intéresse : vos crédits sont débités pour ouvrir l'accès.
                       </p>
                     </div>
                   </div>
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
               
               <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 16px; margin: 24px 0; border-radius: 4px;">
                 <p style="color: #065f46; font-size: 14px; margin: 0;">
-                  <strong>💡 Astuce :</strong> Vous avez déjà reçu des tokens de bienvenue lors de votre inscription. Vous pouvez les utiliser pour activer votre premier module dès maintenant !
+                  <strong>💡 Astuce :</strong> Vous avez déjà reçu des crédits de bienvenue lors de votre inscription. Utilisez-les pour ouvrir l'accès à une première appli dès maintenant !
                 </p>
               </div>
               
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
               
               <p style="color: #9ca3af; font-size: 12px; margin: 0; text-align: center;">
                 Cet email a été envoyé automatiquement par IAHome.<br>
-                Vous avez reçu cet email car vous êtes inscrit(e) sur IAHome mais n'avez pas encore activé de module.
+                Vous avez reçu cet email car vous êtes inscrit(e) sur IAHome mais n'avez pas encore visité d'appli.
               </p>
             </div>
           </div>

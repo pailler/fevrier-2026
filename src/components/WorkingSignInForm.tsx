@@ -1,27 +1,23 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 
 interface WorkingSignInFormProps {
   onSuccess?: (user: any) => void;
   onError?: (error: any) => void;
   className?: string;
-  redirectUrl?: string;
 }
 
 export default function WorkingSignInForm({
   onSuccess,
   onError,
   className = "",
-  redirectUrl
 }: WorkingSignInFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
   const { signIn } = useCustomAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -86,16 +82,10 @@ export default function WorkingSignInForm({
       }
 
       if (result.token) {
-        // Utiliser notre hook personnalisé pour gérer l'état d'authentification
         signIn(result.user, result.token);
-        
-        // Rediriger vers la page d'origine ou la page d'accueil par défaut
-        const redirectTo = redirectUrl ? decodeURIComponent(redirectUrl) : '/';
-        router.push(redirectTo);
+        console.log('Connexion réussie:', result.user);
+        onSuccess?.(result.user);
       }
-
-      console.log('Connexion réussie:', result.user);
-      onSuccess?.(result.user);
     } catch (error: any) {
       console.error('Erreur lors de la connexion:', error);
       setError('Une erreur est survenue lors de la connexion');

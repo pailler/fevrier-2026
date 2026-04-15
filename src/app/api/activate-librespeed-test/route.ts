@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       ;
       return NextResponse.json({
         success: true,
-        message: 'Accès LibreSpeed déjà activé',
+        message: 'LibreSpeed déjà enregistré sur ce compte',
         accessId: existingAccess.id,
         usageCount: existingAccess.usage_count
       });

@@ -15,6 +15,7 @@ export const TOKEN_COSTS = {
   'animagine-xl': 100, // Animagine XL -> 100 tokens
   'florence-2': 100, // Florence-2 -> 100 tokens
   'birefnet': 100, // BiRefNet -> 100 tokens
+  'musetalk': 100, // MuseTalk -> lip-sync video
   
   // Applications essentielles (10 tokens)
   'metube': 10,

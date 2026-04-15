@@ -59,7 +59,8 @@ export default function Hi3DGenPage() {
         else if (e?.message != null) errMsg = typeof e.message === 'string' ? e.message : JSON.stringify(e.message);
         else if (e != null) errMsg = JSON.stringify(e);
         else errMsg = `Erreur ${res.status}`;
-        throw new Error(errMsg);
+        const hint = typeof data?.hint === 'string' && data.hint.trim() ? `\n\n${data.hint.trim()}` : '';
+        throw new Error(errMsg + hint);
       }
 
       const blob = await res.blob();
@@ -191,8 +192,31 @@ export default function Hi3DGenPage() {
           </div>
 
           {error && (
-            <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
-              {error}
+            <div className="mt-6 space-y-3">
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 whitespace-pre-wrap">
+                {error}
+              </div>
+              {(error.includes('IF_Trellis') || error.toLowerCase().includes('not found')) && (
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-950">
+                  <p className="font-semibold mb-2">Custom node requis</p>
+                  <p className="mb-2">
+                    Installez <strong>Stable-X/ComfyUI-Hi3DGen</strong> dans{' '}
+                    <code className="bg-white/80 px-1 rounded">ComfyUI/custom_nodes/</code>, exécutez les dépendances
+                    (<code className="bg-white/80 px-1">win_requirements.txt</code> sous Windows), puis redémarrez ComfyUI.
+                  </p>
+                  <a
+                    href="https://github.com/Stable-X/ComfyUI-Hi3DGen"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-indigo-700 font-medium underline hover:text-indigo-900"
+                  >
+                    Dépôt GitHub ComfyUI-Hi3DGen
+                  </a>
+                  <span className="text-amber-900/80"> — voir aussi </span>
+                  <code className="bg-white/80 px-1 rounded text-xs">docs/HI3DGEN-SETUP.md</code>
+                  <span className="text-amber-900/80"> à la racine du projet.</span>
+                </div>
+              )}
             </div>
           )}
 
@@ -213,7 +237,17 @@ export default function Hi3DGenPage() {
           )}
 
           <p className="mt-8 text-sm text-gray-500">
-            ComfyUI doit être lancé (port 8188) avec le custom node <strong>ComfyUI-Hi3DGen</strong>. Accès : http://localhost:8095
+            ComfyUI sur le port <strong>8188</strong> avec le dépôt{' '}
+            <a
+              href="https://github.com/Stable-X/ComfyUI-Hi3DGen"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-indigo-600 underline hover:text-indigo-800"
+            >
+              Stable-X/ComfyUI-Hi3DGen
+            </a>
+            . Interface dédiée : <code className="bg-gray-100 px-1 rounded">npm run hi3dgen</code> →{' '}
+            <span className="whitespace-nowrap">http://localhost:8095</span>
           </p>
         </div>
       </div>

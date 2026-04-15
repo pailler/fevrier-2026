@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     if (accessError || !access) {
       return NextResponse.json({ 
         success: false, 
-        error: 'Accès non autorisé. Activez d\'abord le module.' 
+        error: 'Accès non autorisé. Ouvrez cette appli depuis votre compte avec vos crédits.'
       }, { status: 403 });
     }
 

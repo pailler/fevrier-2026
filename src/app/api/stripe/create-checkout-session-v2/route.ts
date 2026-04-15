@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { isPrestationMarketingPromoActive } from '../../../../utils/prestationMarketingPromo';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-08-27.basil',
@@ -36,7 +37,27 @@ const PACKAGES_V2 = {
     pricePerToken: 0.0066,
     description: '3000 tokens - Achat unique sans engagement',
     mode: 'payment' as const,
-  }
+  },
+  photobooth_personalized: {
+    name: 'Photobooth personnalisé',
+    price: 39900, // 399,00€ TTC (199,00€ pendant la ristourne jusqu’au 5 avril 2026 inclus)
+    testPrice: 50,
+    tokens: 0,
+    pricePerToken: 0,
+    description:
+      'Borne Photobooth sur mesure (événement) — paiement en ligne IA Home. Nous vous recontactons pour la personnalisation.',
+    mode: 'payment' as const,
+  },
+  prestation_marketing: {
+    name: 'Prestation développement sur mesure',
+    price: 24900, // 249,00€ TTC (199,00€ pendant la ristourne jusqu’au 5 avril 2026 inclus)
+    testPrice: 50,
+    tokens: 0,
+    pricePerToken: 0,
+    description:
+      'Accompagnement / développement sur mesure — paiement en ligne sécurisé. Nous vous recontactons pour préciser votre projet.',
+    mode: 'payment' as const,
+  },
 };
 
 // Emails autorisés pour les tests avec prix minimum
@@ -99,22 +120,45 @@ export async function POST(request: NextRequest) {
     }
 
     const packageData = PACKAGES_V2[packageType as keyof typeof PACKAGES_V2];
-    
+
+    const hasValidPromotionCode =
+      typeof promotion_code_id === 'string' && promotion_code_id.startsWith('promo_');
+
     // Déterminer si on utilise les prix de test
     const useTestPrice = shouldUseTestPrice(userEmail);
-    const actualPrice = useTestPrice ? (packageData as any).testPrice || packageData.price : packageData.price;
-    
+    let lineItemAmount = useTestPrice
+      ? (packageData as { testPrice?: number }).testPrice || packageData.price
+      : packageData.price;
+
+    if (
+      !useTestPrice &&
+      isPrestationMarketingPromoActive() &&
+      (packageType === 'prestation_marketing' || packageType === 'photobooth_personalized')
+    ) {
+      // Photobooth + code Stripe : base catalogue 399 € pour que -20 % (ex. BIENVENUE10) = 319,20 € TTC
+      if (packageType === 'photobooth_personalized' && hasValidPromotionCode) {
+        lineItemAmount = 39900;
+      } else {
+        lineItemAmount = 19900;
+      }
+    }
+
     console.log('📦 Package sélectionné:', {
       ...packageData,
       userEmail,
       useTestPrice,
       displayedPrice: packageData.price / 100 + '€',
-      actualPrice: actualPrice / 100 + '€'
+      chargedAmount: lineItemAmount / 100 + '€',
     });
 
     // Définir l'URL de base
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://iahome.fr';
     console.log('🌐 URL de base:', baseUrl);
+
+    const cancelUrl =
+      packageType === 'prestation_marketing'
+        ? `${baseUrl}/marketing?canceled=true`
+        : `${baseUrl}/pricing2?canceled=true`;
 
     // Fonction helper pour nettoyer les valeurs de métadonnées
     const cleanMetadataValue = (value: string | undefined): string => {
@@ -127,10 +171,7 @@ export async function POST(request: NextRequest) {
         .substring(0, 500); // Limiter la longueur
     };
 
-    // Stripe promotion code IDs start with "promo_" (not "prom_")
-    const discounts = promotion_code_id && typeof promotion_code_id === 'string' && promotion_code_id.startsWith('promo_')
-      ? [{ promotion_code: promotion_code_id }]
-      : undefined;
+    const discounts = hasValidPromotionCode ? [{ promotion_code: promotion_code_id }] : undefined;
 
     // Créer la session de paiement Stripe
     if (packageData.mode === 'subscription') {
@@ -145,7 +186,7 @@ export async function POST(request: NextRequest) {
                 name: packageData.name,
                 description: packageData.description,
               },
-              unit_amount: actualPrice,
+              unit_amount: lineItemAmount,
               recurring: {
                 interval: packageData.interval,
               },
@@ -155,14 +196,14 @@ export async function POST(request: NextRequest) {
         ],
         mode: 'subscription',
         success_url: `${baseUrl}/payment-success?package=${packageType}&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/pricing2?canceled=true`,
+        cancel_url: cancelUrl,
         ...(discounts ? { discounts } : { allow_promotion_codes: true }),
         metadata: {
           userId: cleanMetadataValue(userId),
           userEmail: cleanMetadataValue(userEmail),
           packageType: cleanMetadataValue(packageType),
           tokens: packageData.tokens.toString(),
-          totalTokens: (packageData as any).totalTokens?.toString() || packageData.tokens.toString(),
+          totalTokens: (packageData as { totalTokens?: number }).totalTokens?.toString() || packageData.tokens.toString(),
         },
         customer_email: userEmail, // Email pour reçu / factures Stripe (abonnements)
         subscription_data: {
@@ -179,7 +220,7 @@ export async function POST(request: NextRequest) {
       console.log('💰 Prix appliqué dans Stripe:', {
         sessionId: session.id,
         amountTotal: session.amount_total ? (session.amount_total / 100).toFixed(2) + '€' : 'N/A',
-        expectedPrice: (actualPrice / 100).toFixed(2) + '€',
+        expectedPrice: (lineItemAmount / 100).toFixed(2) + '€',
         useTestPrice,
         userEmail
       });
@@ -190,6 +231,13 @@ export async function POST(request: NextRequest) {
       });
     } else {
       // Mode paiement unique : reçu + facture PDF envoyés au client par Stripe
+      const paymentProductDescription =
+        !useTestPrice && lineItemAmount === 19900 && packageType === 'photobooth_personalized'
+          ? `${packageData.description} Ristourne : 199€ TTC jusqu’au 5 avril 2026 inclus (tarif catalogue 399€).`
+          : !useTestPrice && lineItemAmount === 19900 && packageType === 'prestation_marketing'
+            ? `${packageData.description} Ristourne : 199€ TTC jusqu’au 5 avril 2026 inclus (tarif catalogue 249€).`
+            : packageData.description;
+
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [
@@ -198,16 +246,16 @@ export async function POST(request: NextRequest) {
               currency: 'eur',
               product_data: {
                 name: packageData.name,
-                description: packageData.description,
+                description: paymentProductDescription,
               },
-              unit_amount: actualPrice,
+              unit_amount: lineItemAmount,
             },
             quantity: 1,
           },
         ],
         mode: 'payment',
         success_url: `${baseUrl}/payment-success?package=${packageType}&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/pricing2?canceled=true`,
+        cancel_url: cancelUrl,
         ...(discounts ? { discounts } : { allow_promotion_codes: true }),
         metadata: {
           userId: cleanMetadataValue(userId),
@@ -220,13 +268,15 @@ export async function POST(request: NextRequest) {
         invoice_creation: {
           enabled: true,
           invoice_data: {
-            description: `${packageData.name} - ${packageData.description}`,
+            description: `${packageData.name} - ${paymentProductDescription}`,
             footer: 'IA Home - iahome.fr',
           },
         },
-        // Texte affiché sur le reçu email
         payment_intent_data: {
-          description: `${packageData.name} - ${packageData.tokens} tokens`,
+          description:
+            packageData.tokens > 0
+              ? `${packageData.name} - ${packageData.tokens} tokens`
+              : packageData.name,
         },
       });
 

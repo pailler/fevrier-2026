@@ -71,11 +71,6 @@ export function validateMagicLink(token: string): MagicLinkPayload | null {
       return null;
     }
 
-    // Vérifier l'expiration
-    if (tokenPayload.payload.expiresAt < Date.now()) {
-      return null;
-    }
-
     return tokenPayload.payload;
   } catch (error) {
     return null;

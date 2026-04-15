@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     if (existingAccess) {
       return NextResponse.json({
         success: true,
-        message: 'Accès Apprendre le Code aux enfants déjà activé',
+        message: 'Apprendre le Code aux enfants déjà enregistré sur ce compte',
         accessId: existingAccess.id,
         usageCount: existingAccess.usage_count,
       });

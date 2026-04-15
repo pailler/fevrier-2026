@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Photobooth IA Home — Souvenirs d’exception, sans contrainte</title>
+    <meta
+      name="description"
+      content="Borne photobooth artisanale pour mariages et événements : fonctionne sans Wi‑Fi, galerie en ligne par simple lien. Découvrez l’expérience IA Home."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #1c1917;
+        --ink-soft: #44403c;
+        --cream: #faf7f2;
+        --cream-dark: #f0ebe3;
+        --wood: #c4a574;
+        --wood-deep: #8b6914;
+        --rose: #be185d;
+        --rose-soft: #fce7f3;
+        --green: #047857;
+        --green-soft: #d1fae5;
+        --shadow: 0 24px 60px rgba(28, 25, 23, 0.12);
+        --radius: 20px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Outfit", system-ui, sans-serif;
+        font-weight: 400;
+        color: var(--ink);
+        background: var(--cream);
+        line-height: 1.65;
+        font-size: 1.05rem;
+      }
+
+      .grain {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        z-index: 9999;
+      }
+
+      header.hero {
+        position: relative;
+        min-height: 88vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: clamp(2rem, 6vw, 5rem) clamp(1.25rem, 4vw, 3rem);
+        background:
+          radial-gradient(ellipse 120% 80% at 50% -20%, rgba(190, 24, 93, 0.12), transparent 55%),
+          linear-gradient(165deg, #fffefb 0%, var(--cream-dark) 45%, #e8dfd0 100%);
+        overflow: hidden;
+      }
+
+      header.hero::before {
+        content: "";
+        position: absolute;
+        width: 140%;
+        height: 50%;
+        bottom: -15%;
+        left: -20%;
+        background: linear-gradient(90deg, transparent, rgba(196, 165, 116, 0.15), transparent);
+        transform: rotate(-3deg);
+        pointer-events: none;
+      }
+
+      .hero-inner {
+        position: relative;
+        max-width: 920px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .eyebrow {
+        display: inline-block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--wood-deep);
+        margin-bottom: 1rem;
+      }
+
+      h1 {
+        font-family: "Fraunces", Georgia, serif;
+        font-weight: 700;
+        font-size: clamp(2.15rem, 5.5vw, 3.35rem);
+        line-height: 1.12;
+        margin: 0 0 1.25rem;
+        color: var(--ink);
+      }
+
+      h1 em {
+        font-style: italic;
+        color: var(--rose);
+      }
+
+      .lead {
+        font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+        color: var(--ink-soft);
+        max-width: 38rem;
+        margin: 0 auto 2rem;
+        font-weight: 400;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 1rem 1.6rem;
+        border-radius: 999px;
+        font-family: inherit;
+        font-weight: 600;
+        font-size: 1rem;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--rose) 0%, #9d174d 100%);
+        color: #fff;
+        box-shadow: 0 12px 32px rgba(190, 24, 93, 0.35);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 40px rgba(190, 24, 93, 0.4);
+      }
+
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.75);
+        color: var(--ink);
+        border: 2px solid rgba(68, 64, 60, 0.2);
+      }
+
+      .btn-ghost:hover {
+        transform: translateY(-2px);
+        border-color: var(--wood);
+      }
+
+      main {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: clamp(2.5rem, 5vw, 4rem) clamp(1.25rem, 4vw, 2rem) 4rem;
+      }
+
+      section {
+        margin-bottom: 3.25rem;
+      }
+
+      h2 {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: clamp(1.55rem, 3vw, 1.85rem);
+        font-weight: 600;
+        margin: 0 0 1rem;
+        color: var(--ink);
+      }
+
+      h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 1.75rem 0 0.6rem;
+        color: var(--ink);
+      }
+
+      .pill-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .pill-list li {
+        position: relative;
+        padding: 0.85rem 0 0.85rem 2.5rem;
+        border-bottom: 1px solid rgba(68, 64, 60, 0.1);
+      }
+
+      .pill-list li:last-child {
+        border-bottom: none;
+      }
+
+      .pill-list li::before {
+        content: "✦";
+        position: absolute;
+        left: 0;
+        color: var(--green);
+        font-size: 1rem;
+        top: 0.95rem;
+      }
+
+      .highlight-box {
+        background: linear-gradient(135deg, var(--rose-soft) 0%, var(--green-soft) 100%);
+        border-radius: var(--radius);
+        padding: 1.5rem 1.5rem 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(190, 24, 93, 0.12);
+      }
+
+      .highlight-box p {
+        margin: 0;
+        font-weight: 500;
+      }
+
+      .secondary-note {
+        font-size: 0.95rem;
+        color: var(--ink-soft);
+        padding: 1.25rem;
+        background: var(--cream-dark);
+        border-radius: var(--radius);
+        border-left: 4px solid var(--wood);
+      }
+
+      .secondary-note strong {
+        color: var(--ink);
+      }
+
+      details.legal {
+        background: #fff;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(68, 64, 60, 0.08);
+        overflow: hidden;
+      }
+
+      details.legal + details.legal {
+        margin-top: 0.75rem;
+      }
+
+      details.legal summary {
+        cursor: pointer;
+        padding: 1.1rem 1.25rem;
+        font-weight: 600;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        background: linear-gradient(90deg, var(--cream) 0%, #fff 100%);
+      }
+
+      details.legal summary::-webkit-details-marker {
+        display: none;
+      }
+
+      details.legal summary::after {
+        content: "＋";
+        font-weight: 400;
+        color: var(--wood-deep);
+        transition: transform 0.2s;
+      }
+
+      details.legal[open] summary::after {
+        transform: rotate(45deg);
+      }
+
+      details.legal .inner {
+        padding: 0 1.25rem 1.35rem;
+        color: var(--ink-soft);
+        font-size: 0.98rem;
+      }
+
+      details.legal .inner p {
+        margin: 0 0 0.85rem;
+      }
+
+      details.legal .inner ul {
+        margin: 0 0 0.85rem;
+        padding-left: 1.2rem;
+      }
+
+      .footer-cta {
+        text-align: center;
+        padding: 3rem 1.5rem;
+        background: linear-gradient(180deg, var(--ink) 0%, #292524 100%);
+        color: #e7e5e4;
+      }
+
+      .footer-cta h2 {
+        color: #fff;
+        margin-bottom: 0.75rem;
+      }
+
+      .footer-cta p {
+        max-width: 28rem;
+        margin: 0 auto 1.5rem;
+        opacity: 0.88;
+        font-size: 1rem;
+      }
+
+      .footer-cta .btn-primary {
+        background: #fff;
+        color: var(--rose);
+        box-shadow: none;
+      }
+
+      .footer-cta .btn-primary:hover {
+        background: var(--rose-soft);
+        color: var(--rose);
+      }
+
+      footer.site {
+        text-align: center;
+        padding: 1.5rem;
+        font-size: 0.85rem;
+        color: var(--ink-soft);
+        background: #0c0a09;
+        color: #a8a29e;
+      }
+
+      footer.site a {
+        color: #f5f5f4;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+
+    <header class="hero">
+      <div class="hero-inner">
+        <span class="eyebrow">IA Home · Photobooth</span>
+        <h1>Des souvenirs qui <em>restent</em>, même quand le réseau disparaît</h1>
+        <p class="lead">
+          Une expérience photobooth pensée pour les moments qui comptent : mariages, anniversaires, soirées
+          d’entreprise. Vos invités s’amusent sur place ; vous visualisez toute la galerie en live grâce à votre propre
+          téléphone, en un seul lien — sans dépendre du Wi‑Fi du lieu.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://iahome.fr/pricing2#photobooth-personnalise">Obtenir votre Photobooth personnalisé</a>
+          <a class="btn btn-ghost" href="#cgu">Conditions d’utilisation</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section aria-labelledby="why-title">
+        <h2 id="why-title">Pourquoi les organisateurs nous choisissent</h2>
+        <ul class="pill-list">
+          <li>
+            <strong>Zéro stress réseau.</strong> La borne peut fonctionner sans connexion Wi‑Fi : idéale en salle
+            isolée, sous un chapiteau ou en extérieur.
+          </li>
+          <li>
+            <strong>Une galerie unique pour tout l’événement.</strong> Pendant et après la fête, retrouvez l’ensemble des clichés
+            via un lien en ligne simple à partager — comme sur votre carton « photos en direct ».
+          </li>
+          <li>
+            <strong>Une présence chaleureuse.</strong> Finition bois, ambiance festive : le photobooth devient un
+            élément de déco, pas un écran froid dans un coin.
+          </li>
+          <li>
+            <strong>Pour activer l’appli photobooth,</strong> la création d’un <strong>compte gratuit</strong> sur
+            <a href="https://iahome.fr">iahome.fr</a> est requise ; l’offre souscrite peut ensuite inclure abonnement
+            ou jetons selon la formule.
+          </li>
+        </ul>
+      </section>
+
+      <section class="highlight-box" aria-labelledby="guest-title">
+        <h2 id="guest-title" style="margin-top: 0">Vous étiez invité·e ?</h2>
+        <p>
+          Si cette borne vous a plu, vous pouvez offrir la même magie à vos prochains événements. Retrouvez les tarifs,
+          la personnalisation et les modalités sur la page dédiée des offres IA Home — le même univers fun, avec un
+          accompagnement clair.
+        </p>
+        <div class="cta-row" style="margin-top: 1.25rem; justify-content: flex-start">
+          <a class="btn btn-primary" href="https://iahome.fr/pricing2#photobooth-personnalise">Obtenir votre Photobooth personnalisé</a>
+        </div>
+      </section>
+
+      <section aria-labelledby="details-title">
+        <h2 id="details-title">Le petit plus (sans jargon)</h2>
+        <p>
+          Au-delà du logiciel, la borne peut intégrer des touches ludiques : ampoules latérales qui réagissent au
+          passage de la main, un mini projecteur d’ambiance pour colorer la piste… Des détails qui font sourire — le
+          cœur du produit, c’est avant tout la simplicité pour vos invités et la tranquillité pour vous.
+        </p>
+        <div class="secondary-note" style="margin-top: 1.25rem">
+          <strong>À retenir techniquement :</strong> mode autonome possible sans Wi‑Fi, interface tactile dédiée,
+          centralisation des photos et partage post-événement par lien sécurisé (selon configuration et offre souscrite
+          auprès d’IA Home).
+        </div>
+      </section>
+
+      <section id="cgu" aria-labelledby="cgu-title">
+        <h2 id="cgu-title">Conditions d’utilisation</h2>
+        <p style="color: var(--ink-soft); margin-bottom: 1.25rem">
+          Les présentes conditions encadrent l’usage du service / équipement Photobooth proposé dans le cadre de la
+          plateforme IA Home. Elles complètent les conditions générales du site
+          <a href="https://iahome.fr/terms">iahome.fr</a> lorsqu’elles s’y réfèrent.
+        </p>
+
+        <details class="legal" open>
+          <summary>1. Objet et acceptation</summary>
+          <div class="inner">
+            <p>
+              L’utilisation de l’application Photobooth (interface web, borne ou matériel associé) implique l’acceptation
+              des présentes conditions. L’organisateur de l’événement est responsable de l’information des invités sur
+              la prise de photos et le partage éventuel des clichés.
+            </p>
+          </div>
+        </details>
+
+        <details class="legal">
+          <summary>2. Compte, accès et jetons</summary>
+          <div class="inner">
+            <p>
+              Pour <strong>utiliser l’application Photobooth</strong> en tant qu’organisateur (création d’événement,
+              pilotage de la borne, galerie, etc.), le client doit <strong>s’inscrire gratuitement</strong> sur le site
+              <a href="https://iahome.fr">iahome.fr</a> et disposer d’un compte IA Home. Selon l’offre choisie,
+              l’activation du module Photobooth peut en outre nécessiter un abonnement ou des jetons.
+            </p>
+            <p>
+              Les accès par lien ou jeton (invités) sont personnels ou réservés à l’événement ; toute utilisation
+              abusive (partage de liens d’accès, contournement des limitations) peut entraîner la suspension de l’accès.
+            </p>
+          </div>
+        </details>
+
+        <details class="legal">
+          <summary>3. Contenus et droits sur les images</summary>
+          <div class="inner">
+            <p>
+              Les photos prises via le photobooth sont produites par les utilisateurs finaux (invités). L’organisateur
+              s’assure d’avoir obtenu, le cas échéant, les autorisations nécessaires (droits à l’image, mineurs,
+              règlement intérieur du lieu). IA Home n’est pas responsable du contenu créé par les utilisateurs, sous
+              réserve des obligations légales applicables.
+            </p>
+          </div>
+        </details>
+
+        <details class="legal">
+          <summary>4. Galerie en ligne et lien de récupération</summary>
+          <div class="inner">
+            <p>
+              Lorsque la fonctionnalité est activée, les clichés peuvent être regroupés dans une galerie accessible par
+              lien. La durée de conservation, les droits de téléchargement et le niveau de visibilité (public restreint,
+              mot de passe, etc.) dépendent des paramètres choisis par l’organisateur et des options contractuelles.
+            </p>
+          </div>
+        </details>
+
+        <details class="legal">
+          <summary>5. Fonctionnement sans réseau</summary>
+          <div class="inner">
+            <p>
+              Un mode de fonctionnement sans Wi‑Fi peut être proposé selon le déploiement. Certaines fonctions
+              (synchronisation immédiate, envoi par messagerie) peuvent nécessiter une connexion ultérieure. Les
+              caractéristiques exactes sont précisées au moment de la commande ou de la mise en service.
+            </p>
+          </div>
+        </details>
+
+        <details class="legal">
+          <summary>6. Matériel et lieu d’utilisation</summary>
+          <div class="inner">
+            <p>
+              L’organisateur veille à une utilisation raisonnable du matériel (chocs, liquides, surchauffe). Toute
+              dégradation due à une utilisation non conforme peut être facturée selon les conditions de location ou de
+              vente. Le respect des consignes de sécurité du lieu d’événement incombe à l’organisateur.
+            </p>
+          </div>
+        </details>
+
+        <details class="legal">
+          <summary>7. Limitation de responsabilité</summary>
+          <div class="inner">
+            <p>
+              IA Home s’efforce d’assurer la disponibilité du service mais ne garantit pas une disponibilité
+              ininterrompue. La responsabilité d’IA Home, sauf disposition légale impérative contraire, est limitée au
+              montant payé pour la période concernant le litige. Ne sont notamment pas garantis : la qualité artistique
+              des photos, la compatibilité avec tous les navigateurs ou appareils, ni la conservation au-delà des délais
+              contractuels de rétention des fichiers.
+            </p>
+          </div>
+        </details>
+
+        <details class="legal">
+          <summary>8. Données personnelles</summary>
+          <div class="inner">
+            <p>
+              Le traitement des données personnelles est décrit dans la
+              <a href="https://iahome.fr/privacy">politique de confidentialité</a> d’IA Home. Les photographies peuvent
+              constituer des données à caractère personnel ; leur traitement doit respecter le RGPD et la loi «
+              Informatique et Libertés ».
+            </p>
+          </div>
+        </details>
+
+        <details class="legal">
+          <summary>9. Contact</summary>
+          <div class="inner">
+            <p>
+              Pour toute question relative au Photobooth ou aux présentes conditions :
+              <a href="https://iahome.fr/contact">https://iahome.fr/contact</a>
+            </p>
+          </div>
+        </details>
+
+        <p style="font-size: 0.88rem; color: var(--ink-soft); margin-top: 1.5rem">
+          Dernière mise à jour : avril 2026. IA Home se réserve le droit de modifier ces conditions ; la version en
+          ligne fait foi.
+        </p>
+      </section>
+    </main>
+
+    <div class="footer-cta">
+      <h2>Prêt·e à illuminer votre prochain événement ?</h2>
+      <p>
+        Tarifs, personnalisation de la borne et accès logiciel avec jetons : tout est expliqué sur nos offres, avec
+        possibilité d’activer le module depuis votre compte.
+      </p>
+      <a class="btn btn-primary" href="https://iahome.fr/pricing2#photobooth-personnalise">Obtenir votre Photobooth personnalisé</a>
+    </div>
+
+    <footer class="site">
+      <a href="https://iahome.fr">IA Home</a>
+      ·
+      <a href="https://iahome.fr/terms">CGU site</a>
+      ·
+      <a href="https://iahome.fr/privacy">Confidentialité</a>
+    </footer>
+  </body>
+</html>

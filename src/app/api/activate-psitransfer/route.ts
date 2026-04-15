@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     if (existingAccess && existingAccess.is_active) {
       return NextResponse.json({
         success: true,
-        message: 'PsiTransfer déjà activé',
+        message: 'PsiTransfer déjà enregistré sur ce compte',
         accessId: existingAccess.id,
         moduleId: 'psitransfer'
       });

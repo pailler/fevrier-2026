@@ -51,12 +51,12 @@ export async function POST(request: NextRequest) {
 
     if (existingActivation) {
       return NextResponse.json(
-        { error: 'Application déjà activée' },
+        { error: 'Cette appli est déjà enregistrée sur votre compte' },
         { status: 400 }
       );
     }
 
-    // Activer le module
+    // Ouvrir l'accès (enregistrement user_applications)
     const { data: activation, error: activationError } = await supabase
       .from('user_modules')
       .insert({
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Application Meeting Reports activée avec succès',
+      message: 'Accès à Meeting Reports ouvert sur votre compte',
       activation: activation,
       tokensRemaining: user.tokens - 100
     });

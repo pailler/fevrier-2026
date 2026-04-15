@@ -71,13 +71,6 @@ export default function GoogleSignInButton({
         throw new Error('Client Supabase non initialisé');
       }
       
-      // Stocker l'URL de redirection pour la récupérer dans le callback OAuth
-      // (le paramètre redirect de l'URL login n'est pas préservé lors du flux OAuth)
-      if (redirectUrl) {
-        sessionStorage.setItem('auth_redirect', redirectUrl);
-        console.log('ℹ️ URL de redirection sauvegardée:', redirectUrl);
-      }
-
       // IMPORTANT: NE PAS faire signOut() avant OAuth car cela supprime le code_verifier PKCE
       // Le code_verifier est nécessaire pour échanger le code OAuth
       // Si une session existe, Supabase la remplacera automatiquement lors de la nouvelle connexion
@@ -109,7 +102,10 @@ export default function GoogleSignInButton({
         try {
           sessionStorage.removeItem('session_expired_redirected');
           Object.keys(sessionStorage).forEach(key => {
-            if (key.includes('auth') && !key.includes('supabase')) {
+            if (key === 'auth_redirect' || key.includes('supabase')) {
+              return;
+            }
+            if (key.includes('auth')) {
               sessionStorage.removeItem(key);
             }
           });
@@ -121,6 +117,12 @@ export default function GoogleSignInButton({
         // L'instance sera réutilisée pour le callback
       } catch (e) {
         console.warn('⚠️ Impossible de nettoyer le localStorage:', e);
+      }
+
+      // Après nettoyage sessionStorage (qui supprime les clés contenant "auth" sauf ci-dessous)
+      if (redirectUrl) {
+        sessionStorage.setItem('auth_redirect', redirectUrl);
+        console.log('ℹ️ URL de redirection sauvegardée:', redirectUrl);
       }
       
       // Appel à signInWithOAuth avec gestion améliorée
@@ -257,7 +259,7 @@ export default function GoogleSignInButton({
       onError?.(error);
       setLoading(false);
     }
-  };20
+  };
 
   return (
     <button

@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { loginUrlWithReturn } from '../utils/loginRedirect';
 import Link from 'next/link';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import { useTokenContext } from '../contexts/TokenContext';
+import { getHunyuan3dAppUrl } from '../utils/hunyuan3dAppUrl';
 
 interface ModuleAccessButtonProps {
   moduleId: string;
@@ -31,6 +33,7 @@ export default function ModuleAccessButton({
   const { user, isAuthenticated } = useCustomAuth();
   const { tokens, refreshTokens } = useTokenContext();
   const router = useRouter();
+  const pathname = usePathname();
 
   const resolveModuleUrl = () => {
     if (accessUrl) return accessUrl;
@@ -45,8 +48,9 @@ export default function ModuleAccessButton({
           'animagine-xl': 'http://localhost:7883',
           'sentinelle-numerique': 'http://localhost:3000/sentinelle-numerique',
           'florence-2': 'http://localhost:7884',
+          'musetalk': 'http://localhost:7886',
           'home-assistant': 'http://localhost:8123',
-          'hunyuan3d': 'http://localhost:8888',
+          'hunyuan3d': getHunyuan3dAppUrl(),
           'stablediffusion': 'http://localhost:7880',
           'meeting-reports': 'http://localhost:3050',
           'whisper': 'http://localhost:8093',
@@ -62,8 +66,9 @@ export default function ModuleAccessButton({
           'animagine-xl': 'https://animaginexl.iahome.fr',
           'sentinelle-numerique': 'https://iahome.fr/sentinelle-numerique',
           'florence-2': 'https://florence2.iahome.fr',
+          'musetalk': 'https://musetalk.iahome.fr',
           'home-assistant': 'https://homeassistant.iahome.fr',
-          'hunyuan3d': 'https://hunyuan3d.iahome.fr',
+          'hunyuan3d': getHunyuan3dAppUrl(),
           'stablediffusion': 'https://stablediffusion.iahome.fr',
           'meeting-reports': 'https://meeting-reports.iahome.fr',
           'whisper': 'https://whisper.iahome.fr',
@@ -88,7 +93,14 @@ export default function ModuleAccessButton({
 
   const handleAccess = async () => {
     if (!isAuthenticated) {
-      router.push('/login');
+      if (typeof window !== 'undefined') {
+        const q = window.location.search.replace(/^\?/, '');
+        router.push(
+          loginUrlWithReturn(pathname || window.location.pathname, { toString: () => q })
+        );
+      } else {
+        router.push('/login');
+      }
       return;
     }
 

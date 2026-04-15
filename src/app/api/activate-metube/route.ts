@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (existingAccess) {
-      return NextResponse.json({ success: true, message: 'MeTube déjà activé pour cet utilisateur.' });
+      return NextResponse.json({ success: true, message: 'MeTube déjà enregistré sur ce compte.' });
     }
 
     const now = new Date().toISOString();

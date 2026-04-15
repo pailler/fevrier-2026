@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     if (existingAccess) {
       return NextResponse.json({ 
         success: true, 
-        message: 'Application déjà activée',
+        message: 'Cette appli est déjà enregistrée sur votre compte',
         accessId: existingAccess.id
       });
     }
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Application Hunyuan 3D activée avec succès',
+      message: 'Accès à Hunyuan 3D ouvert sur votre compte',
       accessId: accessData.id
     });
 

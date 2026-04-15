@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           valid: false,
-          error: 'Token invalide ou expiré'
+          error: 'Token invalide'
         },
         { status: 401 }
       );

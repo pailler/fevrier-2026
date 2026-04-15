@@ -253,11 +253,7 @@ export default function AdminApplications() {
       }, {} as Record<string, any>);
 
       // Utiliser TOUS les modules de la table modules, pas seulement ceux avec des utilisations actives
-      // Modules masqués de l'admin (page et fichiers conservés)
-      const hiddenFromAdmin = ['hunyuan3d'];
-      const allModuleIds = (modulesData || [])
-        .map(module => module.id)
-        .filter(id => !hiddenFromAdmin.includes(id));
+      const allModuleIds = (modulesData || []).map(module => module.id);
       
       const applicationsWithRealData = allModuleIds.map(moduleId => {
         const stats = applicationStats[moduleId] || {

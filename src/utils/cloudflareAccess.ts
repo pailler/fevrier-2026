@@ -34,7 +34,6 @@ export const MODULE_SUBDOMAINS: Record<string, string> = {
   ruinedfooocus: 'ruinedfooocus.iahome.fr',
   cogstudio: 'cogstudio.iahome.fr',
   'meeting-reports': 'meeting-reports.iahome.fr',
-  hunyuan3d: 'hunyuan3d.iahome.fr',
 };
 
 /**

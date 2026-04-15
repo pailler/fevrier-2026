@@ -14,29 +14,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier le token JWT
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
-    
-    // Vérifier que le token n'est pas expiré
-    if (decoded.exp && decoded.exp * 1000 > Date.now()) {
-      return NextResponse.json({
-        valid: true,
-        data: {
-          userId: decoded.userId,
-          userEmail: decoded.userEmail,
-          moduleId: decoded.moduleId,
-          moduleTitle: decoded.moduleTitle,
-          accessLevel: decoded.accessLevel,
-          expiresAt: decoded.expiresAt,
-          permissions: decoded.permissions
-        }
-      });
-    } else {
-      return NextResponse.json(
-        { valid: false, error: 'Token expiré' },
-        { status: 401 }
-      );
-    }
+    const decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true }) as any;
+
+    return NextResponse.json({
+      valid: true,
+      data: {
+        userId: decoded.userId,
+        userEmail: decoded.userEmail,
+        moduleId: decoded.moduleId,
+        moduleTitle: decoded.moduleTitle,
+        accessLevel: decoded.accessLevel,
+        expiresAt: decoded.expiresAt,
+        permissions: decoded.permissions
+      }
+    });
 
   } catch (error) {
     console.error('Erreur vérification token:', error);

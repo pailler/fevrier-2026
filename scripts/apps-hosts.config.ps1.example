@@ -2,6 +2,9 @@
 # Copiez ce fichier en apps-hosts.config.ps1 et adaptez les chemins a vos installations.
 
 $PhotomakerPath   = "C:\chemin\vers\photomaker"      # Dossier contenant app.py (port 7881)
+# Optionnel : si acces public HTTPS (ex. Cloudflare -> :7881), evite l'erreur Gradio "No API found"
+# $PhotoMakerGradioRootUrl = "https://photomaker.votredomaine.fr"
 $BirefnetPath     = "C:\chemin\vers\birefnet"        # Dossier contenant app.py (port 7882)
 $Florence2Path    = "C:\chemin\vers\florence-2"     # Dossier contenant app.py (port 7884)
-$AnimagineXLPath  = "C:\chemin\vers\animagine-xl"   # Dossier contenant app.py (port 7881)
+$AnimagineXLPath  = "C:\chemin\vers\animagine-xl"   # Dossier contenant app.py (port 7883)
+$MuseTalkPath     = "C:\chemin\vers\musetalk"       # Dossier MuseTalk / app.py (port 7886)

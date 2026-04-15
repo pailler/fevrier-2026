@@ -35,18 +35,18 @@ export async function POST(request: NextRequest) {
       },
       {
         event_type: 'admin_module_activated',
-        name: 'Notification admin - Application activée',
-        description: 'Notification envoyée à l\'administrateur lorsqu\'une application est activée',
+        name: 'Notification admin - Accès appli ouvert',
+        description: 'Notification envoyée à l\'administrateur lorsqu\'un utilisateur ouvre l\'accès à une appli',
         is_enabled: true,
-        email_template_subject: 'Nouvelle application activée - {{module_name}}',
+        email_template_subject: 'Nouvel accès appli - {{module_name}}',
         email_template_body: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #2563eb;">Application activée</h2>
-            <p>Une nouvelle application a été activée par un utilisateur.</p>
+            <h2 style="color: #2563eb;">Accès appli ouvert</h2>
+            <p>Un utilisateur a ouvert l'accès à une appli (crédits).</p>
             <p><strong>Utilisateur:</strong> {{user_name}} ({{user_email}})</p>
-            <p><strong>Application:</strong> {{module_name}} ({{module_id}})</p>
-            <p><strong>Date d'activation:</strong> {{activation_date}}</p>
-            <p><strong>Méthode:</strong> {{activation_method || 'Tokens'}}</p>
+            <p><strong>Appli:</strong> {{module_name}} ({{module_id}})</p>
+            <p><strong>Date:</strong> {{activation_date}}</p>
+            <p><strong>Méthode:</strong> {{activation_method || 'Crédits'}}</p>
             <hr>
             <p style="color: #666; font-size: 12px;">
               Cet email a été envoyé automatiquement par IAHome.

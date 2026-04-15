@@ -9,7 +9,7 @@
   }
 
   if (isStandalone()) {
-    var location = document.location;
+    var pageLoc = document.location;
     var stop = /^(a|html)$/i;
     document.addEventListener(
       "click",
@@ -22,12 +22,12 @@
         var chref = curnode.href;
         var isInternal =
           chref &&
-          chref.replace(location.href, "").indexOf("#") !== 0 &&
+          chref.replace(pageLoc.href, "").indexOf("#") !== 0 &&
           (!/^[a-z+.\\-]+:/i.test(chref) ||
-            chref.indexOf(location.protocol + "//" + location.host) === 0);
+            chref.indexOf(pageLoc.protocol + "//" + pageLoc.host) === 0);
         if (isInternal) {
           e.preventDefault();
-          location.href = chref;
+          pageLoc.href = chref;
         }
       },
       false
@@ -42,7 +42,7 @@
       a.click();
       document.body.removeChild(a);
     } else {
-      location.href = url;
+      window.location.href = url;
     }
   };
 })(document, window.navigator, "standalone");

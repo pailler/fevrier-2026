@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Header from './Header';
 
 // Squelette identique serveur + premier rendu client pour éviter l'erreur d'hydratation.
@@ -36,7 +36,11 @@ export default function ClientHeader() {
   if (!mounted) {
     return <HeaderSkeleton />;
   }
-  return <Header />;
+  return (
+    <Suspense fallback={<HeaderSkeleton />}>
+      <Header />
+    </Suspense>
+  );
 }
 
 

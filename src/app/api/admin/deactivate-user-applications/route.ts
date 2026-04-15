@@ -75,11 +75,11 @@ export async function POST(request: NextRequest) {
       console.error('❌ Erreur lors de la désactivation:', updateError);
       return NextResponse.json({
         success: false,
-        error: 'Erreur lors de la désactivation des activations'
+        error: 'Erreur lors de la fermeture des accès'
       }, { status: 500 });
     }
 
-    console.log(`✅ ${updatedActivations?.length || 0} activation(s) désactivée(s) avec succès`);
+    console.log(`✅ ${updatedActivations?.length || 0} accès d'appli fermé(s) avec succès`);
 
     // Récupérer les informations des utilisateurs et modules pour le résumé
     const userIdsList = [...new Set(activations.map(a => a.user_id))];
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `${updatedActivations?.length || 0} activation(s) désactivée(s) avec succès`,
+      message: `${updatedActivations?.length || 0} accès d'appli fermé(s) avec succès`,
       deactivatedCount: updatedActivations?.length || 0,
       deactivatedActivations: updatedActivations,
       summary: {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '../../../utils/supabaseClient';
+import { getHunyuan3dAppUrl } from '@/utils/hunyuan3dAppUrl';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
       category: 'IA',
       price: 100, // 100 tokens par accès, et utilisez l'application aussi longtemps que vous souhaitez
       youtube_url: 'https://www.youtube.com/embed/CP2cDFgbs8s?autoplay=0&rel=0&modestbranding=1',
-      url: 'https://hunyuan3d.iahome.fr',
+      url: getHunyuan3dAppUrl(),
       image_url: '/images/module-visuals/hunyuan3d-module.svg',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()

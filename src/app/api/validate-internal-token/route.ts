@@ -121,20 +121,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier l'expiration (pour JWT: exp est en secondes, pour Base64: expiresAt est en millisecondes)
-    const isExpired = tokenPayload.exp 
-      ? tokenPayload.exp * 1000 < Date.now()  // JWT: exp en secondes
-      : (tokenPayload.expiresAt && tokenPayload.expiresAt < Date.now());  // Base64: expiresAt en millisecondes
-    
-    if (isExpired) {
-      return NextResponse.json(
-        { error: 'Token expiré' },
-        { 
-          status: 401,
-          headers: corsHeaders
-        }
-      );
-    }
+    // Pas de rejet sur date d’expiration : l’accès est binaire (token valide + droits module).
 
     // Vérifier que le moduleId correspond
     if (tokenPayload.moduleId !== moduleId) {
@@ -180,7 +167,7 @@ export async function POST(request: NextRequest) {
       console.error('❌ Accès non autorisé - accessError:', accessError, 'access:', access);
       return NextResponse.json(
         { 
-          error: 'Accès non autorisé. Activez d\'abord le module.',
+          error: 'Accès non autorisé. Ouvrez cette appli depuis votre compte avec vos crédits.',
           details: accessError ? { code: accessError.code, message: accessError.message } : 'Aucun accès trouvé'
         },
         { 

@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     if (existingAccess) {
       return NextResponse.json({
         success: true,
-        message: 'Accès Détecteur IA déjà activé',
+        message: 'Détecteur IA déjà enregistré sur ce compte',
         accessId: existingAccess.id,
         usageCount: existingAccess.usage_count
       });
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     if (tokenBalance < 100) {
       return NextResponse.json({
         success: false,
-        error: `Solde de crédits insuffisant. Vous avez ${tokenBalance} crédits, mais 100 crédits sont requis pour activer cette application.`,
+        error: `Solde de crédits insuffisant. Vous avez ${tokenBalance} crédits, mais 100 crédits sont requis pour ouvrir l'accès à cette appli.`,
         requiredTokens: 100,
         currentBalance: tokenBalance,
         pricingUrl: 'https://iahome.fr/pricing2'
@@ -218,7 +218,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Détecteur IA activé avec succès',
+      message: 'Accès au Détecteur IA ouvert sur votre compte',
       accessId: accessData.id,
       moduleId: moduleId,
       tokensDebited: 100,

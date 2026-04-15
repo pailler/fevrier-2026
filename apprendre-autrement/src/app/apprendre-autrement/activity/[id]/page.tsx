@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useState, useEffect, useMemo, useRef, Suspense } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { activities } from '../../../../utils/apprendre-autrement/activities';
 import { getAccessibilitySettings, AccessibilitySettings } from '../../../../utils/apprendre-autrement/accessibility';
@@ -4735,6 +4735,506 @@ function CitySoundsActivity({
 }
 
 
+
+const CHANTIER_SOUNDS_MAP: Record<string, string> = {
+  'chantier-camion': '/sounds/chantier/camion.mp3',
+  'chantier-pelleteuse': '/sounds/chantier/pelleteuse.mp3',
+  'chantier-grue': '/sounds/chantier/grue.mp3',
+  'chantier-monte-charge': '/sounds/chantier/monte-charge.mp3',
+  'chantier-train-marchandise': '/sounds/chantier/train-de-marchandise.mp3',
+  'chantier-robot-police': '/sounds/chantier/robot-police.mp3',
+  'chantier-machine-debut': '/sounds/chantier/machine-debut.mp3',
+  'chantier-robot-nettoyeur': '/sounds/chantier/robot-nettoyeur.mp3'
+};
+
+const CHANTIER_EMOJI_FALLBACK: Record<string, string> = {
+  'chantier-camion': '🚛',
+  'chantier-pelleteuse': '🚜',
+  'chantier-grue': '🏗️',
+  'chantier-monte-charge': '🛗',
+  'chantier-train-marchandise': '🚃',
+  'chantier-robot-police': '🤖',
+  'chantier-machine-debut': '⚙️',
+  'chantier-robot-nettoyeur': '🧹'
+};
+
+type ChantierMissionPhase = 1 | 2 | 3 | 4 | 5;
+
+/** Une icône par série de mission : identique pour les 3 fichiers (titre, mission, validation) */
+const CHANTIER_MISSION_PHASE_EMOJI: Record<ChantierMissionPhase, string> = {
+  1: '📋',
+  2: '🦺',
+  3: '🧹',
+  4: '🚛',
+  5: '👷'
+};
+
+/** Titre affiché pour chaque série (remplace « Mission 1 », « Mission 2 », …) */
+const CHANTIER_MISSION_PHASE_TITLE: Record<ChantierMissionPhase, string> = {
+  1: 'MISSION 1 — Préparer la zone de travaux',
+  2: 'MISSION 2 — Récupérer les matières premières',
+  3: 'MISSION 3 — Charger et transporter les matières premières par le train, en utilisant la grue.',
+  4: 'MISSION 4 — Décharger les trains et livrer sur le chantier',
+  5: 'Temps libre : Repos et détente bien mérités.'
+};
+
+type ChantierMissionAudioItem = {
+  id: string;
+  fileBase: string;
+  label: string;
+  shortLabel: string;
+  phase: ChantierMissionPhase;
+};
+
+/** Fichiers dans public/sounds/missions/ : missionN-titre, missionN, missionN-validation (N = 1…5) */
+function buildChantierMissionItems(): ChantierMissionAudioItem[] {
+  const items: ChantierMissionAudioItem[] = [];
+  for (let p = 1; p <= 5; p++) {
+    const phase = p as ChantierMissionPhase;
+    const t = CHANTIER_MISSION_PHASE_TITLE[phase];
+    items.push(
+      {
+        id: `mission-${p}-titre`,
+        fileBase: `mission${p}-titre`,
+        label: `${t} — Titre`,
+        shortLabel: 'Titre',
+        phase
+      },
+      {
+        id: `mission-${p}-corps`,
+        fileBase: `mission${p}`,
+        label: `${t} — Mission`,
+        shortLabel: 'Mission',
+        phase
+      },
+      {
+        id: `mission-${p}-validation`,
+        fileBase: `mission${p}-validation`,
+        label: `${t} — Validation`,
+        shortLabel: 'Validation',
+        phase
+      }
+    );
+  }
+  return items;
+}
+
+const CHANTIER_MISSION_ITEMS = buildChantierMissionItems();
+
+const CHANTIER_MISSION_SOUNDS_MAP: Record<string, string> = Object.fromEntries(
+  CHANTIER_MISSION_ITEMS.map(m => [m.id, `/sounds/missions/${m.fileBase}.mp3`])
+) as Record<string, string>;
+
+const CHANTIER_MISSION_PHASES_ORDER: ChantierMissionPhase[] = [1, 2, 3, 4, 5];
+
+function getChantierActivityAudioUrl(soundId: string): string | undefined {
+  return CHANTIER_SOUNDS_MAP[soundId] ?? CHANTIER_MISSION_SOUNDS_MAP[soundId];
+}
+
+// Les Bruits de Chantier : un appui = lecture, nouvel appui = arrêt pour ce bruit ; plusieurs bruits différents peuvent se superposer
+function ChantierSoundsActivity({
+  activity: _activity,
+  accessibilitySettings,
+  onComplete
+}: {
+  activity: typeof activities[0];
+  accessibilitySettings: AccessibilitySettings;
+  onComplete: (result: { accuracy: number; timeSpent: number; isPerfect: boolean; isFast: boolean }) => void;
+}) {
+  const displayedWords = useMemo(
+    () => getWordsByCategory('Bruits de Chantier').filter(w => CHANTIER_SOUNDS_MAP[w.id]),
+    []
+  );
+  const [triedIds, setTriedIds] = useState<Set<string>>(new Set());
+  const [triedMissionIds, setTriedMissionIds] = useState<Set<string>>(new Set());
+  const [playingById, setPlayingById] = useState<Record<string, boolean>>({});
+  const [startTime] = useState(Date.now());
+  const activeAudioByIdRef = useRef<Map<string, HTMLAudioElement>>(new Map());
+  const ttsSpeakingIdRef = useRef<string | null>(null);
+  const pressCountRef = useRef(0);
+  const { encourage } = useVoiceEncouragement({
+    enabled: accessibilitySettings.soundEnabled,
+    volume: accessibilitySettings.voiceVolume || 1.0,
+    rate: accessibilitySettings.voiceRate || 0.9
+  });
+
+  const vol = accessibilitySettings.voiceVolume ?? 1;
+
+  useEffect(() => {
+    if (accessibilitySettings.soundEnabled) {
+      setTimeout(() => encourage.activityStart(), 500);
+    }
+  }, []);
+
+  const setPlaying = (soundId: string, on: boolean) => {
+    setPlayingById(prev => {
+      if (on) return { ...prev, [soundId]: true };
+      const next = { ...prev };
+      delete next[soundId];
+      return next;
+    });
+  };
+
+  const stopOneSound = (soundId: string) => {
+    const audio = activeAudioByIdRef.current.get(soundId);
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      activeAudioByIdRef.current.delete(soundId);
+    }
+    if (ttsSpeakingIdRef.current === soundId && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      ttsSpeakingIdRef.current = null;
+    }
+    setPlaying(soundId, false);
+  };
+
+  const speakWord = (soundId: string, word: string) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    const utterance = new SpeechSynthesisUtterance(word);
+    utterance.lang = 'fr-FR';
+    utterance.rate = accessibilitySettings.voiceRate || 0.9;
+    utterance.volume = vol;
+    utterance.pitch = 1.2;
+    const voices = window.speechSynthesis.getVoices();
+    const frenchVoice =
+      voices.find(v => v.lang.startsWith('fr') && v.name.toLowerCase().includes('french')) ||
+      voices.find(v => v.lang.startsWith('fr'));
+    if (frenchVoice) utterance.voice = frenchVoice;
+    ttsSpeakingIdRef.current = soundId;
+    setPlaying(soundId, true);
+    utterance.onend = () => {
+      if (ttsSpeakingIdRef.current === soundId) ttsSpeakingIdRef.current = null;
+      setPlaying(soundId, false);
+    };
+    utterance.onerror = () => {
+      if (ttsSpeakingIdRef.current === soundId) ttsSpeakingIdRef.current = null;
+      setPlaying(soundId, false);
+    };
+    window.speechSynthesis.speak(utterance);
+  };
+
+  /** @returns true si une lecture (fichier ou TTS) a été démarrée, false si arrêt seulement */
+  const toggleChantierSound = (soundId: string, label: string): boolean => {
+    const soundUrl = getChantierActivityAudioUrl(soundId);
+    const existing = activeAudioByIdRef.current.get(soundId);
+
+    if (existing && !existing.paused) {
+      stopOneSound(soundId);
+      return false;
+    }
+    if (existing) {
+      activeAudioByIdRef.current.delete(soundId);
+    }
+
+    if (!soundUrl) {
+      if (ttsSpeakingIdRef.current === soundId) {
+        stopOneSound(soundId);
+        return false;
+      }
+      speakWord(soundId, label);
+      return true;
+    }
+
+    const audio = new Audio(soundUrl);
+    audio.volume = vol;
+    activeAudioByIdRef.current.set(soundId, audio);
+    setPlaying(soundId, true);
+
+    audio.onended = () => {
+      activeAudioByIdRef.current.delete(soundId);
+      setPlaying(soundId, false);
+    };
+    audio.onerror = () => {
+      console.warn(`Son chantier indisponible (${soundId}), synthèse vocale.`);
+      activeAudioByIdRef.current.delete(soundId);
+      setPlaying(soundId, false);
+      speakWord(soundId, label);
+    };
+
+    audio.play().catch(err => {
+      console.error('Lecture audio:', err);
+      activeAudioByIdRef.current.delete(soundId);
+      setPlaying(soundId, false);
+      speakWord(soundId, label);
+    });
+    return true;
+  };
+
+  const stopAllSounds = () => {
+    activeAudioByIdRef.current.forEach(a => {
+      a.pause();
+      a.currentTime = 0;
+    });
+    activeAudioByIdRef.current.clear();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    ttsSpeakingIdRef.current = null;
+    setPlayingById({});
+  };
+
+  const handlePress = (word: VocabularyWord) => {
+    setTriedIds(prev => new Set([...prev, word.id]));
+    const started = toggleChantierSound(word.id, word.word);
+    if (started) {
+      pressCountRef.current += 1;
+      if (accessibilitySettings.soundEnabled && pressCountRef.current % 4 === 0) {
+        setTimeout(() => encourage.correct(), 600);
+      }
+    }
+  };
+
+  const handleMissionPress = (item: ChantierMissionAudioItem) => {
+    setTriedMissionIds(prev => new Set([...prev, item.id]));
+    const started = toggleChantierSound(item.id, item.label);
+    if (started) {
+      pressCountRef.current += 1;
+      if (accessibilitySettings.soundEnabled && pressCountRef.current % 4 === 0) {
+        setTimeout(() => encourage.correct(), 600);
+      }
+    }
+  };
+
+  const handleCompleteActivity = () => {
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+    const n = displayedWords.length;
+    const tried = triedIds.size;
+    const accuracy = n > 0 ? (tried / n) * 100 : 0;
+    stopAllSounds();
+    onComplete({
+      accuracy,
+      timeSpent,
+      isPerfect: n > 0 && tried >= n,
+      isFast: timeSpent < 600
+    });
+  };
+
+  useEffect(() => {
+    return () => stopAllSounds();
+  }, []);
+
+  const total = displayedWords.length;
+  const canFinish = total > 0 && triedIds.size >= total * 0.5;
+
+  return (
+    <div className="space-y-8">
+      <section
+        className="overflow-hidden rounded-2xl shadow-lg border border-orange-400/30"
+        aria-labelledby="chantier-bruits-heading"
+      >
+        <div
+          className={`flex items-start gap-4 px-5 py-4 sm:px-6 sm:py-5 ${
+            accessibilitySettings.colorScheme === 'dark' ? 'bg-orange-700' : 'bg-orange-500'
+          }`}
+        >
+          <span className="text-4xl sm:text-5xl leading-none shrink-0 select-none" aria-hidden>
+            🏗️
+          </span>
+          <div className="min-w-0 text-left">
+            <h2
+              id="chantier-bruits-heading"
+              className="text-xl sm:text-2xl font-bold text-white tracking-tight"
+            >
+              Les Bruits de Chantier
+            </h2>
+            <p className="mt-1.5 text-sm sm:text-base text-white font-normal leading-snug">
+              Écoute les bruits du chantier et découvre les outils et engins.
+            </p>
+            <p className="mt-2 text-sm sm:text-base text-white/95 leading-snug">
+              Un appui sur un bouton <strong className="text-white">démarre</strong> son bruitage, un nouvel appui sur le{' '}
+              <strong className="text-white">même</strong> bouton <strong className="text-white">l&apos;arrête</strong>. Plusieurs
+              bruits différents peuvent jouer en même temps.
+            </p>
+            <p className="mt-2 text-sm text-white/85">
+              Bruits essayés : {triedIds.size} / {total}
+            </p>
+          </div>
+        </div>
+        <div
+          className={`h-1.5 w-full ${
+            accessibilitySettings.colorScheme === 'dark' ? 'bg-purple-900/40' : 'bg-pink-100'
+          }`}
+          aria-hidden
+        />
+      </section>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        {displayedWords.map(word => {
+          const emoji = (word.emoji || '').trim() || CHANTIER_EMOJI_FALLBACK[word.id] || '🔊';
+          const isPlaying = Boolean(playingById[word.id]);
+          return (
+            <button
+              key={word.id}
+              type="button"
+              onClick={() => handlePress(word)}
+              className={`
+                relative flex flex-col items-center justify-center gap-3 rounded-3xl p-6 sm:p-8 min-h-[180px]
+                border-2 transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg
+                ${
+                  accessibilitySettings.colorScheme === 'dark'
+                    ? `bg-gray-700 hover:bg-gray-600 text-white ${
+                        isPlaying ? 'border-orange-400 ring-2 ring-orange-400/60' : 'border-amber-600/50'
+                      }`
+                    : `hover:bg-amber-50/80 text-gray-900 ${
+                        isPlaying ? 'border-orange-500 bg-orange-50/90 ring-2 ring-orange-300' : 'bg-white border-amber-200 hover:border-amber-400'
+                      }`
+                }
+              `}
+              aria-label={isPlaying ? `Arrêter le bruit : ${word.word}` : `Jouer le bruit : ${word.word}`}
+            >
+              <span className="text-7xl sm:text-8xl leading-none select-none" aria-hidden>
+                {emoji}
+              </span>
+              <span className="text-base sm:text-lg font-bold text-center leading-tight px-1">{word.word}</span>
+              {isPlaying && (
+                <span className="absolute top-2 right-2 flex h-8 min-w-8 px-1 items-center justify-center rounded-full bg-orange-600 text-white text-xs font-bold animate-pulse shadow">
+                  ■
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Bandeau type fiche — Missions des ouvriers (même esprit que l’en-tête orange de l’activité) */}
+      <section
+        className="overflow-hidden rounded-2xl shadow-lg border border-orange-400/30"
+        aria-labelledby="chantier-missions-heading"
+      >
+        <div
+          className={`flex items-start gap-4 px-5 py-4 sm:px-6 sm:py-5 ${
+            accessibilitySettings.colorScheme === 'dark' ? 'bg-orange-700' : 'bg-orange-500'
+          }`}
+        >
+          <span className="text-4xl sm:text-5xl leading-none shrink-0 select-none" aria-hidden>
+            👷
+          </span>
+          <div className="min-w-0 text-left">
+            <h2
+              id="chantier-missions-heading"
+              className="text-xl sm:text-2xl font-bold text-white tracking-tight"
+            >
+              Missions des ouvriers du chantier
+            </h2>
+            <p className="mt-1.5 text-sm sm:text-base text-white font-normal leading-snug">
+              Découvre ce que font les professionnels sur un chantier : chaque ouvrier a un rôle et des gestes à connaître.
+            </p>
+            <p className="mt-2 text-sm sm:text-base text-white/95 leading-snug">
+              Comme pour les bruitages : un appui <strong className="text-white">lance</strong> le son de l&apos;étape, un
+              nouvel appui sur le <strong className="text-white">même</strong> bouton <strong className="text-white">l&apos;arrête</strong>.
+            </p>
+            <p className="mt-2 text-sm text-white/85">
+              Étapes écoutées : {triedMissionIds.size} / {CHANTIER_MISSION_ITEMS.length}
+            </p>
+          </div>
+        </div>
+        <div
+          className={`h-1.5 w-full ${
+            accessibilitySettings.colorScheme === 'dark' ? 'bg-purple-900/40' : 'bg-pink-100'
+          }`}
+          aria-hidden
+        />
+        <div
+          className={`px-4 py-6 sm:px-6 ${
+            accessibilitySettings.colorScheme === 'dark' ? 'bg-gray-800/95' : 'bg-orange-50/90'
+          }`}
+        >
+          <div className="flex flex-col gap-6">
+            {CHANTIER_MISSION_PHASES_ORDER.map(phase => {
+              const phaseEmoji = CHANTIER_MISSION_PHASE_EMOJI[phase];
+              const seriesItems = CHANTIER_MISSION_ITEMS.filter(m => m.phase === phase);
+              return (
+                <div
+                  key={phase}
+                  className={`rounded-2xl border-2 p-4 sm:p-5 ${
+                    accessibilitySettings.colorScheme === 'dark'
+                      ? 'border-amber-700/50 bg-gray-800/80'
+                      : 'border-orange-200 bg-white/90'
+                  }`}
+                >
+                  <div className="mb-3 flex items-start gap-3">
+                    <span className="text-4xl leading-none shrink-0 select-none" aria-hidden>
+                      {phaseEmoji}
+                    </span>
+                    <h3
+                      className={`min-w-0 flex-1 text-left text-base font-bold leading-snug sm:text-lg ${
+                        accessibilitySettings.colorScheme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}
+                    >
+                      {CHANTIER_MISSION_PHASE_TITLE[phase]}
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    {seriesItems.map(item => {
+                      const isPlaying = Boolean(playingById[item.id]);
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => handleMissionPress(item)}
+                          className={`
+                            relative flex flex-row items-center gap-3 rounded-2xl p-4 min-h-[80px] text-left
+                            border-2 transition-all transform hover:scale-[1.01] active:scale-[0.99] shadow-md
+                            ${
+                              accessibilitySettings.colorScheme === 'dark'
+                                ? `bg-gray-700 hover:bg-gray-600 text-white ${
+                                    isPlaying ? 'border-orange-400 ring-2 ring-orange-400/60' : 'border-amber-600/50'
+                                  }`
+                                : `bg-white hover:bg-white text-gray-900 ${
+                                    isPlaying
+                                      ? 'border-orange-500 bg-orange-50 ring-2 ring-orange-200'
+                                      : 'border-orange-200 hover:border-orange-400'
+                                  }`
+                            }
+                          `}
+                          aria-label={isPlaying ? `Arrêter : ${item.label}` : `Écouter : ${item.label}`}
+                        >
+                          <span className="text-3xl sm:text-4xl leading-none shrink-0 select-none" aria-hidden>
+                            {phaseEmoji}
+                          </span>
+                          <span className="text-sm font-bold leading-snug pr-7 sm:text-base">{item.shortLabel}</span>
+                          {isPlaying && (
+                            <span className="absolute top-2 right-2 flex h-7 min-w-7 items-center justify-center rounded-full bg-orange-600 text-xs font-bold text-white shadow animate-pulse">
+                              ■
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {canFinish && (
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={handleCompleteActivity}
+            className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
+          >
+            🎉 Terminer l&apos;activité
+          </button>
+        </div>
+      )}
+
+      <div
+        className={`text-center p-4 rounded-xl ${
+          accessibilitySettings.colorScheme === 'dark' ? 'bg-gray-800 text-white' : 'bg-amber-50'
+        }`}
+      >
+        <p className="text-lg font-semibold">
+          Progression : {total > 0 ? Math.round((triedIds.size / total) * 100) : 0}% 🎯
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // Composant spécifique pour l'activité Mon Calendrier Visuel
 function DailyScheduleActivity({ 
   activity, 
@@ -7562,6 +8062,12 @@ function ActivityPageContent() {
           />
         ) : activity.id === 'city-sounds' ? (
           <CitySoundsActivity
+            activity={activity}
+            accessibilitySettings={accessibilitySettings}
+            onComplete={handleComplete}
+          />
+        ) : activity.id === 'chantier-sounds' ? (
+          <ChantierSoundsActivity
             activity={activity}
             accessibilitySettings={accessibilitySettings}
             onComplete={handleComplete}

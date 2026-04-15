@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getSupabaseUrl, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
+import { getHunyuan3dAppUrl } from '@/utils/hunyuan3dAppUrl';
 
 // Utiliser le service role key directement comme les autres API admin
 const supabase = createClient(
@@ -21,7 +22,7 @@ const MODULE_URLS: Record<string, string> = {
   'meeting-reports': 'https://meeting-reports.iahome.fr',
   'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
   'cogstudio': 'https://cogstudio.iahome.fr',
-  'hunyuan3d': 'https://hunyuan3d.iahome.fr',
+  'hunyuan3d': getHunyuan3dAppUrl(),
   'home-assistant': 'https://homeassistant.iahome.fr',
   'homeassistant': 'https://homeassistant.iahome.fr',
   'prompt-generator': 'https://prompt-generator.iahome.fr',
@@ -36,6 +37,7 @@ const MODULE_URLS: Record<string, string> = {
   // Applications IA (Gradio / sous-domaines)
   'animagine-xl': 'https://animaginexl.iahome.fr',
   'birefnet': 'https://birefnet.iahome.fr',
+  'musetalk': 'https://musetalk.iahome.fr',
   'florence-2': 'https://florence2.iahome.fr',
 };
 
@@ -140,6 +142,9 @@ function getModuleSlug(moduleId: string, moduleTitle: string): string {
   }
   if (titleLower.includes('birefnet') || titleLower.includes('bi ref net')) {
     return 'birefnet';
+  }
+  if (titleLower.includes('musetalk') || titleLower.includes('muse talk')) {
+    return 'musetalk';
   }
   if (titleLower.includes('florence-2') || titleLower.includes('florence 2')) {
     return 'florence-2';

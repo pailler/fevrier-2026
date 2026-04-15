@@ -3,12 +3,17 @@ import { useState } from 'react';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 
 interface StripeButton2Props {
-  packageType: 'subscription_monthly' | 'subscription_yearly' | 'pack_standard';
+  packageType:
+    | 'subscription_monthly'
+    | 'subscription_yearly'
+    | 'pack_standard'
+    | 'photobooth_personalized'
+    | 'prestation_marketing';
   className?: string;
   children: React.ReactNode;
   /** ID du code promo Stripe (ex. prom_xxx) pour appliquer la réduction au checkout */
   promotionCodeId?: string | null;
-  /** Code promo brut (ex. BIENVENUE10) : si fourni et promotionCodeId absent, on valide au clic avant le checkout */
+  /** Code promo brut (ex. BIENVENUE10) : si fourni sans promotionCodeId, validation au clic avant checkout */
   promoCodeToValidate?: string | null;
 }
 
@@ -28,7 +33,8 @@ export default function StripeButton2({ packageType, className, children, promot
     try {
       // Si code promo saisi mais pas encore validé, le valider automatiquement
       let effectivePromoId = promotionCodeId;
-      const codeToValidate = promoCodeToValidate?.trim().toUpperCase();
+      let codeToValidate = promoCodeToValidate?.trim().replace(/\s/g, '').toUpperCase() ?? '';
+      if (codeToValidate === 'BIENVENUE2026') codeToValidate = 'BIENVENUE10';
       if (!effectivePromoId && codeToValidate) {
         const res = await fetch(`/api/stripe/validate-promo?code=${encodeURIComponent(codeToValidate)}`);
         const data = await res.json();

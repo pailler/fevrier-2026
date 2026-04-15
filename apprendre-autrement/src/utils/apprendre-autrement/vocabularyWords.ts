@@ -163,6 +163,16 @@ export const vocabularyWords: VocabularyWord[] = [
   { id: 'city-pompiers', word: 'Pompiers', category: 'Bruits de la Ville', emoji: '🚒' },
   // Emoji "camion poubelle" : on utilise un vrai camion (pas une poubelle seule)
   { id: 'city-camion-poubelle', word: 'Camion poubelle', category: 'Bruits de la Ville', emoji: '🚛' },
+
+  // Bruits de Chantier — fichiers dans public/sounds/chantier/ (voir mapping dans ChantierSoundsActivity)
+  { id: 'chantier-camion', word: 'Camion', category: 'Bruits de Chantier', emoji: '🚛' },
+  { id: 'chantier-pelleteuse', word: 'Pelleteuse', category: 'Bruits de Chantier', emoji: '🚜' },
+  { id: 'chantier-grue', word: 'Grue', category: 'Bruits de Chantier', emoji: '🏗️' },
+  { id: 'chantier-monte-charge', word: 'Monte-charge', category: 'Bruits de Chantier', emoji: '🛗' },
+  { id: 'chantier-train-marchandise', word: 'Train de marchandises', category: 'Bruits de Chantier', emoji: '🚃' },
+  { id: 'chantier-robot-police', word: 'Robot police', category: 'Bruits de Chantier', emoji: '🤖' },
+  { id: 'chantier-machine-debut', word: 'Machine début', category: 'Bruits de Chantier', emoji: '⚙️' },
+  { id: 'chantier-robot-nettoyeur', word: 'Robot nettoyeur', category: 'Bruits de Chantier', emoji: '🧹' },
 ];
 
 // Fonction pour obtenir les mots par catégorie

@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
       
       // Essayer de vérifier comme un token JWT standard
       try {
-        const decoded = jwt.verify(token, JWT_SECRET) as any;
+        const decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true }) as any;
         
         console.log('✅ Token JWT valide pour:', decoded.userEmail || decoded.userId);
         
@@ -71,12 +71,6 @@ export async function GET(request: NextRequest) {
         if (decoded.moduleId && decoded.moduleId !== 'ruinedfooocus') {
           console.log('❌ Token pour un autre module:', decoded.moduleId);
           return NextResponse.redirect('https://iahome.fr/account?error=invalid_module', 302);
-        }
-        
-        // Vérifier l'expiration
-        if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
-          console.log('❌ Token expiré');
-          return NextResponse.redirect('https://iahome.fr/account?error=token_expired', 302);
         }
         
         const userId = decoded.userId || decoded.user_id;
@@ -119,18 +113,7 @@ export async function GET(request: NextRequest) {
         console.log('❌ Token non trouvé dans la base de données');
         return NextResponse.redirect('https://iahome.fr/account?error=invalid_token', 302);
       }
-      
-      // Vérifier l'expiration du token
-      if (tokenData.expires_at) {
-        const expirationDate = new Date(tokenData.expires_at);
-        const now = new Date();
-        
-        if (expirationDate <= now) {
-          console.log('❌ Token expiré');
-          return NextResponse.redirect('https://iahome.fr/account?error=token_expired', 302);
-        }
-      }
-      
+
       // Vérifier que le module ruinedfooocus est visible dans /account pour cet utilisateur
       const securityService = ModuleSecurityService.getInstance();
       const canAccess = await securityService.canAccessExternalApp(tokenData.created_by, 'ruinedfooocus');
@@ -268,15 +251,7 @@ export async function POST(request: NextRequest) {
     
     // Vérifier le token rapidement
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as any;
-      
-      // Vérifier l'expiration
-      if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
-        return NextResponse.json(
-          { error: 'Token expiré' },
-          { status: 401 }
-        );
-      }
+      jwt.verify(token, JWT_SECRET, { ignoreExpiration: true }) as any;
     } catch (jwtError) {
       return NextResponse.json(
         { error: 'Token invalide' },

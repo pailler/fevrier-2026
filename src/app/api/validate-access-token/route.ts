@@ -19,14 +19,7 @@ export async function POST(request: NextRequest) {
 
     // Vérifier si c'est un token JWT valide
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as any;
-      // Vérifier l'expiration
-      if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-        return NextResponse.json(
-          { error: 'Token expiré' },
-          { status: 401 }
-        );
-      }
+      const decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true }) as any;
 
       // Récupérer les informations du token depuis la base de données
       const { data: tokenRecord, error: dbError } = await supabase
@@ -59,14 +52,6 @@ export async function POST(request: NextRequest) {
         
         return NextResponse.json(
           { error: 'Token invalide' },
-          { status: 401 }
-        );
-      }
-
-      // Vérifier l'expiration dans la base de données
-      if (new Date(tokenRecord.expires_at) < new Date()) {
-        return NextResponse.json(
-          { error: 'Token expiré' },
           { status: 401 }
         );
       }
@@ -117,14 +102,6 @@ export async function POST(request: NextRequest) {
       if (magicError || !magicLink) {
         return NextResponse.json(
           { error: 'Token invalide' },
-          { status: 401 }
-        );
-      }
-
-      // Vérifier l'expiration du magic link
-      if (new Date(magicLink.expires_at) < new Date()) {
-        return NextResponse.json(
-          { error: 'Token expiré' },
           { status: 401 }
         );
       }

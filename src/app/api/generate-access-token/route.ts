@@ -3,9 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 import { TOKEN_COSTS } from '@/utils/tokenActionService';
 import { getSupabaseUrl, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 
-// Durée maximale de session : 1 heure pour tous les utilisateurs (même admin)
-const TOKEN_DURATION_MS = 60 * 60 * 1000; // 60 minutes (1 heure)
-const TOKEN_DURATION_SECONDS = Math.floor(TOKEN_DURATION_MS / 1000);
+// Jeton d’accès module : pas d’expiration temporelle (présence + droits = accès).
+const ACCESS_TOKEN_EXPIRES_AT_MS = 4102444800000; // ~2100-01-01
+const ACCESS_TOKEN_EXP_SEC = Math.floor(ACCESS_TOKEN_EXPIRES_AT_MS / 1000);
 
 const supabaseAdmin = createClient(
   getSupabaseUrl(),
@@ -144,22 +144,17 @@ export async function POST(request: NextRequest) {
       // token_usage peut être indisponible
     }
 
-    // Durée du token : 1 heure pour tous les utilisateurs
-    const tokenDuration = TOKEN_DURATION_MS;
-    const tokenDurationSeconds = TOKEN_DURATION_SECONDS;
-
-    // Créer un token simple (Base64)
     const tokenPayload = {
       userId,
       userEmail,
       moduleId: normalizedModuleId,
       moduleTitle: normalizedModuleId.charAt(0).toUpperCase() + normalizedModuleId.slice(1),
       accessLevel: 'premium',
-      expiresAt: Date.now() + tokenDuration,
+      expiresAt: ACCESS_TOKEN_EXPIRES_AT_MS,
       permissions: ['read', 'access', 'write', 'advanced_features'],
       issuedAt: Date.now(),
       iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + tokenDurationSeconds
+      exp: ACCESS_TOKEN_EXP_SEC
     };
 
     // Token Base64 URL-safe (+ et / remplacés) pour éviter corruption dans l'URL

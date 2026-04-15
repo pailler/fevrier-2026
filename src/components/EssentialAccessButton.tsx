@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { TokenActionServiceClient } from '../utils/tokenActionServiceClient';
 import { useTokenContext } from '../contexts/TokenContext';
+import { getHunyuan3dAppUrl } from '../utils/hunyuan3dAppUrl';
 
 interface EssentialAccessButtonProps {
   user?: any;
@@ -39,10 +40,8 @@ export default function EssentialAccessButton({
     'meeting-reports': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
       ? 'http://localhost:3050'
       : 'https://meeting-reports.iahome.fr',
-    // Hunyuan 3D : localhost:8888 en dev, hunyuan3d.iahome.fr en prod
-    'hunyuan3d': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
-      ? 'http://localhost:8888'
-      : 'https://hunyuan3d.iahome.fr',
+    // Hunyuan 3D (carte) → Hi3DGen sur le domaine principal
+    'hunyuan3d': getHunyuan3dAppUrl(),
     'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
     'cogstudio': 'https://cogstudio.iahome.fr',
     'administration': '/administration',

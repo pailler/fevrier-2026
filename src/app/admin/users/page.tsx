@@ -395,7 +395,7 @@ export default function AdminUsers() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Avec applis actives</p>
+              <p className="text-sm font-medium text-gray-600">Avec applis sur le compte</p>
               <p className="text-3xl font-bold text-amber-600 mt-2">
                 {users.filter(u => (u.activeModules || []).length > 0).length}
               </p>
@@ -470,7 +470,7 @@ export default function AdminUsers() {
                   Utilisateur
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Applis actives
+                  Applis référencées
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Applis visitées
@@ -524,7 +524,7 @@ export default function AdminUsers() {
                           </span>
                         ))
                       ) : (
-                        <span className="text-xs text-gray-400">Aucune appli active</span>
+                        <span className="text-xs text-gray-400">Aucune appli référencée</span>
                       )}
                     </div>
                     {(user.activeApplications || []).length > 0 && (

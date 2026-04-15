@@ -73,15 +73,7 @@ export async function GET(request: NextRequest) {
 
     // Transformer les tokens d'accès
     const transformedTokens = (accessTokens || [])
-      .filter(token => {
-        if (!token || !token.id) return false;
-        if (!token.expires_at) return true;
-        try {
-          return new Date(token.expires_at) > new Date();
-        } catch (error) {
-          return true;
-        }
-      })
+      .filter(token => Boolean(token && token.id))
       .map(token => ({
         id: `token-${token.id}`,
         type: 'token',

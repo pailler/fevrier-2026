@@ -1,4 +1,4 @@
-# Demarre les apps IA : PhotoMaker, Animagine XL, Florence-2, BiRefNet (en parallele)
+# Demarre les apps IA : PhotoMaker, Animagine XL, Florence-2, BiRefNet, MuseTalk (en parallele)
 # Usage : .\scripts\start-ia-apps.ps1
 # Depuis la racine iahome.
 
@@ -24,11 +24,13 @@ $PhotomakerPath  = if ($PhotomakerPath)  { $PhotomakerPath }  else { Join-Path $
 $AnimagineXLPath = if ($AnimagineXLPath) { $AnimagineXLPath } else { Join-Path $ProjectRoot "gradio-apps\animagine-xl" }
 $Florence2Path   = if ($Florence2Path)   { $Florence2Path }   else { Join-Path $ProjectRoot "gradio-apps\florence-2" }
 $BirefnetPath    = if ($BirefnetPath)    { $BirefnetPath }    else { Join-Path $ProjectRoot "gradio-apps\birefnet" }
+$MuseTalkPath    = if ($MuseTalkPath)    { $MuseTalkPath }    else { Join-Path $ProjectRoot "gradio-apps\musetalk" }
 
 $PortPhotomaker  = 7881
 $PortAnimagineXL = 7883
 $PortFlorence2   = 7884
 $PortBirefnet    = 7882
+$PortMuseTalk    = 7886
 
 function Test-PortInUse {
     param([int]$Port)
@@ -61,7 +63,7 @@ function Ensure-AppDependencies {
 }
 
 function Start-IAApp {
-    param([string]$Name, [string]$Path, [int]$Port)
+    param([string]$Name, [string]$Path, [int]$Port, [string]$ExtraPyArgs = "")
     if (-not $Path -or -not (Test-Path $Path)) {
         Write-Host "  [SKIP] $Name : dossier introuvable ($Path)" -ForegroundColor DarkGray
         return
@@ -84,7 +86,11 @@ function Start-IAApp {
         $env:GRADIO_SERVER_NAME = "0.0.0.0"
         $psi = New-Object System.Diagnostics.ProcessStartInfo
         $psi.FileName = $pythonExe
-        $psi.Arguments = "app.py"
+        if ($ExtraPyArgs -and $ExtraPyArgs.Trim().Length -gt 0) {
+            $psi.Arguments = "app.py $($ExtraPyArgs.Trim())"
+        } else {
+            $psi.Arguments = "app.py"
+        }
         $psi.WorkingDirectory = $Path
         $psi.UseShellExecute = $true
         $psi.CreateNoWindow = $false
@@ -112,10 +118,14 @@ Start-IAApp -Name "Florence-2" -Path $Florence2Path -Port $PortFlorence2
 Write-Host "`n4. BiRefNet :$PortBirefnet ..." -ForegroundColor Yellow
 Start-IAApp -Name "BiRefNet" -Path $BirefnetPath -Port $PortBirefnet
 
+Write-Host "`n5. MuseTalk :$PortMuseTalk ..." -ForegroundColor Yellow
+Start-IAApp -Name "MuseTalk" -Path $MuseTalkPath -Port $PortMuseTalk -ExtraPyArgs "--port $PortMuseTalk --ip 0.0.0.0 --use_float16"
+
 Write-Host "`n========================================" -ForegroundColor Cyan
 Write-Host "  URLs :" -ForegroundColor White
 Write-Host "    PhotoMaker    : http://localhost:$PortPhotomaker" -ForegroundColor Gray
 Write-Host "    Animagine XL  : http://localhost:$PortAnimagineXL" -ForegroundColor Gray
 Write-Host "    Florence-2   : http://localhost:$PortFlorence2" -ForegroundColor Gray
 Write-Host "    BiRefNet     : http://localhost:$PortBirefnet" -ForegroundColor Gray
+Write-Host "    MuseTalk     : http://localhost:$PortMuseTalk" -ForegroundColor Gray
 Write-Host "========================================`n" -ForegroundColor Cyan

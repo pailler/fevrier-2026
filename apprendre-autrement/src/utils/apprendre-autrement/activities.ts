@@ -307,6 +307,20 @@ export const activities: Activity[] = [
     categoryColor: 'bg-gray-100 text-gray-800',
     difficulty: 'facile',
     objectives: ['Reconnaître les bruits de la ville', 'Associer son et image', 'Développer l\'écoute', 'Identifier les véhicules']
+  },
+  {
+    id: 'chantier-sounds',
+    title: 'Les Bruits de Chantier',
+    description: 'Écoute les bruits du chantier et découvre les outils et engins',
+    category: 'Auditif',
+    skill: 'Association',
+    icon: '🏗️',
+    duration: '8 min',
+    type: 'audio',
+    colorGradient: 'from-amber-500 to-orange-600',
+    categoryColor: 'bg-amber-100 text-amber-900',
+    difficulty: 'facile',
+    objectives: ['Reconnaître les bruits de chantier', 'Associer son et image', 'Développer l\'écoute', 'Identifier les outils et machines']
   }
 ];
 

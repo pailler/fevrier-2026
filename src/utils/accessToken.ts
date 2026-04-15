@@ -27,17 +27,7 @@ export async function validateAccessToken(token: string): Promise<AccessTokenDat
       return null;
     }
 
-    // Vérifier l'expiration
     const expiresAt = new Date(data.expires_at);
-    const now = new Date();
-    console.log('Vérification d\'expiration:', {
-      expiresAt: expiresAt.toISOString(),
-      isExpired: expiresAt < now
-    });
-
-    if (expiresAt < now) {
-      return null;
-    }
 
     // Marquer comme utilisé (COMMENTÉ POUR PERMETTRE LA RÉUTILISATION)
     // // await supabase

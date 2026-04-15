@@ -37,9 +37,17 @@
           Creez des souvenirs uniques avec des accessoires digitaux, des filtres
           et partagez vos photos en un instant.
         </p>
-        <p class="subtitle small">
-          La gestion des evenements est sur cette page. Le studio photobooth
-          s'ouvre sur une page dediee, optimisee mobile/tablette.
+
+        <p class="offer-cta-wrap">
+          <a
+            class="btn-offer-photobooth"
+            href="https://iahome.fr/pricing2?promo=BIENVENUE10"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Envie de la meme borne pour vos evenements ?
+            <span class="btn-offer-sub">Decouvrir l'offre & conditions</span>
+          </a>
         </p>
 
         <div class="action-grid">
@@ -76,21 +84,50 @@
         </article>
 
         <article id="panel-choice" class="panel choice-panel">
-          <h3 id="choice-event-name">Choisissez votre action</h3>
-          <p id="choice-event-meta" class="choice-meta"></p>
-          <div class="choice-buttons">
-            <a id="btn-take-photo" class="choice-btn choice-btn-photo" href="./studio.html">
-              <span class="choice-btn-icon">📸</span>
-              <span class="choice-btn-label">Prendre une photo</span>
-              <span class="choice-btn-desc">Studio photobooth</span>
-            </a>
-            <a id="btn-gallery" class="choice-btn choice-btn-gallery" href="./gallery.html">
-              <span class="choice-btn-icon">🖼️</span>
-              <span class="choice-btn-label">Voir la galerie</span>
-              <span class="choice-btn-desc">Photos de l'evenement</span>
-            </a>
+          <div class="choice-stack">
+            <div class="choice-stack-top">
+              <h3 id="choice-event-name">Choisissez votre action</h3>
+              <p id="choice-event-meta" class="choice-meta"></p>
+            </div>
+            <div class="choice-stack-selfie">
+              <a id="btn-take-photo" class="choice-btn choice-btn-photo choice-btn-photo--primary" href="./studio.html">
+                <span class="choice-btn-icon">📸</span>
+                <span class="choice-btn-label">Prendre un selfie</span>
+                <span class="choice-btn-desc">Studio photobooth</span>
+              </a>
+            </div>
+            <div class="choice-stack-split" aria-label="Galerie et offre">
+              <div class="choice-split-gallery">
+                <a id="btn-gallery" class="choice-btn choice-btn-gallery choice-btn-gallery--compact" href="./gallery.html">
+                  <span class="choice-btn-icon">🖼️</span>
+                  <span class="choice-btn-label">Voir la galerie</span>
+                  <span class="choice-btn-desc">Photos de l&apos;evenement</span>
+                </a>
+              </div>
+              <aside class="choice-split-promo">
+                <div id="choice-guest-bottom" class="choice-guest-strip choice-guest-bottom choice-guest-block" hidden>
+                  <p class="choice-guest-badge" aria-hidden="true">-20%</p>
+                  <p class="choice-guest-lead">
+                    Vous souhaitez le m&ecirc;me Photobooth personnalis&eacute; pour vos &eacute;v&eacute;nements ?
+                    Profitez du code promo <strong>BIENVENUE10</strong> pour une r&eacute;duction de 20&nbsp;%.
+                  </p>
+                  <div class="choice-offer-qr-wrap">
+                    <img
+                      id="choice-offer-qr"
+                      class="choice-offer-qr"
+                      src="/api/offer-qr.png?medium=pin"
+                      width="200"
+                      height="200"
+                      alt="QR code : offre photobooth et tarifs sur iahome.fr"
+                    />
+                  </div>
+                </div>
+              </aside>
+            </div>
+            <div class="choice-stack-footer">
+              <a id="choice-back" class="btn-link choice-back" href="./index.html">← changer d&apos;événement</a>
+            </div>
           </div>
-          <a id="choice-back" class="btn-link choice-back" href="./index.html">← Changer de code</a>
         </article>
 
         <article id="panel-create" class="panel">

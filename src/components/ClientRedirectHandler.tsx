@@ -1,6 +1,28 @@
 'use client';
 
 import { useEffect } from 'react';
+import { CACHE_BUST_QUERY_KEYS } from '@/utils/cacheBustQueryParams';
+
+/** Retire les paramètres techniques de l’URL (barre d’adresse + historique) sans recharger — complète la redirection 308 middleware. */
+function stripCacheBustParamsFromAddressBar(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const u = new URL(window.location.href);
+    let changed = false;
+    for (const key of CACHE_BUST_QUERY_KEYS) {
+      if (u.searchParams.has(key)) {
+        u.searchParams.delete(key);
+        changed = true;
+      }
+    }
+    if (!changed) return;
+    const qs = u.searchParams.toString();
+    const path = u.pathname + (qs ? `?${qs}` : '') + u.hash;
+    window.history.replaceState(null, '', path);
+  } catch {
+    // ignore
+  }
+}
 
 export default function ClientRedirectHandler() {
   useEffect(() => {
@@ -8,6 +30,8 @@ export default function ClientRedirectHandler() {
     if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
       return;
     }
+    stripCacheBustParamsFromAddressBar();
+
     // NE JAMAIS recharger sur /auth/callback : le code OAuth est à usage unique,
     // un reload consommerait le code et provoquerait "session non trouvée"
     if (window.location.pathname === '/auth/callback') {
@@ -72,16 +96,8 @@ export default function ClientRedirectHandler() {
         });
       }
       
-      // FORCER le rechargement immédiat avec cache bypass
-      const timestamp = Date.now();
-      const url = new URL(window.location.href);
-      url.searchParams.set('_v', timestamp.toString());
-      url.searchParams.set('_h', HEADER_VERSION);
-      url.searchParams.set('_cb', '1');
-      url.searchParams.set('_force', '1');
-      url.searchParams.set('_clear', '1');
-      url.searchParams.set('_radical', '1');
-      window.location.replace(url.toString());
+      // Rechargement sans ajouter de query params (évite « pages avec redirection » / doublons dans la Search Console)
+      window.location.reload();
       return;
     }
     

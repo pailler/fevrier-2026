@@ -2,7 +2,7 @@
 
 /**
  * Redirection vers CardPageAccessSection.
- * Le système d'activation n'existe plus - accès direct par crédits uniquement.
+ * Wrapper vers l’accès par crédits (tokens) — pas de notion d’« activation » côté utilisateur.
  */
 import CardPageAccessSection from './CardPageAccessSection';
 

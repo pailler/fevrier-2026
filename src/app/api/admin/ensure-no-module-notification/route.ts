@@ -32,9 +32,9 @@ export async function POST(request: NextRequest) {
       .from('notification_settings')
       .insert({
         event_type: 'user_no_module_activated',
-        name: 'Utilisateur sans module activé',
+        name: 'Utilisateur sans appli visitée',
         is_enabled: true,
-        email_template_subject: 'Bienvenue sur IAHome ! Activez votre premier module et recevez 200 crédits bonus !',
+        email_template_subject: 'Bienvenue sur IAHome ! Ouvrez une première appli avec vos crédits et recevez 200 crédits bonus !',
         email_template_body: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.05);">
             <div style="background-color: #2563eb; color: #ffffff; padding: 20px; text-align: center;">
@@ -43,10 +43,10 @@ export async function POST(request: NextRequest) {
             <div style="padding: 20px;">
               <p style="font-size: 16px; color: #333333; line-height: 1.5;">
                 Nous sommes ravis de vous compter parmi nous ! Pour tirer le meilleur parti de votre expérience IAHome,
-                il est temps d'activer votre premier module.
+                il est temps d'ouvrir une première appli avec vos crédits.
               </p>
               <h3 style="color: #2563eb; font-size: 20px; margin-top: 25px; margin-bottom: 15px;">
-                Guide rapide : Activez votre premier module en 3 étapes !
+                Guide rapide : votre première appli en 3 étapes !
               </h3>
               <div style="background-color: #f0f7ff; border-left: 4px solid #2563eb; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
                 <ol style="padding-left: 20px; margin: 0; color: #333333;">
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
                     <strong>2. Choisissez votre favori :</strong> Cliquez sur le module qui vous intéresse le plus. Chaque module a une description détaillée.
                   </li>
                   <li style="margin-bottom: 10px;">
-                    <strong>3. Activez-le :</strong> Suivez les instructions pour activer le module. C'est simple et rapide !
+                    <strong>3. Ouvrez l'accès :</strong> Vos crédits sont débités pour ouvrir l'accès à l'appli. C'est simple et rapide !
                   </li>
                 </ol>
               </div>
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
                 🎁 Offre Spéciale : 200 Crédits Bonus !
               </h3>
               <p style="font-size: 16px; color: #333333; line-height: 1.5;">
-                Pour vous aider à démarrer, activez votre tout premier module dans les <strong>3 prochains jours</strong>
+                Pour vous aider à démarrer, ouvrez votre toute première appli dans les <strong>3 prochains jours</strong>
                 et nous vous offrirons <strong>200 crédits supplémentaires</strong> sur votre compte !
                 C'est le moment idéal pour explorer la puissance de l'IA.
               </p>

@@ -17,13 +17,7 @@ export interface GradioToken {
 
 export function verifyGradioToken(token: string): GradioToken | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as GradioToken;
-    
-    // Vérifier si le token n'est pas expiré
-    if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
-      return null;
-    }
-    
+    const decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true }) as GradioToken;
     return decoded;
   } catch (error) {
     console.error('Erreur vérification token:', error);

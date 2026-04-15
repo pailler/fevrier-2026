@@ -172,7 +172,7 @@ async function authenticateMetubeUser(token: string): Promise<{ success: boolean
     // Valider le token d'accès
     const accessData = await validateAccessToken(token);
     if (!accessData) {
-      return { success: false, method: 'token-validation', error: 'Token invalide ou expiré' };
+      return { success: false, method: 'token-validation', error: 'Token invalide' };
     }
 
     // Vérifier les permissions

@@ -868,9 +868,8 @@ export function useCustomAuth() {
     });
 
     if (response.status === 401) {
-      // Token expiré ou invalide
       signOut();
-      throw new Error('Session expirée');
+      throw new Error('Accès refusé ou session invalide');
     }
 
     return response;

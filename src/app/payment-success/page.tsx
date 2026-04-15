@@ -3,14 +3,23 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Footer from '../../components/Footer';
+import {
+  isPhotoboothPersonalizedPromoActive,
+  isPrestationMarketingPromoActive,
+} from '../../utils/prestationMarketingPromo';
 
 export default function PaymentSuccessPage() {
   const searchParams = useSearchParams();
+  const packageSlug = searchParams.get('package');
+  const isProductOnlyFlow =
+    packageSlug === 'photobooth_personalized' || packageSlug === 'prestation_marketing';
   const [packageInfo, setPackageInfo] = useState<{
     type: string;
     tokens: number;
     price: number;
+    isProductOnly?: boolean;
   } | null>(null);
+  const [paidAmountEuros, setPaidAmountEuros] = useState<number | null>(null);
   const [verificationStatus, setVerificationStatus] = useState<'checking' | 'verified' | 'failed' | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
 
@@ -21,7 +30,19 @@ export default function PaymentSuccessPage() {
     // Nouveaux packages V2
     subscription_monthly: { tokens: 3000, price: 9.90, name: 'Abonnement Starter Mensuel', isSubscription: true },
     subscription_yearly: { tokens: 36000, price: 99.00, name: 'Abonnement Starter Annuel', isSubscription: true },
-    pack_standard: { tokens: 3000, price: 19.80, name: 'Pack Standard' }
+    pack_standard: { tokens: 3000, price: 19.80, name: 'Pack Standard' },
+    photobooth_personalized: {
+      tokens: 0,
+      price: 399,
+      name: 'Photobooth personnalisé',
+      isProductOnly: true,
+    },
+    prestation_marketing: {
+      tokens: 0,
+      price: 249,
+      name: 'Prestation développement sur mesure',
+      isProductOnly: true,
+    },
   };
 
   useEffect(() => {
@@ -58,10 +79,18 @@ export default function PaymentSuccessPage() {
     
     if (packageType && packageDetails[packageType as keyof typeof packageDetails]) {
       const details = packageDetails[packageType as keyof typeof packageDetails];
+      let price = details.price;
+      if (packageType === 'photobooth_personalized' && isPhotoboothPersonalizedPromoActive()) {
+        price = 199;
+      }
+      if (packageType === 'prestation_marketing' && isPrestationMarketingPromoActive()) {
+        price = 199;
+      }
       setPackageInfo({
         type: details.name,
         tokens: details.tokens,
-        price: details.price
+        price,
+        isProductOnly: 'isProductOnly' in details ? details.isProductOnly : false,
       });
     }
   }, [searchParams]);
@@ -81,6 +110,9 @@ export default function PaymentSuccessPage() {
       
       if (data.verified) {
         setVerificationStatus('verified');
+        if (typeof data.amount_total === 'number') {
+          setPaidAmountEuros(data.amount_total);
+        }
         if (data.action === 'tokens_credited') {
           console.log('✅ Tokens crédités via vérification manuelle:', data);
         }
@@ -104,7 +136,13 @@ export default function PaymentSuccessPage() {
               Paiement réussi !
             </h1>
             <p className="text-lg text-gray-600 mb-6">
-              Merci pour votre achat. Vos tokens ont été crédités sur votre compte.
+              {packageSlug === 'photobooth_personalized'
+                ? 'Merci pour votre paiement. Nous vous recontactons rapidement pour la suite de votre commande Photobooth.'
+                : packageSlug === 'prestation_marketing'
+                  ? 'Merci pour votre paiement. Nous vous recontactons rapidement pour la suite de votre projet de développement.'
+                  : packageInfo?.isProductOnly || isProductOnlyFlow
+                    ? 'Merci pour votre paiement. Nous vous recontactons rapidement.'
+                    : 'Merci pour votre achat. Vos tokens ont été crédités sur votre compte.'}
             </p>
 
             {verificationStatus === 'checking' && (
@@ -118,7 +156,13 @@ export default function PaymentSuccessPage() {
             {verificationStatus === 'verified' && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
                 <p className="text-green-800">
-                  ✅ Paiement vérifié et tokens crédités avec succès !
+                  {packageSlug === 'photobooth_personalized'
+                    ? '✅ Paiement vérifié. Votre commande Photobooth est bien enregistrée.'
+                    : packageSlug === 'prestation_marketing'
+                      ? '✅ Paiement vérifié. Votre prestation est bien enregistrée.'
+                      : packageInfo?.isProductOnly || isProductOnlyFlow
+                        ? '✅ Paiement vérifié. Votre commande est bien enregistrée.'
+                        : '✅ Paiement vérifié et tokens crédités avec succès !'}
                 </p>
               </div>
             )}
@@ -162,8 +206,21 @@ export default function PaymentSuccessPage() {
                   {packageInfo.type}
                 </h2>
                 <div className="space-y-1 text-green-700">
-                  <p>💰 Montant payé : {packageInfo.price}€</p>
-                  <p>🪙 Tokens {packageInfo.type.includes('Abonnement') ? 'par mois' : 'crédités'} : {packageInfo.tokens}</p>
+                  <p>
+                    💰 Montant payé :{' '}
+                    {paidAmountEuros != null
+                      ? `${paidAmountEuros}€`
+                      : `${packageInfo.price}€`}
+                  </p>
+                  {!packageInfo.isProductOnly && (
+                    <p>
+                      🪙 Tokens {packageInfo.type.includes('Abonnement') ? 'par mois' : 'crédités'} :{' '}
+                      {packageInfo.tokens}
+                    </p>
+                  )}
+                  {packageInfo.isProductOnly && (
+                    <p className="text-sm">Aucun crédit de jetons sur cet achat (prestation / matériel).</p>
+                  )}
                   {packageInfo.type.includes('Abonnement') && (
                     <p className="text-sm text-green-600 mt-2">
                       ✓ Votre abonnement est actif. Les tokens seront renouvelés automatiquement.

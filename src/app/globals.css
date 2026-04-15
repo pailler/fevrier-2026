@@ -347,3 +347,76 @@ header nav#main-nav a[data-nav-path] {
 }
 
 /* Les styles inline appliqués par JavaScript avec setProperty('important') auront la priorité */
+
+/* --- Page /pricing2 : décor héros (global, sans styled-jsx → hydratation stable) --- */
+@keyframes pricing2-float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+@keyframes pricing2-float-medium {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(-3deg); }
+}
+@keyframes pricing2-float-fast {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+}
+@keyframes pricing2-rotate-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes pricing2-rotate-medium {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(180deg); }
+}
+@keyframes pricing2-rotate-fast {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(90deg); }
+}
+@keyframes pricing2-pulse-slow {
+  0%, 100% { opacity: 0.1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.05); }
+}
+@keyframes pricing2-fade-in-up {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes pricing2-fade-in-up-delayed {
+  0%, 50% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes pricing2-text-glow {
+  0%, 100% { text-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
+  50% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 30px rgba(34, 197, 94, 0.4); }
+}
+
+.pricing2-animate-float-slow {
+  animation: pricing2-float-slow 6s ease-in-out infinite;
+}
+.pricing2-animate-float-medium {
+  animation: pricing2-float-medium 4s ease-in-out infinite;
+}
+.pricing2-animate-float-fast {
+  animation: pricing2-float-fast 3s ease-in-out infinite;
+}
+.pricing2-animate-rotate-slow {
+  animation: pricing2-rotate-slow 20s linear infinite;
+}
+.pricing2-animate-rotate-medium {
+  animation: pricing2-rotate-medium 15s linear infinite;
+}
+.pricing2-animate-rotate-fast {
+  animation: pricing2-rotate-fast 10s linear infinite;
+}
+.pricing2-animate-pulse-slow {
+  animation: pricing2-pulse-slow 4s ease-in-out infinite;
+}
+.pricing2-animate-fade-in-up {
+  animation: pricing2-fade-in-up 1s ease-out;
+}
+.pricing2-animate-fade-in-up-delayed {
+  animation: pricing2-fade-in-up-delayed 1.5s ease-out;
+}
+.pricing2-animate-text-glow {
+  animation: pricing2-text-glow 2s ease-in-out infinite;
+}

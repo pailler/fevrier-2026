@@ -27,6 +27,15 @@ function formatMessage(template: string, childName: string): string {
   return template.replace(/\$\{childName\}/g, childName);
 }
 
+/** Retire emojis / pictos : la synthèse vocale échoue souvent dessus (Chrome, Safari, certains mobiles). */
+function sanitizeSpeechText(text: string): string {
+  const cleaned = text
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return cleaned;
+}
+
 export function getEncouragementMessages(childName: string): Record<EncouragementType, string[]> {
   const name = childName && childName.trim() ? childName.trim() : '';
   const nameWithComma = name ? `${name}, ` : '';
@@ -212,8 +221,16 @@ class VoiceEncouragementManager {
       this.speechSynthesis.cancel();
     }
 
-    const utterance = new SpeechSynthesisUtterance(message);
-    utterance.voice = this.voice;
+    const safeText = sanitizeSpeechText(message);
+    if (!safeText) {
+      this.currentUtterance = null;
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(safeText);
+    if (this.voice) {
+      utterance.voice = this.voice;
+    }
     utterance.volume = this.volume;
     utterance.rate = this.rate;
     utterance.pitch = this.pitch;
@@ -225,12 +242,27 @@ class VoiceEncouragementManager {
       this.currentUtterance = null;
     };
 
-    utterance.onerror = (error) => {
-      console.error('Erreur de synthèse vocale:', error);
+    utterance.onerror = (ev: SpeechSynthesisErrorEvent) => {
+      const code = ev.error;
+      // Annulation ou nouvelle phrase : comportement normal, pas une erreur utilisateur
+      if (code === 'interrupted' || code === 'canceled') {
+        this.currentUtterance = null;
+        return;
+      }
+      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+        console.warn('[synthèse vocale]', code, (ev as SpeechSynthesisErrorEvent & { message?: string }).message ?? '');
+      }
       this.currentUtterance = null;
     };
 
-    this.speechSynthesis.speak(utterance);
+    try {
+      this.speechSynthesis.speak(utterance);
+    } catch (e) {
+      this.currentUtterance = null;
+      if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+        console.warn('[synthèse vocale] speak()', e);
+      }
+    }
   }
 
   encourage(type: EncouragementType, options?: {

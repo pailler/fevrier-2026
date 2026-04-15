@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { loginUrlWithReturn } from '../utils/loginRedirect';
 import { supabase } from '../utils/supabaseClient';
 
 interface AuthGuardProps {
@@ -17,6 +18,18 @@ export default function AuthGuard({ children, moduleName, requireSubscription = 
   const [hasSubscription, setHasSubscription] = useState(false);
   const [checkingSubscription, setCheckingSubscription] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+
+  const goToLogin = () => {
+    if (typeof window !== 'undefined') {
+      const q = window.location.search.replace(/^\?/, '');
+      router.push(
+        loginUrlWithReturn(pathname || window.location.pathname, { toString: () => q })
+      );
+    } else {
+      router.push('/login');
+    }
+  };
 
   useEffect(() => {
     const getSession = async () => {
@@ -99,7 +112,7 @@ export default function AuthGuard({ children, moduleName, requireSubscription = 
           
           <div className="space-y-4">
             <button
-              onClick={() => router.push('/login')}
+              onClick={goToLogin}
               className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
             >
               Se connecter

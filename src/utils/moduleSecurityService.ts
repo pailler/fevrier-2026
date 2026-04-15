@@ -100,25 +100,6 @@ export class ModuleSecurityService {
 
       // Si pas d'accès via user_applications mais qu'il y a un token valide
       if (!userAccess && tokenAccess && tokenAccess.length > 0) {
-        const token = tokenAccess[0];
-        
-        // Vérifier l'expiration du token
-        if (token.expires_at) {
-          const tokenExpirationDate = new Date(token.expires_at);
-          const now = new Date();
-          
-          if (tokenExpirationDate <= now) {
-            console.log(`❌ ModuleSecurityService: Token expiré pour ${moduleIdentifier}`);
-            return {
-              isVisible: true,
-              hasAccess: false,
-              moduleId: moduleData.id,
-              moduleTitle: moduleData.title,
-              reason: `Token expiré pour ${moduleIdentifier}`
-            };
-          }
-        }
-
         console.log(`✅ ModuleSecurityService: Accès via token valide pour ${moduleIdentifier}`);
         return {
           isVisible: true,

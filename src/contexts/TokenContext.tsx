@@ -61,8 +61,7 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
         setTokens(data.tokensRemaining || 0);
         setError(null);
       } else if (response.status === 401) {
-        // Erreur 401 = non autorisé, probablement session expirée
-        console.warn('🪙 TokenContext: Session expirée (401), nettoyage...');
+        console.warn('🪙 TokenContext: 401 non autorisé, nettoyage stockage client...');
         // Nettoyer le localStorage pour éviter les tentatives répétées
         localStorage.removeItem('user_data');
         localStorage.removeItem('auth_token');
@@ -71,9 +70,22 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
         setError(null); // Ne pas afficher d'erreur, c'est normal après déconnexion
       } else {
         const errorText = await response.text();
-        console.error('🪙 TokenContext: Erreur API:', response.status, response.statusText, errorText);
+        const looksLikeHtml =
+          errorText.trimStart().startsWith('<!DOCTYPE') ||
+          errorText.trimStart().startsWith('<html') ||
+          errorText.includes('__NEXT_DATA__');
+        if (looksLikeHtml) {
+          console.error(
+            '🪙 TokenContext: Erreur API',
+            response.status,
+            '— le serveur a renvoyé une page HTML (souvent cache .next corrompu : arrêter le dev, supprimer le dossier .next, relancer npm run dev).'
+          );
+          setError(`Erreur serveur (${response.status}). Si vous êtes en dev local, supprimez le dossier .next puis relancez le serveur.`);
+        } else {
+          console.error('🪙 TokenContext: Erreur API:', response.status, response.statusText, errorText);
+          setError(`Erreur API: ${response.status} ${response.statusText}`);
+        }
         setTokens(0);
-        setError(`Erreur API: ${response.status} ${response.statusText}`);
       }
     } catch (error) {
       console.error('🪙 TokenContext: Erreur lors du rafraîchissement des tokens:', error);

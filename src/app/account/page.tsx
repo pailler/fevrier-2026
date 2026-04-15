@@ -7,6 +7,7 @@ import { supabase } from '../../utils/supabaseClient';
 import { useCustomAuth } from '../../hooks/useCustomAuth';
 import Breadcrumb from '../../components/Breadcrumb';
 import { useTokenContext } from '../../contexts/TokenContext';
+import { getHunyuan3dAppUrl } from '../../utils/hunyuan3dAppUrl';
 
 interface UserProfile {
   id: string;
@@ -34,6 +35,7 @@ const MODULE_DESCRIPTIONS: Record<string, string> = {
   'birefnet': 'Suppression de fond et detourage rapide.',
   'animagine-xl': 'Generation d\'images style anime.',
   'florence-2': 'Analyse visuelle et description intelligente d\'images.',
+  'musetalk': 'Lip-sync video : synchroniser les levres sur une piste audio.',
   'home-assistant': 'Ressources et manuels pour votre domotique HA.',
   'hunyuan3d': 'Generation et exploration d\'objets 3D.',
   'stablediffusion': 'Creation d\'images IA depuis vos prompts.',
@@ -56,7 +58,7 @@ const MODULE_DESCRIPTIONS: Record<string, string> = {
 
 export default function AccountPage() {
   const router = useRouter();
-  const { user, isAuthenticated, loading: authLoading, signOut } = useCustomAuth();
+  const { user, isAuthenticated, loading: authLoading, signOut, token } = useCustomAuth();
   const { tokens, isLoading: tokensLoading } = useTokenContext();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [applications, setApplications] = useState<UserApplication[]>([]);
@@ -99,7 +101,7 @@ export default function AccountPage() {
 
       setProfile(profileData);
 
-      // Récupérer les applications actives
+      // Récupérer les applis visitées (user_applications actives)
       const { data: appsData, error: appsError } = await supabase
         .from('user_applications')
         .select('*')
@@ -144,8 +146,9 @@ export default function AccountPage() {
           'birefnet': 'http://localhost:7882',
           'animagine-xl': 'http://localhost:7883',
           'florence-2': 'http://localhost:7884',
+          'musetalk': 'http://localhost:7886',
           'home-assistant': 'http://localhost:8123/',
-          'hunyuan3d': 'http://localhost:8888',
+          'hunyuan3d': getHunyuan3dAppUrl(),
           'stablediffusion': 'http://localhost:7880',
           'meeting-reports': 'http://localhost:3050',
           'whisper': 'http://localhost:8093',
@@ -166,8 +169,9 @@ export default function AccountPage() {
           'birefnet': 'https://birefnet.iahome.fr',
           'animagine-xl': 'https://animaginexl.iahome.fr',
           'florence-2': 'https://florence2.iahome.fr',
+          'musetalk': 'https://musetalk.iahome.fr',
           'home-assistant': 'https://homeassistant.iahome.fr',
-          'hunyuan3d': 'https://hunyuan3d.iahome.fr',
+          'hunyuan3d': getHunyuan3dAppUrl(),
           'stablediffusion': 'https://stablediffusion.iahome.fr',
           'meeting-reports': 'https://meeting-reports.iahome.fr',
           'whisper': 'https://whisper.iahome.fr',
@@ -249,7 +253,14 @@ export default function AccountPage() {
     setDeleteError(null);
     setDeleteLoading(true);
     try {
-      const res = await fetch('/api/account/delete', { method: 'POST', credentials: 'include' });
+      const headers: HeadersInit = {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      };
+      const res = await fetch('/api/account/delete', {
+        method: 'POST',
+        credentials: 'include',
+        headers,
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         throw new Error(data.error || 'Erreur lors de la suppression du compte');
@@ -391,16 +402,16 @@ export default function AccountPage() {
               </div>
             </div>
 
-            {/* Carte Applications actives */}
+            {/* Applis visitées (consommation de crédits) */}
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
                 <span className="mr-3">📱</span>
-                Applis les plus visites ({applications.length})
+                Applis les plus visitées ({applications.length})
               </h2>
               
               {applications.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
-                  <p>Aucune application active</p>
+                  <p>Aucune appli visitée pour l&apos;instant</p>
                   <Link href="/applications" className="text-blue-600 hover:text-blue-800 mt-2 inline-block">
                     Découvrir les applications →
                   </Link>
@@ -470,7 +481,7 @@ export default function AccountPage() {
               <h2 className="text-xl font-bold text-gray-900 mb-4">📊 Statistiques</h2>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Applications actives</span>
+                  <span className="text-gray-600">Applis visitées</span>
                   <span className="text-2xl font-bold text-blue-600">{applications.length}</span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -498,7 +509,7 @@ export default function AccountPage() {
                   href="/account"
                   className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center font-medium transition-colors"
                 >
-                  Mes applications
+                  Mon compte — applis
                 </Link>
                 <Link
                   href="/applications"
@@ -522,7 +533,7 @@ export default function AccountPage() {
                 Zone dangereuse
               </h2>
               <p className="text-gray-600 text-sm mb-4">
-                La suppression de votre compte est définitive. Toutes vos données (profil, applications, crédits) seront supprimées.
+                La suppression de votre compte est définitive. Toutes vos données (profil, historique d&apos;applis, crédits) seront supprimées.
               </p>
               <button
                 type="button"

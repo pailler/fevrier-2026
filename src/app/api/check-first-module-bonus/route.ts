@@ -11,7 +11,7 @@ const supabase = createClient(
  * Vérifie si un utilisateur est éligible aux 200 tokens bonus
  * et les ajoute si c'est le cas
  * Conditions :
- * - C'est la première activation de module pour cet utilisateur
+ * - C'est la première appli enregistrée pour cet utilisateur
  * - L'utilisateur s'est inscrit dans les 3 derniers jours
  */
 export async function POST(request: NextRequest) {
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`🎁 Vérification bonus premier module pour ${userEmail || userId}`);
 
-    // 1. Vérifier si c'est la première activation de module
+    // 1. Vérifier si c'est la première appli enregistrée
     const { data: existingModules, error: modulesError } = await supabase
       .from('user_applications')
       .select('id, created_at')
@@ -43,21 +43,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Si l'utilisateur a déjà activé un module avant, pas de bonus
+    // Si l'utilisateur a déjà une appli enregistrée, pas de bonus
     if (existingModules && existingModules.length > 0) {
       const firstActivation = new Date(existingModules[0].created_at);
       const now = new Date();
       const timeDiff = now.getTime() - firstActivation.getTime();
       const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
 
-      // Si le premier module a été activé il y a plus de quelques secondes (c'est-à-dire pas maintenant)
-      // et que ce n'est pas la première activation, pas de bonus
+      // Si la première appli a été enregistrée il y a plus de quelques secondes (pas maintenant), pas de bonus
       if (timeDiff > 5000) { // Plus de 5 secondes = ce n'est pas la première activation maintenant
-        console.log(`⚠️ L'utilisateur a déjà activé un module auparavant, pas de bonus`);
+        console.log(`⚠️ L'utilisateur a déjà une appli enregistrée, pas de bonus`);
         return NextResponse.json({
           success: false,
           eligible: false,
-          reason: 'Module déjà activé auparavant'
+          reason: 'Une appli était déjà associée au compte'
         });
       }
     }

@@ -130,12 +130,12 @@ export default function UserPermissionsManager({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-900">Mes Permissions</h3>
+      <h3 className="text-lg font-semibold text-gray-900">Applis sur mon compte</h3>
       
       {permissions.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
           <span className="text-4xl mb-2 block">🔒</span>
-          <p>Aucune permission trouvée</p>
+          <p>Aucune appli enregistrée</p>
         </div>
       ) : (
         <div className="grid gap-4">
@@ -171,10 +171,10 @@ export default function UserPermissionsManager({
                       status === 'quota_exceeded' ? 'bg-yellow-100 text-yellow-800' :
                       'bg-gray-100 text-gray-800'
                     }`}>
-                      {status === 'active' ? 'Actif' :
-                       status === 'expired' ? 'Expiré' :
+                      {status === 'active' ? 'Accès ouvert' :
+                       status === 'expired' ? '—' :
                        status === 'quota_exceeded' ? 'Quota épuisé' :
-                       'Inactif'}
+                       'Sans accès'}
                     </span>
                   </div>
                 </div>

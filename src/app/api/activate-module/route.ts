@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     if (!accessError && existingAccess) {
       return NextResponse.json(
         { 
-          error: 'Application déjà activée',
+          error: 'Cette appli est déjà enregistrée sur votre compte',
           alreadyActivated: true
         },
         { status: 400 }
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
         .eq('user_id', userId);
       
       return NextResponse.json(
-        { error: 'Erreur lors de l\'activation du module' },
+        { error: 'Erreur lors de l\'enregistrement de l\'accès' },
         { status: 500 }
       );
     }
@@ -200,7 +200,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `Application ${moduleName} activée avec succès`,
+      message: `Accès à ${moduleName} ouvert sur votre compte`,
       tokensConsumed: moduleCost,
       tokensRemaining: finalTokenCount,
       bonusApplied,
@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur activation module:', error);
+    console.error('❌ Erreur ouverture d\'accès module:', error);
     const errorMessage = error instanceof Error ? error.message : 'Erreur interne du serveur';
     return NextResponse.json(
       { 

@@ -22,6 +22,7 @@ const APPLICATION_PORTS: { [key: string]: number } = {
   'animagine-xl': 7881,
   'florence-2': 7884,
   'birefnet': 7882,
+  'musetalk': 7886,
 };
 
 // Mapping des modules vers leurs hôtes locaux (si différent de localhost)
@@ -49,7 +50,7 @@ export async function GET(request: Request) {
     
     // Essayer d'abord JWT, puis base64 simple
     try {
-      decoded = jwt.verify(token, JWT_SECRET);
+      decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true });
     } catch (jwtError) {
       // Si JWT échoue, essayer base64 simple
       try {
@@ -62,12 +63,7 @@ export async function GET(request: Request) {
       }
     }
 
-    if (decoded.exp * 1000 < Date.now()) {
-      return NextResponse.json(
-        { error: 'Token expiré' },
-        { status: 401 }
-      );
-    }
+    // Pas de contrôle temporel sur le jeton d’accès module.
 
     // Vérifier que le module correspond
     if (decoded.moduleId === moduleId) {

@@ -96,7 +96,8 @@ body {
 .container--full-bleed .info-section,
 .container--full-bleed .section-automatisations-wrapper,
 .container--full-bleed .section-tableaux-wrapper,
-.container--full-bleed .section-configs-wrapper {
+.container--full-bleed .section-configs-wrapper,
+.container--full-bleed .section-ressources-wrapper {
     padding-left: 24px;
     padding-right: 24px;
     max-width: 1400px;
@@ -412,6 +413,9 @@ body {
 
 .accueil-card-configs { border-color: rgba(52, 152, 219, 0.35); }
 .accueil-card-configs:hover { border-color: var(--primary-color); }
+
+.accueil-card-ressources { border-color: rgba(14, 165, 233, 0.35); }
+.accueil-card-ressources:hover { border-color: #0ea5e9; }
 
 .accueil-card-icon {
     font-size: 3rem;
@@ -763,6 +767,128 @@ body {
 
 .section-configs-note a:hover {
     text-decoration: underline;
+}
+
+/* Section Ressources utiles */
+.section-ressources-wrapper {
+    margin-top: 48px;
+    margin-bottom: 24px;
+}
+
+.section-ressources-intro {
+    color: var(--text-color);
+    font-size: 1.05rem;
+    margin-bottom: 1.75rem;
+    max-width: 800px;
+    line-height: 1.55;
+}
+
+.ressources-columns {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+@media (min-width: 900px) {
+    .ressources-columns {
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+    }
+}
+
+.ressources-panel {
+    border-radius: 16px;
+    padding: 1.5rem 1.25rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+
+.ressources-panel--users {
+    background: linear-gradient(145deg, #fff7ed 0%, #ffedd5 100%);
+    border-color: #fdba74;
+}
+
+.ressources-panel--devs {
+    background: linear-gradient(145deg, #eff6ff 0%, #e0e7ff 100%);
+    border-color: #93c5fd;
+}
+
+.ressources-panel__title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin: 0 0 1.25rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ressources-panel--users .ressources-panel__title {
+    color: #9a3412;
+}
+
+.ressources-panel--devs .ressources-panel__title {
+    color: #1e3a8a;
+}
+
+.ressources-panel__emoji {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.ressources-link-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ressources-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #fff;
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--text-color);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.ressources-panel--users .ressources-link:hover {
+    background: #ffedd5;
+    box-shadow: 0 2px 8px rgba(234, 88, 12, 0.12);
+}
+
+.ressources-panel--devs .ressources-link:hover {
+    background: #dbeafe;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+}
+
+.ressources-link__icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    line-height: 1.2;
+}
+
+.ressources-link__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: left;
+}
+
+.ressources-link__text strong {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.ressources-link__sub {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    font-weight: 400;
 }
 
 /* Bannière fusionnée IAHome + Adamhome */

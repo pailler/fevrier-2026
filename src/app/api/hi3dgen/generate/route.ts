@@ -1,6 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const COMFYUI_URL = process.env.COMFYUI_URL || process.env.COMFYUI_INTERNAL_URL || 'http://localhost:8188';
+/**
+ * ComfyUI pour Hi3DGen uniquement (ne pas confondre avec COMFYUI_INTERNAL_URL souvent = tunnel prod).
+ * Ordre : HI3DGEN_COMFYUI_URL → COMFYUI_URL → en dev, machine locale → sinon COMFYUI_INTERNAL_URL → 127.0.0.1
+ * (127.0.0.1 évite souvent ::1 / localhost sur Windows.)
+ */
+function resolveComfyUiBaseUrl(): string {
+  const hi = process.env.HI3DGEN_COMFYUI_URL?.trim();
+  if (hi) return hi.replace(/\/$/, '');
+  const direct = process.env.COMFYUI_URL?.trim();
+  if (direct) return direct.replace(/\/$/, '');
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://127.0.0.1:8188';
+  }
+  const internal = process.env.COMFYUI_INTERNAL_URL?.trim();
+  if (internal) return internal.replace(/\/$/, '');
+  return 'http://127.0.0.1:8188';
+}
+
+const COMFYUI_URL = resolveComfyUiBaseUrl();
 
 function toErrorString(e: unknown): string {
   if (typeof e === 'string') return e;
@@ -8,6 +26,63 @@ function toErrorString(e: unknown): string {
   if (e && typeof e === 'object' && 'message' in e && typeof (e as { message: unknown }).message === 'string')
     return (e as { message: string }).message;
   return e != null ? JSON.stringify(e) : 'Erreur inconnue';
+}
+
+/** Parcourt la sortie ComfyUI (history.outputs) pour trouver un chemin .glb (STRING / text / etc.). */
+function extractGlbPathFromOutputs(
+  outputs: Record<string, unknown> | undefined,
+  preferredNodeId: string
+): string | null {
+  if (!outputs || typeof outputs !== 'object') return null;
+
+  const tryNode = (nodeId: string): string | null => {
+    const raw = outputs[nodeId];
+    if (!raw || typeof raw !== 'object') return null;
+    const o = raw as Record<string, unknown>;
+    // ComfyUI : STRING → souvent `text`, parfois `string` / anciennes builds `strings`
+    const arrays = [o.text, o.strings, o.string].filter(Boolean) as unknown[];
+    for (const arr of arrays) {
+      if (Array.isArray(arr)) {
+        for (const item of arr) {
+          if (typeof item === 'string' && item.trim()) return item.trim();
+        }
+      }
+      if (typeof arr === 'string' && arr.trim()) return arr.trim();
+    }
+    return null;
+  };
+
+  const fromPreferred = tryNode(preferredNodeId);
+  if (fromPreferred) return fromPreferred;
+
+  const walk = (val: unknown, depth: number): string | null => {
+    if (depth > 10) return null;
+    if (typeof val === 'string') {
+      const t = val.trim();
+      if (t.toLowerCase().includes('.glb')) return t;
+      return null;
+    }
+    if (Array.isArray(val)) {
+      for (const x of val) {
+        const r = walk(x, depth + 1);
+        if (r) return r;
+      }
+      return null;
+    }
+    if (val && typeof val === 'object') {
+      for (const v of Object.values(val as Record<string, unknown>)) {
+        const r = walk(v, depth + 1);
+        if (r) return r;
+      }
+    }
+    return null;
+  };
+
+  for (const nodeOut of Object.values(outputs)) {
+    const r = walk(nodeOut, 0);
+    if (r) return r;
+  }
+  return null;
 }
 
 function buildHi3DGenWorkflow(imageFilename: string, projectName: string) {
@@ -104,7 +179,8 @@ export async function POST(request: NextRequest) {
     }
 
     let history: Record<string, unknown> | null = null;
-    for (let i = 0; i < 120; i++) {
+    // Génération GPU souvent 3–8+ min ; 180 × 2 s ≈ 6 min
+    for (let i = 0; i < 180; i++) {
       await new Promise((r) => setTimeout(r, 2000));
       const historyRes = await fetch(`${COMFYUI_URL}/history/${prompt_id}`);
       if (!historyRes.ok) continue;
@@ -117,18 +193,33 @@ export async function POST(request: NextRequest) {
 
     if (!history) {
       return NextResponse.json(
-        { error: 'Time-out: la génération a pris trop de temps' },
+        { error: 'Time-out: la génération a pris trop de temps (au-delà de ~6 min).' },
         { status: 504 }
       );
     }
 
-    const outputs = (history as { outputs?: Record<string, { strings?: string[]; text?: string[] }> }).outputs;
-    const node3 = outputs?.['3'];
-    const modelPathRaw = node3?.strings?.[0] ?? node3?.text?.[0];
+    const status = (history as { status?: { status_str?: string; messages?: string[] } }).status;
+    const st = status?.status_str;
+    const statusOk = !st || st === 'success' || st === 'completed';
+    if (!statusOk) {
+      const msg = [st, ...(status?.messages || [])].filter(Boolean).join(' — ');
+      return NextResponse.json(
+        { error: `ComfyUI : ${msg || 'exécution non réussie'}`, hint: 'Voir la console du terminal ComfyUI pour la trace complète.' },
+        { status: 502 }
+      );
+    }
+
+    const outputs = (history as { outputs?: Record<string, unknown> }).outputs;
+    const modelPathRaw = extractGlbPathFromOutputs(outputs, '3');
 
     if (!modelPathRaw) {
+      console.error('Hi3DGen: pas de chemin .glb dans history.outputs', JSON.stringify(outputs).slice(0, 4000));
       return NextResponse.json(
-        { error: 'Pas de sortie 3D trouvée', history: outputs },
+        {
+          error:
+            'Pas de sortie 3D trouvée (aucun chemin .glb dans la réponse ComfyUI). Vérifiez la console ComfyUI : la génération a peut-être échoué (GPU, modèles HF, mémoire).',
+          hint: 'Ouvrez le workflow officiel workflow/Hi3DGen_WF_single.json dans ComfyUI et lancez-le une fois pour valider l’installation.',
+        },
         { status: 502 }
       );
     }

@@ -110,15 +110,15 @@ export async function POST(request: NextRequest) {
       console.error('❌ Erreur lors de la désactivation:', updateError);
       return NextResponse.json({
         success: false,
-        error: 'Erreur lors de la désactivation des activations'
+        error: 'Erreur lors de la fermeture des accès'
       }, { status: 500 });
     }
 
-    console.log(`✅ ${updatedActivations?.length || 0} activation(s) désactivée(s) avec succès`);
+    console.log(`✅ ${updatedActivations?.length || 0} accès home-assistant fermé(s) avec succès`);
 
     return NextResponse.json({
       success: true,
-      message: `Activation(s) de home-assistant désactivée(s) pour ${user.email}`,
+      message: `Accès à home-assistant fermé pour ${user.email}`,
       user: {
         id: user.id,
         email: user.email,

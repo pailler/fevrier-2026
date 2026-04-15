@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { sanitizeReturnPath } from '@/utils/loginRedirect';
 
 // Chargement côté client uniquement pour éviter toute erreur SSR (Supabase, etc.)
 const GoogleSignInButton = dynamic(
@@ -75,10 +76,7 @@ function LoginContent() {
 
   const handleAuthSuccess = (user: any) => {
     if (user) {
-      // Récupérer le paramètre redirect de l'URL
-      const redirectParam = searchParams.get('redirect');
-      // Rediriger vers la page d'origine ou la page d'accueil par défaut
-      const redirectUrl = redirectParam ? decodeURIComponent(redirectParam) : '/';
+      const redirectUrl = sanitizeReturnPath(searchParams.get('redirect'));
       router.push(redirectUrl);
     }
   };
@@ -100,6 +98,9 @@ function LoginContent() {
       </div>
     );
   }
+
+  const postLoginTarget = sanitizeReturnPath(searchParams.get('redirect'));
+  const oauthReturnPath = postLoginTarget !== '/' ? postLoginTarget : undefined;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -134,7 +135,7 @@ function LoginContent() {
               onSuccess={handleAuthSuccess}
               onError={handleAuthError}
               className="mb-6"
-              redirectUrl={searchParams.get('redirect') || undefined}
+              redirectUrl={oauthReturnPath}
             />
             
             <div className="relative my-6">
@@ -149,7 +150,6 @@ function LoginContent() {
             <WorkingSignInForm
               onSuccess={handleAuthSuccess}
               onError={handleAuthError}
-              redirectUrl={searchParams.get('redirect') || undefined}
             />
 
             <div className="mt-6 text-center">
