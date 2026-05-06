@@ -4,6 +4,23 @@ function $(id) {
   return document.getElementById(id);
 }
 
+function getSessionIdFromUrl() {
+  const p = new URLSearchParams(window.location.search);
+  const s = p.get("s") || p.get("session");
+  return s && s.trim().length >= 8 ? s.trim() : null;
+}
+
+function getActiveSessionId() {
+  return getSessionIdFromUrl() || sessionStorage.getItem(STORAGE_KEY);
+}
+
+function rememberSession(id) {
+  sessionStorage.setItem(STORAGE_KEY, id);
+  const url = new URL(window.location.href);
+  url.searchParams.set("s", id);
+  history.replaceState({}, "", `${url.pathname}${url.search}`);
+}
+
 function getSelectedBase() {
   const custom = $("baseCustom").value.trim();
   if (custom.startsWith("http")) return custom.replace(/\/+$/, "");
@@ -36,6 +53,7 @@ function updateQr(sessionId) {
   const base = getSelectedBase();
   const voteUrl = `${base}/vote.html?s=${encodeURIComponent(sessionId)}`;
   $("voteUrl").textContent = voteUrl;
+  $("resultsUrl").textContent = `${base}/results.html?s=${encodeURIComponent(sessionId)}`;
   const encBase = encodeURIComponent(base);
   $("qr").src = `/api/qrcode.png?session=${encodeURIComponent(sessionId)}&base=${encBase}&t=${Date.now()}`;
 }
@@ -43,7 +61,10 @@ function updateQr(sessionId) {
 async function createSession() {
   $("createErr").hidden = true;
   const question = $("question").value.trim();
-  const raw = $("options").value.split("\n").map((s) => s.trim()).filter(Boolean);
+  const raw = $("options").value
+    .split("\n")
+    .map((s) => s.trim())
+    .filter(Boolean);
   const res = await fetch("/api/sessions", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -55,7 +76,7 @@ async function createSession() {
     $("createErr").hidden = false;
     return;
   }
-  sessionStorage.setItem(STORAGE_KEY, data.id);
+  rememberSession(data.id);
   showSession(data);
 }
 
@@ -75,11 +96,17 @@ function showSession(s) {
 }
 
 async function loadStoredSession() {
-  const id = sessionStorage.getItem(STORAGE_KEY);
+  const fromUrl = getSessionIdFromUrl();
+  const id = fromUrl || sessionStorage.getItem(STORAGE_KEY);
   if (!id) return;
+  sessionStorage.setItem(STORAGE_KEY, id);
   const res = await fetch(`/api/sessions/${encodeURIComponent(id)}`);
   if (!res.ok) {
     sessionStorage.removeItem(STORAGE_KEY);
+    const url = new URL(window.location.href);
+    url.searchParams.delete("s");
+    url.searchParams.delete("session");
+    history.replaceState({}, "", `${url.pathname}${url.search}`);
     return;
   }
   const s = await res.json();
@@ -87,7 +114,7 @@ async function loadStoredSession() {
 }
 
 async function toggleClose() {
-  const id = sessionStorage.getItem(STORAGE_KEY);
+  const id = getActiveSessionId();
   if (!id) return;
   const s = await (await fetch(`/api/sessions/${encodeURIComponent(id)}`)).json();
   const path = s.closed ? "open" : "close";
@@ -100,7 +127,7 @@ async function toggleClose() {
 }
 
 async function refreshResults() {
-  const id = sessionStorage.getItem(STORAGE_KEY);
+  const id = getActiveSessionId();
   if (!id) return;
   const res = await fetch(`/api/results/${encodeURIComponent(id)}`);
   if (!res.ok) return;
@@ -134,16 +161,23 @@ function escapeHtml(s) {
 
 $("create").addEventListener("click", createSession);
 $("basePick").addEventListener("change", () => {
-  const id = sessionStorage.getItem(STORAGE_KEY);
+  const id = getActiveSessionId();
   if (id) updateQr(id);
 });
 $("baseCustom").addEventListener("input", () => {
-  const id = sessionStorage.getItem(STORAGE_KEY);
+  const id = getActiveSessionId();
   if (id) updateQr(id);
 });
 $("copyUrl").addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText($("voteUrl").textContent);
+  } catch {
+    /* ignore */
+  }
+});
+$("copyResultsUrl").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText($("resultsUrl").textContent);
   } catch {
     /* ignore */
   }

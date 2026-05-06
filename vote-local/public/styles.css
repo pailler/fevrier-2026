@@ -48,6 +48,11 @@ body {
   line-height: 1.45;
 }
 
+.sub.tight {
+  margin-top: 0.35rem;
+  margin-bottom: 0.6rem;
+}
+
 .card {
   background: var(--card);
   border: 1px solid var(--border);
