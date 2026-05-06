@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Organisateur — vote local</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <h1>Vote jeu (local)</h1>
+      <p class="sub">Sans Internet — les téléphones sur le même Wi‑Fi ouvrent le lien du QR.</p>
+    </header>
+
+    <section class="card">
+      <h2>Nouvelle manche</h2>
+      <label class="lbl">Question</label>
+      <input id="question" type="text" placeholder="Ex. Quelle équipe gagne ce tour ?" />
+
+      <label class="lbl">Options (une par ligne, min. 2)</label>
+      <textarea id="options" rows="5" placeholder="Équipe A&#10;Équipe B&#10;Égalité"></textarea>
+
+      <button id="create" type="button" class="btn primary">Créer et afficher le QR</button>
+      <p id="createErr" class="err" hidden></p>
+    </section>
+
+    <section id="sessionPanel" class="card hidden">
+      <h2>Session active</h2>
+      <p class="q" id="sessQuestion"></p>
+      <ul id="sessOptions" class="optlist"></ul>
+
+      <div class="row">
+        <label class="lbl">Adresse pour le QR (choisir l’IP du PC serveur)</label>
+        <select id="basePick"></select>
+        <input id="baseCustom" type="text" placeholder="http://192.168.x.x:8765" />
+      </div>
+
+      <div class="qrbox">
+        <img id="qr" alt="QR code vote" />
+        <div class="qrmeta">
+          <p class="mono" id="voteUrl"></p>
+          <button type="button" class="btn ghost" id="copyUrl">Copier le lien</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn" id="toggleClose">Fermer les votes</button>
+        <button type="button" class="btn ghost" id="refreshResults">Actualiser résultats</button>
+      </div>
+
+      <div id="results" class="results"></div>
+    </section>
+  </div>
+  <script src="/admin.js"></script>
+</body>
+</html>
