@@ -133,16 +133,39 @@ export default function Essentiels() {
         }
 
         // Filtrer pour ne garder que les modules essentiels (exclure whisper)
-        let essentialModulesData = data?.filter(module => 
-          (essentialModules.includes(module.id) ||
-          essentialModules.some(essentialId => 
-            module.title.toLowerCase().includes(essentialId.toLowerCase()) ||
-            module.title.toLowerCase().includes(essentialId.replace('-', ' '))
-          )) && module.id !== 'whisper'
-        ) || [];
+        const idMatchesEssential = (rawId: unknown) => {
+          const idNorm = String(rawId ?? '')
+            .trim()
+            .toLowerCase();
+          return essentialModules.some(
+            (eid) => idNorm === eid.toLowerCase()
+          );
+        };
+
+        let essentialModulesData =
+          data?.filter((module: { id?: unknown; title?: string }) => {
+            const title = (module.title || '').toLowerCase();
+            const includedByTitle = essentialModules.some(
+              (essentialId) =>
+                title.includes(essentialId.toLowerCase()) ||
+                title.includes(essentialId.replace('-', ' ').toLowerCase())
+            );
+            return (
+              (idMatchesEssential(module.id) || includedByTitle) &&
+              String(module.id || '').toLowerCase() !== 'whisper'
+            );
+          }) || [];
+
+        const listHasId = (needle: string) =>
+          essentialModulesData.some(
+            (m: { id?: unknown }) =>
+              String(m.id ?? '')
+                .trim()
+                .toLowerCase() === needle.toLowerCase()
+          );
 
         // Sentinelle Numérique : ajouter si absent de la DB
-        const hasSentinelle = essentialModulesData.some((m: any) => (m.id || '').toString().toLowerCase().includes('sentinelle'));
+        const hasSentinelle = listHasId('sentinelle-numerique');
         if (!hasSentinelle) {
           const sentinelleModule = {
             id: 'sentinelle-numerique',
@@ -156,7 +179,7 @@ export default function Essentiels() {
           essentialModulesData = [sentinelleModule, ...essentialModulesData];
         }
 
-        const hasVote = essentialModulesData.some((m: any) => m.id === 'vote');
+        const hasVote = listHasId('vote');
         if (!hasVote) {
           const voteModule = {
             id: 'vote',
