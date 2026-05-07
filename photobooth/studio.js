@@ -322,32 +322,6 @@ function composeShotFullscreenFormat(snap) {
   return output;
 }
 
-function composeShotFullscreenFormat(snap) {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  const viewportRatio = vw / vh;
-  const snapRatio = snap.width / snap.height;
-  const maxEdge = 1920;
-  let outW, outH;
-  if (viewportRatio >= 1) {
-    outW = Math.min(vw, maxEdge);
-    outH = Math.round(outW / viewportRatio);
-  } else {
-    outH = Math.min(vh, maxEdge);
-    outW = Math.round(outH * viewportRatio);
-  }
-  const output = document.createElement("canvas");
-  output.width = outW;
-  output.height = outH;
-  const ctx = output.getContext("2d");
-  const drawW = snapRatio >= viewportRatio ? outW : Math.round(outH * snapRatio);
-  const drawH = snapRatio >= viewportRatio ? Math.round(outW / snapRatio) : outH;
-  const sx = (snap.width - drawW) / 2;
-  const sy = (snap.height - drawH) / 2;
-  ctx.drawImage(snap, sx, sy, drawW, drawH, 0, 0, outW, outH);
-  return output;
-}
-
 function composeShots(shots, layout, eventData) {
   const output = document.createElement("canvas");
   const ctx = output.getContext("2d");
