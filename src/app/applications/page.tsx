@@ -237,7 +237,7 @@ export default function Home() {
 
 
   // Modules essentiels à exclure de la page applications (affichés dans la page essentiels)
-  const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'code-learning', 'apprendre-autrement', 'home-assistant', 'administration', 'photobooth', 'sentinelle-numerique'];
+  const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'code-learning', 'apprendre-autrement', 'home-assistant', 'administration', 'photobooth', 'sentinelle-numerique', 'vote'];
   // Modules masqués de la liste (vide : Hunyuan 3D / image→3D réaffiché avec lien Hi3DGen)
   const hiddenFromListing: string[] = [];
   const isHiddenModule = (module: { id?: string | number; title?: string }) => {

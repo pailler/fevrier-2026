@@ -95,6 +95,7 @@ const CARD_SLUGS = [
   'sentinelle-numerique',
   'stablediffusion',
   'voice-isolation',
+  'vote',
   'whisper',
 ] as const
 

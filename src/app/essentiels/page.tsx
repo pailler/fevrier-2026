@@ -41,7 +41,8 @@ export default function Essentiels() {
     'home-assistant',
     'administration',
     'photobooth',
-    'sentinelle-numerique'
+    'sentinelle-numerique',
+    'vote',
   ];
 
   // Vérification de l'authentification (optionnelle pour cette page)
@@ -155,6 +156,21 @@ export default function Essentiels() {
           essentialModulesData = [sentinelleModule, ...essentialModulesData];
         }
 
+        const hasVote = essentialModulesData.some((m: any) => m.id === 'vote');
+        if (!hasVote) {
+          const voteModule = {
+            id: 'vote',
+            title: 'Vote en ligne',
+            subtitle: 'Votes avec code PIN organisateur et QR code',
+            description:
+              'Créez un vote simple : nom du scrutin, liste des participants. Code PIN à 4 chiffres (comme le Photobooth), lien public et QR pour voter. Stockage Supabase.',
+            category: 'OUTILS ÉVÉNEMENT',
+            price: 50,
+            image_url: '/iahome-logo.svg',
+          };
+          essentialModulesData = [...essentialModulesData, voteModule];
+        }
+
         // Debug: vérifier si Home Assistant est dans les modules
         const homeAssistantModule = essentialModulesData.find(m => m.id === 'home-assistant' || m.title.toLowerCase().includes('domotisez'));
         if (homeAssistantModule) {
@@ -261,7 +277,7 @@ export default function Essentiels() {
                 Outils essentiels IAHome
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Les outils indispensables pour votre productivité : téléchargement de vidéos, transfert de fichiers, conversion PDF, test de vitesse internet, QR codes dynamiques, apprentissage du code, domotique et services administratifs. Tous accessibles directement depuis votre navigateur, sans téléchargement ni installation.
+                Les outils indispensables pour votre productivité : téléchargement de vidéos, transfert de fichiers, conversion PDF, test de vitesse internet, QR codes dynamiques, apprentissage du code, domotique, votes en ligne (PIN + QR), photobooth et services administratifs. Tous accessibles directement depuis votre navigateur, sans téléchargement ni installation.
               </p>
               
               {/* Barre de recherche et bouton Mes applis */}

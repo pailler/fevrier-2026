@@ -57,7 +57,9 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       'animagine-xl': 'animagine-xl',
       'animaginexl': 'animagine-xl',
       'sentinelle-numerique': 'sentinelle-numerique',
-      'sentinellenumerique': 'sentinelle-numerique'
+      'sentinellenumerique': 'sentinelle-numerique',
+      'photobooth': 'photobooth',
+      'vote': 'vote',
     };
 
     // Vérifier d'abord le mapping direct
@@ -120,6 +122,13 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     }
     if (titleLower.includes('sentinelle') || titleLower.includes('sentinelle numérique')) {
       return 'sentinelle-numerique';
+    }
+    if (
+      titleLower.includes('vote en ligne') ||
+      (titleLower.includes('vote') && titleLower.includes('ligne')) ||
+      moduleId.toLowerCase() === 'vote'
+    ) {
+      return 'vote';
     }
     if (titleLower.includes('voice isolation') || titleLower.includes('voice-isolation') || titleLower.includes('isolation vocale')) {
       return 'voice-isolation';
@@ -198,6 +207,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     
     if (titleLower.includes('photobooth') || titleLower.includes('photo booth') || idLower === 'photobooth') {
       return '/images/photobooth.png';
+    }
+
+    if (idLower === 'vote' || (titleLower.includes('vote') && titleLower.includes('ligne'))) {
+      return '/iahome-logo.svg';
     }
     
     if (titleLower.includes('photo') || titleLower.includes('image')) {
