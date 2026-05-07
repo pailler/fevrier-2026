@@ -46,10 +46,23 @@ function getLanIPv4s() {
   const out = [];
   for (const name of Object.keys(nets)) {
     for (const net of nets[name] || []) {
-      if (net.family === "IPv4" && !net.internal) out.push(net.address);
+      const fam = net.family;
+      const v4 = fam === "IPv4" || fam === 4;
+      if (v4 && !net.internal) out.push(net.address);
     }
   }
-  return [...new Set(out)];
+  return sortLanIPv4s([...new Set(out)]);
+}
+
+/** Priorise les adresses privées utiles pour le Wi‑Fi / LAN. */
+function sortLanIPv4s(ips) {
+  const rank = (ip) => {
+    if (ip.startsWith("192.168.")) return 0;
+    if (ip.startsWith("10.")) return 1;
+    if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(ip)) return 2;
+    return 9;
+  };
+  return [...ips].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
 }
 
 function buildVoteUrl(baseUrl, sessionId) {
@@ -235,9 +248,11 @@ ensureDataDir();
 const server = http.createServer(app);
 server.listen(PORT, "0.0.0.0", () => {
   const ips = getLanIPv4s();
-  console.log(`Vote local — http://127.0.0.1:${PORT}/admin.html`);
-  if (ips.length) {
-    console.log(`Réseau local — ${ips.map((ip) => `http://${ip}:${PORT}`).join(", ")}`);
-  }
+  const lanLine =
+    ips.length > 0
+      ? ips.map((ip) => `http://${ip}:${PORT}`).join(", ")
+      : "(aucune IPv4 LAN détectée)";
+  console.log(`Réseau local — ${lanLine}`);
+  console.log(`Ce PC seulement — http://127.0.0.1:${PORT}/admin.html`);
   console.log(`Stockage: ${STORE_PATH}`);
 });

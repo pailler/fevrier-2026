@@ -34,15 +34,25 @@ async function fetchNetwork() {
   try {
     const r = await fetch("/api/network");
     const j = await r.json();
-    const bases = [j.loopback, ...(j.suggestedBases || [])];
+    const lan = j.suggestedBases || [];
+    const port = Number(j.port) || 8765;
+    const loop = j.loopback || `http://127.0.0.1:${port}`;
+    const bases = [...lan, loop];
     bases.forEach((b, i) => {
       const opt = document.createElement("option");
       opt.value = b;
-      opt.textContent = i === 0 ? `${b} (cette machine)` : b;
+      const isLoop =
+        /(^https?:\/\/)127\.0\.0\.1\b/i.test(b) || /(^https?:\/\/)localhost\b/i.test(b);
+      if (isLoop) {
+        opt.textContent = `${b} (ce PC seulement)`;
+      } else if (i === 0 && lan.length > 0) {
+        opt.textContent = `${b} (réseau local / téléphones)`;
+      } else {
+        opt.textContent = b;
+      }
       sel.appendChild(opt);
     });
-    const preferred =
-      (j.suggestedBases && j.suggestedBases[0]) || j.loopback || window.location.origin;
+    const preferred = lan[0] || loop || `${window.location.origin}`;
     sel.value = preferred;
   } catch {
     sel.innerHTML = `<option value="${window.location.origin}">${window.location.origin}</option>`;
