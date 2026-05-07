@@ -127,12 +127,22 @@ app.post("/api/sessions/:id/open", (req, res) => {
 });
 
 app.post("/api/vote", (req, res) => {
-  const { sessionId, optionIndex, deviceId } = req.body || {};
+  const body = req.body || {};
+  const sessionId = body.sessionId;
+  let optionIndex = body.optionIndex;
+  const deviceId = body.deviceId;
+
   if (typeof sessionId !== "string" || !sessionId) {
     return res.status(400).json({ error: "sessionId manquant" });
   }
   if (typeof deviceId !== "string" || deviceId.length < 8 || deviceId.length > 128) {
     return res.status(400).json({ error: "deviceId invalide" });
+  }
+
+  if (typeof optionIndex === "string") {
+    optionIndex = parseInt(optionIndex, 10);
+  } else if (typeof optionIndex === "number") {
+    optionIndex = Math.trunc(optionIndex);
   }
   if (!Number.isInteger(optionIndex) || optionIndex < 0) {
     return res.status(400).json({ error: "optionIndex invalide" });
