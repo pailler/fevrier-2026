@@ -1,0 +1,15 @@
+services:
+  vote:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iahome-vote
+    restart: unless-stopped
+    ports:
+      - "7890:7890"
+    environment:
+      - VOTE_PORT=7890
+      # URL absolue pour les QR (production : https://vote.iahome.fr)
+      - VOTE_PUBLIC_BASE_URL=${VOTE_PUBLIC_BASE_URL:-}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
