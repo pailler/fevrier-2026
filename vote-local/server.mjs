@@ -54,15 +54,42 @@ function getLanIPv4s() {
   return sortLanIPv4s([...new Set(out)]);
 }
 
-/** Priorise les adresses privées utiles pour le Wi‑Fi / LAN. */
+/** Priorise les adresses privées ; 172.16.x utile sur certains LAN / VPN. */
 function sortLanIPv4s(ips) {
   const rank = (ip) => {
     if (ip.startsWith("192.168.")) return 0;
-    if (ip.startsWith("10.")) return 1;
-    if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(ip)) return 2;
+    if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(ip)) return 1;
+    if (ip.startsWith("10.")) return 2;
     return 9;
   };
   return [...ips].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+}
+
+function normalizePublicBase() {
+  const raw = process.env.VOTE_PUBLIC_BASE?.trim();
+  if (raw && /^https?:\/\//i.test(raw)) return raw.replace(/\/+$/, "");
+  return null;
+}
+
+function normalizeLanIp() {
+  const raw = process.env.VOTE_LAN_IP?.trim();
+  if (!raw) return null;
+  return /^\d{1,3}(\.\d{1,3}){3}$/.test(raw) ? raw : null;
+}
+
+/** URLs proposées pour le QR ; peut forcer une IP type 172.16.53.144 via VOTE_LAN_IP. */
+function buildSuggestedBases(ips) {
+  const auto = ips.map((ip) => `http://${ip}:${PORT}`);
+  const pub = normalizePublicBase();
+  if (pub) {
+    return [pub, ...auto.filter((u) => u !== pub)];
+  }
+  const forced = normalizeLanIp();
+  if (forced) {
+    const primary = `http://${forced}:${PORT}`;
+    return [primary, ...auto.filter((u) => u !== primary)];
+  }
+  return auto;
 }
 
 function buildVoteUrl(baseUrl, sessionId) {
@@ -78,9 +105,10 @@ app.get("/api/health", (_req, res) => {
 
 app.get("/api/network", (_req, res) => {
   const ips = getLanIPv4s();
+  const suggestedBases = buildSuggestedBases(ips);
   res.json({
     port: PORT,
-    suggestedBases: ips.map((ip) => `http://${ip}:${PORT}`),
+    suggestedBases,
     loopback: `http://127.0.0.1:${PORT}`,
   });
 });
@@ -248,11 +276,14 @@ ensureDataDir();
 const server = http.createServer(app);
 server.listen(PORT, "0.0.0.0", () => {
   const ips = getLanIPv4s();
+  const suggested = buildSuggestedBases(ips);
+  const primary = suggested[0];
   const lanLine =
-    ips.length > 0
-      ? ips.map((ip) => `http://${ip}:${PORT}`).join(", ")
-      : "(aucune IPv4 LAN détectée)";
-  console.log(`Réseau local — ${lanLine}`);
+    suggested.length > 0
+      ? suggested.join(", ")
+      : "(aucune URL LAN configurée ou détectée)";
+  console.log(`Adresse QR / téléphones — ${primary || `http://127.0.0.1:${PORT}`}`);
+  console.log(`Toutes les URLs LAN — ${lanLine}`);
   console.log(`Ce PC seulement — http://127.0.0.1:${PORT}/admin.html`);
   console.log(`Stockage: ${STORE_PATH}`);
 });

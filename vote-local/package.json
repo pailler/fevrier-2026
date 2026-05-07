@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Vote local hors Internet pour jeu (QR code, un vote par appareil)",
+  "description": "Vote local hors Internet (QR, un vote par appareil). Optionnel: VOTE_LAN_IP=172.16.x.x ou VOTE_PUBLIC_BASE=http://172.16.x.x:8765 pour forcer l’URL du QR.",
   "scripts": {
     "start": "node server.mjs",
     "dev": "node server.mjs"
