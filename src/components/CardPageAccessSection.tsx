@@ -61,6 +61,7 @@ export default function CardPageAccessSection({
           'comfyui': 'http://localhost:8188',
           'apprendre-autrement': 'http://localhost:9001',
           'photobooth': 'http://localhost:7885',
+          'vote': 'http://localhost:7890',
           'prompt-generator': 'https://prompt-generator.iahome.fr',
         }
       : {
@@ -81,6 +82,7 @@ export default function CardPageAccessSection({
           'comfyui': 'https://comfyui.iahome.fr',
           'apprendre-autrement': 'https://apprendre-autrement.iahome.fr',
           'photobooth': 'https://photobooth.iahome.fr',
+          'vote': 'https://vote.iahome.fr',
           'prompt-generator': 'https://prompt-generator.iahome.fr',
         };
 
