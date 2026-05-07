@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+function getOpenAI(): OpenAI {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY non configurée');
+  }
+  return new OpenAI({ apiKey });
+}
 
 interface AnalysisRequest {
   text: string;
@@ -73,7 +77,7 @@ export async function POST(request: NextRequest) {
       "reasons": ["raison1", "raison2", "raison3"]
     }`;
 
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
@@ -136,7 +140,7 @@ export async function POST(request: NextRequest) {
           "scores": [score1, score2, score3, ...]
         }`;
 
-        const sentenceCompletion = await openai.chat.completions.create({
+        const sentenceCompletion = await getOpenAI().chat.completions.create({
           model: 'gpt-4o-mini',
           messages: [
             {
