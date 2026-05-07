@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Résultats du vote</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Résultats</h1>
+        <p class="sub" id="hint">Chargement…</p>
+      </header>
+
+      <section id="panel" class="card hidden">
+        <p id="title" style="font-weight: 600; margin: 0 0 1rem"></p>
+        <div id="results"></div>
+        <p class="mono" id="updated" style="margin-top: 1rem; color: var(--muted)"></p>
+      </section>
+
+      <section id="bad" class="card hidden">
+        <p class="err">Lien incomplet ou vote introuvable (<code>?slug=…</code>).</p>
+      </section>
+    </div>
+    <script src="/results.js"></script>
+  </body>
+</html>

@@ -1,0 +1,53 @@
+# Vote en ligne — vote.iahome.fr → service Docker `vote` (port 7890)
+
+http:
+  middlewares:
+    vote-headers:
+      headers:
+        customResponseHeaders:
+          Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+          X-Content-Type-Options: "nosniff"
+          X-Frame-Options: "SAMEORIGIN"
+          Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self';"
+
+  serversTransports:
+    vote-transport:
+      forwardingTimeouts:
+        dialTimeout: "30s"
+        responseHeaderTimeout: "30s"
+        idleConnTimeout: "300s"
+
+  routers:
+    vote-acme:
+      rule: "Host(`vote.iahome.fr`) && PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["web"]
+      service: vote-service
+      priority: 1000
+
+    vote-main:
+      rule: "Host(`vote.iahome.fr`)"
+      entryPoints: ["web"]
+      service: vote-service
+      middlewares: ["vote-headers"]
+      priority: 10
+
+    vote-https:
+      rule: "Host(`vote.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: vote-service
+      tls:
+        certResolver: letsencrypt
+      middlewares: ["vote-headers"]
+      priority: 10
+
+  services:
+    vote-service:
+      loadBalancer:
+        servers:
+          - url: "http://vote:7890"
+        passHostHeader: true
+        serversTransport: vote-transport
+        healthCheck:
+          path: "/health"
+          interval: "30s"
+          timeout: "5s"

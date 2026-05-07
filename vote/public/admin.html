@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vote — Administration</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Vote en ligne</h1>
+        <p class="sub">Administration protégée par code PIN (4 chiffres), comme le Photobooth.</p>
+      </header>
+
+      <section id="pinPanel" class="card">
+        <label for="pin">Code PIN</label>
+        <input id="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="one-time-code" placeholder="••••" />
+        <p id="pinErr" class="err hidden"></p>
+        <div class="row" style="margin-top: 0.75rem">
+          <button type="button" class="btn" id="btnLoad">Ouvrir le scrutin</button>
+        </div>
+      </section>
+
+      <section id="createPanel" class="card">
+        <h2 style="font-size: 1rem; margin: 0 0 0.75rem">Nouveau vote</h2>
+        <label for="title">Nom du vote</label>
+        <input id="title" type="text" maxlength="200" placeholder="Ex. Meilleure équipe" />
+        <label for="opts" style="margin-top: 0.75rem">Participants (une ligne = une option)</label>
+        <textarea id="opts" placeholder="Alice&#10;Bob&#10;Charlie"></textarea>
+        <p id="createErr" class="err hidden"></p>
+        <div class="row" style="margin-top: 0.75rem">
+          <button type="button" class="btn" id="btnCreate">Créer et obtenir un PIN</button>
+        </div>
+      </section>
+
+      <section id="dashPanel" class="card hidden">
+        <h2 style="font-size: 1rem; margin: 0 0 0.5rem" id="dashTitle"></h2>
+        <p class="mono" id="dashPin"></p>
+        <p class="sub" style="margin: 0.5rem 0">Lien public (QR pour les votants)</p>
+        <p class="mono" id="voteUrl"></p>
+        <div class="row" style="margin: 0.75rem 0">
+          <img id="qr" alt="QR code" class="hidden" width="200" height="200" />
+        </div>
+        <p class="sub" style="margin: 0">Résultats en direct (autre écran / smartphone)</p>
+        <p class="mono" id="resultsUrl"></p>
+        <div class="row" style="margin-top: 0.5rem">
+          <button type="button" class="btn btn-ghost" id="copyVote">Copier lien vote</button>
+          <button type="button" class="btn btn-ghost" id="copyResults">Copier résultats</button>
+        </div>
+        <div id="resultsBlock" style="margin-top: 1rem"></div>
+        <div class="row" style="margin-top: 1rem">
+          <button type="button" class="btn btn-ghost" id="btnRefresh">Actualiser</button>
+        </div>
+      </section>
+    </div>
+    <script src="/admin.js"></script>
+  </body>
+</html>
