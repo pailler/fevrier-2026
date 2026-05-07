@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Voter — IAHome</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <h1>Votre vote</h1>
+    <p class="sub" id="hint">Chargement…</p>
+
+    <section id="panel" class="card hidden">
+      <p style="font-size:1.1rem;font-weight:600;margin:0 0 1rem" id="question"></p>
+      <div id="choices"></div>
+      <p id="voteErr" class="feedback hidden" role="alert"></p>
+      <button type="button" class="btn btn-primary" id="btn-send">Envoyer</button>
+    </section>
+
+    <section id="done" class="card hidden">
+      <p id="doneMsg" class="feedback ok" style="margin:0">Merci, votre vote est enregistré.</p>
+    </section>
+
+    <section id="bad" class="card hidden">
+      <p class="feedback">Lien invalide ou vote introuvable.</p>
+    </section>
+
+    <footer class="brand">
+      <a href="https://iahome.fr">iahome.fr</a>
+    </footer>
+  </div>
+  <script src="/vote-client.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "vote-iahome",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Votes en ligne (PIN admin, QR public) — backend Supabase",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.58.0",
+    "express": "^5.1.0",
+    "qrcode": "^1.5.4"
+  }
+}

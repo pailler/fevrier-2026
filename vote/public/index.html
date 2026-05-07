@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vote — IAHome</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <h1>Vote en ligne</h1>
+    <p class="sub">
+      Créez un vote avec un code PIN à 4 chiffres (comme le Photobooth). Les participants scannent le QR ou ouvrent le lien public.
+    </p>
+
+    <div class="tabs">
+      <button type="button" class="tab active" data-tab="create">Créer</button>
+      <button type="button" class="tab" data-tab="admin">Admin (PIN)</button>
+    </div>
+
+    <section id="panel-create" class="card panel active">
+      <label for="vote-title">Nom du vote</label>
+      <input id="vote-title" type="text" maxlength="200" placeholder="Ex. Meilleure équipe du jour" />
+
+      <label for="participants">Participants (un par ligne, minimum 2)</label>
+      <textarea id="participants" placeholder="Alice&#10;Bob&#10;Charlie"></textarea>
+
+      <button type="button" class="btn btn-primary" id="btn-create">Créer le vote</button>
+      <p id="fb-create" class="feedback hidden"></p>
+    </section>
+
+    <section id="panel-admin" class="card panel">
+      <label for="admin-pin">Code PIN à 4 chiffres</label>
+      <input id="admin-pin" type="text" maxlength="4" inputmode="numeric" autocomplete="one-time-code" placeholder="Ex. 4829" />
+
+      <button type="button" class="btn btn-primary" id="btn-load-admin">Afficher QR et résultats</button>
+      <p id="fb-admin" class="feedback hidden"></p>
+
+      <div id="admin-content" class="hidden">
+        <p class="sub" style="margin-top: 1rem">Code PIN organisateur</p>
+        <div class="pin-big" id="display-pin"></div>
+        <p class="sub">Lien public (sans PIN)</p>
+        <p class="mono" id="public-url"></p>
+        <button type="button" class="btn btn-ghost" id="btn-copy-url">Copier le lien</button>
+
+        <div class="qr-wrap">
+          <img id="qr-img" alt="QR code vote" width="220" height="220" />
+        </div>
+
+        <button type="button" class="btn btn-ghost" id="btn-refresh">Actualiser les résultats</button>
+        <div id="results"></div>
+      </div>
+    </section>
+
+    <footer class="brand">
+      <a href="https://iahome.fr/card/vote">iahome.fr — module Vote</a>
+    </footer>
+  </div>
+  <script src="/home.js" defer></script>
+</body>
+</html>
