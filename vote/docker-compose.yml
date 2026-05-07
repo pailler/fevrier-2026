@@ -7,11 +7,9 @@ services:
     restart: unless-stopped
     ports:
       - "7890:7890"
+    # Variables Supabase + optionnel VOTE_PUBLIC_BASE_URL : fichier .env à la racine du dépôt iahome
     env_file:
-      - .env
+      - ../.env
     environment:
       NODE_ENV: production
       VOTE_PORT: "7890"
-      SUPABASE_URL: ${SUPABASE_URL}
-      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
-      VOTE_PUBLIC_BASE_URL: ${VOTE_PUBLIC_BASE_URL:-http://localhost:7890}
