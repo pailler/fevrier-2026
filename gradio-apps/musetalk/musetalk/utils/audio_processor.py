@@ -61,6 +61,11 @@ class AudioProcessor:
         fps = int(fps)
         whisper_idx_multiplier = audio_fps / fps
         num_frames = math.floor((librosa_length / sr) * fps)
+        if num_frames < 1:
+            raise ValueError(
+                "Piste audio trop courte pour produire au moins une image à 25 ips "
+                f"(durée utile ~{librosa_length / sr:.2f} s). Utilisez un fichier audio plus long."
+            )
         actual_length = math.floor((librosa_length / sr) * audio_fps)
         whisper_feature = whisper_feature[:,:actual_length,...]
 
@@ -82,12 +87,15 @@ class AudioProcessor:
                 assert audio_clip.shape[1] == audio_feature_length_per_frame
                 audio_prompts.append(audio_clip)
             except Exception as e:
+                # Ne jamais exit() : tuait uvicorn/Gradio → page localhost:7886 « cassée » après une génération.
                 print(f"Error occurred: {e}")
                 print(f"whisper_feature.shape: {whisper_feature.shape}")
-                print(f"audio_clip.shape: {audio_clip.shape}")
                 print(f"num frames: {num_frames}, fps: {fps}, whisper_idx_multiplier: {whisper_idx_multiplier}")
                 print(f"frame_index: {frame_index}, audio_index: {audio_index}-{audio_index + audio_feature_length_per_frame}")
-                exit()
+                raise RuntimeError(
+                    "Alignement audio / Whisper impossible pour cette combinaison (FPS, durée ou indices). "
+                    "Essayez une autre piste audio ou une vidéo de référence plus courte."
+                ) from e
 
         audio_prompts = torch.cat(audio_prompts, dim=0)  # T, 10, 5, 384
         audio_prompts = rearrange(audio_prompts, 'b c h w -> b (c h) w')

@@ -1,32 +1,29 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Breadcrumb from '../../../components/Breadcrumb';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
+import { useHydrated } from '../../../hooks/useHydrated';
 
 const PHOTOBOOTH_DISCOVER_CANONICAL =
   'https://iahome.fr/photobooth-decouverte.html';
 
 export default function PhotoboothPage() {
-  const [photoboothAppUrl, setPhotoboothAppUrl] = useState('https://photobooth.iahome.fr');
+  const hydrated = useHydrated();
+  const photoboothAppUrl =
+    hydrated && window.location.hostname === 'localhost'
+      ? 'http://localhost:7885'
+      : 'https://photobooth.iahome.fr';
   /** Même valeur SSR + 1er rendu client → pas d’écart d’hydratation ; puis origine réelle (localhost, preview, etc.). */
-  const [discoverPageHref, setDiscoverPageHref] = useState(PHOTOBOOTH_DISCOVER_CANONICAL);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-      setPhotoboothAppUrl('http://localhost:7885');
-    }
-    if (typeof window !== 'undefined') {
-      setDiscoverPageHref(`${window.location.origin}/photobooth-decouverte.html`);
-    }
-  }, []);
+  const discoverPageHref = hydrated
+    ? `${window.location.origin}/photobooth-decouverte.html`
+    : PHOTOBOOTH_DISCOVER_CANONICAL;
   const moduleData = {
     id: 'photobooth',
-    title: 'Photobooth',
-    subtitle: 'Le photobooth intelligent pour vos evenements',
+    title: 'Photobooth événements',
+    subtitle: 'Le photobooth connecté pour tous vos événements',
     description:
-      'Creez un espace photo simple et fun pour mariage, anniversaire ou evenement pro. ' +
-      'Les participants prennent leurs photos instantanement depuis le navigateur, avec une experience fluide et moderne.',
+      'Créez un espace photo simple et fun pour vos événements (mariage, anniversaire, soirée pro). ' +
+      'Les participants prennent leurs photos instantanément depuis le navigateur, avec une expérience fluide et moderne.',
     category: 'MEDIA TOOLS',
   };
 

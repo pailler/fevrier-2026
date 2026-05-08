@@ -16,6 +16,9 @@ services:
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - CRON_SECRET=${CRON_SECRET}
+      # Carnet /carnet-annonces : limite optionnelle aux critères d'un utilisateur (UUID Supabase)
+      - REAL_ESTATE_CARNET_USER_ID=${REAL_ESTATE_CARNET_USER_ID:-}
+      - REAL_ESTATE_CARNET_LIMIT=${REAL_ESTATE_CARNET_LIMIT:-200}
     env_file:
       - .env.production
     # Ne pas exposer le port publiquement, seulement via Traefik

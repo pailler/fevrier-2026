@@ -18,11 +18,12 @@ if (-not (Test-Path (Join-Path $ProjectRoot "docker-compose.prod.yml"))) {
 }
 Set-Location $ProjectRoot
 
-Write-Host "`nDemarrage iahome..." -ForegroundColor Cyan
-$result = docker-compose -f docker-compose.prod.yml up -d iahome-app 2>&1
+Write-Host "`nDemarrage iahome + apprendre-autrement..." -ForegroundColor Cyan
+$result = docker compose -f docker-compose.prod.yml up -d iahome-app apprendre-autrement 2>&1
 if ($LASTEXITCODE -eq 0) {
-    Write-Host "[OK] iahome demarre - http://localhost:3000" -ForegroundColor Green
-    Write-Host "     Logs: docker logs -f iahome-app" -ForegroundColor Gray
+    Write-Host "[OK] iahome - http://localhost:3000" -ForegroundColor Green
+    Write-Host "[OK] apprendre-autrement (port 9001 uniquement sur le reseau Docker, pas sur l'hote)" -ForegroundColor Green
+    Write-Host "     Logs: docker logs -f iahome-app | docker logs -f apprendre-autrement" -ForegroundColor Gray
 } else {
     Write-Host "[X] Erreur: $result" -ForegroundColor Red
     Write-Host "    Si l'image n'existe pas, lancez d'abord: .\scripts\redeploy-prod-full.ps1" -ForegroundColor Yellow

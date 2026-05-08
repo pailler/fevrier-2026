@@ -59,15 +59,95 @@
 
       header.hero {
         position: relative;
-        min-height: 88vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding: clamp(2rem, 6vw, 5rem) clamp(1.25rem, 4vw, 3rem);
+        min-height: auto;
+        display: block;
+        padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 4vw, 2rem) clamp(2.5rem, 6vw, 4rem);
         background:
           radial-gradient(ellipse 120% 80% at 50% -20%, rgba(190, 24, 93, 0.12), transparent 55%),
           linear-gradient(165deg, #fffefb 0%, var(--cream-dark) 45%, #e8dfd0 100%);
         overflow: hidden;
+      }
+
+      .hero-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(240px, min(44vw, 420px));
+        gap: clamp(1.5rem, 4vw, 3rem);
+        max-width: 1120px;
+        margin: 0 auto;
+        align-items: center;
+      }
+
+      .hero-visual {
+        position: relative;
+        margin: 0;
+      }
+
+      .hero-photo-frame {
+        margin: 0;
+        border-radius: 18px;
+        padding: 10px;
+        background: linear-gradient(160deg, #ffffff 0%, #faf7f2 100%);
+        box-shadow:
+          0 4px 0 rgba(28, 25, 23, 0.04),
+          0 28px 70px rgba(28, 25, 23, 0.14),
+          0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+        transform: rotate(1.25deg);
+        transition: transform 0.35s ease, box-shadow 0.35s ease;
+        cursor: zoom-in;
+      }
+
+      .hero-photo-frame:hover {
+        transform: rotate(0deg) translateY(-3px);
+        box-shadow:
+          0 8px 0 rgba(28, 25, 23, 0.03),
+          0 36px 85px rgba(28, 25, 23, 0.18),
+          0 0 0 1px rgba(255, 255, 255, 0.95) inset;
+      }
+
+      .hero-visual img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-height: min(82vh, 880px);
+        object-fit: cover;
+        object-position: center 28%;
+        border-radius: 12px;
+      }
+
+      .hero-visual .hero-caption {
+        margin: 0.65rem 0 0;
+        font-size: 0.78rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        text-align: center;
+        font-weight: 600;
+      }
+
+      @media (max-width: 900px) {
+        .hero-layout {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+
+        .hero-visual {
+          order: -1;
+          max-width: min(100%, 380px);
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .hero-photo-frame {
+          transform: none;
+        }
+
+        .hero-inner {
+          text-align: center;
+        }
+
+        .hero-inner .cta-row {
+          justify-content: center;
+        }
       }
 
       header.hero::before {
@@ -84,9 +164,9 @@
 
       .hero-inner {
         position: relative;
-        max-width: 920px;
-        margin: 0 auto;
-        text-align: center;
+        max-width: 36rem;
+        margin: 0;
+        text-align: left;
       }
 
       .eyebrow {
@@ -117,8 +197,14 @@
         font-size: clamp(1.05rem, 2.2vw, 1.25rem);
         color: var(--ink-soft);
         max-width: 38rem;
-        margin: 0 auto 2rem;
+        margin: 0 0 2rem;
         font-weight: 400;
+      }
+
+      @media (min-width: 901px) {
+        .hero-inner .cta-row {
+          justify-content: flex-start;
+        }
       }
 
       .cta-row {
@@ -339,26 +425,392 @@
       footer.site a {
         color: #f5f5f4;
       }
+
+      /* ——— Galerie visuels (borne réelle) ——— */
+      .showcase-wrap {
+        padding: clamp(2.75rem, 7vw, 5rem) clamp(1rem, 4vw, 2rem) clamp(3rem, 8vw, 5.5rem);
+        background:
+          radial-gradient(ellipse 100% 60% at 20% 0%, rgba(190, 24, 93, 0.18), transparent 50%),
+          radial-gradient(ellipse 80% 50% at 85% 100%, rgba(196, 165, 116, 0.12), transparent 45%),
+          linear-gradient(168deg, #0f0e0d 0%, #1c1917 38%, #292524 100%);
+        color: #e7e5e4;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .showcase-wrap::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23ffffff' fill-opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+      }
+
+      .showcase-inner {
+        position: relative;
+        max-width: 1120px;
+        margin: 0 auto;
+        z-index: 1;
+      }
+
+      .showcase-wrap .eyebrow {
+        color: #d6bc8a;
+        letter-spacing: 0.18em;
+      }
+
+      .showcase-wrap h2 {
+        color: #fff;
+        font-size: clamp(1.75rem, 4vw, 2.35rem);
+        max-width: 20ch;
+        line-height: 1.15;
+      }
+
+      .showcase-lead {
+        color: #a8a29e;
+        max-width: 36rem;
+        margin: 0 0 2.25rem;
+        font-size: clamp(1rem, 2vw, 1.12rem);
+      }
+
+      .showcase-mosaic {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(4, minmax(100px, 18vh));
+        gap: clamp(0.65rem, 2vw, 1.1rem);
+        align-items: stretch;
+      }
+
+      .showcase-mosaic .tile {
+        margin: 0;
+        position: relative;
+        border-radius: 4px;
+        background: linear-gradient(145deg, #fffefb 0%, #f5f0e8 100%);
+        padding: 0.55rem 0.55rem 1.85rem;
+        box-shadow:
+          0 4px 0 rgba(28, 25, 23, 0.06),
+          0 20px 50px rgba(0, 0, 0, 0.35);
+        cursor: zoom-in;
+        transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+      }
+
+      .showcase-mosaic .tile::after {
+        content: "";
+        position: absolute;
+        top: 0.35rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 32%;
+        height: 5px;
+        background: rgba(28, 25, 23, 0.06);
+        border-radius: 3px;
+      }
+
+      .showcase-mosaic .tile:hover {
+        transform: scale(1.02) translateY(-4px) rotate(0deg);
+        z-index: 2;
+        box-shadow:
+          0 6px 0 rgba(28, 25, 23, 0.05),
+          0 28px 60px rgba(0, 0, 0, 0.45);
+      }
+
+      .showcase-mosaic .tile:focus-within {
+        outline: 2px solid #fce7f3;
+        outline-offset: 3px;
+      }
+
+      .showcase-mosaic .tile img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 2px;
+      }
+
+      .showcase-mosaic .tile figcaption {
+        position: absolute;
+        bottom: 0.35rem;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 0.65rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #78716c;
+        font-weight: 600;
+      }
+
+      .showcase-mosaic .tile:nth-child(1) {
+        grid-column: 1;
+        grid-row: 1 / -1;
+        transform: rotate(-1.2deg);
+      }
+
+      .showcase-mosaic .tile:nth-child(2) {
+        grid-column: 2;
+        grid-row: 1;
+        transform: rotate(1.4deg);
+      }
+
+      .showcase-mosaic .tile:nth-child(3) {
+        grid-column: 2;
+        grid-row: 2;
+        transform: rotate(-0.8deg);
+      }
+
+      .showcase-mosaic .tile:nth-child(4) {
+        grid-column: 2;
+        grid-row: 3;
+        transform: rotate(1deg);
+      }
+
+      .showcase-mosaic .tile:nth-child(5) {
+        grid-column: 2;
+        grid-row: 4;
+        transform: rotate(-1.1deg);
+      }
+
+      .showcase-mosaic .tile:nth-child(6) {
+        grid-column: 3;
+        grid-row: 1 / -1;
+        transform: rotate(1.1deg);
+      }
+
+      .showcase-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        font-size: 0.88rem;
+        color: #d6d3d1;
+      }
+
+      .lightbox {
+        max-width: min(96vw, 920px);
+        max-height: 92vh;
+        padding: 0;
+        border: none;
+        background: transparent;
+      }
+
+      .lightbox::backdrop {
+        background: rgba(12, 10, 9, 0.88);
+        backdrop-filter: blur(6px);
+      }
+
+      .lightbox img {
+        display: block;
+        max-width: 100%;
+        max-height: 88vh;
+        width: auto;
+        height: auto;
+        margin: 0 auto;
+        border-radius: 6px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+      }
+
+      .lightbox-close {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 10;
+        width: 3rem;
+        height: 3rem;
+        border: none;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        font-size: 1.5rem;
+        cursor: pointer;
+        line-height: 1;
+      }
+
+      @media (max-width: 820px) {
+        .showcase-mosaic {
+          grid-template-columns: 1fr 1fr;
+          grid-template-rows: none;
+          grid-auto-rows: minmax(160px, 28vw);
+        }
+
+        .showcase-mosaic .tile:nth-child(1) {
+          grid-column: 1 / -1;
+          grid-row: auto;
+          min-height: 280px;
+          transform: rotate(0);
+        }
+
+        .showcase-mosaic .tile:nth-child(2) {
+          grid-column: 1;
+          grid-row: auto;
+        }
+        .showcase-mosaic .tile:nth-child(3) {
+          grid-column: 2;
+          grid-row: auto;
+        }
+        .showcase-mosaic .tile:nth-child(4) {
+          grid-column: 1;
+          grid-row: auto;
+        }
+        .showcase-mosaic .tile:nth-child(5) {
+          grid-column: 2;
+          grid-row: auto;
+        }
+        .showcase-mosaic .tile:nth-child(6) {
+          grid-column: 1 / -1;
+          grid-row: auto;
+          max-width: 420px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .showcase-mosaic .tile {
+          transform: none !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .showcase-mosaic {
+          grid-template-columns: 1fr;
+        }
+        .showcase-mosaic .tile:nth-child(n) {
+          grid-column: 1;
+        }
+      }
     </style>
   </head>
   <body>
     <div class="grain" aria-hidden="true"></div>
 
     <header class="hero">
-      <div class="hero-inner">
-        <span class="eyebrow">IA Home · Photobooth</span>
-        <h1>Des souvenirs qui <em>restent</em>, même quand le réseau disparaît</h1>
-        <p class="lead">
-          Une expérience photobooth pensée pour les moments qui comptent : mariages, anniversaires, soirées
-          d’entreprise. Vos invités s’amusent sur place ; vous visualisez toute la galerie en live grâce à votre propre
-          téléphone, en un seul lien — sans dépendre du Wi‑Fi du lieu.
-        </p>
-        <div class="cta-row">
-          <a class="btn btn-primary" href="https://iahome.fr/pricing2#photobooth-personnalise">Obtenir votre Photobooth personnalisé</a>
-          <a class="btn btn-ghost" href="#cgu">Conditions d’utilisation</a>
+      <div class="hero-layout">
+        <div class="hero-inner">
+          <span class="eyebrow">IA Home · Photobooth</span>
+          <h1>Des souvenirs qui <em>restent</em>, même quand le réseau disparaît</h1>
+          <p class="lead">
+            Une expérience photobooth pensée pour les moments qui comptent : mariages, anniversaires, soirées
+            d’entreprise. Vos invités s’amusent sur place ; vous visualisez toute la galerie en live grâce à votre propre
+            téléphone, en un seul lien — sans dépendre du Wi‑Fi du lieu.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="https://iahome.fr/pricing2#photobooth-personnalise">Obtenir votre Photobooth personnalisé</a>
+            <a class="btn btn-ghost" href="#cgu">Conditions d’utilisation</a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <figure
+            class="hero-photo-frame"
+            tabindex="0"
+            role="button"
+            aria-label="Agrandir la photo du photobooth"
+            data-full="https://iahome.fr/photobooth-visuels/IMG_20260408_224017.jpg"
+          >
+            <img
+              src="https://iahome.fr/photobooth-visuels/IMG_20260408_224017.jpg"
+              alt="Photobooth IA Home en bois : inscription Photobooth, tablette avec interface mariage, lumières d’ambiance"
+              width="900"
+              height="1350"
+              fetchpriority="high"
+              decoding="async"
+            />
+            <p class="hero-caption">Borne + application — en situation réelle</p>
+          </figure>
         </div>
       </div>
     </header>
+
+    <section class="showcase-wrap" aria-labelledby="showcase-title">
+      <div class="showcase-inner">
+        <span class="eyebrow">En situation réelle</span>
+        <h2 id="showcase-title">La magie opère déjà sur le terrain</h2>
+        <p class="showcase-lead">
+          Quelques clichés de la borne en action : ambiance chaleureuse, finitions soignées, invités pris en flagrant
+          délice. Imaginez la même présence à votre prochain événement — sans la fragilité du Wi‑Fi du lieu.
+        </p>
+
+        <div class="showcase-mosaic">
+          <figure class="tile" tabindex="0" data-full="/photobooth-visuels/IMG_20260408_224637.jpg">
+            <img
+              src="/photobooth-visuels/IMG_20260408_224637.jpg"
+              alt="Photobooth IA Home — vue d’ensemble de la borne en événement"
+              width="800"
+              height="1200"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption>Le cœur de la fête</figcaption>
+          </figure>
+          <figure class="tile" tabindex="0" data-full="/photobooth-visuels/IMG_20260408_223333.jpg">
+            <img
+              src="/photobooth-visuels/IMG_20260408_223333.jpg"
+              alt="Détail ambiance photobooth"
+              width="600"
+              height="450"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption>Ambiance</figcaption>
+          </figure>
+          <figure class="tile" tabindex="0" data-full="/photobooth-visuels/IMG_20260408_223620.jpg">
+            <img
+              src="/photobooth-visuels/IMG_20260408_223620.jpg"
+              alt="Invités autour du photobooth"
+              width="600"
+              height="450"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption>Sourires</figcaption>
+          </figure>
+          <figure class="tile" tabindex="0" data-full="/photobooth-visuels/IMG_20260408_223652.jpg">
+            <img
+              src="/photobooth-visuels/IMG_20260408_223652.jpg"
+              alt="Photobooth en utilisation"
+              width="600"
+              height="450"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption>Sur place</figcaption>
+          </figure>
+          <figure class="tile" tabindex="0" data-full="/photobooth-visuels/IMG_20260408_223847.jpg">
+            <img
+              src="/photobooth-visuels/IMG_20260408_223847.jpg"
+              alt="Détail photobooth bois et lumière"
+              width="600"
+              height="450"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption>Détails</figcaption>
+          </figure>
+          <figure class="tile" tabindex="0" data-full="/photobooth-visuels/IMG_20260408_224214.jpg">
+            <img
+              src="/photobooth-visuels/IMG_20260408_224214.jpg"
+              alt="Soirée et photobooth IA Home"
+              width="600"
+              height="900"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption>Souvenir fort</figcaption>
+          </figure>
+        </div>
+
+        <p class="showcase-badge">✦ Cliquez sur une photo pour l’agrandir</p>
+        <div class="cta-row" style="margin-top: 1.75rem">
+          <a class="btn btn-primary" href="https://iahome.fr/pricing2#photobooth-personnalise">Obtenir votre Photobooth personnalisé</a>
+        </div>
+      </div>
+    </section>
+
+    <dialog id="pb-lightbox" class="lightbox" aria-label="Photo agrandie">
+      <button type="button" class="lightbox-close" aria-label="Fermer">×</button>
+      <img id="pb-lightbox-img" src="" alt="" />
+    </dialog>
 
     <main>
       <section aria-labelledby="why-title">
@@ -548,5 +1000,41 @@
       ·
       <a href="https://iahome.fr/privacy">Confidentialité</a>
     </footer>
+
+    <script>
+      (function () {
+        var dlg = document.getElementById("pb-lightbox");
+        var lbImg = document.getElementById("pb-lightbox-img");
+        var closeBtn = dlg && dlg.querySelector(".lightbox-close");
+        if (!dlg || !lbImg || !closeBtn) return;
+
+        document.querySelectorAll(".showcase-mosaic .tile, .hero-photo-frame").forEach(function (tile) {
+          function open() {
+            var url = tile.getAttribute("data-full");
+            var im = tile.querySelector("img");
+            lbImg.src = url || "";
+            lbImg.alt = (im && im.getAttribute("alt")) || "";
+            dlg.showModal();
+          }
+          tile.addEventListener("click", open);
+          tile.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              open();
+            }
+          });
+        });
+
+        closeBtn.addEventListener("click", function () {
+          dlg.close();
+        });
+        dlg.addEventListener("click", function (e) {
+          if (e.target === dlg) dlg.close();
+        });
+        dlg.addEventListener("close", function () {
+          lbImg.removeAttribute("src");
+        });
+      })();
+    </script>
   </body>
 </html>

@@ -11,6 +11,7 @@ interface CardPageActivationSectionProps {
   moduleName: string;
   tokenCost: number;
   tokenUnit?: string;
+  showCostSummaryOnButton?: boolean;
   apiEndpoint?: string;
   gradientColors?: string;
   icon?: string;
@@ -20,7 +21,7 @@ interface CardPageActivationSectionProps {
   moduleDescription?: string;
   moduleCategory?: string;
   moduleUrl?: string;
-  customRequestBody?: (userId: string, email: string, moduleId: string) => any;
+  customRequestBody?: (userId: string, email: string, moduleId: string) => Record<string, unknown>;
   accessUrl?: string;
 }
 
@@ -31,6 +32,7 @@ export default function CardPageActivationSection(props: CardPageActivationSecti
       moduleName={props.moduleName}
       tokenCost={props.tokenCost}
       tokenUnit={props.tokenUnit}
+      showCostSummaryOnButton={props.showCostSummaryOnButton}
       gradientColors={props.gradientColors}
       icon={props.icon}
       moduleTitle={props.moduleTitle}

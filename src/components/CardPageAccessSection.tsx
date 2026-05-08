@@ -4,12 +4,16 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import { getHunyuan3dAppUrl } from '../utils/hunyuan3dAppUrl';
+import { isBrowserLocalIahomeDev } from '../utils/isBrowserLocalIahomeDev';
 
 interface CardPageAccessSectionProps {
   moduleId: string;
   moduleName: string;
   tokenCost: number;
   tokenUnit?: string;
+  /** Si false, le bouton n’affiche pas la répétition « N tokens + unité » (déjà dans le bloc bleu à gauche). */
+  showCostSummaryOnButton?: boolean;
+  /** Classes Tailwind (sans bg-gradient) : ex. from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 */
   gradientColors?: string;
   icon?: string;
   moduleTitle?: string;
@@ -25,7 +29,8 @@ export default function CardPageAccessSection({
   moduleName,
   tokenCost,
   tokenUnit = 'par accès',
-  gradientColors = 'from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700',
+  showCostSummaryOnButton = true,
+  gradientColors,
   icon = '💻',
   moduleUrl,
   accessUrl,
@@ -41,7 +46,7 @@ export default function CardPageAccessSection({
     if (accessUrl) return accessUrl;
     if (moduleUrl) return moduleUrl;
     const normalizedModuleId = (moduleId || '').trim().toLowerCase();
-    const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const isDevelopment = isBrowserLocalIahomeDev();
     const urlMap: Record<string, string> = isDevelopment
       ? {
           'librespeed': 'http://localhost:8085',
@@ -52,6 +57,7 @@ export default function CardPageAccessSection({
           'sentinelle-numerique': 'http://localhost:3000/sentinelle-numerique',
           'florence-2': 'http://localhost:7884',
           'musetalk': 'http://localhost:7886',
+          'photo-vivante': 'http://localhost:7887',
           'home-assistant': 'http://localhost:8123',
           'hunyuan3d': getHunyuan3dAppUrl(),
           'stablediffusion': 'http://localhost:7880',
@@ -72,6 +78,7 @@ export default function CardPageAccessSection({
           'sentinelle-numerique': 'https://iahome.fr/sentinelle-numerique',
           'florence-2': 'https://florence2.iahome.fr',
           'musetalk': 'https://musetalk.iahome.fr',
+          'photo-vivante': 'https://photo-vivante.iahome.fr',
           'home-assistant': 'https://homeassistant.iahome.fr',
           'hunyuan3d': getHunyuan3dAppUrl(),
           'stablediffusion': 'https://stablediffusion.iahome.fr',
@@ -99,20 +106,22 @@ export default function CardPageAccessSection({
   };
 
   const handleDirectAccess = async () => {
+    const loginReturnPath = `/card/${(moduleId || '').trim().toLowerCase()}`;
     if (!isAuthenticated || !user) {
-      router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}`)}`);
+      router.push(`/login?redirect=${encodeURIComponent(loginReturnPath)}`);
       return;
     }
 
     try {
       setLoading(true);
+      const normalizedModuleId = (moduleId || '').trim().toLowerCase();
       const response = await fetch('/api/generate-access-token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          moduleId,
+          moduleId: normalizedModuleId,
           userId: user.id,
           userEmail: user.email,
         }),
@@ -131,8 +140,9 @@ export default function CardPageAccessSection({
 
       const targetUrl = resolveModuleUrl();
       if (targetUrl) {
-        const separator = targetUrl.includes('?') ? '&' : '?';
-        window.open(`${targetUrl}${separator}token=${encodeURIComponent(token)}`, '_blank');
+        const u = new URL(targetUrl, typeof window !== 'undefined' ? window.location.origin : 'https://iahome.fr');
+        u.searchParams.set('token', token);
+        window.open(u.toString(), '_blank', 'noopener,noreferrer');
       } else {
         throw new Error(`URL d'accès introuvable pour le module ${moduleId}`);
       }
@@ -154,7 +164,7 @@ export default function CardPageAccessSection({
                 Accès à {moduleName}
               </h2>
               <p className="text-lg text-gray-700 mb-6">
-                Ouvrez {moduleName} via un token d'accès sécurisé.
+                Ouvrez {moduleName} via un token d&apos;accès sécurisé.
               </p>
               <div className="flex items-center space-x-4">
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-200">
@@ -171,10 +181,17 @@ export default function CardPageAccessSection({
             <div className="flex justify-center">
               <div className="w-full max-w-md">
                 <button
+                  type="button"
                   onClick={handleDirectAccess}
                   disabled={loading}
-                  className={`w-full font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1
-                    ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#16a34a] hover:bg-[#15803d] text-white'}`}
+                  className={`w-full font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-white
+                    ${
+                      loading
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : gradientColors
+                          ? `bg-gradient-to-r ${gradientColors}`
+                          : 'bg-[#16a34a] hover:bg-[#15803d]'
+                    }`}
                 >
                   {loading ? (
                     <>
@@ -183,7 +200,12 @@ export default function CardPageAccessSection({
                     </>
                   ) : (
                     <>
-                      <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                      {icon ? (
+                        <span className="text-3xl sm:text-4xl leading-none" aria-hidden>
+                          {icon}
+                        </span>
+                      ) : null}
+                      <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
                         <polyline points="10 17 15 12 10 7" />
                         <line x1="15" y1="12" x2="3" y2="12" />
@@ -191,9 +213,11 @@ export default function CardPageAccessSection({
                       <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">
                         {isAuthenticated && user ? `Accéder à ${moduleName}` : `Connectez-vous pour accéder`}
                       </span>
-                      <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">
-                        {tokenCost} tokens {tokenUnit}
-                      </span>
+                      {showCostSummaryOnButton ? (
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">
+                          {tokenCost} tokens {tokenUnit}
+                        </span>
+                      ) : null}
                     </>
                   )}
                 </button>

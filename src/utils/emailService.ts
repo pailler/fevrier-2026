@@ -1,4 +1,4 @@
-import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
+import { getSupabaseUrl, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 import { Resend } from 'resend';
 import fs from 'fs';
 import path from 'path';
@@ -9,6 +9,8 @@ export interface EmailData {
   html: string;
   from?: string;
 }
+
+type TemplateValue = string | number | boolean | null | undefined;
 
 export class EmailService {
   private static instance: EmailService;
@@ -146,7 +148,7 @@ export class EmailService {
   async sendNotificationEmail(
     eventType: string, 
     userEmail: string, 
-    templateData: Record<string, any> = {}
+    templateData: Record<string, TemplateValue> = {}
   ): Promise<boolean> {
     try {
       if (!this.isConfigured || !this.resend) {
@@ -184,8 +186,9 @@ export class EmailService {
 
       Object.keys(templateData).forEach(key => {
         const placeholder = `{{${key}}}`;
-        subject = subject.replace(new RegExp(placeholder, 'g'), templateData[key] || '');
-        html = html.replace(new RegExp(placeholder, 'g'), templateData[key] || '');
+        const replacement = templateData[key] == null ? '' : String(templateData[key]);
+        subject = subject.replace(new RegExp(placeholder, 'g'), replacement);
+        html = html.replace(new RegExp(placeholder, 'g'), replacement);
       });
 
       // Pièce jointe inline pour le visuel iahome (relance offres)

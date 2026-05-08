@@ -4,7 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     GRADIO_SERVER_NAME=0.0.0.0 \
-    PHOTOBOOTH_PORT=7885
+    PHOTOBOOTH_PORT=7887
 
 WORKDIR /app
 
@@ -19,6 +19,6 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY . .
 
-EXPOSE 7885
+EXPOSE 7887
 
 CMD ["python", "app.py"]

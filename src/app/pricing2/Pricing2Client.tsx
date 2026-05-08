@@ -1,8 +1,9 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import StripeButton2 from '../../components/StripeButton2';
 import { isPhotoboothPersonalizedPromoActive } from '../../utils/prestationMarketingPromo';
+import { useHydrated } from '../../hooks/useHydrated';
 
 const PRICES = {
   monthly: 9.9,
@@ -91,10 +92,7 @@ function PromoCodeBlock({
 }
 
 export default function Pricing2Client() {
-  const [hydrated, setHydrated] = useState(false);
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
+  const hydrated = useHydrated();
 
   const [promoInput, setPromoInput] = useState('');
   const [promoResult, setPromoResult] = useState<{

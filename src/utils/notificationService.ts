@@ -1,4 +1,5 @@
 import { EmailService } from './emailService';
+import { notifyTelegramAdmins } from './telegramNotify';
 
 export class NotificationService {
   private static instance: NotificationService;
@@ -75,12 +76,17 @@ export class NotificationService {
    * Envoyer une alerte administrateur
    */
   async sendAdminAlert(adminEmail: string, alertType: string, alertDetails: string, severity: 'low' | 'medium' | 'high' = 'medium'): Promise<boolean> {
-    return this.emailService.sendNotificationEmail('admin_alert', adminEmail, {
+    const ok = await this.emailService.sendNotificationEmail('admin_alert', adminEmail, {
       alert_type: alertType,
       alert_details: alertDetails,
       severity: severity,
       alert_date: new Date().toLocaleString('fr-FR')
     });
+    void notifyTelegramAdmins({
+      title: `Alerte admin [${severity}] · ${alertType}`,
+      lines: [alertDetails, `Email cible template : ${adminEmail}`],
+    }).catch(() => {});
+    return ok;
   }
 
   /**

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta http-equiv="Permissions-Policy" content="camera=(self), microphone=(self)" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="./manifest.json" />
+    <title>Courte vidéo — Photobooth</title>
+    <meta name="description" content="Enregistrez une courte vidéo souvenir pour votre événement." />
+    <link rel="stylesheet" href="./styles.css?v=21" />
+    <script src="./stay-standalone.js?v=3"></script>
+  </head>
+  <body>
+    <main class="page studio-page video-studio-page">
+      <div class="festive-bg studio-decor">
+        <span class="deco deco-ring">💍</span>
+        <span class="deco deco-flower">🌸</span>
+        <span class="deco deco-heart">💚</span>
+        <span class="deco deco-confetti">✨</span>
+      </div>
+
+      <section id="auth-banner" class="auth-banner"></section>
+
+      <section class="studio active">
+        <div class="studio-header">
+          <div>
+            <h4>Courte vidéo</h4>
+            <p id="video-studio-meta" class="studio-meta">Chargement de l'evenement…</p>
+          </div>
+          <div class="header-actions">
+            <a id="video-back" class="btn-link" href="./index.html">← Retour</a>
+          </div>
+        </div>
+
+        <div class="studio-grid video-studio-grid">
+          <article class="studio-card">
+            <p class="camera-permission-hint" id="video-hint">
+              Touchez d&apos;abord « Activer la caméra ». Puis « Enregistrer » pour capturer jusqu&apos;à 15 secondes
+              (son inclus si le navigateur l&apos;autorise).
+            </p>
+            <div class="camera-activate-row">
+              <button id="video-start-camera" class="btn-capture btn-activate-camera" type="button">
+                Activer la caméra et le micro
+              </button>
+            </div>
+            <div id="video-preview-wrap" class="video-preview-wrap preview-stage wedding-stage">
+              <div class="frame-corner tl">💐</div>
+              <div class="frame-corner tr">💐</div>
+              <div class="frame-corner bl">🎉</div>
+              <div class="frame-corner br">🎉</div>
+              <video id="video-preview" class="video-preview-feed" autoplay playsinline webkit-playsinline muted></video>
+              <div id="video-record-badge" class="video-record-badge" hidden>
+                <span class="video-record-dot" aria-hidden="true"></span>
+                <span id="video-record-seconds">0</span> s
+              </div>
+            </div>
+            <div class="studio-actions video-studio-actions">
+              <button id="video-record" class="btn-capture" type="button" disabled>
+                <span class="btn-capture-icon">⏺</span>
+                Enregistrer
+              </button>
+              <button id="video-stop" class="btn-secondary" type="button" disabled>Arrêter</button>
+            </div>
+            <p id="video-feedback" class="feedback"></p>
+          </article>
+          <article class="studio-card controls-card video-studio-side">
+            <h5>Infos</h5>
+            <p class="video-studio-blurb">
+              La vidéo est enregistrée dans le dossier de votre événement et apparaît dans la galerie, onglet
+              « Vidéos ».
+            </p>
+            <a id="video-link-gallery" class="btn-secondary video-gallery-link" href="./gallery.html">Ouvrir la galerie</a>
+          </article>
+        </div>
+      </section>
+    </main>
+    <script src="./video-studio.js?v=9"></script>
+  </body>
+</html>

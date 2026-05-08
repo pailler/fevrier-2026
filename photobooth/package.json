@@ -4,7 +4,8 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "start:prod": "node -e \"process.env.NODE_ENV='production'; require('./server.js')\""
   },
   "dependencies": {
     "express": "^5.1.0",

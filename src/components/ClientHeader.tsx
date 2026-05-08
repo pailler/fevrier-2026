@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { Suspense } from 'react';
 import Header from './Header';
+import { useHydrated } from '../hooks/useHydrated';
 
 // Squelette identique serveur + premier rendu client pour éviter l'erreur d'hydratation.
 // Après montage client, on affiche le vrai Header (avec auth, nav, etc.).
@@ -29,8 +30,7 @@ function HeaderSkeleton() {
 }
 
 export default function ClientHeader() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useHydrated();
 
   // Même HTML côté serveur et au premier rendu client → pas de hydration mismatch.
   if (!mounted) {

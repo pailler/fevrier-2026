@@ -1,0 +1,58 @@
+# Traefik — musetalk.iahome.fr → Gradio MuseTalk sur l’hôte (port 7886)
+# Même principe que photomaker / birefnet : host.docker.internal + en-têtes proxy pour Gradio.
+#
+# Cloudflare (DNS déjà OK) :
+#   - SSL/TLS : « Full » ou « Full (strict) » si l’origine présente un cert (Let’s Encrypt sur Traefik).
+#   - MuseTalk doit tourner sur l’hôte :7886 ; Traefik (docker-compose.prod) doit résoudre host.docker.internal
+#     → extra_hosts host-gateway sur le service traefik (Linux).
+#
+# Sur l’hôte qui lance app.py : MUSETALK_TRUST_PROXY=1 et MUSETALK_PUBLIC_HOST=musetalk.iahome.fr
+# (voir scripts/restart-musetalk.ps1 -BehindTraefik) pour cookies Secure et URLs Gradio / SSE.
+# Les poids : gradio-apps/musetalk/models/ (ex. musetalkV15).
+
+http:
+  serversTransports:
+    musetalk-transport:
+      forwardingTimeouts:
+        dialTimeout: "30s"
+        responseHeaderTimeout: "120s"
+        idleConnTimeout: "300s"
+
+  middlewares:
+    musetalk-proxy-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-Host: "musetalk.iahome.fr"
+          X-Forwarded-For: "127.0.0.1"
+          X-Real-IP: "127.0.0.1"
+
+  routers:
+    musetalk-main:
+      rule: "Host(`musetalk.iahome.fr`)"
+      entryPoints: ["web"]
+      service: musetalk-service
+      middlewares: ["security-headers@file", "musetalk-proxy-headers@file"]
+      priority: 10
+
+    musetalk-https:
+      rule: "Host(`musetalk.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: musetalk-service
+      tls:
+        certResolver: letsencrypt
+      middlewares: ["security-headers@file", "musetalk-proxy-headers@file"]
+      priority: 10
+
+  services:
+    musetalk-service:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:7886"
+        passHostHeader: true
+        serversTransport: musetalk-transport
+        healthCheck:
+          # Route /healthz sur FastAPI parente (hors auth Gradio sur /)
+          path: "/healthz"
+          interval: "30s"
+          timeout: "10s"

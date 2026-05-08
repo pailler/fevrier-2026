@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Récupérer votre photo — Photobooth</title>
+    <meta name="description" content="Ouvrez le lien reçu après la photo au photobooth pour enregistrer ou partager." />
+    <link rel="stylesheet" href="./styles.css?v=14" />
+    <style>
+      .pickup-main {
+        max-width: 520px;
+        margin: 0 auto;
+        padding: 20px 16px 48px;
+      }
+      .pickup-main h1 {
+        font-size: 1.25rem;
+        margin: 0 0 12px;
+        color: var(--text-main);
+      }
+      .pickup-status {
+        margin: 0 0 12px;
+        color: var(--text-soft);
+      }
+      .pickup-status.error {
+        color: #b91c1c;
+        font-weight: 600;
+      }
+      .pickup-img-wrap {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #c9d7e3;
+        background: #fff;
+        margin-bottom: 14px;
+      }
+      .pickup-img-wrap img {
+        display: block;
+        width: 100%;
+        height: auto;
+        vertical-align: middle;
+      }
+      .pickup-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .pickup-actions .btn-secondary,
+      .pickup-actions .btn-primary {
+        text-align: center;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+      .pickup-muted {
+        font-size: 0.85rem;
+        color: var(--text-soft);
+        margin-top: 14px;
+        line-height: 1.45;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <div class="pickup-main">
+        <h1>Votre photo</h1>
+        <p id="pickup-status" class="pickup-status">Chargement…</p>
+        <div id="pickup-img-wrap" class="pickup-img-wrap" hidden>
+          <img id="pickup-img" alt="Photo photobooth" />
+        </div>
+        <div class="pickup-actions" id="pickup-actions" hidden>
+          <a id="pickup-download" class="btn-secondary" href="#" download>Télécharger</a>
+          <button type="button" id="pickup-share" class="btn-primary">Partager (téléphone)</button>
+          <a id="pickup-sms" class="btn-secondary" href="#">Ouvrir SMS avec le lien</a>
+        </div>
+        <p class="pickup-muted">
+          Astuce : sur iPhone, touchez l’image puis « Ajouter à la photo » ou utilisez Partager. Le lien expire après
+          quelques heures selon la configuration du serveur.
+        </p>
+      </div>
+    </main>
+    <script src="./pickup.js?v=1"></script>
+  </body>
+</html>

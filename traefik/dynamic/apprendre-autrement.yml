@@ -1,0 +1,52 @@
+# Traefik — apprendre-autrement.iahome.fr → conteneur Docker apprendre-autrement:9001
+# (service défini dans docker-compose.prod.yml, réseau iahome-network)
+
+http:
+  middlewares:
+    apprendre-autrement-proxy-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-Host: "apprendre-autrement.iahome.fr"
+          X-Forwarded-For: ""
+          X-Real-IP: ""
+        customResponseHeaders:
+          X-Frame-Options: "SAMEORIGIN"
+          X-Content-Type-Options: "nosniff"
+          Referrer-Policy: "strict-origin-when-cross-origin"
+
+  routers:
+    apprendre-autrement-acme:
+      rule: "Host(`apprendre-autrement.iahome.fr`) && PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["web"]
+      service: apprendre-autrement-service
+      priority: 1000
+
+    apprendre-autrement-main:
+      rule: "Host(`apprendre-autrement.iahome.fr`)"
+      entryPoints: ["web"]
+      service: apprendre-autrement-service
+      middlewares:
+        - security-headers@file
+        - compress@file
+        - apprendre-autrement-proxy-headers@file
+      priority: 10
+
+    apprendre-autrement-https:
+      rule: "Host(`apprendre-autrement.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: apprendre-autrement-service
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - security-headers@file
+        - compress@file
+        - apprendre-autrement-proxy-headers@file
+      priority: 10
+
+  services:
+    apprendre-autrement-service:
+      loadBalancer:
+        servers:
+          - url: "http://apprendre-autrement:9001"
+        passHostHeader: true

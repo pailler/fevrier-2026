@@ -104,7 +104,9 @@ export default function DynamicPage() {
   // Redirection immédiate pour certaines routes exclues uniquement
   useEffect(() => {
     if (redirectRoutes.includes(slug)) {
-      router.replace('/account');
+      const qs =
+        typeof window !== 'undefined' && window.location.search ? window.location.search : '';
+      router.replace(`/account${qs}`);
     }
   }, [slug, router]);
 

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
+import { getSupabaseUrl, getSupabaseAnonKey } from '@/utils/supabaseConfig';
 import { LibreSpeedAccessService } from '../../../utils/librespeedAccess';
 import ModuleSecurityService from '../../../utils/moduleSecurityService';
 import { getHunyuan3dAppUrl } from '@/utils/hunyuan3dAppUrl';
+import { issueModuleAccessJwtWithDebit } from '@/utils/moduleAccessJwtIssue';
 const supabase = createClient(
   getSupabaseUrl(),
   getSupabaseAnonKey()
@@ -24,16 +25,37 @@ const MODULE_URLS: { [key: string]: string } = {
   'photomaker': 'https://photomaker.iahome.fr',
   'birefnet': 'https://birefnet.iahome.fr',
   'musetalk': 'https://musetalk.iahome.fr',
+  'photo-vivante': 'https://photo-vivante.iahome.fr',
   'florence-2': 'https://florence2.iahome.fr',
   'animagine-xl': 'https://animaginexl.iahome.fr',
 };
+
+/**
+ * Sous-domaines *.iahome.fr : on ajoute ?token= (JWT + débit) pour passer le worker Cloudflare.
+ * MuseTalk : même URL ?token= que Florence-2 ; le worker accepte aussi le cookie musetalk_iahome_gate
+ * sur GET / pour les revisites sans query.
+ * Hors photobooth et hors site principal.
+ */
+function subdomainRequiresFirstPartyJwt(moduleId: string): boolean {
+  const base = MODULE_URLS[moduleId];
+  if (!base) return false;
+  try {
+    const host = new URL(base).hostname.toLowerCase();
+    if (host === 'photobooth.iahome.fr') return false;
+    if (host === 'iahome.fr' || host === 'www.iahome.fr') return false;
+    return host.endsWith('.iahome.fr');
+  } catch {
+    return false;
+  }
+}
 
 export async function GET(request: NextRequest) {
   try {
     console.log('🔗 Unified Redirect: Redirection unifiée vers application');
     
     const url = new URL(request.url);
-    const moduleId = url.searchParams.get('module');
+    const moduleIdRaw = url.searchParams.get('module');
+    const moduleId = moduleIdRaw ? moduleIdRaw.trim().toLowerCase() : null;
     const token = url.searchParams.get('token');
     
     if (!moduleId) {
@@ -90,7 +112,9 @@ export async function GET(request: NextRequest) {
           .update({ is_used: true })
           .eq('id', tokenData.id);
         
-        const destinationUrl = MODULE_URLS[moduleId];
+        const base = MODULE_URLS[moduleId];
+        const sep = base.includes('?') ? '&' : '?';
+        const destinationUrl = `${base}${sep}token=${encodeURIComponent(token)}`;
         console.log('✅ Redirection avec token valide:', destinationUrl);
         return NextResponse.redirect(destinationUrl, 302);
       }
@@ -181,8 +205,34 @@ export async function GET(request: NextRequest) {
         console.log('❌ Module non accessible:', reason);
         return NextResponse.redirect(`https://iahome.fr/account?error=module_not_accessible&reason=${encodeURIComponent(reason)}`, 302);
       }
-      
+
       const destinationUrl = MODULE_URLS[moduleId];
+      if (subdomainRequiresFirstPartyJwt(moduleId)) {
+        const issued = await issueModuleAccessJwtWithDebit({
+          userId: session.user.id,
+          userEmail: session.user.email!,
+          moduleId,
+        });
+        if (issued.ok === false) {
+          const fail = issued;
+          console.log('❌ unified-redirect: émission JWT / crédits:', fail.code, fail.error);
+          if (fail.code === 'INSUFFICIENT_TOKENS') {
+            return NextResponse.redirect(
+              `https://iahome.fr/account?error=insufficient_tokens&module=${encodeURIComponent(moduleId)}`,
+              302
+            );
+          }
+          return NextResponse.redirect(
+            `https://iahome.fr/account?error=token_issue&code=${encodeURIComponent(fail.code)}`,
+            302
+          );
+        }
+        const sep = destinationUrl.includes('?') ? '&' : '?';
+        const withToken = `${destinationUrl}${sep}token=${encodeURIComponent(issued.token)}`;
+        console.log('✅ Redirection sous-domaine avec JWT (worker Cloudflare):', moduleId);
+        return NextResponse.redirect(withToken, 302);
+      }
+
       console.log('✅ Redirection directe vers:', destinationUrl);
       return NextResponse.redirect(destinationUrl, 302);
     }

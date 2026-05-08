@@ -7,30 +7,26 @@ export const useNotifications = () => {
   const notifyUserCreated = useCallback(async (userEmail: string, userName?: string) => {
     try {
       await notificationService.notifyUserCreated(userEmail, userName);
-    } catch (error) {
-      }
-  }, []);
+    } catch {}
+  }, [notificationService]);
 
   const notifyUserLogin = useCallback(async (userEmail: string, userName?: string) => {
     try {
       await notificationService.notifyUserLogin(userEmail, userName);
-    } catch (error) {
-      }
-  }, []);
+    } catch {}
+  }, [notificationService]);
 
   const notifyModuleActivated = useCallback(async (userEmail: string, moduleName: string, userName?: string) => {
     try {
       await notificationService.notifyModuleActivated(userEmail, moduleName, userName);
-    } catch (error) {
-      }
-  }, []);
+    } catch {}
+  }, [notificationService]);
 
   const notifyUserLogout = useCallback(async (userEmail: string, userName?: string) => {
     try {
       await notificationService.notifyUserLogout(userEmail, userName);
-    } catch (error) {
-      }
-  }, []);
+    } catch {}
+  }, [notificationService]);
 
   return {
     notifyUserCreated,

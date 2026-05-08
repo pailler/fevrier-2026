@@ -5,7 +5,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { getSupabaseUrl, getSupabaseAnonKey, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
+import { getSupabaseUrl, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 
 const SESSION_DURATION_MS = 60 * 60 * 1000; // 60 minutes (1 heure) en millisecondes
 
@@ -16,6 +16,21 @@ const supabase = createClient(
   getSupabaseServiceRoleKey()
 );
 
+type SessionLike = {
+  user?: {
+    email?: string | null;
+    id?: string;
+  } | null;
+  created_at?: string;
+  issued_at?: string;
+  access_token?: string;
+  expires_at?: string;
+};
+
+type JwtPayload = {
+  iat?: number;
+};
+
 export interface SessionDurationCheckResult {
   isValid: boolean;
   reason?: string;
@@ -25,7 +40,7 @@ export interface SessionDurationCheckResult {
 /**
  * Décode un JWT token pour extraire les informations (iat, exp, etc.)
  */
-function decodeJWT(token: string): any {
+function decodeJWT(token: string): JwtPayload | null {
   try {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -111,7 +126,7 @@ export async function initializeUserSession(userId: string, userEmail: string): 
  * @param session - La session Supabase à vérifier
  * @returns Résultat de la vérification avec isValid et reason si invalide
  */
-export async function checkSessionDuration(session: any): Promise<SessionDurationCheckResult> {
+export async function checkSessionDuration(session: SessionLike | null | undefined): Promise<SessionDurationCheckResult> {
   try {
     // Si pas de session, elle est invalide
     if (!session || !session.user) {

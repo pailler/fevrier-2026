@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../utils/supabaseClient';
 import { isAdminUser } from '../utils/sessionDurationCheck';
+import { useHydrated } from './useHydrated';
 
 interface User {
   id: string;
@@ -44,6 +45,7 @@ const isNetworkError = (error: any): boolean => {
 
 export function useCustomAuth() {
   const router = useRouter();
+  const isClient = useHydrated();
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     token: null,
@@ -51,18 +53,12 @@ export function useCustomAuth() {
     loading: true
   });
 
-  const [isClient, setIsClient] = useState(false);
   const sessionCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const networkErrorCountRef = useRef<number>(0);
   const errorHandlerRef = useRef<((error: ErrorEvent) => void) | null>(null);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const signOutRef = useRef<() => Promise<void>>(async () => {});
   const MAX_LOADING_TIME = 5000; // Maximum 5 secondes de chargement
-
-  useEffect(() => {
-    // Marquer que nous sommes côté client
-    setIsClient(true);
-  }, []);
 
   // Fonction pour vérifier et déconnecter si la session a expiré
   // DÉSACTIVÉE : Plus de déconnexion automatique après 1 heure

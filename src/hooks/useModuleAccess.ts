@@ -1,16 +1,21 @@
 import { useState } from 'react';
-import { TokenActionServiceClient } from '../utils/tokenActionServiceClient';
 import { useTokenContext } from '../contexts/TokenContext';
 import { getHunyuan3dAppUrl } from '../utils/hunyuan3dAppUrl';
+import { isBrowserLocalIahomeDev } from '../utils/isBrowserLocalIahomeDev';
+
+interface ModuleAccessUser {
+  id: string;
+  email?: string | null;
+}
 
 interface UseModuleAccessOptions {
-  user: any;
+  user: ModuleAccessUser | null;
   moduleId: string;
   moduleTitle: string;
   tokenCost?: number;
 }
 
-export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }: UseModuleAccessOptions) {
+export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost: _tokenCost = 10 }: UseModuleAccessOptions) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { refreshTokens } = useTokenContext();
@@ -30,32 +35,8 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
     setError(null);
 
     try {
-      console.log(`🪙 ${moduleTitle}: Vérification et consommation des tokens pour:`, user.email);
-      
-      // Utiliser le service pour la consommation côté serveur
-      const tokenService = TokenActionServiceClient.getInstance();
-      const consumeResult = await tokenService.checkAndConsumeTokens(
-        user.id,
-        moduleId as any,
-        'access',
-        moduleTitle
-      );
-      
-      if (!consumeResult.success) {
-        console.log(`🪙 ${moduleTitle}: Échec consommation tokens:`, consumeResult.reason);
-        const errorMessage = consumeResult.reason || 'Plus de crédits ? Rechargez';
-        setError(errorMessage);
-        onAccessDenied?.(errorMessage);
-        return;
-      }
-      
-      console.log(`🪙 ${moduleTitle}: Tokens consommés avec succès:`, consumeResult.tokensConsumed);
-      console.log(`🪙 ${moduleTitle}: Tokens restants:`, consumeResult.tokensRemaining);
-      
-      // Mettre à jour le contexte côté client
-      await refreshTokens();
-
-      // Générer un token d'accès
+      // Un seul débit côté serveur : generate-access-token (identique à ModuleAccessButton / carte module).
+      const normalizedModuleId = (moduleId || '').trim().toLowerCase();
       const tokenResponse = await fetch('/api/generate-access-token', {
         method: 'POST',
         headers: {
@@ -64,12 +45,18 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         body: JSON.stringify({
           userId: user.id,
           userEmail: user.email,
-          moduleId: moduleId
-        })
+          moduleId: normalizedModuleId,
+        }),
       });
 
       if (!tokenResponse.ok) {
-        throw new Error('Erreur génération token');
+        const errBody = await tokenResponse.json().catch(() => ({}));
+        const msg =
+          (errBody && (errBody.error as string)) ||
+          `Erreur génération token (${tokenResponse.status})`;
+        setError(msg);
+        onAccessDenied?.(msg);
+        return;
       }
 
       const tokenData = await tokenResponse.json();
@@ -77,7 +64,7 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
       // Mapping des modules vers leurs sous-domaines publics
       // En développement : utiliser localhost si disponible
       // En production : utiliser les sous-domaines publics
-      const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+      const isDevelopment = isBrowserLocalIahomeDev();
       
       // Mapping des module_id (numériques ou slugs) vers les slugs
       const moduleIdMapping: { [key: string]: string } = {
@@ -137,13 +124,14 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'florence-2': isDevelopment ? 'http://127.0.0.1:7884' : 'https://florence2.iahome.fr',
         // BiRefNet : sous-domaine comme les autres modules IA
         'birefnet': isDevelopment ? 'http://127.0.0.1:7882' : 'https://birefnet.iahome.fr',
-        'musetalk': isDevelopment ? 'http://127.0.0.1:7886' : 'https://musetalk.iahome.fr',
+        'musetalk': isDevelopment ? 'http://localhost:7886' : 'https://musetalk.iahome.fr',
+        'photo-vivante': isDevelopment ? 'http://localhost:7887' : 'https://photo-vivante.iahome.fr',
         // Photobooth : sous-domaine dedie
         'photobooth': isDevelopment ? 'http://localhost:7885' : 'https://photobooth.iahome.fr',
       };
       
       // Convertir module_id numérique en slug si nécessaire
-      const slug = moduleIdMapping[moduleId] || moduleId;
+      const slug = moduleIdMapping[normalizedModuleId] || normalizedModuleId;
       
       // Obtenir l'URL du sous-domaine pour ce module
       const moduleUrl = moduleSubdomains[slug];
@@ -153,14 +141,18 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         throw new Error(`Module ${moduleId} non trouvé`);
       }
       
-      // Ouvrir le sous-domaine avec le token en paramètre (même système pour tous les modules)
-      const directUrl = `${moduleUrl}?token=${encodeURIComponent(tokenData.token)}`;
+      const u = new URL(
+        moduleUrl,
+        typeof window !== 'undefined' ? window.location.origin : 'https://iahome.fr'
+      );
+      u.searchParams.set('token', tokenData.token);
+      const directUrl = u.toString();
+
+      console.log(`🔗 ${moduleTitle}: Accès sous-domaine avec JWT (worker + gate si MuseTalk):`, directUrl);
+      window.open(directUrl, '_blank', 'noopener,noreferrer');
       
-      console.log(`🔗 ${moduleTitle}: Accès direct au sous-domaine avec token:`, directUrl);
-      window.open(directUrl, '_blank');
-      
-      // Appeler le callback pour notifier l'accès accordé
       onAccessGranted?.(directUrl);
+      await refreshTokens();
     } catch (err) {
       console.error(`❌ ${moduleTitle}: Erreur inattendue:`, err);
       setError('Une erreur inattendue est survenue.');

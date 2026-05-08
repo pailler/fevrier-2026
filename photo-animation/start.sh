@@ -23,7 +23,7 @@ fi
 
 # Démarrer l'application
 echo "🚀 Lancement de l'application..."
-export PHOTOBOOTH_PORT="${PHOTOBOOTH_PORT:-7885}"
+export PHOTOBOOTH_PORT="${PHOTOBOOTH_PORT:-7887}"
 echo "📍 L'application sera accessible sur http://localhost:${PHOTOBOOTH_PORT}"
 echo ""
 

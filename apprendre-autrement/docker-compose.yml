@@ -1,3 +1,5 @@
+# Démo / dev local uniquement. En production avec le dépôt iahome, préférer le service
+# « apprendre-autrement » dans docker-compose.prod.yml à la racine (démarrage avec iahome + Traefik).
 services:
   apprendre-autrement:
     build:

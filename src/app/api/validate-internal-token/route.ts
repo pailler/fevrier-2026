@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/utils/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
+import { getSupabaseServiceRoleKey, getSupabaseUrl } from '@/utils/supabaseConfig';
+
+/** Côté serveur sans session utilisateur : service role pour user_applications (RLS). */
+const supabaseAdmin = createClient(getSupabaseUrl(), getSupabaseServiceRoleKey());
 
 const JWT_SECRET = process.env.JWT_SECRET || 'iahome-jwt-secret-2024-production-secure-key';
 
@@ -8,9 +12,15 @@ const JWT_SECRET = process.env.JWT_SECRET || 'iahome-jwt-secret-2024-production-
 function getCorsHeaders(origin: string | null): Record<string, string> {
   const allowedOrigins = [
     'https://apprendre-autrement.iahome.fr',
+    'https://musetalk.iahome.fr',
+    'https://photo-vivante.iahome.fr',
     'https://iahome.fr',
     'http://localhost:9001',
     'http://localhost:3000',
+    'http://localhost:7886',
+    'http://127.0.0.1:7886',
+    'http://localhost:7887',
+    'http://127.0.0.1:7887',
   ];
 
   // Normaliser l'origine (enlever le slash final si présent)
@@ -92,7 +102,10 @@ export async function POST(request: NextRequest) {
         console.log('⚠️ Erreur JWT:', jwtError.message);
         // Si JWT échoue, essayer Base64 simple
         try {
-          const decoded = atob(token);
+          // Jetons generate-access-token : Base64 URL-safe (sans padding) — atob() ne suffit pas
+          const padLength = (4 - (token.length % 4)) % 4;
+          const padded = token.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat(padLength);
+          const decoded = Buffer.from(padded, 'base64').toString('utf8');
           tokenPayload = JSON.parse(decoded);
           console.log('✅ Token Base64 décodé avec succès');
           console.log('📋 Payload Base64:', JSON.stringify(tokenPayload, null, 2));
@@ -148,33 +161,41 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier l'accès au module dans user_applications
+    // Vérifier l'accès au module dans user_applications (admin : pas de session navigateur)
     console.log(`🔍 Vérification accès pour userId: ${userId}, moduleId: ${moduleId}`);
-    const { data: access, error: accessError } = await supabase
+    const { data: row, error: rowError } = await supabaseAdmin
       .from('user_applications')
       .select('*')
       .eq('user_id', userId)
       .eq('module_id', moduleId)
-      .eq('is_active', true)
-      .single();
+      .maybeSingle();
 
-    if (accessError) {
-      console.error('❌ Erreur Supabase:', accessError);
-      console.error('❌ Code:', accessError.code, 'Message:', accessError.message);
+    if (rowError) {
+      console.error('❌ Erreur Supabase:', rowError);
     }
 
-    if (accessError || !access) {
-      console.error('❌ Accès non autorisé - accessError:', accessError, 'access:', access);
+    if (!row) {
+      console.error('❌ Aucune ligne user_applications pour ce module');
       return NextResponse.json(
-        { 
+        {
           error: 'Accès non autorisé. Ouvrez cette appli depuis votre compte avec vos crédits.',
-          details: accessError ? { code: accessError.code, message: accessError.message } : 'Aucun accès trouvé'
+          details: 'Aucun accès trouvé',
         },
-        { 
+        {
           status: 403,
-          headers: corsHeaders
+          headers: corsHeaders,
         }
       );
+    }
+
+    let access = row;
+    if (!row.is_active) {
+      const now = new Date().toISOString();
+      await supabaseAdmin
+        .from('user_applications')
+        .update({ is_active: true, updated_at: now })
+        .eq('id', row.id);
+      access = { ...row, is_active: true };
     }
 
     console.log('✅ Accès trouvé:', access.id);

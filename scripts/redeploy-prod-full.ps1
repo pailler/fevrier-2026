@@ -235,7 +235,7 @@ if (Test-Path $envProdLocal) {
 Write-Step 7 "Build image Docker (--no-cache)..."
 
 $ErrorActionPreference = 'Continue'
-$buildDocker = docker compose -f docker-compose.prod.yml build --no-cache --pull iahome-app 2>&1
+$buildDocker = docker compose -f docker-compose.prod.yml build --no-cache --pull iahome-app apprendre-autrement 2>&1
 $ErrorActionPreference = 'Stop'
 
 if ($LASTEXITCODE -ne 0) {
@@ -321,4 +321,5 @@ Write-Host "  • Ou vider le cache du navigateur" -ForegroundColor Gray
 Write-Host "  • Ou tester en navigation privée" -ForegroundColor Gray
 Write-Host ""
 Write-Host "  Logs: docker logs -f iahome-app" -ForegroundColor Gray
+Write-Host "        docker logs -f apprendre-autrement" -ForegroundColor Gray
 Write-Host ""

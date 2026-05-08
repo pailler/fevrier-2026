@@ -2,9 +2,9 @@
 
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void;
-    fbq?: (...args: any[]) => void;
-    dataLayer?: any[];
+    gtag?: (command: string, eventName: string, params?: Record<string, unknown>) => void;
+    fbq?: (command: string, eventName: string, params?: Record<string, unknown>) => void;
+    dataLayer?: Array<Record<string, unknown>>;
   }
 }
 
@@ -29,7 +29,7 @@ export function trackGoogleEvent(
 /**
  * Envoie un événement de conversion à Facebook Pixel
  */
-export function trackFacebookEvent(eventName: string, params?: Record<string, any>) {
+export function trackFacebookEvent(eventName: string, params?: Record<string, unknown>) {
   if (typeof window !== 'undefined' && window.fbq) {
     window.fbq('track', eventName, params || {});
   }
@@ -73,7 +73,8 @@ export function trackSignup(method: string = 'email') {
 /**
  * Track un achat de tokens
  */
-export function trackTokenPurchase(packageType: string, amount: number, tokens: number) {
+export function trackTokenPurchase(packageType: string, amount: number, _tokens: number) {
+  void _tokens;
   trackGoogleEvent('purchase', 'ecommerce', packageType, amount);
   trackFacebookEvent('Purchase', {
     content_name: packageType,
@@ -104,7 +105,7 @@ export function trackModuleActivation(moduleId: string, moduleName: string) {
  * Track une visite sur la page MeTube depuis une publicité
  */
 export function trackMeTubePageView(source?: string, medium?: string, campaign?: string) {
-  const params: any = {
+  const params: Record<string, string> = {
     page_path: '/card/metube',
     page_title: 'MeTube - Téléchargeur YouTube',
   };

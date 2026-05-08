@@ -1,116 +1,113 @@
 /**
- * Cloudflare Worker pour protéger les applis iahome.fr
- * Redirige uniquement la requête HTML principale sans token
- * Laisse passer toutes les ressources (JS, CSS, WebSockets, etc.)
- * 
- * FIX : Exclut les requêtes API et POST pour permettre les uploads
- * FIX : Amélioration pour éviter les pages blanches
+ * Cloudflare Worker — protect-sous-domaines-iahome
+ * (format Service Worker : addEventListener — coller tel quel dans le dashboard « Quick edit » classique.)
+ *
+ * Si votre worker Cloudflare est en **Modules** (export default), copiez plutôt le fichier
+ * `cloudflare-worker-protect-sous-domaines.modules.js` du même dépôt.
+ *
+ * - JWT : iahome.fr → generate-access-token / unified-redirect.
+ * - Hôtes dans HOSTS_SKIP_DOCUMENT_TOKEN : pas de ?token= sur GET / (ex. photobooth).
+ * - musetalk.iahome.fr : comme Florence-2 — ?token= requis sur GET / **ou** cookie musetalk_iahome_gate
+ *   (session après première visite avec JWT).
+ * - Autres sous-domaines protégés : GET / sans ?token= → https://iahome.fr/encours?error=direct_access_denied
  */
 
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request));
-});
+const HOSTS_SKIP_DOCUMENT_TOKEN = new Set([
+  'photobooth.iahome.fr',
+  'www.photobooth.iahome.fr',
+]);
+
+const MUSE_TALK_HOSTS = new Set(['musetalk.iahome.fr', 'www.musetalk.iahome.fr']);
+
+function clientHostname(request) {
+  let fromUrl = '';
+  try {
+    fromUrl = new URL(request.url).hostname.toLowerCase();
+  } catch {
+    fromUrl = '';
+  }
+  const raw =
+    request.headers.get('x-forwarded-host') ||
+    request.headers.get('X-Forwarded-Host') ||
+    request.headers.get('host') ||
+    request.headers.get('Host') ||
+    '';
+  let h = raw.split(',')[0].trim().split(':')[0].toLowerCase() || fromUrl;
+  if (h.endsWith('.')) h = h.slice(0, -1);
+  return h || fromUrl;
+}
 
 async function handleRequest(request) {
   const url = new URL(request.url);
   const method = request.method;
-  const hostname = url.hostname;
+  const host = clientHostname(request);
 
-  // photobooth.iahome.fr : accès direct autorisé (sans restriction token)
-  if (hostname === 'photobooth.iahome.fr') {
+  if (HOSTS_SKIP_DOCUMENT_TOKEN.has(host)) {
     return fetch(request);
   }
 
-  // ============================================
-  // FIX CRITIQUE : Laisser passer les uploads et API EN PREMIER
-  // ============================================
-  
-  // Toutes les requêtes API (inclut /api/upload)
   if (url.pathname.startsWith('/api/')) {
     return fetch(request);
   }
-  
-  // Toutes les requêtes POST (uploads de fichiers)
-  if (method === 'POST') {
+
+  if (method === 'POST' || method === 'PUT' || method === 'DELETE' || method === 'OPTIONS') {
     return fetch(request);
   }
-  
-  // Toutes les requêtes PUT, DELETE (modifications)
-  if (method === 'PUT' || method === 'DELETE') {
-    return fetch(request);
-  }
-  
-  // Toutes les requêtes OPTIONS (CORS preflight)
-  if (method === 'OPTIONS') {
-    return fetch(request);
-  }
-  
-  // ============================================
-  // Laisser passer les ressources statiques
-  // ============================================
-  
-  // Liste des extensions de ressources à laisser passer directement
+
   const resourceExtensions = [
     '.js', '.css', '.jpg', '.jpeg', '.png', '.gif', '.svg', '.ico',
     '.woff', '.woff2', '.ttf', '.eot', '.mp4', '.webm', '.json',
     '.xml', '.pdf', '.zip', '.txt', '.map', '.webp', '.avif',
-    '.woff2', '.woff', '.ttf', '.otf', '.eot' // Fonts
+    '.otf',
   ];
-  
-  // Vérifier si c'est une ressource statique
-  const isResource = resourceExtensions.some(ext => 
+
+  const isResource = resourceExtensions.some((ext) =>
     url.pathname.toLowerCase().endsWith(ext)
   );
-  
-  // Vérifier si c'est dans un dossier de ressources statiques
-  const isStaticPath = url.pathname.startsWith('/static/') ||
-                       url.pathname.startsWith('/assets/') ||
-                       url.pathname.startsWith('/_next/') ||
-                       url.pathname.startsWith('/favicon.ico');
-  
-  // Vérifier si c'est une requête WebSocket
-  const isWebSocket = request.headers.get('Upgrade') === 'websocket' ||
-                      request.headers.get('Connection')?.includes('Upgrade');
-  
-  // Vérifier si c'est une requête SSE (Server-Sent Events)
-  const isSSE = request.headers.get('Accept')?.includes('text/event-stream');
-  
-  // Vérifier si c'est une requête de health check ou monitoring
-  const isHealthCheck = url.pathname.includes('/health') ||
-                        url.pathname.includes('/ping') ||
-                        url.pathname.includes('/status');
-  
-  // Si c'est une ressource, WebSocket, SSE ou health check → Laisser passer directement
+
+  const isStaticPath =
+    url.pathname.startsWith('/static/') ||
+    url.pathname.startsWith('/assets/') ||
+    url.pathname.startsWith('/_next/') ||
+    url.pathname.startsWith('/favicon.ico');
+
+  const isWebSocket =
+    request.headers.get('Upgrade') === 'websocket' ||
+    (request.headers.get('Connection') || '').includes('Upgrade');
+
+  const isSSE = (request.headers.get('Accept') || '').includes('text/event-stream');
+
+  const isHealthCheck =
+    url.pathname.includes('/health') ||
+    url.pathname.includes('/ping') ||
+    url.pathname.includes('/status');
+
   if (isResource || isStaticPath || isWebSocket || isSSE || isHealthCheck) {
     return fetch(request);
   }
-  
-  // ============================================
-  // PROTECTION : Vérifier le token pour GET /
-  // ============================================
-  
-  // Vérifier si c'est la requête principale (GET / ou GET /index.html)
-  const isMainRequest = (
-    method === 'GET' && 
-    (url.pathname === '/' || 
-     url.pathname === '' ||
-     url.pathname.toLowerCase() === '/index.html' ||
-     url.pathname.toLowerCase().endsWith('/index'))
-  );
-  
+
+  const isMainRequest =
+    method === 'GET' &&
+    (url.pathname === '/' ||
+      url.pathname === '' ||
+      url.pathname.toLowerCase() === '/index.html' ||
+      url.pathname.toLowerCase().endsWith('/index'));
+
   if (isMainRequest) {
-    // Vérifier si un token est présent dans l'URL
     const hasToken = url.searchParams.has('token');
-    
-    if (!hasToken) {
-      // Pas de token sur la requête principale → Rediriger vers iahome.fr
+    const cookieHeader = request.headers.get('Cookie') || '';
+    const musetalkSession =
+      MUSE_TALK_HOSTS.has(host) && cookieHeader.includes('musetalk_iahome_gate=');
+
+    if (!hasToken && !musetalkSession) {
       return Response.redirect('https://iahome.fr/encours?error=direct_access_denied', 302);
     }
-    
-    // Token présent → Laisser passer avec le token pour que l'app puisse le lire
     return fetch(request);
   }
-  
-  // Token présent OU ce n'est pas la requête principale → Laisser passer normalement
+
   return fetch(request);
 }
+
+addEventListener('fetch', (event) => {
+  event.respondWith(handleRequest(event.request));
+});

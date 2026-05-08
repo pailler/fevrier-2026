@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = 'iahome-jwt-secret-2024-production-secure-key';
+/** Aligné sur generate-access-token / validate-internal-token. */
+const JWT_SECRET = process.env.JWT_SECRET || 'iahome-jwt-secret-2024-production-secure-key';
 
 // Mapping des modules vers leurs ports locaux
 const APPLICATION_PORTS: { [key: string]: number } = {
@@ -23,6 +24,7 @@ const APPLICATION_PORTS: { [key: string]: number } = {
   'florence-2': 7884,
   'birefnet': 7882,
   'musetalk': 7886,
+  'photo-vivante': 7887,
 };
 
 // Mapping des modules vers leurs hôtes locaux (si différent de localhost)
@@ -54,7 +56,9 @@ export async function GET(request: Request) {
     } catch (jwtError) {
       // Si JWT échoue, essayer base64 simple
       try {
-        decoded = JSON.parse(atob(token));
+        const padLength = (4 - (token.length % 4)) % 4;
+        const padded = token.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat(padLength);
+        decoded = JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
       } catch (base64Error) {
         return NextResponse.json(
           { error: 'Token invalide' },
@@ -68,7 +72,10 @@ export async function GET(request: Request) {
     // Vérifier que le module correspond
     if (decoded.moduleId === moduleId) {
       const port = APPLICATION_PORTS[moduleId as keyof typeof APPLICATION_PORTS];
-      const host = APPLICATION_HOSTS[moduleId as keyof typeof APPLICATION_HOSTS] || 'localhost';
+      const host =
+        moduleId === 'apprendre-autrement' && process.env.APPRENDRE_AUTREMENT_HTTP_HOST
+          ? process.env.APPRENDRE_AUTREMENT_HTTP_HOST
+          : APPLICATION_HOSTS[moduleId as keyof typeof APPLICATION_HOSTS] || 'localhost';
       
       if (port) {
         // Faire un proxy vers l'application locale

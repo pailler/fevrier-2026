@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import Breadcrumb from '../../../components/Breadcrumb';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
@@ -11,7 +12,7 @@ export default function MuseTalkPage() {
     subtitle: 'Lip-sync haute fidélité : vidéo ou image + audio',
     description:
       'MuseTalk (Tencent Lyra Lab) anime le visage d’une vidéo de référence selon une piste audio : ' +
-      'doublage, avatars parlants, contenus marketing. Modèle open source (code MIT) ; prévoir un GPU NVIDIA et les poids téléchargés.',
+      'doublage, avatars parlants, contenus marketing. Modèle open source (code MIT) ; bénéficiez de la puissance des ordinateurs de IAHome, sans téléchargement ni installation, tout se passe directement dans votre navigateur',
     category: 'AI VIDEO',
   };
 
@@ -30,8 +31,8 @@ export default function MuseTalkPage() {
 
       <section className="bg-gradient-to-br from-sky-600 via-indigo-600 to-violet-700 py-10 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            <div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center min-w-0">
+            <div className="min-w-0">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
                 MuseTalk : synchronisation labiale pilotée par l’audio
               </h1>
@@ -42,25 +43,20 @@ export default function MuseTalkPage() {
               <p className="text-sky-100">{moduleData.subtitle}</p>
             </div>
 
-            <div className="bg-white/90 rounded-2xl p-8 shadow-2xl border border-white/50">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Installation locale</h2>
-              <ul className="space-y-3 text-gray-700 text-sm">
-                <li>
-                  Dépôt : <span className="font-mono text-xs">gradio-apps/musetalk</span>
-                </li>
-                <li>Python 3.10, CUDA, FFmpeg dans le PATH (recommandé)</li>
-                <li>
-                  Exécuter <span className="font-mono">.\scripts\setup-musetalk-local.ps1</span> puis{' '}
-                  <span className="font-mono">download_weights.bat</span> dans le dossier MuseTalk
-                </li>
-                <li>
-                  Lancement groupé : <span className="font-mono">.\scripts\start-all-apps.ps1</span> (port{' '}
-                  <span className="font-mono">7886</span>)
-                </li>
-              </ul>
-              <div className="mt-6 text-sm text-gray-500">
-                URL applicative : <span className="font-medium">musetalk.iahome.fr</span> (prod) /{' '}
-                <span className="font-medium">localhost:7886</span> (dev)
+            {/* Visuel : w-full + min-w-0 évite une largeur 0 en grille (Image fill invisible). */}
+            <div className="bg-white rounded-xl shadow-2xl border border-white/50 overflow-hidden w-full max-w-lg min-w-0 mx-auto lg:mx-0 lg:ml-auto">
+              <div className="relative w-full aspect-[16/10] min-h-[14rem] sm:min-h-[15rem] overflow-hidden bg-gray-100">
+                <Image
+                  src="/images/musetalk.jpg"
+                  alt={moduleData.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 512px"
+                  priority
+                  style={{
+                    filter: 'brightness(1.1) contrast(1.05) saturate(1.05)',
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -89,12 +85,8 @@ export default function MuseTalkPage() {
         moduleName="MuseTalk"
         tokenCost={100}
         tokenUnit="par accès. Utilisez l'application aussi longtemps que vous souhaitez"
+        showCostSummaryOnButton={false}
         apiEndpoint="/api/activate-module"
-        accessUrl={
-          typeof window !== 'undefined' && window.location.hostname === 'localhost'
-            ? 'http://localhost:7886'
-            : 'https://musetalk.iahome.fr'
-        }
         gradientColors="from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700"
         icon="🎬"
       />

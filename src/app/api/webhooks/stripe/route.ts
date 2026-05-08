@@ -169,8 +169,29 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
 
   if (userError || !userData) {
     console.log('❌ Utilisateur non trouvé:', customerEmail);
+    void import('@/utils/telegramNotify').then((m) =>
+      m.notifyTelegramAdmins({
+        title: 'Stripe : session payée, profil introuvable',
+        lines: [
+          `Email session : ${customerEmail}`,
+          `Session : ${session.id}`,
+          `Module (meta) : ${String(moduleTitle || moduleId || '—')}`,
+        ],
+      })
+    );
     return;
   }
+
+  void import('@/utils/telegramNotify').then((m) =>
+    m.notifyTelegramStripePaymentReceived({
+      sessionId: session.id,
+      customerEmail,
+      amountCents: session.amount_total,
+      currency: session.currency,
+      moduleOrPackage: String(moduleTitle || moduleId || packageType || '—'),
+      mode: session.mode,
+    })
+  );
 
   // Gérer les abonnements (premier paiement)
   // Vérifier si c'est un abonnement même si packageType n'est pas dans les métadonnées
@@ -589,6 +610,16 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     if (userEmail) {
       console.log(`⚠️ Échec de paiement pour ${userEmail} - Abonnement: ${subscriptionId}`);
     }
+
+    const failReason = (invoice as { last_finalization_error?: { message?: string } })
+      .last_finalization_error?.message;
+    void import('@/utils/telegramNotify').then((m) =>
+      m.notifyTelegramStripePaymentFailed({
+        userEmail: userEmail || null,
+        invoiceId: invoice.id,
+        reason: failReason,
+      })
+    );
   } catch (error) {
     console.error('❌ Erreur gestion échec paiement:', error);
   }

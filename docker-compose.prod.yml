@@ -8,6 +8,8 @@ services:
     environment:
       - NODE_ENV=production
       - RUINEDFOOOCUS_INTERNAL_URL=${RUINEDFOOOCUS_INTERNAL_URL:-http://matrix-stability:7870}
+      # Hôte du conteneur « apprendre-autrement » (réseau Docker) — évite localhost:9001 depuis iahome-app
+      - APPRENDRE_AUTREMENT_HTTP_HOST=apprendre-autrement
       - PORT=3000
       - HOSTNAME=0.0.0.0
     # Fichier d'env sur l'hôte (à côté de ce docker-compose).
@@ -15,7 +17,7 @@ services:
     # Si vous utilisez env.production.local (sans point), renommez-le en .env.production.local ou copiez-le.
     env_file:
       - .env.production.local
-    # Port exposé pour cloudflared
+    # Port exposé pour cloudflared (ne pas lancer `next dev -p 3000` en parallèle sur l’hôte).
     ports:
       - "3000:3000"
     volumes:
@@ -40,6 +42,43 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.iahome.loadbalancer.server.port=3000"
+
+  # Application Next.js « Apprendre autrement » (port interne 9001). Accès Docker : Traefik → apprendre-autrement:9001.
+  # Mapping ports 127.0.0.1:9001 → si le tunnel Cloudflare vise http://127.0.0.1:9001 sans cela → 502. En `next dev -p 9001`
+  # sur la machine hôte en parallèle, commentez temporairement le bloc `ports:` ci-dessous.
+  apprendre-autrement:
+    build:
+      context: ./apprendre-autrement
+      dockerfile: Dockerfile
+    image: iahome-apprendre-autrement:latest
+    container_name: apprendre-autrement
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=9001
+      - HOSTNAME=0.0.0.0
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    volumes:
+      - ./apprendre-autrement/public/sounds:/app/public/sounds:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "127.0.0.1:9001:9001"
+    networks:
+      - iahome-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9001/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "0.5"
+        reservations:
+          memory: 256M
+          cpus: "0.1"
 
   # iahome-nginx:
   #   image: nginx:alpine
@@ -70,6 +109,9 @@ services:
     image: traefik:v2.10
     container_name: iahome-traefik
     restart: unless-stopped
+    # Linux : sans cette ligne, host.docker.internal (musetalk.yml, photomaker.yml, …) ne résout pas → 502.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command:
       - "--api.dashboard=true"
       - "--api.insecure=true"

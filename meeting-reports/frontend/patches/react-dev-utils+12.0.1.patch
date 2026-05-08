@@ -1,0 +1,51 @@
+diff --git a/node_modules/react-dev-utils/WebpackDevServerUtils.js b/node_modules/react-dev-utils/WebpackDevServerUtils.js
+index d9eea34..9527a1c 100644
+--- a/node_modules/react-dev-utils/WebpackDevServerUtils.js
++++ b/node_modules/react-dev-utils/WebpackDevServerUtils.js
+@@ -13,7 +13,6 @@ const url = require('url');
+ const chalk = require('chalk');
+ const detect = require('detect-port-alt');
+ const isRoot = require('is-root');
+-const prompts = require('prompts');
+ const clearConsole = require('./clearConsole');
+ const formatWebpackMessages = require('./formatWebpackMessages');
+ const getProcessForPort = require('./getProcessForPort');
+@@ -399,30 +398,17 @@ function choosePort(host, defaultPort) {
+           process.platform !== 'win32' && defaultPort < 1024 && !isRoot()
+             ? `Admin permissions are required to run a server on a port below 1024.`
+             : `Something is already running on port ${defaultPort}.`;
++        // Sans question interactive (Y/n) : utiliser le port libre detecte
+         if (isInteractive) {
+           clearConsole();
+-          const existingProcess = getProcessForPort(defaultPort);
+-          const question = {
+-            type: 'confirm',
+-            name: 'shouldChangePort',
+-            message:
+-              chalk.yellow(
+-                message +
+-                  `${existingProcess ? ` Probably:\n  ${existingProcess}` : ''}`
+-              ) + '\n\nWould you like to run the app on another port instead?',
+-            initial: true,
+-          };
+-          prompts(question).then(answer => {
+-            if (answer.shouldChangePort) {
+-              resolve(port);
+-            } else {
+-              resolve(null);
+-            }
+-          });
+-        } else {
+-          console.log(chalk.red(message));
+-          resolve(null);
+         }
++        const existingProcess = getProcessForPort(defaultPort);
++        console.log(
++          chalk.yellow(
++            message + (existingProcess ? `\n  Probably:\n  ${existingProcess}` : '')
++          ) + chalk.cyan(`\n\nUsing port ${port} instead.`)
++        );
++        resolve(port);
+       }),
+     err => {
+       throw new Error(

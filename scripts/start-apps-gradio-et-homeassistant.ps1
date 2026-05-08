@@ -8,6 +8,7 @@ if (-not (Test-Path (Join-Path $ProjectRoot "package.json"))) {
     $ProjectRoot = Get-Location
 }
 Set-Location $ProjectRoot
+. (Join-Path $PSScriptRoot "port-utils.ps1")
 
 # ========== CONFIGURATION : chemins des apps Gradio ==========
 # Si vous avez les projets en local, definissez les chemins ci-dessous (ou creez scripts\apps-hosts.config.ps1).
@@ -44,17 +45,6 @@ $PortPhotomaker   = 7881
 $PortBirefnet     = 7882
 $PortFlorence2    = 7884
 $PortAnimagineXL  = 7883   # port dedie (7881 = PhotoMaker)
-
-function Test-PortInUse {
-    param([int]$Port)
-    try {
-        $conn = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
-        return ($null -ne $conn)
-    } catch {
-        $out = netstat -ano 2>$null
-        return ($out | Select-String -Pattern "LISTENING" | Select-String -Pattern ":$Port\s" -Quiet)
-    }
-}
 
 function Start-GradioApp {
     param(

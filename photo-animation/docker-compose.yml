@@ -6,15 +6,15 @@ services:
     container_name: photobooth-iahome
     restart: unless-stopped
     environment:
-      - PHOTOBOOTH_PORT=7885
-      - GRADIO_SERVER_PORT=7885
+      - PHOTOBOOTH_PORT=7887
+      - GRADIO_SERVER_PORT=7887
       - GRADIO_SERVER_NAME=0.0.0.0
     ports:
-      - "7885:7885"
+      - "7887:7887"
     volumes:
       - photobooth_models_cache:/ai-models-cache/huggingface
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:7885')"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:7887')"]
       interval: 30s
       timeout: 10s
       retries: 5

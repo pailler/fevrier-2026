@@ -1,0 +1,17 @@
+{
+  "name": "vote-local-qrcode",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Vote local sur LAN avec QR code (sans cloud)",
+  "scripts": {
+    "start": "node server.mjs",
+    "vote": "node server.mjs"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

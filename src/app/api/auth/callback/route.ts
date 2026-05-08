@@ -115,6 +115,16 @@ export async function POST(request: NextRequest) {
         console.error('Erreur lors de l\'envoi de la notification admin:', emailError);
       }
 
+      void import('@/utils/telegramNotify')
+        .then((m) =>
+          m.notifyTelegramNewUser({
+            userEmail: email,
+            userName: name || email,
+            source: 'oauth',
+          })
+        )
+        .catch(() => {});
+
       return NextResponse.json({ success: true, user: newUser });
     }
 

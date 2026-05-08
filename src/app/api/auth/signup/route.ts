@@ -169,6 +169,16 @@ export async function POST(request: NextRequest) {
       // Ne pas faire échouer la création du compte pour l'email admin
     }
 
+    void import('@/utils/telegramNotify')
+      .then((m) =>
+        m.notifyTelegramNewUser({
+          userEmail: email,
+          userName: fullName,
+          source: 'email',
+        })
+      )
+      .catch(() => {});
+
     return NextResponse.json({
       success: true,
       user: profileData,

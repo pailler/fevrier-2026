@@ -1,4 +1,6 @@
-import { TokenActionService, TokenConsumptionResult, ModuleId } from './tokenActionService';
+import { TokenConsumptionResult, ModuleId } from './tokenActionService';
+
+type TokenHistoryEntry = Record<string, unknown>;
 
 export class TokenActionServiceClient {
   private static instance: TokenActionServiceClient;
@@ -91,6 +93,7 @@ export class TokenActionServiceClient {
       'florence-2': 100, // Florence-2 -> 100 tokens
       'birefnet': 100, // BiRefNet -> 100 tokens
       'musetalk': 100, // MuseTalk
+      'photo-vivante': 100, // Photo Vivante
       
       // Applications essentielles (10 tokens)
       'metube': 10,
@@ -145,7 +148,7 @@ export class TokenActionServiceClient {
   }
 
   // Méthode pour récupérer l'historique des tokens d'un utilisateur (ne rejette jamais)
-  async getUserTokenHistory(userId: string, limit: number = 20): Promise<any[]> {
+  async getUserTokenHistory(userId: string, limit: number = 20): Promise<TokenHistoryEntry[]> {
     try {
       const response = await fetch(`/api/user-tokens-simple/history?userId=${userId}&limit=${limit}`, {
         method: 'GET',

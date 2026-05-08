@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { getSupabaseClient } from '../../../utils/supabaseService';
 import { useCustomAuth } from '@/hooks/useCustomAuth';
+import { getLocalDevUrlForModule } from '@/utils/moduleLocalDevUrl';
 
 interface Application {
   id: string;
@@ -72,6 +73,7 @@ interface ApplicationHealthCheck {
   module_name: string;
   url: string | null;
   isValid: boolean;
+  isSkipped?: boolean;
   statusCode?: number;
   errorMessage?: string;
   responseTime?: number;
@@ -317,6 +319,14 @@ export default function AdminApplications() {
           tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
           description = `Détecteur de contenu généré par IA. Analyse les documents texte, PDF, DOCX et images. Coût: ${tokenCost} crédits par accès.`;
+        } else if (moduleId.includes('musetalk') || moduleId.includes('photo-vivante')) {
+          tokenCost = 100;
+          estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
+          if (moduleId.includes('musetalk')) {
+            description = `MuseTalk (lip-sync vidéo, audio + visage). Coût: ${tokenCost} crédits par accès.`;
+          } else {
+            description = `Photo Vivante (animation de photo). Coût: ${tokenCost} crédits par accès.`;
+          }
         } else {
           tokenCost = 10;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
@@ -341,6 +351,10 @@ export default function AdminApplications() {
             moduleName = 'Générateur de prompts';
           } else if (moduleId.includes('ai-detector') || moduleId.includes('detecteur')) {
             moduleName = 'Détecteur de Contenu IA';
+          } else if (moduleId.includes('musetalk')) {
+            moduleName = 'MuseTalk';
+          } else if (moduleId.includes('photo-vivante')) {
+            moduleName = 'Photo Vivante';
           }
         }
 
@@ -630,6 +644,7 @@ export default function AdminApplications() {
               module_name: data.module_name,
               url: data.url,
               isValid: data.isValid,
+              isSkipped: data.isSkipped,
               statusCode: data.statusCode,
               errorMessage: data.errorMessage,
               responseTime: data.responseTime,
@@ -821,6 +836,10 @@ export default function AdminApplications() {
       return '🏛️';
     } else if (appName.includes('voice') || appName.includes('isolation') || appName.includes('vocale')) {
       return '🎤';
+    } else if (appName.toLowerCase().includes('musetalk') || appName.toLowerCase().includes('muse talk')) {
+      return '🎬';
+    } else if (appName.toLowerCase().includes('photo vivante') || appName.toLowerCase().includes('photo-vivante')) {
+      return '🎞️';
     }
     return '📱';
   };
@@ -835,6 +854,11 @@ export default function AdminApplications() {
       </div>
     );
   }
+
+  const healthCheckValues = Object.values(healthChecks);
+  const skippedHealthChecks = healthCheckValues.filter((h) => h.isSkipped);
+  const failedHealthChecks = healthCheckValues.filter((h) => !h.isValid && !h.isSkipped);
+  const validHealthChecks = healthCheckValues.filter((h) => h.isValid && !h.isSkipped);
 
   return (
     <div className="space-y-6">
@@ -893,12 +917,17 @@ export default function AdminApplications() {
                       <div className="flex items-center gap-4 text-sm mt-2">
                         <div className="flex items-center gap-2">
                           <span className="text-green-600 font-medium">
-                            ✅ {Object.values(healthChecks).filter(h => h.isValid).length} opérationnelles
+                            ✅ {validHealthChecks.length} opérationnelles
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-red-600 font-medium">
-                            ❌ {Object.values(healthChecks).filter(h => !h.isValid).length} en erreur
+                            ❌ {failedHealthChecks.length} en erreur
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-600 font-medium">
+                            ⚪ {skippedHealthChecks.length} ignorées
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -908,11 +937,66 @@ export default function AdminApplications() {
                         </div>
                       </div>
                     )}
+                    {failedHealthChecks.length > 0 && (
+                      <div
+                        className="mt-4 rounded-lg border border-red-200 bg-red-50/90 p-4 text-sm"
+                        role="region"
+                        aria-label="Applications en erreur après la vérification"
+                      >
+                        <p className="font-semibold text-red-900 mb-2">
+                          Applications en erreur ({failedHealthChecks.length})
+                        </p>
+                        <ul className="space-y-3 list-none m-0 p-0">
+                          {failedHealthChecks.map((h) => (
+                            <li
+                              key={h.module_id}
+                              className="rounded-md border border-red-100 bg-white/80 px-3 py-2 text-red-950"
+                            >
+                              <div className="font-medium text-red-900">
+                                {h.module_name || h.module_id}
+                                <span className="ml-2 font-normal text-red-700/90">
+                                  ({h.module_id})
+                                </span>
+                              </div>
+                              {h.url && (
+                                <div className="mt-1 break-all text-xs text-gray-700">
+                                  URL testée :{' '}
+                                  <a
+                                    href={h.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-700 underline hover:text-blue-900"
+                                  >
+                                    {h.url}
+                                  </a>
+                                </div>
+                              )}
+                              <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-red-800">
+                                {h.statusCode != null && (
+                                  <span>Code HTTP : {h.statusCode}</span>
+                                )}
+                                {h.isCloudflareError && (
+                                  <span className="font-medium">Erreur Cloudflare</span>
+                                )}
+                                {h.responseTime != null && (
+                                  <span>Temps : {h.responseTime} ms</span>
+                                )}
+                              </div>
+                              {h.errorMessage && (
+                                <p className="mt-2 text-xs text-red-800 whitespace-pre-wrap border-t border-red-100 pt-2">
+                                  {h.errorMessage}
+                                </p>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                   <button
                     onClick={() => handleCheckApplicationsHealth()}
                     disabled={checkingHealth}
-                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium shadow-md hover:shadow-lg transition-all"
+                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium shadow-md hover:shadow-lg transition-all shrink-0"
                   >
                     {checkingHealth ? (
                       <>
@@ -1011,7 +1095,9 @@ export default function AdminApplications() {
                 </div>
               ) : (
                 <div className="divide-y divide-gray-200">
-                  {applications.map((application) => (
+                  {applications.map((application) => {
+                    const localDevUrl = getLocalDevUrlForModule(application.id, application.name);
+                    return (
                     <div key={application.id} className="p-6 hover:bg-gray-50">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -1029,6 +1115,19 @@ export default function AdminApplications() {
                           <p className="mt-1 text-sm text-gray-600">
                             {application.description}
                           </p>
+                          {localDevUrl && (
+                            <p className="mt-1 text-xs text-gray-500">
+                              URL locale :{' '}
+                              <a
+                                href={localDevUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-mono text-gray-700 underline decoration-gray-400 hover:text-blue-700"
+                              >
+                                {localDevUrl}
+                              </a>
+                            </p>
+                          )}
                           
                           <div className="mt-3 flex items-center space-x-6 text-sm text-gray-500">
                             <div className="flex items-center">
@@ -1059,18 +1158,26 @@ export default function AdminApplications() {
                           {/* Affichage de l'état de santé */}
                           {healthChecks[application.id] && (
                             <div className={`mt-3 p-3 rounded-lg border ${
-                              healthChecks[application.id].isValid
+                              healthChecks[application.id].isSkipped
+                                ? 'bg-gray-50 border-gray-200'
+                                : healthChecks[application.id].isValid
                                 ? 'bg-green-50 border-green-200'
                                 : 'bg-red-50 border-red-200'
                             }`}>
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   <span className="text-xl">
-                                    {healthChecks[application.id].isValid ? '✅' : '❌'}
+                                    {healthChecks[application.id].isSkipped
+                                      ? '⚪'
+                                      : healthChecks[application.id].isValid
+                                      ? '✅'
+                                      : '❌'}
                                   </span>
                                   <div>
                                     <p className="font-medium text-sm">
-                                      {healthChecks[application.id].isValid 
+                                      {healthChecks[application.id].isSkipped
+                                        ? 'Application ignorée (hors périmètre IAHome)'
+                                        : healthChecks[application.id].isValid 
                                         ? 'Application opérationnelle' 
                                         : 'Application en erreur'}
                                     </p>
@@ -1239,7 +1346,8 @@ export default function AdminApplications() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </>

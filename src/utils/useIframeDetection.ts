@@ -1,41 +1,32 @@
 import { useEffect, useState } from 'react';
 
+function detectIframe(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  try {
+    if (window !== window.parent) {
+      return true;
+    }
+
+    if (window !== window.top) {
+      return true;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('iframe') === 'true' || urlParams.get('embedded') === 'true';
+  } catch {
+    return true;
+  }
+}
+
 export function useIframeDetection() {
-  const [isInIframe, setIsInIframe] = useState(false);
+  const [isInIframe, setIsInIframe] = useState<boolean>(detectIframe);
 
   useEffect(() => {
-    // Détecter si l'application est dans une iframe
-    const checkIfInIframe = () => {
-      try {
-        // Méthode 1: Comparer window avec window.parent
-        if (window !== window.parent) {
-          return true;
-        }
-        
-        // Méthode 2: Vérifier si on peut accéder à window.top
-        if (window !== window.top) {
-          return true;
-        }
-        
-        // Méthode 3: Vérifier les paramètres d'URL
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('iframe') === 'true' || urlParams.get('embedded') === 'true') {
-          return true;
-        }
-        
-        return false;
-      } catch (e) {
-        // Si on ne peut pas accéder à window.parent ou window.top, 
-        // on est probablement dans une iframe avec des restrictions de sécurité
-        return true;
-      }
-    };
-
-    setIsInIframe(checkIfInIframe());
-
-    // Écouter les changements de taille de fenêtre (pour détecter les changements d'iframe)
     const handleResize = () => {
-      setIsInIframe(checkIfInIframe());
+      setIsInIframe(detectIframe());
     };
 
     window.addEventListener('resize', handleResize);

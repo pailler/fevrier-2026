@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { TokenActionServiceClient } from '../utils/tokenActionServiceClient';
 import { useTokenContext } from '../contexts/TokenContext';
 import { getHunyuan3dAppUrl } from '../utils/hunyuan3dAppUrl';
+import { getTokenCostForModuleId } from '../utils/tokenActionService';
 
 interface EssentialAccessButtonProps {
   user?: any;
@@ -52,6 +53,9 @@ export default function EssentialAccessButton({
     'photobooth': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
       ? 'http://localhost:7885'
       : 'https://photobooth.iahome.fr',
+    'photo-vivante': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+      ? 'http://localhost:7887'
+      : 'https://photo-vivante.iahome.fr',
     // Détecteur de Contenu IA : sur le domaine principal
     'ai-detector': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
       ? 'http://localhost:3000/ai-detector'
@@ -210,7 +214,7 @@ export default function EssentialAccessButton({
           <>
             <span>🔧</span>
             <span>
-              Accéder à {moduleTitle} ({moduleId === 'photobooth' ? 100 : 10} crédits par accès)
+              Accéder à {moduleTitle} ({getTokenCostForModuleId(moduleId)} crédits par accès)
             </span>
           </>
         )}

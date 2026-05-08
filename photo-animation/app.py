@@ -321,6 +321,17 @@ def create_interface():
             Téléchargez une photo et choisissez le type d'animation souhaité.
             
             **Note:** Cette application utilise des modèles d'IA pour créer des animations réalistes.
+
+            ---
+
+            **Messages dans la console du navigateur**
+
+            - **`bootstrap-autofill-overlay.js`** ou **`getElementById` avec une chaîne vide** : en général une **extension**
+              (remplissage automatique / gestionnaire de mots de passe), pas cette application. Essayez une fenêtre privée sans extensions.
+            - **`Method not implemented`** dans un fichier **`index-….js`** (code interne Gradio) : souvent une API que le navigateur
+              n’implémente pas ; l’interface peut fonctionner normalement.
+
+            ---
             """
         )
         
@@ -372,13 +383,7 @@ def create_interface():
                     interactive=False
                 )
         
-        # Exemples
-        gr.Markdown("### 📸 Exemples")
-        gr.Examples(
-            examples=[],
-            inputs=[input_image],
-            label="Téléchargez votre propre image pour commencer"
-        )
+        gr.Markdown("### 📸 Chargez une image ci-dessus pour commencer.")
         
         # Événements
         animate_btn.click(
@@ -387,11 +392,11 @@ def create_interface():
             outputs=[output_image, status]
         )
         
-        input_image.upload(
-            fn=lambda img: (img, "✅ Image chargée, prêt à animer!"),
-            inputs=[input_image],
-            outputs=[input_image, status]
-        )
+        def _on_upload(img):
+            """Ne pas réinjecter l’image en sortie du même composant (évite effets de bord UI)."""
+            return "✅ Image chargée, prêt à animer!" if img is not None else "En attente d'une image..."
+
+        input_image.upload(fn=_on_upload, inputs=[input_image], outputs=[status])
     
     return demo
 
@@ -402,8 +407,8 @@ if __name__ == "__main__":
     print("Demarrage de l'application d'animation de photos...")
     print("=" * 60)
     try:
-        # Le port 7885 est aligne avec le routage photobooth dans IAHome.
-        server_port = int(os.environ.get("PHOTOBOOTH_PORT", os.environ.get("GRADIO_SERVER_PORT", "7885")))
+        # Cette app locale utilise 7887 pour éviter tout conflit avec Photobooth et MuseTalk.
+        server_port = int(os.environ.get("PHOTOBOOTH_PORT", os.environ.get("GRADIO_SERVER_PORT", "7887")))
         server_host = os.environ.get("GRADIO_SERVER_NAME", "0.0.0.0")
         demo = create_interface()
         print("\n[INFO] Interface creee avec succes")

@@ -85,6 +85,7 @@ const CARD_SLUGS = [
   'meeting-reports',
   'metube',
   'musetalk',
+  'photo-vivante',
   'pdf',
   'photobooth',
   'photomaker',
@@ -203,6 +204,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${baseUrl}/photobooth`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.75,
+    },
+    {
+      url: `${baseUrl}/photo-vivante`,
       lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.75,

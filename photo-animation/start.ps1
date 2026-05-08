@@ -24,7 +24,7 @@ try {
 
 # Démarrer l'application
 Write-Host "🚀 Lancement de l'application..." -ForegroundColor Cyan
-if (-not $env:PHOTOBOOTH_PORT) { $env:PHOTOBOOTH_PORT = "7885" }
+if (-not $env:PHOTOBOOTH_PORT) { $env:PHOTOBOOTH_PORT = "7887" }
 Write-Host "📍 L'application sera accessible sur http://localhost:$($env:PHOTOBOOTH_PORT)" -ForegroundColor Green
 Write-Host ""
 

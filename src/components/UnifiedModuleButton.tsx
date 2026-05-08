@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useModuleAccess } from '../hooks/useModuleAccess';
+import { getTokenCostForModuleId } from '../utils/tokenActionService';
 
 interface UnifiedModuleButtonProps {
   user?: any;
@@ -24,7 +25,7 @@ export default function UnifiedModuleButton({
     user: user!,
     moduleId,
     moduleTitle,
-    tokenCost: 10
+    tokenCost: getTokenCostForModuleId(moduleId)
   });
 
   // Ne pas afficher le bouton si l’accès est déjà ouvert pour ce module

@@ -45,9 +45,9 @@ export const seoConfig = {
   
   pages: {
     home: {
-      title: "IAHome — plateforme IA française | transcription, images, PDF, domotique",
+      title: "IAHome — Toutes les applications et la puissance des serveurs IAHome chez vous",
       description:
-        "Tous vos outils d'intelligence artificielle au même endroit : Whisper, Stable Diffusion, PDF+IA, Home Assistant, QR codes. Interface en français, crédits transparents.",
+        "Toutes les applications et la puissance des serveurs IAHome chez vous : Whisper, Stable Diffusion, PDF+IA, Home Assistant, QR codes. Interface en français, crédits transparents.",
       keywords: [
         "plateforme IA France",
         "outils IA en ligne",
@@ -148,7 +148,14 @@ export const seoConfig = {
   }
 };
 
-export const generatePageMetadata = (page: keyof typeof seoConfig.pages, customData?: any) => {
+type PageMetadataOverrides = {
+  title?: string;
+  description?: string;
+  keywords?: string[];
+  ogImage?: string;
+};
+
+export const generatePageMetadata = (page: keyof typeof seoConfig.pages, customData?: PageMetadataOverrides) => {
   const pageConfig = seoConfig.pages[page];
   const siteConfig = seoConfig.site;
   

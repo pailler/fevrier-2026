@@ -226,7 +226,7 @@ export default function Home() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
-                Gagnez une longueur d'avance avec l'Intelligence Artificielle
+                Toutes les applications et la puissance des serveurs IAHome chez vous
               </h1>
               <p className="text-xl text-gray-700 mb-6">
                 Apprenez, pratiquez et grandissez : l'IA simplifie votre quotidien, boost vos projets et décuple vos idées. Sans téléchargement.
@@ -250,7 +250,7 @@ export default function Home() {
                 
               {/* Texte supplémentaire */}
               <div className="mt-6 text-sm text-gray-600">
-                <p className="font-medium">Explorez notre collection complète d'outils d'intelligence artificielle conçus pour simplifier votre travail et booster votre productivité. Tous nos services sont des web-services accessibles directement depuis votre navigateur, sans installation ni téléchargement.</p>
+                <p className="font-medium">Explorez notre collection complète d'outils conçus pour simplifier votre travail et booster votre productivité. Tous nos services sont des web-services accessibles directement depuis votre navigateur, sans installation ni téléchargement.</p>
               </div>
             </div>
             

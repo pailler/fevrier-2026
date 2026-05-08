@@ -235,20 +235,6 @@ export default function Hi3DGenPage() {
               </a>
             </div>
           )}
-
-          <p className="mt-8 text-sm text-gray-500">
-            ComfyUI sur le port <strong>8188</strong> avec le dépôt{' '}
-            <a
-              href="https://github.com/Stable-X/ComfyUI-Hi3DGen"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-indigo-600 underline hover:text-indigo-800"
-            >
-              Stable-X/ComfyUI-Hi3DGen
-            </a>
-            . Interface dédiée : <code className="bg-gray-100 px-1 rounded">npm run hi3dgen</code> →{' '}
-            <span className="whitespace-nowrap">http://localhost:8095</span>
-          </p>
         </div>
       </div>
     </div>

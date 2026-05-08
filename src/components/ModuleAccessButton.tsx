@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import { useTokenContext } from '../contexts/TokenContext';
 import { getHunyuan3dAppUrl } from '../utils/hunyuan3dAppUrl';
+import { isBrowserLocalIahomeDev } from '../utils/isBrowserLocalIahomeDev';
 
 interface ModuleAccessButtonProps {
   moduleId: string;
@@ -38,7 +39,7 @@ export default function ModuleAccessButton({
   const resolveModuleUrl = () => {
     if (accessUrl) return accessUrl;
     const normalizedModuleId = (moduleId || '').trim().toLowerCase();
-    const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const isDevelopment = isBrowserLocalIahomeDev();
     const urlMap: Record<string, string> = isDevelopment
       ? {
           'librespeed': 'http://localhost:8085',
@@ -49,6 +50,7 @@ export default function ModuleAccessButton({
           'sentinelle-numerique': 'http://localhost:3000/sentinelle-numerique',
           'florence-2': 'http://localhost:7884',
           'musetalk': 'http://localhost:7886',
+          'photo-vivante': 'http://localhost:7887',
           'home-assistant': 'http://localhost:8123',
           'hunyuan3d': getHunyuan3dAppUrl(),
           'stablediffusion': 'http://localhost:7880',
@@ -67,6 +69,7 @@ export default function ModuleAccessButton({
           'sentinelle-numerique': 'https://iahome.fr/sentinelle-numerique',
           'florence-2': 'https://florence2.iahome.fr',
           'musetalk': 'https://musetalk.iahome.fr',
+          'photo-vivante': 'https://photo-vivante.iahome.fr',
           'home-assistant': 'https://homeassistant.iahome.fr',
           'hunyuan3d': getHunyuan3dAppUrl(),
           'stablediffusion': 'https://stablediffusion.iahome.fr',

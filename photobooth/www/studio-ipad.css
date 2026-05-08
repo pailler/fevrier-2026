@@ -1,0 +1,39 @@
+/* Studio photobooth — iPad uniquement (
+ *   <html class="ipad-studio"> posé par le script inline dans studio.html
+ * ). Le bureau n’applique pas ces règles. */
+
+/* Coins : au-dessus du bouton d’activation — sinon les taps ne déclenchent pas getUserMedia */
+html.ipad-studio .preview-stage .frame-corner {
+  pointer-events: none;
+}
+
+/* Bouton plein cadre : au-dessus vidéo (z-index 1–2) et des coins (5) */
+html.ipad-studio .studio-page .camera-tap-hint {
+  z-index: 24 !important;
+  font-size: 52px !important;
+  line-height: 1.12 !important;
+  font-weight: 900 !important;
+  padding: 32px 24px !important;
+  -webkit-text-size-adjust: 100% !important;
+  text-size-adjust: 100% !important;
+  letter-spacing: -0.03em !important;
+}
+
+/* iPad mini / fenêtre étroite */
+@media (max-width: 600px) {
+  html.ipad-studio .studio-page .camera-tap-hint {
+    font-size: 40px !important;
+    padding: 24px 18px !important;
+  }
+}
+
+/* Zone prévisualisation un peu plus haute pour respirer avec le gros libellé */
+html.ipad-studio .studio-page #camera-zone.preview-stage {
+  min-height: clamp(220px, 48vw, 420px);
+}
+
+/* Bouton vert : texte plus lisible en mode « activer la caméra » */
+html.ipad-studio .studio-actions .btn-capture.btn-activate-camera {
+  font-size: clamp(1.15rem, 3.2vw, 1.45rem) !important;
+  min-height: 76px !important;
+}

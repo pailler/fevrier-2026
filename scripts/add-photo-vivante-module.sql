@@ -1,4 +1,4 @@
--- Ajoute le module MuseTalk (lip-sync video) pour IAHome.
+-- Ajoute le module Photo Vivante (animation photo realiste) pour IAHome.
 -- Executer dans Supabase SQL Editor.
 
 INSERT INTO modules (
@@ -12,13 +12,13 @@ INSERT INTO modules (
   created_at,
   updated_at
 ) VALUES (
-  'musetalk',
-  'MuseTalk',
-  'Lip-sync haute fidélité : animez une vidéo de référence avec une piste audio (doublage, avatars, marketing). Interface Gradio locale, GPU NVIDIA recommandé.',
-  'AI VIDEO',
+  'photo-vivante',
+  'Photo Vivante',
+  'Animation photo realiste : donnez du mouvement a une image fixe avec une interface locale rapide et un acces securise par token.',
+  'AI PHOTO',
   100,
-  '/card/musetalk',
-  '/images/musetalk.jpg',
+  '/card/photo-vivante',
+  '/images/iaphoto.jpg',
   NOW(),
   NOW()
 )
@@ -31,4 +31,4 @@ ON CONFLICT (id) DO UPDATE SET
   image_url = EXCLUDED.image_url,
   updated_at = NOW();
 
-SELECT id, title, category, price, url FROM modules WHERE id = 'musetalk';
+SELECT id, title, category, price, url FROM modules WHERE id = 'photo-vivante';

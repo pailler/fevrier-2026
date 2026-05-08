@@ -1,49 +1,58 @@
 #!/usr/bin/env node
 /**
- * Script de monitoring localhost:3000 - envoie une notification Resend quand le serveur est down.
- * S'exécute indépendamment de Next.js : même si l'app crash, ce script peut toujours envoyer l'alerte.
+ * Script de monitoring localhost:3000 — notification Resend (formateur_tic@hotmail.com par défaut) si l’app ne répond pas.
+ * S’exécute hors Next.js : une alerte peut partir même si le serveur Next est arrêté.
  *
  * Usage:
- *   npm run monitor          # Surveillance continue (vérification toutes les 2 min)
- *   npm run monitor:check    # Vérification unique
+ *   npm run monitor              # Surveillance continue (toutes les 2 min, cooldown 30 min entre mails)
+ *   npm run monitor:check        # Une vérification puis exit (adapté Tâche planifiée Windows, 2×/jour)
+ *   npm run monitor:schedule-install  # Enregistre la tâche Windows (08:00 et 20:00)
  *
- * Variables d'environnement requises (.env.local ou .env) :
- *   RESEND_API_KEY          - Clé API Resend
- *   MONITOR_ALERT_EMAIL     - Email pour recevoir les alertes (optionnel, fallback: RESEND_ALERT_EMAIL)
- *   RESEND_FROM_EMAIL       - Email expéditeur (optionnel)
- *   MONITOR_URL             - URL à surveiller (défaut: http://localhost:3000)
- *   MONITOR_INTERVAL_MS     - Intervalle entre les vérifications en ms (défaut: 120000 = 2 min)
+ * Variables (.env, .env.local, .env.production.local — chargés dans cet ordre, dernier gagne) :
+ *   RESEND_API_KEY           - Obligatoire pour l’envoi
+ *   MONITOR_ALERT_EMAIL      - Destinataire (défaut: formateur_tic@hotmail.com)
+ *   RESEND_FROM_EMAIL        - Expéditeur vérifié chez Resend
+ *   MONITOR_URL              - URL de test (défaut: http://localhost:3000/api/version)
+ *   MONITOR_INTERVAL_MS      - Mode continu uniquement (défaut: 120000)
  */
 
 const path = require('path');
 const fs = require('fs');
 
-// Charger les variables d'environnement
+function parseEnvLine(line) {
+  const trimmed = line.trim();
+  if (!trimmed || trimmed.startsWith('#')) return null;
+  const eq = trimmed.indexOf('=');
+  if (eq <= 0) return null;
+  const key = trimmed.slice(0, eq).trim();
+  let value = trimmed.slice(eq + 1).trim();
+  if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+    value = value.slice(1, -1);
+  }
+  return { key, value };
+}
+
+/** Charge .env puis .env.local puis .env.production.local (comme Next), dernier fichier gagne. */
 function loadEnv() {
-  const envFiles = ['.env.local', '.env'];
+  const envFiles = ['.env', '.env.local', '.env.production.local'];
   const projectRoot = path.resolve(__dirname, '..');
 
   for (const file of envFiles) {
     const filePath = path.join(projectRoot, file);
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, 'utf8');
-      for (const line of content.split('\n')) {
-        const match = line.match(/^([^#=]+)=(.*)$/);
-        if (match) {
-          const key = match[1].trim();
-          const value = match[2].trim().replace(/^["']|["']$/g, '');
-          if (!process.env[key]) process.env[key] = value;
-        }
-      }
-      console.log(`📂 Config chargée depuis ${file}`);
-      break;
+    if (!fs.existsSync(filePath)) continue;
+    const content = fs.readFileSync(filePath, 'utf8');
+    for (const line of content.split('\n')) {
+      const parsed = parseEnvLine(line);
+      if (parsed) process.env[parsed.key] = parsed.value;
     }
+    console.log(`📂 Config fusionnée: ${file}`);
   }
 }
 
 loadEnv();
 
-const MONITOR_URL = process.env.MONITOR_URL || 'http://localhost:3000';
+const MONITOR_URL =
+  process.env.MONITOR_URL || 'http://localhost:3000/api/version';
 const MONITOR_INTERVAL_MS = parseInt(process.env.MONITOR_INTERVAL_MS || '120000', 10);
 const ALERT_EMAIL =
   process.env.MONITOR_ALERT_EMAIL || process.env.RESEND_ALERT_EMAIL || 'formateur_tic@hotmail.com';
@@ -63,8 +72,10 @@ async function checkLocalhost() {
     });
     clearTimeout(timeout);
 
-    if (response.status === 200 || response.status < 500) {
+    if (response.ok) {
       isOnline = true;
+    } else {
+      errorMessage = `HTTP ${response.status} ${response.statusText || ''}`.trim();
     }
   } catch (error) {
     isOnline = false;
@@ -85,7 +96,11 @@ async function sendAlertEmail(errorMessage) {
   const resend = new Resend(apiKey);
   const fromEmail = process.env.RESEND_FROM_EMAIL || 'IAHome <noreply@iahome.fr>';
 
-  const subject = '🚨 ALERTE: localhost:3000 est hors ligne';
+  const scheduled =
+    process.argv.includes('--once') || process.argv.includes('-o');
+  const subject = scheduled
+    ? '🚨 IAHome — localhost:3000 indisponible (contrôle planifié)'
+    : '🚨 ALERTE: localhost:3000 est hors ligne';
   const html = `
 <!DOCTYPE html>
 <html>
@@ -119,14 +134,14 @@ async function sendAlertEmail(errorMessage) {
     <h3>Actions recommandées:</h3>
     <ul>
       <li>Vérifier si le processus Node.js est en cours d'exécution</li>
-      <li>Vérifier les logs du serveur (npm run dev)</li>
-      <li>Redémarrer l'application: npm run dev</li>
+      <li>Vérifier les logs du serveur (npm run dev ou npm run start)</li>
+      <li>Redémarrer : <code>npm run dev</code> (dev) ou <code>npm run start</code> (prod après build)</li>
       <li>Vérifier l'utilisation des ressources (CPU, mémoire)</li>
     </ul>
   </div>
 
   <p style="margin-top: 20px; color: #666; font-size: 12px;">
-    Cette alerte a été générée par le script de monitoring IAHome (scripts/monitor-localhost.js).
+    Alerte générée par scripts/monitor-localhost.js${scheduled ? ' (exécution planifiée 2×/jour).' : '.'}
   </p>
 </body>
 </html>

@@ -32,6 +32,15 @@ export interface PhotoUploadData {
   customTags?: string[];
 }
 
+type SearchPhotoResult = {
+  photo_id: string;
+  [key: string]: unknown;
+};
+
+type UserPhotoStats = Record<string, unknown>;
+
+type UserPhotoRecord = Record<string, unknown>;
+
 export class PhotoAnalysisService {
   /**
    * Analyse une photo et génère une description détaillée avec des tags
@@ -249,7 +258,7 @@ export class PhotoAnalysisService {
     userId: string,
     limit: number = 10,
     threshold: number = 0.7
-  ): Promise<any[]> {
+  ): Promise<SearchPhotoResult[]> {
     try {
       // Générer l'embedding de la requête
       const queryEmbedding = await this.generateEmbedding(query);
@@ -268,7 +277,7 @@ export class PhotoAnalysisService {
 
       // Mettre à jour les statistiques de recherche
       if (data && data.length > 0) {
-        const photoIds = data.map((photo: any) => photo.photo_id);
+        const photoIds = data.map((photo: SearchPhotoResult) => photo.photo_id);
         // Mettre à jour les statistiques de recherche pour chaque photo
         for (const photoId of photoIds) {
           // Récupérer le count actuel et l'incrémenter
@@ -301,7 +310,7 @@ export class PhotoAnalysisService {
   /**
    * Obtient les statistiques d'un utilisateur
    */
-  static async getUserStats(userId: string): Promise<any> {
+  static async getUserStats(userId: string): Promise<UserPhotoStats | null> {
     try {
       const { data, error } = await supabase.rpc('get_user_photo_stats', {
         user_id_param: userId
@@ -326,7 +335,7 @@ export class PhotoAnalysisService {
     page: number = 1,
     limit: number = 20,
     collectionId?: string
-  ): Promise<{ photos: any[], total: number }> {
+  ): Promise<{ photos: UserPhotoRecord[]; total: number }> {
     try {
       let query = supabase
         .from('photo_metadata')

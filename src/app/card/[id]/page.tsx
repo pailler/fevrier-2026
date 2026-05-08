@@ -173,6 +173,7 @@ export default function CardDetailPage() {
         'florence-2': isDevelopment ? 'http://localhost:7884' : 'https://florence2.iahome.fr',
         'birefnet': isDevelopment ? 'http://localhost:7882' : 'https://birefnet.iahome.fr',
         'musetalk': isDevelopment ? 'http://localhost:7886' : 'https://musetalk.iahome.fr',
+        'photo-vivante': isDevelopment ? 'http://localhost:7887' : 'https://photo-vivante.iahome.fr',
       };
 
       const accessUrl = applicationUrls[moduleId];
@@ -309,7 +310,7 @@ export default function CardDetailPage() {
       console.log('🔧 Chargement carte pour:', params.id);
 
       // Liste des modules qui ont des pages spécifiques
-      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'cogstudio', 'ruinedfooocus', 'whisper', 'meeting-reports', 'psitransfer', 'hunyuan3d', 'photomaker', 'animagine-xl', 'florence-2', 'birefnet', 'musetalk', 'sentinelle-numerique'];
+      const specificPages = ['qrcodes', 'stablediffusion', 'comfyui', 'cogstudio', 'ruinedfooocus', 'whisper', 'meeting-reports', 'psitransfer', 'hunyuan3d', 'photomaker', 'animagine-xl', 'florence-2', 'birefnet', 'musetalk', 'photo-vivante', 'sentinelle-numerique'];
       
       // Si c'est un module avec une page spécifique, charger la page spécifique
       if (specificPages.includes(params.id as string)) {

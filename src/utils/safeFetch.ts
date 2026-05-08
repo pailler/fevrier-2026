@@ -1,8 +1,27 @@
+type ErrorLike = {
+  message?: string;
+  name?: string;
+  toString?: () => string;
+};
+
+type ApiErrorPayload = {
+  message?: string;
+  error?: string;
+};
+
+function toErrorLike(error: unknown): ErrorLike | null {
+  if (!error || typeof error !== 'object') {
+    return null;
+  }
+  return error as ErrorLike;
+}
+
 // Fonction pour détecter si une erreur est due à un problème réseau
-export function isNetworkError(error: any): boolean {
+export function isNetworkError(error: unknown): boolean {
   if (!error) return false;
-  const errorMessage = error?.message || error?.toString() || '';
-  const errorName = error?.name || '';
+  const errorLike = toErrorLike(error);
+  const errorMessage = errorLike?.message || errorLike?.toString?.() || '';
+  const errorName = errorLike?.name || '';
   
   return (
     errorMessage.includes('Failed to fetch') ||
@@ -17,7 +36,7 @@ export function isNetworkError(error: any): boolean {
 }
 
 // Fonction pour faire un fetch avec gestion d'erreurs et retry
-export async function safeApiFetchJson<T = any>(
+export async function safeApiFetchJson<T = unknown>(
   url: string,
   options: RequestInit = {},
   retries: number = 2,
@@ -41,7 +60,7 @@ export async function safeApiFetchJson<T = any>(
 
         if (!response.ok) {
           // Essayer de parser le JSON de l'erreur
-          let errorData: any = {};
+          let errorData: ApiErrorPayload = {};
           try {
             const text = await response.text();
             if (text) {
@@ -69,18 +88,18 @@ export async function safeApiFetchJson<T = any>(
         // Parser la réponse JSON
         const data = await response.json();
         return data as T;
-      } catch (fetchError: any) {
+      } catch (fetchError: unknown) {
         clearTimeout(timeoutId);
 
         // Si c'est une erreur d'abort (timeout), la traiter comme une erreur réseau
-        if (fetchError.name === 'AbortError') {
+        if (toErrorLike(fetchError)?.name === 'AbortError') {
           throw new Error('Timeout: La requête a pris trop de temps');
         }
 
         throw fetchError;
       }
-    } catch (error: any) {
-      lastError = error;
+    } catch (error: unknown) {
+      lastError = error instanceof Error ? error : new Error(String(error));
 
       // Si c'est une erreur réseau et qu'on a encore des tentatives, réessayer
       if (isNetworkError(error) && attempt < retries) {
@@ -91,7 +110,7 @@ export async function safeApiFetchJson<T = any>(
 
       // Si ce n'est pas une erreur réseau ou qu'on n'a plus de tentatives, propager l'erreur
       if (!isNetworkError(error) || attempt >= retries) {
-        throw error;
+        throw lastError;
       }
     }
   }

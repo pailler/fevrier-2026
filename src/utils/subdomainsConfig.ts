@@ -147,9 +147,9 @@ export const subdomainsConfig: SubdomainInfo[] = [
   {
     subdomain: 'photobooth.iahome.fr',
     url: 'https://photobooth.iahome.fr',
-    title: 'Photobooth Mariage - Photos Instantanées Événement | IA Home',
-    description: 'Créez un photobooth mariage ou événement en ligne avec galerie privée, captures instantanées et partage simplifié. Une expérience photo festive accessible depuis le navigateur.',
-    keywords: ['photobooth', 'photobooth mariage', 'photobooth événement', 'borne photo en ligne', 'photos événement', 'galerie privée'],
+    title: 'Photobooth événements - Photos instantanées | IA Home',
+    description: 'Créez un photobooth en ligne pour vos événements (mariage, anniversaires, entreprises…) : galerie privée, captures instantanées et partage simplifié. Une expérience photo festive depuis le navigateur.',
+    keywords: ['photobooth', 'photobooth événement', 'borne photo en ligne', 'photos événement', 'galerie privée', 'photobooth anniversaire', 'photobooth entreprise'],
     category: 'media',
     icon: '📸',
     features: [
@@ -160,9 +160,9 @@ export const subdomainsConfig: SubdomainInfo[] = [
       'Accès sécurisé par token'
     ],
     useCases: [
-      'Animer un mariage avec un espace photo',
-      'Créer un photobooth pour un anniversaire',
-      'Collecter les photos d\'un événement professionnel'
+      'Animer vos événements : mariage, anniversaire, entreprise…',
+      'Créer un photobooth pour une soirée privée ou associative',
+      'Collecter les photos d\'un séminaire ou d\'une cérémonie'
     ]
   },
   {

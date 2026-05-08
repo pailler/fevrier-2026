@@ -1,4 +1,8 @@
 import os
+
+# Télémétrie Gradio / Hub (évite appels HF inutiles en usage local).
+os.environ.setdefault("GRADIO_ANALYTICS_ENABLED", "false")
+
 import time
 import pdb
 import re
@@ -32,10 +36,52 @@ from transformers import WhisperModel
 ProjectDir = os.path.abspath(os.path.dirname(__file__))
 CheckpointsDir = os.path.join(ProjectDir, "models")
 
+
+def _filepath_from_gradio_media(val):
+    """Normalize Gradio 5 outputs: FileData (.path), str/Path, VideoData (.video), dict."""
+    if val is None:
+        return None
+    if isinstance(val, str):
+        s = val.strip()
+        return s or None
+    if isinstance(val, (list, tuple)):
+        if not val:
+            return None
+        return _filepath_from_gradio_media(val[0])
+    # gr.Video : modèle VideoData { video: FileData }
+    v_nested = getattr(val, "video", None)
+    if v_nested is not None and v_nested is not val:
+        got = _filepath_from_gradio_media(v_nested)
+        if got:
+            return got
+    p = getattr(val, "path", None)
+    if isinstance(p, str) and p.strip():
+        return p.strip()
+    if isinstance(val, dict):
+        for k in ("path", "video", "name"):
+            v = val.get(k)
+            if isinstance(v, str) and v.strip():
+                return v.strip()
+        return None
+    if hasattr(val, "__fspath__"):
+        try:
+            s = os.fspath(val)
+        except TypeError:
+            return None
+        s = str(s).strip()
+        return s or None
+    return None
+
+
 @torch.no_grad()
 def debug_inpainting(video_path, bbox_shift, extra_margin=10, parsing_mode="jaw", 
                     left_cheek_width=90, right_cheek_width=90):
     """Debug inpainting parameters, only process the first frame"""
+    video_path = _filepath_from_gradio_media(video_path)
+    if not video_path:
+        raise gr.Error("Chargez une vidéo ou une image de référence avant de tester l'inpainting.")
+    if not os.path.isfile(video_path):
+        raise gr.Error("Référence invalide : fichier introuvable.")
     # Set default parameters
     args_dict = {
         "result_dir": './results/debug', 
@@ -120,7 +166,8 @@ def debug_inpainting(video_path, bbox_shift, extra_margin=10, parsing_mode="jaw"
                 f"right_cheek_width: {right_cheek_width}\n" + \
                 f"Detected face coordinates: [{x1}, {y1}, {x2}, {y2}]"
     
-    return cv2.cvtColor(combine_frame, cv2.COLOR_RGB2BGR), info_text
+    # get_image returns BGR numpy; Gradio Image expects RGB
+    return cv2.cvtColor(combine_frame, cv2.COLOR_BGR2RGB), info_text
 
 def print_directory_contents(path):
     for child in os.listdir(path):
@@ -195,6 +242,101 @@ def fast_check_ffmpeg(exe_path=None):
     return False
 
 
+def _catch_gradio_inference_errors(fn):
+    """Évite les exceptions brutes (Gradio « Erreur » opaque) et ne laisse jamais le process mourir silencieusement."""
+    import functools
+    import traceback
+
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except gr.Error:
+            raise
+        except Exception as e:
+            traceback.print_exc()
+            msg = str(e).strip() or type(e).__name__
+            if len(msg) > 900:
+                msg = msg[:900] + "…"
+            raise gr.Error(
+                "Échec de la génération MuseTalk. "
+                f"Détail : {msg} — Voir le terminal du serveur pour la trace complète."
+            ) from e
+
+    return wrapper
+
+
+def _normalize_reference_video_for_musetalk(video: str) -> str:
+    """
+    Convertit la vidéo de référence en H.264 25 fps sans piste audio (idempotent si déjà outputxxx_*).
+    Même logique que check_video : utilisé aussi au clic « Générer » pour éviter les courses avec l’événement change.
+    """
+    video = (video or "").strip()
+    if not video:
+        raise gr.Error("Chemin vidéo vide.")
+    _dir, file_name = os.path.split(os.path.normpath(video))
+    if file_name.startswith("outputxxx_"):
+        return os.path.abspath(video)
+
+    base = os.path.splitext(file_name)[0]
+    out_name = f"outputxxx_{base}.mp4"
+    os.makedirs("./results", exist_ok=True)
+    os.makedirs("./results/output", exist_ok=True)
+    os.makedirs("./results/input", exist_ok=True)
+    output_video = os.path.abspath(os.path.join("./results/input", out_name))
+
+    ffmpeg_exe = FFMPEG_EXE_CACHED or resolve_ffmpeg_executable()
+    if not ffmpeg_exe:
+        raise gr.Error(
+            "ffmpeg not found. From gradio-apps/musetalk run: pip install \"imageio[ffmpeg]\" "
+            "(installs imageio-ffmpeg), or add FFmpeg to PATH, or start with:\n"
+            "--ffmpeg_path \"C:\\\\path\\\\to\\\\bin\"  or  --ffmpeg_path \"C:\\\\path\\\\to\\\\ffmpeg.exe\""
+        )
+
+    src = os.path.normpath(os.path.abspath(video))
+    cmd = [
+        ffmpeg_exe,
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-y",
+        "-i",
+        src,
+        "-r",
+        "25",
+        "-c:v",
+        "libx264",
+        "-pix_fmt",
+        "yuv420p",
+        "-preset",
+        "fast",
+        "-crf",
+        "23",
+        "-movflags",
+        "+faststart",
+        "-an",
+        output_video,
+    ]
+    try:
+        subprocess.run(
+            cmd,
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
+    except subprocess.CalledProcessError as e:
+        tail = (e.stderr or e.stdout or str(e))[-1200:]
+        raise gr.Error(f"Video conversion failed (ffmpeg). {tail}") from e
+
+    if not os.path.isfile(output_video) or os.path.getsize(output_video) == 0:
+        raise gr.Error("Video conversion produced an empty or missing file.")
+
+    return output_video
+
+
+@_catch_gradio_inference_errors
 @torch.no_grad()
 def inference(audio_path, video_path, bbox_shift, extra_margin=10, parsing_mode="jaw",
               left_cheek_width=90, right_cheek_width=90):
@@ -215,8 +357,27 @@ def inference(audio_path, video_path, bbox_shift, extra_margin=10, parsing_mode=
     }
     args = Namespace(**args_dict)
 
+    video_path = _filepath_from_gradio_media(video_path)
+    audio_path = _filepath_from_gradio_media(audio_path)
+    if not video_path:
+        raise gr.Error("Référence vidéo manquante. Chargez une vidéo ou une image.")
+    if not audio_path:
+        raise gr.Error("Piste audio manquante. Chargez un fichier audio avant Générer.")
+    if not os.path.isfile(audio_path):
+        raise gr.Error("Fichier audio introuvable ou invalide.")
+    if not (os.path.isfile(video_path) or os.path.isdir(video_path)):
+        raise gr.Error("Référence vidéo/image introuvable ou invalide.")
+
+    # Normalisation 25 fps (même traitement que check_video) : ne pas dépendre seulement de l’événement change.
+    if get_file_type(video_path) == "video":
+        _vn = os.path.basename(os.path.normpath(video_path))
+        if not _vn.startswith("outputxxx_"):
+            video_path = _normalize_reference_video_for_musetalk(video_path)
+
     if not fast_check_ffmpeg(resolve_ffmpeg_executable()):
         print("Warning: Unable to run ffmpeg; video steps may fail")
+
+    print(f"[MuseTalk] inference video={video_path!r} audio={audio_path!r}", flush=True)
 
     input_basename = os.path.basename(video_path).split('.')[0]
     audio_basename = os.path.basename(audio_path).split('.')[0]
@@ -248,14 +409,24 @@ def inference(audio_path, video_path, bbox_shift, extra_margin=10, parsing_mode=
             imageio.imwrite(f"{save_dir_full}/{i:08d}.png", im)
         input_img_list = sorted(glob.glob(os.path.join(save_dir_full, '*.[jpJP][pnPN]*[gG]')))
         fps = get_video_fps(video_path)
-    else: # input img folder
+    elif os.path.isfile(video_path) and get_file_type(video_path) == "image":
+        input_img_list = [video_path]
+        fps = args.fps
+    else:  # folder of numbered images
+        if not os.path.isdir(video_path):
+            raise gr.Error(
+                "Référence invalide : utilisez une vidéo, une image fichier, ou un dossier d'images numérotées."
+            )
         input_img_list = glob.glob(os.path.join(video_path, '*.[jpJP][pnPN]*[gG]'))
         input_img_list = sorted(input_img_list, key=lambda x: int(os.path.splitext(os.path.basename(x))[0]))
         fps = args.fps
         
     ############################################## extract audio feature ##############################################
     # Extract audio features
-    whisper_input_features, librosa_length = audio_processor.get_audio_feature(audio_path)
+    _audio_feats = audio_processor.get_audio_feature(audio_path)
+    if _audio_feats is None:
+        raise gr.Error("Impossible de lire la piste audio (fichier absent ou chemin invalide).")
+    whisper_input_features, librosa_length = _audio_feats
     whisper_chunks = audio_processor.get_whisper_chunk(
         whisper_input_features, 
         device, 
@@ -440,11 +611,25 @@ parser.add_argument(
     default=r"ffmpeg-master-latest-win64-gpl-shared\bin",
     help="Folder containing ffmpeg (e.g. ...\\bin) or full path to ffmpeg.exe",
 )
-parser.add_argument("--ip", type=str, default="127.0.0.1", help="IP address to bind to")
-parser.add_argument("--port", type=int, default=7860, help="Port to bind to")
+parser.add_argument("--ip", type=str, default="0.0.0.0", help="IP to bind (0.0.0.0 = toutes interfaces, aligné scripts IA Home)")
+parser.add_argument("--port", type=int, default=7886, help="Port IA Home MuseTalk (localhost:7886)")
 parser.add_argument("--share", action="store_true", help="Create a public link")
-parser.add_argument("--use_float16", action="store_true", help="Use float16 for faster inference")
+parser.add_argument(
+    "--use_float16",
+    action="store_true",
+    help="Float16 sur GPU CUDA uniquement (ignoré sur CPU : non supporté par PyTorch pour les convolutions).",
+)
 args = parser.parse_args()
+
+# Gradio enregistre server_name dans la config (URLs / redirects). Avec 0.0.0.0, le client peut
+# recevoir des 307 incohérents (localhost ↔ 127.0.0.1). Uvicorn bind toujours sur args.ip.
+_gradio_public = os.environ.get("MUSETALK_PUBLIC_HOST", "").strip()
+if _gradio_public:
+    _mount_server_name = _gradio_public
+elif args.ip in ("0.0.0.0", "::", "::0", ""):
+    _mount_server_name = "localhost"
+else:
+    _mount_server_name = args.ip
 
 
 def resolve_ffmpeg_executable():
@@ -509,14 +694,19 @@ if _ffmpeg_resolved:
     except Exception:
         pass
 
-# Set data type
-if args.use_float16:
-    # Convert models to half precision for better performance
+# Set data type : float16 uniquement sur CUDA. Sur CPU, PyTorch lève
+# "slow_conv2d_cpu not implemented for 'Half'" si on passe les poids en half.
+if args.use_float16 and device.type == "cuda":
     pe = pe.half()
     vae.vae = vae.vae.half()
     unet.model = unet.model.half()
     weight_dtype = torch.float16
 else:
+    if args.use_float16 and device.type != "cuda":
+        print(
+            "Notice: --use_float16 ignoré sans GPU CUDA "
+            "(le CPU PyTorch n'implémente pas les convolutions en float16). Poids en float32."
+        )
     weight_dtype = torch.float32
 
 # Move models to specified device
@@ -538,78 +728,130 @@ def check_video(video):
     Normalize reference video to 25 FPS H.264 MP4 for MuseTalk and for browser preview.
     Uses ffmpeg (stream) instead of loading all frames into RAM — long uploads no longer OOM/timeout.
     """
-    if video is None:
+    video = _filepath_from_gradio_media(video)
+    if not video or not isinstance(video, str):
         return None
-    if not isinstance(video, str):
+    if get_file_type(video) != "video":
         return video
-
-    _dir, file_name = os.path.split(video)
-    if file_name.startswith("outputxxx_"):
-        return video
-
-    base = os.path.splitext(file_name)[0]
-    out_name = f"outputxxx_{base}.mp4"
-    os.makedirs("./results", exist_ok=True)
-    os.makedirs("./results/output", exist_ok=True)
-    os.makedirs("./results/input", exist_ok=True)
-    output_video = os.path.abspath(os.path.join("./results/input", out_name))
-
-    ffmpeg_exe = FFMPEG_EXE_CACHED or resolve_ffmpeg_executable()
-    if not ffmpeg_exe:
-        raise gr.Error(
-            "ffmpeg not found. From gradio-apps/musetalk run: pip install \"imageio[ffmpeg]\" "
-            "(installs imageio-ffmpeg), or add FFmpeg to PATH, or start with:\n"
-            "--ffmpeg_path \"C:\\\\path\\\\to\\\\bin\"  or  --ffmpeg_path \"C:\\\\path\\\\to\\\\ffmpeg.exe\""
-        )
-
-    src = os.path.normpath(os.path.abspath(video))
-    cmd = [
-        ffmpeg_exe,
-        "-hide_banner",
-        "-loglevel",
-        "error",
-        "-y",
-        "-i",
-        src,
-        "-r",
-        "25",
-        "-c:v",
-        "libx264",
-        "-pix_fmt",
-        "yuv420p",
-        "-preset",
-        "fast",
-        "-crf",
-        "23",
-        "-movflags",
-        "+faststart",
-        "-an",
-        output_video,
-    ]
     try:
-        subprocess.run(
-            cmd,
-            check=True,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-        )
-    except subprocess.CalledProcessError as e:
-        tail = (e.stderr or e.stdout or str(e))[-1200:]
-        raise gr.Error(f"Video conversion failed (ffmpeg). {tail}") from e
-
-    if not os.path.isfile(output_video) or os.path.getsize(output_video) == 0:
-        raise gr.Error("Video conversion produced an empty or missing file.")
-
-    return output_video
+        return _normalize_reference_video_for_musetalk(video)
+    except gr.Error:
+        raise
 
 
 
 
 css = """#input_img {max-width: 1024px !important} #output_vid {max-width: 1024px; max-height: 576px}"""
+# Sur certains navigateurs Windows, la pile Gradio (ui-sans-serif, system-ui) peut déclencher
+# des GET vers /static/fonts/ui-sans-serif/*.woff2 (inexistant → erreurs console). On force
+# une pile explicite + IBM Plex (fichiers présents sous /static/fonts/IBMPlexSans/).
+css += """
+[class^="gradio-container"] {
+  --font: "IBM Plex Sans", "Segoe UI", Roboto, Arial, sans-serif !important;
+  --font-sans: "IBM Plex Sans", "Segoe UI", Roboto, Arial, sans-serif !important;
+  --font-mono: "IBM Plex Mono", Consolas, "Courier New", monospace !important;
+}
+"""
+# Hors Hugging Face Spaces, Gradio peut appeler postMessage(..., "https://huggingface.co") vers
+# cette fenêtre (localhost / musetalk.iahome.fr) → erreur console ; idem supports_zerogpu_headers.
+_MUSE_HEAD = """
+<script>
+(function () {
+  try {
+    if (window.location && /huggingface\\.co/i.test(String(window.location.hostname || ""))) return;
+    if (Window.prototype.__musetalkPmWrapped) return;
+    Window.prototype.__musetalkPmWrapped = 1;
+    var opm = Window.prototype.postMessage;
+    Window.prototype.postMessage = function (message, targetOrigin, transfer) {
+      try {
+        if (typeof targetOrigin === "string" && /huggingface\\.co/i.test(targetOrigin)) {
+          var ao = "";
+          try {
+            ao = this && this.location && this.location.origin ? String(this.location.origin) : "";
+          } catch (e) {}
+          if (!ao || /huggingface\\.co/i.test(ao)) {
+            try {
+              if (this === window && window.location && window.location.origin) {
+                ao = String(window.location.origin);
+              }
+            } catch (e2) {}
+          }
+          if (ao && !/huggingface\\.co/i.test(ao)) {
+            targetOrigin = ao;
+          } else {
+            targetOrigin = "*";
+          }
+        }
+      } catch (e) {}
+      return arguments.length >= 3
+        ? opm.call(this, message, targetOrigin, transfer)
+        : opm.call(this, message, targetOrigin);
+    };
+  } catch (e) {}
+})();
+(function () {
+  try { delete window.supports_zerogpu_headers; } catch (e) {}
+  try {
+    Object.defineProperty(window, "supports_zerogpu_headers", {
+      configurable: true,
+      enumerable: true,
+      get: function () { return false; },
+      set: function () {},
+    });
+  } catch (e) {}
+})();
+</script>
+"""
 
-with gr.Blocks(css=css) as demo:
+with gr.Blocks(
+    css=css,
+    head=_MUSE_HEAD,
+    js="""
+function () {
+  try {
+    if (window.location && /huggingface\\.co/i.test(String(window.location.hostname || ""))) return;
+    if (Window.prototype.__musetalkPmWrapped) return;
+    Window.prototype.__musetalkPmWrapped = 1;
+    var opm = Window.prototype.postMessage;
+    Window.prototype.postMessage = function (message, targetOrigin, transfer) {
+      try {
+        if (typeof targetOrigin === "string" && /huggingface\\.co/i.test(targetOrigin)) {
+          var ao = "";
+          try {
+            ao = this && this.location && this.location.origin ? String(this.location.origin) : "";
+          } catch (e) {}
+          if (!ao || /huggingface\\.co/i.test(ao)) {
+            try {
+              if (this === window && window.location && window.location.origin) {
+                ao = String(window.location.origin);
+              }
+            } catch (e2) {}
+          }
+          if (ao && !/huggingface\\.co/i.test(ao)) {
+            targetOrigin = ao;
+          } else {
+            targetOrigin = "*";
+          }
+        }
+      } catch (e) {}
+      return arguments.length >= 3
+        ? opm.call(this, message, targetOrigin, transfer)
+        : opm.call(this, message, targetOrigin);
+    };
+  } catch (e) {}
+  try { delete window.supports_zerogpu_headers; } catch (e) {}
+  try {
+    Object.defineProperty(window, "supports_zerogpu_headers", {
+      configurable: true,
+      enumerable: true,
+      get: function () { return false; },
+      set: function () {},
+    });
+  } catch (e) {}
+}
+""",
+    analytics_enabled=False,
+) as demo:
     gr.Markdown(
         """<div align='center'> <h1>MuseTalk: Real-Time High-Fidelity Video Dubbing via Spatio-Temporal Sampling</h1> \
                     <h2 style='font-weight: 450; font-size: 1rem; margin: 0rem'>\
@@ -665,7 +907,8 @@ with gr.Blocks(css=css) as demo:
             left_cheek_width,
             right_cheek_width
         ],
-        outputs=[out1,bbox_shift_scale]
+        outputs=[out1, bbox_shift_scale],
+        show_progress="full",
     )
     debug_btn.click(
         fn=debug_inpainting,
@@ -685,10 +928,89 @@ if sys.platform == 'win32':
     import asyncio
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-# Start Gradio application
-demo.queue().launch(
-    share=args.share, 
-    debug=True, 
-    server_name=args.ip, 
-    server_port=args.port
+# --- Production : FastAPI + gate jeton (musetalk.iahome.fr) + Gradio sur /
+# Localhost reste ouvert sans jeton (voir iahome_token_gate.gate_disabled_for_request).
+# Lien utilisateur : unified-redirect / compte → ?token=… → cookie HttpOnly → accès Gradio.
+demo.queue(default_concurrency_limit=1)
+
+from fastapi import FastAPI
+import uvicorn
+from gradio import mount_gradio_app
+import gradio.routes as _gradio_routes
+
+# Gradio mount path="/" → configure_app définit souvent root_path="/". Alors Starlette
+# get_route_path(scope) vaut "" pour une requête "/", redirect_slashes ajoute "/" et
+# renvoie Location http://host:7886/ → boucle 307 dans le navigateur.
+_orig_configure_app = _gradio_routes.App.configure_app
+
+
+def _configure_app_fix_root_path(self, blocks):
+    _orig_configure_app(self, blocks)
+    if (getattr(self, "root_path", None) or "") == "/" and (
+        getattr(blocks, "custom_mount_path", None) or ""
+    ) == "/":
+        self.root_path = ""
+        blocks.root_path = ""
+
+
+_gradio_routes.App.configure_app = _configure_app_fix_root_path  # type: ignore[method-assign]
+
+from iahome_token_gate import (
+    FixRedirectLocationDoubleSlashMiddleware,
+    MuseTalkAsgiRequestFixMiddleware,
+    MuseTalkGradioHtmlShimMiddleware,
+    MuseTalkIahomeGateMiddleware,
+    make_auth_dependency,
 )
+
+# Évite des 307 incohérents au niveau du routeur parent (slash / sous-routes).
+_fastapi = FastAPI(redirect_slashes=False)
+
+
+@_fastapi.get("/healthz")
+@_fastapi.head("/healthz")
+async def _healthz():
+    """Sonde Traefik / load balancer (sans auth Gradio)."""
+    return {"status": "ok"}
+
+
+# Dernier add_middleware = le plus externe (exécuté en premier sur la requête).
+# Une seule couche gate (cookie + redirect 401) au lieu de deux BaseHTTPMiddleware : évite des
+# NS_ERROR_NET_RESET / « Connection errored out » sur /gradio_api/queue/data (SSE).
+_fastapi.add_middleware(FixRedirectLocationDoubleSlashMiddleware)
+_fastapi.add_middleware(MuseTalkAsgiRequestFixMiddleware)
+# Réécrit le HTML Gradio (shim). Désactivable si problème de navigation : MUSETALK_DISABLE_HTML_SHIM=1
+if os.environ.get("MUSETALK_DISABLE_HTML_SHIM", "").lower() not in ("1", "true", "yes"):
+    _fastapi.add_middleware(MuseTalkGradioHtmlShimMiddleware)
+_fastapi.add_middleware(MuseTalkIahomeGateMiddleware)
+
+app = mount_gradio_app(
+    _fastapi,
+    demo,
+    path="/",
+    server_name=_mount_server_name,
+    server_port=args.port,
+    auth_dependency=make_auth_dependency(),
+    app_kwargs={"redirect_slashes": False},
+)
+
+# Traefik / reverse-proxy : activer avec MUSETALK_TRUST_PROXY=1 (défaut off : en local, des
+# X-Forwarded-* fantômes (VPN, proxy) peuvent casser cookies / URLs sur http://localhost:7886).
+if os.environ.get("MUSETALK_TRUST_PROXY", "").lower() in ("1", "true", "yes"):
+    try:
+        from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
+
+        app = ProxyHeadersMiddleware(app, trusted_hosts="*")
+    except ImportError:
+        pass
+
+if __name__ == "__main__":
+    _fwd = os.environ.get("UVICORN_FORWARDED_ALLOW_IPS", "*")
+    uvicorn.run(
+        app,
+        host=args.ip,
+        port=args.port,
+        log_level="info",
+        forwarded_allow_ips=_fwd,
+        timeout_keep_alive=120,
+    )

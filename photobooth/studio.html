@@ -2,17 +2,36 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta http-equiv="Permissions-Policy" content="camera=(self), microphone=(self)" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="manifest" href="./manifest.json" />
-    <title>Studio Photobooth Mariage</title>
+    <title>Studio Photobooth événements</title>
+    <script>
+      (function () {
+        try {
+          var ua = navigator.userAgent || "";
+          var p = navigator.platform || "";
+          var maxTouch = navigator.maxTouchPoints || navigator.msMaxTouchPoints || 0;
+          var isIpad =
+            /iPad/i.test(ua) ||
+            (p === "MacIntel" && maxTouch > 1) ||
+            (p === "iPad");
+          if (isIpad) document.documentElement.classList.add("ipad-studio");
+        } catch (e) {}
+      })();
+    </script>
     <meta
       name="description"
-      content="Studio photobooth responsive avec cadres festifs, filtres et galerie."
+      content="Studio photobooth événements : cadres festifs, filtres et galerie."
     />
-    <link rel="stylesheet" href="./styles.css?v=4" />
-    <script src="./stay-standalone.js"></script>
+    <link rel="stylesheet" href="./styles.css?v=50" />
+    <link rel="stylesheet" href="./studio-ipad.css?v=3" />
+    <script src="./stay-standalone.js?v=3"></script>
   </head>
   <body>
     <main class="page studio-page">
@@ -29,7 +48,7 @@
         <div class="studio-header">
           <div>
             <h4>Studio Photobooth</h4>
-            <p id="studio-event-meta" class="studio-meta">Chargement de la session...</p>
+            <p id="studio-event-meta" class="studio-meta">Chargement de l'evenement…</p>
           </div>
           <div class="header-actions">
             <a id="back-to-events" class="btn-link" href="./index.html">← Retour</a>
@@ -38,29 +57,58 @@
 
         <div class="studio-grid">
           <article class="studio-card">
-            <div class="camera-activate-row">
-              <button id="start-camera" class="btn-capture btn-activate-camera" type="button">
-                Etape 1 : cliquez ici et préparez-vous pour la photo
-              </button>
-            </div>
-            <div id="camera-zone" class="preview-stage wedding-stage" role="button" tabindex="0" aria-label="Zone camera - toucher pour plein ecran, toucher a nouveau pour prendre la photo">
+            <div id="camera-zone" class="preview-stage wedding-stage" role="region" aria-live="polite" aria-label="Aperçu caméra — utilisez les boutons sous l’aperçu.">
               <div class="frame-corner tl">💐</div>
               <div class="frame-corner tr">💐</div>
               <div class="frame-corner bl">🎉</div>
               <div class="frame-corner br">🎉</div>
-              <video id="camera-feed" autoplay playsinline muted></video>
-              <canvas id="capture-layer"></canvas>
+              <button type="button" id="camera-activate-hint" class="camera-tap-hint camera-activate-hint" hidden>
+                Activez la caméra
+              </button>
+            <video id="camera-feed" autoplay playsinline webkit-playsinline muted></video>
+            <canvas id="capture-layer"></canvas>
+            <canvas id="face-overlay" class="face-overlay-canvas" aria-hidden="true"></canvas>
               <div id="countdown-overlay" class="countdown"></div>
             </div>
 
             <div class="studio-actions">
-              <button id="capture-photo" class="btn-capture" type="button">
-                <span class="btn-capture-icon">📸</span>
-                Etape 2 : Prêt ? cliquez pour le compte à rebours de 8 secondes
+              <button id="activate-camera-btn" class="btn-capture btn-activate-camera studio-open-camera-btn" type="button">
+                <span class="btn-activate-camera-lede">1. Ouvrir la caméra</span>
+              </button>
+              <button id="capture-photo" class="btn-capture btn-activate-camera" type="button">
+                <span class="btn-activate-camera-lede">2. Prendre la photo, puis valider</span>
+              </button>
+              <input
+                type="file"
+                id="studio-camera-file"
+                class="studio-camera-file-input"
+                accept="image/*"
+                capture="user"
+                aria-hidden="true"
+                tabindex="-1"
+              />
+              <button type="button" id="studio-file-capture-btn" class="btn-secondary studio-file-capture-btn">
+                Selfie (caméra avant)
               </button>
             </div>
 
             <p id="studio-feedback" class="feedback"></p>
+
+            <div id="validate-step-panel" class="validate-step-panel">
+              <div id="validate-step-pending-only" class="validate-step-pending-only" hidden>
+              <div class="validate-step-preview-wrap">
+                <img id="validate-step-preview" class="validate-step-preview" alt="Aperçu de la photo" width="480" height="360" />
+              </div>
+              <div class="validate-step-actions validate-step-actions--choice">
+                <button type="button" class="btn-capture btn-activate-camera btn-activate-camera--reject validate-step-btn-reject" id="validate-step-cancel">
+                  <span class="btn-activate-camera-lede">Rejetez la photo</span>
+                </button>
+                <button type="button" class="btn-capture btn-activate-camera" id="validate-step-confirm">
+                  <span class="btn-activate-camera-lede">Validez la photo</span>
+                </button>
+              </div>
+              </div>
+            </div>
           </article>
 
           <article class="studio-card controls-card">
@@ -79,7 +127,7 @@
               <option value="8" selected>8 secondes</option>
             </select>
 
-            <label for="filter-select">Filtre</label>
+            <label for="filter-select">Filtre léger</label>
             <select id="filter-select">
               <option value="none">Aucun</option>
               <option value="bw">Noir & blanc</option>
@@ -88,7 +136,7 @@
               <option value="vintage">Vintage</option>
             </select>
 
-            <label for="prop-select">Accessoire digital</label>
+            <label for="prop-select">Accessoire</label>
             <select id="prop-select">
               <option value="none">Aucun</option>
               <option value="glasses">Lunettes</option>
@@ -97,16 +145,22 @@
               <option value="hearts">Coeurs</option>
             </select>
 
-            <button id="download-last" class="btn-secondary" type="button">
-              Telecharger la derniere photo
-            </button>
-
             <div class="qr-card">
               <h6>QR code galerie</h6>
               <img id="gallery-qr-image" alt="QR code vers galerie" />
               <a id="gallery-link" href="#">
                 Ouvrir la galerie
               </a>
+            </div>
+
+            <div class="qr-card pickup-card" id="pickup-card-wrap">
+              <p class="pickup-card-hint">
+                Après chaque prise : scannez le QR pour ouvrir la dernière photo sur votre téléphone.
+              </p>
+              <img id="last-photo-qr" class="last-photo-qr" alt="QR code dernière photo" hidden />
+              <div class="pickup-studio-actions">
+                <button type="button" id="copy-pickup-url" class="btn-secondary" hidden>Copier le lien</button>
+              </div>
             </div>
           </article>
         </div>
@@ -118,9 +172,38 @@
           </div>
           <div id="gallery-grid" class="gallery-grid"></div>
         </article>
+
+        <article class="studio-card gallery-card gallery-card-videos">
+          <div class="gallery-header">
+            <h5>Vidéos de l'événement</h5>
+            <span id="studio-video-count">0 vidéo</span>
+          </div>
+          <div id="studio-video-grid" class="gallery-grid gallery-video-grid"></div>
+          <p class="studio-video-hint">
+            <a id="studio-open-video-studio" class="pickup-open-link" href="./video-studio.html">Enregistrer une courte vidéo</a>
+          </p>
+        </article>
+
+        <div id="studio-video-modal" class="studio-video-modal" hidden role="dialog" aria-modal="true" aria-label="Lecture vidéo">
+          <div class="studio-video-modal__backdrop" id="studio-video-modal-backdrop"></div>
+          <div class="studio-video-modal__panel">
+            <button type="button" class="studio-video-modal__close" id="studio-video-modal-close" aria-label="Fermer">
+              ×
+            </button>
+            <video
+              id="studio-video-modal-player"
+              class="studio-video-modal__player"
+              controls
+              playsinline
+              webkit-playsinline
+              preload="metadata"
+            ></video>
+          </div>
+        </div>
       </section>
     </main>
 
-    <script src="./studio.js?v=7"></script>
+    <script src="./face-guide.js?v=7"></script>
+    <script src="./studio.js?v=59"></script>
   </body>
 </html>

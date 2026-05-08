@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getSupabaseUrl, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 import { createLinkedInPost } from '@/utils/linkedinHelper';
+import { notifyTelegramBlogArticlePublished } from '@/utils/telegramNotify';
 
 const supabaseAdmin = createClient(
   getSupabaseUrl(),
@@ -53,8 +54,10 @@ export async function POST(request: NextRequest) {
 
     // Créer automatiquement un post LinkedIn si l'article est publié
     if (article.status === 'published' && data) {
+      void notifyTelegramBlogArticlePublished({ title: article.title, slug }).catch(() => {});
+
       const articleUrl = `/blog/${slug}`;
-      
+
       const linkedinResult = await createLinkedInPost({
         title: article.title,
         content: article.content,

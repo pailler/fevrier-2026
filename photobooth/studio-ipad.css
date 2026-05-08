@@ -1,0 +1,38 @@
+/* Studio photobooth — iPad uniquement (
+ *   <html class="ipad-studio"> posé par le script inline dans studio.html
+ * ). Le bureau n’applique pas ces règles. */
+
+/* Coins : décor uniquement */
+html.ipad-studio .preview-stage .frame-corner {
+  pointer-events: none;
+}
+
+/* Zone prévisualisation un peu plus haute sur iPad */
+html.ipad-studio .studio-page #camera-zone.preview-stage {
+  min-height: clamp(220px, 48vw, 420px);
+}
+
+/* Message « Activez la caméra » : très grand, au-dessus de la pile vidéo */
+html.ipad-studio .studio-page .camera-activate-hint {
+  z-index: 24 !important;
+  font-size: clamp(2rem, 7vw, 52px) !important;
+  line-height: 1.12 !important;
+  font-weight: 900 !important;
+  padding: clamp(24px, 5vw, 36px) clamp(20px, 4vw, 28px) !important;
+  -webkit-text-size-adjust: 100% !important;
+  text-size-adjust: 100% !important;
+  letter-spacing: -0.03em !important;
+}
+
+@media (max-width: 600px) {
+  html.ipad-studio .studio-page .camera-activate-hint {
+    font-size: clamp(1.75rem, 8vw, 40px) !important;
+    padding: 22px 18px !important;
+  }
+}
+
+/* Boutons capture : texte lisible */
+html.ipad-studio .studio-actions .btn-capture.btn-activate-camera {
+  font-size: clamp(1.15rem, 3.2vw, 1.45rem) !important;
+  min-height: 76px !important;
+}

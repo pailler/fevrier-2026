@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { sanitizeReturnPath } from '@/utils/loginRedirect';
+import { useHydrated } from '@/hooks/useHydrated';
 
 // Chargement côté client uniquement pour éviter toute erreur SSR (Supabase, etc.)
 const GoogleSignInButton = dynamic(
@@ -20,12 +21,9 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false);
+  const isClient = useHydrated();
 
   useEffect(() => {
-    // Marquer que nous sommes côté client
-    setIsClient(true);
-    
     // Filtrer les erreurs CORS YouTube dans la console (elles sont normales et n'affectent pas la connexion)
     if (typeof window !== 'undefined') {
       const originalError = console.error;

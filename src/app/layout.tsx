@@ -8,11 +8,13 @@ import ClientOnly from '../components/ClientOnly'
 import ScrollToTop from '../components/ScrollToTop'
 import ClientRedirectHandler from '../components/ClientRedirectHandler'
 import Analytics from '../components/Analytics'
+import { JsonLd } from '../components/JsonLd'
+import { getDefaultJsonLdGraph } from '../utils/structuredData'
 
 export const metadata: Metadata = {
-  title: 'IAHome — plateforme IA française | transcription, images, PDF, domotique',
+  title: 'IAHome — Toutes les applications et la puissance des serveurs IAHome chez vous',
   description:
-    'Tous vos outils d’intelligence artificielle au même endroit : Whisper, Stable Diffusion, PDF+IA, Home Assistant, QR codes, transfert de fichiers. Interface en français, crédits transparents, pensé pour la France et le RGPD.',
+    'Toutes les applications et la puissance des serveurs IAHome chez vous : Whisper, images IA, PDF, domotique, QR codes et plus. Interface en français, crédits transparents.',
   applicationName: 'IA Home',
   authors: [{ name: 'IA Home', url: 'https://iahome.fr' }],
   keywords: [
@@ -75,7 +77,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'IAHome — plateforme IA française | transcription, images, PDF, domotique',
+    title: 'IAHome — Toutes les applications et la puissance des serveurs IAHome chez vous',
     description:
       'Whisper, Stable Diffusion, PDF+IA, Home Assistant et plus : une plateforme en français, avec crédits clairs.',
     url: 'https://iahome.fr',
@@ -97,9 +99,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@iahome_fr',
     creator: '@iahome_fr',
-    title: 'IAHome — plateforme IA française | transcription, images, PDF, domotique',
+    title: 'IAHome — Toutes les applications et la puissance des serveurs IAHome chez vous',
     description:
-      'Tous vos outils IA au même endroit : interface en français, crédits transparents.',
+      'Toutes les applications et la puissance des serveurs IAHome chez vous. Interface en français, crédits transparents.',
     images: ['https://iahome.fr/images/og-image.jpg'],
   },
   icons: {
@@ -138,6 +140,7 @@ export default function RootLayout({
         {process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && (
           <meta name="google-site-verification" content={process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION} />
         )}
+        <JsonLd data={getDefaultJsonLdGraph()} />
       </head>
       <body className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100" suppressHydrationWarning>
         <Analytics />

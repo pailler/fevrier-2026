@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   }
 
   const moduleId = 'photobooth';
-  const moduleTitle = 'Photobooth Mariage';
+  const moduleTitle = 'Photobooth événements';
 
   try {
     const { data: existingAccessList } = await supabase

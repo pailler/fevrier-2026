@@ -1,5 +1,7 @@
 # Script pour vérifier la configuration Cloudflare Tunnel réellement utilisée
 
+. (Join-Path $PSScriptRoot "port-utils.ps1")
+
 Write-Host "`n========================================" -ForegroundColor Cyan
 Write-Host "  VÉRIFICATION CONFIGURATION CLOUDFLARE" -ForegroundColor Cyan
 Write-Host "========================================`n" -ForegroundColor Cyan
@@ -48,8 +50,8 @@ Write-Host ""
 
 # Vérifier les services locaux
 Write-Host "[3/3] Vérification des services locaux..." -ForegroundColor Yellow
-$port3000 = Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue
-$port5000 = Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue
+$port3000 = Test-PortInUse -Port 3000
+$port5000 = Test-PortInUse -Port 5000
 
 if ($port3000) {
     try {

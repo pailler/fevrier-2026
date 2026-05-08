@@ -5,10 +5,10 @@ export const metadata: Metadata = buildPageSeo({
   path: '/photobooth',
   title: 'Photobooth événementiel — borne photo et animations',
   description:
-    'Photobooth connecté pour mariages, soirées et événements : captures, galerie et partage. Service Photobooth IAHome.',
+    'Photobooth connecté pour vos événements (mariage, anniversaires, entreprises…) : captures, galerie et partage. Service Photobooth IAHome.',
   keywords: [
     'photobooth événement',
-    'borne photo mariage',
+    'borne photo événement',
     'photobooth connecté',
     'animation photo soirée',
     'IAHome photobooth',

@@ -6,4 +6,4 @@ docker compose build --no-cache photobooth
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 Write-Host "Redemarrage du container..." -ForegroundColor Cyan
 docker compose up -d photobooth
-Write-Host "OK - Photobooth disponible sur port 7885" -ForegroundColor Green
+Write-Host "OK - Photobooth disponible sur http://localhost:7885" -ForegroundColor Green

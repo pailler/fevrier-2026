@@ -678,6 +678,60 @@ export default function MarketingPage() {
                 </li>
               </ul>
             </div>
+
+            {/* Photobooth : application + borne physique */}
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2 border-2 border-fuchsia-100">
+              <div className="flex items-center mb-4">
+                <span className="text-5xl mr-3" aria-hidden="true">
+                  📸
+                </span>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Application &amp; objet Photobooth
+                </h3>
+              </div>
+              <p className="text-gray-600 mb-4">
+                L&apos;application web IA Home pour créer des événements, capturer les clichés et partager une galerie
+                en ligne — couplée à une borne physique chaleureuse (finition bois, ambiance festive) pour mariages,
+                anniversaires et soirées pro.
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                <span className="bg-fuchsia-100 text-fuchsia-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Événementiel
+                </span>
+                <span className="bg-fuchsia-100 text-fuchsia-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Galerie en ligne
+                </span>
+                <span className="bg-fuchsia-100 text-fuchsia-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Sans Wi‑Fi requis
+                </span>
+              </div>
+              <ul className="text-sm text-gray-600 space-y-2 mb-4">
+                <li className="flex items-start">
+                  <span className="text-fuchsia-600 mr-2 font-bold">✓</span>
+                  Studio tactile : compte à rebours, filtres, templates et galerie événement
+                </li>
+                <li className="flex items-start">
+                  <span className="text-fuchsia-600 mr-2 font-bold">✓</span>
+                  Borne « objet » pensée déco, pas un simple écran dans un coin
+                </li>
+                <li className="flex items-start">
+                  <span className="text-fuchsia-600 mr-2 font-bold">✓</span>
+                  Partage des photos par lien — idéal carton « photos en direct »
+                </li>
+                <li className="flex items-start">
+                  <span className="text-fuchsia-600 mr-2 font-bold">✓</span>
+                  Activation via votre compte iahome.fr (offre et jetons selon formule)
+                </li>
+              </ul>
+              <a
+                href="https://iahome.fr/photobooth-decouverte.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-fuchsia-100 text-fuchsia-900 hover:bg-fuchsia-200 px-4 py-2 rounded-lg font-medium text-sm transition-colors"
+              >
+                Découvrir le Photobooth →
+              </a>
+            </div>
           </div>
 
           {/* Section Avantages */}

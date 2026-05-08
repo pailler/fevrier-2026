@@ -6,6 +6,13 @@ const supabaseAdmin = createClient(
   getSupabaseServiceRoleKey()
 );
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return 'Erreur inconnue';
+}
+
 export interface LinkedInPostData {
   title: string;
   content: string;
@@ -94,9 +101,9 @@ export async function createLinkedInPost(data: LinkedInPostData): Promise<{ succ
 
     console.log('✅ Post LinkedIn créé avec succès:', post.id);
     return { success: true, postId: post.id };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la création du post LinkedIn:', error);
-    return { success: false, error: error.message || 'Erreur inconnue' };
+    return { success: false, error: getErrorMessage(error) };
   }
 }
 
@@ -167,9 +174,9 @@ export async function publishLinkedInPost(postId: string): Promise<{ success: bo
       }]);
 
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors de la publication du post LinkedIn:', error);
-    return { success: false, error: error.message || 'Erreur inconnue' };
+    return { success: false, error: getErrorMessage(error) };
   }
 }
 

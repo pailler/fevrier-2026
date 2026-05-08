@@ -1,0 +1,45 @@
+# Configuration Traefik pour Photo Vivante
+# Route photo-vivante.iahome.fr vers port 7887 (host.docker.internal)
+# Timeouts augmentes pour Gradio, pas de compress (streaming)
+
+http:
+  serversTransports:
+    photo-vivante-transport:
+      forwardingTimeouts:
+        dialTimeout: "30s"
+        responseHeaderTimeout: "30s"
+        idleConnTimeout: "90s"
+  middlewares:
+    photo-vivante-proxy-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-Host: "photo-vivante.iahome.fr"
+          X-Forwarded-For: "127.0.0.1"
+          X-Real-IP: "127.0.0.1"
+  routers:
+    photo-vivante-main:
+      rule: "Host(`photo-vivante.iahome.fr`)"
+      entryPoints: ["web"]
+      service: photo-vivante-service
+      middlewares: ["security-headers@file", "photo-vivante-proxy-headers@file"]
+      priority: 10
+    photo-vivante-https:
+      rule: "Host(`photo-vivante.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: photo-vivante-service
+      tls:
+        certResolver: letsencrypt
+      middlewares: ["security-headers@file", "photo-vivante-proxy-headers@file"]
+      priority: 10
+  services:
+    photo-vivante-service:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:7887"
+        passHostHeader: true
+        serversTransport: photo-vivante-transport
+        healthCheck:
+          path: "/"
+          interval: "30s"
+          timeout: "5s"

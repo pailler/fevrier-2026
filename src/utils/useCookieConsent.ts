@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export interface CookiePreferences {
   necessary: boolean;
@@ -16,17 +16,49 @@ export const DEFAULT_PREFERENCES: CookiePreferences = {
   functional: false,
 };
 
+/** window.gtag typé dans tracking.ts (compatible consent / config / event). */
+
 export function useCookieConsent() {
   const [preferences, setPreferences] = useState<CookiePreferences>(DEFAULT_PREFERENCES);
   const [hasConsent, setHasConsent] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    // Charger les préférences depuis localStorage
-    loadPreferences();
+  const clearExistingCookies = useCallback(() => {
+    // Supprimer les cookies non nécessaires si le consentement est retiré
+    const cookies = document.cookie.split(';');
+    
+    cookies.forEach(cookie => {
+      const eqPos = cookie.indexOf('=');
+      const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
+      
+      // Ne pas supprimer les cookies nécessaires
+      const necessaryCookies = ['session', 'csrf', 'auth', 'cookieConsent'];
+      const isNecessary = necessaryCookies.some(necessary => name.includes(necessary));
+      
+      if (!isNecessary) {
+        // Supprimer le cookie
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`;
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${window.location.hostname};`;
+      }
+    });
   }, []);
 
-  const loadPreferences = () => {
+  const clearConsent = useCallback(() => {
+    try {
+      localStorage.removeItem('cookieConsent');
+      localStorage.removeItem('cookieConsentDate');
+      setPreferences(DEFAULT_PREFERENCES);
+      setHasConsent(false);
+      
+      // Nettoyer les cookies existants
+      clearExistingCookies();
+    } catch (error) {
+      console.error('Erreur lors de la suppression du consentement:', error);
+    }
+  }, [clearExistingCookies]);
+
+  const loadPreferences = useCallback(() => {
     try {
       const consent = localStorage.getItem('cookieConsent');
       const consentDate = localStorage.getItem('cookieConsentDate');
@@ -51,7 +83,12 @@ export function useCookieConsent() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [clearConsent]);
+
+  useEffect(() => {
+    // Charger les préférences depuis localStorage
+    loadPreferences();
+  }, [loadPreferences]);
 
   const savePreferences = (newPreferences: CookiePreferences) => {
     try {
@@ -64,20 +101,6 @@ export function useCookieConsent() {
       applyCookieSettings(newPreferences);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des préférences cookies:', error);
-    }
-  };
-
-  const clearConsent = () => {
-    try {
-      localStorage.removeItem('cookieConsent');
-      localStorage.removeItem('cookieConsentDate');
-      setPreferences(DEFAULT_PREFERENCES);
-      setHasConsent(false);
-      
-      // Nettoyer les cookies existants
-      clearExistingCookies();
-    } catch (error) {
-      console.error('Erreur lors de la suppression du consentement:', error);
     }
   };
 
@@ -112,8 +135,8 @@ export function useCookieConsent() {
     console.log('Analytics cookies activés');
     
     // Exemple d'activation de Google Analytics (à adapter selon vos besoins)
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('consent', 'update', {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('consent', 'update', {
         analytics_storage: 'granted'
       });
     }
@@ -123,8 +146,8 @@ export function useCookieConsent() {
     console.log('Analytics cookies désactivés');
     
     // Exemple de désactivation de Google Analytics
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('consent', 'update', {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('consent', 'update', {
         analytics_storage: 'denied'
       });
     }
@@ -133,8 +156,8 @@ export function useCookieConsent() {
   const enableMarketingCookies = () => {
     console.log('Marketing cookies activés');
     
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('consent', 'update', {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('consent', 'update', {
         ad_storage: 'granted',
         ad_user_data: 'granted',
         ad_personalization: 'granted'
@@ -145,8 +168,8 @@ export function useCookieConsent() {
   const disableMarketingCookies = () => {
     console.log('Marketing cookies désactivés');
     
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('consent', 'update', {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('consent', 'update', {
         ad_storage: 'denied',
         ad_user_data: 'denied',
         ad_personalization: 'denied'
@@ -157,8 +180,8 @@ export function useCookieConsent() {
   const enableFunctionalCookies = () => {
     console.log('Functional cookies activés');
     
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('consent', 'update', {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('consent', 'update', {
         functionality_storage: 'granted'
       });
     }
@@ -167,32 +190,11 @@ export function useCookieConsent() {
   const disableFunctionalCookies = () => {
     console.log('Functional cookies désactivés');
     
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('consent', 'update', {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('consent', 'update', {
         functionality_storage: 'denied'
       });
     }
-  };
-
-  const clearExistingCookies = () => {
-    // Supprimer les cookies non nécessaires si le consentement est retiré
-    const cookies = document.cookie.split(';');
-    
-    cookies.forEach(cookie => {
-      const eqPos = cookie.indexOf('=');
-      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
-      
-      // Ne pas supprimer les cookies nécessaires
-      const necessaryCookies = ['session', 'csrf', 'auth', 'cookieConsent'];
-      const isNecessary = necessaryCookies.some(necessary => name.includes(necessary));
-      
-      if (!isNecessary) {
-        // Supprimer le cookie
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`;
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${window.location.hostname};`;
-      }
-    });
   };
 
   const acceptAll = () => {

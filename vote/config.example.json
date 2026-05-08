@@ -1,0 +1,5 @@
+{
+  "title": "Vote de la réunion",
+  "choices": ["Option A", "Option B", "Option C"],
+  "port": 3847
+}

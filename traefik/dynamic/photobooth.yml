@@ -1,5 +1,5 @@
 # Configuration Traefik pour Photobooth
-# Route photobooth.iahome.fr vers le service sur port 7885
+# Route photobooth.iahome.fr vers le service Gradio sur port 7885
 # Accès direct autorisé (sans token). CSP permissive pour permettre l'exécution des scripts.
 
 http:
@@ -49,6 +49,6 @@ http:
         passHostHeader: true
         serversTransport: photobooth-transport
         healthCheck:
-          path: "/health"
+          path: "/"
           interval: "30s"
           timeout: "5s"

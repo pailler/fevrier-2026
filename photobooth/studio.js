@@ -7,10 +7,19 @@ const galleryCount = document.getElementById("gallery-count");
 const backToEvents = document.getElementById("back-to-events");
 const galleryQrImage = document.getElementById("gallery-qr-image");
 const galleryLink = document.getElementById("gallery-link");
+const lastPhotoQr = document.getElementById("last-photo-qr");
+const copyPickupUrlBtn = document.getElementById("copy-pickup-url");
 
-const startCameraBtn = document.getElementById("start-camera");
+const studioVideoGrid = document.getElementById("studio-video-grid");
+const studioVideoCount = document.getElementById("studio-video-count");
+const studioOpenVideoStudio = document.getElementById("studio-open-video-studio");
+const studioVideoModal = document.getElementById("studio-video-modal");
+const studioVideoModalBackdrop = document.getElementById("studio-video-modal-backdrop");
+const studioVideoModalClose = document.getElementById("studio-video-modal-close");
+const studioVideoModalPlayer = document.getElementById("studio-video-modal-player");
+
 const captureBtn = document.getElementById("capture-photo");
-const downloadLastBtn = document.getElementById("download-last");
+const activateCameraBtn = document.getElementById("activate-camera-btn");
 const layoutSelect = document.getElementById("layout-select");
 const timerSelect = document.getElementById("timer-select");
 const filterSelect = document.getElementById("filter-select");
@@ -21,8 +30,262 @@ const captureLayer = document.getElementById("capture-layer");
 const countdownOverlay = document.getElementById("countdown-overlay");
 const captureCtx = captureLayer ? captureLayer.getContext("2d") : null;
 
-const SESSION_EVENT_KEY = "photobooth_current_event";
+const cameraZone = document.getElementById("camera-zone");
+const cameraActivateHint = document.getElementById("camera-activate-hint");
+
+const validateStepPanel = document.getElementById("validate-step-panel");
+const validateStepPendingOnly = document.getElementById("validate-step-pending-only");
+const validateStepPreview = document.getElementById("validate-step-preview");
+const validateStepConfirmBtn = document.getElementById("validate-step-confirm");
+const validateStepCancelBtn = document.getElementById("validate-step-cancel");
+const fileCameraInput = document.getElementById("studio-camera-file");
+const fileCaptureBtn = document.getElementById("studio-file-capture-btn");
+
+function updateStudioCaptureUi() {
+  if (cameraZone) {
+    cameraZone.setAttribute(
+      "aria-label",
+      mediaStream
+        ? "Aperçu caméra actif. Utilisez « 2. Prendre la photo » pour le décompte et la prise, puis validez ou rejetez dans le panneau."
+        : "Aperçu caméra. Utilisez d’abord « 1. Ouvrir la caméra », puis « 2. Prendre la photo »."
+    );
+  }
+  var camBlocked =
+    !hasValidAccess ||
+    !currentEvent ||
+    !!pendingSelfieCanvas ||
+    !!filePickSession ||
+    isCapturing;
+  if (activateCameraBtn) {
+    activateCameraBtn.disabled = camBlocked || !!isCameraStartPending || !!mediaStream;
+  }
+  if (captureBtn) {
+    var lede = captureBtn.querySelector(".btn-activate-camera-lede");
+    if (lede) {
+      lede.textContent = mediaStream
+        ? "2. Prendre la photo, puis valider"
+        : "2. Prendre la photo — ouvrez la caméra d’abord";
+    }
+    captureBtn.disabled = camBlocked || !mediaStream;
+  }
+  if (cameraActivateHint) {
+    var isIpadUi =
+      typeof document !== "undefined" &&
+      document.documentElement.classList.contains("ipad-studio");
+    if (!isIpadUi || mediaStream) {
+      cameraActivateHint.hidden = true;
+    } else {
+      cameraActivateHint.hidden = !!camBlocked;
+      cameraActivateHint.disabled = !!isCameraStartPending;
+    }
+  }
+}
+
+if (window.PhotoFaceGuide && typeof PhotoFaceGuide.syncPreviewFaceGuideUi === "function") {
+  const camZoneFace = document.getElementById("camera-zone");
+  if (camZoneFace) {
+    PhotoFaceGuide.syncPreviewFaceGuideUi(camZoneFace, null);
+  }
+}
+
+let pendingSelfieCanvas = null;
+let pipelineUploadInFlight = false;
+let validateStepTimerId = null;
+const VALIDATE_STEP_MS = 60 * 1000;
+
+function clearValidateStepTimer() {
+  if (validateStepTimerId != null) {
+    clearTimeout(validateStepTimerId);
+    validateStepTimerId = null;
+  }
+}
+
+function startValidateStepTimer() {
+  clearValidateStepTimer();
+  validateStepTimerId = setTimeout(function () {
+    validateStepTimerId = null;
+    if (pipelineUploadInFlight) return;
+    if (!pendingSelfieCanvas) return;
+    if (!validateStepPendingOnly || validateStepPendingOnly.hidden) return;
+    closeValidateStepPanel();
+    setFeedback("Délai écoulé : la photo n'a pas été ajoutée à la galerie.", "error");
+  }, VALIDATE_STEP_MS);
+}
+
+function cloneCanvasForPipeline(source) {
+  const c = document.createElement("canvas");
+  c.width = source.width;
+  c.height = source.height;
+  c.getContext("2d").drawImage(source, 0, 0);
+  return c;
+}
+
+function refreshValidateStepPreview() {
+  if (!validateStepPreview || !pendingSelfieCanvas) return;
+  validateStepPreview.src = pendingSelfieCanvas.toDataURL("image/jpeg", 0.88);
+}
+
+function scrollValidateStepIntoView() {
+  const target = validateStepPanel;
+  if (!target) return;
+  var smooth = true;
+  try {
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) smooth = false;
+  } catch {
+    /* noop */
+  }
+  function doScroll() {
+    try {
+      target.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start", inline: "nearest" });
+    } catch {
+      try {
+        target.scrollIntoView(true);
+      } catch {
+        /* noop */
+      }
+    }
+  }
+  doScroll();
+  window.setTimeout(doScroll, 320);
+}
+
+function openValidateStepPanel() {
+  if (!pendingSelfieCanvas || !validateStepPreview) {
+    setFeedback("Erreur : recharger la page studio (validation indisponible).", "error");
+    console.error("openValidateStepPanel: requis manquant", { pendingSelfieCanvas: !!pendingSelfieCanvas, validateStepPreview });
+    return;
+  }
+  clearValidateStepTimer();
+  exitCameraFullscreen();
+  refreshValidateStepPreview();
+  if (validateStepPanel) validateStepPanel.classList.add("validate-step-panel--active");
+  if (validateStepPendingOnly) validateStepPendingOnly.hidden = false;
+  startValidateStepTimer();
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      scrollValidateStepIntoView();
+    });
+  });
+}
+
+function closeValidateStepPanel() {
+  clearValidateStepTimer();
+  if (validateStepPanel) validateStepPanel.classList.remove("validate-step-panel--active");
+  if (validateStepPendingOnly) validateStepPendingOnly.hidden = true;
+  if (validateStepPreview) validateStepPreview.removeAttribute("src");
+  pendingSelfieCanvas = null;
+  updateStudioCaptureUi();
+}
+
+async function confirmValidateStepAndUpload() {
+  if (pipelineUploadInFlight) return;
+  if (!pendingSelfieCanvas || !currentEvent || !validateStepConfirmBtn) return;
+  clearValidateStepTimer();
+  pipelineUploadInFlight = true;
+  validateStepConfirmBtn.disabled = true;
+  try {
+    const finalDataUrl = pendingSelfieCanvas.toDataURL("image/jpeg", 0.94);
+    lastCaptureDataUrl = finalDataUrl;
+    const uploaded = await uploadEventPhoto(currentEvent.id, finalDataUrl, {
+      originalDataUrl: finalDataUrl,
+      pipelineStyle: "",
+    });
+    if (captureLayer && captureCtx) {
+      captureLayer.width = pendingSelfieCanvas.width;
+      captureLayer.height = pendingSelfieCanvas.height;
+      captureCtx.clearRect(0, 0, captureLayer.width, captureLayer.height);
+      captureCtx.drawImage(pendingSelfieCanvas, 0, 0);
+    }
+    const optimistic = {
+      id: uploaded.id,
+      filename: uploaded.filename,
+      createdAt: uploaded.createdAt || new Date().toISOString(),
+      url: uploaded.url,
+    };
+    currentPhotos = [optimistic, ...currentPhotos.filter((p) => p.filename !== optimistic.filename)];
+    renderGallery();
+    try {
+      await refreshGallery();
+    } catch (galErr) {
+      console.warn("refreshGallery after upload", galErr);
+    }
+    mergeUploadedIfMissing(uploaded);
+    if (!currentPhotos.some((p) => p.filename === uploaded.filename)) {
+      await wait(300);
+      try {
+        await refreshGallery();
+      } catch (e2) {
+        console.warn("refreshGallery 2e tentative", e2);
+      }
+      mergeUploadedIfMissing(uploaded);
+    }
+    await refreshPickupUi(uploaded.filename);
+    setFeedback("Souvenir enregistre (galerie + QR).", "success");
+    closeValidateStepPanel();
+  } catch (e) {
+    setFeedback(e instanceof Error ? e.message : "Erreur enregistrement.", "error");
+  } finally {
+    pipelineUploadInFlight = false;
+    validateStepConfirmBtn.disabled = false;
+  }
+}
+
+function bindTapOrClick(el, handler) {
+  if (!el || typeof handler !== "function") return;
+  var startX = 0;
+  var startY = 0;
+  var moved = false;
+  el.addEventListener(
+    "touchstart",
+    function (e) {
+      moved = false;
+      if (e.touches && e.touches[0]) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      }
+    },
+    { passive: true }
+  );
+  el.addEventListener(
+    "touchmove",
+    function (e) {
+      if (!e.touches || !e.touches[0]) return;
+      var dx = Math.abs(e.touches[0].clientX - startX);
+      var dy = Math.abs(e.touches[0].clientY - startY);
+      if (dx > 14 || dy > 14) moved = true;
+    },
+    { passive: true }
+  );
+  el.addEventListener(
+    "touchend",
+    function (e) {
+      if (moved) return;
+      var t = e.changedTouches && e.changedTouches[0];
+      if (!t) return;
+      var dx = Math.abs(t.clientX - startX);
+      var dy = Math.abs(t.clientY - startY);
+      if (dx > 14 || dy > 14) return;
+      e.preventDefault();
+      handler();
+    },
+    { passive: false }
+  );
+  el.addEventListener("click", function () {
+    handler();
+  });
+}
+
+if (validateStepConfirmBtn) bindTapOrClick(validateStepConfirmBtn, function () {
+  void confirmValidateStepAndUpload();
+});
+if (validateStepCancelBtn)
+  bindTapOrClick(validateStepCancelBtn, function () {
+    setFeedback("Photo rejetée — vous pouvez refaire une prise.", "");
+    closeValidateStepPanel();
+  });
+
 const MODULE_ID = "photobooth";
+const SESSION_EVENT_KEY = "photobooth_current_event";
 const INACTIVITY_MS = 60 * 1000; // 1 minute
 
 let hasValidAccess = false;
@@ -30,11 +293,17 @@ let inactivityTimer = null;
 let currentEvent = null;
 let mediaStream = null;
 let lastCaptureDataUrl = "";
+let lastPickupUrl = "";
 let isCapturing = false;
+/** Prise via input file + capture : plusieurs taps pour strip/grid (iOS exige un geste par ouverture). */
+let filePickSession = null;
 let currentPhotos = [];
+let currentVideos = [];
 let isCameraFullscreen = false;
+let isCameraStartPending = false;
 
 function setFeedback(message = "", type = "") {
+  if (!studioFeedback) return;
   studioFeedback.textContent = message;
   studioFeedback.className = "feedback";
   if (type) studioFeedback.classList.add(type);
@@ -100,8 +369,140 @@ function isLocalRuntime() {
   return host === "localhost" || host === "127.0.0.1" || host === "::1";
 }
 
+/** iPad / Safari : contexte non sécurisé (http + IP) bloque souvent getUserMedia ; HTTPS ou localhost requis. */
+function canUseCameraInThisContext() {
+  if (typeof window.isSecureContext !== "boolean") return true;
+  if (window.isSecureContext) return true;
+  return isLocalRuntime();
+}
+
+/**
+ * iPad / Web App : parfois `mediaDevices.getUserMedia` incomplet sans pont webkit.
+ */
+function patchMediaDevicesIfNeeded() {
+  try {
+    if (typeof navigator === "undefined") return;
+    if (!navigator.mediaDevices) {
+      navigator.mediaDevices = {};
+    }
+    var md = navigator.mediaDevices;
+    if (typeof md.getUserMedia !== "function") {
+      var legacy =
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia ||
+        navigator.getUserMedia ||
+        navigator.msGetUserMedia;
+      if (typeof legacy === "function") {
+        md.getUserMedia = function (constraints) {
+          return new Promise(function (resolve, reject) {
+            legacy.call(navigator, constraints, resolve, reject);
+          });
+        };
+      }
+    }
+  } catch (e) {
+    console.warn("patchMediaDevicesIfNeeded", e);
+  }
+}
+
+function isLikelyIosStandaloneApp() {
+  try {
+    if (navigator.standalone === true) return true;
+    if (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) return true;
+  } catch (e) {
+    /* noop */
+  }
+  return false;
+}
+
+/** iPhone / iPad / iPadOS (y compris « MacIntel » tactile). Utile pour messages WebView / kiosque. */
+function isLikelyIosOrIpados() {
+  try {
+    var ua = navigator.userAgent || "";
+    if (/iPad|iPhone|iPod/i.test(ua)) return true;
+    if (navigator.platform === "MacIntel" && (navigator.maxTouchPoints || 0) > 1) return true;
+    if (navigator.platform === "iPad") return true;
+  } catch (e) {
+    /* noop */
+  }
+  return false;
+}
+
+function ensureGetUserMedia() {
+  patchMediaDevicesIfNeeded();
+  if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === "function") {
+    return navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+  }
+  const legacy =
+    navigator.webkitGetUserMedia ||
+    navigator.getUserMedia ||
+    navigator.mozGetUserMedia ||
+    navigator.msGetUserMedia;
+  if (!legacy) return null;
+  return function (constraints) {
+    return new Promise(function (resolve, reject) {
+      legacy.call(navigator, constraints, resolve, reject);
+    });
+  };
+}
+
+/**
+ * Selfie : contraintes progressives (anciens iPad : facingMode + idéal largeur → OverconstrainedError).
+ * IMPORTANT (Safari iPad / iPhone / PWA) : `getUserMedia` doit être appelé dans la pile synchrone du
+ * geste utilisateur. Un `async` qui fait `await` avant le premier `gum()` casse souvent l’activation.
+ */
+function getSelfieCameraStream() {
+  const gum = ensureGetUserMedia();
+  if (!gum) {
+    return Promise.reject(Object.assign(new Error("NO_GUM"), { name: "NoGetUserMedia" }));
+  }
+  if (!canUseCameraInThisContext()) {
+    return Promise.reject(Object.assign(new Error("INSECURE"), { name: "InsecureContext" }));
+  }
+  const attempts = isLikelyIosStandaloneApp()
+    ? [
+        { audio: false, video: true },
+        { audio: false, video: { facingMode: "user" } },
+      ]
+    : [
+        { audio: false, video: { facingMode: "user" } },
+        { audio: false, video: true },
+      ];
+  function tryAttempt(index, lastErr) {
+    if (index >= attempts.length) {
+      return Promise.reject(lastErr || new Error("CAMERA_FAILED"));
+    }
+    return gum(attempts[index]).catch(function (err) {
+      return tryAttempt(index + 1, err);
+    });
+  }
+  return tryAttempt(0, null);
+}
+
+async function primeIosVideo(videoEl) {
+  if (!videoEl) return;
+  videoEl.setAttribute("playsinline", "");
+  videoEl.setAttribute("webkit-playsinline", "");
+  videoEl.muted = true;
+  videoEl.defaultMuted = true;
+  try {
+    await videoEl.play();
+  } catch {
+    /* Safari peut exiger un second essai une fois une frame disponible */
+    await new Promise(function (r) {
+      setTimeout(r, 120);
+    });
+    try {
+      await videoEl.play();
+    } catch {
+      /* laisser l’autoplay natif tenter le reste */
+    }
+  }
+}
+
 function setLockedMode(locked, message, type = "error") {
-  page.classList.toggle("locked", locked);
+  if (page) page.classList.toggle("locked", locked);
+  if (!authBanner) return;
   authBanner.className = "auth-banner";
   if (type) authBanner.classList.add(type);
   authBanner.textContent = message;
@@ -138,17 +539,59 @@ function validateAccessToken() {
   return true;
 }
 
+const EVENT_FETCH_TIMEOUT_MS = 20000;
+
 async function fetchJson(url, options = {}) {
-  const response = await fetch(url, options);
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(data.error || "Erreur API");
+  const timeoutMs = options.timeoutMs;
+  const fetchOpts = Object.assign({}, options);
+  delete fetchOpts.timeoutMs;
+
+  const methodUpper = String(fetchOpts.method || "GET").toUpperCase();
+  if (methodUpper === "GET" && fetchOpts.cache == null) {
+    fetchOpts.cache = "no-store";
   }
-  return data;
+
+  function doFetch() {
+    return fetch(url, fetchOpts).then(function (response) {
+      return response
+        .json()
+        .catch(function () {
+          return {};
+        })
+        .then(function (data) {
+          if (!response.ok) {
+            throw new Error(data.error || "Erreur API");
+          }
+          return data;
+        });
+    });
+  }
+
+  /* Toujours un délai max (certains WebKit ne rejettent pas fetch après AbortController.abort). */
+  if (typeof timeoutMs === "number" && timeoutMs > 0) {
+    return Promise.race([
+      doFetch(),
+      new Promise(function (resolve, reject) {
+        setTimeout(function () {
+          const err = new Error("aborted");
+          err.name = "AbortError";
+          reject(err);
+        }, timeoutMs);
+      }),
+    ]);
+  }
+  return doFetch();
 }
 
 async function getEventById(eventId) {
-  const data = await fetchJson(`/api/events/${encodeURIComponent(eventId)}`);
+  const data = await fetchJson(`/api/events/${encodeURIComponent(eventId)}`, {
+    timeoutMs: EVENT_FETCH_TIMEOUT_MS,
+  });
+  if (!data || !data.event || typeof data.event.id !== "string" || !data.event.id) {
+    const err = new Error("INVALID_EVENT");
+    err.name = "InvalidEventResponse";
+    throw err;
+  }
   return data.event;
 }
 
@@ -157,11 +600,21 @@ async function getEventPhotos(eventId) {
   return data.photos || [];
 }
 
-async function uploadEventPhoto(eventId, imageDataUrl) {
+async function getEventVideos(eventId) {
+  const data = await fetchJson(`/api/events/${encodeURIComponent(eventId)}/videos`);
+  return data.videos || [];
+}
+
+async function uploadEventPhoto(eventId, imageDataUrl, options) {
+  var body = { imageDataUrl: imageDataUrl };
+  if (options) {
+    if (options.originalDataUrl) body.originalDataUrl = options.originalDataUrl;
+    if (options.pipelineStyle) body.pipelineStyle = options.pipelineStyle;
+  }
   const data = await fetchJson(`/api/events/${encodeURIComponent(eventId)}/photos`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ imageDataUrl }),
+    body: JSON.stringify(body),
   });
   return data.photo;
 }
@@ -172,6 +625,25 @@ async function getGalleryQr(eventId) {
   return fetchJson(`/api/events/${encodeURIComponent(eventId)}/qrcode${query}`);
 }
 
+async function refreshPickupUi(photoFilename) {
+  if (!currentEvent || !photoFilename || !lastPhotoQr) return;
+  try {
+    const data = await fetchJson(`/api/events/${encodeURIComponent(currentEvent.id)}/pickup-token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ filename: photoFilename }),
+    });
+    lastPickupUrl = data.pickupUrl || "";
+    lastPhotoQr.src = data.qrDataUrl;
+    lastPhotoQr.hidden = false;
+    if (copyPickupUrlBtn) copyPickupUrlBtn.hidden = false;
+  } catch {
+    lastPickupUrl = "";
+    lastPhotoQr.hidden = true;
+    if (copyPickupUrlBtn) copyPickupUrlBtn.hidden = true;
+  }
+}
+
 function getCurrentEventId() {
   const url = new URL(window.location.href);
   const eventIdFromQuery = url.searchParams.get("eventId");
@@ -179,7 +651,7 @@ function getCurrentEventId() {
 
   try {
     const inSession = JSON.parse(sessionStorage.getItem(SESSION_EVENT_KEY) || "null");
-    if (inSession?.id) return inSession.id;
+    if (inSession && inSession.id) return inSession.id;
   } catch {
     return null;
   }
@@ -239,6 +711,7 @@ function wait(ms) {
 }
 
 async function runCountdown(seconds, countdownAudio) {
+  if (!countdownOverlay) return;
   countdownOverlay.classList.add("active");
   try {
     for (let value = seconds; value >= 1; value -= 1) {
@@ -265,90 +738,296 @@ function startCountdownAudio(seconds) {
   return audio;
 }
 
+/** WebKit iOS / iPadOS : ctx.filter + drawImage(video) peut produire un cadre noir ; la vidéo garde le filtre CSS. */
+function useCanvas2dFilterOnVideoCapture() {
+  if (typeof navigator === "undefined") return true;
+  const ua = navigator.userAgent || "";
+  if (/iPhone|iPad|iPod/i.test(ua)) return false;
+  if (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) return false;
+  return true;
+}
+
+function waitForCameraDimensions(videoEl, maxWaitMs = 3500) {
+  return new Promise((resolve) => {
+    const t0 = Date.now();
+    function check() {
+      if (
+        videoEl &&
+        videoEl.videoWidth > 0 &&
+        videoEl.videoHeight > 0 &&
+        videoEl.readyState >= 2
+      ) {
+        resolve(true);
+        return;
+      }
+      if (Date.now() - t0 >= maxWaitMs) {
+        resolve(false);
+        return;
+      }
+      requestAnimationFrame(check);
+    }
+    check();
+  });
+}
+
+function advanceVideoFrame(videoEl) {
+  return new Promise((resolve) => {
+    if (videoEl && typeof videoEl.requestVideoFrameCallback === "function") {
+      try {
+        videoEl.requestVideoFrameCallback(() => resolve());
+        return;
+      } catch {
+        /* pass */
+      }
+    }
+    requestAnimationFrame(() => resolve());
+  });
+}
+
+/** Retourne false si la vidéo n’a pas encore de taille intrinsèque (Safari / WebKit). */
 function ensureCaptureLayerSize() {
-  const width = cameraFeed.videoWidth || 1280;
-  const height = cameraFeed.videoHeight || 720;
-  captureLayer.width = width;
-  captureLayer.height = height;
+  const vw = cameraFeed.videoWidth;
+  const vh = cameraFeed.videoHeight;
+  if (!vw || !vh || !captureLayer) return false;
+  captureLayer.width = vw;
+  captureLayer.height = vh;
+  return true;
 }
 
 function snapSingleFrame() {
-  ensureCaptureLayerSize();
+  if (!ensureCaptureLayerSize()) {
+    throw new Error("CAMERA_NOT_READY");
+  }
   const width = captureLayer.width;
   const height = captureLayer.height;
+  const vw = cameraFeed.videoWidth;
+  const vh = cameraFeed.videoHeight;
   const tempCanvas = document.createElement("canvas");
   tempCanvas.width = width;
   tempCanvas.height = height;
   const tempCtx = tempCanvas.getContext("2d");
   tempCtx.save();
-  tempCtx.filter = getFilterCss(filterSelect.value);
+  const cssFilter = getFilterCss(filterSelect.value);
+  tempCtx.filter = useCanvas2dFilterOnVideoCapture() ? cssFilter : "none";
   tempCtx.translate(width, 0);
   tempCtx.scale(-1, 1);
-  tempCtx.drawImage(cameraFeed, 0, 0, width, height);
+  tempCtx.drawImage(cameraFeed, 0, 0, vw, vh, 0, 0, width, height);
   tempCtx.restore();
   drawProp(tempCtx, width, height, propSelect.value);
   return tempCanvas;
 }
 
-function composeShotFullscreenFormat(snap) {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  const viewportRatio = vw / vh;
-  const maxLongEdge = 1920;
-  let outW, outH;
-  if (vw >= vh) {
-    outW = Math.min(vw, maxLongEdge);
-    outH = Math.round(outW / viewportRatio);
-  } else {
-    outH = Math.min(vh, maxLongEdge);
-    outW = Math.round(outH * viewportRatio);
-  }
-  const output = document.createElement("canvas");
-  output.width = outW;
-  output.height = outH;
-  const ctx = output.getContext("2d");
-  const snapW = snap.width;
-  const snapH = snap.height;
-  const snapRatio = snapW / snapH;
-  let sx = 0, sy = 0, sW = snapW, sH = snapH;
-  if (snapRatio > viewportRatio) {
-    sW = Math.round(snapH * viewportRatio);
-    sx = Math.round((snapW - sW) / 2);
-  } else {
-    sH = Math.round(snapW / viewportRatio);
-    sy = Math.round((snapH - sH) / 2);
-  }
-  ctx.drawImage(snap, sx, sy, sW, sH, 0, 0, outW, outH);
-  return output;
+function pickOneImageFile() {
+  return new Promise(function (resolve, reject) {
+    var input = fileCameraInput;
+    if (!input) {
+      reject(new Error("NO_INPUT"));
+      return;
+    }
+    function onChange() {
+      input.removeEventListener("change", onChange);
+      var f = input.files && input.files[0];
+      input.value = "";
+      if (!f) {
+        reject(new Error("NO_FILE"));
+        return;
+      }
+      resolve(f);
+    }
+    input.addEventListener("change", onChange);
+    try {
+      input.click();
+    } catch (err) {
+      input.removeEventListener("change", onChange);
+      reject(err);
+    }
+  });
 }
 
-function composeShotFullscreenFormat(snap) {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  const viewportRatio = vw / vh;
-  const snapRatio = snap.width / snap.height;
-  const maxEdge = 1920;
-  let outW, outH;
-  if (viewportRatio >= 1) {
-    outW = Math.min(vw, maxEdge);
-    outH = Math.round(outW / viewportRatio);
-  } else {
-    outH = Math.min(vh, maxEdge);
-    outW = Math.round(outH * viewportRatio);
-  }
-  const output = document.createElement("canvas");
-  output.width = outW;
-  output.height = outH;
-  const ctx = output.getContext("2d");
-  const drawW = snapRatio >= viewportRatio ? outW : Math.round(outH * snapRatio);
-  const drawH = snapRatio >= viewportRatio ? Math.round(outW / snapRatio) : outH;
-  const sx = (snap.width - drawW) / 2;
-  const sy = (snap.height - drawH) / 2;
-  ctx.drawImage(snap, sx, sy, drawW, drawH, 0, 0, outW, outH);
-  return output;
+function fileToShotCanvas(file) {
+  return new Promise(function (resolve, reject) {
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function () {
+      try {
+        URL.revokeObjectURL(url);
+        var w = img.naturalWidth;
+        var h = img.naturalHeight;
+        if (!w || !h) {
+          reject(new Error("IMAGE_EMPTY"));
+          return;
+        }
+        var c = document.createElement("canvas");
+        c.width = w;
+        c.height = h;
+        var cx = c.getContext("2d");
+        var cssFilter = getFilterCss(filterSelect.value);
+        cx.save();
+        cx.filter = cssFilter && cssFilter !== "none" ? cssFilter : "none";
+        cx.translate(w, 0);
+        cx.scale(-1, 1);
+        cx.drawImage(img, 0, 0, w, h);
+        cx.restore();
+        drawProp(cx, w, h, propSelect.value);
+        resolve(c);
+      } catch (err) {
+        reject(err);
+      }
+    };
+    img.onerror = function () {
+      URL.revokeObjectURL(url);
+      reject(new Error("IMAGE_LOAD"));
+    };
+    img.src = url;
+  });
 }
 
-function composeShots(shots, layout, eventData) {
+function resetFileCaptureButtonUi() {
+  if (!fileCaptureBtn) return;
+  fileCaptureBtn.textContent = "Selfie (caméra avant)";
+  fileCaptureBtn.disabled = false;
+}
+
+async function handleFileCaptureClick() {
+  if (!hasValidAccess || !currentEvent) {
+    setFeedback("Accès non valide : ouvrez le studio avec le lien ou le jeton fourni.", "error");
+    return;
+  }
+  if (!fileCameraInput || !fileCaptureBtn) return;
+  if (pendingSelfieCanvas) {
+    setFeedback("Terminez la validation de la photo avant une nouvelle prise.", "error");
+    return;
+  }
+  if (isCapturing && !filePickSession) return;
+
+  var shotCount = getLayoutShots();
+  var layoutKey = layoutSelect.value;
+
+  if (!filePickSession) {
+    filePickSession = { shots: [], total: shotCount, layoutKey: layoutKey };
+    isCapturing = true;
+    updateStudioCaptureUi();
+  }
+
+  try {
+    if (filePickSession.shots.length === 0) {
+      setFeedback("Ouverture de la caméra avant (selfie)…", "");
+    } else {
+      setFeedback(
+        "Selfie " + (filePickSession.shots.length + 1) + "/" + filePickSession.total + " — ouverture…",
+        ""
+      );
+    }
+    var file = await pickOneImageFile();
+    var shot = await fileToShotCanvas(file);
+    filePickSession.shots.push(shot);
+
+    if (filePickSession.shots.length < filePickSession.total) {
+      setFeedback(
+        "Selfie " +
+          filePickSession.shots.length +
+          "/" +
+          filePickSession.total +
+          " enregistré. Touchez encore « Selfie » pour la suite.",
+        "success"
+      );
+      fileCaptureBtn.textContent =
+        "Selfie suivant (" + (filePickSession.shots.length + 1) + "/" + filePickSession.total + ")";
+      return;
+    }
+
+    var output = await composeShotsWithFaces(filePickSession.shots, filePickSession.layoutKey, currentEvent);
+    pendingSelfieCanvas = cloneCanvasForPipeline(output);
+    filePickSession = null;
+    resetFileCaptureButtonUi();
+    isCapturing = false;
+    updateStudioCaptureUi();
+    setFeedback("Validez ou rejetez la photo.", "success");
+    openValidateStepPanel();
+  } catch (e) {
+    console.warn("handleFileCaptureClick", e);
+    filePickSession = null;
+    resetFileCaptureButtonUi();
+    isCapturing = false;
+    updateStudioCaptureUi();
+    var msg = "Impossible d'utiliser la photo.";
+    if (e && e.message === "NO_FILE") {
+      msg = "Aucune photo choisie.";
+    } else if (
+      (e && e.message === "IMAGE_LOAD") ||
+      (e && e.message === "IMAGE_EMPTY")
+    ) {
+      msg = "Image illisible. Réessayez.";
+    }
+    setFeedback(msg, "error");
+  }
+}
+
+function clamp(v, lo, hi) {
+  return Math.max(lo, Math.min(hi, v));
+}
+
+/**
+ * Dessine l'image en "cover" dans (dx,dy,dW,dH), centré ; si focusRect (union des visages),
+ * centre le crop sur cette zone (meilleur cadrage groupe en sortie portrait).
+ */
+function drawImageCoverFocus(ctx, img, dx, dy, dW, dH, focusRect) {
+  const iw = img.width;
+  const ih = img.height;
+  if (!iw || !ih) return;
+  const destRatio = dW / dH;
+  let sx;
+  let sy;
+  let sw;
+  let sh;
+
+  if (focusRect && focusRect.width > 4 && focusRect.height > 4) {
+    const pad = Math.max(focusRect.width, focusRect.height) * 0.45;
+    const fx0 = clamp(focusRect.x - pad, 0, iw);
+    const fy0 = clamp(focusRect.y - pad, 0, ih);
+    const fx1 = clamp(focusRect.x + focusRect.width + pad, 0, iw);
+    const fy1 = clamp(focusRect.y + focusRect.height + pad, 0, ih);
+    const fw = fx1 - fx0;
+    const fh = fy1 - fy0;
+    const fcx = (fx0 + fx1) / 2;
+    const fcy = (fy0 + fy1) / 2;
+
+    if (fw / fh > destRatio) {
+      sh = fh;
+      sw = fh * destRatio;
+    } else {
+      sw = fw;
+      sh = fw / destRatio;
+    }
+    sw = Math.min(sw, iw);
+    sh = Math.min(sh, ih);
+    sx = clamp(fcx - sw / 2, 0, iw - sw);
+    sy = clamp(fcy - sh / 2, 0, ih - sh);
+  } else {
+    const srcRatio = iw / ih;
+    if (srcRatio > destRatio) {
+      sh = ih;
+      sw = ih * destRatio;
+      sx = (iw - sw) / 2;
+      sy = 0;
+    } else {
+      sw = iw;
+      sh = iw / destRatio;
+      sx = 0;
+      sy = (ih - sh) / 2;
+    }
+  }
+  ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dW, dH);
+}
+
+async function detectFocusForShot(canvas) {
+  if (!window.PhotoFaceGuide || !PhotoFaceGuide.detectFaces) return null;
+  const faces = await PhotoFaceGuide.detectFaces(canvas);
+  if (!faces || !faces.length) return null;
+  return PhotoFaceGuide.faceUnionBBox(faces);
+}
+
+async function composeShotsWithFaces(shots, layout, eventData) {
   const output = document.createElement("canvas");
   const ctx = output.getContext("2d");
   if (layout === "strip") {
@@ -367,9 +1046,15 @@ function composeShots(shots, layout, eventData) {
   ctx.fillStyle = "#0f172a";
   ctx.font = "700 34px Inter, Arial, sans-serif";
   ctx.fillText(title, 36, 52);
+
   if (layout === "single") {
     const pad = 36;
-    ctx.drawImage(shots[0], pad, 80, output.width - pad * 2, output.height - 128);
+    const dx = pad;
+    const dy = 80;
+    const dW = output.width - pad * 2;
+    const dH = output.height - 128;
+    const focus = await detectFocusForShot(shots[0]);
+    drawImageCoverFocus(ctx, shots[0], dx, dy, dW, dH, focus);
   } else if (layout === "strip") {
     const pad = 36;
     const top = 96;
@@ -378,7 +1063,8 @@ function composeShots(shots, layout, eventData) {
     const slotWidth = output.width - pad * 2;
     for (let i = 0; i < 3; i += 1) {
       const y = top + i * (slotHeight + gap);
-      ctx.drawImage(shots[i], pad, y, slotWidth, slotHeight);
+      const focus = await detectFocusForShot(shots[i]);
+      drawImageCoverFocus(ctx, shots[i], pad, y, slotWidth, slotHeight, focus);
     }
   } else {
     const pad = 36;
@@ -391,7 +1077,8 @@ function composeShots(shots, layout, eventData) {
       const col = i % 2;
       const x = pad + col * (cellW + gap);
       const y = top + row * (cellH + gap);
-      ctx.drawImage(shots[i], x, y, cellW, cellH);
+      const focus = await detectFocusForShot(shots[i]);
+      drawImageCoverFocus(ctx, shots[i], x, y, cellW, cellH, focus);
     }
   }
   ctx.strokeStyle = "#10b981";
@@ -400,165 +1087,338 @@ function composeShots(shots, layout, eventData) {
   return output;
 }
 
-/** Compose une photo au format plein écran (ratio viewport). */
-function composeShotFullscreenFormat(snap) {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  const viewportRatio = vw / vh;
-  const maxEdge = 1920;
-  let outW, outH;
-  if (vw >= vh) {
-    outW = Math.min(vw, maxEdge);
-    outH = Math.round(outW / viewportRatio);
-  } else {
-    outH = Math.min(vh, maxEdge);
-    outW = Math.round(outH * viewportRatio);
-  }
-  const output = document.createElement("canvas");
-  output.width = outW;
-  output.height = outH;
-  const ctx = output.getContext("2d");
-  const snapW = snap.width;
-  const snapH = snap.height;
-  const snapRatio = snapW / snapH;
-  let sx = 0, sy = 0, sW = snapW, sH = snapH;
-  if (snapRatio > viewportRatio) {
-    sW = snapH * viewportRatio;
-    sx = (snapW - sW) / 2;
-  } else {
-    sH = snapW / viewportRatio;
-    sy = (snapH - sH) / 2;
-  }
-  ctx.drawImage(snap, sx, sy, sW, sH, 0, 0, outW, outH);
-  ctx.strokeStyle = "#10b981";
-  ctx.lineWidth = Math.max(2, Math.floor(Math.min(outW, outH) / 200));
-  ctx.strokeRect(4, 4, outW - 8, outH - 8);
-  return output;
-}
-
-function downloadDataUrl(dataUrl, filename) {
-  const link = document.createElement("a");
-  link.href = dataUrl;
-  link.download = filename;
-  link.click();
+function galleryPhotoSrc(photo, index) {
+  const base = photo && photo.url ? String(photo.url) : "";
+  if (!base) return "";
+  const token = encodeURIComponent(String(photo.filename || photo.id || photo.createdAt || index || ""));
+  const sep = base.indexOf("?") >= 0 ? "&" : "?";
+  return `${base}${sep}_cb=${token}`;
 }
 
 function renderGallery() {
-  if (!currentEvent) return;
+  if (!currentEvent || !galleryGrid || !galleryCount) return;
   galleryGrid.innerHTML = "";
   galleryCount.textContent = `${currentPhotos.length} photo${currentPhotos.length > 1 ? "s" : ""}`;
   currentPhotos.forEach((photo, index) => {
     const item = document.createElement("article");
-    item.className = "gallery-item";
+    item.className = "gallery-item gallery-item--preview-only";
     const image = document.createElement("img");
-    image.src = photo.url;
+    image.src = galleryPhotoSrc(photo, index);
     image.alt = `Photo ${index + 1}`;
+    image.draggable = false;
     item.appendChild(image);
-    const dl = document.createElement("button");
-    dl.type = "button";
-    dl.textContent = "Telecharger";
-    dl.addEventListener("click", () => {
-      const absolute = new URL(photo.url, window.location.origin).toString();
-      downloadDataUrl(absolute, `${currentEvent.name}-photo-${index + 1}.png`);
-    });
-    item.appendChild(dl);
     galleryGrid.appendChild(item);
   });
+}
+
+function renderStudioVideos() {
+  if (!currentEvent || !studioVideoGrid || !studioVideoCount) return;
+  studioVideoGrid.innerHTML = "";
+  const n = currentVideos.length;
+  studioVideoCount.textContent = `${n} vidéo${n !== 1 ? "s" : ""}`;
+  currentVideos.forEach((clip, idx) => {
+    const item = document.createElement("article");
+    item.className = "gallery-item gallery-item-video";
+    item.setAttribute("role", "button");
+    item.tabIndex = 0;
+    item.setAttribute("aria-label", "Lire la vidéo " + (idx + 1));
+    const thumb = document.createElement("video");
+    thumb.src = clip.url;
+    thumb.muted = true;
+    thumb.playsInline = true;
+    thumb.setAttribute("playsinline", "");
+    thumb.setAttribute("webkit-playsinline", "");
+    thumb.preload = "metadata";
+    thumb.className = "gallery-video-thumb";
+    item.appendChild(thumb);
+    const badge = document.createElement("span");
+    badge.className = "gallery-video-badge";
+    badge.setAttribute("aria-hidden", "true");
+    badge.textContent = "▶";
+    item.appendChild(badge);
+    bindTapOrClick(item, function () {
+      openStudioVideoModal(clip);
+    });
+    item.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openStudioVideoModal(clip);
+      }
+    });
+    studioVideoGrid.appendChild(item);
+  });
+}
+
+function openStudioVideoModal(clip) {
+  if (!studioVideoModal || !studioVideoModalPlayer || !clip || !clip.url) return;
+  studioVideoModalPlayer.src = clip.url;
+  try {
+    studioVideoModalPlayer.play();
+  } catch {
+    /* pass */
+  }
+  studioVideoModal.hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function closeStudioVideoModal() {
+  if (studioVideoModalPlayer) {
+    studioVideoModalPlayer.pause();
+    studioVideoModalPlayer.removeAttribute("src");
+    try {
+      studioVideoModalPlayer.load();
+    } catch {
+      /* pass */
+    }
+  }
+  if (studioVideoModal) studioVideoModal.hidden = true;
+  document.body.style.overflow = "";
+}
+
+if (studioVideoModalClose) bindTapOrClick(studioVideoModalClose, closeStudioVideoModal);
+if (studioVideoModalBackdrop) {
+  studioVideoModalBackdrop.addEventListener("click", closeStudioVideoModal);
+  studioVideoModalBackdrop.addEventListener(
+    "touchend",
+    function (e) {
+      e.preventDefault();
+      closeStudioVideoModal();
+    },
+    { passive: false }
+  );
+}
+
+function mergeUploadedIfMissing(uploaded) {
+  if (!uploaded || !uploaded.filename || !currentEvent) return;
+  if (currentPhotos.some((p) => p.filename === uploaded.filename)) return;
+  const row = {
+    id: uploaded.id,
+    filename: uploaded.filename,
+    createdAt: uploaded.createdAt || new Date().toISOString(),
+    url: uploaded.url,
+  };
+  currentPhotos = [row, ...currentPhotos.filter((p) => p.filename !== row.filename)];
+  renderGallery();
 }
 
 async function refreshGallery() {
   if (!currentEvent) return;
   currentPhotos = await getEventPhotos(currentEvent.id);
   renderGallery();
+  try {
+    currentVideos = await getEventVideos(currentEvent.id);
+  } catch (vidErr) {
+    console.warn("refreshGallery: videos", vidErr);
+    currentVideos = [];
+  }
+  renderStudioVideos();
 }
 
 async function updateGalleryQr() {
   if (!currentEvent) return;
+  if (!galleryQrImage || !galleryLink) return;
   const data = await getGalleryQr(currentEvent.id);
   galleryQrImage.src = data.qrDataUrl;
   galleryLink.href = data.galleryUrl;
 }
 
-async function startCamera() {
-  if (!hasValidAccess) return;
-  if (mediaStream) {
-    setFeedback("Camera deja active.", "success");
+/** Chaîne .then (pas async/await) pour garder le geste utilisateur aussi proche que possible de getUserMedia (Safari PWA / iPad). */
+function startCamera() {
+  if (filePickSession) {
+    setFeedback("Terminez la série de selfies ou rechargez la page.", "error");
     return;
   }
-  try {
-    mediaStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
-      audio: false,
-    });
-    cameraFeed.srcObject = mediaStream;
-    applyPreviewFilter();
-    setFeedback("Camera activee avec succes.", "success");
-  } catch {
-    setFeedback("Impossible d'activer la camera. Verifie les permissions.", "error");
+  if (!hasValidAccess) {
+    setFeedback("Accès non valide : ouvrez le studio avec le lien ou le jeton fourni.", "error");
+    return;
   }
+  if (mediaStream) {
+    setFeedback("Camera deja active.", "success");
+    updateStudioCaptureUi();
+    return;
+  }
+  if (isCameraStartPending) {
+    return;
+  }
+  isCameraStartPending = true;
+  updateStudioCaptureUi();
+  patchMediaDevicesIfNeeded();
+  getSelfieCameraStream()
+    .then(function (stream) {
+      mediaStream = stream;
+      if (cameraFeed) {
+        cameraFeed.srcObject = stream;
+      }
+      return primeIosVideo(cameraFeed);
+    })
+    .then(function () {
+      applyPreviewFilter();
+      try {
+        if (window.PhotoFaceGuide) {
+          const faceOverlay = document.getElementById("face-overlay");
+          const camZone = document.getElementById("camera-zone");
+          window.PhotoFaceGuide.startFaceGuide(cameraFeed, null, null, faceOverlay, camZone);
+        }
+      } catch (guideErr) {
+        console.warn("PhotoFaceGuide.startFaceGuide", guideErr);
+      }
+      setFeedback("Camera activee avec succes.", "success");
+    })
+    .catch(function (e) {
+      console.warn("startCamera", e);
+      exitCameraFullscreen();
+      var msg = "Impossible d'activer la camera. Verifie les permissions.";
+      var name = e && e.name ? String(e.name) : "";
+      if (name === "InsecureContext" || !canUseCameraInThisContext()) {
+        msg =
+          "Sur iPad/iPhone : ouvrez cette page en HTTPS (certificat) ou via localhost — le navigateur bloque la camera en HTTP sur une adresse IP.";
+      } else if (name === "NoGetUserMedia") {
+        if (isLikelyIosStandaloneApp()) {
+          msg =
+            "Caméra indisponible en mode app : ouvrez ce lien dans Safari une fois pour autoriser le site, puis réessayez depuis l’icône, ou mettez à jour iPadOS.";
+        } else if (isLikelyIosOrIpados()) {
+          msg =
+            "Caméra indisponible dans ce navigateur intégré (souvent les apps « Web Kiosk »). Causes fréquentes : page en http:// ou sur une IP sans HTTPS — utilisez une URL https:// valide ; l’app kiosque ne délègue pas getUserMedia / WebRTC — essayez Safari ou une autre app kiosque à jour ; dans les réglages de l’app, activez caméra / média si l’option existe.";
+        } else {
+          msg = "Camera indisponible : navigateur trop ancien, mode restreint ou API masquee.";
+        }
+      } else if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+        msg = isLikelyIosStandaloneApp()
+          ? "Caméra refusée : Réglages iPad → Photobooth (ou Safari) → autoriser Appareil photo pour ce site. Ou ouvrez studio.html dans Safari."
+          : "Autorisation refusee : Reglages > Safari > (site) > Camera > Autoriser.";
+      } else if (name === "OverconstrainedError" || name === "ConstraintNotSatisfiedError") {
+        msg = "Camera : contraintes non supportees — reessayez ou mettez a jour iPadOS.";
+      } else if (name === "AbortError") {
+        msg = "Ouverture de la camera interrompue — reessayez.";
+      }
+      setFeedback(msg, "error");
+    })
+    .finally(function () {
+      isCameraStartPending = false;
+      updateStudioCaptureUi();
+    });
 }
 
-async function captureSequence() {
+async function captureSequence(opts) {
+  opts = opts || {};
+  const countdownAudio = opts.countdownAudio || null;
+
   if (!hasValidAccess || !currentEvent) return;
+  if (filePickSession) {
+    setFeedback("Terminez les selfies (bouton gris) avant la capture directe.", "error");
+    return;
+  }
   if (!mediaStream) {
-    setFeedback("Active d'abord la camera.", "error");
+    setFeedback("Ouvrez d’abord la caméra avec le bouton 1.", "error");
+    return;
+  }
+  if (pendingSelfieCanvas) {
+    setFeedback("Terminez la validation de la photo avant une nouvelle prise.", "error");
     return;
   }
   if (isCapturing) return;
 
   isCapturing = true;
-  captureBtn.disabled = true;
+  updateStudioCaptureUi();
+
+  if (!isCameraFullscreen) {
+    enterCameraFullscreen();
+  }
+  await new Promise((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(resolve));
+  });
+
   try {
     const shotCount = getLayoutShots();
     const timerValue = Number(timerSelect.value);
     const shots = [];
-    setFeedback("Capture en cours...", "");
+    const layoutKey = layoutSelect.value;
+    setFeedback(
+      shotCount > 1 ? `Template ${layoutKey} : ${shotCount} photos à prendre.` : "Capture en cours...",
+      ""
+    );
     for (let index = 0; index < shotCount; index += 1) {
-      await runCountdown(timerValue, null);
-      const snap = snapSingleFrame();
-      shots.push(snap);
+      await runCountdown(timerValue, index === 0 ? countdownAudio : null);
+      const dimsOk = await waitForCameraDimensions(cameraFeed);
+      if (!dimsOk) {
+        throw new Error("CAMERA_NOT_READY");
+      }
+      await advanceVideoFrame(cameraFeed);
+      shots.push(snapSingleFrame());
       setFeedback(`Prise ${index + 1}/${shotCount} capturee.`, "success");
-      await wait(250);
+      if (index < shotCount - 1) {
+        await wait(250);
+      }
     }
-    const output = composeShots(shots, layoutSelect.value, currentEvent);
-    const dataUrl = output.toDataURL("image/png");
-    lastCaptureDataUrl = dataUrl;
-    await uploadEventPhoto(currentEvent.id, dataUrl);
-    if (captureLayer && captureCtx) {
-      captureLayer.width = output.width;
-      captureLayer.height = output.height;
-      captureCtx.clearRect(0, 0, output.width, output.height);
-      captureCtx.drawImage(output, 0, 0);
+    const output = await composeShotsWithFaces(shots, layoutKey, currentEvent);
+    pendingSelfieCanvas = cloneCanvasForPipeline(output);
+    exitCameraFullscreen();
+    setFeedback("Validez ou rejetez la photo.", "success");
+    openValidateStepPanel();
+  } catch (e) {
+    console.warn("captureSequence", e);
+    const notReady = e instanceof Error && e.message === "CAMERA_NOT_READY";
+    if (notReady) {
+      setFeedback("La caméra n’est pas prête (attente image). Réessayez dans une seconde.", "error");
+    } else {
+      setFeedback("Erreur pendant la capture photo.", "error");
     }
-    await refreshGallery();
-    setFeedback("Photo enregistree dans le dossier de l'evenement.", "success");
-  } catch {
-    setFeedback("Erreur pendant la capture photo.", "error");
+    exitCameraFullscreen();
   } finally {
-    captureBtn.disabled = false;
+    exitCameraFullscreen();
     isCapturing = false;
+    updateStudioCaptureUi();
   }
 }
 
 async function setupEventSession() {
   const eventId = getCurrentEventId();
   if (!eventId) {
-    studioEventMeta.textContent = "Aucun evenement selectionne.";
+    if (studioEventMeta) studioEventMeta.textContent = "Aucun evenement selectionne.";
     setFeedback("Retourne a la gestion des evenements pour ouvrir une session.", "error");
     return false;
+  }
+  if (studioEventMeta) {
+    studioEventMeta.textContent = "Chargement de l'evenement…";
   }
   try {
     currentEvent = await getEventById(eventId);
     sessionStorage.setItem(SESSION_EVENT_KEY, JSON.stringify(currentEvent));
-    studioEventMeta.textContent = `${currentEvent.name} • PIN ${currentEvent.pin} • Host ${currentEvent.host}`;
-    await refreshGallery();
-    await updateGalleryQr();
-    return true;
-  } catch {
-    studioEventMeta.textContent = "Evenement introuvable.";
-    setFeedback("Impossible de charger la session evenement.", "error");
+    configureVideoStudioLink();
+    if (studioEventMeta) {
+      studioEventMeta.textContent = "Application proposée par Régis Pailler, pour IAHome.fr";
+    }
+  } catch (e) {
+    const aborted = e && e.name === "AbortError";
+    const invalid = e && e.name === "InvalidEventResponse";
+    if (studioEventMeta) {
+      studioEventMeta.textContent = aborted
+        ? "Delai depasse — serveur injoignable."
+        : invalid
+          ? "Evenement introuvable ou reponse invalide."
+          : "Evenement introuvable.";
+    }
+    setFeedback(
+      aborted
+        ? "Verifiez que le photobooth tourne (port 7885) et le reseau, puis rechargez."
+        : invalid
+          ? "L'API ne renvoie pas l'evenement attendu (proxy ou URL). Revenez a l'accueil."
+          : "Impossible de charger la session evenement.",
+      "error"
+    );
     return false;
   }
+  try {
+    await refreshGallery();
+    await updateGalleryQr();
+    if (currentPhotos.length > 0) {
+      await refreshPickupUi(currentPhotos[0].filename);
+    }
+  } catch (err) {
+    console.warn("setupEventSession secondary", err);
+    setFeedback("Session ouverte : galerie ou liens partiellement indisponibles.", "error");
+  }
+  return true;
 }
 
 function getChoicePageUrl() {
@@ -571,6 +1431,7 @@ function getChoicePageUrl() {
 }
 
 function goBackToChoice() {
+  closeValidateStepPanel();
   var url = getChoicePageUrl();
   if (typeof window.navigateInApp === "function") {
     window.navigateInApp(url);
@@ -591,25 +1452,103 @@ function setupInactivityListener() {
 }
 
 function configureBackLink() {
-  backToEvents.href = getChoicePageUrl();
+  if (backToEvents) backToEvents.href = getChoicePageUrl();
 }
 
-hasValidAccess = validateAccessToken();
-configureBackLink();
-setupEventSession();
-setupInactivityListener();
+function configureVideoStudioLink() {
+  if (!studioOpenVideoStudio) return;
+  const eventId = getCurrentEventId();
+  const token = readTokenFromUrl();
+  const url = new URL("./video-studio.html", window.location.href);
+  if (eventId) url.searchParams.set("eventId", eventId);
+  if (token) url.searchParams.set("token", token);
+  studioOpenVideoStudio.href = url.toString();
+}
 
-filterSelect.addEventListener("change", applyPreviewFilter);
-startCameraBtn.addEventListener("click", startCamera);
-captureBtn.addEventListener("click", handleCaptureButtonClick);
+function initStudioPage() {
+  try {
+    hasValidAccess = validateAccessToken();
+    configureBackLink();
+    configureVideoStudioLink();
+    void setupEventSession().catch(function (err) {
+      console.warn("setupEventSession", err);
+      if (studioEventMeta) {
+        studioEventMeta.textContent = "Erreur de chargement. Rechargez la page.";
+      }
+      setFeedback("Une erreur empeche le chargement. Rechargez.", "error");
+    });
+    setupInactivityListener();
+    if (filterSelect) filterSelect.addEventListener("change", applyPreviewFilter);
+    if (captureBtn) captureBtn.addEventListener("click", handleCaptureButtonClick);
+    if (activateCameraBtn) activateCameraBtn.addEventListener("click", () => startCamera());
+    if (cameraActivateHint) {
+      cameraActivateHint.addEventListener("click", function (e) {
+        e.stopPropagation();
+        startCamera();
+      });
+      cameraActivateHint.addEventListener(
+        "touchend",
+        function (e) {
+          if (!document.documentElement.classList.contains("ipad-studio")) return;
+          if (mediaStream || isCameraStartPending || cameraActivateHint.disabled) return;
+          e.preventDefault();
+          e.stopPropagation();
+          startCamera();
+        },
+        { passive: false }
+      );
+    }
+    if (fileCaptureBtn) fileCaptureBtn.addEventListener("click", () => void handleFileCaptureClick());
+    updateStudioCaptureUi();
+  } catch (e) {
+    console.warn("initStudioPage", e);
+    if (studioEventMeta) {
+      studioEventMeta.textContent = "Erreur au chargement. Rechargez la page ou revenez a l'accueil.";
+    }
+    setFeedback(e instanceof Error ? e.message : String(e), "error");
+  }
+}
 
-const cameraZone = document.getElementById("camera-zone");
+initStudioPage();
+
+function tryEnterDomFullscreenCameraZone() {
+  if (!cameraZone) return;
+  var req = cameraZone.requestFullscreen || cameraZone.webkitRequestFullscreen;
+  if (typeof req !== "function") return;
+  try {
+    var p = req.call(cameraZone);
+    if (p && typeof p.then === "function") p.catch(function () {});
+  } catch (e) {
+    /* iPad / Safari : refus, API absente ou pas dans un geste utilisateur */
+  }
+}
+
+function syncExitDomFullscreen() {
+  if (typeof document === "undefined") return;
+  var active = document.fullscreenElement || document.webkitFullscreenElement;
+  if (!active) return;
+  var exitFn = document.exitFullscreen || document.webkitExitFullscreen;
+  if (typeof exitFn !== "function") return;
+  try {
+    var p = exitFn.call(document);
+    if (p && typeof p.then === "function") p.catch(function () {});
+  } catch (e) {
+    /* ignore */
+  }
+}
 
 function enterCameraFullscreen() {
   if (isCameraFullscreen) return;
   isCameraFullscreen = true;
+  document.documentElement.classList.add("camera-zone-fullscreen-html");
   document.body.classList.add("camera-zone-fullscreen");
-  // Afficher le flux camera en direct, pas la derniere photo
+  try {
+    window.scrollTo(0, 0);
+  } catch (e) {
+    /* ignore */
+  }
+  /* Même synchrone que le clic : avant tout await dans captureSequence (activation utilisateur). */
+  tryEnterDomFullscreenCameraZone();
   if (captureLayer && captureCtx) {
     ensureCaptureLayerSize();
     captureCtx.clearRect(0, 0, captureLayer.width, captureLayer.height);
@@ -619,89 +1558,61 @@ function enterCameraFullscreen() {
 function exitCameraFullscreen() {
   if (!isCameraFullscreen) return;
   isCameraFullscreen = false;
+  document.documentElement.classList.remove("camera-zone-fullscreen-html");
   document.body.classList.remove("camera-zone-fullscreen");
+  syncExitDomFullscreen();
 }
 
 async function handleCaptureButtonClick() {
-  if (!hasValidAccess) return;
+  if (!hasValidAccess) {
+    setFeedback("Accès non valide : ouvrez le studio avec le lien ou le jeton fourni.", "error");
+    return;
+  }
+  if (filePickSession) {
+    setFeedback("Terminez les selfies avec le bouton gris, ou rechargez la page.", "error");
+    return;
+  }
   if (!mediaStream) {
-    setFeedback("Active d'abord la camera.", "error");
+    setFeedback("Ouvrez d’abord la caméra avec le bouton 1.", "error");
     return;
   }
   if (!currentEvent) {
     setFeedback("Aucun evenement selectionne.", "error");
     return;
   }
-  var countdown = Number(timerSelect?.value) || 8;
-  var countdownAudio = startCountdownAudio(countdown);
-  enterCameraFullscreen();
-  await captureFromFullscreen(countdown, countdownAudio);
+  const countdown = Number((timerSelect && timerSelect.value) || 8) || 8;
+  const countdownAudio = startCountdownAudio(countdown);
+  await captureSequence({ countdownAudio });
 }
 
-async function captureFromFullscreen(countdownSeconds, countdownAudio) {
-  if (!hasValidAccess || !currentEvent || !mediaStream || isCapturing) return;
-  countdownSeconds = countdownSeconds ?? 8;
-  isCapturing = true;
-  try {
-    await runCountdown(countdownSeconds, countdownAudio);
-    await wait(3000);
-    const snap = snapSingleFrame();
-    const output = composeShotFullscreenFormat(snap);
-    const dataUrl = output.toDataURL("image/jpeg", 0.92);
-    lastCaptureDataUrl = dataUrl;
-    await uploadEventPhoto(currentEvent.id, dataUrl);
-    if (captureLayer && captureCtx) {
-      captureLayer.width = output.width;
-      captureLayer.height = output.height;
-      captureCtx.clearRect(0, 0, output.width, output.height);
-      captureCtx.drawImage(output, 0, 0);
-    }
-    await refreshGallery();
-    setFeedback("Photo enregistree.", "success");
-  } catch {
-    setFeedback("Erreur pendant la capture.", "error");
-  } finally {
-    isCapturing = false;
+window.addEventListener("pageshow", function (ev) {
+  if (ev.persisted) {
     exitCameraFullscreen();
   }
-}
-
-function handleCameraZoneInteraction(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  if (!hasValidAccess) return;
-  if (!mediaStream) {
-    setFeedback("Active d'abord la camera.", "error");
-    return;
-  }
-  if (!currentEvent) {
-    setFeedback("Aucun evenement selectionne.", "error");
-    return;
-  }
-  if (isCapturing) return;
-  var countdown = Number(timerSelect?.value) || 8;
-  var countdownAudio = startCountdownAudio(countdown);
-  if (isCameraFullscreen) {
-    captureFromFullscreen(countdown, countdownAudio);
-  } else {
-    enterCameraFullscreen();
-    captureFromFullscreen(countdown, countdownAudio);
-  }
-}
-
-if (cameraZone) {
-  cameraZone.addEventListener("click", handleCameraZoneInteraction);
-  cameraZone.addEventListener("touchend", (e) => {
-    e.preventDefault();
-    handleCameraZoneInteraction(e);
-  }, { passive: false });
-}
-
-downloadLastBtn.addEventListener("click", () => {
-  if (!lastCaptureDataUrl || !currentEvent) {
-    setFeedback("Aucune photo a telecharger pour le moment.", "error");
-    return;
-  }
-  const ext = lastCaptureDataUrl.startsWith("data:image/jpeg") ? "jpg" : "png";
-  downloadDataUrl(lastCaptureDataUrl, `${currentEvent.name}-latest.${ext}`);
 });
+
+if (copyPickupUrlBtn) {
+  copyPickupUrlBtn.addEventListener("click", async () => {
+    const url = (lastPickupUrl || "").trim();
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(url);
+      setFeedback("Lien copie dans le presse-papiers.", "success");
+    } catch {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+        setFeedback("Lien copie (navigateur ancien).", "success");
+      } catch {
+        setFeedback("Copie impossible — scannez le QR.", "error");
+      }
+    }
+  });
+}

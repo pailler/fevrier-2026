@@ -199,6 +199,14 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     if (titleLower.includes('photobooth') || titleLower.includes('photo booth') || idLower === 'photobooth') {
       return '/images/photobooth.png';
     }
+
+    if (
+      titleLower.includes('photo vivante') ||
+      titleLower.includes('photo-vivante') ||
+      idLower === 'photo-vivante'
+    ) {
+      return '/images/photo-vivante.jpg';
+    }
     
     if (titleLower.includes('photo') || titleLower.includes('image')) {
       return '/images/iaphoto.jpg';
@@ -340,6 +348,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   const isFlorence2 = module.title.toLowerCase().includes('florence-2') || module.title.toLowerCase().includes('florence 2') || module.title.toLowerCase().includes('florence2') || module.id === 'florence-2';
 
   const isMuseTalk = module.title.toLowerCase().includes('musetalk') || module.title.toLowerCase().includes('muse talk') || module.id === 'musetalk';
+
+  const isPhotoVivante =
+    module.title.toLowerCase().includes('photo vivante') ||
+    module.title.toLowerCase().includes('photo-vivante') ||
+    module.id === 'photo-vivante';
   
   // Vérifier si c'est le module Détecteur de Contenu IA pour appliquer un style spécial
   const isAIDetector = module.title.toLowerCase().includes('détecteur') || module.title.toLowerCase().includes('detecteur') || module.title.toLowerCase().includes('ai detector') || module.title.toLowerCase().includes('contenu ia') || module.id === 'ai-detector';
@@ -413,10 +426,12 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   ? '/images/birefnet.jpg'
                   : isPhotoMaker
                     ? '/images/photomaker.jpg'
-                    : isFlorence2
-                      ? '/images/florence-2.jpg'
-                      : isMuseTalk
-                        ? '/images/musetalk.jpg'
+                    : isMuseTalk
+                      ? '/images/musetalk.jpg'
+                      : isPhotoVivante
+                        ? '/images/photo-vivante.jpg'
+                      : isFlorence2
+                        ? '/images/florence-2.jpg'
                         : isSentinelleNumerique
                           ? '/images/sentinelle-numerique.jpg'
                           : isAIDetector
@@ -491,7 +506,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               <span className={`text-base font-semibold ${
                 isFree ? 'text-green-600' : 'text-gray-700'
               }`}>
-                {isSentinelleNumerique ? '10 crédits' : formatPrice(module.price)}
+                {isSentinelleNumerique
+                  ? '10 crédits'
+                  : isMuseTalk || isPhotoVivante
+                    ? '100 crédits'
+                    : formatPrice(module.price)}
               </span>
             </div>
             

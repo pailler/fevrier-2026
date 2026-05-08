@@ -25,8 +25,11 @@ Application web photobooth inspiree d'une experience event moderne:
 Depuis le dossier `photobooth`:
 
 ```powershell
-python -m http.server 7885
+npm install
+npm start
 ```
+
+Le serveur Express ecoute le port **7885** par defaut (variable d'environnement `PHOTOBOOTH_PORT`) — le **3050** local est reserve au compte rendu (Meeting Reports).
 
 Puis ouvrir `http://localhost:7885`.
 
@@ -40,7 +43,7 @@ Depuis le dossier `photobooth`:
 docker compose up -d --build
 ```
 
-Puis ouvrir `http://localhost:7885`.
+Puis ouvrir `http://localhost:7885` (même port qu’en local hors Docker, pour ne pas empieter sur le compte rendu en **3050**).
 
 ## Stockage des photos (dossiers separes par evenement)
 

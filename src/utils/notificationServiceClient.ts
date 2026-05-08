@@ -1,5 +1,3 @@
-import { supabase } from './supabaseClient';
-
 export interface NotificationSetting {
   id: string;
   event_type: string;
@@ -17,7 +15,7 @@ export interface NotificationLog {
   event_type: string;
   user_id?: string;
   user_email?: string;
-  event_data: any;
+  event_data: Record<string, unknown>;
   email_sent: boolean;
   email_sent_at?: string;
   email_error?: string;
@@ -45,7 +43,7 @@ export class NotificationServiceClient {
       if (!response.ok) return [];
       const data = await response.json();
       return data.settings || [];
-    } catch (error) {
+    } catch {
       return [];
     }
   }
@@ -62,7 +60,7 @@ export class NotificationServiceClient {
         body: JSON.stringify({ eventType, updates })
       });
       return response.ok;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -74,7 +72,7 @@ export class NotificationServiceClient {
       if (!response.ok) return [];
       const data = await response.json();
       return data.logs || [];
-    } catch (error) {
+    } catch {
       return [];
     }
   }
@@ -83,7 +81,7 @@ export class NotificationServiceClient {
   async sendNotification(
     eventType: string,
     userEmail: string,
-    eventData: any = {}
+    eventData: Record<string, unknown> = {}
   ): Promise<boolean> {
     try {
       const response = await fetch('/api/test-notification', {

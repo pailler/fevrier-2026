@@ -6,6 +6,7 @@
     - librespeed (port 8085)
     - qrcodes (port 7006)
     - photobooth (port 7885)
+    - apprendre-autrement (port 9001, via docker-compose.prod.yml si present)
 .EXAMPLE
     .\scripts\start-essentiels-services.ps1
 #>
@@ -80,12 +81,29 @@ if (Test-Path (Join-Path $photoboothPath "docker-compose.yml")) {
     Write-Host "  [!] photobooth/ non trouve" -ForegroundColor Yellow
 }
 
+# Apprendre Autrement (Next.js) — service defini dans docker-compose.prod.yml a la racine du depot
+$prodCompose = Join-Path $ProjectRoot "docker-compose.prod.yml"
+if (Test-Path $prodCompose) {
+    Write-Host "  apprendre-autrement (docker-compose.prod.yml)..." -ForegroundColor Gray
+    Push-Location $ProjectRoot
+    docker compose -f docker-compose.prod.yml up -d apprendre-autrement *> $null
+    $exitAa = $LASTEXITCODE
+    Pop-Location
+    if ($exitAa -ne 0) {
+        Write-Host "  [!] Erreur apprendre-autrement (build ou image manquant ? redeploy-prod-full.ps1)" -ForegroundColor Yellow
+        $ok = $false
+    } else {
+        Write-Host "  [OK] apprendre-autrement (reseau Docker :9001, pas d'ecoute sur l'hote)" -ForegroundColor Green
+    }
+}
+
 Write-Host ""
 if ($ok) {
     Write-Host "Services demarres. URLs locales:" -ForegroundColor Green
     Write-Host "  - librespeed: http://localhost:8085" -ForegroundColor Gray
     Write-Host "  - qrcodes:    http://localhost:7006" -ForegroundColor Gray
     Write-Host "  - photobooth: http://localhost:7885" -ForegroundColor Gray
+    Write-Host "  - apprendre-autrement: apprendre-autrement.iahome.fr (ou reseau Docker, pas localhost:9001)" -ForegroundColor Gray
 } else {
     Write-Host "Certains services n'ont pas demarre. Verifiez les logs Docker." -ForegroundColor Yellow
 }

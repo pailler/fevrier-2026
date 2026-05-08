@@ -8,6 +8,7 @@ import { useCustomAuth } from '../../hooks/useCustomAuth';
 import Breadcrumb from '../../components/Breadcrumb';
 import { useTokenContext } from '../../contexts/TokenContext';
 import { getHunyuan3dAppUrl } from '../../utils/hunyuan3dAppUrl';
+import { isBrowserLocalIahomeDev } from '../../utils/isBrowserLocalIahomeDev';
 
 interface UserProfile {
   id: string;
@@ -36,6 +37,7 @@ const MODULE_DESCRIPTIONS: Record<string, string> = {
   'animagine-xl': 'Generation d\'images style anime.',
   'florence-2': 'Analyse visuelle et description intelligente d\'images.',
   'musetalk': 'Lip-sync video : synchroniser les levres sur une piste audio.',
+  'photo-vivante': 'Anime une photo fixe avec un rendu naturel et realiste.',
   'home-assistant': 'Ressources et manuels pour votre domotique HA.',
   'hunyuan3d': 'Generation et exploration d\'objets 3D.',
   'stablediffusion': 'Creation d\'images IA depuis vos prompts.',
@@ -69,6 +71,20 @@ export default function AccountPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [accessingModuleId, setAccessingModuleId] = useState<string | null>(null);
+  const [subdomainAccessNotice, setSubdomainAccessNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const sp = new URLSearchParams(window.location.search);
+    if (sp.get('error') !== 'direct_access_denied') return;
+    setSubdomainAccessNotice(
+      'Accès direct au sous-domaine refusé (sécurité). Ouvrez l’application depuis la liste ci-dessous : un jeton sera ajouté à l’URL, comme pour les autres apps protégées.'
+    );
+    const u = new URL(window.location.href);
+    u.searchParams.delete('error');
+    const next = u.pathname + (u.searchParams.toString() ? `?${u.searchParams.toString()}` : '');
+    router.replace(next, { scroll: false });
+  }, [router]);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -139,7 +155,7 @@ export default function AccountPage() {
 
   const resolveModuleUrl = useCallback((moduleId: string) => {
     const normalizedModuleId = (moduleId || '').trim().toLowerCase();
-    const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const isDevelopment = isBrowserLocalIahomeDev();
     const urlMap: Record<string, string> = isDevelopment
       ? {
           'photomaker': 'http://localhost:7881',
@@ -147,6 +163,7 @@ export default function AccountPage() {
           'animagine-xl': 'http://localhost:7883',
           'florence-2': 'http://localhost:7884',
           'musetalk': 'http://localhost:7886',
+          'photo-vivante': 'http://localhost:7887',
           'home-assistant': 'http://localhost:8123/',
           'hunyuan3d': getHunyuan3dAppUrl(),
           'stablediffusion': 'http://localhost:7880',
@@ -170,6 +187,7 @@ export default function AccountPage() {
           'animagine-xl': 'https://animaginexl.iahome.fr',
           'florence-2': 'https://florence2.iahome.fr',
           'musetalk': 'https://musetalk.iahome.fr',
+          'photo-vivante': 'https://photo-vivante.iahome.fr',
           'home-assistant': 'https://homeassistant.iahome.fr',
           'hunyuan3d': getHunyuan3dAppUrl(),
           'stablediffusion': 'https://stablediffusion.iahome.fr',
@@ -224,7 +242,7 @@ export default function AccountPage() {
         body: JSON.stringify({
           userId: user.id,
           userEmail: user.email,
-          moduleId: app.module_id,
+          moduleId: (app.module_id || '').trim().toLowerCase(),
         }),
       });
 
@@ -309,6 +327,20 @@ export default function AccountPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+      {subdomainAccessNotice && (
+        <div className="bg-amber-50 border-b border-amber-200 text-amber-950 px-4 py-3">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <p className="text-sm sm:text-base pr-4">{subdomainAccessNotice}</p>
+            <button
+              type="button"
+              onClick={() => setSubdomainAccessNotice(null)}
+              className="shrink-0 text-sm font-medium text-amber-900 underline hover:no-underline"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
       {/* Fil d'Ariane */}
       <div className="bg-white/60 backdrop-blur-sm border-b border-gray-200/50 pt-2">
         <div className="max-w-7xl mx-auto px-6 py-1">

@@ -16,6 +16,7 @@ export const TOKEN_COSTS = {
   'florence-2': 100, // Florence-2 -> 100 tokens
   'birefnet': 100, // BiRefNet -> 100 tokens
   'musetalk': 100, // MuseTalk -> lip-sync video
+  'photo-vivante': 100, // Photo Vivante -> animation photo realiste
   
   // Applications essentielles (10 tokens)
   'metube': 10,
@@ -54,6 +55,18 @@ const MODULE_ID_ALIASES: { [key: string]: keyof typeof TOKEN_COSTS } = {
   'sentinelle-numerique': 'sentinelle-numerique',
   'sentinellenumerique': 'sentinelle-numerique',
 };
+
+/** Coût en crédits pour l’affichage UI (fallback 10 si inconnu). */
+export function getTokenCostForModuleId(moduleId: string): number {
+  const n = moduleId.toLowerCase().trim();
+  if (MODULE_ID_ALIASES[n]) {
+    return TOKEN_COSTS[MODULE_ID_ALIASES[n]];
+  }
+  if (n in TOKEN_COSTS) {
+    return TOKEN_COSTS[n as keyof typeof TOKEN_COSTS];
+  }
+  return 10;
+}
 
 export class TokenActionService {
   private static instance: TokenActionService;
