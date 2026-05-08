@@ -33,7 +33,7 @@ export const TOKEN_COSTS = {
   'home-assistant': 100,
   'voice-isolation': 100,
   /** Vote en ligne (PIN + QR, Supabase) */
-  'vote': 50,
+  'vote': 10,
 } as const;
 
 export type ModuleId = keyof typeof TOKEN_COSTS;

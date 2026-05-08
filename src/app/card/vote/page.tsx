@@ -22,9 +22,9 @@ const DEFAULT_VOTE: Card = {
   title: 'Vote en ligne',
   subtitle: 'Scrutins avec code PIN organisateur et QR code',
   description:
-    'Créez un vote simple : nom du scrutin et liste des participants. Un code PIN à 4 chiffres (comme le Photobooth) protège l’administration ; un lien public et un QR code permettent de voter. Une participation par appareil, données sur Supabase.',
+    'Créez un vote simple : nom du scrutin et liste des participants. Un code PIN à 4 chiffres protège l’administration ; un lien public et un QR code permettent de voter. Une participation par appareil, données sur Supabase.',
   category: 'OUTILS ÉVÉNEMENT',
-  price: 50,
+  price: 10,
   image_url: '/iahome-logo.svg',
 };
 
@@ -77,7 +77,7 @@ export default function VoteCardPage() {
     return null;
   }
 
-  const moduleCost = typeof card.price === 'string' ? parseInt(String(card.price), 10) || 50 : Number(card.price) || 50;
+  const moduleCost = typeof card.price === 'string' ? parseInt(String(card.price), 10) || 10 : Number(card.price) || 10;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-indigo-50 to-violet-50">

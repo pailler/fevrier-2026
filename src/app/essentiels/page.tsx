@@ -188,7 +188,7 @@ export default function Essentiels() {
             description:
               'Créez un vote simple : nom du scrutin, liste des participants. Code PIN à 4 chiffres (comme le Photobooth), lien public et QR pour voter. Stockage Supabase.',
             category: 'OUTILS ÉVÉNEMENT',
-            price: 50,
+            price: 10,
             image_url: '/iahome-logo.svg',
           };
           essentialModulesData = [...essentialModulesData, voteModule];
