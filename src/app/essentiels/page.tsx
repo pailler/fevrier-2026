@@ -186,13 +186,22 @@ export default function Essentiels() {
             title: 'Vote en ligne',
             subtitle: 'Votes avec code PIN organisateur et QR code',
             description:
-              'Créez un vote simple : nom du scrutin, liste des participants. Code PIN à 4 chiffres (comme le Photobooth), lien public et QR pour voter. Stockage Supabase.',
+              'Créez un vote simple : nom du scrutin, liste des participants. Code PIN à 4 chiffres pour l’administration, lien public et QR pour voter. Stockage Supabase.',
             category: 'OUTILS ÉVÉNEMENT',
             price: 10,
+            url: '/card/vote',
             image_url: '/iahome-logo.svg',
           };
           essentialModulesData = [...essentialModulesData, voteModule];
         }
+
+        essentialModulesData = essentialModulesData.map((m: { id?: unknown; url?: string }) =>
+          String(m.id ?? '')
+            .trim()
+            .toLowerCase() === 'vote'
+            ? { ...m, url: '/card/vote' }
+            : m
+        );
 
         // Debug: vérifier si Home Assistant est dans les modules
         const homeAssistantModule = essentialModulesData.find(m => m.id === 'home-assistant' || m.title.toLowerCase().includes('domotisez'));

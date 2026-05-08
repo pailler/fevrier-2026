@@ -168,14 +168,9 @@ export default function VoteCardPage() {
             <p className="text-gray-700 mb-4">{card.description}</p>
             <ul className="list-disc list-inside text-gray-600 space-y-2">
               <li>Création du vote : titre + liste des participants (options)</li>
-              <li>Code PIN à 4 chiffres pour l’espace organisateur (comme le Photobooth)</li>
+              <li>Code PIN à 4 chiffres pour l’espace organisateur</li>
               <li>Lien public et QR code pour les votants</li>
               <li>Un vote par appareil (navigateur)</li>
-              <li>
-                Application dédiée :{' '}
-                <span className="font-semibold">vote.iahome.fr</span> — en local Docker, port{' '}
-                <span className="font-mono">7890</span>
-              </li>
             </ul>
           </div>
 
@@ -238,8 +233,8 @@ export default function VoteCardPage() {
             <div className="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded">
               <p className="font-semibold text-indigo-900 mb-2">Rappel</p>
               <p className="text-indigo-800">
-                L’application Vote tourne sur <span className="font-medium">vote.iahome.fr</span> (production) ou{' '}
-                <span className="font-mono">localhost:7890</span> en développement local.
+                La fiche du module est sur IAHome ; l’outil de vote s’ouvre après débit des crédits via le bouton
+                d’accès.
               </p>
             </div>
           </div>
