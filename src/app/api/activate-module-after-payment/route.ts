@@ -1,12 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
+import { getStripeServer } from '@/utils/stripeServer';
 import { supabase } from '../../../utils/supabaseClient';
-
-// Initialiser Stripe avec la clé secrète
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-08-27.basil',
-});
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,7 +29,7 @@ export async function POST(request: NextRequest) {
       // Pour le mode test, utiliser les métadonnées ou détecter le module
       // D'abord, essayer de récupérer la session Stripe pour obtenir les métadonnées
       try {
-        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        const session = await getStripeServer().checkout.sessions.retrieve(sessionId);
         if (session && session.metadata) {
           moduleId = session.metadata.moduleId || '';
           moduleTitle = session.metadata.moduleTitle || '';
@@ -80,7 +75,7 @@ export async function POST(request: NextRequest) {
       console.log('🧪 Mode test activé - Simulation d\'un paiement réussi pour', moduleTitle);
     } else {
       // Mode production : vérifier avec Stripe
-      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      const session = await getStripeServer().checkout.sessions.retrieve(sessionId);
       
       if (!session) {
         return NextResponse.json(

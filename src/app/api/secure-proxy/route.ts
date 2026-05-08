@@ -23,6 +23,8 @@ const APPLICATION_PORTS: { [key: string]: number } = {
   'florence-2': 7884,
   'birefnet': 7882,
   'musetalk': 7886,
+  'photobooth': 7885,
+  'vote': 7890,
 };
 
 // Mapping des modules vers leurs hôtes locaux (si différent de localhost)

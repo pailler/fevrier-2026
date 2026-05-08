@@ -34,6 +34,7 @@ const MODULE_URLS: Record<string, string> = {
   'voice-isolation': 'https://voice-isolation.iahome.fr',
   'photomaker': 'https://photomaker.iahome.fr',
   'photobooth': 'https://photobooth.iahome.fr',
+  'vote': 'https://vote.iahome.fr',
   // Applications IA (Gradio / sous-domaines)
   'animagine-xl': 'https://animaginexl.iahome.fr',
   'birefnet': 'https://birefnet.iahome.fr',
@@ -118,6 +119,13 @@ function getModuleSlug(moduleId: string, moduleTitle: string): string {
   }
   if (titleLower.includes('photobooth') || titleLower.includes('photo booth')) {
     return 'photobooth';
+  }
+  if (
+    moduleId.toLowerCase() === 'vote' ||
+    titleLower.includes('vote en ligne') ||
+    (titleLower.includes('vote') && titleLower.includes('ligne'))
+  ) {
+    return 'vote';
   }
   if (titleLower.includes('apprendre autrement') || titleLower.includes('apprendre-autrement')) {
     return 'apprendre-autrement';

@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
+import { getStripeServer } from '@/utils/stripeServer';
 import { isPrestationMarketingPromoActive } from '../../../../utils/prestationMarketingPromo';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-08-27.basil',
-});
 
 // Configuration des nouveaux packages
 const PACKAGES_V2 = {
@@ -98,6 +94,8 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    const stripe = getStripeServer();
 
     const { packageType, userId, userEmail, promotion_code_id } = await request.json();
     
