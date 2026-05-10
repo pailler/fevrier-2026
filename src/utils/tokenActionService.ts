@@ -27,14 +27,13 @@ export const TOKEN_COSTS = {
   'code-learning': 10,
   'apprendre-autrement': 10,
   'administration': 10,
+  /** Vote en ligne (PIN + QR, Supabase) */
   'vote': 10,
 
   // Applications premium (100 tokens)
   'qrcodes': 100,
   'home-assistant': 100,
   'voice-isolation': 100,
-  /** Vote en ligne (PIN + QR, Supabase) */
-  'vote': 10,
 } as const;
 
 export type ModuleId = keyof typeof TOKEN_COSTS;
