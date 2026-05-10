@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Voter</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="wrap narrow">
+    <header class="head">
+      <h1>Votre vote</h1>
+      <p class="sub" id="hint">Chargement…</p>
+    </header>
+
+    <section id="panel" class="card hidden">
+      <p class="q" id="question"></p>
+      <form id="form">
+        <div id="choices" class="choices"></div>
+        <p id="voteErr" class="err" hidden role="alert"></p>
+        <button type="submit" class="btn primary full" id="submitBtn">Envoyer</button>
+      </form>
+    </section>
+
+    <section id="done" class="card ok hidden">
+      <p id="doneMsg">Merci, votre vote a bien été enregistré pour cet appareil.</p>
+    </section>
+
+    <section id="closed" class="card warn hidden">
+      <p>Les votes sont fermés pour cette manche.</p>
+    </section>
+
+    <section id="bad" class="card errbox hidden">
+      <p id="badMsg">Lien invalide ou session introuvable.</p>
+    </section>
+  </div>
+  <script src="/vote.js"></script>
+</body>
+</html>

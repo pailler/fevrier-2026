@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import { getHunyuan3dAppUrl } from '../utils/hunyuan3dAppUrl';
+import { getModuleAccessOpenUrl } from '../utils/moduleAccessOpenUrl';
 
 interface CardPageAccessSectionProps {
   moduleId: string;
@@ -40,7 +41,12 @@ export default function CardPageAccessSection({
   const resolveModuleUrl = () => {
     if (accessUrl) return accessUrl;
     if (moduleUrl) return moduleUrl;
-    const normalizedModuleId = (moduleId || '').trim().toLowerCase();
+    const MODULE_SLUG_ALIASES: Record<string, string> = {
+      'vote-en-ligne': 'vote',
+    };
+    const normalizedModuleId =
+      MODULE_SLUG_ALIASES[(moduleId || '').trim().toLowerCase()] ||
+      (moduleId || '').trim().toLowerCase();
     const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
     const urlMap: Record<string, string> = isDevelopment
       ? {
@@ -132,9 +138,13 @@ export default function CardPageAccessSection({
       }
 
       const targetUrl = resolveModuleUrl();
-      if (targetUrl) {
-        const separator = targetUrl.includes('?') ? '&' : '?';
-        window.open(`${targetUrl}${separator}token=${encodeURIComponent(token)}`, '_blank');
+      const openUrl = getModuleAccessOpenUrl({
+        token,
+        apiUrl: data?.url,
+        targetBaseUrl: targetUrl,
+      });
+      if (openUrl) {
+        window.open(openUrl, '_blank');
       } else {
         throw new Error(`URL d'accès introuvable pour le module ${moduleId}`);
       }
