@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import { useTokenContext } from '../contexts/TokenContext';
 import { getHunyuan3dAppUrl } from '../utils/hunyuan3dAppUrl';
+import { getModuleAccessOpenUrl } from '../utils/moduleAccessOpenUrl';
 
 interface ModuleAccessButtonProps {
   moduleId: string;
@@ -37,7 +38,12 @@ export default function ModuleAccessButton({
 
   const resolveModuleUrl = () => {
     if (accessUrl) return accessUrl;
-    const normalizedModuleId = (moduleId || '').trim().toLowerCase();
+    const MODULE_SLUG_ALIASES: Record<string, string> = {
+      'vote-en-ligne': 'vote',
+    };
+    const normalizedModuleId =
+      MODULE_SLUG_ALIASES[(moduleId || '').trim().toLowerCase()] ||
+      (moduleId || '').trim().toLowerCase();
     const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
     const urlMap: Record<string, string> = isDevelopment
       ? {
@@ -57,6 +63,7 @@ export default function ModuleAccessButton({
           'ruinedfooocus': 'http://localhost:7870',
           'comfyui': 'http://localhost:8188',
           'photobooth': 'http://localhost:7885',
+          'vote': 'http://localhost:7890',
         }
         : {
           'librespeed': 'https://librespeed.iahome.fr',
@@ -75,6 +82,7 @@ export default function ModuleAccessButton({
           'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
           'comfyui': 'https://comfyui.iahome.fr',
           'photobooth': 'https://photobooth.iahome.fr',
+          'vote': 'https://vote.iahome.fr',
         };
 
     if (urlMap[normalizedModuleId]) {
@@ -148,9 +156,13 @@ export default function ModuleAccessButton({
       }
 
       const targetUrl = resolveModuleUrl();
-      if (targetUrl) {
-        const separator = targetUrl.includes('?') ? '&' : '?';
-        window.open(`${targetUrl}${separator}token=${encodeURIComponent(token)}`, '_blank');
+      const openUrl = getModuleAccessOpenUrl({
+        token,
+        apiUrl: data?.url,
+        targetBaseUrl: targetUrl,
+      });
+      if (openUrl) {
+        window.open(openUrl, '_blank');
       } else {
         throw new Error(`URL d'accès introuvable pour le module ${moduleId}`);
       }

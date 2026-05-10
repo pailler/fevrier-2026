@@ -8,6 +8,7 @@ import { useCustomAuth } from '../../hooks/useCustomAuth';
 import Breadcrumb from '../../components/Breadcrumb';
 import { useTokenContext } from '../../contexts/TokenContext';
 import { getHunyuan3dAppUrl } from '../../utils/hunyuan3dAppUrl';
+import { getModuleAccessOpenUrl } from '../../utils/moduleAccessOpenUrl';
 
 interface UserProfile {
   id: string;
@@ -54,6 +55,7 @@ const MODULE_DESCRIPTIONS: Record<string, string> = {
   'administration': 'Outils d\'administration de la plateforme.',
   'ai-detector': 'Detection de contenus generes par IA.',
   'code-learning': 'Apprendre le code avec parcours guides.',
+  'vote': 'Votes en ligne avec PIN organisateur et QR code pour les participants.',
 };
 
 export default function AccountPage() {
@@ -138,7 +140,12 @@ export default function AccountPage() {
   };
 
   const resolveModuleUrl = useCallback((moduleId: string) => {
-    const normalizedModuleId = (moduleId || '').trim().toLowerCase();
+    const MODULE_SLUG_ALIASES: Record<string, string> = {
+      'vote-en-ligne': 'vote',
+    };
+    const normalizedModuleId =
+      MODULE_SLUG_ALIASES[(moduleId || '').trim().toLowerCase()] ||
+      (moduleId || '').trim().toLowerCase();
     const isDevelopment = typeof window !== 'undefined' && window.location.hostname === 'localhost';
     const urlMap: Record<string, string> = isDevelopment
       ? {
@@ -163,6 +170,7 @@ export default function AccountPage() {
           'pdf': 'http://localhost:8086',
           'voice-isolation': 'http://localhost:8100',
           'photobooth': 'http://localhost:7885',
+          'vote': 'http://localhost:7890',
         }
       : {
           'photomaker': 'https://photomaker.iahome.fr',
@@ -186,6 +194,7 @@ export default function AccountPage() {
           'pdf': 'https://pdf.iahome.fr',
           'voice-isolation': 'https://voice-isolation.iahome.fr',
           'photobooth': 'https://photobooth.iahome.fr',
+          'vote': 'https://vote.iahome.fr',
         };
 
     if (urlMap[normalizedModuleId]) {
@@ -238,8 +247,12 @@ export default function AccountPage() {
         throw new Error('Token d\'accès manquant');
       }
 
-      const separator = targetUrl.includes('?') ? '&' : '?';
-      window.open(`${targetUrl}${separator}token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
+      const openUrl = getModuleAccessOpenUrl({
+        token: tokenData.token,
+        apiUrl: tokenData.url,
+        targetBaseUrl: targetUrl,
+      });
+      window.open(openUrl, '_blank', 'noopener,noreferrer');
       await fetchUserData();
     } catch (error) {
       alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);

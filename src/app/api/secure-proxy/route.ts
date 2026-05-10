@@ -3,6 +3,20 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = 'iahome-jwt-secret-2024-production-secure-key';
 
+/** JWT historique ou payload JSON en Base64 URL-safe (/api/generate-access-token). */
+function decodeModuleAccessToken(token: string): Record<string, unknown> {
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true });
+    return decoded as Record<string, unknown>;
+  } catch {
+    let b64 = token.replace(/-/g, '+').replace(/_/g, '/');
+    const pad = b64.length % 4;
+    if (pad) b64 += '='.repeat(4 - pad);
+    const json = Buffer.from(b64, 'base64').toString('utf8');
+    return JSON.parse(json) as Record<string, unknown>;
+  }
+}
+
 // Mapping des modules vers leurs ports locaux
 const APPLICATION_PORTS: { [key: string]: number } = {
   'librespeed': 8085,
@@ -23,6 +37,8 @@ const APPLICATION_PORTS: { [key: string]: number } = {
   'florence-2': 7884,
   'birefnet': 7882,
   'musetalk': 7886,
+  'photobooth': 7885,
+  'vote': 7890,
 };
 
 // Mapping des modules vers leurs hôtes locaux (si différent de localhost)
@@ -46,22 +62,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    let decoded: any;
-    
-    // Essayer d'abord JWT, puis base64 simple
-    try {
-      decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true });
-    } catch (jwtError) {
-      // Si JWT échoue, essayer base64 simple
-      try {
-        decoded = JSON.parse(atob(token));
-      } catch (base64Error) {
-        return NextResponse.json(
-          { error: 'Token invalide' },
-          { status: 401 }
-        );
-      }
-    }
+    const decoded = decodeModuleAccessToken(token);
 
     // Pas de contrôle temporel sur le jeton d’accès module.
 

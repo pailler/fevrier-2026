@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { TokenActionServiceClient } from '../utils/tokenActionServiceClient';
 import { useTokenContext } from '../contexts/TokenContext';
 import { getHunyuan3dAppUrl } from '../utils/hunyuan3dAppUrl';
+import { getModuleAccessOpenUrl } from '../utils/moduleAccessOpenUrl';
 
 interface UseModuleAccessOptions {
   user: any;
@@ -140,6 +141,8 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'musetalk': isDevelopment ? 'http://127.0.0.1:7886' : 'https://musetalk.iahome.fr',
         // Photobooth : sous-domaine dedie
         'photobooth': isDevelopment ? 'http://localhost:7885' : 'https://photobooth.iahome.fr',
+        // Vote en ligne : sous-domaine dédié (Docker / Traefik)
+        'vote': isDevelopment ? 'http://localhost:7890' : 'https://vote.iahome.fr',
       };
       
       // Convertir module_id numérique en slug si nécessaire
@@ -154,8 +157,12 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
       }
       
       // Ouvrir le sous-domaine avec le token en paramètre (même système pour tous les modules)
-      const directUrl = `${moduleUrl}?token=${encodeURIComponent(tokenData.token)}`;
-      
+      const directUrl = getModuleAccessOpenUrl({
+        token: tokenData.token,
+        apiUrl: tokenData.url,
+        targetBaseUrl: moduleUrl,
+      });
+
       console.log(`🔗 ${moduleTitle}: Accès direct au sous-domaine avec token:`, directUrl);
       window.open(directUrl, '_blank');
       

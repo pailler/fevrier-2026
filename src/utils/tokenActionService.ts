@@ -27,7 +27,8 @@ export const TOKEN_COSTS = {
   'code-learning': 10,
   'apprendre-autrement': 10,
   'administration': 10,
-  
+  'vote': 10,
+
   // Applications premium (100 tokens)
   'qrcodes': 100,
   'home-assistant': 100,
