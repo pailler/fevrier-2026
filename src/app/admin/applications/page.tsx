@@ -301,6 +301,10 @@ export default function AdminApplications() {
           tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
           description = `Générateur de codes QR dynamiques. Coût: ${tokenCost} crédits par génération.`;
+        } else if (moduleId === 'vote') {
+          tokenCost = 10;
+          estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
+          description = `Votes en ligne : PIN organisateur, participants et QR code (vote.iahome.fr). Coût: ${tokenCost} crédits par accès.`;
         } else if (moduleId.includes('home-assistant') || moduleId.includes('homeassistant')) {
           tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;

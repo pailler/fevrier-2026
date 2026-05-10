@@ -142,6 +142,29 @@ services:
       - "traefik.http.routers.portainer.service=portainer-service"
       - "traefik.http.services.portainer-service.loadbalancer.server.port=9000"
 
+  vote:
+    build:
+      context: ./vote
+      dockerfile: Dockerfile
+    container_name: iahome-vote
+    restart: unless-stopped
+    env_file:
+      - .env.production.local
+    environment:
+      - NODE_ENV=production
+      - VOTE_PORT=7890
+      - VOTE_PUBLIC_BASE_URL=${VOTE_PUBLIC_BASE_URL:-https://vote.iahome.fr}
+    ports:
+      - "7890:7890"
+    networks:
+      - iahome-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:7890/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
   # Service de monitoring (optionnel)
   # prometheus:
   #   image: prom/prometheus:latest

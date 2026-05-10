@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-08-27.basil',
-});
+import type Stripe from 'stripe';
+import { getStripeServer } from '@/utils/stripeServer';
 
 /** Code promo standard site (-20 %), celui utilisé sur la page tarifs et les liens marketing. */
 const STANDARD_PROMO_CODE = 'BIENVENUE10';
@@ -27,7 +24,7 @@ async function listByCodeVariants(variants: string[]): Promise<Stripe.PromotionC
   for (const v of variants) {
     if (!v) continue;
     try {
-      const { data } = await stripe.promotionCodes.list({ code: v, limit: 30 });
+      const { data } = await getStripeServer().promotionCodes.list({ code: v, limit: 30 });
       for (const p of data) {
         if (!byId.has(p.id)) byId.set(p.id, p);
       }
@@ -44,7 +41,7 @@ async function findPromotionCodePaginated(upperCode: string, maxPages = 40): Pro
   for (let i = 0; i < maxPages; i++) {
     const params: Stripe.PromotionCodeListParams = { limit: 100 };
     if (startingAfter) params.starting_after = startingAfter;
-    const { data: page, has_more } = await stripe.promotionCodes.list(params);
+    const { data: page, has_more } = await getStripeServer().promotionCodes.list(params);
     const hit = page.find((p) => (p.code || '').toUpperCase() === upperCode && p.active && p.coupon);
     if (hit) return hit;
     if (!has_more || page.length === 0) break;
@@ -61,7 +58,7 @@ async function ensureBienvenue10PromotionCode(): Promise<Stripe.PromotionCode | 
   const CODE = STANDARD_PROMO_CODE;
   const PERCENT_OFF = 20;
 
-  const { data: matching } = await stripe.promotionCodes.list({ code: CODE, limit: 30 });
+  const { data: matching } = await getStripeServer().promotionCodes.list({ code: CODE, limit: 30 });
 
   const activeHit = matching.find(
     (p) => p.active && p.coupon && (p.code || '').toUpperCase() === CODE
@@ -72,18 +69,18 @@ async function ensureBienvenue10PromotionCode(): Promise<Stripe.PromotionCode | 
     (p) => !p.active && p.coupon && (p.code || '').toUpperCase() === CODE
   );
   if (inactive) {
-    return await stripe.promotionCodes.update(inactive.id, { active: true });
+    return await getStripeServer().promotionCodes.update(inactive.id, { active: true });
   }
 
   let couponId: string | null = null;
-  const couponsList = await stripe.coupons.list({ limit: 100 });
+  const couponsList = await getStripeServer().coupons.list({ limit: 100 });
   const couponMatch = couponsList.data.find(
     (c) => (c as Stripe.Coupon).percent_off === PERCENT_OFF && c.duration === 'once' && !c.redeem_by
   );
   if (couponMatch) {
     couponId = couponMatch.id;
   } else {
-    const created = await stripe.coupons.create({
+    const created = await getStripeServer().coupons.create({
       percent_off: PERCENT_OFF,
       duration: 'once',
       name: `Promo ${CODE} -${PERCENT_OFF}%`,
@@ -91,7 +88,7 @@ async function ensureBienvenue10PromotionCode(): Promise<Stripe.PromotionCode | 
     couponId = created.id;
   }
 
-  const promotionCode = await stripe.promotionCodes.create({
+  const promotionCode = await getStripeServer().promotionCodes.create({
     coupon: couponId,
     code: CODE,
   });
@@ -127,7 +124,7 @@ async function resolvePromotionCode(rawTrimmed: string, upperCode: string): Prom
     process.env.STRIPE_PROMOTION_CODE_ID_BIENVENUE2026?.trim();
   if (upperCode === STANDARD_PROMO_CODE && envId?.startsWith('promo_')) {
     try {
-      const pc = await stripe.promotionCodes.retrieve(envId);
+      const pc = await getStripeServer().promotionCodes.retrieve(envId);
       if (pc.active && pc.coupon) return pc;
     } catch {
       /* ignore */
@@ -171,7 +168,7 @@ export async function GET(request: NextRequest) {
     }
 
     const coupon =
-      typeof match.coupon === 'object' ? match.coupon : await stripe.coupons.retrieve(match.coupon as string);
+      typeof match.coupon === 'object' ? match.coupon : await getStripeServer().coupons.retrieve(match.coupon as string);
     const normalizedCode = ((match.code || upper) as string).toUpperCase();
     let percentOff = coupon && 'percent_off' in coupon ? coupon.percent_off : null;
     if (normalizedCode === STANDARD_PROMO_CODE) {

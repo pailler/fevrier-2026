@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
+import type Stripe from 'stripe';
+import { getStripeServer } from '@/utils/stripeServer';
 import { supabase } from '../../../../utils/supabaseClient';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-08-27.basil',
-});
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -21,6 +18,7 @@ export async function POST(request: NextRequest) {
     let event: Stripe.Event;
 
     try {
+      const stripe = getStripeServer();
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
       console.log('✅ Événement Stripe validé:', event.type);
     } catch (err) {

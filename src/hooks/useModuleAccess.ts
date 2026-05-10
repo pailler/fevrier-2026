@@ -102,6 +102,7 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'birefnet': 'birefnet', // BiRefNet -> birefnet
         'musetalk': 'musetalk',
         'photobooth': 'photobooth', // Photobooth -> photobooth
+        'vote': 'vote',
         'sentinelle-numerique': 'sentinelle-numerique', // Sentinelle Numérique
       };
       
@@ -141,7 +142,7 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost = 10 }:
         'musetalk': isDevelopment ? 'http://127.0.0.1:7886' : 'https://musetalk.iahome.fr',
         // Photobooth : sous-domaine dedie
         'photobooth': isDevelopment ? 'http://localhost:7885' : 'https://photobooth.iahome.fr',
-        // Vote en ligne : sous-domaine dédié (Docker / Traefik)
+        // Vote en ligne : Express dédié (Docker / Traefik ou localhost:7890)
         'vote': isDevelopment ? 'http://localhost:7890' : 'https://vote.iahome.fr',
       };
       

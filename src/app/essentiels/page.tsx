@@ -41,7 +41,8 @@ export default function Essentiels() {
     'home-assistant',
     'administration',
     'photobooth',
-    'sentinelle-numerique'
+    'sentinelle-numerique',
+    'vote',
   ];
 
   // Vérification de l'authentification (optionnelle pour cette page)
@@ -132,16 +133,39 @@ export default function Essentiels() {
         }
 
         // Filtrer pour ne garder que les modules essentiels (exclure whisper)
-        let essentialModulesData = data?.filter(module => 
-          (essentialModules.includes(module.id) ||
-          essentialModules.some(essentialId => 
-            module.title.toLowerCase().includes(essentialId.toLowerCase()) ||
-            module.title.toLowerCase().includes(essentialId.replace('-', ' '))
-          )) && module.id !== 'whisper'
-        ) || [];
+        const idMatchesEssential = (rawId: unknown) => {
+          const idNorm = String(rawId ?? '')
+            .trim()
+            .toLowerCase();
+          return essentialModules.some(
+            (eid) => idNorm === eid.toLowerCase()
+          );
+        };
+
+        let essentialModulesData =
+          data?.filter((module: { id?: unknown; title?: string }) => {
+            const title = (module.title || '').toLowerCase();
+            const includedByTitle = essentialModules.some(
+              (essentialId) =>
+                title.includes(essentialId.toLowerCase()) ||
+                title.includes(essentialId.replace('-', ' ').toLowerCase())
+            );
+            return (
+              (idMatchesEssential(module.id) || includedByTitle) &&
+              String(module.id || '').toLowerCase() !== 'whisper'
+            );
+          }) || [];
+
+        const listHasId = (needle: string) =>
+          essentialModulesData.some(
+            (m: { id?: unknown }) =>
+              String(m.id ?? '')
+                .trim()
+                .toLowerCase() === needle.toLowerCase()
+          );
 
         // Sentinelle Numérique : ajouter si absent de la DB
-        const hasSentinelle = essentialModulesData.some((m: any) => (m.id || '').toString().toLowerCase().includes('sentinelle'));
+        const hasSentinelle = listHasId('sentinelle-numerique');
         if (!hasSentinelle) {
           const sentinelleModule = {
             id: 'sentinelle-numerique',
@@ -154,6 +178,30 @@ export default function Essentiels() {
           };
           essentialModulesData = [sentinelleModule, ...essentialModulesData];
         }
+
+        const hasVote = listHasId('vote');
+        if (!hasVote) {
+          const voteModule = {
+            id: 'vote',
+            title: 'Vote en ligne',
+            subtitle: 'Votes avec code PIN organisateur et QR code',
+            description:
+              'Créez un vote simple : nom du scrutin, liste des participants. Code PIN à 4 chiffres pour l’administration, lien public et QR pour voter. Stockage Supabase.',
+            category: 'OUTILS ÉVÉNEMENT',
+            price: 10,
+            url: '/card/vote',
+            image_url: '/iahome-logo.svg',
+          };
+          essentialModulesData = [...essentialModulesData, voteModule];
+        }
+
+        essentialModulesData = essentialModulesData.map((m: { id?: unknown; url?: string }) =>
+          String(m.id ?? '')
+            .trim()
+            .toLowerCase() === 'vote'
+            ? { ...m, url: '/card/vote' }
+            : m
+        );
 
         // Debug: vérifier si Home Assistant est dans les modules
         const homeAssistantModule = essentialModulesData.find(m => m.id === 'home-assistant' || m.title.toLowerCase().includes('domotisez'));
@@ -261,7 +309,7 @@ export default function Essentiels() {
                 Outils essentiels IAHome
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Les outils indispensables pour votre productivité : téléchargement de vidéos, transfert de fichiers, conversion PDF, test de vitesse internet, QR codes dynamiques, apprentissage du code, domotique et services administratifs. Tous accessibles directement depuis votre navigateur, sans téléchargement ni installation.
+                Les outils indispensables pour votre productivité : téléchargement de vidéos, transfert de fichiers, conversion PDF, test de vitesse internet, QR codes dynamiques, apprentissage du code, domotique, votes en ligne (PIN + QR), photobooth et services administratifs. Tous accessibles directement depuis votre navigateur, sans téléchargement ni installation.
               </p>
               
               {/* Barre de recherche et bouton Mes applis */}
