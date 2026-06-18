@@ -961,9 +961,16 @@ body.camera-zone-fullscreen .preview-stage {
   bottom: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
+  max-height: 100dvh !important;
   aspect-ratio: auto !important;
   border-radius: 0 !important;
   z-index: 9999;
+  /* Contexte d’empilement pour que z-index enfants (vidéo vs compte à rebours) soit fiable sur iPad Safari */
+  isolation: isolate;
+}
+
+body.camera-zone-fullscreen .festive-bg {
+  visibility: hidden !important;
 }
 
 
@@ -974,7 +981,7 @@ body.camera-zone-fullscreen .preview-stage {
 
 .frame-corner {
   position: absolute;
-  z-index: 3;
+  z-index: 4;
   font-size: 1.2rem;
   background: rgba(255, 255, 255, 0.82);
   border: 1px solid #f0abfc;
@@ -1014,30 +1021,48 @@ body.camera-zone-fullscreen .preview-stage {
 }
 
 #camera-feed {
-  transform: scaleX(-1);
+  position: relative;
+  z-index: 0;
+  /* Évite que la couche vidéo hardware WebKit passe systématiquement au-dessus du compte à rebours */
+  -webkit-transform: scaleX(-1) translateZ(0);
+  transform: scaleX(-1) translateZ(0);
 }
 
 #capture-layer {
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 5;
+  pointer-events: none;
 }
 
 .countdown {
   position: absolute;
   inset: 0;
+  z-index: 50;
   display: none;
   align-items: center;
   justify-content: center;
-  font-size: clamp(3rem, 8vw, 6rem);
+  font-size: clamp(3rem, 10vmin, 7rem);
   font-weight: 900;
   color: #ffffff;
-  text-shadow: 0 0 20px rgba(0, 0, 0, 0.55);
-  background: rgba(0, 0, 0, 0.2);
+  text-shadow:
+    0 0 24px rgba(0, 0, 0, 0.9),
+    0 2px 8px rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  /* Calque composité au-dessus de la vidéo sur iOS / iPadOS */
+  -webkit-transform: translate3d(0, 0, 1px);
+  transform: translate3d(0, 0, 1px);
 }
 
 .countdown.active {
   display: flex;
+}
+
+body.camera-zone-fullscreen .countdown.active {
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.55);
 }
 
 .camera-activate-row {
