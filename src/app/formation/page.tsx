@@ -197,23 +197,10 @@ export default function FormationPage() {
     router.push('/admin/formation');
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Chargement des formations...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
 
-            {/* Section héros */}
+            {/* Section héros — toujours rendue (SEO / SSR) */}
       <section className="bg-gradient-to-br from-yellow-100 via-green-50 to-green-200 py-8 relative overflow-hidden">
         {/* Effet de particules en arrière-plan - Thème formation/éducation */}
         <div className="absolute inset-0">
@@ -327,7 +314,12 @@ export default function FormationPage() {
          </div>
 
         {/* Articles */}
-        {filteredArticles.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Chargement des formations...</p>
+          </div>
+        ) : filteredArticles.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-500 mb-4">
               {categoryFilter === 'all' ? 'Aucune formation disponible' : `Aucune formation dans la catégorie "${categoryFilter}"`}

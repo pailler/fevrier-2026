@@ -1,3 +1,4 @@
+import { CardPageJsonLd } from '@/components/CardPageJsonLd'
 import type { Metadata } from 'next';
 import { buildPageSeo } from '@/utils/pageMetadata';
 
@@ -15,5 +16,10 @@ export const metadata: Metadata = buildPageSeo({
 });
 
 export default function CardAiDetectorLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <CardPageJsonLd slug="ai-detector" />
+      {children}
+    </>
+  );
 }

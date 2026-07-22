@@ -43,6 +43,7 @@ export default function Essentiels() {
     'photobooth',
     'sentinelle-numerique',
     'vote',
+    'resas-system',
   ];
 
   // Vérification de l'authentification (optionnelle pour cette page)
@@ -186,12 +187,27 @@ export default function Essentiels() {
             title: 'Vote en ligne',
             subtitle: 'Votes avec code PIN organisateur et QR code',
             description:
-              'Créez un vote simple : nom du scrutin, liste des participants. Code PIN à 4 chiffres (comme le Photobooth), lien public et QR pour voter. Stockage Supabase.',
+              'Créez un vote simple : nom du scrutin, liste des participants. Code PIN à 4 chiffres (comme le Photobooth/Videobooth connecté), lien public et QR pour voter. Stockage Supabase.',
             category: 'OUTILS ÉVÉNEMENT',
             price: 50,
             image_url: '/iahome-logo.svg',
           };
           essentialModulesData = [...essentialModulesData, voteModule];
+        }
+
+        const hasResasSystem = listHasId('resas-system');
+        if (!hasResasSystem) {
+          const resasModule = {
+            id: 'resas-system',
+            title: 'Réservation matériel',
+            subtitle: 'Calendrier, notifications et suivi des emprunts',
+            description:
+              'Réservation de matériels (jeux vidéo, équipements), calendrier de disponibilité, notifications et suivi des emprunts.',
+            category: 'OUTILS ÉVÉNEMENT',
+            price: 100,
+            image_url: '/images/resas-system.svg',
+          };
+          essentialModulesData = [...essentialModulesData, resasModule];
         }
 
         // Debug: vérifier si Home Assistant est dans les modules
@@ -253,18 +269,6 @@ export default function Essentiels() {
     [filteredModules.map(m => m.id).sort().join(',')]
   );
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -281,7 +285,7 @@ export default function Essentiels() {
   return (
     <div className="min-h-screen bg-blue-50 font-sans">
 
-      {/* Section héros */}
+      {/* Section héros — toujours rendue (SEO / SSR) */}
       <section className="bg-gradient-to-br from-yellow-100 via-green-50 to-green-200 py-16 relative overflow-hidden">
         {/* Effet de particules en arrière-plan */}
         <div className="absolute inset-0">
@@ -300,7 +304,7 @@ export default function Essentiels() {
                 Outils essentiels IAHome
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Les outils indispensables pour votre productivité : téléchargement de vidéos, transfert de fichiers, conversion PDF, test de vitesse internet, QR codes dynamiques, apprentissage du code, domotique, votes en ligne (PIN + QR), photobooth et services administratifs. Tous accessibles directement depuis votre navigateur, sans téléchargement ni installation.
+                Les outils indispensables pour votre productivité : téléchargement de vidéos, transfert de fichiers, conversion PDF, test de vitesse internet, QR codes dynamiques, apprentissage du code, domotique, votes en ligne (PIN + QR), réservation de matériel, Photobooth/Videobooth connecté et services administratifs. Tous accessibles directement depuis votre navigateur, sans téléchargement ni installation.
               </p>
               
               {/* Barre de recherche et bouton Mes applis */}
@@ -365,7 +369,11 @@ export default function Essentiels() {
           <div className="w-full">
 
         {/* Grille des modules */}
-        {displayedModules.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        ) : displayedModules.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-500">Aucune application essentielle trouvée</div>
           </div>

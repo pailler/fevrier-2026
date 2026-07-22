@@ -45,9 +45,9 @@ export const seoConfig = {
   
   pages: {
     home: {
-      title: "IAHome — Toutes les applications et la puissance des serveurs IAHome chez vous",
+      title: "IAHome — Outils essentiels, toutes plateformes, sans install",
       description:
-        "Toutes les applications et la puissance des serveurs IAHome chez vous : Whisper, Stable Diffusion, PDF+IA, Home Assistant, QR codes. Interface en français, crédits transparents.",
+        "Outils essentiels, toutes plateformes, sans install : Whisper, Stable Diffusion, PDF+IA, Home Assistant, QR codes. Interface en français, crédits transparents.",
       keywords: [
         "plateforme IA France",
         "outils IA en ligne",
@@ -118,13 +118,6 @@ export const seoConfig = {
   
   contact: {
     email: "contact@iahome.fr",
-    phone: "+33 1 23 45 67 89",
-    address: {
-      street: "123 Rue de l'IA",
-      city: "Paris",
-      postalCode: "75001",
-      country: "France"
-    }
   },
   
   analytics: {

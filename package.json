@@ -12,7 +12,15 @@
     "monitor:schedule-install": "powershell -ExecutionPolicy Bypass -File ./scripts/register-localhost-health-scheduled-task.ps1",
     "test:monitor-email": "node scripts/test-resend-monitor-alert.mjs",
     "test:telegram": "node scripts/telegram-test-send.mjs",
-    "redeploy": "powershell -ExecutionPolicy Bypass -File ./scripts/redeploy-prod-full.ps1"
+    "redeploy": "powershell -ExecutionPolicy Bypass -File ./scripts/redeploy-prod-full.ps1",
+    "seo:verify": "node scripts/seo/verify-seo.mjs",
+    "seo:verify:local": "node scripts/seo/verify-seo.mjs --base-url=http://localhost:3000",
+    "seo:verify:json": "node scripts/seo/verify-seo.mjs --json",
+    "seo:sync-jsonld": "node scripts/extract-card-jsonld.mjs",
+    "seo:check": "node scripts/seo/run-all.mjs",
+    "seo:check:local": "node scripts/seo/run-all.mjs --base-url=http://localhost:3000",
+    "seo:check:code": "node scripts/seo/run-all.mjs --skip-fetch",
+    "seo:schedule-install": "powershell -ExecutionPolicy Bypass -File ./scripts/register-seo-scheduled-task.ps1"
   },
   "dependencies": {
     "@langchain/openai": "^0.2.7",

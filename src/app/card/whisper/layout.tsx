@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { CardPageJsonLd } from '@/components/CardPageJsonLd'
 
 export const metadata: Metadata = {
   title: 'Transcrire audio et vidéo en texte – Whisper IA | IA Home',
@@ -69,7 +70,10 @@ export default function WhisperLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <>
+      <CardPageJsonLd slug="whisper" />
+      {children}
+    </>
+  )
 }
-
-

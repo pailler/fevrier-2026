@@ -1,3 +1,4 @@
+import { CardPageJsonLd } from '@/components/CardPageJsonLd'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -71,7 +72,12 @@ export default function AdministrationLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <>
+      <CardPageJsonLd slug="administration" />
+      {children}
+    </>
+  )
 }
 
 

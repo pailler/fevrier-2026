@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { CardPageJsonLd } from '@/components/CardPageJsonLd'
 
 export const metadata: Metadata = {
   title: 'Sentinelle Numérique – Vigilance et détection de contenu IA | IA Home',
@@ -59,5 +60,10 @@ export default function SentinelleNumeriqueLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <>
+      <CardPageJsonLd slug="sentinelle-numerique" />
+      {children}
+    </>
+  )
 }

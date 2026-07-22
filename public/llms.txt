@@ -1,0 +1,45 @@
+# IAHome — https://iahome.fr
+
+> Plateforme française d'applications d'intelligence artificielle en ligne.
+> Interface en français, crédits transparents, sans installation.
+
+## À propos
+
+IAHome regroupe des outils IA professionnels accessibles depuis le navigateur :
+transcription audio/vidéo (Whisper), génération d'images (Stable Diffusion, ComfyUI),
+traitement PDF, domotique (Home Assistant), QR codes dynamiques, et plus.
+
+## Pages principales
+
+- Accueil : https://iahome.fr/
+- Catalogue applications : https://iahome.fr/applications
+- Essentiels : https://iahome.fr/essentiels
+- Formations IA : https://iahome.fr/formation
+- Blog : https://iahome.fr/blog
+- Tarifs : https://iahome.fr/pricing2
+- Contact : https://iahome.fr/contact
+
+## Fiches produit (exemples)
+
+- Whisper (transcription) : https://iahome.fr/card/whisper
+- Stable Diffusion : https://iahome.fr/card/stablediffusion
+- ComfyUI : https://iahome.fr/card/comfyui
+- PDF+IA : https://iahome.fr/card/pdf
+- QR codes : https://iahome.fr/card/qrcodes
+- Home Assistant : https://iahome.fr/card/home-assistant
+
+## Contenu éditorial
+
+- Blog IA (articles, tutoriels) : https://iahome.fr/blog
+- Formations structurées : https://iahome.fr/formation
+
+## Contact
+
+- Email : contact@iahome.fr
+- Site : https://iahome.fr/contact
+
+## Politique d'utilisation par les systèmes IA
+
+- Indexation recherche : autorisée (voir robots.txt Content-Signal: search=yes)
+- Entraînement de modèles : non autorisé (ai-train=no)
+- Citation/référence : autorisée (use=reference)

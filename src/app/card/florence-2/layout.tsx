@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { CardPageJsonLd } from '@/components/CardPageJsonLd'
 
 export const metadata: Metadata = {
   title: 'Florence-2 : légender et analyser des images avec l\'IA | IA Home',
@@ -70,5 +71,10 @@ export default function Florence2Layout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <>
+      <CardPageJsonLd slug="florence-2" />
+      {children}
+    </>
+  )
 }

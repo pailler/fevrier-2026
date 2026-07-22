@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { CardPageJsonLd } from '@/components/CardPageJsonLd'
 
 export const metadata: Metadata = {
   title: 'Portraits personnalisés par IA – PhotoMaker | IA Home',
@@ -69,5 +70,10 @@ export default function PhotoMakerLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <>
+      <CardPageJsonLd slug="photomaker" />
+      {children}
+    </>
+  )
 }

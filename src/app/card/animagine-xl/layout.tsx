@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { CardPageJsonLd } from '@/components/CardPageJsonLd'
 
 export const metadata: Metadata = {
   title: 'Générer des images anime avec l\'IA – Animagine XL | IA Home',
@@ -70,5 +71,10 @@ export default function AnimagineXLLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <>
+      <CardPageJsonLd slug="animagine-xl" />
+      {children}
+    </>
+  )
 }

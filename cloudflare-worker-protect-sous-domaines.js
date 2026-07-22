@@ -15,6 +15,8 @@
 const HOSTS_SKIP_DOCUMENT_TOKEN = new Set([
   'photobooth.iahome.fr',
   'www.photobooth.iahome.fr',
+  'resas.iahome.fr',
+  'game.iahome.fr',
 ]);
 
 const MUSE_TALK_HOSTS = new Set(['musetalk.iahome.fr', 'www.musetalk.iahome.fr']);

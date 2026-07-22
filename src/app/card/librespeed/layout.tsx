@@ -1,3 +1,4 @@
+import { CardPageJsonLd } from '@/components/CardPageJsonLd'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -70,7 +71,12 @@ export default function LibreSpeedLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <>
+      <CardPageJsonLd slug="librespeed" />
+      {children}
+    </>
+  )
 }
 
 

@@ -1,0 +1,52 @@
+name: SEO Audit
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'src/app/**'
+      - 'src/components/**'
+      - 'src/data/**'
+      - 'src/utils/**'
+      - 'public/**'
+      - 'next.config.ts'
+      - 'scripts/seo/**'
+  pull_request:
+    paths:
+      - 'src/app/**'
+      - 'src/components/**'
+      - 'src/data/**'
+      - 'src/utils/**'
+      - 'public/**'
+      - 'next.config.ts'
+      - 'scripts/seo/**'
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  seo-codebase:
+    name: SEO codebase
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - name: Sync JSON-LD + vérif structure
+        run: node scripts/seo/run-all.mjs --skip-fetch
+
+  seo-live:
+    name: SEO live (iahome.fr)
+    runs-on: ubuntu-latest
+    needs: seo-codebase
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Audit HTTP production
+        run: node scripts/seo/verify-seo.mjs --base-url=https://iahome.fr
+        continue-on-error: true

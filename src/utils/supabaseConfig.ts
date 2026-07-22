@@ -2,9 +2,9 @@
 // Ce fichier garantit que les valeurs Supabase sont toujours disponibles,
 // même si les variables d'environnement ne sont pas définies au moment du build
 
-// Valeurs par défaut hardcodées - TOUJOURS utilisées comme fallback
-export const DEFAULT_SUPABASE_URL = 'https://example.supabase.co';
-export const DEFAULT_SUPABASE_ANON_KEY = 'REPLACE_WITH_REAL_VALUE';
+// Valeurs par défaut — alignées sur next.config.ts pour éviter les erreurs sitemap/API au runtime
+export const DEFAULT_SUPABASE_URL = 'https://xemtoyzcihmncbrlsmhr.supabase.co';
+export const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlbXRveXpjaWhtbmNicmxzbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0MDUzMDUsImV4cCI6MjA2NTk4MTMwNX0.afcRGhlB5Jj-7kgCV6IzUDRdGUQkHkm1Fdl1kzDdj6M';
 export const DEFAULT_SERVICE_ROLE_KEY = 'REPLACE_WITH_REAL_VALUE';
 
 // Fonction helper pour obtenir une variable d'environnement avec fallback garanti

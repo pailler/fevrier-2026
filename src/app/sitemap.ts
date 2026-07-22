@@ -2,6 +2,9 @@ import { MetadataRoute } from 'next'
 import { createClient } from '@supabase/supabase-js'
 import { getSupabaseUrl, getSupabaseAnonKey } from '@/utils/supabaseConfig'
 
+/** Régénération toutes les heures (blog + formations dynamiques). */
+export const revalidate = 3600
+
 const supabase = createClient(getSupabaseUrl(), getSupabaseAnonKey())
 
 // Fonction pour récupérer les articles de blog publiés
@@ -96,7 +99,9 @@ const CARD_SLUGS = [
   'sentinelle-numerique',
   'stablediffusion',
   'voice-isolation',
+  'tts',
   'vote',
+  'resas-system',
   'whisper',
 ] as const
 
@@ -104,12 +109,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://iahome.fr'
   const currentDate = new Date().toISOString()
 
-  // Récupérer les pages dynamiques en parallèle
-  const [blogPosts, dynamicPages, formationArticles] = await Promise.all([
-    getBlogPosts(),
-    getDynamicPages(),
-    getFormationArticles(),
-  ])
+  let blogPosts: Awaited<ReturnType<typeof getBlogPosts>> = []
+  let dynamicPages: Awaited<ReturnType<typeof getDynamicPages>> = []
+  let formationArticles: Awaited<ReturnType<typeof getFormationArticles>> = []
+
+  try {
+    ;[blogPosts, dynamicPages, formationArticles] = await Promise.all([
+      getBlogPosts(),
+      getDynamicPages(),
+      getFormationArticles(),
+    ])
+  } catch (error) {
+    console.error('Sitemap : échec Supabase, pages statiques uniquement', error)
+  }
 
   // Pages statiques
   const staticPages: MetadataRoute.Sitemap = [
@@ -184,42 +196,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/code-learning`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.75,
-    },
-    {
-      url: `${baseUrl}/ai-detector`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.75,
-    },
-    {
-      url: `${baseUrl}/sentinelle-numerique`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.75,
-    },
-    {
-      url: `${baseUrl}/photobooth`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.75,
-    },
-    {
-      url: `${baseUrl}/photo-vivante`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.75,
-    },
-    {
-      url: `${baseUrl}/administration`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.75,
     },
     // Pages légales (routes réelles : /terms, /privacy, /cookies)
     {

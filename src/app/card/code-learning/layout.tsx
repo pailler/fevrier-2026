@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { CardPageJsonLd } from '@/components/CardPageJsonLd'
 
 export const metadata: Metadata = {
   title: 'Apprendre à coder pour les enfants – 6–14 ans | IA Home',
@@ -70,7 +71,12 @@ export default function CodeLearningLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <>
+      <CardPageJsonLd slug="code-learning" />
+      {children}
+    </>
+  )
 }
 
 

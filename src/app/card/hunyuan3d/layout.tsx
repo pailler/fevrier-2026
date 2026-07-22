@@ -1,3 +1,4 @@
+import { CardPageJsonLd } from '@/components/CardPageJsonLd'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -70,7 +71,12 @@ export default function Hunyuan3DLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <>
+      <CardPageJsonLd slug="hunyuan3d" />
+      {children}
+    </>
+  )
 }
 
 

@@ -1,14 +1,17 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 // Valeurs par défaut pour Supabase (utilisées si les variables d'environnement ne sont pas définies)
 const DEFAULT_SUPABASE_URL = 'https://xemtoyzcihmncbrlsmhr.supabase.co';
 const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhlbXRveXpjaWhtbmNicmxzbWhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0MDUzMDUsImV4cCI6MjA2NTk4MTMwNX0.afcRGhlB5Jj-7kgCV6IzUDRdGUQkHkm1Fdl1kzDdj6M';
 
 const nextConfig: NextConfig = {
+  // Évite que Next déduise une fausse racine workspace (ex. lockfile parent) → ENOENT sur les routes API au build.
+  outputFileTracingRoot: path.resolve(process.cwd()),
+
   // Configuration pour la production
   // output: 'standalone', // Désactivé pour résoudre les problèmes de fichiers statiques
   experimental: {
-    // outputFileTracingRoot: undefined,
     optimizePackageImports: ['@supabase/supabase-js'],
     // Limite body pour /api/whisper-upload/chunk (chunks 20MB) — défaut 10MB avec middleware
     middlewareClientMaxBodySize: '100mb',
@@ -352,6 +355,7 @@ const nextConfig: NextConfig = {
   
   // Configuration des domaines autorisés
   images: {
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -398,6 +402,15 @@ const nextConfig: NextConfig = {
       { source: '/applications/whisper', destination: '/card/whisper', permanent: true },
       { source: '/applications/stable-diffusion', destination: '/card/stablediffusion', permanent: true },
       { source: '/applications/comfyui', destination: '/card/comfyui', permanent: true },
+      // URLs courtes dupliquées → fiche produit canonique /card/{slug}
+      { source: '/administration', destination: '/card/administration', permanent: true },
+      { source: '/ai-detector', destination: '/card/ai-detector', permanent: true },
+      { source: '/code-learning', destination: '/card/code-learning', permanent: true },
+      { source: '/photobooth', destination: '/card/photobooth', permanent: true },
+      { source: '/photo-vivante', destination: '/card/photo-vivante', permanent: true },
+      { source: '/resas-system', destination: '/card/resas-system', permanent: true },
+      { source: '/sentinelle-numerique', destination: '/card/sentinelle-numerique', permanent: true },
+      { source: '/vote', destination: '/card/vote', permanent: true },
     ];
   },
 

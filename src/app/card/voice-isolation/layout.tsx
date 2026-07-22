@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { CardPageJsonLd } from '@/components/CardPageJsonLd'
 
 export const metadata: Metadata = {
   title: 'Séparer voix et musique – Isolation vocale Demucs v4 | IA Home',
@@ -89,5 +90,10 @@ export default function VoiceIsolationLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <>
+      <CardPageJsonLd slug="voice-isolation" />
+      {children}
+    </>
+  )
 }
