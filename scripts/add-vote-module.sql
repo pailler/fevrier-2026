@@ -16,7 +16,7 @@ INSERT INTO modules (
   'Vote en ligne',
   'Création de votes avec code PIN, liste de participants, QR code et page publique. Données sur Supabase, un vote par appareil.',
   'OUTILS ÉVÉNEMENT',
-  50,
+  10,
   '/card/vote',
   '/iahome-logo.svg',
   NOW(),

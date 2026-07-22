@@ -1,17 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
-
-// Initialiser Stripe avec la clé secrète (peut être test ou production selon l'environnement)
-let stripe: Stripe;
-try {
-  stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-    apiVersion: '2025-08-27.basil',
-  });
-  ;
-} catch (error) {
-  console.error('❌ Erreur initialisation Stripe:', error);
-  throw error;
-}
+import { getStripeServer } from '@/utils/stripeServer';
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,6 +26,13 @@ export async function POST(request: NextRequest) {
       tokenPackage,
       tokens
     } = body;
+
+    if (!process.env.STRIPE_SECRET_KEY?.trim()) {
+      console.error('❌ STRIPE_SECRET_KEY manquante');
+      return NextResponse.json({ error: 'Stripe non configuré' }, { status: 503 });
+    }
+
+    const stripe = getStripeServer();
 
     // Déterminer si on est en mode production ou test
     const isProductionMode = process.env.STRIPE_MODE === 'production' && !testMode;

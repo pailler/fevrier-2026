@@ -88,6 +88,7 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost: _token
         'birefnet': 'birefnet', // BiRefNet -> birefnet
         'musetalk': 'musetalk',
         'photobooth': 'photobooth', // Photobooth -> photobooth
+        'vote': 'vote',
         'sentinelle-numerique': 'sentinelle-numerique', // Sentinelle Numérique
       };
       
@@ -128,6 +129,8 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost: _token
         'photo-vivante': isDevelopment ? 'http://localhost:7887' : 'https://photo-vivante.iahome.fr',
         // Photobooth : sous-domaine dedie
         'photobooth': isDevelopment ? 'http://localhost:7885' : 'https://photobooth.iahome.fr',
+        // Vote en ligne : service Express dédié (Docker / local)
+        'vote': isDevelopment ? 'http://localhost:7890' : 'https://vote.iahome.fr',
       };
       
       // Convertir module_id numérique en slug si nécessaire

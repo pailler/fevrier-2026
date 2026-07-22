@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-08-27.basil',
-});
+import { getStripeServer } from '@/utils/stripeServer';
 
 // Configuration des packages de tokens
 const TOKEN_PACKAGES = {
@@ -49,6 +45,8 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    const stripe = getStripeServer();
 
     const { packageType, userId, userEmail } = await request.json();
     

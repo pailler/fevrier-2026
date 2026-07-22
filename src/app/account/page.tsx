@@ -180,6 +180,7 @@ export default function AccountPage() {
           'pdf': 'http://localhost:8086',
           'voice-isolation': 'http://localhost:8100',
           'photobooth': 'http://localhost:7885',
+          'vote': 'http://localhost:7890',
         }
       : {
           'photomaker': 'https://photomaker.iahome.fr',
@@ -204,6 +205,7 @@ export default function AccountPage() {
           'pdf': 'https://pdf.iahome.fr',
           'voice-isolation': 'https://voice-isolation.iahome.fr',
           'photobooth': 'https://photobooth.iahome.fr',
+          'vote': 'https://vote.iahome.fr',
         };
 
     if (urlMap[normalizedModuleId]) {

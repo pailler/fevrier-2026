@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
+import { getStripeServer } from '@/utils/stripeServer';
 import { supabase } from '../../../../utils/supabaseClient';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-08-27.basil',
-});
 
 /**
  * Endpoint pour vérifier manuellement une session Stripe
@@ -25,6 +21,8 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('🔍 Vérification manuelle de la session:', sessionId);
+
+    const stripe = getStripeServer();
 
     // Récupérer la session depuis Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId, {

@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
+import type Stripe from 'stripe';
+import { getStripeServer } from '@/utils/stripeServer';
 import { supabase } from '../../../utils/supabaseClient';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-08-27.basil',
-});
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
 
@@ -38,6 +35,16 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    if (!process.env.STRIPE_SECRET_KEY?.trim()) {
+      console.error('❌ STRIPE_SECRET_KEY manquante pour le webhook');
+      return NextResponse.json(
+        { error: 'Stripe non configuré' },
+        { status: 500 }
+      );
+    }
+
+    const stripe = getStripeServer();
 
     console.log('🔐 Vérification de la signature webhook...');
     let event: Stripe.Event;
@@ -181,7 +188,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     
     if (!finalPackageType && session.subscription) {
       try {
-        const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+        const subscription = await getStripeServer().subscriptions.retrieve(session.subscription as string);
         finalPackageType = subscription.metadata?.packageType || 'subscription_monthly';
         finalTokens = parseInt(subscription.metadata?.tokens || '3000');
         console.log('📦 Package type récupéré depuis l\'abonnement:', finalPackageType);
@@ -511,7 +518,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
   // Récupérer l'abonnement depuis Stripe
   let subscription: Stripe.Subscription;
   try {
-    subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    subscription = await getStripeServer().subscriptions.retrieve(subscriptionId);
   } catch (error) {
     console.error('❌ Erreur récupération abonnement:', error);
     return;
@@ -676,7 +683,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   }
 
   try {
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    const subscription = await getStripeServer().subscriptions.retrieve(subscriptionId);
     const userEmail = subscription.metadata?.userEmail || invoice.customer_email;
 
     if (userEmail) {

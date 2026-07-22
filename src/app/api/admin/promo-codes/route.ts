@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-08-27.basil',
-});
+import type Stripe from 'stripe';
+import { getStripeServer } from '@/utils/stripeServer';
 
 /** GET: liste des codes promo Stripe (actifs et inactifs) */
 export async function GET() {
@@ -15,6 +12,7 @@ export async function GET() {
       );
     }
 
+    const stripe = getStripeServer();
     const [promoCodesRes, couponsRes] = await Promise.all([
       stripe.promotionCodes.list({ limit: 100 }),
       stripe.coupons.list({ limit: 100 }),
@@ -62,6 +60,8 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    const stripe = getStripeServer();
 
     const body = await request.json().catch(() => ({}));
     const { action = 'ensure_bienvenue10', code, amount_off, percent_off } = body;
@@ -242,6 +242,8 @@ export async function PATCH(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    const stripe = getStripeServer();
 
     const body = await request.json().catch(() => ({}));
     const { promotion_code_id, active } = body;
