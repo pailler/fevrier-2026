@@ -59,6 +59,7 @@ export default function ModuleAccessButton({
           'ruinedfooocus': 'http://localhost:7870',
           'comfyui': 'http://localhost:8188',
           'photobooth': 'http://localhost:7885',
+          'vote': 'http://localhost:7890',
         }
         : {
           'librespeed': 'https://librespeed.iahome.fr',
@@ -78,6 +79,7 @@ export default function ModuleAccessButton({
           'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
           'comfyui': 'https://comfyui.iahome.fr',
           'photobooth': 'https://photobooth.iahome.fr',
+          'vote': 'https://vote.iahome.fr',
         };
 
     if (urlMap[normalizedModuleId]) {

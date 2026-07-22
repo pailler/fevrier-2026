@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Voter</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Voter</h1>
+        <p class="sub" id="hint">Chargement…</p>
+      </header>
+
+      <section id="bad" class="card hidden">
+        <p class="err">Lien incomplet ou vote introuvable.</p>
+      </section>
+
+      <section id="formPanel" class="card hidden">
+        <p class="sub" id="qTitle" style="color: #e2e8f0; font-size: 1rem"></p>
+        <fieldset class="options" id="options"></fieldset>
+        <p id="voteErr" class="err hidden"></p>
+        <button type="button" class="btn" id="btnSend" style="margin-top: 0.75rem">Envoyer mon vote</button>
+      </section>
+
+      <section id="donePanel" class="card hidden">
+        <p class="ok">Merci, votre vote a bien été enregistré.</p>
+      </section>
+    </div>
+    <script src="/vote.js"></script>
+  </body>
+</html>

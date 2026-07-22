@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { getTokenCostForModuleId } from '../utils/tokenActionService';
+import { getPhotoboothModuleDisplayTitle } from '../utils/photoboothProductName';
 
 interface ModuleCardProps {
   module: {
@@ -53,11 +55,15 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       'apprendre-autrement': 'apprendre-autrement',
       'prompt-generator': 'prompt-generator',
       'voice-isolation': 'voice-isolation',
+      'tts': 'tts',
       'photomaker': 'photomaker',
       'animagine-xl': 'animagine-xl',
       'animaginexl': 'animagine-xl',
       'sentinelle-numerique': 'sentinelle-numerique',
-      'sentinellenumerique': 'sentinelle-numerique'
+      'sentinellenumerique': 'sentinelle-numerique',
+      'vote': 'vote',
+      'resas-system': 'resas-system',
+      'photobooth': 'photobooth',
     };
 
     // Vérifier d'abord le mapping direct
@@ -121,6 +127,12 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     if (titleLower.includes('sentinelle') || titleLower.includes('sentinelle numérique')) {
       return 'sentinelle-numerique';
     }
+    if (titleLower.includes('réservation matériel') || titleLower.includes('reservation materiel')) {
+      return 'resas-system';
+    }
+    if (titleLower.includes('synthèse vocale') || titleLower.includes('synthese vocale') || titleLower.includes('text to speech') || titleLower.includes('text-to-speech') || titleLower.includes('(tts)')) {
+      return 'tts';
+    }
     if (titleLower.includes('voice isolation') || titleLower.includes('voice-isolation') || titleLower.includes('isolation vocale')) {
       return 'voice-isolation';
     }
@@ -156,6 +168,13 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
 
   // Obtenir le slug correct pour le lien
   const moduleSlug = getModuleSlug(module.id, module.title);
+
+  /** Photobooth / resas-system : tarif réel = TOKEN_COSTS, même si la ligne Supabase a un autre prix. */
+  const moduleIdLowerForPrice = String(module.id ?? '').trim().toLowerCase();
+  const effectiveModulePrice =
+    moduleIdLowerForPrice === 'photobooth' || moduleIdLowerForPrice === 'resas-system'
+      ? getTokenCostForModuleId(moduleIdLowerForPrice)
+      : module.price;
   
   // Supprimé la gestion d'erreur d'image qui empêchait l'affichage
   // const [imageError, setImageError] = useState(false);
@@ -248,6 +267,14 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     if (titleLower.includes('sentinelle') || idLower === 'sentinelle-numerique' || idLower === 'sentinellenumerique') {
       return '/images/sentinelle-numerique.jpg';
     }
+
+    if (idLower === 'vote' || titleLower.includes('vote en ligne') || (titleLower.includes('vote') && titleLower.includes('scrutin'))) {
+      return '/images/vote-en-ligne.svg';
+    }
+
+    if (idLower === 'resas-system' || titleLower.includes('réservation matériel') || titleLower.includes('reservation materiel')) {
+      return '/images/resas-system.svg';
+    }
     
     // Image par défaut pour tous les autres modules
     return '/images/module-visuals/generic-module.svg';
@@ -262,7 +289,8 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   // };
 
   // Déterminer le style du prix
-  const numericPrice = typeof module.price === 'string' ? parseFloat(module.price) : module.price;
+  const numericPrice =
+    typeof effectiveModulePrice === 'string' ? parseFloat(effectiveModulePrice) : effectiveModulePrice;
   const isFree = numericPrice === 0 || numericPrice === null || numericPrice === undefined || isNaN(numericPrice);
   const priceStyle = isFree 
     ? "bg-green-100 text-green-800 border-green-200" 
@@ -340,6 +368,14 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   
   // Vérifier si c'est le module Isolation Vocale IA pour appliquer un style spécial
   const isVoiceIsolation = module.title.toLowerCase().includes('isolation vocale') || module.title.toLowerCase().includes('voice isolation') || module.title.toLowerCase().includes('voice-isolation') || module.id === 'voice-isolation';
+
+  const isTts =
+    module.id === 'tts' ||
+    module.title.toLowerCase().includes('synthèse vocale') ||
+    module.title.toLowerCase().includes('synthese vocale') ||
+    module.title.toLowerCase().includes('text to speech') ||
+    module.title.toLowerCase().includes('text-to-speech') ||
+    module.title.toLowerCase().includes('(tts)');
   
   // Vérifier si c'est le module PhotoMaker pour appliquer un style spécial
   const isPhotoMaker = module.title.toLowerCase().includes('photomaker') || module.title.toLowerCase().includes('photo maker') || module.title.toLowerCase().includes('photo-maker') || module.id === 'photomaker';
@@ -362,6 +398,18 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
 
   // Vérifier si c'est le module Photobooth (mariage, événement)
   const isPhotobooth = module.title.toLowerCase().includes('photobooth') || module.title.toLowerCase().includes('photo booth') || module.id === 'photobooth';
+  const displayTitle = getPhotoboothModuleDisplayTitle(module);
+
+  // Vote en ligne (outil événement, même famille que Photobooth)
+  const isVote =
+    module.id === 'vote' ||
+    module.title.toLowerCase().includes('vote en ligne') ||
+    (module.title.toLowerCase().includes('vote') && module.title.toLowerCase().includes('scrutin'));
+
+  const isResasSystem =
+    module.id === 'resas-system' ||
+    module.title.toLowerCase().includes('réservation matériel') ||
+    module.title.toLowerCase().includes('reservation materiel');
   
   // Debug temporaire pour Home Assistant - LOG TRÈS VISIBLE
   if (module.id === 'home-assistant' || module.title.toLowerCase().includes('home') || module.title.toLowerCase().includes('domotisez')) {
@@ -418,6 +466,8 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
           ? '/images/ruinedfooocus.jpg'
           : isWhisper
             ? '/images/whisper.jpg'
+            : isTts
+              ? '/images/whisper.jpg'
             : isVoiceIsolation
               ? '/images/demucs.jpg'
               : isPromptGenerator
@@ -438,7 +488,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                             ? '/images/iapasia.jpg'
                             : isPhotobooth
                               ? '/images/photobooth.png'
-                              : '/images/animagine-xl.jpg';
+                              : isVote
+                                ? '/images/vote-en-ligne.svg'
+                                : isResasSystem
+                                  ? '/images/resas-system.svg'
+                                : '/images/animagine-xl.jpg';
 
     // Déterminer les badges selon le type de module (style Claid.ai : badge violet "New")
     const getBadgeLabel = () => {
@@ -450,14 +504,14 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     const badge = getBadgeLabel();
     
     return (
-      <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 group">
+      <div className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 group ${isVote ? 'ring-2 ring-indigo-400/45' : ''} ${isResasSystem ? 'ring-2 ring-purple-400/45' : ''}`}>
         <Link href={`/card/${moduleSlug}`} prefetch={false} className="block">
           {/* Zone visuelle - style Claid.ai avec image illustrative */}
           <div className="relative h-56 overflow-hidden bg-gray-50">
             {/* Image de fond - style Claid.ai (images dédiées par module, sinon animagine-xl.jpg) */}
             <img 
               src={claidImageSrc}
-              alt={module.title}
+              alt={displayTitle}
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               style={{ 
                 filter: 'brightness(1.1) contrast(1.05) saturate(1.05)',
@@ -483,7 +537,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             {/* Titre avec badge - style Claid.ai */}
             <div className="flex items-center gap-2 mb-3">
               <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
-                {module.title}
+                {displayTitle}
               </h3>
               {badge.show && (
                 <span className="bg-purple-600 text-white text-xs font-semibold px-2 py-0.5 rounded">
@@ -494,7 +548,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             
             {/* Description - style Claid.ai (texte gris, concis) */}
             <p className="text-gray-700 text-sm mb-6 line-clamp-3 leading-relaxed">
-              {isSentinelleNumerique
+              {isVote
+                ? 'Scrutins avec PIN organisateur, participants, lien public et QR code — un vote par appareil, données sur Supabase.'
+                : isResasSystem
+                ? 'Réservation de matériels, calendrier en temps réel, notifications et suivi des emprunts et retours.'
+                : isSentinelleNumerique
                 ? "Cybersécurité personnelle et processus de fin de vie numérique: audit sécurité, plan de transmission et actions post-événement."
                 : (module.subtitle || module.description)}
             </p>
@@ -506,11 +564,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               <span className={`text-base font-semibold ${
                 isFree ? 'text-green-600' : 'text-gray-700'
               }`}>
-                {isSentinelleNumerique
+                {isSentinelleNumerique || isVote
                   ? '10 crédits'
-                  : isMuseTalk || isPhotoVivante
+                  : isResasSystem || isMuseTalk || isPhotoVivante
                     ? '100 crédits'
-                    : formatPrice(module.price)}
+                    : formatPrice(effectiveModulePrice)}
               </span>
             </div>
             
@@ -675,7 +733,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
           {!isLibrespeed && !isPsitransfer && !isPdfPlus && !isMeTube && !isCogStudio && !isComfyUI && !isStableDiffusion && !isRuinedFooocus && !isAnimagineXL && !isQRCodes && !isWhisper && !isIAPhoto && !isIATube && !isStirlingPDF && !isMeetingReports && !isHunyuan3D && !isCodeLearning && !isApprendreAutrement && !isHomeAssistant && !isAdministration && !isPromptGenerator && !isAIDetector && imageUrl && (
             <img 
               src={imageUrl} 
-              alt={module.title}
+              alt={displayTitle}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               loading="lazy"
             />
@@ -760,7 +818,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                     LibreSpeed
                   </span>
                   <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                    {formatPrice(module.price)}
+                    {formatPrice(effectiveModulePrice)}
                   </span>
                 </div>
               
@@ -819,7 +877,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   PSITransfer
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -881,7 +939,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   PDF+
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -943,7 +1001,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   MeTube
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -1011,7 +1069,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               {/* Badge prix en haut à droite */}
               <div className="absolute top-3 right-3 z-20">
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -1083,7 +1141,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               {/* Badge prix en haut à droite */}
               <div className="absolute top-3 right-3 z-20">
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -1160,7 +1218,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               {/* Badge prix en haut à droite */}
               <div className="absolute top-3 right-3 z-20">
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -1232,7 +1290,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               {/* Badge prix en haut à droite */}
               <div className="absolute top-3 right-3 z-20">
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -1290,7 +1348,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               {/* Badge prix en haut à droite */}
               <div className="absolute top-3 right-3 z-30">
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-xl backdrop-blur-md`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
               
@@ -1375,7 +1433,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   QR Codes Dynamiques
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -1431,7 +1489,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               {/* Badge prix en haut à droite */}
               <div className="absolute top-3 right-3 z-20">
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -1482,7 +1540,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               {/* Badge prix en haut à droite */}
               <div className="absolute top-3 right-3 z-20">
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -1532,7 +1590,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               {/* Badge prix en haut à droite */}
               <div className="absolute top-3 right-3 z-20">
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -1584,7 +1642,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               {/* Badge prix en haut à droite */}
               <div className="absolute top-3 right-3 z-20">
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -1644,7 +1702,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   Stable diffusion
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -1709,7 +1767,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   ComfyUI
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -1765,7 +1823,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   Whisper IA
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -1826,7 +1884,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   Ruinedfooocus
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -1891,7 +1949,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   Cogstudio IA
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -1981,7 +2039,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   Meeting Reports
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -2081,7 +2139,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   Hunyuan 3D
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -2147,7 +2205,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   Apprendre le Code aux enfants
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -2190,7 +2248,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   Apprendre Autrement
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -2310,7 +2368,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                   Services Administratifs
                 </span>
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -2385,7 +2443,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               {/* Badge prix en haut à droite */}
               <div className="absolute top-3 right-3 z-20">
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1.5 rounded-full border shadow-lg`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             
@@ -2414,7 +2472,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               </div>
               <div className="absolute top-3 right-3">
                 <span className={`${priceStyle} text-sm font-bold px-3 py-1 rounded-full border`}>
-                  {formatPrice(module.price)}
+                  {formatPrice(effectiveModulePrice)}
                 </span>
               </div>
             </>
@@ -2427,7 +2485,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
         <Link href={`/card/${moduleSlug}`} prefetch={false} className="block group">
           {/* Titre du module - affiché pour tous les modules */}
           <h3 className="text-3xl sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
-            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isAnimagineXL ? "Génération d'anime et manga par IA" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : isHunyuan3D ? "Hunyuan 3D - Génération 3D par IA" : isCodeLearning ? "Apprendre le Code aux enfants" : isApprendreAutrement ? "Apprendre Autrement" : isPromptGenerator ? "Générateur de prompts" : isHomeAssistant ? "Domotisez votre habitat" : isAdministration ? "Services de l'Administration" : isAIDetector ? "Détecteur de Contenu IA" : module.title}
+            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isAnimagineXL ? "Génération d'anime et manga par IA" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : isHunyuan3D ? "Hunyuan 3D - Génération 3D par IA" : isCodeLearning ? "Apprendre le Code aux enfants" : isApprendreAutrement ? "Apprendre Autrement" : isPromptGenerator ? "Générateur de prompts" : isHomeAssistant ? "Domotisez votre habitat" : isAdministration ? "Services de l'Administration" : isAIDetector ? "Détecteur de Contenu IA" : displayTitle}
           </h3>
           {/* Pour les modules spéciaux, afficher seulement la description si pas de sous-titre */}
           {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isAnimagineXL || isQRCodes || isWhisper || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports || isHunyuan3D || isCodeLearning || isApprendreAutrement || isPromptGenerator || isHomeAssistant || isAdministration || isAIDetector ? (
