@@ -403,7 +403,7 @@ const nextConfig: NextConfig = {
       { source: '/applications/stable-diffusion', destination: '/card/stablediffusion', permanent: true },
       { source: '/applications/comfyui', destination: '/card/comfyui', permanent: true },
       // URLs courtes dupliquées → fiche produit canonique /card/{slug}
-      { source: '/administration', destination: '/card/administration', permanent: true },
+      // Note: /administration sert l'application (token requis) ; la fiche produit est /card/administration
       { source: '/ai-detector', destination: '/card/ai-detector', permanent: true },
       { source: '/code-learning', destination: '/card/code-learning', permanent: true },
       { source: '/photobooth', destination: '/card/photobooth', permanent: true },
