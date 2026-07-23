@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Résultats du vote</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <h1>Résultats</h1>
+      <p class="sub" id="hint">Chargement…</p>
+    </header>
+
+    <section id="panel" class="card hidden">
+      <p class="q" id="question"></p>
+      <div id="results" class="results"></div>
+      <p class="total mono" id="updated"></p>
+    </section>
+
+    <section id="bad" class="card errbox hidden">
+      <p>Lien incomplet ou session introuvable. Utilisez l’URL fournie par l’organisateur (<code>?s=…</code>).</p>
+    </section>
+  </div>
+  <script src="/results.js"></script>
+</body>
+</html>
