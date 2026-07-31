@@ -1,0 +1,40 @@
+# Production — Photo Vivante (Gradio, port 7887)
+# Usage: docker compose -f docker-compose.prod.yml up -d --build
+
+services:
+  photo-vivante:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: photo-vivante-iahome:latest
+    container_name: photo-vivante-iahome
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PHOTOBOOTH_PORT=7887
+      - GRADIO_SERVER_PORT=7887
+      - GRADIO_SERVER_NAME=0.0.0.0
+      - GRADIO_ANALYTICS_ENABLED=false
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "7887:7887"
+    volumes:
+      - ./outputs:/app/outputs
+      - photo_vivante_models_cache:/ai-models-cache/huggingface
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:7887')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: "2.0"
+        reservations:
+          memory: 512M
+          cpus: "0.25"
+
+volumes:
+  photo_vivante_models_cache:

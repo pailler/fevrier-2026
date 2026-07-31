@@ -137,7 +137,27 @@ photobooth/.SynologyWorkingDirectory/
 # Cursor — config locale (peut contenir des secrets MCP)
 .cursor/mcp.json
 .cursor/environment.json
+.cursor/add-cloud-google-mcp.js
+.cursor/add-cloud-google-mcp.py
+.cursor/add-cloud-mcp.py
+.cursor/setup-event-test-drive.py
+.cursor/reconnect-cloud-supabase.py
 
 # Docs PDF volumineux (sources Markdown/HTML versionnées à la place)
 docs/ARCHITECTURE-NUMERIQUE/*.pdf
 docs/photobooth-manuel-utilisateur/*.pdf
+
+# Reveil intelligent (app Next.js embarquée)
+reveil/.next/
+reveil/node_modules/
+
+# Scripts Python — cache
+scripts/__pycache__/
+scripts/**/__pycache__/
+
+# Vidéos promo — WAV régénérables via scripts/promo_*.py
+public/videos/**/*.wav
+public/videos/**/_verify_promo_face.jpg
+
+# QR codes — secrets locaux (modèle : config.env.example)
+docker-services/essentiels/qrcodes/config.env

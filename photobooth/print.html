@@ -1,0 +1,270 @@
+<!doctype html>
+
+<html lang="fr">
+
+  <head>
+
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+
+    <title> </title>
+
+    <style>
+
+      html,
+
+      body {
+
+        margin: 0;
+
+        padding: 0;
+
+        background: #000;
+
+      }
+
+      .loading {
+
+        font-family: system-ui, -apple-system, sans-serif;
+
+        padding: 24px;
+
+        text-align: center;
+
+        color: #fff;
+
+      }
+
+    </style>
+
+  </head>
+
+  <body>
+
+    <p class="loading" id="loading">Preparation de l'impression…</p>
+
+    <script src="./print-portrait.js?v=3"></script>
+
+    <script>
+
+      (function () {
+
+        var KEY_SRC = "pb-print-src";
+
+        var KEY_RETURN = "pb-print-return";
+
+        var MIN_PRINT_MS = 2800;
+
+        var src = null;
+
+        var back = "./gallery.html";
+
+        try {
+
+          src = sessionStorage.getItem(KEY_SRC) || localStorage.getItem(KEY_SRC);
+
+          var r = sessionStorage.getItem(KEY_RETURN) || localStorage.getItem(KEY_RETURN);
+
+          if (r) back = r;
+
+        } catch (e) {}
+
+
+
+        var loading = document.getElementById("loading");
+
+        if (!src) {
+
+          if (loading) loading.textContent = "Aucune image a imprimer.";
+
+          setTimeout(function () {
+
+            window.location.replace(back);
+
+          }, 1500);
+
+          return;
+
+        }
+
+
+
+        var printStartedAt = 0;
+
+        var printed = false;
+
+        var returned = false;
+
+        var delay =
+
+          window.PhotoboothPrint && window.PhotoboothPrint.isLegacyIosWebKit && window.PhotoboothPrint.isLegacyIosWebKit()
+
+            ? 950
+
+            : 450;
+
+
+
+        function clearPrintStorage() {
+
+          try {
+
+            sessionStorage.removeItem(KEY_SRC);
+
+            sessionStorage.removeItem(KEY_RETURN);
+
+            localStorage.removeItem(KEY_SRC);
+
+            localStorage.removeItem(KEY_RETURN);
+
+          } catch (e) {}
+
+        }
+
+
+
+        function goBack() {
+
+          if (returned) return;
+
+          if (printStartedAt && Date.now() - printStartedAt < MIN_PRINT_MS) return;
+
+          returned = true;
+
+          clearPrintStorage();
+
+          if (window.opener && !window.opener.closed) {
+
+            try {
+
+              window.opener.focus();
+
+            } catch (e) {}
+
+            window.close();
+
+            return;
+
+          }
+
+          window.location.replace(back);
+
+        }
+
+
+
+        function launchPrint() {
+
+          if (printed) return;
+
+          printed = true;
+
+          printStartedAt = Date.now();
+
+          document.title = " ";
+
+
+
+          var html =
+
+            window.PhotoboothPrint && window.PhotoboothPrint.buildPrintStandaloneDocument
+
+              ? window.PhotoboothPrint.buildPrintStandaloneDocument(src, false)
+
+              : null;
+
+
+
+          if (html) {
+
+            document.open();
+
+            document.write(html);
+
+            document.close();
+
+          } else {
+
+            document.body.innerHTML = "";
+
+            var img = document.createElement("img");
+
+            img.id = "pb-print-img";
+
+            img.alt = "";
+
+            document.body.appendChild(img);
+
+            img.src = src;
+
+          }
+
+
+
+          window.addEventListener("afterprint", function () {
+
+            setTimeout(goBack, 900);
+
+          });
+
+
+
+          var trigger = function () {
+
+            setTimeout(function () {
+
+              window.focus();
+
+              window.print();
+
+            }, delay);
+
+          };
+
+
+
+          var imgEl = document.getElementById("pb-print-img");
+
+          if (imgEl) {
+
+            imgEl.onload = trigger;
+
+            imgEl.onerror = function () {
+
+              document.body.innerHTML = "<p class=\"loading\">Erreur de chargement.</p>";
+
+              setTimeout(goBack, 2000);
+
+            };
+
+            if (imgEl.complete && imgEl.naturalWidth) trigger();
+
+          } else {
+
+            trigger();
+
+          }
+
+          setTimeout(trigger, delay + 2200);
+
+        }
+
+
+
+        launchPrint();
+
+        setTimeout(goBack, 180000);
+
+      })();
+
+    </script>
+
+  </body>
+
+</html>
+

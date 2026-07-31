@@ -1,0 +1,503 @@
+SCRIPTS SHORTS INSTAGRAM / YOUTUBE — 30 APPLICATIONS IAHome
+Vouvoiement · Phrases complètes · Durée cible : 20–30 secondes à l'oral
+CTA commun : « … sur iahome.fr »
+
+================================================================================
+OUTILS ESSENTIELS (14)
+================================================================================
+
+--------------------------------------------------------------------------------
+1. PHOTO-VIDEOBOOTH — photobooth.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~25 s)
+Vous organisez un mariage, une soirée ou un salon pro, et vous voulez que les
+gens repartent avec un souvenir sympa ? Avec Photo-Videobooth, vos invités se
+prennent en photo ou en vidéo, tout est rangé dans une galerie en ligne, et
+vous pouvez leur donner l'accès avec un QR code ou un PIN. C'est le photobooth
+moderne, sans matos compliqué. Vous le trouvez sur iahome.fr.
+
+EXEMPLE
+Vous organisez la fête des 40 ans de votre sœur : vous affichez un QR code à
+l'entrée, les invités filment leurs messages, et le lendemain tout le monde
+récupère la galerie.
+
+--------------------------------------------------------------------------------
+2. LIBRESPEED — librespeed.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~22 s)
+Votre vidéo freeze, votre visio coupe, et vous vous demandez si c'est votre box
+ou votre Wi-Fi ? Avec LibreSpeed, vous lancez un test en quelques secondes et
+vous voyez votre débit montant, descendant et votre latence. C'est gratuit,
+vous pouvez le refaire autant que vous voulez, et vous savez enfin si le
+problème vient de votre connexion. C'est sur iahome.fr.
+
+EXEMPLE
+Vous travaillez en télétravail et votre visio lag : vous testez avant la
+réunion, vous voyez que votre upload est faible, et vous passez en Ethernet
+au lieu de culpabiliser votre collègue.
+
+--------------------------------------------------------------------------------
+3. METUBE — metube.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~24 s)
+Vous avez trouvé une super vidéo ou un tuto sur YouTube, et vous aimeriez la
+garder sur votre disque ou l'écouter en MP3 dans la voiture ? Avec MeTube,
+vous collez le lien, vous choisissez le format, et vous téléchargez. Pas besoin
+d'installer quinze logiciels bizarres : tout se fait en ligne, simplement.
+MeTube, c'est sur iahome.fr.
+
+EXEMPLE
+Vous suivez un cours de guitare en ligne : vous téléchargez les leçons en MP3
+pour les réécouter dans le train, même sans réseau.
+
+--------------------------------------------------------------------------------
+4. PSITRANSFER — psitransfer.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~25 s)
+Vous devez envoyer un gros fichier — une vidéo, un dossier de photos, un ZIP
+de 2 Go — et votre mail vous dit « pièce jointe trop lourde » ? Avec
+PsiTransfer, vous uploadez votre fichier, vous récupérez un lien sécurisé, et
+vous l'envoyez à qui vous voulez. La personne télécharge, c'est fini. Fini les
+« ah désolé, envoie par WeTransfer payant ». PsiTransfer, sur iahome.fr.
+
+EXEMPLE
+Vous êtes graphiste : vous envoyez les fichiers HD de votre client par un lien
+PsiTransfer au lieu de couper le projet en dix morceaux.
+
+--------------------------------------------------------------------------------
+5. PDF+ — pdf.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~26 s)
+Vous avez trois PDF à fusionner, un contrat à signer, ou un document de 15 Mo
+qui refuse de s'envoyer ? PDF+ vous permet de fusionner, couper, compresser,
+convertir et signer vos PDF directement dans le navigateur. Vous faites tout
+en quelques clics, c'est gratuit et illimité, et vous n'avez plus besoin
+d'installer Adobe quinze fois. PDF+, c'est sur iahome.fr.
+
+EXEMPLE
+Vous candidatez pour un job : vous fusionnez votre CV, votre lettre et vos
+diplômes en un seul PDF propre avant l'envoi.
+
+--------------------------------------------------------------------------------
+6. QR CODES DYNAMIQUES — qrcodes.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~28 s)
+Vous avez imprimé un QR code sur un flyer, une carte de visite ou une affiche,
+et vous vous rendez compte que le lien n'est plus le bon ? Avec les QR Codes
+dynamiques, vous changez la destination quand vous voulez, sans réimprimer
+quoi que ce soit. En plus, vous voyez combien de personnes scannent, d'où, et
+quand. C'est le QR code intelligent, pas celui gravé dans le marbre. Sur
+iahome.fr.
+
+EXEMPLE
+Vous faites un flyer pour votre association : le QR pointe vers l'événement de
+mars, puis vous le basculez vers celui de juin — même flyer, nouveau lien.
+
+--------------------------------------------------------------------------------
+7. APPRENDRE À CODER — iahome.fr/code-learning
+--------------------------------------------------------------------------------
+
+SCRIPT (~27 s)
+Votre enfant vous demande « c'est quoi coder ? » et vous voulez lui montrer
+quelque chose de concret, pas juste une vidéo YouTube ? Apprendre à coder sur
+iahome.fr, c'est des exercices interactifs, progressifs, pensés pour les
+6–14 ans. Il avance à son rythme, il comprend la logique, et c'est gratuit
+sans limite. Qui sait, peut-être que c'est le début d'une passion.
+
+EXEMPLE
+Votre fils de 10 ans crée un petit jeu « attrape le chat » en une semaine de
+15 minutes par jour, et il est fier de vous montrer son score.
+
+--------------------------------------------------------------------------------
+8. APPRENDRE AUTREMENT — apprendre-autrement.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~28 s)
+Votre enfant a du mal avec la méthode classique, il a besoin d'autre chose que
+des fiches et des répétitions ? Apprendre autrement propose des activités
+adaptées, avec des badges et des encouragements vocaux pour le motiver.
+L'idée, c'est de transformer l'apprentissage en expérience positive, pas en
+corvée. Vous pouvez l'essayer sur iahome.fr.
+
+EXEMPLE
+Votre fille déteste les maths : elle débloque un badge « championne des
+additions » après trois sessions courtes, et elle redemande à jouer le
+lendemain.
+
+--------------------------------------------------------------------------------
+9. DOMOTISEZ VOTRE HABITAT — homeassistant.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~27 s)
+Vous rêvez de lumières qui s'allument toutes seules, de volets qui se ferment
+la nuit, ou d'une alerte quand vous oubliez le fer à repasser ? Domotisez
+votre habitat vous donne des configurations prêtes à l'emploi pour Home
+Assistant : scénarios, intégrations, automatisations. Vous partez de bases
+solides au lieu de tout inventer from scratch. C'est sur iahome.fr.
+
+EXEMPLE
+Vous installez un scénario « je sors de chez moi » : lumières off, volets
+fermés, chauffage en éco — un bouton, c'est réglé.
+
+--------------------------------------------------------------------------------
+10. SERVICES DE L'ADMINISTRATION — iahome.fr/administration
+--------------------------------------------------------------------------------
+
+SCRIPT (~25 s)
+Vous devez renouveler votre carte grise, déclarer vos impôts, ou vous
+inscrire à Pôle emploi, et vous ne savez jamais sur quel site officiel aller
+en premier ? Services de l'Administration regroupe les liens utiles pour les
+démarches en France. Vous gagnez du temps, vous évitez les faux sites, et
+c'est gratuit. Simple et pratique, sur iahome.fr.
+
+EXEMPLE
+Vous déménagez : vous retrouvez en un clic les liens pour changer d'adresse à
+la CAF, à la Sécu et aux impôts.
+
+--------------------------------------------------------------------------------
+11. VOTE EN LIGNE — vote.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~26 s)
+Vous devez organiser un vote en AG, en classe ou en comité, et vous en avez
+marre des feuilles volantes et des décomptes à la main ? Vote en ligne vous
+permet de créer un scrutin, de le partager par QR code ou PIN, et d'afficher
+les résultats en direct. C'est rapide, transparent, et tout le monde voit le
+même chiffre. Vote en ligne, sur iahome.fr.
+
+EXEMPLE
+Votre copropriété choisit la couleur de la façade : 42 votants scannent le QR
+en AG, le résultat s'affiche en direct sur l'écran.
+
+--------------------------------------------------------------------------------
+12. SENTINELLE NUMÉRIQUE — iahome.fr/sentinelle-numerique
+--------------------------------------------------------------------------------
+
+SCRIPT (~29 s)
+Vous avez des dizaines de comptes en ligne, des photos, des mails, et vous
+vous demandez ce qui arriverait si vous n'étiez plus là demain ? Sentinelle
+Numérique vous aide à réfléchir à votre cybersécurité, à votre fin de vie
+numérique, et à ce que vos proches pourraient récupérer ou fermer. Ce n'est pas
+glauque, c'est responsable. Et ça se passe sur iahome.fr.
+
+EXEMPLE
+Vous préparez un dossier pour votre conjointe : liste des comptes importants,
+mots de passe d'urgence, et consignes pour fermer Facebook et Gmail
+proprement.
+
+--------------------------------------------------------------------------------
+13. RÉVEIL INTELLIGENT — reveil-intelligent.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~26 s)
+Vous vous faites surprendre par un jour férié, ou vous réveillez vos gamins un
+samedi alors que c'est les vacances scolaires ? Le Réveil Intelligent connaît
+les jours fériés, la météo, et les vacances zones A, B et C. Vous programmez
+une seule fois, et vous dormez tranquille. C'est gratuit, sans pub, sur
+iahome.fr.
+
+EXEMPLE
+Vous mettez une alarme « école » du lundi au vendredi : elle ne sonne pas un
+11 novembre ni pendant les vacances de toussaint.
+
+--------------------------------------------------------------------------------
+14. RÉSERVATION MATÉRIEL — resas.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~27 s)
+Dans votre asso, votre école ou votre fablab, tout le monde veut le
+vidéoprojecteur en même temps, et personne ne sait qui l'a pris ? Réservation
+matériel vous donne un calendrier partagé : vous réservez, vous voyez ce qui
+est dispo, et vous recevez des rappels. Fini les « ah pardon, je croyais
+qu'il était libre ». C'est sur iahome.fr.
+
+EXEMPLE
+Votre club de jeux réserve le plateau « Catan » pour vendredi soir : tout le
+monde voit qu'il est pris, personne ne le ramène deux fois par erreur.
+
+
+================================================================================
+APPLICATIONS IA (16)
+================================================================================
+
+--------------------------------------------------------------------------------
+15. WHISPER IA — whisper.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~27 s)
+Vous avez enregistré une réunion, une interview ou une vidéo sans sous-titres,
+et vous n'avez clairement pas envie de tout retaper à la main ? Whisper IA
+transcrit votre audio ou votre vidéo, en plusieurs langues, en quelques
+minutes. Vous récupérez un texte exploitable pour un compte-rendu, des
+sous-titres ou une recherche. Whisper IA, sur iahome.fr.
+
+EXEMPLE
+Vous enregistrez un podcast de 45 minutes : Whisper vous sort la transcription
+complète, que vous corrigez en 10 minutes au lieu de 3 heures.
+
+--------------------------------------------------------------------------------
+16. STABLE DIFFUSION — stablediffusion.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~26 s)
+Vous avez une idée visuelle en tête — une affiche, un concept art, une
+illustration — mais vous ne savez pas dessiner ? Avec Stable Diffusion, vous
+décrivez ce que vous voulez en texte, et l'IA génère l'image avec des
+réglages avancés pour peaufiner le résultat. C'est votre studio créatif en
+ligne. Stable Diffusion, sur iahome.fr.
+
+EXEMPLE
+Vous lancez votre petit café : vous générez trois visuels de logo « ambiance
+chaleureuse, tons marron et vert » et vous faites voter vos amis sur Instagram.
+
+--------------------------------------------------------------------------------
+17. RUINEDFOOOCUS — ruinedfooocus.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~24 s)
+Vous voulez des images IA de qualité, mais les interfaces compliquées vous
+découragent ? RuinedFooocus, c'est la version simple : vous écrivez une
+phrase, vous cliquez, et l'image arrive. Pas besoin d'être ingénieur pour avoir
+un rendu bluffant. RuinedFooocus, sur iahome.fr.
+
+EXEMPLE
+Vous préparez une invitation d'anniversaire sur le thème « space party » :
+vous générez une fusée colorée en 30 secondes chrono.
+
+--------------------------------------------------------------------------------
+18. COMFYUI — comfyui.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~28 s)
+Vous maîtrisez déjà l'image IA et vous voulez aller plus loin avec des
+workflows sur mesure ? ComfyUI vous laisse construire des pipelines par nœuds
+: vous enchaînez les étapes, vous testez, vous optimisez. C'est l'outil des
+gens qui veulent du contrôle total sur leurs générations. ComfyUI, sur
+iahome.fr.
+
+EXEMPLE
+Vous créez un workflow « photo produit e-commerce » : détourage auto, fond
+blanc, upscale — vous le réutilisez sur 50 articles.
+
+--------------------------------------------------------------------------------
+19. PHOTOMAKER — photomaker.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~27 s)
+Vous avez besoin d'un portrait pro pour LinkedIn, ou vous voulez vous voir en
+version « avatar fantasy » ? PhotoMaker prend quelques photos de vous en
+référence, et l'IA génère des portraits variés et réalistes. C'est parfait
+pour un profil pro ou pour s'amuser. PhotoMaker, sur iahome.fr.
+
+EXEMPLE
+Vous refaites votre profil LinkedIn : vous uploadez 5 selfies, vous récupérez
+un headshot pro avec veste et fond neutre, sans passer chez le photographe.
+
+--------------------------------------------------------------------------------
+20. BIREFNET — birefnet.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~25 s)
+Vous avez une super photo, mais le fond est moche — mur jaune, bureau
+bordélique, passant qui photobombe ? BiRefNet détourre votre sujet
+proprement en un clic, avec des bords nets. Vous récupérez un PNG transparent,
+prêt pour votre site, vos réseaux ou votre catalogue. BiRefNet, sur iahome.fr.
+
+EXEMPLE
+Vous vendez des bijoux sur Etsy : vous photographiez chaque pièce sur votre
+table, BiRefNet enlève le fond, vous avez un visuel pro en deux minutes.
+
+--------------------------------------------------------------------------------
+21. ANIMAGINE XL — animaginexl.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~26 s)
+Vous êtes fan de manga, d'anime ou de culture japonaise, et vous voudriez
+créer vos propres personnages ? Animagine XL génère des images en style anime
+de très haute qualité à partir d'une simple description. Vous décrivez la
+scène, l'IA dessine en mode SDXL. Animagine XL, sur iahome.fr.
+
+EXEMPLE
+Vous écrivez une histoire fantasy : vous générez votre héros « chevalier aux
+cheveux blancs, cape bleue, style manga épique » pour la couverture.
+
+--------------------------------------------------------------------------------
+22. FLORENCE-2 — florence2.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~27 s)
+Vous avez une image — une photo, un scan, une capture — et vous voulez savoir
+ce qu'elle contient, en extraire le texte, ou poser des questions dessus ?
+Florence-2 combine vision et langage : caption automatique, OCR, et
+questions-réponses sur l'image. L'IA voit et comprend ce qu'il y a devant
+elle. Florence-2, sur iahome.fr.
+
+EXEMPLE
+Vous photographiez une vieille facture papier : Florence-2 extrait le montant,
+la date et le nom du fournisseur sans que vous retapiez tout.
+
+--------------------------------------------------------------------------------
+23. HI3DGEN — iahome.fr/hi3dgen
+--------------------------------------------------------------------------------
+
+SCRIPT (~28 s)
+Vous avez une photo d'un objet — une chaise, un personnage, un produit — et
+vous aimeriez en faire un modèle 3D exploitable ? Hi3DGen transforme votre
+image en mesh 3D que vous pouvez utiliser pour de la proto, des jeux ou de
+l'impression 3D. Une photo en entrée, un modèle en sortie. Hi3DGen, sur
+iahome.fr.
+
+EXEMPLE
+Vous êtes maker : vous photographiez une figurine artisanale, Hi3DGen génère
+le modèle 3D, et vous l'imprimez en double pour offrir à un ami.
+
+--------------------------------------------------------------------------------
+24. MUSETALK — musetalk.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~27 s)
+Vous voulez qu'une photo parle avec une synchro labiale réaliste — pour une
+vidéo avatar, une blague entre amis, ou un contenu créatif ? MuseTalk prend un
+visage et une piste audio, et génère une vidéo où la bouche bouge en sync.
+C'est bluffant, et ça se fait en quelques minutes. MuseTalk, sur iahome.fr.
+
+EXEMPLE
+Vous faites chanter votre chat : vous mettez sa photo, vous uploadez un
+extrait de chanson, et vous postez la vidéo sur TikTok.
+
+--------------------------------------------------------------------------------
+25. PHOTO VIVANTE — photo-vivante.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~25 s)
+Vous avez une photo fixe — un portrait de grand-père, un paysage, une vieille
+photo — et vous voulez lui donner vie avec un mouvement subtil et réaliste ?
+Photo Vivante anime votre image en quelques clics. L'effet « waouh » est
+garanti, surtout quand vous montrez le avant/après. Photo Vivante, sur
+iahome.fr.
+
+EXEMPLE
+Vous animez la photo de mariage de vos parents : un léger mouvement du sourire
+et des cheveux, vous l'envoyez pour leurs noces d'or.
+
+--------------------------------------------------------------------------------
+26. ISOLATION VOCALE — voice-isolation.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~27 s)
+Vous avez un enregistrement où la voix est noyée dans la musique, ou vous
+voulez récupérer juste la piste chant d'une chanson ? Isolation vocale utilise
+Demucs pour séparer voix, batterie, basse et instruments. Vous obtenez des
+pistes propres, comme en studio. Isolation vocale, sur iahome.fr.
+
+EXEMPLE
+Vous enregistrez un cover dans votre chambre avec un beat en fond : vous
+isolez votre voix, vous la remettez sur une instru propre, et le rendu est
+10 fois mieux.
+
+--------------------------------------------------------------------------------
+27. MEETING REPORTS — meeting-reports.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~29 s)
+Vous sortez d'une réunion d'une heure, vous n'avez presque rien noté, et on
+vous demande le compte-rendu pour demain ? Meeting Reports transcrit l'audio,
+résume les points clés, et sort les actions à mener. Vous passez d'une heure
+de discussion à un CR exploitable en quelques minutes. Meeting Reports, sur
+iahome.fr.
+
+EXEMPLE
+Réunion projet du lundi : vous uploadez l'enregistrement, vous récupérez un
+résumé avec « décision budget validée » et « Paul envoie le devis avant
+vendredi ».
+
+--------------------------------------------------------------------------------
+28. GÉNÉRATEUR DE PROMPTS — prompt-generator.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~26 s)
+Vous utilisez ChatGPT ou une IA image, mais vos prompts sont vagues style «
+fais-moi un truc cool », et les résultats déçoivent ? Le Générateur de
+prompts transforme votre idée en prompt optimisé, structuré, efficace. Vous
+gagnez du temps, vous améliorez la qualité, et vous arrêtez de tâtonner. Sur
+iahome.fr.
+
+EXEMPLE
+Vous voulez une image « startup tech moderne » : le générateur vous sort un
+prompt détaillé avec style, lumière, composition — et Stable Diffusion vous
+sort enfin un rendu pro.
+
+--------------------------------------------------------------------------------
+29. DÉTECTEUR DE CONTENU IA — iahome.fr/ai-detector
+--------------------------------------------------------------------------------
+
+SCRIPT (~28 s)
+Vous recevez un devoir, un mail, un article, et vous vous demandez s'il a été
+écrit par un humain ou généré par une IA ? Le Détecteur de Contenu IA analyse
+le texte en quelques secondes et vous donne un score de confiance. C'est utile
+pour l'école, la rédaction, ou la modération. Détecteur de Contenu IA, sur
+iahome.fr.
+
+EXEMPLE
+Un élève rend une dissertation suspecte : vous passez le texte dans le
+détecteur, vous obtenez un score élevé « probablement IA », et vous ouvrez la
+discussion avec lui.
+
+--------------------------------------------------------------------------------
+30. COG STUDIO — cogstudio.iahome.fr
+--------------------------------------------------------------------------------
+
+SCRIPT (~27 s)
+Vous en avez assez des images statiques, et vous voulez passer à la vidéo
+générée par IA ? Cog Studio vous permet de décrire une scène et d'obtenir un
+clip vidéo. C'est parfait pour des prototypes créatifs, des contenus courts ou
+tester une idée avant un vrai tournage. Cog Studio, sur iahome.fr.
+
+EXEMPLE
+Vous préparez une pub pour votre food truck : vous générez un clip de
+5 secondes « burger fumant, gros plan, lumière dorée » pour tester l'accroche
+sur Reels.
+
+
+================================================================================
+BONUS — 31. SYNTHÈSE VOCALE (TTS) — tts.iahome.fr
+================================================================================
+
+SCRIPT (~28 s)
+Vous avez un texte — un article, un script, une notice — et vous voulez le
+transformer en voix sans enregistrer vous-même ? La Synthèse vocale IA propose
+58 voix, 17 langues, et même du clonage vocal. Vous collez votre texte, vous
+choisissez la voix, vous récupérez l'audio. Parfait pour des vidéos, des
+podcasts ou l'accessibilité. Sur iahome.fr.
+
+EXEMPLE
+Vous faites une vidéo tuto sans montrer votre visage : vous écrivez le script,
+TTS génère la voix off en français naturel, vous montez votre vidéo en une
+heure.
+
+
+================================================================================
+CONSEILS TOURNAGE (COMMUN À TOUS)
+================================================================================
+
+Structure type :
+  1. Accroche — situation relatable (3–5 s)
+  2. Solution — ce que fait l'app, en phrases complètes (10–15 s)
+  3. CTA — « c'est sur iahome.fr » (3 s)
+  4. Exemple — à montrer à l'écran ou en voix off pendant la démo (5–8 s)
+
+Format vidéo recommandé :
+  - Instagram Reels / YouTube Shorts : 9:16 vertical
+  - Durée totale : 20–30 s (script oral + démo visuelle)
+  - Face caméra en bas à gauche, capture app en haut
+
+Fichiers promo existants :
+  - public/videos/qrcodes/iahome-qrcodes-promo-20s.mp4
+  - public/videos/qrcodes/iahome-qrcodes-youtube-short-20s.mp4
+  - public/videos/qrcodes/iahome-qrcodes-promo-horizontal-45s.mp4

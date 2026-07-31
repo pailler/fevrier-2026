@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     libpq-dev \
+    libzbar0 \
     curl \
     && rm -rf /var/lib/apt/lists/*
 

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="./manifest.json" />
+    <title>Vidéos smartphone — Photobooth/Videobooth connecté</title>
+    <meta name="description" content="Importez les vidéos prises avec votre smartphone dans l'album de l'événement." />
+    <link rel="stylesheet" href="./styles.css?v=69" />
+    <script src="./stay-standalone.js?v=6"></script>
+  </head>
+  <body>
+    <main class="page">
+      <section class="auth-banner ok gallery-header-row">
+        <span class="gallery-header-label">Import vidéos</span>
+        <a id="smartphone-video-back-gallery" class="btn-link gallery-back-choice" href="./gallery.html">← Retour aux galeries</a>
+      </section>
+      <section class="features">
+        <h4 id="smartphone-video-title">Chargement…</h4>
+        <p id="smartphone-video-lead" class="smartphone-gallery-lead">
+          Choisissez une ou plusieurs vidéos depuis la galerie de votre téléphone (jusqu&apos;à 300 Mo ; gros fichiers envoyés par morceaux).
+        </p>
+      </section>
+      <section class="gallery-smartphone-import-zone smartphone-upload-top">
+        <article class="studio-card gallery-card gallery-card-smartphone gallery-card-smartphone-import">
+          <div class="smartphone-upload-zone">
+            <input
+              id="smartphone-video-file-input"
+              class="smartphone-file-input"
+              type="file"
+              accept="video/mp4,video/quicktime,video/webm,video/*"
+              multiple
+              hidden
+            />
+            <button id="smartphone-video-upload-btn" class="gallery-section-cta gallery-add-video-btn" type="button">
+              <span class="gallery-add-selfie-icon" aria-hidden="true">🎬</span>
+              <span class="gallery-add-selfie-copy">
+                <span class="gallery-add-selfie-title">Ajoutez des vidéos de votre smartphone</span>
+                <span class="gallery-add-selfie-sub">Jusqu&apos;à 300 Mo par vidéo</span>
+              </span>
+            </button>
+            <p id="smartphone-video-upload-feedback" class="feedback smartphone-upload-feedback" role="status" aria-live="polite"></p>
+          </div>
+        </article>
+      </section>
+      <section class="studio active smartphone-uploads-zone">
+        <article class="studio-card gallery-card">
+          <div class="gallery-header">
+            <h5>Vidéos importées</h5>
+            <span id="smartphone-video-count">0 vidéo</span>
+          </div>
+          <div id="smartphone-video-grid" class="gallery-grid gallery-video-grid"></div>
+        </article>
+      </section>
+    </main>
+
+    <div id="smartphone-video-lightbox" class="photo-lightbox photo-lightbox--video" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Lecteur vidéos smartphone">
+      <div class="photo-lightbox-backdrop" role="presentation"></div>
+      <div class="photo-lightbox-chrome" aria-hidden="false">
+        <button type="button" class="photo-lightbox-close" aria-label="Fermer">×</button>
+        <button type="button" class="photo-lightbox-nav photo-lightbox-prev" id="smartphone-video-lightbox-prev" aria-label="Vidéo precedente">‹</button>
+        <button type="button" class="photo-lightbox-nav photo-lightbox-next" id="smartphone-video-lightbox-next" aria-label="Vidéo suivante">›</button>
+      </div>
+      <div class="photo-lightbox-content">
+        <video
+          id="smartphone-video-lightbox-player"
+          class="video-lightbox-player"
+          controls
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        ></video>
+        <p id="smartphone-video-lightbox-error" class="video-lightbox-error" hidden role="alert"></p>
+      </div>
+    </div>
+
+    <script src="./smartphone-video-gallery.js?v=16"></script>
+  </body>
+</html>

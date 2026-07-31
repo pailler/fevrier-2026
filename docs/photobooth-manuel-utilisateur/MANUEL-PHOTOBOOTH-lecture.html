@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Manuel — Photobooth / Videobooth IAHome</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <!-- Typographie confort : polices optionnelles (dégradé silencieux si hors-ligne) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./manuel-typography.css" />
+  </head>
+  <body>
+
+    <div class="doc-wrap">
+      <article class="doc-surface">
+        <header>
+          <h1>Manuel utilisateur — Photobooth / Videobooth IAHome</h1>
+          <div class="doc-meta">
+            <p>
+              <strong>Document réservé aux clients</strong> ayant acquis l'offre Photobooth / Videobooth.
+              Ne pas diffuser publiquement.
+            </p>
+            <p>
+              <em>Version provisoire — chapitre matériel et détails à compléter ultérieurement.</em><br />
+              <strong>Révision : juin 2026.</strong>
+            </p>
+          </div>
+        </header>
+
+        <p class="doc-callout">
+          Pour enregistrer en PDF : dans le navigateur, utilisez <strong>Fichier → Imprimer → Enregistrer au format PDF</strong>
+          (Chrome, Edge, Safari).
+        </p>
+<h2 id="sommaire">Sommaire</h2>
+<ol type="1">
+<li><a href="#1-à-quoi-ça-sert--usages">À quoi ça sert ?
+(Usages)</a></li>
+<li><a href="#2-logiciel--comment-ça-marche-">Logiciel — Comment ça
+marche ?</a></li>
+<li><a href="#3-matériel--borne-et-réseau">Matériel — Borne et
+réseau</a></li>
+<li><a
+href="#4-annexe--modules-iahome-essentiels-et-applications-ia">Annexe —
+Modules IAHome (Essentiels et Applications IA)</a></li>
+<li><a href="#5-support-et-mise-à-jour-du-manuel">Support et mise à jour
+du manuel</a></li>
+</ol>
+<hr />
+<h2 id="à-quoi-ça-sert-usages">1. À quoi ça sert ? (Usages)</h2>
+<h3 id="objectif">1.1 Objectif</h3>
+<p>La solution <strong>Photobooth / Videobooth</strong> permet à vos
+invités, lors d’un <strong>événement</strong> (mariage, anniversaire,
+soirée d’entreprise, séminaire, etc.), de :</p>
+<ul>
+<li><strong>Prendre des selfies</strong> directement depuis un
+<strong>navigateur</strong> (tablette — en pratique un
+<strong>iPad</strong> — ou smartphone), avec <strong>compte à
+rebours</strong>, <strong>filtres</strong> optionnels et <strong>cadres
+/ thèmes</strong> pour un rendu soigné.</li>
+<li><strong>Enregistrer de courtes vidéos</strong> (souvenirs animés)
+depuis la même expérience numérique.</li>
+<li><strong>Retrouver toutes les photos et vidéos</strong> dans une
+<strong>galerie</strong> liée à l’événement, partageable par
+<strong>lien</strong> ou <strong>QR code</strong>.</li>
+<li><strong>Réunir les contenus</strong> dans un <strong>même
+album</strong> par événement, sans mélanger plusieurs fêtes.</li>
+</ul>
+<p>En résumé : vous proposez une <strong>borne photo/vidéo
+légère</strong>, centrée sur le <strong>navigateur</strong> et votre
+<strong>réseau Wi‑Fi</strong>, sans équipement lourd à installer pour
+les invités.</p>
+<h3 id="pour-qui">1.2 Pour qui ?</h3>
+<div class="doc-table-wrap"><table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 66%" />
+</colgroup>
+<thead>
+<tr>
+<th>Public</th>
+<th>Usage typique</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Hôte / organisateur</strong></td>
+<td>Crée l’événement, régénère ou communique le <strong>code
+PIN</strong>, optionnellement ouvre le studio depuis un compte IAHome
+<strong>premium</strong>.</td>
+</tr>
+<tr>
+<td><strong>Invités</strong></td>
+<td>Saisissent le <strong>PIN à 4 chiffres</strong>, accèdent au studio,
+à la courte vidéo ou à la galerie selon les liens fournis.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="fonctionnalités-côté-invité-rappel">1.3 Fonctionnalités côté
+invité (rappel)</h3>
+<p><strong>Préalable — compte sur la plateforme IAHome :</strong> pour
+utiliser le Photobooth / Videobooth <strong>depuis l’écosystème
+IAHome</strong> (accès avec jeton, espace connecté, etc.), il faut
+d’abord être <strong>enregistré</strong> sur <strong><a
+href="https://iahome.fr">iahome.fr</a></strong> comme
+<strong>utilisateur de la plateforme</strong>. Une fois
+<strong>connecté</strong>, choisir l’application
+<strong>Photobooth</strong> dans le menu <strong>« Applis essentielles
+»</strong>. <strong>Chaque utilisation</strong> de l’application
+<strong>consomme 100 tokens</strong> (montant à rapprocher des
+conditions et du solde indiqués sur votre compte).</p>
+<ul>
+<li><strong>Connexion à un événement existant</strong> avec le
+<strong>code PIN</strong> à 4 chiffres.</li>
+<li><strong>Création d’un nouvel événement</strong> (selon votre
+configuration et les droits du compte).</li>
+<li><strong>Studio photo</strong> : caméra, décompte, gabarits (photo
+unique, bande, collage), filtres, cadres visuels.</li>
+<li><strong>Studio vidéo</strong> : activation caméra et son (si le
+navigateur le permet), enregistrement court (limite d’usage définie dans
+l’interface — typiquement jusqu’à environ <strong>15
+secondes</strong>).</li>
+<li><strong>Galerie</strong> : consultation des <strong>photos</strong>
+et <strong>vidéos</strong> de l’événement ; accès direct possible vers
+la section <strong>Vidéos</strong> via un <strong>QR code</strong>
+depuis la page vidéo (selon version déployée).</li>
+</ul>
+<hr />
+<h2 id="logiciel-comment-ça-marche">2. Logiciel — Comment ça marche
+?</h2>
+<h3 id="vue-densemble">2.1 Vue d’ensemble</h3>
+<p>L’application fonctionne comme un <strong>site web</strong> hébergé
+sur un <strong>serveur Photobooth</strong> (ou une instance dédiée). Les
+invités y accèdent avec l’adresse fournie (ex. <code>https://…</code>)
+via le <strong>Wi‑Fi</strong> du lieu. Aucune installation d’appli
+obligatoire sur l’iPad : l’usage se fait dans <strong>Safari</strong>
+(recommandé sur iPad) ou un autre navigateur récent.</p>
+<p><strong>Éléments principaux :</strong></p>
+<ul>
+<li>Une <strong>page d’accueil</strong> : rejoindre ou créer un
+événement (PIN, choix selfie / vidéo / galerie).</li>
+<li>Un <strong>studio photo</strong> : prise de vue, validation, envoi
+vers la galerie.</li>
+<li>Un <strong>studio vidéo</strong> : enregistrement, envoi des
+clips.</li>
+<li>Une <strong>galerie</strong> : liste des médias par événement.</li>
+<li>Un <strong>stockage côté serveur</strong> : les fichiers sont
+enregistrés dans l’arborescence prévue sur le serveur / la machine qui
+héberge le Photobooth.</li>
+</ul>
+<h3 id="accès-et-sécurité-iahome">2.2 Accès et sécurité (IAHome)</h3>
+<ul>
+<li>Selon votre offre, l’accès peut être protégé par un <strong>jeton
+(token)</strong> lié à votre <strong>compte</strong> et au
+<strong>module</strong> Photobooth sur <strong>IAHome</strong>. Dans ce
+cas, ouvrez les liens <strong>depuis votre espace IAHome</strong> ou
+avec l’URL complète qui contient le paramètre d’authentification.</li>
+<li>Sans jeton, selon la configuration du déploiement, certaines actions
+peuvent être <strong>restreintes</strong> ou limitées — suivez les
+indications reçues avec votre commande.</li>
+</ul>
+<h3 id="déroulement-type-pour-les-invités">2.3 Déroulement type pour les
+invités</h3>
+<ol type="1">
+<li>Se connecter au <strong>réseau Wi‑Fi</strong> du lieu (voir chapitre
+<strong>Matériel</strong>).</li>
+<li>Ouvrir l’<strong>adresse du Photobooth</strong> dans le navigateur
+de l’iPad (ou du téléphone).</li>
+<li>Saisir le <strong>code événement à 4 chiffres</strong> (PIN
+communiqué par l’organisateur).</li>
+<li>Choisir <strong>Prendre un selfie</strong>, <strong>Courte
+vidéo</strong> ou <strong>Voir la galerie</strong>.</li>
+<li>Autoriser <strong>caméra</strong> et <strong>micro</strong> lorsque
+le navigateur le demande.</li>
+<li>Pour une photo : suivre le <strong>décompte</strong>, valider ou
+refaire ; pour une vidéo : <strong>démarrer</strong> puis
+<strong>arrêter</strong> selon les indications à l’écran.</li>
+<li>Retrouver les contenus dans la <strong>galerie</strong> de
+l’événement ; un <strong>QR code</strong> peut être affiché pour ouvrir
+directement une vue adaptée (ex. section vidéos).</li>
+</ol>
+<h3 id="conseils-pratiques-sur-ipad-safari">2.4 Conseils pratiques sur
+iPad / Safari</h3>
+<ul>
+<li>Utiliser <strong>HTTPS</strong> (adresse en <code>https://</code>) —
+requis pour la <strong>caméra</strong> et le <strong>micro</strong> dans
+la plupart des cas (sauf <code>localhost</code>).</li>
+<li>En <strong>PWA</strong> ou raccourci « Sur l’écran d’accueil », si
+la caméra pose problème, tester en ouvrant d’abord le lien dans
+<strong>Safari</strong>.</li>
+<li>Vérifier dans <strong>Réglages &gt; Safari &gt; (site
+concerné)</strong> les autorisations <strong>Caméra</strong> et
+<strong>Microphone</strong>.</li>
+</ul>
+<h3 id="organisation-et-événements">2.5 Organisation et événements</h3>
+<ul>
+<li>Chaque <strong>événement</strong> possède son
+<strong>identifiant</strong> et un <strong>PIN</strong> ; les fichiers
+sont rangés <strong>par événement</strong> sur le serveur.</li>
+<li>Conservez une note du <strong>PIN</strong> et des
+<strong>liens</strong> transmis par IAHome pour ne pas les mélanger
+entre deux manifestations.</li>
+</ul>
+<h3 id="limites-connues-à-anticiper">2.6 Limites connues (à
+anticiper)</h3>
+<ul>
+<li>Qualité et durée possibles selon le <strong>navigateur</strong>, la
+<strong>connexion</strong> et la <strong>charge</strong> du
+serveur.</li>
+<li>Taille maximale des <strong>vidéos</strong> acceptée : paramétrage
+serveur (seuil typique de l’ordre de <strong>quelques dizaines de
+Mo</strong> — valeur exacte communiquée par votre administrateur /
+documentation technique si besoin).</li>
+<li>En <strong>4G</strong> sur le routeur, la <strong>latence</strong>
+ou le <strong>débit</strong> peut influencer l’<strong>upload</strong>
+des clips ou le chargement de la galerie.</li>
+</ul>
+<p><em>(Les chiffres exacts et options avancées pourront être complétés
+dans une annexe technique ou par votre interlocuteur IAHome.)</em></p>
+<hr />
+<h2 id="matériel-borne-et-réseau">3. Matériel — Borne et réseau</h2>
+<p><em>Les sections ci-dessous seront enrichies (photos, schémas de
+câblage, réglages d’impression détaillés, etc.).</em></p>
+<h3 id="formats-proposés-et-encombrement-cm">3.1 Formats proposés et
+encombrement (cm)</h3>
+<p>Dimensions indicatives <strong>du plus compact au plus
+complet</strong> (ordre du plus petit encombrement au plus grand) :</p>
+<div class="doc-table-wrap"><table>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 28%" />
+<col style="width: 13%" />
+<col style="width: 17%" />
+<col style="width: 13%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr>
+<th>Offre</th>
+<th>Contenu principal</th>
+<th style="text-align: right;">Largeur</th>
+<th style="text-align: right;">Profondeur</th>
+<th style="text-align: right;">Hauteur</th>
+<th>Remarque</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Compact</strong></td>
+<td>Sans imprimante</td>
+<td style="text-align: right;"><strong>26</strong> cm</td>
+<td style="text-align: right;"><strong>11</strong> cm</td>
+<td style="text-align: right;"><strong>33</strong> cm</td>
+<td>Avec <strong>couvercle ouvert</strong> : hauteur <strong>50</strong>
+cm</td>
+</tr>
+<tr>
+<td><strong>Complet</strong></td>
+<td>Imprimante + routeur</td>
+<td style="text-align: right;"><strong>50</strong> cm</td>
+<td style="text-align: right;"><strong>19</strong> cm</td>
+<td style="text-align: right;"><strong>19</strong> cm</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p>Les <strong>noms commerciaux</strong> exacts des offres peuvent être
+repris depuis la page tarifs ou votre contrat IAHome.</p>
+<h3 id="tablette-apple-ipad">3.2 Tablette — Apple iPad</h3>
+<ul>
+<li><strong>Rôle</strong> : poste principal pour l’interface Photobooth
+/ Videobooth (Safari recommandé).</li>
+<li><strong>Préparation</strong> : charge complète avant l’événement ;
+mise à jour <strong>iPadOS</strong> conseillée ; test <strong>caméra /
+micro</strong> sur le site avant le jour J.</li>
+<li><strong>À compléter</strong> : modèles recommandés, supports (pied,
+coque antivol), luminosité, mode « Ne pas déranger » pour éviter les
+notifications.</li>
+</ul>
+<h3 id="imprimante-photo-canon-selphy-cp1500">3.3 Imprimante photo —
+Canon SELPHY CP1500</h3>
+<ul>
+<li><strong>Rôle</strong> : impression optionnelle de tirages pour les
+invités (selon votre configuration : impression depuis le navigateur,
+borne dédiée ou workflow IAHome associé).</li>
+<li><strong>À compléter</strong> : liaison à l’iPad ou à un PC/Mac,
+consommables (cartouche, papier), réglages qualité, dimensions des
+tirages, procédure en cas de bourrage papier.</li>
+</ul>
+<h3 id="routeur-4g-wifi-tp-link-modèle-tlmr150">3.4 Routeur 4G / Wi‑Fi —
+TP-Link (modèle TL‑MR150)</h3>
+<p><strong>Indications issues de votre inventaire (à vérifier sur
+l’étiquette produit) :</strong></p>
+<div class="doc-table-wrap"><table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Élément</th>
+<th>Détail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Marque / type</strong></td>
+<td>TP-Link — routeur Wi‑Fi</td>
+</tr>
+<tr>
+<td><strong>Modèle</strong></td>
+<td><strong>TL‑MR150</strong> (vérifier la référence exacte sur
+l’appareil)</td>
+</tr>
+<tr>
+<td><strong>Débit Wi‑Fi annoncé</strong></td>
+<td>jusqu’à <strong>300 Mbps</strong> (bande et conditions réelles selon
+environnement)</td>
+</tr>
+<tr>
+<td><strong>Réseau cellulaire</strong></td>
+<td><strong>4G LTE</strong> — partage de connexion Internet vers les
+invités</td>
+</tr>
+<tr>
+<td><strong>Garantie</strong></td>
+<td>jusqu’au <strong>17 octobre 2027</strong> <em>(à confirmer sur
+facture ou espace constructeur)</em></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Rôle pour le Photobooth :</strong></p>
+<ul>
+<li>Créer un <strong>réseau Wi‑Fi local</strong> auquel
+l’<strong>iPad</strong> (et éventuellement d’autres appareils) se
+connecte.</li>
+<li>Assurer l’<strong>accès Internet</strong> via carte SIM
+<strong>4G</strong> pour joindre le serveur Photobooth si celui-ci est
+sur Internet (hébergement cloud ou accès distant). En réseau <strong>100
+% local</strong> (serveur sur LAN), le routeur sert surtout de
+<strong>Wi‑Fi</strong> ; la 4G n’est utile que si le serveur est
+joignable via Internet.</li>
+</ul>
+<p><strong>À compléter :</strong></p>
+<ul>
+<li>Opérateur SIM, forfait data, identifiants Wi‑Fi (SSID / mot de
+passe).</li>
+<li>Emplacement pour une meilleure réception 4G (hauteur, proximité
+fenêtre).</li>
+<li><strong>Sécurisation</strong> : mot de passe invité, limitation du
+nombre d’appareils si besoin.</li>
+</ul>
+<hr />
+<h2 id="annexe-modules-iahome-essentiels-et-applications-ia">4. Annexe —
+Modules IAHome (Essentiels et Applications IA)</h2>
+<p>Cette annexe présente <strong>l’ensemble des modules</strong>
+disponibles sur <strong><a
+href="https://iahome.fr">iahome.fr</a></strong>, classés <strong>comme
+sur le site</strong> :</p>
+<div class="doc-table-wrap"><table>
+<colgroup>
+<col style="width: 51%" />
+<col style="width: 18%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr>
+<th>Menu du site</th>
+<th>URL</th>
+<th>Nature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Outils essentiels</strong></td>
+<td><a href="https://iahome.fr/essentiels">iahome.fr/essentiels</a></td>
+<td>Outils <strong>pratiques au quotidien</strong>, sans intelligence
+artificielle générative (productivité, réseau, fichiers, pédagogie,
+services).</td>
+</tr>
+<tr>
+<td><strong>Applications IA</strong></td>
+<td><a
+href="https://iahome.fr/applications">iahome.fr/applications</a></td>
+<td>Applications qui s’appuient sur l’<strong>IA</strong> (GPU distant)
+: image, audio, vidéo, transcription, 3D, etc.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Accès commun :</strong></p>
+<ul>
+<li>Créer un <strong>compte</strong> sur iahome.fr, puis se
+<strong>connecter</strong>.</li>
+<li>Ouvrir le module depuis la page <strong>Essentiels</strong> ou
+<strong>Applications</strong>, ou depuis <strong>Mon
+compte</strong>.</li>
+<li>Chaque <strong>lancement</strong> consomme des
+<strong>tokens</strong> (crédits) selon le module — solde visible sur
+votre compte. Les montants ci-dessous sont ceux en vigueur au
+<strong>juin 2026</strong> (susceptibles d’évoluer ; se référer à la
+fiche du module sur le site).</li>
+</ul>
+<p>Le <strong>Photobooth / Videobooth</strong> (chapitres 1 à 3) fait
+partie des <strong>Essentiels</strong> ; il est rappelé en tête de liste
+ci-dessous.</p>
+<hr />
+<h3 id="outils-essentiels-modules-pratiques-sans-ia-générative">4.1
+Outils essentiels — modules pratiques (sans IA générative)</h3>
+<p><em>Page site : <strong>Outils essentiels IAHome</strong> — outils
+utiles dans le navigateur, sans téléchargement d’application.</em></p>
+<div class="doc-table-wrap"><table>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 21%" />
+<col style="width: 43%" />
+<col style="width: 23%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>Accès / fiche</th>
+<th>Caractéristiques principales</th>
+<th>Tokens / usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Photobooth / Videobooth</strong></td>
+<td><a href="https://iahome.fr/essentiels">Essentiels</a> · <a
+href="https://iahome.fr/card/photobooth">fiche</a> · <a
+href="https://photobooth.iahome.fr">app</a></td>
+<td>Selfies et courtes vidéos en événement, PIN à 4 chiffres, galerie
+par événement, partage lien / QR code. <strong>Objet de ce
+manuel.</strong></td>
+<td><strong>100</strong> tokens / utilisation</td>
+</tr>
+<tr>
+<td><strong>LibreSpeed</strong></td>
+<td><a href="https://iahome.fr/card/librespeed">fiche</a> · <a
+href="https://librespeed.iahome.fr">app</a></td>
+<td>Test de <strong>vitesse Internet</strong> : débit
+montant/descendant, latence (ping). Diagnostic réseau avant un événement
+Photobooth.</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>MeTube</strong></td>
+<td><a href="https://iahome.fr/card/metube">fiche</a> · <a
+href="https://metube.iahome.fr">app</a></td>
+<td><strong>Téléchargement</strong> de vidéos YouTube (qualité au choix,
+extraction MP3). Usage personnel / droits à respecter.</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>PsiTransfer</strong></td>
+<td><a href="https://iahome.fr/card/psitransfer">fiche</a> · <a
+href="https://psitransfer.iahome.fr">app</a></td>
+<td><strong>Transfert de fichiers</strong> volumineux via lien
+temporaire sécurisé (plusieurs Go). Partage sans messagerie.</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>PDF+</strong> (Stirling PDF)</td>
+<td><a href="https://iahome.fr/card/pdf">fiche</a> · <a
+href="https://pdf.iahome.fr">app</a></td>
+<td><strong>Manipulation PDF</strong> : fusionner, diviser, compresser,
+convertir, signer, réorganiser les pages.</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>QR Codes dynamiques</strong></td>
+<td><a href="https://iahome.fr/card/qrcodes">fiche</a> · <a
+href="https://qrcodes.iahome.fr">app</a></td>
+<td><strong>Création et suivi</strong> de QR codes : modifier l’URL de
+destination sans réimprimer le code, statistiques de scans. Idéal pour
+affiches événement.</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>Apprendre à coder</strong></td>
+<td><a href="https://iahome.fr/card/code-learning">fiche</a> · <a
+href="https://iahome.fr/code-learning">app</a></td>
+<td>Initiation <strong>programmation</strong> ludique (enfants ~6–14
+ans) : variables, boucles, mini-défis interactifs.</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>Apprendre autrement</strong></td>
+<td><a href="https://iahome.fr/card/apprendre-autrement">fiche</a> · <a
+href="https://apprendre-autrement.iahome.fr">app</a></td>
+<td><strong>Activités éducatives</strong> adaptées (rythme
+individualisé, badges, encouragement vocal) pour public jeune ou besoins
+spécifiques.</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>Home Assistant (ressources)</strong></td>
+<td><a href="https://iahome.fr/card/home-assistant">fiche</a> · <a
+href="https://homeassistant.iahome.fr">app</a></td>
+<td>Bibliothèque de <strong>codes YAML</strong>, configs et ressources
+domotique — <strong>site de documentation</strong>, distinct de
+l’instance HA <code>ha.regispailler.fr</code>.</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>Administration</strong></td>
+<td><a href="https://iahome.fr/card/administration">fiche</a> · <a
+href="https://iahome.fr/administration">app</a></td>
+<td><strong>Annuaire des démarches</strong> administratives en France :
+liens et informations pratiques (services publics).</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>Vote en ligne</strong></td>
+<td><a href="https://iahome.fr/card/vote">fiche</a> · <a
+href="https://vote.iahome.fr">app</a></td>
+<td><strong>Sondages / votes</strong> : accès par <strong>PIN</strong>
+ou <strong>QR code</strong>, résultats en temps réel (associations,
+réunions, événements).</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>Sentinelle Numérique</strong></td>
+<td><a href="https://iahome.fr/card/sentinelle-numerique">fiche</a> · <a
+href="https://iahome.fr/sentinelle-numerique">app</a></td>
+<td>Accompagnement <strong>cybersécurité</strong> et <strong>fin de vie
+numérique</strong> (comptes, héritiers, bonnes pratiques) — module
+IAHome à vocation pédagogique, listé avec les Essentiels.</td>
+<td>10</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h3 id="applications-ia-modules-avec-intelligence-artificielle">4.2
+Applications IA — modules avec intelligence artificielle</h3>
+<p><em>Page site : <strong>Applications</strong> — accès à distance à la
+<strong>puissance GPU</strong> des serveurs IAHome ; usage dans le
+navigateur, sans installation locale.</em></p>
+<div class="doc-table-wrap"><table>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 21%" />
+<col style="width: 43%" />
+<col style="width: 23%" />
+</colgroup>
+<thead>
+<tr>
+<th>Module</th>
+<th>Accès / fiche</th>
+<th>Caractéristiques principales</th>
+<th>Tokens / usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Whisper</strong></td>
+<td><a href="https://iahome.fr/card/whisper">fiche</a> · <a
+href="https://whisper.iahome.fr">app</a></td>
+<td><strong>Transcription</strong> automatique audio/vidéo (OpenAI
+Whisper), sous-titres, OCR sur images, multilingue.</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>Stable Diffusion</strong></td>
+<td><a href="https://iahome.fr/card/stablediffusion">fiche</a> · <a
+href="https://stablediffusion.iahome.fr">app</a></td>
+<td><strong>Génération d’images</strong> à partir de texte (prompt),
+réglages avancés, haute résolution.</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>RuinedFooocus</strong></td>
+<td><a href="https://iahome.fr/card/ruinedfooocus">fiche</a> · <a
+href="https://ruinedfooocus.iahome.fr">app</a></td>
+<td>Génération d’<strong>images IA</strong> interface simplifiée
+(Fooocus), presets et styles.</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>ComfyUI</strong></td>
+<td><a href="https://iahome.fr/card/comfyui">fiche</a> · <a
+href="https://comfyui.iahome.fr">app</a></td>
+<td><strong>Workflows visuels</strong> de génération d’image (nœuds,
+pipelines personnalisés) — contrôle fin pour utilisateurs avancés.</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>PhotoMaker</strong></td>
+<td><a href="https://iahome.fr/card/photomaker">fiche</a> · <a
+href="https://photomaker.iahome.fr">app</a></td>
+<td><strong>Portraits IA</strong> à partir de photos de référence,
+styles et identité visuelle.</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>BiRefNet</strong></td>
+<td><a href="https://iahome.fr/card/birefnet">fiche</a> · <a
+href="https://birefnet.iahome.fr">app</a></td>
+<td><strong>Détourage</strong> et suppression / remplacement de
+<strong>fond</strong> sur images.</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>Animagine XL</strong></td>
+<td><a href="https://iahome.fr/card/animagine-xl">fiche</a> · <a
+href="https://animaginexl.iahome.fr">app</a></td>
+<td>Génération d’images style <strong>anime / manga</strong>.</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>Florence-2</strong></td>
+<td><a href="https://iahome.fr/card/florence-2">fiche</a> · <a
+href="https://florence2.iahome.fr">app</a></td>
+<td>Modèle <strong>vision + langage</strong> : légendes, OCR,
+description d’images, Q&amp;R visuelle.</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>Hunyuan3D</strong></td>
+<td><a href="https://iahome.fr/card/hunyuan3d">fiche</a> · <a
+href="https://hunyuan3d.iahome.fr">app</a></td>
+<td>Génération de <strong>modèles 3D</strong> (Tencent Hunyuan).</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>Hi3DGen</strong></td>
+<td><a href="https://iahome.fr/card/hi3dgen">fiche</a></td>
+<td><strong>Image → modèle 3D</strong> ; interface intégrée sur
+iahome.fr.</td>
+<td>Selon fiche</td>
+</tr>
+<tr>
+<td><strong>MuseTalk</strong></td>
+<td><a href="https://iahome.fr/card/musetalk">fiche</a> · <a
+href="https://musetalk.iahome.fr">app</a></td>
+<td><strong>Lip-sync vidéo</strong> : synchronisation labiale d’un
+visage sur une piste audio.</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>Photo vivante</strong></td>
+<td><a href="https://iahome.fr/card/photo-vivante">fiche</a> · <a
+href="https://photo-vivante.iahome.fr">app</a></td>
+<td><strong>Animation</strong> d’une photo fixe (effet « photo qui bouge
+» réaliste).</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>Isolation vocale</strong></td>
+<td><a href="https://iahome.fr/card/voice-isolation">fiche</a> · <a
+href="https://voice-isolation.iahome.fr">app</a></td>
+<td>Séparation <strong>piste audio</strong> (voix, batterie, basse…) via
+modèle Demucs.</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>Meeting Reports</strong></td>
+<td><a href="https://iahome.fr/card/meeting-reports">fiche</a> · <a
+href="https://meeting-reports.iahome.fr">app</a></td>
+<td><strong>Comptes rendus de réunion</strong> : transcription + résumé
++ actions extraites de l’audio/vidéo.</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>Générateur de prompts</strong></td>
+<td><a href="https://iahome.fr/card/prompt-generator">fiche</a> · <a
+href="https://prompt-generator.iahome.fr">app</a></td>
+<td><strong>Prompt engineering</strong> pour ChatGPT et LLM (Zero-shot,
+Few-shot, Chain-of-Thought, multilingue).</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>Détecteur IA</strong></td>
+<td><a href="https://iahome.fr/card/ai-detector">fiche</a> · <a
+href="https://iahome.fr/ai-detector">app</a></td>
+<td>Analyse si un texte ou contenu est probablement <strong>généré par
+IA</strong>.</td>
+<td>100</td>
+</tr>
+<tr>
+<td><strong>CogStudio</strong></td>
+<td><a href="https://iahome.fr/card/cogstudio">fiche</a> · <a
+href="https://cogstudio.iahome.fr">app</a></td>
+<td><strong>Génération vidéo IA</strong> (CogVideo / CogStudio).</td>
+<td>10</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h3 id="retrouver-un-module-sur-le-site">4.3 Retrouver un module sur le
+site</h3>
+<ol type="1">
+<li>Aller sur <strong><a href="https://iahome.fr">iahome.fr</a></strong>
+→ menu <strong>Essentiels</strong> ou <strong>Applications</strong>
+(selon le type ci-dessus).</li>
+<li>Cliquer sur la <strong>carte</strong> du module → fiche détaillée
+(<code>/card/…</code>) avec description et bouton
+<strong>Lancer</strong>.</li>
+<li>Si le module consomme des tokens, vérifier le <strong>solde</strong>
+dans <strong>Mon compte</strong> avant un événement.</li>
+<li><strong>Photobooth</strong> : depuis <strong>Essentiels</strong>, ou
+lien direct <a
+href="https://photobooth.iahome.fr">photobooth.iahome.fr</a> avec
+authentification IAHome.</li>
+</ol>
+<p><em>Liste alignée sur le dépôt iahome (pages
+<code>/essentiels</code>, <code>/applications</code>, fiches
+<code>/card/*</code>) — juin 2026.</em></p>
+<hr />
+<h2 id="support-et-mise-à-jour-du-manuel">5. Support et mise à jour du
+manuel</h2>
+<ul>
+<li><strong>Questions d’usage</strong> : contact indiqué sur votre
+<strong>contrat</strong> ou la page <strong>IAHome</strong> (support
+client / photobooth).</li>
+<li><strong>Évolutions</strong> : ce manuel est un <strong>document
+vivant</strong> ; les sections « À compléter » seront renseignées au fil
+du temps (matériel, captures d’écran, FAQ).</li>
+</ul>
+<hr />
+<p><em>Fin du document — usage, logiciel, matériel, annexe modules
+IAHome.</em></p>
+        <p class="doc-footer-note">Fin du document — usage, logiciel, matériel, annexe modules IAHome.</p>
+      </article>
+    </div>
+  </body>
+</html>

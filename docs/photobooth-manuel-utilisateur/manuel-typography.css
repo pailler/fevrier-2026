@@ -1,0 +1,279 @@
+/* Édition lecture — Photobooth / Videobooth (confort lecture + impression PDF) */
+
+:root {
+  color-scheme: light dark;
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --text: #1c1917;
+  --text-muted: #57534e;
+  --accent: #0d9488;
+  --accent-soft: rgba(13, 148, 136, 0.12);
+  --border: #e7e5e4;
+  --link: #0f766e;
+  --shadow: 0 1px 2px rgba(28, 25, 23, 0.06);
+  --font-serif: "Source Serif 4", "Georgia", "Times New Roman", serif;
+  --font-sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --measure: 42rem;
+  --leading: 1.65;
+  --leading-heading: 1.25;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1917;
+    --surface: #292524;
+    --text: #fafaf9;
+    --text-muted: #a8a29e;
+    --border: #44403c;
+    --accent-soft: rgba(45, 212, 191, 0.15);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    --link: #5eead4;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: clamp(15px, 1.35vw + 12px, 18px);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  line-height: var(--leading);
+  color: var(--text);
+  background: var(--bg);
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+/* Google Fonts optionnel (chargement doux) */
+@supports (font-variation-settings: normal) {
+  body {
+    font-feature-settings: "kern" 1, "liga" 1, "onum" 1;
+  }
+}
+
+.doc-wrap {
+  max-width: calc(var(--measure) + 8rem);
+  margin: 0 auto;
+  padding: clamp(1.25rem, 4vw, 2.75rem) clamp(1rem, 4vw, 2rem) 3.5rem;
+}
+
+.doc-surface {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: clamp(1.5rem, 5vw, 2.75rem) clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.doc-meta {
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.doc-meta strong {
+  color: var(--text);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  line-height: var(--leading-heading);
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: clamp(1.65rem, 4vw, 2.15rem);
+  margin: 0 0 0.35em 0;
+}
+
+h2 {
+  font-size: clamp(1.25rem, 2.8vw, 1.45rem);
+  margin: 2rem 0 0.75rem 0;
+  padding-top: 0.35rem;
+  border-top: 3px solid var(--accent);
+}
+
+.doc-surface h2:first-of-type {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+h3 {
+  font-size: 1.05rem;
+  font-weight: 650;
+  margin: 1.35rem 0 0.5rem 0;
+  color: var(--text);
+}
+
+p {
+  margin: 0 0 1em 0;
+  max-width: var(--measure);
+}
+
+ul,
+ol {
+  margin: 0 0 1em 0;
+  padding-left: 1.35em;
+  max-width: var(--measure);
+}
+
+li {
+  margin-bottom: 0.35em;
+}
+
+li::marker {
+  color: var(--accent);
+}
+
+strong {
+  font-weight: 650;
+}
+
+em {
+  font-style: italic;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+a {
+  color: var(--link);
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.doc-table-wrap {
+  overflow-x: auto;
+  margin: 1rem 0 1.25rem;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+}
+
+th,
+td {
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  background: var(--accent-soft);
+  font-weight: 650;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+code,
+.doc-code {
+  font-family: ui-monospace, "Cascadia Code", "Consolas", monospace;
+  font-size: 0.88em;
+  background: var(--accent-soft);
+  padding: 0.12em 0.35em;
+  border-radius: 4px;
+}
+
+.doc-lead {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  max-width: var(--measure);
+  margin-bottom: 1.25rem;
+}
+
+.doc-callout {
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  padding: 0.9rem 1rem;
+  margin: 1.25rem 0;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  max-width: var(--measure);
+}
+
+.doc-footer-note {
+  font-style: italic;
+  color: var(--text-muted);
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed var(--border);
+  font-size: 0.95rem;
+}
+
+/* Impression / PDF navigateur */
+@page {
+  margin: 1.6cm;
+}
+
+@media print {
+  html {
+    font-size: 11pt;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .doc-wrap {
+    padding: 0;
+    max-width: none;
+  }
+
+  .doc-surface {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  h2 {
+    page-break-after: avoid;
+    border-top-color: #0d9488;
+  }
+
+  h3,
+  .doc-callout,
+  .doc-table-wrap {
+    page-break-inside: avoid;
+  }
+
+  a {
+    color: #000;
+    text-decoration: underline;
+  }
+}

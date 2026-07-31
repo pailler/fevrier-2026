@@ -38,8 +38,9 @@ services:
     environment:
       - FLASK_ENV=production
       - PORT=7006
-      - IAHOME_JWT_SECRET=qr-code-secret-key-change-in-production
+      - IAHOME_JWT_SECRET=${IAHOME_JWT_SECRET:-iahome-jwt-secret-2024-production-secure-key}
       - IAHOME_API_URL=http://iahome-app:3000
+      - NEXT_PUBLIC_APP_URL=https://iahome.fr
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}

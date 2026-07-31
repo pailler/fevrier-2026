@@ -301,7 +301,7 @@ class MuseTalkIahomeGateMiddleware(BaseHTTPMiddleware):
             return response
         if gate_disabled_for_request(request):
             return response
-        if request.method != "GET":
+        if request.method != "GET" and request.method != "HEAD":
             return response
         path = normalize_url_path(request.url.path or "/")
         if path != "/":
@@ -309,6 +309,16 @@ class MuseTalkIahomeGateMiddleware(BaseHTTPMiddleware):
         accept = (request.headers.get("accept") or "").lower()
         if "text/html" not in accept:
             return response
+        dest = f"{_app_public_base()}/login?redirect={quote(str(request.url), safe='')}"
+        return RedirectResponse(url=dest, status_code=302)
+
+    @staticmethod
+    def _redirect_to_card_or_login(request: Request) -> RedirectResponse:
+        """Visite directe sans jeton : renvoyer vers la fiche produit (pas un 401 Gradio)."""
+        accept = (request.headers.get("accept") or "").lower()
+        card_url = f"{_app_public_base()}/card/musetalk"
+        if "text/html" in accept or "*/*" in accept or not accept.strip():
+            return RedirectResponse(url=card_url, status_code=302)
         dest = f"{_app_public_base()}/login?redirect={quote(str(request.url), safe='')}"
         return RedirectResponse(url=dest, status_code=302)
 
@@ -362,6 +372,13 @@ class MuseTalkIahomeGateMiddleware(BaseHTTPMiddleware):
                 path="/",
             )
             return self._maybe_browser_redirect_on_401(request, response)
+
+        if verify_gate_cookie(request.cookies.get(COOKIE_NAME)):
+            response = await call_next(request)
+            return self._maybe_browser_redirect_on_401(request, response)
+
+        if request.method in ("GET", "HEAD") and path == "/":
+            return self._redirect_to_card_or_login(request)
 
         response = await call_next(request)
         return self._maybe_browser_redirect_on_401(request, response)

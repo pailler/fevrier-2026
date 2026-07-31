@@ -1,0 +1,37 @@
+services:
+  tts-xtts:
+    build: .
+    container_name: tts-xtts-service
+    restart: unless-stopped
+    ports:
+      - "8101:7860"
+    volumes:
+      - ./outputs:/app/outputs
+      - ../ai-models-cache/coqui:/root/.local/share/tts
+      - ../ai-models-cache/huggingface:/root/.cache/huggingface
+    environment:
+      - COQUI_TOS_AGREED=1
+      - GRADIO_SERVER_NAME=0.0.0.0
+      - GRADIO_SERVER_PORT=7860
+      - GRADIO_ANALYTICS_ENABLED=False
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+    networks:
+      - iahome-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 300s
+
+networks:
+  iahome-network:
+    external: true

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="./manifest.json" />
+    <title>Ajoutez vos photos et vidéos — Photobooth/Videobooth connecté</title>
+    <meta name="description" content="Importez les photos prises avec votre smartphone dans l'album de l'événement." />
+    <link rel="stylesheet" href="./styles.css?v=67" />
+    <script src="./stay-standalone.js?v=6"></script>
+  </head>
+  <body>
+    <main class="page">
+      <section class="auth-banner ok gallery-header-row">
+        <span class="gallery-header-label">Import photos</span>
+        <a id="smartphone-back-gallery" class="btn-link gallery-back-choice" href="./gallery.html">← Retour aux galeries</a>
+      </section>
+      <section class="features">
+        <h4 id="smartphone-title">Chargement…</h4>
+        <p id="smartphone-lead" class="smartphone-gallery-lead">
+          Choisissez une ou plusieurs photos depuis la galerie de votre téléphone.
+        </p>
+      </section>
+      <section class="gallery-smartphone-import-zone smartphone-upload-top">
+        <article class="studio-card gallery-card gallery-card-smartphone gallery-card-smartphone-import">
+          <div class="smartphone-upload-zone">
+            <input
+              id="smartphone-file-input"
+              class="smartphone-file-input"
+              type="file"
+              accept="image/*"
+              multiple
+              hidden
+            />
+            <button id="smartphone-upload-btn" class="gallery-section-cta gallery-add-smartphone-btn" type="button">
+              <span class="gallery-add-selfie-icon" aria-hidden="true">📱</span>
+              <span class="gallery-add-selfie-copy">
+                <span class="gallery-add-selfie-title">Ajoutez des photos de votre smartphone</span>
+                <span class="gallery-add-selfie-sub">Importer une ou plusieurs photos depuis votre téléphone</span>
+              </span>
+            </button>
+            <p id="smartphone-upload-feedback" class="feedback smartphone-upload-feedback" role="status" aria-live="polite"></p>
+          </div>
+        </article>
+      </section>
+      <section class="studio active smartphone-uploads-zone">
+        <article class="studio-card gallery-card">
+          <div class="gallery-header">
+            <h5>Photos importées</h5>
+            <span id="smartphone-count">0 photo</span>
+          </div>
+          <div id="smartphone-grid" class="gallery-grid"></div>
+        </article>
+      </section>
+    </main>
+
+    <div id="smartphone-lightbox" class="photo-lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Diaporama photos smartphone">
+      <div class="photo-lightbox-backdrop" role="presentation"></div>
+      <div class="photo-lightbox-chrome" aria-hidden="false">
+        <button type="button" class="photo-lightbox-close" aria-label="Fermer">×</button>
+        <button type="button" class="photo-lightbox-slideshow" id="smartphone-lightbox-slideshow" aria-pressed="false" hidden>
+          ▶ Diaporama
+        </button>
+        <button type="button" class="photo-lightbox-fullscreen" id="smartphone-lightbox-fullscreen" aria-pressed="false" hidden>
+          ⛶ Plein écran
+        </button>
+        <button type="button" class="photo-lightbox-nav photo-lightbox-prev" id="smartphone-lightbox-prev" aria-label="Photo precedente">‹</button>
+        <button type="button" class="photo-lightbox-nav photo-lightbox-next" id="smartphone-lightbox-next" aria-label="Photo suivante">›</button>
+      </div>
+      <div class="photo-lightbox-content">
+        <img id="smartphone-lightbox-img" src="" alt="" />
+      </div>
+    </div>
+
+    <script src="./smartphone-gallery.js?v=8"></script>
+  </body>
+</html>
