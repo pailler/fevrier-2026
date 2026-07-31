@@ -1,13 +1,14 @@
 'use client';
 import type { CardInteractiveProps, CardModuleData } from '@/types/cardModule';
 import { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { loginHrefFromWindow, loginUrlWithReturn } from '@/utils/loginRedirect';
 import { supabase } from '../../../utils/supabaseClient';
 import Link from 'next/link';
 import Image from 'next/image';
 import Breadcrumb from '../../../components/Breadcrumb';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
-import { TOKEN_COSTS } from '../../../utils/tokenActionService';
+import { TOKEN_COSTS, formatCreditsPerAccess } from '../../../utils/tokenActionService';
 import { getAppLinks } from '../../../utils/appUsefulLinks';
 import { getHunyuan3dAppUrl } from '../../../utils/hunyuan3dAppUrl';
 import YouTubeEmbed from '../../../components/YouTubeEmbed';
@@ -37,6 +38,9 @@ interface Card {
 export default function CardDetailPage({ initialModule }: CardInteractiveProps) {
   const params = useParams();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const loginHref = loginUrlWithReturn(pathname, searchParams);
   const { user, isAuthenticated, loading: authLoading, token } = useCustomAuth();
   const [card, setCard] = useState<CardModuleData | null>(initialModule ?? null);
   const [loading, setLoading] = useState(!initialModule);
@@ -88,7 +92,7 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
     card?.title?.toLowerCase().includes('psitransfer')
   );
 
-  // Fonction helper pour obtenir le texte du prix en tokens
+  // Fonction helper pour obtenir le texte du prix en crédits
   const getPriceText = (moduleId: string | undefined, modulePrice: number | string | null | undefined): string => {
     if (!moduleId) return 'Gratuit';
     
@@ -97,10 +101,10 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
       return 'Gratuit';
     }
     
-    // Vérifier si le module a un coût en tokens défini
+    // Vérifier si le module a un coût en crédits défini
     const tokenCost = TOKEN_COSTS[moduleId as keyof typeof TOKEN_COSTS];
     if (tokenCost) {
-      return `${tokenCost} tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez`;
+      return formatCreditsPerAccess(tokenCost);
     }
     
     // Fallback: utiliser le prix tel quel (pour compatibilité avec les anciens modules)
@@ -182,13 +186,7 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
         throw new Error(`URL d'accès non configurée pour ${moduleId}`);
       }
 
-      // Administration : page interne, redirection sans token
-      if (moduleId === 'administration') {
-        window.location.href = accessUrl;
-        return;
-      }
-
-      // Générer le token d'accès (consomme des tokens, authentifie l'utilisateur pour l'app)
+      // Générer le token d'accès (consomme des crédits, authentifie l'utilisateur pour l'app)
       const tokenResponse = await fetch('/api/generate-access-token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -332,8 +330,8 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
           const librespeedCard = {
             id: 'librespeed',
             title: 'LibreSpeed',
-            description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision. Coûte 10 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez.',
-            subtitle: 'Test de vitesse internet complet - 10 tokens par accès, utilisez aussi longtemps que vous souhaitez',
+            description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision. Coûte 10 crédits par accès. Utilisez l\'application aussi longtemps que vous souhaitez.',
+            subtitle: 'Test de vitesse internet complet - 10 crédits par accès, utilisez aussi longtemps que vous souhaitez',
             category: 'WEB TOOLS',
             price: 10,
             image_url: '/images/librespeed.jpg',
@@ -342,12 +340,12 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
               'Interface moderne et intuitive',
               'Résultats détaillés',
               'Compatible tous navigateurs',
-              '10 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez'
+              '10 crédits par accès. Utilisez l\'application aussi longtemps que vous souhaitez'
             ],
             requirements: [
               'Connexion internet stable',
               'Navigateur web moderne',
-              '10 tokens disponibles'
+              '10 crédits disponibles'
             ],
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
@@ -395,7 +393,7 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
             id: 'psitransfer',
             title: 'PsiTransfer',
             description: 'Transfert de fichiers sécurisé et privé. Envoyez vos fichiers sans surveillance, sans publicité. Quota maximum: 10 Go.',
-            subtitle: 'Transfert de fichiers sécurisé (10 tokens par accès)',
+            subtitle: 'Transfert de fichiers sécurisé (10 crédits par accès)',
             category: 'WEB TOOLS',
             price: 10,
             image_url: '/images/psitransfer.jpg',
@@ -405,12 +403,12 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
               'Chiffrement end-to-end',
               'Partage par lien temporaire',
               'Interface simple et intuitive',
-              '10 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez'
+              '10 crédits par accès. Utilisez l\'application aussi longtemps que vous souhaitez'
             ],
             requirements: [
               'Connexion internet stable',
               'Navigateur web moderne',
-              '10 tokens disponibles'
+              '10 crédits disponibles'
             ],
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
@@ -435,7 +433,7 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
             features: [
               'Génération vidéo assistée par IA',
               'Interface dédiée sur cogstudio.iahome.fr',
-              '10 tokens par accès, utilisation selon vos crédits',
+              '10 crédits par accès, utilisation selon vos crédits',
             ],
             requirements: ['Compte IAHome', 'Crédits disponibles', 'Navigateur moderne'],
             created_at: new Date().toISOString(),
@@ -886,7 +884,7 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
                 ) : (card.price === 0 || card.price === '0') && (!isAuthenticated || !user) && !isLibrespeed ? (
                   // Message pour les modules gratuits quand l'utilisateur n'est pas connecté (sauf LibreSpeed)
                   <Link 
-                    href="/login"
+                    href={loginHref}
                     className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
                   >
                     <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
@@ -933,7 +931,7 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
                         className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                         onClick={async () => {
                           if (!isAuthenticated || !user) {
-                            window.location.href = '/login';
+                            window.location.href = loginHrefFromWindow();
                             return;
                           }
 
@@ -1029,7 +1027,7 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
                           <line x1="15" y1="12" x2="3" y2="12" />
                         </svg>
                         <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accéder à Photobooth' : 'Connectez-vous pour accéder'}</span>
-                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">100 tokens par accès</span>
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">100 crédits par accès</span>
                       </button>
                     )}
 
@@ -1082,7 +1080,7 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
                           <line x1="15" y1="12" x2="3" y2="12" />
                         </svg>
                         <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accéder à Apprendre le Code aux enfants' : 'Connectez-vous pour accéder'}</span>
-                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 tokens par accès</span>
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 crédits par accès</span>
                       </button>
                     )}
 
@@ -1134,7 +1132,7 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
                           <line x1="15" y1="12" x2="3" y2="12" />
                         </svg>
                         <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accéder à Apprendre Autrement' : 'Connectez-vous pour accéder'}</span>
-                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 tokens par accès</span>
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 crédits par accès</span>
                       </button>
                     )}
 
@@ -1186,7 +1184,7 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
                           <line x1="15" y1="12" x2="3" y2="12" />
                         </svg>
                         <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accéder à LibreSpeed' : 'Connectez-vous pour accéder'}</span>
-                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 tokens par accès</span>
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 crédits par accès</span>
                       </button>
                     )}
 
@@ -1269,7 +1267,7 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
                           </button>
                         ) : (
                           <Link 
-                            href="/login"
+                            href={loginHref}
                             className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
                           >
                             <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
@@ -1396,7 +1394,7 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
                       <line x1="15" y1="12" x2="3" y2="12" />
                     </svg>
                     <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accéder à PsiTransfer' : 'Connectez-vous pour accéder'}</span>
-                    <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 tokens par accès</span>
+                    <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 crédits par accès</span>
                   </button>
                 )}
 

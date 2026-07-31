@@ -478,7 +478,7 @@ export default function Pricing2Client() {
               <li className="flex gap-2">
                 <span className="text-pink-600 font-bold shrink-0">✓</span>
                 <span>
-                  <strong>Logiciel IA Home</strong> : accès à l’application Photobooth avec vos jetons ou votre abonnement
+                  <strong>Logiciel IA Home</strong> : accès à l’application Photobooth avec vos crédits ou votre abonnement
                   (activation depuis votre compte).
                 </span>
               </li>
@@ -557,7 +557,7 @@ export default function Pricing2Client() {
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">⚡ Utilisation</h3>
                 <ul className="space-y-2 text-sm text-gray-600">
-                  <li>• Tokens crédités instantanément</li>
+                  <li>• Crédits ajoutés instantanément</li>
                   <li>• Support client inclus</li>
                   <li>• Résiliation possible à tout moment</li>
                 </ul>

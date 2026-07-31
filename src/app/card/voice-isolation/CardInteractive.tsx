@@ -509,7 +509,7 @@ export default function VoiceIsolationPage({ initialModule }: CardInteractivePro
                 <li>Une meilleure qualité de séparation vocale</li>
                 <li>Un traitement plus rapide grâce à l'architecture optimisée</li>
                 <li>Une interface moderne et intuitive</li>
-                <li>Un accès gratuit avec système de tokens</li>
+                <li>Un accès gratuit avec système de crédits</li>
                 <li>Un support de multiples formats audio</li>
               </ul>
             </div>

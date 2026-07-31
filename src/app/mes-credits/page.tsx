@@ -20,7 +20,7 @@ interface TokenUsage {
   usage_date: string;
 }
 
-export default function MyTokensPage() {
+export default function MesCreditsPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -61,7 +61,7 @@ export default function MyTokensPage() {
       setLoading(true);
       setError(null);
 
-      // Récupérer les tokens de l'utilisateur
+      // Récupérer les crédits de l'utilisateur
       const response = await fetch(`/api/user-tokens?userId=${userId}`);
       const data = await response.json();
 
@@ -81,7 +81,7 @@ export default function MyTokensPage() {
 
   const fetchTokenUsage = async (userId: string) => {
     try {
-      // Récupérer l'historique d'utilisation des tokens via l'API
+      // Récupérer l'historique d'utilisation des crédits via l'API
       const response = await fetch(`/api/user-tokens-simple/history?userId=${userId}&limit=20`);
       
       if (!response.ok) {
@@ -153,7 +153,7 @@ export default function MyTokensPage() {
       <div className="w-full px-4 sm:px-6 lg:px-8 pt-20">
         <Breadcrumb items={[
           { label: 'Accueil', href: '/' },
-          { label: 'Mes crédits', href: '/my-tokens' }
+          { label: 'Mes crédits', href: '/mes-credits' }
         ]} />
 
         <div className="mb-8">
@@ -177,7 +177,7 @@ export default function MyTokensPage() {
           </div>
         )}
 
-        {/* Carte principale des tokens */}
+        {/* Carte principale des crédits */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900">Vos crédits</h2>
@@ -193,11 +193,11 @@ export default function MyTokensPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Solde des tokens */}
+            {/* Solde des crédits */}
             <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-600">Tokens disponibles</p>
+                  <p className="text-sm font-medium text-blue-600">Crédits disponibles</p>
                   <p className={`text-3xl font-bold ${getTokenStatusColor(userTokens?.tokens || 0)}`}>
                     {userTokens?.tokens || 0}
                   </p>
@@ -306,7 +306,7 @@ export default function MyTokensPage() {
           )}
         </div>
 
-        {/* Informations sur les tokens */}
+        {/* Informations sur les crédits */}
         <div className="bg-blue-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-blue-900 mb-3">Comment utiliser vos crédits ?</h3>
           <div className="space-y-2 text-blue-800">

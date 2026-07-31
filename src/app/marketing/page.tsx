@@ -1,7 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { subdomainsConfig } from '../../utils/subdomainsConfig';
+import { getFeaturedSubdomains } from '../../utils/subdomainsConfig';
 
 // Désactiver le cache pour cette page
 export const dynamic = 'force-dynamic';
@@ -358,7 +358,7 @@ export default function MarketingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {subdomainsConfig.slice(0, 6).map((service, index) => (
+            {getFeaturedSubdomains().map((service, index) => (
               <div
                 key={index}
                 className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2"
@@ -677,6 +677,51 @@ export default function MarketingPage() {
                   Interface livreur et client
                 </li>
               </ul>
+            </div>
+
+            {/* Réveil Intelligent */}
+            <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2 border-2 border-indigo-100">
+              <div className="flex items-center mb-4">
+                <span className="text-5xl mr-3" aria-hidden="true">
+                  ⏰
+                </span>
+                <h3 className="text-xl font-bold text-gray-900">Réveil Intelligent</h3>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Réveil mobile synchronisé avec votre compte IAHome : alarmes récurrentes, musiques de réveil,
+                prévisions météo du jour et messages adaptés aux jours fériés et vacances scolaires (zones A, B, C).
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                <span className="bg-indigo-100 text-indigo-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Météo locale
+                </span>
+                <span className="bg-indigo-100 text-indigo-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Mobile-first
+                </span>
+                <span className="bg-indigo-100 text-indigo-800 text-xs px-3 py-1 rounded-full font-medium">
+                  Accès gratuit
+                </span>
+              </div>
+              <ul className="text-sm text-gray-600 space-y-2 mb-4">
+                <li className="flex items-start">
+                  <span className="text-indigo-600 mr-2 font-bold">✓</span>
+                  Alarmes multiples, récurrence et musiques de réveil
+                </li>
+                <li className="flex items-start">
+                  <span className="text-indigo-600 mr-2 font-bold">✓</span>
+                  Prévisions horaires et messages contextuels au réveil
+                </li>
+                <li className="flex items-start">
+                  <span className="text-indigo-600 mr-2 font-bold">✓</span>
+                  Synchronisation de vos réglages avec votre compte IAHome
+                </li>
+              </ul>
+              <Link
+                href="/card/reveil-intelligent"
+                className="inline-flex items-center gap-2 bg-indigo-100 text-indigo-900 hover:bg-indigo-200 px-4 py-2 rounded-lg font-medium text-sm transition-colors"
+              >
+                Découvrir le Réveil Intelligent →
+              </Link>
             </div>
 
             {/* Photobooth : application + borne physique */}

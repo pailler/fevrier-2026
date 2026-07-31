@@ -28,7 +28,7 @@ export default function HomeAssistantPage({ initialModule }: CardInteractiveProp
     subtitle: 'Avec Home Assistant, domotisez votre habitat (maison, garage, lieu de vacances, lieu de travail, etc.) sans frais d\'installation, ni frais de logiciels puisque tout est open-source. Des centaines de codes prêts à l\'emploi sont aussi mis à disposition gratuitement.',
     description: 'Manuel utilisateur ultra complet pour domotiser votre habitat (maison, garage, lieu de vacances, lieu de travail, etc.) sans frais d\'installation, ni frais de logiciels puisque tout est open-source. Des centaines de codes prêts à l\'emploi sont aussi mis à disposition gratuitement.',
     category: 'DOMOTIQUE',
-    price: '100 tokens',
+    price: '100 crédits',
     image: '/images/home-assistant-module.jpg',
   };
 
@@ -311,7 +311,7 @@ export default function HomeAssistantPage({ initialModule }: CardInteractiveProp
                         <line x1="15" y1="12" x2="3" y2="12" />
                       </svg>
                       <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accéder à Home Assistant' : 'Connectez-vous pour accéder'}</span>
-                      <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">100 tokens par accès</span>
+                      <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">100 crédits par accès</span>
                     </>
                   )}
                 </button>
@@ -553,7 +553,7 @@ export default function HomeAssistantPage({ initialModule }: CardInteractiveProp
                   <div className="bg-gradient-to-r from-red-50 to-blue-50 p-6 rounded-2xl border-l-4 border-red-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Home Assistant est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Oui, Home Assistant est entièrement gratuit et open-source. Il n'y a aucun frais d'installation, aucun abonnement, et aucun coût caché. Vous avez juste besoin d'un Raspberry Pi ou d'un ordinateur pour l'héberger. Notre manuel et nos codes sont également fournis gratuitement après accès avec 100 tokens.
+                      Oui, Home Assistant est entièrement gratuit et open-source. Il n'y a aucun frais d'installation, aucun abonnement, et aucun coût caché. Vous avez juste besoin d'un Raspberry Pi ou d'un ordinateur pour l'héberger. Notre manuel et nos codes sont également fournis gratuitement après accès avec 100 crédits.
                     </p>
                   </div>
                   
@@ -794,7 +794,7 @@ export default function HomeAssistantPage({ initialModule }: CardInteractiveProp
                         <span className="text-xl">💰</span>
                       </div>
                       <h5 className="font-bold text-gray-900 mb-2">Prix</h5>
-                      <p className="text-gray-700">100 tokens</p>
+                      <p className="text-gray-700">100 crédits</p>
                     </div>
                     <div className="text-center">
                       <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">

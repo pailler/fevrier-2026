@@ -282,7 +282,7 @@ export default function MeTubePage({ initialModule }: CardInteractiveProps) {
                   <line x1="15" y1="12" x2="3" y2="12" />
                 </svg>
                 <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accédez à MeTube' : 'Connectez-vous pour accéder'}</span>
-                <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 tokens par accès</span>
+                <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 crédits par accès</span>
               </button>
             </div>
           </div>
@@ -403,7 +403,7 @@ export default function MeTubePage({ initialModule }: CardInteractiveProps) {
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à MeTube</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Accédez à MeTube avec 10 tokens. L'accès est immédiat, le service est accessible depuis vos applications.
+                          Accédez à MeTube avec 10 crédits. L'accès est immédiat, le service est accessible depuis vos applications.
                         </p>
                       </div>
                     </div>
@@ -539,14 +539,14 @@ export default function MeTubePage({ initialModule }: CardInteractiveProps) {
                   <div className="bg-gradient-to-r from-pink-50 to-purple-50 p-6 rounded-2xl border-l-4 border-pink-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Comment télécharger une vidéo YouTube avec MeTube ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Pour télécharger une vidéo YouTube avec MeTube, accédez directement au service avec 10 tokens. L'accès est immédiat, collez l'URL de la vidéo YouTube dans l'interface MeTube, choisissez la qualité et le format souhaités, puis lancez le téléchargement. La vidéo sera téléchargée sur vos serveurs de manière privée.
+                      Pour télécharger une vidéo YouTube avec MeTube, accédez directement au service avec 10 crédits. L'accès est immédiat, collez l'URL de la vidéo YouTube dans l'interface MeTube, choisissez la qualité et le format souhaités, puis lancez le téléchargement. La vidéo sera téléchargée sur vos serveurs de manière privée.
                     </p>
                   </div>
                   
                   <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-purple-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">MeTube est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      MeTube est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez télécharger des vidéos YouTube sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking.
+                      MeTube est un outil open-source et gratuit. L'accès du service coûte 10 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez télécharger des vidéos YouTube sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking.
                     </p>
                   </div>
                   

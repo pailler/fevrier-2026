@@ -1,22 +1,110 @@
 'use client';
-import Image from "next/image";
 import { useEffect, useState, useMemo } from "react";
-
-/** Mélange Fisher-Yates pour afficher les apps dans un ordre aléatoire */
-function shuffleArray<T>(array: T[]): T[] {
-  const result = [...array];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
-}
 import { supabase } from "../../utils/supabaseClient";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import { useCustomAuth } from '../../hooks/useCustomAuth';
-import Breadcrumb from '../../components/Breadcrumb';
 import ModuleCard from '../../components/ModuleCard';
+
+type OfferLevel = 'autonome' | 'accompagnement' | 'specialise';
+
+const OFFER_LEVELS: Array<{
+  id: OfferLevel;
+  title: string;
+  shortTitle: string;
+  description: string;
+  badge: string;
+  accent: string;
+}> = [
+  {
+    id: 'autonome',
+    title: 'IA prête à utiliser',
+    shortTitle: 'Autonomie',
+    description: 'Des applications ciblées avec un parcours direct pour obtenir rapidement un premier résultat.',
+    badge: 'Utilisation directe',
+    accent: 'border-emerald-300 bg-emerald-50 text-emerald-900',
+  },
+  {
+    id: 'accompagnement',
+    title: 'IA avec prise en main accompagnée',
+    shortTitle: 'Accompagnement',
+    description: 'Des outils plus créatifs ou professionnels, adaptés à un atelier guidé autour de votre projet.',
+    badge: 'Atelier et conseils',
+    accent: 'border-blue-300 bg-blue-50 text-blue-900',
+  },
+  {
+    id: 'specialise',
+    title: 'Création et réalisation spécialisées',
+    shortTitle: 'Sur mesure',
+    description: 'Des workflows avancés pour une vidéo, un prototype ou un objet 3D préparé selon votre besoin.',
+    badge: 'Projet personnalisé',
+    accent: 'border-purple-300 bg-purple-50 text-purple-900',
+  },
+];
+
+const AI_OFFER_LEVELS: Record<string, OfferLevel> = {
+  whisper: 'autonome',
+  ruinedfooocus: 'autonome',
+  birefnet: 'autonome',
+  'florence-2': 'autonome',
+  'prompt-generator': 'autonome',
+  'ai-detector': 'autonome',
+  tts: 'autonome',
+  stablediffusion: 'accompagnement',
+  photomaker: 'accompagnement',
+  'animagine-xl': 'accompagnement',
+  'voice-isolation': 'accompagnement',
+  'meeting-reports': 'accompagnement',
+  musetalk: 'accompagnement',
+  'photo-vivante': 'accompagnement',
+  comfyui: 'specialise',
+  hunyuan3d: 'specialise',
+  hi3dgen: 'specialise',
+  cogstudio: 'specialise',
+};
+
+const AI_OFFER_NOTES: Record<string, string> = {
+  whisper: 'Importez un fichier audio ou vidéo et récupérez directement sa transcription.',
+  ruinedfooocus: 'Décrivez votre image et obtenez un premier résultat avec une interface simplifiée.',
+  birefnet: 'Détourez une image et récupérez un fond transparent en quelques clics.',
+  'florence-2': 'Analysez une image, extrayez son texte ou obtenez une description automatiquement.',
+  'prompt-generator': 'Transformez une idée courte en prompt structuré prêt à réutiliser.',
+  'ai-detector': 'Analysez un texte et utilisez le score comme indication, avec recul critique.',
+  tts: 'Collez un texte, choisissez une voix et générez votre piste audio.',
+  stablediffusion: 'Un atelier aide à maîtriser les prompts, modèles et paramètres de génération.',
+  photomaker: 'La préparation des photos sources et du style peut être réalisée avec vous.',
+  'animagine-xl': 'Un accompagnement aide à préciser le style, la composition et les prompts anime.',
+  'voice-isolation': 'La qualité dépend du fichier et des réglages ; une prise en main peut optimiser le résultat.',
+  'meeting-reports': 'Construisez un workflow adapté à vos réunions, comptes rendus et actions à suivre.',
+  musetalk: 'Préparez correctement le portrait, l’audio et les paramètres de synchronisation labiale.',
+  'photo-vivante': 'Choisissez l’image et le mouvement adaptés pour obtenir une animation crédible.',
+  comfyui: 'IAHome peut préparer un workflow avancé et réutilisable pour votre besoin créatif.',
+  hunyuan3d: 'Transformez une image en modèle 3D puis étudiez sa préparation pour le prototypage.',
+  hi3dgen: 'Un projet peut aller de l’image source jusqu’au fichier 3D préparé pour impression.',
+  cogstudio: 'La réalisation combine scénario, génération, sélection des plans et préparation de la vidéo.',
+};
+
+function getAiOfferLevel(module: { id?: unknown; title?: string }): OfferLevel {
+  const id = String(module.id ?? '').trim().toLowerCase();
+  if (AI_OFFER_LEVELS[id]) return AI_OFFER_LEVELS[id];
+
+  const title = (module.title ?? '').toLowerCase().replace(/\s+/g, '');
+  if (title.includes('comfy') || title.includes('3d') || title.includes('cogstudio')) return 'specialise';
+  if (
+    title.includes('stable') ||
+    title.includes('photomaker') ||
+    title.includes('musetalk') ||
+    title.includes('meeting')
+  ) {
+    return 'accompagnement';
+  }
+  return 'autonome';
+}
+
+function getAiOfferNote(module: { id?: unknown; title?: string }): string {
+  const id = String(module.id ?? '').trim().toLowerCase();
+  return AI_OFFER_NOTES[id] ?? 'L’application peut être utilisée directement pour obtenir un premier résultat.';
+}
 
 export default function Home() {
   const router = useRouter();
@@ -28,6 +116,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [forceShowContent, setForceShowContent] = useState(false);
+  const [offerFilter, setOfferFilter] = useState<'all' | OfferLevel>('all');
 
   const [userSubscriptions, setUserSubscriptions] = useState<{[key: string]: boolean}>({});
   const [showScrollToTop, setShowScrollToTop] = useState(false);
@@ -160,7 +249,35 @@ export default function Home() {
           };
           const allModules = modulesData || [];
           const hasSentinelle = allModules.some((m: any) => (m.id || '').toString().toLowerCase().includes('sentinelle'));
-          const modulesToProcess = hasSentinelle ? allModules : [sentinelleModule, ...allModules];
+          const platformFallbacks = [
+            ...(hasSentinelle ? [] : [sentinelleModule]),
+            ...(!allModules.some((m: any) => (m.id || '').toString().toLowerCase() === 'vote')
+              ? [{
+                  id: 'vote',
+                  title: 'Vote en ligne',
+                  subtitle: 'Votes avec code PIN organisateur et QR code',
+                  description: 'Créez un vote simple : participants, PIN admin, lien public et QR pour voter.',
+                  category: 'OUTILS ÉVÉNEMENT',
+                  price: 10,
+                  url: '/card/vote',
+                  image_url: '/iahome-logo.svg',
+                }]
+              : []),
+            ...(!allModules.some((m: any) => (m.id || '').toString().toLowerCase() === 'reveil-intelligent')
+              ? [{
+                  id: 'reveil-intelligent',
+                  title: 'Réveil Intelligent',
+                  subtitle: 'Météo, jours fériés et vacances scolaires',
+                  description:
+                    'Réveil mobile : alarmes récurrentes, prévisions météo, jours fériés et vacances scolaires (zones A, B, C).',
+                  category: 'OUTILS QUOTIDIEN',
+                  price: 0,
+                  url: '/card/reveil-intelligent',
+                  image_url: '/images/reveil-intelligent.svg',
+                }]
+              : []),
+          ];
+          const modulesToProcess = [...platformFallbacks, ...allModules];
 
           // Traiter les modules avec la structure simple
           const modulesWithRoles = modulesToProcess.map((module: any) => {
@@ -176,7 +293,7 @@ export default function Home() {
               category: primaryCategory,
               // Catégories multiples (utiliser la même catégorie pour compatibilité)
               categories: [primaryCategory],
-              // Sentinelle Numérique: prix fixe 10 tokens
+              // Sentinelle Numérique : prix fixe de 10 crédits
               price: isSentinelle ? 10 : module.price,
               // Ajouter des données aléatoires seulement pour l'affichage (pas stockées en DB)
               role: getRandomRole(),
@@ -237,7 +354,7 @@ export default function Home() {
 
 
   // Modules essentiels à exclure de la page applications (affichés dans la page essentiels)
-  const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'code-learning', 'apprendre-autrement', 'home-assistant', 'administration', 'photobooth', 'sentinelle-numerique', 'vote'];
+  const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'qrcodes', 'code-learning', 'apprendre-autrement', 'home-assistant', 'administration', 'photobooth', 'sentinelle-numerique', 'vote', 'reveil-intelligent', 'resas-system'];
   // Modules masqués de la liste (vide : Hunyuan 3D / image→3D réaffiché avec lien Hi3DGen)
   const hiddenFromListing: string[] = [];
   const isHiddenModule = (module: { id?: string | number; title?: string }) => {
@@ -281,10 +398,23 @@ export default function Home() {
   // Pour rétablir la pagination, remplacer filteredModules par currentModules ci-dessous
   const currentModules = filteredModules; // Afficher toutes les applications
 
-  // Mélanger l'ordre des applications pour un affichage aléatoire (une fois par ensemble de résultats)
+  // Conserver un ordre stable pour rendre les niveaux d'accompagnement lisibles.
   const displayedModules = useMemo(
-    () => shuffleArray([...currentModules]),
+    () => [...currentModules].sort((a, b) => a.title.localeCompare(b.title, 'fr')),
     [currentModules.map(m => m.id).sort().join(',')]
+  );
+
+  const groupedModules = useMemo(
+    () =>
+      OFFER_LEVELS.map((offer) => ({
+        ...offer,
+        modules: displayedModules.filter(
+          (module) =>
+            getAiOfferLevel(module) === offer.id &&
+            (offerFilter === 'all' || offerFilter === offer.id)
+        ),
+      })).filter((offer) => offer.modules.length > 0),
+    [displayedModules, offerFilter]
   );
   
   // Calculer les indices pour la pagination (pour référence future)
@@ -351,10 +481,10 @@ export default function Home() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
-                Utilisez à distance la puissance GPU des ordinateurs IAHome
+                Bénéficiez de la puissance des serveurs IAHome avec un accompagnement individuel
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Le numérique à portée de main, pour une utilisation simple et directe de l'IA. Sans téléchargement.
+                Le numérique à portée de main, pour une utilisation simple et directe de l&apos;IA. Sans téléchargement.
               </p>
               
               {/* Barre de recherche et bouton Mes applis */}
@@ -419,10 +549,40 @@ export default function Home() {
           {/* Contenu principal */}
           <div className="w-full">
 
-              {/* Grille de templates */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Lecture commerciale des applications */}
+              <div className="mb-10">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  {OFFER_LEVELS.map((offer) => (
+                    <button
+                      key={offer.id}
+                      type="button"
+                      onClick={() => setOfferFilter(offerFilter === offer.id ? 'all' : offer.id)}
+                      aria-pressed={offerFilter === offer.id}
+                      className={`text-left rounded-xl border-2 p-5 transition-all ${offer.accent} ${
+                        offerFilter === offer.id ? 'ring-2 ring-offset-2 ring-blue-500' : 'hover:-translate-y-0.5'
+                      }`}
+                    >
+                      <span className="block text-xs font-bold uppercase tracking-wide opacity-75 mb-2">{offer.badge}</span>
+                      <span className="block text-lg font-bold mb-2">{offer.shortTitle}</span>
+                      <span className="block text-sm opacity-85">{offer.description}</span>
+                    </button>
+                  ))}
+                </div>
+                {offerFilter !== 'all' && (
+                  <button
+                    type="button"
+                    onClick={() => setOfferFilter('all')}
+                    className="text-sm font-semibold text-blue-700 hover:text-blue-900"
+                  >
+                    Afficher les trois niveaux
+                  </button>
+                )}
+              </div>
+
+              {/* Applications classées par niveau d'offre */}
+              <div>
                 {loading && !forceShowContent ? (
-                  <div className="col-span-full text-center py-12">
+                  <div className="text-center py-12">
                     <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <svg className="w-8 h-8 text-blue-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -431,7 +591,7 @@ export default function Home() {
                     <div className="text-gray-500">Chargement des applications...</div>
                   </div>
                 ) : error ? (
-                  <div className="col-span-full text-center py-12">
+                  <div className="text-center py-12">
                     <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -447,22 +607,64 @@ export default function Home() {
                     </button>
                   </div>
                 ) : filteredModules.length === 0 ? (
-                  <div className="col-span-full text-left py-12">
-                    <div className="text-gray-500">Aucun template trouvé pour "{search}"</div>
+                  <div className="text-left py-12">
+                    <div className="text-gray-500">Aucun template trouvé pour &quot;{search}&quot;</div>
                   </div>
                 ) : displayedModules.length === 0 ? (
-                  <div className="col-span-full text-left py-12">
+                  <div className="text-left py-12">
                     <div className="text-gray-500">Aucun module à afficher</div>
                     <div className="text-sm text-gray-400 mt-2">Total modules: {filteredModules.length}</div>
                   </div>
                 ) : (
-                  displayedModules.map((module) => (
-                    <ModuleCard
-                      key={module.id}
-                      module={module}
-                      userEmail={user?.email}
-                    />
-                  ))
+                  <div className="space-y-14">
+                    {groupedModules.map((offer) => (
+                      <section key={offer.id} aria-labelledby={`offer-${offer.id}`}>
+                        <div className={`rounded-xl border-l-4 p-5 mb-6 ${offer.accent}`}>
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <div>
+                              <p className="text-xs font-bold uppercase tracking-wide opacity-75 mb-1">{offer.badge}</p>
+                              <h2 id={`offer-${offer.id}`} className="text-2xl font-bold">{offer.title}</h2>
+                            </div>
+                            <p className="text-sm max-w-xl sm:text-right opacity-85">{offer.description}</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 items-stretch gap-6">
+                          {offer.modules.map((module) => (
+                            <div key={module.id} className="flex h-full flex-col">
+                              <div className="flex-1 [&>div]:h-full">
+                                <ModuleCard
+                                  module={module}
+                                  userEmail={user?.email}
+                                />
+                              </div>
+                              <div className={`mt-3 flex min-h-28 flex-col rounded-lg border px-4 py-3 text-sm ${offer.accent}`}>
+                                <p>
+                                  <span className="font-semibold">{offer.shortTitle} : </span>
+                                  {getAiOfferNote(module)}
+                                </p>
+                                {offer.id === 'accompagnement' && (
+                                  <Link
+                                    href={`/contact?type=help&app=${encodeURIComponent(module.title)}`}
+                                    className="mt-auto pt-3 font-bold underline decoration-2 underline-offset-4 hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                                  >
+                                    Demander une aide à l&apos;utilisation →
+                                  </Link>
+                                )}
+                                {offer.id === 'specialise' && (
+                                  <Link
+                                    href={`/contact?type=project&app=${encodeURIComponent(module.title)}`}
+                                    className="mt-auto pt-3 font-bold underline decoration-2 underline-offset-4 hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+                                  >
+                                    Soumettre mon projet →
+                                  </Link>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </section>
+                    ))}
+                  </div>
                 )}
               </div>
               

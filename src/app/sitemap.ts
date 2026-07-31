@@ -101,6 +101,7 @@ const CARD_SLUGS = [
   'voice-isolation',
   'tts',
   'vote',
+  'reveil-intelligent',
   'resas-system',
   'whisper',
 ] as const

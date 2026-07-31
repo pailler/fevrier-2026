@@ -2,6 +2,7 @@
 import type { CardInteractiveProps, CardModuleData } from '@/types/cardModule';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { loginHrefFromWindow } from '@/utils/loginRedirect';
 import { supabase } from '../../../utils/supabaseClient';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -396,7 +397,7 @@ export default function BiRefNetPage({ initialModule }: CardInteractiveProps) {
             <div className="space-y-6">
               {/* Boutons d'action */}
               <div className="space-y-4">
-                {/* Bouton d'accès avec tokens */}
+                {/* Bouton d'accès avec crédits */}
                 <div className="w-3/4 mx-auto">
                   <ModuleAccessButton
                     moduleId={card.id}
@@ -418,7 +419,7 @@ export default function BiRefNetPage({ initialModule }: CardInteractiveProps) {
                     className="w-3/4 font-semibold py-4 px-6 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                     onClick={async () => {
                       if (!session) {
-                        window.location.href = '/login';
+                        window.location.href = loginHrefFromWindow();
                         return;
                       }
 

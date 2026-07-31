@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import { getHunyuan3dAppUrl } from '../utils/hunyuan3dAppUrl';
 import { isBrowserLocalIahomeDev } from '../utils/isBrowserLocalIahomeDev';
+import { FREE_UNLIMITED_ACCESS_LABEL, formatCreditsAmount } from '../utils/tokenActionService';
 
 interface CardPageAccessSectionProps {
   moduleId: string;
@@ -68,7 +69,11 @@ export default function CardPageAccessSection({
           'apprendre-autrement': 'http://localhost:9001',
           'photobooth': 'http://localhost:7885',
           'vote': 'http://localhost:7890',
+          'reveil-intelligent': 'http://localhost:7891',
           'prompt-generator': 'https://prompt-generator.iahome.fr',
+          'code-learning': '/code-learning',
+          'administration': '/administration',
+          'pdf': 'http://localhost:8080',
         }
       : {
           'librespeed': 'https://librespeed.iahome.fr',
@@ -90,7 +95,11 @@ export default function CardPageAccessSection({
           'apprendre-autrement': 'https://apprendre-autrement.iahome.fr',
           'photobooth': 'https://photobooth.iahome.fr',
           'vote': 'https://vote.iahome.fr',
+          'reveil-intelligent': 'https://reveil-intelligent.iahome.fr',
           'prompt-generator': 'https://prompt-generator.iahome.fr',
+          'code-learning': '/code-learning',
+          'administration': '/administration',
+          'pdf': 'https://pdf.iahome.fr',
         };
 
     if (urlMap[normalizedModuleId]) {
@@ -166,16 +175,22 @@ export default function CardPageAccessSection({
                 Accès à {moduleName}
               </h2>
               <p className="text-lg text-gray-700 mb-6">
-                Ouvrez {moduleName} via un token d&apos;accès sécurisé.
+                Ouvrez {moduleName} via un code d&apos;accès sécurisé.
               </p>
               <div className="flex items-center space-x-4">
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-200">
                   <div className="text-2xl font-bold text-blue-900">
-                    {tokenCost} tokens
+                    {tokenCost === 0 ? FREE_UNLIMITED_ACCESS_LABEL : formatCreditsAmount(tokenCost)}
                   </div>
-                  <div className="text-sm text-blue-700">
-                    {tokenUnit}
-                  </div>
+                  {tokenCost > 0 ? (
+                    <div className="text-sm text-blue-700">
+                      {tokenUnit}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-blue-700">
+                      Connexion requise · mode connecté
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -217,7 +232,9 @@ export default function CardPageAccessSection({
                       </span>
                       {showCostSummaryOnButton ? (
                         <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">
-                          {tokenCost} tokens {tokenUnit}
+                          {tokenCost === 0
+                            ? FREE_UNLIMITED_ACCESS_LABEL
+                            : `${formatCreditsAmount(tokenCost)} ${tokenUnit}`}
                         </span>
                       ) : null}
                     </>

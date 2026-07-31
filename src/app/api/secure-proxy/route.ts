@@ -27,6 +27,7 @@ const APPLICATION_PORTS: { [key: string]: number } = {
   'photo-vivante': 7887,
   'photobooth': 7885,
   'vote': 7890,
+  'reveil-intelligent': 7891,
 };
 
 // Mapping des modules vers leurs hôtes locaux (si différent de localhost)

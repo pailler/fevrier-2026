@@ -1,21 +1,94 @@
 'use client';
-import Image from "next/image";
 import { useEffect, useState, useMemo } from "react";
-
-/** Mélange Fisher-Yates pour afficher les apps dans un ordre aléatoire */
-function shuffleArray<T>(array: T[]): T[] {
-  const result = [...array];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
-}
 import { supabase } from "../../utils/supabaseClient";
 import Link from "next/link";
 import { useCustomAuth } from '../../hooks/useCustomAuth';
-import Breadcrumb from '../../components/Breadcrumb';
 import ModuleCard from '../../components/ModuleCard';
+
+type OfferLevel = 'autonome' | 'accompagnement' | 'specialise';
+
+const OFFER_LEVELS: Array<{
+  id: OfferLevel;
+  title: string;
+  shortTitle: string;
+  description: string;
+  badge: string;
+  accent: string;
+}> = [
+  {
+    id: 'autonome',
+    title: 'À utiliser en autonomie',
+    shortTitle: 'Autonomie',
+    description: 'Des outils simples à prendre en main directement depuis votre navigateur.',
+    badge: 'Utilisation directe',
+    accent: 'border-emerald-300 bg-emerald-50 text-emerald-900',
+  },
+  {
+    id: 'accompagnement',
+    title: 'Avec accompagnement possible',
+    shortTitle: 'Accompagnement',
+    description: 'Vous utilisez l’application vous-même et pouvez être guidé pour votre premier projet.',
+    badge: 'Conseils et prise en main',
+    accent: 'border-blue-300 bg-blue-50 text-blue-900',
+  },
+  {
+    id: 'specialise',
+    title: 'Projet personnalisé ou expertise partenaire',
+    shortTitle: 'Sur mesure',
+    description: 'Pour un événement, un objet physique ou un besoin qui demande une préparation spécifique.',
+    badge: 'Étude personnalisée',
+    accent: 'border-purple-300 bg-purple-50 text-purple-900',
+  },
+];
+
+const ESSENTIAL_OFFER_LEVELS: Record<string, OfferLevel> = {
+  librespeed: 'autonome',
+  metube: 'autonome',
+  psitransfer: 'autonome',
+  pdf: 'autonome',
+  'code-learning': 'autonome',
+  administration: 'autonome',
+  'reveil-intelligent': 'autonome',
+  'apprendre-autrement': 'accompagnement',
+  'sentinelle-numerique': 'accompagnement',
+  vote: 'accompagnement',
+  'resas-system': 'accompagnement',
+  qrcodes: 'specialise',
+  photobooth: 'specialise',
+  'home-assistant': 'specialise',
+};
+
+const ESSENTIAL_OFFER_NOTES: Record<string, string> = {
+  librespeed: 'Lancez le test et interprétez directement le débit et la latence.',
+  metube: 'Collez un lien, choisissez le format et récupérez votre fichier.',
+  psitransfer: 'Déposez vos fichiers et partagez immédiatement un lien sécurisé.',
+  pdf: 'Fusionnez, compressez, convertissez ou signez vos documents en autonomie.',
+  'code-learning': 'Progressez avec des exercices interactifs accessibles sans accompagnement.',
+  administration: 'Retrouvez directement les services publics et démarches utiles.',
+  'reveil-intelligent': 'Configurez vos alarmes, la météo et le calendrier depuis votre compte.',
+  'apprendre-autrement': 'Un accompagnement peut aider à construire un parcours adapté à l’enfant.',
+  'sentinelle-numerique': 'Une prise en main guidée aide à organiser les priorités et le plan d’action.',
+  vote: 'Un accompagnement est utile pour préparer le scrutin, les participants et le partage par QR code.',
+  'resas-system': 'La mise en place peut être guidée selon le matériel, les règles et les utilisateurs.',
+  qrcodes: 'IAHome peut préparer un QR code dynamique et son support physique personnalisé.',
+  photobooth: 'Prestation adaptée aux mariages et événements : personnalisation, galerie et mise en service.',
+  'home-assistant': 'Les ressources sont accessibles directement ; l’expertise avancée est assurée avec un partenaire spécialisé.',
+};
+
+function getEssentialOfferLevel(module: { id?: unknown; title?: string }): OfferLevel {
+  const id = String(module.id ?? '').trim().toLowerCase();
+  if (ESSENTIAL_OFFER_LEVELS[id]) return ESSENTIAL_OFFER_LEVELS[id];
+
+  const title = (module.title ?? '').toLowerCase();
+  if (title.includes('home assistant') || title.includes('domotisez')) return 'specialise';
+  if (title.includes('photo') || title.includes('qr code')) return 'specialise';
+  return 'accompagnement';
+}
+
+function getEssentialOfferNote(module: { id?: unknown; title?: string }): string {
+  const id = String(module.id ?? '').trim().toLowerCase();
+  return ESSENTIAL_OFFER_NOTES[id] ?? 'Une prise en main peut être proposée selon votre objectif et votre contexte.';
+}
 
 export default function Essentiels() {
   const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
@@ -25,6 +98,7 @@ export default function Essentiels() {
   const [modules, setModules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [offerFilter, setOfferFilter] = useState<'all' | OfferLevel>('all');
 
   const [userSubscriptions, setUserSubscriptions] = useState<{[key: string]: boolean}>({});
   const [showScrollToTop, setShowScrollToTop] = useState(false);
@@ -43,6 +117,7 @@ export default function Essentiels() {
     'photobooth',
     'sentinelle-numerique',
     'vote',
+    'reveil-intelligent',
     'resas-system',
   ];
 
@@ -196,6 +271,22 @@ export default function Essentiels() {
           essentialModulesData = [...essentialModulesData, voteModule];
         }
 
+        const hasReveil = listHasId('reveil-intelligent');
+        if (!hasReveil) {
+          const reveilModule = {
+            id: 'reveil-intelligent',
+            title: 'Réveil Intelligent',
+            subtitle: 'Météo, jours fériés et vacances scolaires',
+            description:
+              'Réveil mobile responsive : alarmes multiples, messages adaptés à la météo, au jour de la semaine, aux jours fériés et aux vacances scolaires (zones A, B, C).',
+            category: 'OUTILS QUOTIDIEN',
+            price: 0,
+            url: '/card/reveil-intelligent',
+            image_url: '/images/reveil-intelligent.svg',
+          };
+          essentialModulesData = [...essentialModulesData, reveilModule];
+        }
+
         const hasResasSystem = listHasId('resas-system');
         if (!hasResasSystem) {
           const resasModule = {
@@ -211,13 +302,12 @@ export default function Essentiels() {
           essentialModulesData = [...essentialModulesData, resasModule];
         }
 
-        essentialModulesData = essentialModulesData.map((m: { id?: unknown; url?: string }) =>
-          String(m.id ?? '')
-            .trim()
-            .toLowerCase() === 'vote'
-            ? { ...m, url: '/card/vote' }
-            : m
-        );
+        essentialModulesData = essentialModulesData.map((m: { id?: unknown; url?: string }) => {
+          const id = String(m.id ?? '').trim().toLowerCase();
+          if (id === 'vote') return { ...m, url: '/card/vote' };
+          if (id === 'reveil-intelligent') return { ...m, url: '/card/reveil-intelligent' };
+          return m;
+        });
 
         // Debug: vérifier si Home Assistant est dans les modules
         const homeAssistantModule = essentialModulesData.find(m => m.id === 'home-assistant' || m.title.toLowerCase().includes('domotisez'));
@@ -272,10 +362,23 @@ export default function Essentiels() {
     return matchesSearch;
   });
 
-  // Mélanger l'ordre des applications pour un affichage aléatoire (une fois par ensemble de résultats)
+  // Classer les applications de façon stable par niveau d'accompagnement.
   const displayedModules = useMemo(
-    () => shuffleArray([...filteredModules]),
+    () => [...filteredModules].sort((a, b) => a.title.localeCompare(b.title, 'fr')),
     [filteredModules.map(m => m.id).sort().join(',')]
+  );
+
+  const groupedModules = useMemo(
+    () =>
+      OFFER_LEVELS.map((offer) => ({
+        ...offer,
+        modules: displayedModules.filter(
+          (module) =>
+            getEssentialOfferLevel(module) === offer.id &&
+            (offerFilter === 'all' || offerFilter === offer.id)
+        ),
+      })).filter((offer) => offer.modules.length > 0),
+    [displayedModules, offerFilter]
   );
 
   if (error) {
@@ -313,7 +416,7 @@ export default function Essentiels() {
                 Outils essentiels IAHome
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Les outils indispensables pour votre productivité : téléchargement de vidéos, transfert de fichiers, conversion PDF, test de vitesse internet, QR codes dynamiques, apprentissage du code, domotique, votes en ligne (PIN + QR), réservation de matériel, Photobooth/Videobooth connecté et services administratifs. Tous accessibles directement depuis votre navigateur, sans téléchargement ni installation.
+                Les outils indispensables pour votre productivité : téléchargement de vidéos, transfert de fichiers, conversion PDF, test de vitesse internet, QR codes dynamiques, apprentissage du code, domotique, votes en ligne (PIN + QR), réveil intelligent (météo, fériés, vacances scolaires), réservation de matériel, Photobooth/Videobooth connecté et services administratifs. Tous accessibles directement depuis votre navigateur, sans téléchargement ni installation.
               </p>
               
               {/* Barre de recherche et bouton Mes applis */}
@@ -377,6 +480,36 @@ export default function Essentiels() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="w-full">
 
+        {/* Lecture commerciale des applications */}
+        <div className="mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {OFFER_LEVELS.map((offer) => (
+              <button
+                key={offer.id}
+                type="button"
+                onClick={() => setOfferFilter(offerFilter === offer.id ? 'all' : offer.id)}
+                aria-pressed={offerFilter === offer.id}
+                className={`text-left rounded-xl border-2 p-5 transition-all ${offer.accent} ${
+                  offerFilter === offer.id ? 'ring-2 ring-offset-2 ring-blue-500' : 'hover:-translate-y-0.5'
+                }`}
+              >
+                <span className="block text-xs font-bold uppercase tracking-wide opacity-75 mb-2">{offer.badge}</span>
+                <span className="block text-lg font-bold mb-2">{offer.shortTitle}</span>
+                <span className="block text-sm opacity-85">{offer.description}</span>
+              </button>
+            ))}
+          </div>
+          {offerFilter !== 'all' && (
+            <button
+              type="button"
+              onClick={() => setOfferFilter('all')}
+              className="text-sm font-semibold text-blue-700 hover:text-blue-900"
+            >
+              Afficher les trois niveaux
+            </button>
+          )}
+        </div>
+
         {/* Grille des modules */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
@@ -387,13 +520,38 @@ export default function Essentiels() {
             <div className="text-gray-500">Aucune application essentielle trouvée</div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayedModules.map((module) => (
-              <ModuleCard
-                key={module.id}
-                module={module}
-                userEmail={user?.email}
-              />
+          <div className="space-y-14">
+            {groupedModules.map((offer) => (
+              <section key={offer.id} aria-labelledby={`offer-${offer.id}`}>
+                <div className={`rounded-xl border-l-4 p-5 mb-6 ${offer.accent}`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wide opacity-75 mb-1">{offer.badge}</p>
+                      <h2 id={`offer-${offer.id}`} className="text-2xl font-bold">{offer.title}</h2>
+                    </div>
+                    <p className="text-sm max-w-xl sm:text-right opacity-85">{offer.description}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {offer.modules.map((module) => (
+                    <div key={module.id} className="flex flex-col">
+                      <ModuleCard
+                        module={module}
+                        userEmail={user?.email}
+                      />
+                      <div className={`mt-3 rounded-lg border px-4 py-3 text-sm ${offer.accent}`}>
+                        <span className="font-semibold">{offer.shortTitle} : </span>
+                        {getEssentialOfferNote(module)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {offer.id === 'specialise' && (
+                  <div className="mt-5 text-sm text-gray-600">
+                    Home Assistant reste une ressource autonome ; toute expertise avancée est proposée avec un partenaire spécialisé.
+                  </div>
+                )}
+              </section>
             ))}
           </div>
         )}

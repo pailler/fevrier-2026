@@ -7,6 +7,7 @@ import Breadcrumb from '../../../components/Breadcrumb';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
 import YouTubeEmbed from '../../../components/YouTubeEmbed';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
+import { FREE_UNLIMITED_ACCESS_LABEL } from '../../../utils/tokenActionService';
 
 export default function PDFPage({ initialModule }: CardInteractiveProps) {
   const router = useRouter();
@@ -270,7 +271,7 @@ export default function PDFPage({ initialModule }: CardInteractiveProps) {
                   <line x1="15" y1="12" x2="3" y2="12" />
                 </svg>
                 <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accédez à PDF+' : 'Connectez-vous pour accéder'}</span>
-                <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 crédits par accès</span>
+                <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">{FREE_UNLIMITED_ACCESS_LABEL}</span>
               </button>
             </div>
           </div>
@@ -794,8 +795,8 @@ export default function PDFPage({ initialModule }: CardInteractiveProps) {
       <CardPageActivationSection
         moduleId="pdf"
         moduleName="PDF Tools"
-        tokenCost={10}
-        tokenUnit="par accès"
+        tokenCost={0}
+        tokenUnit={FREE_UNLIMITED_ACCESS_LABEL}
         apiEndpoint="/api/activate-pdf"
         gradientColors="from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700"
         icon="📄"

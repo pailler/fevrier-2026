@@ -53,7 +53,7 @@ export default function PhotoVivantePage({ initialModule }: CardInteractiveProps
                 <li>🖼️ Importer une photo et generer un rendu plus vivant en quelques secondes</li>
                 <li>🎚️ Ajuster le style de transformation selon l effet souhaite : leger, modere ou plus marque</li>
                 <li>👤 Sublimer un portrait, une photo souvenir ou un visuel social media</li>
-                <li>🔒 Acceder a l application via un lien securise avec token IAHome</li>
+                <li>🔒 Accéder à l&apos;application via un lien sécurisé IAHome</li>
               </ul>
               <div className="mt-6 text-sm text-gray-500">
                 URL applicative: <span className="font-medium">photo-vivante.iahome.fr</span>

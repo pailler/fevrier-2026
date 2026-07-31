@@ -1,6 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
-import { TOKEN_COSTS } from '@/utils/tokenActionService';
+import { TOKEN_COSTS, isFreeUnlimitedModule } from '@/utils/tokenActionService';
 import { getSupabaseUrl, getSupabaseServiceRoleKey } from '@/utils/supabaseConfig';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'iahome-jwt-secret-2024-production-secure-key';
@@ -60,52 +60,73 @@ export async function issueModuleAccessJwtWithDebit(params: {
   }
 
   const normalizedModuleId = normalizeModuleIdForAccessJwt(moduleId);
-  const moduleCost = TOKEN_COSTS[normalizedModuleId as keyof typeof TOKEN_COSTS] ?? 10;
+  const moduleCost = isFreeUnlimitedModule(normalizedModuleId)
+    ? 0
+    : (TOKEN_COSTS[normalizedModuleId as keyof typeof TOKEN_COSTS] ?? 10);
   const admin = supabaseAdmin();
 
-  const { data: tokenRow, error: tokenFetchError } = await admin
-    .from('user_tokens')
-    .select('tokens')
-    .eq('user_id', userId)
-    .single();
+  let currentTokens = 0;
+  let newTokenCount = 0;
 
-  if (tokenFetchError || !tokenRow) {
-    return {
-      ok: false,
-      code: 'TOKENS_NOT_FOUND',
-      error: 'Solde de tokens introuvable',
-    };
+  if (moduleCost > 0) {
+    const { data: tokenRow, error: tokenFetchError } = await admin
+      .from('user_tokens')
+      .select('tokens')
+      .eq('user_id', userId)
+      .single();
+
+    if (tokenFetchError || !tokenRow) {
+      return {
+        ok: false,
+        code: 'TOKENS_NOT_FOUND',
+        error: 'Solde de crédits introuvable',
+      };
+    }
+
+    currentTokens = Number(tokenRow.tokens || 0);
+    if (currentTokens < moduleCost) {
+      return {
+        ok: false,
+        code: 'INSUFFICIENT_TOKENS',
+        error: `Crédits insuffisants (${currentTokens}/${moduleCost})`,
+        tokensRemaining: currentTokens,
+        tokensRequired: moduleCost,
+      };
+    }
+
+    newTokenCount = currentTokens - moduleCost;
+    const nowDebit = new Date().toISOString();
+
+    const { error: tokenUpdateError } = await admin
+      .from('user_tokens')
+      .update({
+        tokens: newTokenCount,
+        updated_at: nowDebit,
+      })
+      .eq('user_id', userId);
+
+    if (tokenUpdateError) {
+      return {
+        ok: false,
+        code: 'TOKENS_UPDATE_FAILED',
+        error: 'Erreur lors du débit des crédits',
+      };
+    }
+  } else {
+    try {
+      const { data: tokenRow } = await admin
+        .from('user_tokens')
+        .select('tokens')
+        .eq('user_id', userId)
+        .maybeSingle();
+      currentTokens = Number(tokenRow?.tokens || 0);
+      newTokenCount = currentTokens;
+    } catch {
+      // Solde optionnel pour les modules gratuits
+    }
   }
 
-  const currentTokens = Number(tokenRow.tokens || 0);
-  if (currentTokens < moduleCost) {
-    return {
-      ok: false,
-      code: 'INSUFFICIENT_TOKENS',
-      error: `Crédits insuffisants (${currentTokens}/${moduleCost})`,
-      tokensRemaining: currentTokens,
-      tokensRequired: moduleCost,
-    };
-  }
-
-  const newTokenCount = currentTokens - moduleCost;
   const now = new Date().toISOString();
-
-  const { error: tokenUpdateError } = await admin
-    .from('user_tokens')
-    .update({
-      tokens: newTokenCount,
-      updated_at: now,
-    })
-    .eq('user_id', userId);
-
-  if (tokenUpdateError) {
-    return {
-      ok: false,
-      code: 'TOKENS_UPDATE_FAILED',
-      error: 'Erreur lors du débit des tokens',
-    };
-  }
 
   try {
     const { data: existingApp } = await admin
@@ -145,20 +166,22 @@ export async function issueModuleAccessJwtWithDebit(params: {
     console.warn('⚠️ Enregistrement visite issueModuleAccessJwtWithDebit:', usageErr);
   }
 
-  try {
-    await admin.from('token_usage').insert({
-      user_id: userId,
-      module_id: normalizedModuleId,
-      module_name: normalizedModuleId
-        .split('-')
-        .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-        .join(' '),
-      tokens_consumed: moduleCost,
-      usage_date: now,
-      action_type: 'module_usage',
-    });
-  } catch {
-    // token_usage peut être indisponible
+  if (moduleCost > 0) {
+    try {
+      await admin.from('token_usage').insert({
+        user_id: userId,
+        module_id: normalizedModuleId,
+        module_name: normalizedModuleId
+          .split('-')
+          .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+          .join(' '),
+        tokens_consumed: moduleCost,
+        usage_date: now,
+        action_type: 'module_usage',
+      });
+    } catch {
+      // token_usage peut être indisponible
+    }
   }
 
   const tokenPayload = {

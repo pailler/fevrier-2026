@@ -3,6 +3,7 @@ import type { CardInteractiveProps, CardModuleData } from '@/types/cardModule';
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { loginHrefFromWindow } from '@/utils/loginRedirect';
 import { supabase } from '../../../utils/supabaseClient';
 import Breadcrumb from '../../../components/Breadcrumb';
 import WhisperLimits from '../../../components/WhisperLimits';
@@ -54,7 +55,7 @@ export default function WhisperPage({ initialModule }: CardInteractiveProps) {
     }
 
     try {
-      // Générer un token d'accès (décompte tokens inclus)
+      // Générer un token d'accès (décompte crédits inclus)
       const response = await fetch('/api/generate-access-token', {
         method: 'POST',
         headers: {
@@ -212,7 +213,7 @@ export default function WhisperPage({ initialModule }: CardInteractiveProps) {
 
   const handleActivate = async (card: CardModuleData) => {
     if (!session?.user?.id) {
-      router.push('/login');
+      router.push(loginHrefFromWindow());
       return;
     }
 
@@ -443,7 +444,7 @@ export default function WhisperPage({ initialModule }: CardInteractiveProps) {
             <div className="space-y-6">
               {/* Boutons d'action */}
               <div className="space-y-4">
-                {/* Bouton d'accès avec tokens */}
+                {/* Bouton d'accès avec crédits */}
                 <div className="w-3/4 mx-auto">
                   <ModuleAccessButton
                     moduleId={card?.id || 'whisper'}

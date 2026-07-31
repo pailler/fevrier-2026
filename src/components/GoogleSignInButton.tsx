@@ -2,6 +2,11 @@
 
 import { useState } from 'react';
 import { supabase } from '../utils/supabaseClient';
+import {
+  oauthCallbackUrlWithReturn,
+  persistPostLoginRedirect,
+  sanitizeReturnPath,
+} from '../utils/loginRedirect';
 
 interface GoogleSignInButtonProps {
   onSuccess?: (user: any) => void;
@@ -120,14 +125,19 @@ export default function GoogleSignInButton({
       }
 
       // Après nettoyage sessionStorage (qui supprime les clés contenant "auth" sauf ci-dessous)
-      if (redirectUrl) {
-        sessionStorage.setItem('auth_redirect', redirectUrl);
-        console.log('ℹ️ URL de redirection sauvegardée:', redirectUrl);
+      const returnPath = sanitizeReturnPath(
+        redirectUrl ??
+          (typeof window !== 'undefined'
+            ? new URLSearchParams(window.location.search).get('redirect')
+            : null)
+      );
+      if (returnPath !== '/') {
+        persistPostLoginRedirect(returnPath);
+        baseRedirectUrl = oauthCallbackUrlWithReturn(baseRedirectUrl, returnPath);
+        console.log('ℹ️ Retour post-login:', returnPath);
       }
-      
-      // Appel à signInWithOAuth avec gestion améliorée
-      console.log('🔄 Appel à signInWithOAuth...');
-      console.log('🔄 URL de redirection:', baseRedirectUrl);
+
+      console.log('🔍 Callback OAuth final:', baseRedirectUrl);
       
       // IMPORTANT: Vérifier que le code_verifier sera stocké AVANT la redirection
       // Supabase stocke le code_verifier dans localStorage AVANT de rediriger vers Google

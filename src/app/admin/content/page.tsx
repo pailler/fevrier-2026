@@ -93,7 +93,7 @@ export default function AdminContent() {
           }, {} as Record<string, any>);
 
           // Définir les modules essentiels et premium
-          const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed'];
+          const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'vote', 'reveil-intelligent'];
           const premiumModules = ['qrcodes', 'home-assistant'];
           
           Object.values(appGroups).forEach((app: any) => {

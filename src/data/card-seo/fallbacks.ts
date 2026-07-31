@@ -87,4 +87,12 @@ export const cardSeoFallbacks: Record<string, CardSeoEntry> = {
         'Créez un vote avec code PIN, participants et QR code pour voter en ligne. Module IAHome.',
     },
   },
+  'reveil-intelligent': {
+    product: {
+      slug: 'reveil-intelligent',
+      name: 'Réveil Intelligent — IA Home',
+      description:
+        'Réveil mobile : alarmes récurrentes, musiques, prévisions météo horaires, jours fériés et vacances scolaires. Accès gratuit via compte IAHome.',
+    },
+  },
 };

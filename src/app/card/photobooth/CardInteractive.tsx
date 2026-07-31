@@ -73,7 +73,7 @@ export default function PhotoboothPage({ initialModule }: CardInteractiveProps) 
               <ul className="space-y-3 text-gray-700">
                 <li>📸 Prise de photos instantanee depuis le navigateur</li>
                 <li>🖼️ Galerie evenement centralisee</li>
-                <li>🔒 Acces securise par connexion + token</li>
+                <li>🔒 Accès sécurisé par connexion + code d&apos;accès</li>
                 <li>⚡ Ouverture rapide sans installation</li>
               </ul>
               <div className="mt-6 text-sm text-gray-500">

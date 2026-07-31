@@ -30,6 +30,8 @@ const MODULE_URLS: Record<string, string> = {
   musetalk: 'https://musetalk.iahome.fr',
   'photo-vivante': 'https://photo-vivante.iahome.fr',
   'florence-2': 'https://florence2.iahome.fr',
+  vote: 'https://vote.iahome.fr',
+  'reveil-intelligent': 'https://reveil-intelligent.iahome.fr',
 };
 
 const MODULE_ID_MAPPING: Record<string, string> = {
@@ -148,6 +150,12 @@ export function getModuleSlug(moduleId: string, moduleTitle: string): string {
   }
   if (titleLower.includes('florence-2') || titleLower.includes('florence 2')) {
     return 'florence-2';
+  }
+  if (titleLower.includes('vote en ligne') || (titleLower.includes('vote') && titleLower.includes('scrutin'))) {
+    return 'vote';
+  }
+  if (titleLower.includes('réveil intelligent') || titleLower.includes('reveil intelligent')) {
+    return 'reveil-intelligent';
   }
 
   return slug;

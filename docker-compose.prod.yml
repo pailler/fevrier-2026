@@ -207,6 +207,29 @@ services:
       retries: 3
       start_period: 20s
 
+  reveil-intelligent:
+    build:
+      context: ./reveil
+      dockerfile: Dockerfile
+    image: iahome-reveil-intelligent:latest
+    container_name: iahome-reveil
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=7891
+      - IAHOME_INTERNAL_URL=http://iahome-app:3000
+      - NEXT_PUBLIC_IAHOME_URL=https://iahome.fr
+    ports:
+      - "7891:7891"
+    networks:
+      - iahome-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:7891/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
   # Service de monitoring (optionnel)
   # prometheus:
   #   image: prom/prometheus:latest
@@ -232,8 +255,10 @@ services:
   #     - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
 
 networks:
+  # Même réseau que docker-services/essentiels (pdf, metube, psitransfer, …)
   iahome-network:
-    driver: bridge
+    external: true
+    name: iahome-network
 
 volumes:
   letsencrypt:

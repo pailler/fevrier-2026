@@ -30,6 +30,8 @@ const KNOWN_MODULE_SLUGS = new Set([
   'musetalk',
   'photo-vivante',
   'florence-2',
+  'vote',
+  'reveil-intelligent',
 ]);
 
 const MODULE_ID_MAPPING: Record<string, string> = {
@@ -90,6 +92,8 @@ export function getModuleSlugForAdminLocalUrl(moduleId: string, moduleTitle: str
     titleLower.includes('photo realiste')
   ) return 'photo-vivante';
   if (titleLower.includes('florence-2') || titleLower.includes('florence 2')) return 'florence-2';
+  if (titleLower.includes('vote en ligne') || titleLower.includes('vote')) return 'vote';
+  if (titleLower.includes('réveil intelligent') || titleLower.includes('reveil intelligent')) return 'reveil-intelligent';
 
   return slug;
 }
@@ -122,6 +126,8 @@ const SLUG_TO_LOCAL: Record<string, string> = {
   musetalk: 'http://localhost:7886',
   'photo-vivante': 'http://localhost:7887',
   'florence-2': 'http://localhost:7884',
+  vote: 'http://localhost:7890',
+  'reveil-intelligent': 'http://localhost:7891',
 };
 
 /**

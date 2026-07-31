@@ -2,6 +2,8 @@
  * Construction d’URL /login?redirect=… et validation du retour post-connexion (chemins relatifs uniquement).
  */
 
+export const AUTH_REDIRECT_STORAGE_KEY = 'auth_redirect';
+
 const RETURN_BLOCKLIST_PREFIXES = [
   '/login',
   '/signup',
@@ -75,4 +77,60 @@ export function sanitizeReturnPath(raw: string | null | undefined): string {
     return '/';
   }
   return s;
+}
+
+/** Mémorise la page de retour (OAuth / email) dans sessionStorage. */
+export function persistPostLoginRedirect(path: string): void {
+  if (typeof sessionStorage === 'undefined') return;
+  const safe = sanitizeReturnPath(path);
+  if (safe === '/') return;
+  sessionStorage.setItem(AUTH_REDIRECT_STORAGE_KEY, safe);
+}
+
+/**
+ * Page de retour après connexion : param URL `redirect`, puis sessionStorage.
+ * @param consume — retire la valeur du sessionStorage (callback OAuth).
+ */
+export function getPostLoginRedirect(
+  searchParams: URLSearchParams | null | undefined,
+  options?: { consume?: boolean }
+): string {
+  let raw: string | null = null;
+
+  if (searchParams) {
+    raw = searchParams.get('redirect');
+  }
+
+  if (!raw && typeof sessionStorage !== 'undefined') {
+    raw = sessionStorage.getItem(AUTH_REDIRECT_STORAGE_KEY);
+    if (raw && options?.consume) {
+      sessionStorage.removeItem(AUTH_REDIRECT_STORAGE_KEY);
+    }
+  }
+
+  return sanitizeReturnPath(raw);
+}
+
+/** URL /login avec la page courante (navigateur). */
+export function loginHrefFromWindow(): string {
+  if (typeof window === 'undefined') return '/login';
+  const q = window.location.search.replace(/^\?/, '');
+  return loginUrlWithReturn(window.location.pathname, { toString: () => q });
+}
+
+/** Ajoute ?redirect= au callback OAuth Supabase pour survivre au round-trip Google. */
+export function oauthCallbackUrlWithReturn(
+  callbackBaseUrl: string,
+  returnPath: string
+): string {
+  const safe = sanitizeReturnPath(returnPath);
+  if (safe === '/') return callbackBaseUrl;
+  try {
+    const url = new URL(callbackBaseUrl);
+    url.searchParams.set('redirect', safe);
+    return url.toString();
+  } catch {
+    const sep = callbackBaseUrl.includes('?') ? '&' : '?';
+    return `${callbackBaseUrl}${sep}redirect=${encodeURIComponent(safe)}`;
+  }
 }

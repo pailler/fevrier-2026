@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getSupabaseClient } from '../../../utils/supabaseService';
+import { getTokenCostForModuleId, FREE_UNLIMITED_ACCESS_LABEL } from '@/utils/tokenActionService';
 
 interface TokenConsumption {
   id: string;
@@ -34,18 +35,12 @@ export default function AdminTokens() {
   const loadTokenConsumptions = useCallback(async () => {
     try {
       setIsUpdating(true);
-      console.log('🔄 Chargement des consommations de tokens...');
+      console.log('🔄 Chargement des consommations de crédits...');
       
       const supabase = getSupabaseClient();
 
       let consumptions: TokenConsumption[] = [];
-      const getTokenCost = (moduleId: string) => {
-        if (moduleId.includes('cogstudio') || moduleId.includes('stablediffusion') || moduleId.includes('ruinedfooocus') ||
-            moduleId.includes('hunyuan3d') || moduleId.includes('comfyui') || moduleId.includes('whisper')) return 100;
-        if (moduleId.includes('metube') || moduleId.includes('librespeed') || moduleId.includes('pdf') || moduleId.includes('psitransfer')) return 10;
-        if (moduleId.includes('qrcodes') || moduleId.includes('home-assistant') || moduleId.includes('homeassistant')) return 100;
-        return 10;
-      };
+      const getTokenCost = (moduleId: string) => getTokenCostForModuleId(moduleId);
 
       // 1. Récupérer depuis token_usage (alimenté par user-tokens-simple)
       const tokenUsageIds = new Set<string>();
@@ -130,7 +125,7 @@ export default function AdminTokens() {
       consumptions.sort((a, b) => new Date(b.consumed_at).getTime() - new Date(a.consumed_at).getTime());
       consumptions = consumptions.slice(0, 1000);
 
-      console.log(`✅ ${consumptions.length} consommations de tokens chargées`);
+      console.log(`✅ ${consumptions.length} consommations de crédits chargées`);
       setConsumptions(consumptions);
       setLastUpdate(new Date());
     } catch (error) {
@@ -341,10 +336,10 @@ export default function AdminTokens() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Consommation des tokens
+              Consommation des crédits
             </h1>
             <p className="text-gray-600">
-              Suivi chronologique de la consommation de tokens par utilisateur et application
+              Suivi chronologique de la consommation de crédits par utilisateur et application
             </p>
           </div>
           <div className="flex items-center space-x-3">
@@ -375,7 +370,7 @@ export default function AdminTokens() {
               <span className="text-2xl">🪙</span>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Tokens consommés</p>
+              <p className="text-sm font-medium text-gray-600">Crédits consommés</p>
               <p className="text-2xl font-bold text-gray-900">{getTotalConsumption().toLocaleString()}</p>
             </div>
           </div>
@@ -495,7 +490,7 @@ export default function AdminTokens() {
                   Application
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tokens
+                  Crédits
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date
@@ -537,7 +532,7 @@ export default function AdminTokens() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                      {consumption.tokens_consumed} tokens
+                      {consumption.tokens_consumed} crédits
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -562,7 +557,7 @@ export default function AdminTokens() {
           <div className="text-center py-12">
             <div className="text-gray-400 text-6xl mb-4">🪙</div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune consommation trouvée</h3>
-            <p className="text-gray-500">Aucune consommation de tokens ne correspond aux critères de filtrage.</p>
+            <p className="text-gray-500">Aucune consommation de crédits ne correspond aux critères de filtrage.</p>
           </div>
         )}
       </div>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { getTokenCostForModuleId } from '../utils/tokenActionService';
+import { getTokenCostForModuleId, FREE_UNLIMITED_ACCESS_LABEL } from '../utils/tokenActionService';
 import { getPhotoboothModuleDisplayTitle } from '../utils/photoboothProductName';
 
 interface ModuleCardProps {
@@ -62,6 +62,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       'sentinelle-numerique': 'sentinelle-numerique',
       'sentinellenumerique': 'sentinelle-numerique',
       'vote': 'vote',
+      'reveil-intelligent': 'reveil-intelligent',
       'resas-system': 'resas-system',
       'photobooth': 'photobooth',
     };
@@ -130,6 +131,9 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     if (titleLower.includes('réservation matériel') || titleLower.includes('reservation materiel')) {
       return 'resas-system';
     }
+    if (titleLower.includes('réveil intelligent') || titleLower.includes('reveil intelligent') || titleLower.includes('reveil-intelligent')) {
+      return 'reveil-intelligent';
+    }
     if (titleLower.includes('synthèse vocale') || titleLower.includes('synthese vocale') || titleLower.includes('text to speech') || titleLower.includes('text-to-speech') || titleLower.includes('(tts)')) {
       return 'tts';
     }
@@ -169,11 +173,14 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   // Obtenir le slug correct pour le lien
   const moduleSlug = getModuleSlug(module.id, module.title);
 
-  /** Photobooth / resas-system : tarif réel = TOKEN_COSTS, même si la ligne Supabase a un autre prix. */
+  /** Tarif affiché : TOKEN_COSTS pour les modules référencés, sinon prix Supabase. */
   const moduleIdLowerForPrice = String(module.id ?? '').trim().toLowerCase();
+  const tokenCostFromConfig = getTokenCostForModuleId(moduleIdLowerForPrice);
   const effectiveModulePrice =
-    moduleIdLowerForPrice === 'photobooth' || moduleIdLowerForPrice === 'resas-system'
-      ? getTokenCostForModuleId(moduleIdLowerForPrice)
+    moduleIdLowerForPrice === 'photobooth' ||
+    moduleIdLowerForPrice === 'resas-system' ||
+    tokenCostFromConfig === 0
+      ? tokenCostFromConfig
       : module.price;
   
   // Supprimé la gestion d'erreur d'image qui empêchait l'affichage
@@ -270,6 +277,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
 
     if (idLower === 'vote' || titleLower.includes('vote en ligne') || (titleLower.includes('vote') && titleLower.includes('scrutin'))) {
       return '/images/vote-en-ligne.svg';
+    }
+
+    if (idLower === 'reveil-intelligent' || titleLower.includes('réveil intelligent') || titleLower.includes('reveil intelligent')) {
+      return '/images/reveil-intelligent.svg';
     }
 
     if (idLower === 'resas-system' || titleLower.includes('réservation matériel') || titleLower.includes('reservation materiel')) {
@@ -406,6 +417,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     module.title.toLowerCase().includes('vote en ligne') ||
     (module.title.toLowerCase().includes('vote') && module.title.toLowerCase().includes('scrutin'));
 
+  const isReveilIntelligent =
+    module.id === 'reveil-intelligent' ||
+    module.title.toLowerCase().includes('réveil intelligent') ||
+    module.title.toLowerCase().includes('reveil intelligent');
+
   const isResasSystem =
     module.id === 'resas-system' ||
     module.title.toLowerCase().includes('réservation matériel') ||
@@ -490,7 +506,9 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                               ? '/images/photobooth.png'
                               : isVote
                                 ? '/images/vote-en-ligne.svg'
-                                : isResasSystem
+                                : isReveilIntelligent
+                                  ? '/images/reveil-intelligent.svg'
+                                  : isResasSystem
                                   ? '/images/resas-system.svg'
                                 : '/images/animagine-xl.jpg';
 
@@ -504,7 +522,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     const badge = getBadgeLabel();
     
     return (
-      <div className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 group ${isVote ? 'ring-2 ring-indigo-400/45' : ''} ${isResasSystem ? 'ring-2 ring-purple-400/45' : ''}`}>
+      <div className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 group ${isVote ? 'ring-2 ring-indigo-400/45' : ''} ${isReveilIntelligent ? 'ring-2 ring-violet-400/45' : ''} ${isResasSystem ? 'ring-2 ring-purple-400/45' : ''}`}>
         <Link href={`/card/${moduleSlug}`} prefetch={false} className="block">
           {/* Zone visuelle - style Claid.ai avec image illustrative */}
           <div className="relative h-56 overflow-hidden bg-gray-50">
@@ -550,7 +568,9 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             <p className="text-gray-700 text-sm mb-6 line-clamp-3 leading-relaxed">
               {isVote
                 ? 'Scrutins avec PIN organisateur, participants, lien public et QR code — un vote par appareil, données sur Supabase.'
-                : isResasSystem
+                : isReveilIntelligent
+                  ? 'Réveil mobile avec météo, jours fériés et vacances scolaires (zones A, B, C) — messages de réveil contextuels.'
+                  : isResasSystem
                 ? 'Réservation de matériels, calendrier en temps réel, notifications et suivi des emprunts et retours.'
                 : isSentinelleNumerique
                 ? "Cybersécurité personnelle et processus de fin de vie numérique: audit sécurité, plan de transmission et actions post-événement."
@@ -564,7 +584,9 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
               <span className={`text-base font-semibold ${
                 isFree ? 'text-green-600' : 'text-gray-700'
               }`}>
-                {isSentinelleNumerique || isVote
+                {isFree
+                  ? FREE_UNLIMITED_ACCESS_LABEL
+                  : isSentinelleNumerique || isVote
                   ? '10 crédits'
                   : isResasSystem || isMuseTalk || isPhotoVivante
                     ? '100 crédits'

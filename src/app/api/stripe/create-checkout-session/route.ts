@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
             currency: 'eur',
             product_data: {
               name: packageData.name,
-              description: `${packageData.tokens} tokens - ${packageData.description}`,
+              description: `${packageData.tokens} crédits - ${packageData.description}`,
             },
             unit_amount: packageData.price,
           },
@@ -96,12 +96,12 @@ export async function POST(request: NextRequest) {
       invoice_creation: {
         enabled: true,
         invoice_data: {
-          description: `${packageData.name} - ${packageData.tokens} tokens`,
+          description: `${packageData.name} - ${packageData.tokens} crédits`,
           footer: 'IA Home - iahome.fr',
         },
       },
       payment_intent_data: {
-        description: `${packageData.name} - ${packageData.tokens} tokens`,
+        description: `${packageData.name} - ${packageData.tokens} crédits`,
       },
     });
 

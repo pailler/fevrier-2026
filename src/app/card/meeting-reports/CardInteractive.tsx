@@ -3,6 +3,7 @@ import type { CardInteractiveProps, CardModuleData } from '@/types/cardModule';
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { loginHrefFromWindow } from '@/utils/loginRedirect';
 import { supabase } from '../../../utils/supabaseClient';
 import Breadcrumb from '../../../components/Breadcrumb';
 import Link from 'next/link';
@@ -55,7 +56,7 @@ export default function MeetingReportsPage({ initialModule }: CardInteractivePro
     console.log(`🔗 Tentative d'accès au module ${moduleId} avec l'URL: ${moduleUrl}`);
 
     try {
-      // Générer un token d'accès (décompte tokens inclus)
+      // Générer un token d'accès (décompte crédits inclus)
       const response = await fetch('/api/generate-access-token', {
         method: 'POST',
         headers: {
@@ -219,7 +220,7 @@ export default function MeetingReportsPage({ initialModule }: CardInteractivePro
 
   const handleActivate = async (card: CardModuleData) => {
     if (!session?.user?.id) {
-      router.push('/login');
+      router.push(loginHrefFromWindow());
       return;
     }
 
@@ -453,7 +454,7 @@ export default function MeetingReportsPage({ initialModule }: CardInteractivePro
             <div className="space-y-6">
               {/* Boutons d'action */}
               <div className="space-y-4">
-                {/* Bouton d'accès avec tokens */}
+                {/* Bouton d'accès avec crédits */}
                 <div className="w-3/4 mx-auto">
                   <ModuleAccessButton
                     moduleId={card?.id || 'meeting-reports'}
@@ -605,7 +606,7 @@ export default function MeetingReportsPage({ initialModule }: CardInteractivePro
                         <div>
                           <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à Compte rendus IA</h3>
                           <p className="text-gray-700 leading-relaxed">
-                            Accédez à Compte rendus IA avec 100 tokens. L'accès est immédiat, le service est accessible depuis vos applications via meeting-reports.iahome.fr.
+                            Accédez à Compte rendus IA avec 100 crédits. L'accès est immédiat, le service est accessible depuis vos applications via meeting-reports.iahome.fr.
                           </p>
                         </div>
                       </div>
@@ -744,7 +745,7 @@ export default function MeetingReportsPage({ initialModule }: CardInteractivePro
                     <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-teal-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser Compte rendus IA ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        Pour utiliser Compte rendus IA, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via meeting-reports.iahome.fr. Enregistrez vos réunions en temps réel avec le microphone intégré, ou uploadez des fichiers audio existants (MP3, WAV, WebM). L'IA transcrit automatiquement l'audio avec Whisper, puis génère un résumé intelligent avec GPT incluant les points clés, les décisions prises et les actions à suivre. Vous pouvez ensuite télécharger le rapport en PDF ou Markdown.
+                        Pour utiliser Compte rendus IA, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via meeting-reports.iahome.fr. Enregistrez vos réunions en temps réel avec le microphone intégré, ou uploadez des fichiers audio existants (MP3, WAV, WebM). L'IA transcrit automatiquement l'audio avec Whisper, puis génère un résumé intelligent avec GPT incluant les points clés, les décisions prises et les actions à suivre. Vous pouvez ensuite télécharger le rapport en PDF ou Markdown.
                       </p>
                     </div>
                     
@@ -758,7 +759,7 @@ export default function MeetingReportsPage({ initialModule }: CardInteractivePro
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border-l-4 border-blue-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Compte rendus IA est-il gratuit ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        L'accès de Compte rendus IA coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : enregistrement audio, transcription automatique, résumé intelligent, identification des intervenants, extraction des points clés, et export PDF/Markdown. Il n'y a pas de frais supplémentaires pour le traitement des réunions.
+                        L'accès de Compte rendus IA coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : enregistrement audio, transcription automatique, résumé intelligent, identification des intervenants, extraction des points clés, et export PDF/Markdown. Il n'y a pas de frais supplémentaires pour le traitement des réunions.
                       </p>
                     </div>
                     
@@ -993,7 +994,7 @@ export default function MeetingReportsPage({ initialModule }: CardInteractivePro
                 </div>
                 <div>
                   <h5 className="font-semibold text-gray-900">Prix</h5>
-                  <p className="text-gray-600 text-sm">100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez</p>
+                  <p className="text-gray-600 text-sm">100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez</p>
                 </div>
               </div>
               

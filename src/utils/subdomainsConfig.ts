@@ -337,6 +337,48 @@ export const subdomainsConfig: SubdomainInfo[] = [
     ]
   },
   {
+    subdomain: 'vote.iahome.fr',
+    url: 'https://vote.iahome.fr',
+    title: 'Vote en ligne — Scrutins et sondages | IA Home',
+    description:
+      'Organisez des votes en ligne avec PIN organisateur, participation par QR code et résultats en direct. Idéal pour réunions, associations et événements.',
+    keywords: ['vote en ligne', 'sondage', 'scrutin', 'vote iahome', 'qr code vote'],
+    category: 'tools',
+    icon: '🗳️',
+    features: [
+      'Création de sondages en quelques clics',
+      'PIN organisateur sécurisé',
+      'Participation via QR code',
+      'Résultats en temps réel',
+    ],
+    useCases: [
+      'Voter en réunion ou en association',
+      'Lancer un sondage rapide',
+      'Collecter des avis anonymes',
+    ],
+  },
+  {
+    subdomain: 'reveil-intelligent.iahome.fr',
+    url: 'https://reveil-intelligent.iahome.fr',
+    title: 'Réveil Intelligent — Météo et jours fériés | IA Home',
+    description:
+      'Réveil mobile synchronisé avec votre compte IAHome : alarmes récurrentes, musiques de réveil, messages adaptés à la météo, aux jours fériés et aux vacances scolaires.',
+    keywords: ['réveil intelligent', 'alarme mobile', 'météo réveil', 'jours fériés', 'vacances scolaires'],
+    category: 'tools',
+    icon: '⏰',
+    features: [
+      'Alarmes multiples avec récurrence',
+      'Musiques de réveil et volume progressif',
+      'Messages contextuels météo et calendrier',
+      'Synchronisation avec votre compte IAHome',
+    ],
+    useCases: [
+      'Se réveiller avec la météo de votre ville',
+      'Adapter le message aux jours fériés',
+      'Retrouver vos alarmes sur tous vos appareils',
+    ],
+  },
+  {
     subdomain: 'prompt-generator.iahome.fr',
     url: 'https://prompt-generator.iahome.fr',
     title: 'Générateur de prompts - Prompt Engineering | IA Home',
@@ -363,6 +405,22 @@ export const subdomainsConfig: SubdomainInfo[] = [
 export const getSubdomainInfo = (subdomain: string): SubdomainInfo | undefined => {
   return subdomainsConfig.find(s => s.subdomain === subdomain);
 };
+
+/** Services mis en avant sur la page Découvrir (/marketing) */
+const FEATURED_SUBDOMAINS = [
+  'whisper.iahome.fr',
+  'librespeed.iahome.fr',
+  'pdf.iahome.fr',
+  'qrcodes.iahome.fr',
+  'vote.iahome.fr',
+  'reveil-intelligent.iahome.fr',
+] as const;
+
+export function getFeaturedSubdomains(): SubdomainInfo[] {
+  return FEATURED_SUBDOMAINS.map((sub) => subdomainsConfig.find((s) => s.subdomain === sub)).filter(
+    (s): s is SubdomainInfo => !!s
+  );
+}
 
 export const getSubdomainsByCategory = (category: SubdomainInfo['category']): SubdomainInfo[] => {
   return subdomainsConfig.filter(s => s.category === category);

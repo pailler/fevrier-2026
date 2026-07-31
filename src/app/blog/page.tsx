@@ -4,6 +4,7 @@ import { supabase } from "../../utils/supabaseClient";
 import { useSession, useUser } from "@supabase/auth-helpers-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { loginHrefFromWindow } from '@/utils/loginRedirect';
 import Breadcrumb from '../../components/Breadcrumb';
 import { getArticleImage } from '../../utils/articleImageGenerator';
 import {
@@ -159,7 +160,7 @@ export default function BlogPage() {
 
   const handleAddArticle = () => {
     if (!session) {
-      router.push('/login');
+      router.push(loginHrefFromWindow());
       return;
     }
     

@@ -114,7 +114,7 @@ export default function AdminSettings() {
       const activeUsers = users.filter(u => u.updated_at && new Date(u.updated_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length;
       
       // Séparer applications et essentiels
-      const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed'];
+      const essentialModules = ['metube', 'psitransfer', 'pdf', 'librespeed', 'vote', 'reveil-intelligent'];
       const premiumModules = ['qrcodes', 'home-assistant'];
       const applications = userApps.filter(app => !essentialModules.includes(app.module_id) && !premiumModules.includes(app.module_id));
       const essentiels = userApps.filter(app => essentialModules.includes(app.module_id));
@@ -460,7 +460,7 @@ export default function AdminSettings() {
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Tokens totaux</p>
+              <p className="text-sm font-medium text-gray-600">Crédits totaux</p>
               <p className="text-2xl font-bold text-gray-900">{stats.totalTokens.toLocaleString()}</p>
               <p className="text-xs text-gray-500">{stats.tokenStats.tokensAvailable.toLocaleString()} disponibles</p>
             </div>
@@ -475,7 +475,7 @@ export default function AdminSettings() {
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Tokens utilisés</p>
+              <p className="text-sm font-medium text-gray-600">Crédits utilisés</p>
               <p className="text-2xl font-bold text-gray-900">{stats.tokenStats.tokensUsed.toLocaleString()}</p>
               <p className="text-xs text-gray-500">{stats.tokenStats.averageTokensPerUser.toFixed(0)} par utilisateur</p>
             </div>
@@ -565,7 +565,7 @@ export default function AdminSettings() {
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Tokens par utilisateur</span>
+              <span className="text-sm text-gray-600">Crédits par utilisateur</span>
               <span className="text-sm font-medium text-gray-900">
                 {stats.tokenStats.averageTokensPerUser.toFixed(0)}
               </span>
@@ -629,22 +629,22 @@ export default function AdminSettings() {
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Statistiques tokens</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Statistiques crédits</h3>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Tokens totaux</span>
+              <span className="text-sm text-gray-600">Crédits totaux</span>
               <span className="text-sm font-medium text-gray-900">
                 {stats.tokenStats.totalTokens.toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Tokens utilisés</span>
+              <span className="text-sm text-gray-600">Crédits utilisés</span>
               <span className="text-sm font-medium text-gray-900">
                 {stats.tokenStats.tokensUsed.toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Tokens disponibles</span>
+              <span className="text-sm text-gray-600">Crédits disponibles</span>
               <span className="text-sm font-medium text-gray-900">
                 {stats.tokenStats.tokensAvailable.toLocaleString()}
               </span>

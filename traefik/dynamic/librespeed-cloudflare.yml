@@ -22,10 +22,10 @@ http:
     librespeed-direct:
       loadBalancer:
         servers:
-          - url: "http://librespeed-auth:7006"
+          - url: "http://librespeed:80"
 
     # Service principal pour LibreSpeed - Service d'authentification
     librespeed-auth-service:
       loadBalancer:
         servers:
-          - url: "http://librespeed-auth:7006"
+          - url: "http://librespeed:80"

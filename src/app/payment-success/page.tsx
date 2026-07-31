@@ -114,7 +114,7 @@ export default function PaymentSuccessPage() {
           setPaidAmountEuros(data.amount_total);
         }
         if (data.action === 'tokens_credited') {
-          console.log('✅ Tokens crédités via vérification manuelle:', data);
+          console.log('✅ Crédits ajoutés via vérification manuelle:', data);
         }
       } else {
         setVerificationStatus('failed');
@@ -142,7 +142,7 @@ export default function PaymentSuccessPage() {
                   ? 'Merci pour votre paiement. Nous vous recontactons rapidement pour la suite de votre projet de développement.'
                   : packageInfo?.isProductOnly || isProductOnlyFlow
                     ? 'Merci pour votre paiement. Nous vous recontactons rapidement.'
-                    : 'Merci pour votre achat. Vos tokens ont été crédités sur votre compte.'}
+                    : 'Merci pour votre achat. Vos crédits ont été ajoutés sur votre compte.'}
             </p>
 
             {verificationStatus === 'checking' && (
@@ -162,7 +162,7 @@ export default function PaymentSuccessPage() {
                       ? '✅ Paiement vérifié. Votre prestation est bien enregistrée.'
                       : packageInfo?.isProductOnly || isProductOnlyFlow
                         ? '✅ Paiement vérifié. Votre commande est bien enregistrée.'
-                        : '✅ Paiement vérifié et tokens crédités avec succès !'}
+                        : '✅ Paiement vérifié et crédits ajoutés avec succès !'}
                 </p>
               </div>
             )}
@@ -187,7 +187,7 @@ export default function PaymentSuccessPage() {
                 ) : (
                   <div>
                     <p className="text-yellow-800 mb-2">
-                      La vérification automatique a échoué. Les tokens seront crédités via le webhook.
+                      La vérification automatique a échoué. Les crédits seront ajoutés via le webhook.
                     </p>
                     <button
                       onClick={() => verifySession(sessionId)}
@@ -214,16 +214,16 @@ export default function PaymentSuccessPage() {
                   </p>
                   {!packageInfo.isProductOnly && (
                     <p>
-                      🪙 Tokens {packageInfo.type.includes('Abonnement') ? 'par mois' : 'crédités'} :{' '}
+                      🪙 Crédits {packageInfo.type.includes('Abonnement') ? 'par mois' : 'ajoutés'} :{' '}
                       {packageInfo.tokens}
                     </p>
                   )}
                   {packageInfo.isProductOnly && (
-                    <p className="text-sm">Aucun crédit de jetons sur cet achat (prestation / matériel).</p>
+                    <p className="text-sm">Aucun crédit sur cet achat (prestation / matériel).</p>
                   )}
                   {packageInfo.type.includes('Abonnement') && (
                     <p className="text-sm text-green-600 mt-2">
-                      ✓ Votre abonnement est actif. Les tokens seront renouvelés automatiquement.
+                      ✓ Votre abonnement est actif. Les crédits seront renouvelés automatiquement.
                     </p>
                   )}
                 </div>
@@ -232,10 +232,10 @@ export default function PaymentSuccessPage() {
 
             <div className="space-y-4">
               <Link
-                href="/account"
+                href="/mes-credits"
                 className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
               >
-                Voir mes tokens
+                Voir mes crédits
               </Link>
               <div className="text-sm text-gray-500">
                 <Link href="/pricing2" className="text-blue-600 hover:underline">

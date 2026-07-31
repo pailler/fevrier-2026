@@ -3,6 +3,7 @@ import type { CardInteractiveProps, CardModuleData } from '@/types/cardModule';
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { loginHrefFromWindow } from '@/utils/loginRedirect';
 import { supabase } from '../../../utils/supabaseClient';
 import Breadcrumb from '../../../components/Breadcrumb';
 import Link from 'next/link';
@@ -54,7 +55,7 @@ export default function Hunyuan3DPage({ initialModule }: CardInteractiveProps) {
     }
 
     try {
-      // Générer un token d'accès (décompte tokens inclus)
+      // Générer un token d'accès (décompte crédits inclus)
       const response = await fetch('/api/generate-access-token', {
         method: 'POST',
         headers: {
@@ -219,7 +220,7 @@ export default function Hunyuan3DPage({ initialModule }: CardInteractiveProps) {
 
   const handleActivate = async (card: CardModuleData) => {
     if (!session?.user?.id) {
-      router.push('/login');
+      router.push(loginHrefFromWindow());
       return;
     }
 
@@ -261,13 +262,13 @@ export default function Hunyuan3DPage({ initialModule }: CardInteractiveProps) {
 
   const handleAccessClick = async (card: CardModuleData) => {
     if (!session?.user?.id) {
-      router.push('/login');
+      router.push(loginHrefFromWindow());
       return;
     }
 
     if (card?.url) {
       try {
-        // Générer un token d'accès (décompte tokens inclus)
+        // Générer un token d'accès (décompte crédits inclus)
         const response = await fetch('/api/generate-access-token', {
           method: 'POST',
           headers: {
@@ -488,7 +489,7 @@ export default function Hunyuan3DPage({ initialModule }: CardInteractiveProps) {
             <div className="space-y-6">
               {/* Boutons d'action */}
               <div className="space-y-4">
-                {/* Bouton d'accès avec tokens */}
+                {/* Bouton d'accès avec crédits */}
                 <div className="w-3/4 mx-auto">
                   <ModuleAccessButton
                     moduleId={card?.id || 'hunyuan3d'}
@@ -608,7 +609,7 @@ export default function Hunyuan3DPage({ initialModule }: CardInteractiveProps) {
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à Hunyuan 3D</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Accédez à Hunyuan 3D avec 100 tokens. L'accès est immédiat, le service est accessible depuis vos applications.
+                          Accédez à Hunyuan 3D avec 100 crédits. L'accès est immédiat, le service est accessible depuis vos applications.
                         </p>
                       </div>
                     </div>
@@ -718,7 +719,7 @@ export default function Hunyuan3DPage({ initialModule }: CardInteractiveProps) {
                         </tr>
                         <tr className="bg-white">
                           <td className="border border-gray-300 p-4 font-semibold">Coût</td>
-                          <td className="border border-gray-300 p-4 text-center">100 tokens</td>
+                          <td className="border border-gray-300 p-4 text-center">100 crédits</td>
                           <td className="border border-gray-300 p-4 text-center">Logiciels payants</td>
                         </tr>
                       </tbody>
@@ -744,14 +745,14 @@ export default function Hunyuan3DPage({ initialModule }: CardInteractiveProps) {
                   <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Comment générer un modèle 3D avec Hunyuan 3D ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Pour générer un modèle 3D avec Hunyuan 3D, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface, uploadez une image 2D, et l'IA génère automatiquement un modèle 3D détaillé avec textures et géométries précises. Vous pouvez ensuite exporter le modèle dans les formats standards (OBJ, STL, PLY).
+                      Pour générer un modèle 3D avec Hunyuan 3D, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface, uploadez une image 2D, et l'IA génère automatiquement un modèle 3D détaillé avec textures et géométries précises. Vous pouvez ensuite exporter le modèle dans les formats standards (OBJ, STL, PLY).
                     </p>
                   </div>
                   
                   <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-2xl border-l-4 border-blue-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Hunyuan 3D est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'accès du service Hunyuan 3D coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles.
+                      L'accès du service Hunyuan 3D coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles.
                     </p>
                   </div>
                   
@@ -974,7 +975,7 @@ export default function Hunyuan3DPage({ initialModule }: CardInteractiveProps) {
                 </div>
                 <div>
                   <h5 className="font-semibold text-gray-900">Prix</h5>
-                  <p className="text-gray-600 text-sm">100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez</p>
+                  <p className="text-gray-600 text-sm">100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez</p>
                 </div>
               </div>
               

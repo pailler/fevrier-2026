@@ -30,7 +30,7 @@ http:
     metube-direct:
       loadBalancer:
         servers:
-          - url: "http://metube:80"
+          - url: "http://metube:8081"
 
     # Service principal pour MeTube
     metube-service:

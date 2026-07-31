@@ -15,7 +15,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       "name": "Services de l'Administration - IA Home",
       "description": "Portail centralisé pour accéder rapidement aux principaux services de l'administration française : CAF, Sécurité Sociale, permis de conduire, aides sociales, scolarité, études, retraites, famille, handicap, impôts. Accès simplifié aux démarches en ligne.",
       "applicationCategory": "WebApplication",
-      "priceTokens": 10,
+      "priceTokens": 0,
       "features": [
         "Accès centralisé aux services administratifs",
         "Navigation par catégories",
@@ -33,7 +33,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Comment accéder aux Services de l'Administration ?",
-        "answer": "Pour accéder aux Services de l'Administration, accédez directement au service avec 10 tokens. L'accès est immédiat, le portail est accessible depuis vos applications. Vous pourrez alors naviguer par catégories ou utiliser la recherche pour trouver rapidement le service administratif dont vous avez besoin."
+        "answer": "Pour accéder aux Services de l'Administration, connectez-vous à IAHome puis ouvrez le portail en mode connecté. L'accès est gratuit et illimité. Vous pourrez naviguer par catégories ou utiliser la recherche pour trouver rapidement le service administratif dont vous avez besoin."
       },
       {
         "question": "Quels services administratifs sont disponibles ?",
@@ -41,7 +41,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Les Services de l'Administration sont-ils gratuits ?",
-        "answer": "L'accès du portail Services de l'Administration coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez accéder à tous les liens et services sans frais supplémentaires. Les liens pointent vers les sites officiels des administrations françaises."
+        "answer": "L'accès au portail Services de l'Administration est gratuit et illimité pour les utilisateurs connectés (mode connecté IAHome). Vous pouvez accéder à tous les liens et services sans frais. Les liens pointent vers les sites officiels des administrations françaises."
       },
       {
         "question": "Puis-je accéder aux applications mobiles des administrations ?",
@@ -82,7 +82,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Comment utiliser Animagine XL ?",
-        "answer": "Pour utiliser Animagine XL, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via animagine-xl.iahome.fr. Utilisez la structure de prompt recommandée (1girl/1boy, nom du personnage, tags descriptifs, tags de qualité) et générez vos images d'anime de haute qualité."
+        "answer": "Pour utiliser Animagine XL, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via animagine-xl.iahome.fr. Utilisez la structure de prompt recommandée (1girl/1boy, nom du personnage, tags descriptifs, tags de qualité) et générez vos images d'anime de haute qualité."
       },
       {
         "question": "Quelle est la qualité des images générées par Animagine XL ?",
@@ -90,7 +90,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Animagine XL est-il gratuit ?",
-        "answer": "L'accès d'Animagine XL coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : génération d'anime de haute qualité, connaissance de 5000+ personnages, pas de LoRA requis pour les personnages connus, et génération optimisée."
+        "answer": "L'accès d'Animagine XL coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : génération d'anime de haute qualité, connaissance de 5000+ personnages, pas de LoRA requis pour les personnages connus, et génération optimisée."
       },
       {
         "question": "Dois-je utiliser des LoRAs avec Animagine XL ?",
@@ -208,7 +208,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       "name": "Apprendre le Code aux Enfants - IA Home",
       "description": "Application éducative interactive pour apprendre la programmation aux enfants de 6 à 14 ans, avec une progression par âge. Exercices progressifs sur les variables, boucles, conditions, logique, fonctions, tableaux et objets. Interface ludique et colorée.",
       "applicationCategory": "EducationalApplication",
-      "priceTokens": 10,
+      "priceTokens": 0,
       "features": [
         "35 exercices progressifs",
         "Apprentissage des variables",
@@ -241,7 +241,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Combien coûte l'application ?",
-        "answer": "L'accès d'Apprendre le Code aux Enfants coûte 10 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiate, l'application est accessible depuis vos applications."
+        "answer": "L'accès à Apprendre le Code aux Enfants est gratuit et illimité pour les utilisateurs connectés (mode connecté IAHome). Utilisez l'application aussi longtemps que vous souhaitez."
       },
       {
         "question": "L'application peut-elle être utilisée à l'école ?",
@@ -376,7 +376,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Home Assistant est-il gratuit ?",
-        "answer": "Oui, Home Assistant est entièrement gratuit et open-source. Il n'y a aucun frais d'installation, aucun abonnement, et aucun coût caché. Vous avez juste besoin d'un Raspberry Pi ou d'un ordinateur pour l'héberger. Notre manuel et nos codes sont également fournis gratuitement après accès avec 100 tokens."
+        "answer": "Oui, Home Assistant est entièrement gratuit et open-source. Il n'y a aucun frais d'installation, aucun abonnement, et aucun coût caché. Vous avez juste besoin d'un Raspberry Pi ou d'un ordinateur pour l'héberger. Notre manuel et nos codes sont également fournis gratuitement après accès avec 100 crédits."
       },
       {
         "question": "Comment installer Home Assistant ?",
@@ -425,11 +425,11 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Comment générer un modèle 3D avec Hunyuan 3D ?",
-        "answer": "Pour générer un modèle 3D avec Hunyuan 3D, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface, uploadez une image 2D, et l'IA génère automatiquement un modèle 3D détaillé avec textures et géométries précises. Vous pouvez ensuite exporter le modèle dans les formats standards (OBJ, STL, PLY)."
+        "answer": "Pour générer un modèle 3D avec Hunyuan 3D, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface, uploadez une image 2D, et l'IA génère automatiquement un modèle 3D détaillé avec textures et géométries précises. Vous pouvez ensuite exporter le modèle dans les formats standards (OBJ, STL, PLY)."
       },
       {
         "question": "Hunyuan 3D est-il gratuit ?",
-        "answer": "L'accès du service Hunyuan 3D coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles."
+        "answer": "L'accès du service Hunyuan 3D coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez générer des modèles 3D. Il n'y a pas de frais supplémentaires pour la génération ou l'export des modèles."
       },
       {
         "question": "Quels formats d'export sont supportés par Hunyuan 3D ?",
@@ -455,7 +455,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       "name": "LibreSpeed - IA Home",
       "description": "Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement, upload et latence avec LibreSpeed. Test gratuit, open-source, sans publicité et respectueux de la vie privée.",
       "applicationCategory": "WebApplication",
-      "priceTokens": 10,
+      "priceTokens": 0,
       "features": [
         "Test de vitesse internet précis",
         "Mesure du débit download et upload",
@@ -474,11 +474,11 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Comment tester ma vitesse internet avec LibreSpeed ?",
-        "answer": "Pour tester votre vitesse internet avec LibreSpeed, accédez directement au service avec 10 tokens. L'accès est immédiat, lancez le test depuis l'interface. LibreSpeed mesurera automatiquement votre débit de téléchargement (download), votre débit d'upload, et votre latence (ping) en quelques secondes."
+        "answer": "Pour tester votre vitesse internet avec LibreSpeed, connectez-vous à IAHome puis ouvrez le service en mode connecté. L'accès est gratuit et illimité. LibreSpeed mesurera automatiquement votre débit de téléchargement (download), votre débit d'upload, et votre latence (ping) en quelques secondes."
       },
       {
         "question": "LibreSpeed est-il gratuit ?",
-        "answer": "LibreSpeed est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez effectuer des tests de vitesse sans frais supplémentaires."
+        "answer": "LibreSpeed est un outil open-source et gratuit. Sur IAHome, l'accès est gratuit et illimité pour les utilisateurs connectés (mode connecté). Vous pouvez effectuer des tests de vitesse sans frais supplémentaires."
       },
       {
         "question": "Mes données sont-elles protégées avec LibreSpeed ?",
@@ -523,7 +523,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Comment utiliser Compte rendus IA ?",
-        "answer": "Pour utiliser Compte rendus IA, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via meeting-reports.iahome.fr. Enregistrez vos réunions en temps réel avec le microphone intégré, ou uploadez des fichiers audio existants (MP3, WAV, WebM). L'IA transcrit automatiquement l'audio avec Whisper, puis génère un résumé intelligent avec GPT incluant les points clés, les décisions prises et les actions à suivre. Vous pouvez ensuite télécharger le rapport en PDF ou Markdown."
+        "answer": "Pour utiliser Compte rendus IA, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via meeting-reports.iahome.fr. Enregistrez vos réunions en temps réel avec le microphone intégré, ou uploadez des fichiers audio existants (MP3, WAV, WebM). L'IA transcrit automatiquement l'audio avec Whisper, puis génère un résumé intelligent avec GPT incluant les points clés, les décisions prises et les actions à suivre. Vous pouvez ensuite télécharger le rapport en PDF ou Markdown."
       },
       {
         "question": "Quelle est la précision de la transcription de Compte rendus IA ?",
@@ -531,7 +531,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Compte rendus IA est-il gratuit ?",
-        "answer": "L'accès de Compte rendus IA coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : enregistrement audio, transcription automatique, résumé intelligent, identification des intervenants, extraction des points clés, et export PDF/Markdown. Il n'y a pas de frais supplémentaires pour le traitement des réunions."
+        "answer": "L'accès de Compte rendus IA coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : enregistrement audio, transcription automatique, résumé intelligent, identification des intervenants, extraction des points clés, et export PDF/Markdown. Il n'y a pas de frais supplémentaires pour le traitement des réunions."
       },
       {
         "question": "Quels formats audio sont supportés par Compte rendus IA ?",
@@ -572,11 +572,11 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Comment télécharger une vidéo YouTube avec MeTube ?",
-        "answer": "Pour télécharger une vidéo YouTube avec MeTube, accédez directement au service avec 10 tokens. L'accès est immédiat, collez l'URL de la vidéo YouTube dans l'interface MeTube, choisissez la qualité et le format souhaités, puis lancez le téléchargement. La vidéo sera téléchargée sur vos serveurs de manière privée."
+        "answer": "Pour télécharger une vidéo YouTube avec MeTube, accédez directement au service avec 10 crédits. L'accès est immédiat, collez l'URL de la vidéo YouTube dans l'interface MeTube, choisissez la qualité et le format souhaités, puis lancez le téléchargement. La vidéo sera téléchargée sur vos serveurs de manière privée."
       },
       {
         "question": "MeTube est-il gratuit ?",
-        "answer": "MeTube est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez télécharger des vidéos YouTube sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking."
+        "answer": "MeTube est un outil open-source et gratuit. L'accès du service coûte 10 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez télécharger des vidéos YouTube sans frais supplémentaires. Il n'y a aucune publicité et aucun tracking."
       },
       {
         "question": "Puis-je télécharger des playlists YouTube avec MeTube ?",
@@ -603,6 +603,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       "name": "IA PDF - IA Home",
       "description": "Outil IA pour analyser, résumer et interroger des documents PDF. Analysez vos PDF avec une IA : résumés automatiques, questions-réponses, compréhension rapide de documents longs.",
       "applicationCategory": "BusinessApplication",
+      "priceTokens": 0,
       "features": [
         "Analyser un PDF avec une IA",
         "Résumer un PDF automatiquement",
@@ -631,7 +632,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Est-ce gratuit ?",
-        "answer": "L'IA PDF de IA Home est accessible avec un système de crédits. 10 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. Consultez la page d'accès pour connaître les détails de tarification et les options disponibles."
+        "answer": "L'IA PDF de IA Home est accessible gratuitement et sans limite pour les utilisateurs connectés (mode connecté IAHome). Utilisez l'application aussi longtemps que vous souhaitez."
       },
       {
         "question": "Quelle IA pour comprendre un document PDF ?",
@@ -718,7 +719,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Comment utiliser le Générateur de prompts IA ?",
-        "answer": "Pour utiliser le Générateur de prompts IA, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface, remplissez le formulaire intuitif avec vos paramètres (type de tâche, technique, langue, ton, créativité, longueur), et l'IA génère automatiquement un prompt optimisé. Vous pouvez ensuite copier le prompt en un clic et l'utiliser avec ChatGPT, Claude, Gemini ou tout autre modèle de langage."
+        "answer": "Pour utiliser le Générateur de prompts IA, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface, remplissez le formulaire intuitif avec vos paramètres (type de tâche, technique, langue, ton, créativité, longueur), et l'IA génère automatiquement un prompt optimisé. Vous pouvez ensuite copier le prompt en un clic et l'utiliser avec ChatGPT, Claude, Gemini ou tout autre modèle de langage."
       },
       {
         "question": "Quelles techniques de prompting sont supportées ?",
@@ -726,7 +727,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Le Générateur de prompts IA est-il gratuit ?",
-        "answer": "L'accès du Générateur de prompts IA coûte 100 tokens par accès. L'accès est immédiat, vous avez un accès illimité pendant 90 jours. Il n'y a pas de frais supplémentaires pour la génération de prompts."
+        "answer": "L'accès du Générateur de prompts IA coûte 100 crédits par accès. L'accès est immédiat, vous avez un accès illimité pendant 90 jours. Il n'y a pas de frais supplémentaires pour la génération de prompts."
       },
       {
         "question": "Puis-je créer des prompts marketing avec le Générateur de prompts IA ?",
@@ -816,11 +817,11 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Comment créer un QR code dynamique ?",
-        "answer": "Pour créer un QR code dynamique, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface de génération, entrez l'URL de destination, personnalisez les couleurs et le logo si souhaité, puis générez le code. Vous recevrez un token de gestion et une URL de gestion pour modifier le QR code ultérieurement."
+        "answer": "Pour créer un QR code dynamique, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface de génération, entrez l'URL de destination, personnalisez les couleurs et le logo si souhaité, puis générez le code. Vous recevrez un code de gestion et une URL de gestion pour modifier le QR code ultérieurement."
       },
       {
         "question": "Puis-je modifier un QR code après l'avoir créé ?",
-        "answer": "Oui, avec les QR codes dynamiques, vous pouvez modifier l'URL de destination, les couleurs, le logo et d'autres paramètres à tout moment après la création. Utilisez le token de gestion et l'URL de gestion fournis lors de la création pour accéder à la fonction de modification. Les modifications sont appliquées instantanément."
+        "answer": "Oui, avec les QR codes dynamiques, vous pouvez modifier l'URL de destination, les couleurs, le logo et d'autres paramètres à tout moment après la création. Utilisez le code de gestion et l'URL de gestion fournis lors de la création pour accéder à la fonction de modification. Les modifications sont appliquées instantanément."
       },
       {
         "question": "Quelle est la différence entre un QR code statique et un QR code dynamique ?",
@@ -828,7 +829,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Les QR codes dynamiques sont-ils gratuits ?",
-        "answer": "L'accès du service QR codes dynamiques coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes."
+        "answer": "L'accès du service QR codes dynamiques coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes."
       },
       {
         "question": "Puis-je personnaliser l'apparence de mes QR codes ?",
@@ -866,7 +867,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Comment utiliser RuinedFooocus ?",
-        "answer": "Pour utiliser RuinedFooocus, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via ruinedfooocus.iahome.fr. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis."
+        "answer": "Pour utiliser RuinedFooocus, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via ruinedfooocus.iahome.fr. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis."
       },
       {
         "question": "Quelle est la différence entre RuinedFooocus et Stable Diffusion ?",
@@ -874,7 +875,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "RuinedFooocus est-il gratuit ?",
-        "answer": "L'accès de RuinedFooocus coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, support multi-plateformes, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images."
+        "answer": "L'accès de RuinedFooocus coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : génération text-to-image, contrôle artistique avancé, résolution jusqu'à 1024x1024, support multi-plateformes, et interface intuitive. Il n'y a pas de frais supplémentaires pour la génération d'images."
       },
       {
         "question": "Quelles plateformes sont supportées par RuinedFooocus ?",
@@ -991,6 +992,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
     ]
   },
   "vote": null,
+  "reveil-intelligent": null,
   "whisper": {
     "product": {
       "slug": "whisper",

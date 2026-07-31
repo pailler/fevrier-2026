@@ -1,0 +1,26 @@
+# Configuration TTS (Synthèse vocale XTTS v2) pour Cloudflare SSL
+# Note: SSL géré par Cloudflare, pas besoin de Let's Encrypt
+http:
+  routers:
+    tts-main:
+      rule: "Host(`tts.iahome.fr`)"
+      entryPoints: ["web"]
+      service: tts-service
+      middlewares: ["security-headers@file", "compress@file", "tts-buffer@file"]
+      priority: 10
+
+  middlewares:
+    tts-buffer:
+      buffering:
+        maxRequestBodyBytes: 52428800   # 50 MB
+        maxResponseBodyBytes: 52428800  # 50 MB
+        memRequestBodyBytes: 10485760   # 10 MB en mémoire
+        memResponseBodyBytes: 10485760  # 10 MB en mémoire
+        retryExpression: "IsNetworkError() && Attempts() < 2"
+
+  services:
+    tts-service:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.1.150:8101"
+        passHostHeader: true

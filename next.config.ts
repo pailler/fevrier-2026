@@ -410,7 +410,8 @@ const nextConfig: NextConfig = {
       { source: '/photo-vivante', destination: '/card/photo-vivante', permanent: true },
       { source: '/resas-system', destination: '/card/resas-system', permanent: true },
       { source: '/sentinelle-numerique', destination: '/card/sentinelle-numerique', permanent: true },
-      { source: '/vote', destination: '/card/vote', permanent: true },
+      { source: '/my-tokens', destination: '/mes-credits', permanent: true },
+      { source: '/admin/tokens', destination: '/admin/credits', permanent: true },
     ];
   },
 

@@ -23,9 +23,9 @@ http:
         retryExpression: "IsNetworkError() && Attempts() < 2"
 
   services:
-    # Service pour Voice Isolation (Gradio sur port 8100)
+    # Service pour Voice Isolation (Gradio interne port 7860, conteneur voice-isolation-service)
     voice-isolation-service:
       loadBalancer:
         servers:
-          - url: "http://192.168.1.150:8100"
+          - url: "http://voice-isolation:7860"
         passHostHeader: true

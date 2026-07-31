@@ -37,7 +37,7 @@ export default function TokenBalance({ className = '', showIcon = true, linkToPr
         </span>
       )}
       {!loading && !error && tokens === 0 && (
-        <span className="text-yellow-500 text-xs" title="Aucun token disponible">
+        <span className="text-yellow-500 text-xs" title="Aucun crédit disponible">
           ⚠️
         </span>
       )}
@@ -49,7 +49,7 @@ export default function TokenBalance({ className = '', showIcon = true, linkToPr
       <Link
         href="/pricing2"
         className={`inline-flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer ${className}`}
-        title="Acheter des tokens"
+        title="Acheter des crédits"
       >
         {content}
       </Link>

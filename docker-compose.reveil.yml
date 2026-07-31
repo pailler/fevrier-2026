@@ -1,0 +1,24 @@
+# Réveil Intelligent — lancer depuis la racine du dépôt iahome
+#   docker compose -f docker-compose.reveil.yml up -d --build
+
+services:
+  reveil:
+    build:
+      context: ./reveil
+      dockerfile: Dockerfile
+    image: iahome-reveil-intelligent:latest
+    container_name: iahome-reveil
+    restart: unless-stopped
+    ports:
+      - "7891:7891"
+    environment:
+      NODE_ENV: production
+      PORT: "7891"
+      IAHOME_INTERNAL_URL: http://iahome-app:3000
+      NEXT_PUBLIC_IAHOME_URL: https://iahome.fr
+    networks:
+      - iahome-network
+
+networks:
+  iahome-network:
+    external: true

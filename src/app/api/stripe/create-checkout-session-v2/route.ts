@@ -10,7 +10,7 @@ const PACKAGES_V2 = {
     testPrice: 50, // 0,50€ en centimes pour les tests
     tokens: 3000,
     pricePerToken: 0.0033,
-    description: '3000 tokens/mois - Accès complet à toutes les applications',
+    description: '3000 crédits/mois - Accès complet à toutes les applications',
     mode: 'subscription' as const,
     interval: 'month' as const,
   },
@@ -21,7 +21,7 @@ const PACKAGES_V2 = {
     tokens: 3000, // tokens par mois
     totalTokens: 36000, // tokens pour l'année
     pricePerToken: 0.00275,
-    description: '3000 tokens/mois × 12 mois - 2 mois gratuits',
+    description: '3000 crédits/mois × 12 mois - 2 mois gratuits',
     mode: 'subscription' as const,
     interval: 'year' as const,
   },
@@ -31,7 +31,7 @@ const PACKAGES_V2 = {
     testPrice: 50, // 0,50€ en centimes pour les tests
     tokens: 3000,
     pricePerToken: 0.0066,
-    description: '3000 tokens - Achat unique sans engagement',
+    description: '3000 crédits - Achat unique sans engagement',
     mode: 'payment' as const,
   },
   photobooth_personalized: {
@@ -273,7 +273,7 @@ export async function POST(request: NextRequest) {
         payment_intent_data: {
           description:
             packageData.tokens > 0
-              ? `${packageData.name} - ${packageData.tokens} tokens`
+              ? `${packageData.name} - ${packageData.tokens} crédits`
               : packageData.name,
         },
       });

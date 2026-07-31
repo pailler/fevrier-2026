@@ -31,11 +31,11 @@ const STATIC_MODULES: Record<string, CardModuleData> = {
   librespeed: {
     id: 'librespeed',
     title: 'LibreSpeed',
-    subtitle: 'Test de vitesse internet complet - 10 tokens par accès',
+    subtitle: 'Test de vitesse internet complet — accès gratuit et illimité',
     description:
       'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision.',
     category: 'WEB TOOLS',
-    price: 10,
+    price: 0,
     image_url: '/images/librespeed.jpg',
   },
   metube: {
@@ -51,7 +51,7 @@ const STATIC_MODULES: Record<string, CardModuleData> = {
   psitransfer: {
     id: 'psitransfer',
     title: 'PsiTransfer',
-    subtitle: 'Transfert de fichiers sécurisé (10 tokens par accès)',
+    subtitle: 'Transfert de fichiers sécurisé (10 crédits par accès)',
     description:
       'Transfert de fichiers sécurisé et privé. Envoyez vos fichiers sans surveillance, sans publicité.',
     category: 'WEB TOOLS',

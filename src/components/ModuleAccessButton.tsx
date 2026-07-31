@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { loginUrlWithReturn } from '../utils/loginRedirect';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { loginHrefFromWindow, loginUrlWithReturn } from '../utils/loginRedirect';
 import Link from 'next/link';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import { useTokenContext } from '../contexts/TokenContext';
 import { getHunyuan3dAppUrl } from '../utils/hunyuan3dAppUrl';
 import { isBrowserLocalIahomeDev } from '../utils/isBrowserLocalIahomeDev';
+import { FREE_UNLIMITED_ACCESS_LABEL } from '../utils/tokenActionService';
 
 interface ModuleAccessButtonProps {
   moduleId: string;
@@ -35,6 +36,8 @@ export default function ModuleAccessButton({
   const { tokens, refreshTokens } = useTokenContext();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const loginHref = loginUrlWithReturn(pathname, searchParams);
 
   const resolveModuleUrl = () => {
     if (accessUrl) return accessUrl;
@@ -60,6 +63,7 @@ export default function ModuleAccessButton({
           'comfyui': 'http://localhost:8188',
           'photobooth': 'http://localhost:7885',
           'vote': 'http://localhost:7890',
+          'reveil-intelligent': 'http://localhost:7891',
         }
         : {
           'librespeed': 'https://librespeed.iahome.fr',
@@ -80,6 +84,7 @@ export default function ModuleAccessButton({
           'comfyui': 'https://comfyui.iahome.fr',
           'photobooth': 'https://photobooth.iahome.fr',
           'vote': 'https://vote.iahome.fr',
+          'reveil-intelligent': 'https://reveil-intelligent.iahome.fr',
         };
 
     if (urlMap[normalizedModuleId]) {
@@ -104,7 +109,7 @@ export default function ModuleAccessButton({
           loginUrlWithReturn(pathname || window.location.pathname, { toString: () => q })
         );
       } else {
-        router.push('/login');
+        router.push(loginHrefFromWindow());
       }
       return;
     }
@@ -114,7 +119,7 @@ export default function ModuleAccessButton({
       return;
     }
 
-    if (tokens === null || tokens < moduleCost) {
+    if (moduleCost > 0 && (tokens === null || tokens < moduleCost)) {
       setError(`Crédits insuffisants. Requis: ${moduleCost}, Disponible: ${tokens || 0}`);
       onAccessError?.(`Crédits insuffisants: ${tokens || 0}/${moduleCost}`);
       return;
@@ -181,9 +186,9 @@ export default function ModuleAccessButton({
     <div className={`flex flex-col items-center space-y-2 ${className}`}>
       <button
         onClick={handleAccess}
-        disabled={isLoading || !isAuthenticated || (tokens !== null && tokens < moduleCost)}
+        disabled={isLoading || !isAuthenticated || (moduleCost > 0 && tokens !== null && tokens < moduleCost)}
         className={`w-full font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 shadow-lg ${
-          isLoading || !isAuthenticated || (tokens !== null && tokens < moduleCost)
+          isLoading || !isAuthenticated || (moduleCost > 0 && tokens !== null && tokens < moduleCost)
             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
             : 'bg-[#16a34a] hover:bg-[#15803d] text-white hover:shadow-xl transform hover:-translate-y-1'
         }`}
@@ -201,7 +206,9 @@ export default function ModuleAccessButton({
               <line x1="15" y1="12" x2="3" y2="12" />
             </svg>
             <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">Accéder à {moduleName}</span>
-            <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">{moduleCost} crédits par accès</span>
+            <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">
+              {moduleCost === 0 ? FREE_UNLIMITED_ACCESS_LABEL : `${moduleCost} crédits par accès`}
+            </span>
           </>
         )}
       </button>
@@ -213,12 +220,12 @@ export default function ModuleAccessButton({
       )}
       
       {!isAuthenticated && (
-        <Link href="/login" className="text-blue-600 hover:text-blue-800 text-sm underline">
+        <Link href={loginHref} className="text-blue-600 hover:text-blue-800 text-sm underline">
           Connectez-vous pour accéder
         </Link>
       )}
       
-      {isAuthenticated && tokens !== null && tokens < moduleCost && (
+      {isAuthenticated && moduleCost > 0 && tokens !== null && tokens < moduleCost && (
         <div className="text-red-600 text-sm text-center max-w-xs">
           Crédits insuffisants ({tokens}/{moduleCost})
         </div>

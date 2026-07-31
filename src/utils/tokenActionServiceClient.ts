@@ -1,5 +1,4 @@
-import { TokenConsumptionResult, ModuleId } from './tokenActionService';
-
+import { TokenConsumptionResult, ModuleId, getTokenCostForModuleId } from './tokenActionService';
 type TokenHistoryEntry = Record<string, unknown>;
 
 export class TokenActionServiceClient {
@@ -19,13 +18,12 @@ export class TokenActionServiceClient {
     moduleTitle: string
   ): Promise<TokenConsumptionResult> {
     try {
-      const cost = this.getTokenCost(moduleId);
-      if (!cost) {
+      const cost = getTokenCostForModuleId(moduleId);
+      if (cost === 0) {
         return {
-          success: false,
+          success: true,
           tokensConsumed: 0,
           tokensRemaining: 0,
-          reason: `Module ${moduleId} non trouvé`
         };
       }
 
@@ -76,44 +74,8 @@ export class TokenActionServiceClient {
   }
 
   private getTokenCost(moduleId: ModuleId): number | null {
-    const costs: Record<ModuleId, number> = {
-      // Applications IA (100 tokens)
-      'whisper': 100,
-      'stablediffusion': 100,
-      'ruinedfooocus': 100,
-      'comfyui': 100,
-      'hunyuan3d': 100,
-      'prompt-generator': 100,
-      'ai-detector': 100,
-      'ia-generator': 100, // Alias pour ai-detector
-      'sentinelle-numerique': 10,
-      'photomaker': 100, // PhotoMaker -> 100 tokens
-      'photobooth': 100, // Photobooth -> 100 tokens
-      'animagine-xl': 100, // Animagine XL -> 100 tokens
-      'florence-2': 100, // Florence-2 -> 100 tokens
-      'birefnet': 100, // BiRefNet -> 100 tokens
-      'musetalk': 100, // MuseTalk
-      'photo-vivante': 100, // Photo Vivante
-      
-      // Applications essentielles (10 tokens)
-      'metube': 10,
-      'librespeed': 10,
-      'psitransfer': 10,
-      'pdf': 10,
-      'meeting-reports': 100,
-      'cogstudio': 10,
-      'code-learning': 10,
-      'apprendre-autrement': 10,
-      'administration': 10,
-      'vote': 10,
-
-      // Applications premium (100 tokens)
-      'qrcodes': 100,
-      'home-assistant': 100,
-      'voice-isolation': 100
-    };
-
-    return costs[moduleId] || null;
+    const cost = getTokenCostForModuleId(moduleId);
+    return cost >= 0 ? cost : null;
   }
 
   // Méthode pour récupérer le solde de tokens d'un utilisateur

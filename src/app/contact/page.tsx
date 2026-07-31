@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { supabase } from '../../utils/supabaseClient';
 import { Mail, Phone, MapPin, Facebook, Youtube, Send, CheckCircle, AlertCircle } from 'lucide-react';
 
@@ -10,7 +11,10 @@ interface ContactForm {
   message: string;
 }
 
-export default function ContactPage() {
+function ContactPageContent() {
+  const searchParams = useSearchParams();
+  const requestType = searchParams.get('type');
+  const applicationName = searchParams.get('app');
   const [formData, setFormData] = useState<ContactForm>({
     name: '',
     email: '',
@@ -20,6 +24,28 @@ export default function ContactPage() {
   const [isSubmitting, setSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [submitMessage, setSubmitMessage] = useState('');
+
+  useEffect(() => {
+    if (requestType === 'project') {
+      setFormData(prev => ({
+        ...prev,
+        subject: 'project',
+        message: applicationName
+          ? `Bonjour, je souhaite vous soumettre un projet autour de ${applicationName} :\n\n`
+          : 'Bonjour, je souhaite vous soumettre le projet suivant :\n\n'
+      }));
+    }
+
+    if (requestType === 'help') {
+      setFormData(prev => ({
+        ...prev,
+        subject: 'help',
+        message: applicationName
+          ? `Bonjour, je souhaite être accompagné(e) pour utiliser ${applicationName} :\n\n`
+          : 'Bonjour, je souhaite être accompagné(e) pour utiliser l’application suivante :\n\n'
+      }));
+    }
+  }, [applicationName, requestType]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -238,6 +264,8 @@ export default function ContactPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
                 >
                   <option value="">Sélectionnez un sujet</option>
+                  <option value="project">Soumettre un projet</option>
+                  <option value="help">Aide à l&apos;utilisation d&apos;une application</option>
                   <option value="support">Support technique</option>
                   <option value="feature">Demande de fonctionnalité</option>
                   <option value="bug">Signalement de bug</option>
@@ -308,5 +336,13 @@ export default function ContactPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50" />}>
+      <ContactPageContent />
+    </Suspense>
   );
 }

@@ -6,7 +6,7 @@ export const metadata: Metadata = buildPageSeo({
   path: '/card/photo-vivante',
   title: 'Photo Vivante — animation photo realiste',
   description:
-    'Photo Vivante sur IAHome : animez une photo fixe avec un rendu naturel, acces par credits et ouverture securisee par token.',
+    'Photo Vivante sur IAHome : animez une photo fixe avec un rendu naturel, accès par crédits et ouverture sécurisée.',
   keywords: [
     'Photo Vivante IAHome',
     'animation photo IA',

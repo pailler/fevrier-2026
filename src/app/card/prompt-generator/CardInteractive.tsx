@@ -16,7 +16,7 @@ export default function PromptGeneratorCardPage({ initialModule }: CardInteracti
   const [checkingActivation, setCheckingActivation] = useState(false);
 
   const moduleId = 'prompt-generator';
-  const isFreeModule = false; // Module payant : 100 tokens par accès
+  const isFreeModule = false; // Module payant : 100 crédits par accès
 
   // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
@@ -294,7 +294,7 @@ export default function PromptGeneratorCardPage({ initialModule }: CardInteracti
                 <div className="bg-gradient-to-r from-pink-50 to-orange-50 p-6 rounded-2xl border-l-4 border-pink-500">
                   <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser le Générateur de prompts IA ?</h3>
                   <p className="text-gray-700 leading-relaxed">
-                    Pour utiliser le Générateur de prompts IA, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface, remplissez le formulaire intuitif avec vos paramètres (type de tâche, technique, langue, ton, créativité, longueur), et l'IA génère automatiquement un prompt optimisé. Vous pouvez ensuite copier le prompt en un clic et l'utiliser avec ChatGPT, Claude, Gemini ou tout autre modèle de langage.
+                    Pour utiliser le Générateur de prompts IA, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface, remplissez le formulaire intuitif avec vos paramètres (type de tâche, technique, langue, ton, créativité, longueur), et l'IA génère automatiquement un prompt optimisé. Vous pouvez ensuite copier le prompt en un clic et l'utiliser avec ChatGPT, Claude, Gemini ou tout autre modèle de langage.
                   </p>
                 </div>
                 
@@ -308,7 +308,7 @@ export default function PromptGeneratorCardPage({ initialModule }: CardInteracti
                 <div className="bg-gradient-to-r from-yellow-50 to-green-50 p-6 rounded-2xl border-l-4 border-yellow-500">
                   <h3 className="text-xl font-bold text-gray-900 mb-3">Le Générateur de prompts IA est-il gratuit ?</h3>
                   <p className="text-gray-700 leading-relaxed">
-                    L'accès du Générateur de prompts IA coûte 100 tokens par accès. L'accès est immédiat, vous avez un accès illimité pendant 90 jours. Il n'y a pas de frais supplémentaires pour la génération de prompts.
+                    L'accès du Générateur de prompts IA coûte 100 crédits par accès. L'accès est immédiat, vous avez un accès illimité pendant 90 jours. Il n'y a pas de frais supplémentaires pour la génération de prompts.
                   </p>
                 </div>
                 
@@ -354,7 +354,7 @@ export default function PromptGeneratorCardPage({ initialModule }: CardInteracti
                     <li>Personnalisation : Ton, créativité, longueur de réponse</li>
                     <li>Génération avec OpenAI GPT-4o-mini</li>
                     <li>Copie en un clic du prompt généré</li>
-                    <li>100 tokens par accès</li>
+                    <li>100 crédits par accès</li>
                   </ul>
                 </div>
               </div>
@@ -508,7 +508,7 @@ export default function PromptGeneratorCardPage({ initialModule }: CardInteracti
                           <line x1="15" y1="12" x2="3" y2="12" />
                         </svg>
                         <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accédez à Générateur de prompts' : 'Connectez-vous pour accéder'}</span>
-                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">100 tokens par accès</span>
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">100 crédits par accès</span>
                       </>
                     )}
                   </button>

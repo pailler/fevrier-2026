@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { TokenActionServiceClient } from '../utils/tokenActionServiceClient';
 import { useTokenContext } from '../contexts/TokenContext';
 import { getHunyuan3dAppUrl } from '../utils/hunyuan3dAppUrl';
-import { getTokenCostForModuleId } from '../utils/tokenActionService';
+import { getTokenCostForModuleId, getModuleAccessCostLabel, FREE_UNLIMITED_ACCESS_LABEL } from '../utils/tokenActionService';
 
 interface EssentialAccessButtonProps {
   user?: any;
@@ -56,6 +56,12 @@ export default function EssentialAccessButton({
     'photo-vivante': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
       ? 'http://localhost:7887'
       : 'https://photo-vivante.iahome.fr',
+    'vote': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+      ? 'http://localhost:7890'
+      : 'https://vote.iahome.fr',
+    'reveil-intelligent': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+      ? 'http://localhost:7891'
+      : 'https://reveil-intelligent.iahome.fr',
     // Détecteur de Contenu IA : sur le domaine principal
     'ai-detector': (typeof window !== 'undefined' && window.location.hostname === 'localhost')
       ? 'http://localhost:3000/ai-detector'
@@ -79,28 +85,29 @@ export default function EssentialAccessButton({
     try {
       console.log(`🪙 ${moduleTitle}: Vérification et consommation des tokens pour:`, user.email);
       
-      // Utiliser le service pour la consommation côté serveur
-      const tokenService = TokenActionServiceClient.getInstance();
-      const consumeResult = await tokenService.checkAndConsumeTokens(
-        user.id,
-        moduleId as any,
-        'access',
-        moduleTitle
-      );
-      
-      if (!consumeResult.success) {
-        console.log(`🪙 ${moduleTitle}: Échec consommation tokens:`, consumeResult.reason);
-        const errorMessage = consumeResult.reason || 'Plus de crédits ? Rechargez';
-        setError(errorMessage);
-        onAccessDenied?.(errorMessage);
-        return;
+      const moduleCost = getTokenCostForModuleId(moduleId);
+      if (moduleCost > 0) {
+        const tokenService = TokenActionServiceClient.getInstance();
+        const consumeResult = await tokenService.checkAndConsumeTokens(
+          user.id,
+          moduleId as any,
+          'access',
+          moduleTitle
+        );
+        
+        if (!consumeResult.success) {
+          console.log(`🪙 ${moduleTitle}: Échec consommation tokens:`, consumeResult.reason);
+          const errorMessage = consumeResult.reason || 'Plus de crédits ? Rechargez';
+          setError(errorMessage);
+          onAccessDenied?.(errorMessage);
+          return;
+        }
+        
+        console.log(`🪙 ${moduleTitle}: Tokens consommés avec succès:`, consumeResult.tokensConsumed);
+        console.log(`🪙 ${moduleTitle}: Tokens restants:`, consumeResult.tokensRemaining);
+        
+        await refreshTokens();
       }
-      
-      console.log(`🪙 ${moduleTitle}: Tokens consommés avec succès:`, consumeResult.tokensConsumed);
-      console.log(`🪙 ${moduleTitle}: Tokens restants:`, consumeResult.tokensRemaining);
-      
-      // Mettre à jour le contexte côté client
-      await refreshTokens();
 
       // Obtenir l'URL du sous-domaine pour ce module
       const moduleUrl = moduleSubdomains[moduleId];
@@ -197,7 +204,8 @@ export default function EssentialAccessButton({
         ) : moduleId === 'administration' ? (
           <>
             <span>🏛️</span>
-            <span>Accéder aux services administratifs (10 crédits par accès)</span>
+            <span>Accéder aux services administratifs</span>
+            <span className="text-xs opacity-90">({FREE_UNLIMITED_ACCESS_LABEL})</span>
           </>
         ) : moduleId === 'apprendre-autrement' ? (
           <>
@@ -208,13 +216,31 @@ export default function EssentialAccessButton({
         ) : moduleId === 'code-learning' ? (
           <>
             <span>💻</span>
-            <span>Accéder à Apprendre le Code (10 crédits par accès)</span>
+            <span>Accéder à Apprendre le Code</span>
+            <span className="text-xs opacity-90">({FREE_UNLIMITED_ACCESS_LABEL})</span>
+          </>
+        ) : moduleId === 'reveil-intelligent' ? (
+          <>
+            <span>⏰</span>
+            <span>Accéder au Réveil Intelligent</span>
+            <span className="text-xs opacity-90">({FREE_UNLIMITED_ACCESS_LABEL})</span>
+          </>
+        ) : moduleId === 'vote' ? (
+          <>
+            <span>🗳️</span>
+            <span>Accéder au Vote en ligne (10 crédits par accès)</span>
+          </>
+        ) : getTokenCostForModuleId(moduleId) === 0 ? (
+          <>
+            <span>🔧</span>
+            <span>Accéder à {moduleTitle}</span>
+            <span className="text-xs opacity-90">({FREE_UNLIMITED_ACCESS_LABEL})</span>
           </>
         ) : (
           <>
             <span>🔧</span>
             <span>
-              Accéder à {moduleTitle} ({getTokenCostForModuleId(moduleId)} crédits par accès)
+              Accéder à {moduleTitle} ({getModuleAccessCostLabel(moduleId)})
             </span>
           </>
         )}

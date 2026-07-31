@@ -45,11 +45,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     try {
       const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
       if (numericPrice === 0 || numericPrice === null || numericPrice === undefined || isNaN(numericPrice)) return 'Gratuit';
-      return `${numericPrice} tokens`;
+      return `${numericPrice} crédits`;
     } catch (error) {
       const numericPrice = typeof price === 'string' ? parseFloat(price) : price;
       if (numericPrice === 0 || numericPrice === null || numericPrice === undefined || isNaN(numericPrice)) return 'Gratuit';
-      return `${numericPrice} tokens`;
+      return `${numericPrice} crédits`;
     }
   };
 

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Breadcrumb from '../../../components/Breadcrumb';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
+import { FREE_UNLIMITED_ACCESS_LABEL } from '../../../utils/tokenActionService';
 
 export default function CodeLearningCardPage({ initialModule }: CardInteractiveProps) {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function CodeLearningCardPage({ initialModule }: CardInteractiveP
   const [checkingActivation, setCheckingActivation] = useState(false);
 
   const moduleId = 'code-learning';
-  const isFreeModule = false; // Module payant : 10 crédits par accès
+  const isFreeModule = true;
 
   // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
@@ -312,7 +313,7 @@ export default function CodeLearningCardPage({ initialModule }: CardInteractiveP
                           <line x1="15" y1="12" x2="3" y2="12" />
                         </svg>
                         <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accédez à l\'apprentissage du code' : 'Connectez-vous pour accéder'}</span>
-                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 crédits par accès</span>
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">{FREE_UNLIMITED_ACCESS_LABEL}</span>
                       </>
                     )}
                   </button>
@@ -588,7 +589,7 @@ export default function CodeLearningCardPage({ initialModule }: CardInteractiveP
       <CardPageActivationSection
         moduleId={moduleId}
         moduleName="Apprendre le Code aux Enfants"
-        tokenCost={10}
+        tokenCost={0}
         tokenUnit="par accès"
         apiEndpoint="/api/activate-code-learning"
         gradientColors="from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"

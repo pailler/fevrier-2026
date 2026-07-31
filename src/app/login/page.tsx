@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { sanitizeReturnPath } from '@/utils/loginRedirect';
+import { getPostLoginRedirect, persistPostLoginRedirect, sanitizeReturnPath } from '@/utils/loginRedirect';
 import { useHydrated } from '@/hooks/useHydrated';
 
 // Chargement côté client uniquement pour éviter toute erreur SSR (Supabase, etc.)
@@ -58,7 +58,12 @@ function LoginContent() {
     
     // Ne pas afficher d'erreur pour session_expired car c'est géré par le message
     if (errorParam && errorParam !== 'session_expired') {
-      setError('Une erreur est survenue lors de la connexion. Veuillez réessayer.');
+      const detail = searchParams.get('detail');
+      setError(
+        detail
+          ? decodeURIComponent(detail)
+          : 'Une erreur est survenue lors de la connexion. Veuillez réessayer.'
+      );
     }
 
     // Vérifier les messages de succès dans l'URL
@@ -70,11 +75,16 @@ function LoginContent() {
         setError(null);
       }
     }
+
+    const redirectParam = searchParams.get('redirect');
+    if (redirectParam) {
+      persistPostLoginRedirect(sanitizeReturnPath(redirectParam));
+    }
   }, [searchParams]);
 
   const handleAuthSuccess = (user: any) => {
     if (user) {
-      const redirectUrl = sanitizeReturnPath(searchParams.get('redirect'));
+      const redirectUrl = getPostLoginRedirect(searchParams);
       router.push(redirectUrl);
     }
   };

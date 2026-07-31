@@ -10,7 +10,7 @@ const navigation = [
   { name: 'Utilisateurs', href: '/admin/users', icon: '👥' },
   { name: 'Applications', href: '/admin/applications', icon: '📱' },
   { name: 'Paiements', href: '/admin/payments', icon: '💳' },
-  { name: 'Tokens', href: '/admin/tokens', icon: '🪙' },
+  { name: 'Crédits', href: '/admin/credits', icon: '🪙' },
   { name: 'Contenu', href: '/admin/content', icon: '📝' },
   { name: 'LinkedIn', href: '/admin/linkedin', icon: '💼' },
   { name: 'Campagnes', href: '/admin/campaigns', icon: '📢' },

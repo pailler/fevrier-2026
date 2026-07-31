@@ -20,11 +20,18 @@ if (Test-Path $configPath) {
         Write-Host "   ❌ iahome.fr non configuré correctement" -ForegroundColor Red
     }
     
-    # Vérifier resas.regispailler.fr
-    if ($config -match "resas\.regispailler\.fr" -and $config -match "127\.0\.0\.1:5000") {
-        Write-Host "   ✅ resas.regispailler.fr → http://127.0.0.1:5000" -ForegroundColor Green
+# Vérifier reveil-intelligent
+    if ($config -match "reveil-intelligent\.iahome\.fr" -and $config -match "localhost:7891") {
+        Write-Host "   ✅ reveil-intelligent.iahome.fr → http://localhost:7891" -ForegroundColor Green
     } else {
-        Write-Host "   ❌ resas.regispailler.fr non configuré correctement" -ForegroundColor Red
+        Write-Host "   ❌ reveil-intelligent.iahome.fr non configuré correctement" -ForegroundColor Red
+    }
+    
+    # Vérifier vote (référence essentiels)
+    if ($config -match "vote\.iahome\.fr" -and $config -match "localhost:7890") {
+        Write-Host "   ✅ vote.iahome.fr → http://localhost:7890" -ForegroundColor Green
+    } else {
+        Write-Host "   ❌ vote.iahome.fr non configuré correctement" -ForegroundColor Red
     }
 } else {
     Write-Host "   ❌ Fichier non trouvé" -ForegroundColor Red
@@ -73,6 +80,26 @@ if ($port5000) {
     }
 } else {
     Write-Host "   ❌ Port 5000 : Non actif" -ForegroundColor Red
+}
+
+$port7891 = Test-PortInUse -Port 7891
+if ($port7891) {
+    try {
+        $response = Invoke-WebRequest -Uri "http://localhost:7891" -TimeoutSec 3 -UseBasicParsing -ErrorAction Stop
+        Write-Host "   ✅ Port 7891 (reveil-intelligent) : Actif (HTTP $($response.StatusCode))" -ForegroundColor Green
+    } catch {
+        Write-Host "   ❌ Port 7891 : Ne répond pas" -ForegroundColor Red
+    }
+} else {
+    Write-Host "   ❌ Port 7891 : Non actif" -ForegroundColor Red
+}
+
+try {
+    $reveilPublic = Invoke-WebRequest -Uri "https://reveil-intelligent.iahome.fr/" -TimeoutSec 15 -UseBasicParsing -ErrorAction Stop
+    Write-Host "   ✅ https://reveil-intelligent.iahome.fr → HTTP $($reveilPublic.StatusCode)" -ForegroundColor Green
+} catch {
+    Write-Host "   ❌ https://reveil-intelligent.iahome.fr → 502 (route tunnel manquante ou incorrecte)" -ForegroundColor Red
+    Write-Host "      Lancez en admin : .\scripts\sync-reveil-cloudflare-tunnel.ps1" -ForegroundColor Yellow
 }
 
 Write-Host ""

@@ -4,9 +4,9 @@ import type { CardInteractiveProps, CardModuleData } from '@/types/cardModule';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Breadcrumb from '../../../components/Breadcrumb';
-import Link from 'next/link';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
+import { FREE_UNLIMITED_ACCESS_LABEL } from '../../../utils/tokenActionService';
 
 export default function AdministrationPage({ initialModule }: CardInteractiveProps) {
   const router = useRouter();
@@ -16,7 +16,7 @@ export default function AdministrationPage({ initialModule }: CardInteractivePro
   const [checkingActivation, setCheckingActivation] = useState(false);
 
   const moduleId = 'administration';
-  const isFreeModule = false; // Module payant : 10 tokens par accès
+  const isFreeModule = true;
 
   // Fonction pour vérifier si un module est déjà accessible
   const checkModuleActivation = useCallback(async (moduleId: string) => {
@@ -61,6 +61,52 @@ export default function AdministrationPage({ initialModule }: CardInteractivePro
   }, [user?.id, moduleId, checkModuleActivation]);
 
   const isModuleActivated = alreadyActivatedModules.includes(moduleId);
+
+  const openAdministrationWithToken = async (options?: { manageLoading?: boolean }) => {
+    const manageLoading = options?.manageLoading ?? true;
+
+    if (!isAuthenticated || !user) {
+      router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}`)}`);
+      return;
+    }
+
+    if (manageLoading) {
+      setLoading(true);
+    }
+
+    try {
+      const tokenResponse = await fetch('/api/generate-access-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          moduleId,
+          userId: user.id,
+          userEmail: user.email,
+        }),
+      });
+
+      if (!tokenResponse.ok) {
+        const errorData = await tokenResponse.json().catch(() => ({ error: 'Erreur inconnue' }));
+        throw new Error(errorData.error || `Erreur HTTP ${tokenResponse.status}`);
+      }
+
+      const tokenData = await tokenResponse.json();
+      if (!tokenData?.token) {
+        throw new Error('Token d\'accès manquant');
+      }
+
+      window.open(`/administration?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      console.error('❌ Erreur ouverture Administration avec token:', error);
+      alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+    } finally {
+      if (manageLoading) {
+        setLoading(false);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -221,8 +267,9 @@ export default function AdministrationPage({ initialModule }: CardInteractivePro
                     </div>
                   </div>
                   <div className="mt-3 text-center">
-                    <Link
-                      href="/administration"
+                    <button
+                      type="button"
+                      onClick={() => openAdministrationWithToken()}
                       className="inline-flex flex-col items-center gap-1 px-6 py-3 bg-[#16a34a] hover:bg-[#15803d] text-white rounded-2xl transition-colors font-semibold shadow-lg"
                     >
                       <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
@@ -230,8 +277,8 @@ export default function AdministrationPage({ initialModule }: CardInteractivePro
                         <polyline points="10 17 15 12 10 7" />
                         <line x1="15" y1="12" x2="3" y2="12" />
                       </svg>
-                      <span>Aller à Mes Applications</span>
-                    </Link>
+                      <span>Ouvrir l'application</span>
+                    </button>
                   </div>
                 </div>
               )}
@@ -260,8 +307,7 @@ export default function AdministrationPage({ initialModule }: CardInteractivePro
                             if (data.success) {
                               console.log('✅ Services administratifs accessibles avec succès');
                               setAlreadyActivatedModules(prev => [...prev, moduleId]);
-                              // Rediriger vers la page des modules actifs
-                              window.open('/administration', '_blank');
+                              await openAdministrationWithToken({ manageLoading: false });
                             } else {
                               console.error('❌ Erreur accès services administratifs:', data.error);
                               alert('Erreur lors de l\'accès: ' + (data.error || 'Erreur inconnue'));
@@ -299,7 +345,7 @@ export default function AdministrationPage({ initialModule }: CardInteractivePro
                           <line x1="15" y1="12" x2="3" y2="12" />
                         </svg>
                         <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accédez aux services administratifs' : 'Connectez-vous pour accéder'}</span>
-                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 tokens par accès</span>
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">{FREE_UNLIMITED_ACCESS_LABEL}</span>
                       </>
                     )}
                   </button>
@@ -396,7 +442,7 @@ export default function AdministrationPage({ initialModule }: CardInteractivePro
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à le portail</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Accédez à le portail Services de l'Administration avec 10 tokens. L'accès est immédiat, le portail est accessible depuis vos applications.
+                          Accédez à le portail Services de l'Administration avec 10 crédits. L'accès est immédiat, le portail est accessible depuis vos applications.
                         </p>
                       </div>
                     </div>
@@ -532,7 +578,7 @@ export default function AdministrationPage({ initialModule }: CardInteractivePro
                   <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Comment accéder aux Services de l'Administration ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Pour accéder aux Services de l'Administration, accédez directement au service avec 10 tokens. L'accès est immédiat, le portail est accessible depuis vos applications. Vous pourrez alors naviguer par catégories ou utiliser la recherche pour trouver rapidement le service administratif dont vous avez besoin.
+                      Pour accéder aux Services de l'Administration, accédez directement au service avec 10 crédits. L'accès est immédiat, le portail est accessible depuis vos applications. Vous pourrez alors naviguer par catégories ou utiliser la recherche pour trouver rapidement le service administratif dont vous avez besoin.
                     </p>
                   </div>
                   
@@ -546,7 +592,7 @@ export default function AdministrationPage({ initialModule }: CardInteractivePro
                   <div className="bg-gradient-to-r from-pink-50 to-red-50 p-6 rounded-2xl border-l-4 border-pink-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Les Services de l'Administration sont-ils gratuits ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'accès du portail Services de l'Administration coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez accéder à tous les liens et services sans frais supplémentaires. Les liens pointent vers les sites officiels des administrations françaises.
+                      L'accès du portail Services de l'Administration coûte 10 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez accéder à tous les liens et services sans frais supplémentaires. Les liens pointent vers les sites officiels des administrations françaises.
                     </p>
                   </div>
                   
@@ -738,8 +784,8 @@ export default function AdministrationPage({ initialModule }: CardInteractivePro
       <CardPageActivationSection
         moduleId={moduleId}
         moduleName="Administration"
-        tokenCost={10}
-        tokenUnit="Utilisez l'application aussi longtemps que vous souhaitez"
+        tokenCost={0}
+        tokenUnit={FREE_UNLIMITED_ACCESS_LABEL}
         apiEndpoint="/api/activate-administration"
         gradientColors="from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
         icon="⚙️"

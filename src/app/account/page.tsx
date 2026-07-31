@@ -56,6 +56,9 @@ const MODULE_DESCRIPTIONS: Record<string, string> = {
   'administration': 'Outils d\'administration de la plateforme.',
   'ai-detector': 'Detection de contenus generes par IA.',
   'code-learning': 'Apprendre le code avec parcours guides.',
+  vote: 'Votes en ligne avec PIN organisateur et QR code.',
+  'reveil-intelligent':
+    'Réveil mobile : alarmes récurrentes, musiques, prévisions météo, jours fériés et vacances scolaires — accès gratuit.',
 };
 
 export default function AccountPage() {
@@ -78,7 +81,7 @@ export default function AccountPage() {
     const sp = new URLSearchParams(window.location.search);
     if (sp.get('error') !== 'direct_access_denied') return;
     setSubdomainAccessNotice(
-      'Accès direct au sous-domaine refusé (sécurité). Ouvrez l’application depuis la liste ci-dessous : un jeton sera ajouté à l’URL, comme pour les autres apps protégées.'
+      'Accès direct au sous-domaine refusé (sécurité). Ouvrez l’application depuis la liste ci-dessous : un code d’accès sera ajouté à l’URL, comme pour les autres apps protégées.'
     );
     const u = new URL(window.location.href);
     u.searchParams.delete('error');
@@ -181,6 +184,7 @@ export default function AccountPage() {
           'voice-isolation': 'http://localhost:8100',
           'photobooth': 'http://localhost:7885',
           'vote': 'http://localhost:7890',
+          'reveil-intelligent': 'http://localhost:7891',
         }
       : {
           'photomaker': 'https://photomaker.iahome.fr',
@@ -206,6 +210,7 @@ export default function AccountPage() {
           'voice-isolation': 'https://voice-isolation.iahome.fr',
           'photobooth': 'https://photobooth.iahome.fr',
           'vote': 'https://vote.iahome.fr',
+          'reveil-intelligent': 'https://reveil-intelligent.iahome.fr',
         };
 
     if (urlMap[normalizedModuleId]) {
@@ -461,7 +466,7 @@ export default function AccountPage() {
                           <div className="flex-1">
                             <h3 className="font-semibold text-gray-900">{app.module_title}</h3>
                             <p className="text-sm text-gray-600 mt-1">
-                              {MODULE_DESCRIPTIONS[app.module_id] || 'Application IA disponible avec acces direct tokenise.'}
+                              {MODULE_DESCRIPTIONS[app.module_id] || 'Application IA disponible avec accès direct sécurisé.'}
                             </p>
                             <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
                               <span>Utilisations: {app.usage_count}</span>
@@ -502,9 +507,15 @@ export default function AccountPage() {
                   <p className="text-blue-100 text-sm mb-4">crédits disponibles</p>
                   <Link
                     href="/pricing2"
-                    className="block w-full text-center px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 font-semibold transition-colors"
+                    className="block w-full text-center px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 font-semibold transition-colors mb-2"
                   >
                     Acheter des crédits
+                  </Link>
+                  <Link
+                    href="/mes-credits"
+                    className="block w-full text-center px-4 py-2 bg-white/15 text-white rounded-lg hover:bg-white/25 font-medium transition-colors text-sm"
+                  >
+                    Historique d&apos;utilisation
                   </Link>
                 </>
               )}

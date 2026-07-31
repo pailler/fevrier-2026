@@ -236,7 +236,7 @@ export default function QRCodesPage({ initialModule }: CardInteractiveProps) {
             price: 100,
             features: [
               'QR codes dynamiques : modifiez l\'URL sans recréer le code',
-              'Modification après création avec token de gestion',
+              'Modification après création avec code de gestion',
               'QR codes statiques et dynamiques',
               'Personnalisation avancée (couleurs, logo)',
               'Analytics en temps réel',
@@ -246,7 +246,7 @@ export default function QRCodesPage({ initialModule }: CardInteractiveProps) {
             requirements: [
               'Connexion internet',
               'Navigateur moderne',
-              '100 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez'
+              '100 crédits par accès. Utilisez l\'application aussi longtemps que vous souhaitez'
             ],
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
@@ -274,7 +274,7 @@ export default function QRCodesPage({ initialModule }: CardInteractiveProps) {
           price: 100,
           features: [
             'QR codes dynamiques : modifiez l\'URL sans recréer le code',
-            'Modification après création avec token de gestion',
+            'Modification après création avec code de gestion',
             'QR codes statiques et dynamiques',
             'Personnalisation avancée (couleurs, logo)',
             'Analytics en temps réel',
@@ -284,7 +284,7 @@ export default function QRCodesPage({ initialModule }: CardInteractiveProps) {
           requirements: [
             'Connexion internet',
             'Navigateur moderne',
-            '100 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez'
+            '100 crédits par accès. Utilisez l\'application aussi longtemps que vous souhaitez'
           ],
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
@@ -483,7 +483,7 @@ export default function QRCodesPage({ initialModule }: CardInteractiveProps) {
                           if (card?.id && !updated.includes(card.id)) updated.push(card.id);
                           return updated;
                         });
-                        alert('QR Codes accessible avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les tokens seront consommés lors de l\'utilisation.');
+                        alert('QR Codes accessible avec succès ! Vous pouvez maintenant y accéder depuis vos applications. Les crédits seront consommés lors de l\'utilisation.');
                         await accessModuleWithJWT('QR Codes', 'qrcodes');
                       } else {
                         console.error('❌ Erreur accès QR Codes:', result.error);
@@ -502,7 +502,7 @@ export default function QRCodesPage({ initialModule }: CardInteractiveProps) {
                     <line x1="15" y1="12" x2="3" y2="12" />
                   </svg>
                   <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accéder à QR Codes' : 'Connectez-vous pour accéder'}</span>
-                  <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 tokens par accès</span>
+                  <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 crédits par accès</span>
                 </button>
               ) : (
                 <div className="w-3/4 text-center py-4 px-6 text-gray-600">
@@ -613,7 +613,7 @@ export default function QRCodesPage({ initialModule }: CardInteractiveProps) {
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder au service QR codes</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Accédez au service QR codes dynamiques avec 100 tokens. L'accès est immédiat, le service est accessible depuis vos applications.
+                          Accédez au service QR codes dynamiques avec 100 crédits. L'accès est immédiat, le service est accessible depuis vos applications.
                         </p>
                       </div>
                     </div>
@@ -625,7 +625,7 @@ export default function QRCodesPage({ initialModule }: CardInteractiveProps) {
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">Créer votre QR code</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Entrez l'URL de destination, personnalisez les couleurs et le logo si souhaité, puis générez le code. Vous recevrez un token de gestion et une URL de gestion pour modifier le QR code ultérieurement.
+                          Entrez l'URL de destination, personnalisez les couleurs et le logo si souhaité, puis générez le code. Vous recevrez un code de gestion et une URL de gestion pour modifier le QR code ultérieurement.
                         </p>
                       </div>
                     </div>
@@ -649,7 +649,7 @@ export default function QRCodesPage({ initialModule }: CardInteractiveProps) {
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">Modifier et optimiser</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Utilisez le token de gestion et l'URL de gestion pour modifier l'URL de destination, les couleurs, ou le logo à tout moment. Consultez les analytics pour optimiser vos campagnes.
+                          Utilisez le code de gestion et l'URL de gestion pour modifier l'URL de destination, les couleurs, ou le logo à tout moment. Consultez les analytics pour optimiser vos campagnes.
                         </p>
                       </div>
                     </div>
@@ -723,7 +723,7 @@ export default function QRCodesPage({ initialModule }: CardInteractiveProps) {
                         </tr>
                         <tr className="bg-white">
                           <td className="border border-gray-300 p-4 font-semibold">Coût</td>
-                          <td className="border border-gray-300 p-4 text-center">100 tokens</td>
+                          <td className="border border-gray-300 p-4 text-center">100 crédits</td>
                           <td className="border border-gray-300 p-4 text-center">Gratuit</td>
                         </tr>
                       </tbody>
@@ -749,14 +749,14 @@ export default function QRCodesPage({ initialModule }: CardInteractiveProps) {
                   <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Comment créer un QR code dynamique ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Pour créer un QR code dynamique, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface de génération, entrez l'URL de destination, personnalisez les couleurs et le logo si souhaité, puis générez le code. Vous recevrez un token de gestion et une URL de gestion pour modifier le QR code ultérieurement.
+                      Pour créer un QR code dynamique, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface de génération, entrez l'URL de destination, personnalisez les couleurs et le logo si souhaité, puis générez le code. Vous recevrez un code de gestion et une URL de gestion pour modifier le QR code ultérieurement.
                     </p>
                   </div>
                   
                   <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-purple-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Puis-je modifier un QR code après l'avoir créé ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Oui, avec les QR codes dynamiques, vous pouvez modifier l'URL de destination, les couleurs, le logo et d'autres paramètres à tout moment après la création. Utilisez le token de gestion et l'URL de gestion fournis lors de la création pour accéder à la fonction de modification. Les modifications sont appliquées instantanément.
+                      Oui, avec les QR codes dynamiques, vous pouvez modifier l'URL de destination, les couleurs, le logo et d'autres paramètres à tout moment après la création. Utilisez le code de gestion et l'URL de gestion fournis lors de la création pour accéder à la fonction de modification. Les modifications sont appliquées instantanément.
                     </p>
                   </div>
                   
@@ -770,7 +770,7 @@ export default function QRCodesPage({ initialModule }: CardInteractiveProps) {
                   <div className="bg-gradient-to-r from-red-50 to-orange-50 p-6 rounded-2xl border-l-4 border-red-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Les QR codes dynamiques sont-ils gratuits ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      L'accès du service QR codes dynamiques coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes.
+                      L'accès du service QR codes dynamiques coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez créer et gérer vos QR codes. Il n'y a pas de frais supplémentaires pour la création ou la modification des codes.
                     </p>
                   </div>
                   
@@ -876,8 +876,8 @@ export default function QRCodesPage({ initialModule }: CardInteractiveProps) {
                           <div className="flex items-start space-x-3">
                             <span className="text-emerald-600 font-bold text-xl mt-1">✓</span>
                             <p className="flex-1">
-                              <strong>Token de gestion sécurisé :</strong> Chaque QR code dynamique génère un token unique 
-                              qui vous permet de le modifier ultérieurement. Conservez ce token en lieu sûr pour accéder à 
+                              <strong>Code de gestion sécurisé :</strong> Chaque QR code dynamique génère un code unique 
+                              qui vous permet de le modifier ultérieurement. Conservez ce code en lieu sûr pour accéder à 
                               la fonction de modification.
                             </p>
                           </div>
@@ -972,8 +972,8 @@ export default function QRCodesPage({ initialModule }: CardInteractiveProps) {
                       <div className="bg-emerald-100/80 p-4 rounded-lg border border-emerald-300">
                         <p className="text-sm text-emerald-900">
                           <strong>💾 Important :</strong> Lors de la création d'un QR code dynamique, vous recevrez un 
-                          <strong> token de gestion</strong> et une <strong>URL de gestion</strong>. Conservez ces informations 
-                          précieusement pour pouvoir modifier votre QR code ultérieurement. Sans ce token, vous ne pourrez 
+                          <strong> code de gestion</strong> et une <strong>URL de gestion</strong>. Conservez ces informations 
+                          précieusement pour pouvoir modifier votre QR code ultérieurement. Sans ce code, vous ne pourrez 
                           pas modifier le QR code après sa création.
                         </p>
                       </div>
@@ -1107,7 +1107,7 @@ export default function QRCodesPage({ initialModule }: CardInteractiveProps) {
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez
+                          100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez
                         </p>
                       </div>
                     </div>

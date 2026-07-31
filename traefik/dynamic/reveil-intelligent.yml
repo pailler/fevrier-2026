@@ -1,0 +1,63 @@
+# Réveil Intelligent — reveil-intelligent.iahome.fr → conteneur Docker reveil-intelligent:7891
+
+http:
+  middlewares:
+    reveil-intelligent-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+          X-Forwarded-Host: "reveil-intelligent.iahome.fr"
+        customResponseHeaders:
+          Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+          X-Content-Type-Options: "nosniff"
+          X-Frame-Options: "SAMEORIGIN"
+          Referrer-Policy: "strict-origin-when-cross-origin"
+          Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://iahome.fr https://api.open-meteo.com https://calendrier.api.gouv.fr https://data.education.gouv.fr https://api-adresse.data.gouv.fr;"
+
+  serversTransports:
+    reveil-intelligent-transport:
+      forwardingTimeouts:
+        dialTimeout: "30s"
+        responseHeaderTimeout: "30s"
+        idleConnTimeout: "300s"
+
+  routers:
+    reveil-intelligent-acme:
+      rule: "Host(`reveil-intelligent.iahome.fr`) && PathPrefix(`/.well-known/acme-challenge`)"
+      entryPoints: ["web"]
+      service: reveil-intelligent-service
+      priority: 1000
+
+    reveil-intelligent-main:
+      rule: "Host(`reveil-intelligent.iahome.fr`)"
+      entryPoints: ["web"]
+      service: reveil-intelligent-service
+      middlewares:
+        - security-headers@file
+        - compress@file
+        - reveil-intelligent-headers@file
+      priority: 10
+
+    reveil-intelligent-https:
+      rule: "Host(`reveil-intelligent.iahome.fr`)"
+      entryPoints: ["websecure"]
+      service: reveil-intelligent-service
+      tls:
+        certResolver: letsencrypt
+      middlewares:
+        - security-headers@file
+        - compress@file
+        - reveil-intelligent-headers@file
+      priority: 10
+
+  services:
+    reveil-intelligent-service:
+      loadBalancer:
+        servers:
+          - url: "http://reveil-intelligent:7891"
+        passHostHeader: true
+        serversTransport: reveil-intelligent-transport
+        healthCheck:
+          path: "/"
+          interval: "30s"
+          timeout: "5s"

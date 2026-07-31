@@ -172,7 +172,7 @@ export default function AdminDashboard() {
       value: stats.totalUsage.toLocaleString(),
       icon: '📊',
       color: 'bg-yellow-500',
-      change: `${stats.totalTokens} tokens générés`,
+      change: `${stats.totalTokens} crédits générés`,
       changeType: 'positive' as const,
     },
   ];
@@ -378,10 +378,10 @@ export default function AdminDashboard() {
             <p className="text-sm text-gray-600">Analyses approfondies</p>
           </a>
 
-          <a href="/admin/tokens" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block">
+          <a href="/admin/credits" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block">
             <div className="text-2xl mb-2">🪙</div>
-            <h3 className="font-medium text-gray-900">Gérer les tokens</h3>
-            <p className="text-sm text-gray-600">{stats.totalTokens} tokens générés</p>
+            <h3 className="font-medium text-gray-900">Gérer les crédits</h3>
+            <p className="text-sm text-gray-600">{stats.totalTokens} crédits générés</p>
           </a>
 
           <a href="/admin/payments" className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left block">

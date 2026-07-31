@@ -58,6 +58,7 @@ models-cache/
 
 # Fichiers d'environnement
 .env.local
+.env.google-mcp
 .env.production
 .env.production.local
 env.production.local
@@ -109,6 +110,7 @@ instantmesh/ckpts/
 v16_hunyuan2-stableprojectorz/
 docker-services/essentiels/metube/downloads/*.mkv
 docker-services/essentiels/metube/downloads/*.webm
+docker-services/essentiels/metube/downloads/.metube/
 meeting-reports/uploads/*.mp3
 meeting-reports/uploads/*.FLAC
 
@@ -128,4 +130,14 @@ gradio-apps/**/.venv/
 
 # Artefacts build / runtime local
 tsconfig.tsbuildinfo
-homeassistant.pid
+# Photobooth — données runtime / événements (photos invités)
+photobooth/storage/
+photobooth/.SynologyWorkingDirectory/
+
+# Cursor — config locale (peut contenir des secrets MCP)
+.cursor/mcp.json
+.cursor/environment.json
+
+# Docs PDF volumineux (sources Markdown/HTML versionnées à la place)
+docs/ARCHITECTURE-NUMERIQUE/*.pdf
+docs/photobooth-manuel-utilisateur/*.pdf

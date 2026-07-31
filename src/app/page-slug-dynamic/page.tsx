@@ -74,7 +74,7 @@ export default function DynamicPage() {
     'qrcodes',
     'pdf',
     'tokens',
-    'my-tokens',
+    'mes-credits',
     'modules-access',
     'card',
     'qr-code',

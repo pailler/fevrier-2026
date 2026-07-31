@@ -7,6 +7,7 @@ import Breadcrumb from '../../../components/Breadcrumb';
 import Link from 'next/link';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
+import { FREE_UNLIMITED_ACCESS_LABEL } from '../../../utils/tokenActionService';
 
 export default function LibreSpeedCardPage({ initialModule }: CardInteractiveProps) {
   const router = useRouter();
@@ -16,16 +17,16 @@ export default function LibreSpeedCardPage({ initialModule }: CardInteractivePro
   const [checkingActivation, setCheckingActivation] = useState(false);
 
   const moduleId = 'librespeed';
-  const isFreeModule = false; // Module payant : 10 tokens par accès
+  const isFreeModule = true;
 
   // Configuration du module LibreSpeed
   const librespeedModule = {
     id: 'librespeed',
     title: 'LibreSpeed',
-    subtitle: 'Test de vitesse internet complet - 10 tokens par accès, utilisez aussi longtemps que vous souhaitez',
-    description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision. Coûte 10 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez.',
+    subtitle: 'Test de vitesse internet complet — accès gratuit et illimité',
+    description: 'Test de vitesse internet rapide et précis. Mesurez votre débit de téléchargement et d\'upload avec précision. Accès gratuit et illimité pour les utilisateurs connectés.',
     category: 'WEB TOOLS',
-    price: '10 tokens',
+    price: 'Gratuit',
     image: '/images/librespeed.jpg',
   };
 
@@ -323,7 +324,7 @@ export default function LibreSpeedCardPage({ initialModule }: CardInteractivePro
                           <line x1="15" y1="12" x2="3" y2="12" />
                         </svg>
                         <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">{isAuthenticated && user ? 'Accéder à LibreSpeed' : 'Connectez-vous pour accéder'}</span>
-                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">10 tokens par accès</span>
+                        <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">{FREE_UNLIMITED_ACCESS_LABEL}</span>
                       </>
                     )}
                   </button>
@@ -411,7 +412,7 @@ export default function LibreSpeedCardPage({ initialModule }: CardInteractivePro
                       <div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à LibreSpeed</h3>
                         <p className="text-gray-700 leading-relaxed">
-                          Accédez à LibreSpeed avec 10 tokens. L'accès est immédiat, le service est accessible depuis vos applications.
+                          Accédez à LibreSpeed avec 10 crédits. L'accès est immédiat, le service est accessible depuis vos applications.
                         </p>
                       </div>
                     </div>
@@ -535,14 +536,14 @@ export default function LibreSpeedCardPage({ initialModule }: CardInteractivePro
                   <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Comment tester ma vitesse internet avec LibreSpeed ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Pour tester votre vitesse internet avec LibreSpeed, accédez directement au service avec 10 tokens. L'accès est immédiat, lancez le test depuis l'interface. LibreSpeed mesurera automatiquement votre débit de téléchargement (download), votre débit d'upload, et votre latence (ping) en quelques secondes.
+                      Pour tester votre vitesse internet avec LibreSpeed, accédez directement au service avec 10 crédits. L'accès est immédiat, lancez le test depuis l'interface. LibreSpeed mesurera automatiquement votre débit de téléchargement (download), votre débit d'upload, et votre latence (ping) en quelques secondes.
                     </p>
                   </div>
                   
                   <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-2xl border-l-4 border-purple-500">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">LibreSpeed est-il gratuit ?</h3>
                     <p className="text-gray-700 leading-relaxed">
-                      LibreSpeed est un outil open-source et gratuit. L'accès du service coûte 10 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez effectuer des tests de vitesse sans frais supplémentaires.
+                      LibreSpeed est un outil open-source et gratuit. L'accès du service coûte 10 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous pouvez effectuer des tests de vitesse sans frais supplémentaires.
                     </p>
                   </div>
                   
@@ -585,8 +586,8 @@ export default function LibreSpeedCardPage({ initialModule }: CardInteractivePro
       <CardPageActivationSection
         moduleId={moduleId}
         moduleName="LibreSpeed"
-        tokenCost={10}
-        tokenUnit="Utilisez l'application aussi longtemps que vous souhaitez"
+        tokenCost={0}
+        tokenUnit={FREE_UNLIMITED_ACCESS_LABEL}
         apiEndpoint="/api/activate-librespeed-test"
         gradientColors="from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
         icon="⚡"

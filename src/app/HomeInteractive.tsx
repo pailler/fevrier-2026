@@ -220,7 +220,7 @@ export default function HomeInteractive() {
                 Outils essentiels, toutes plateformes, sans install
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Apprenez, pratiquez et grandissez : l'IA simplifie votre quotidien, boost vos projets et décuple vos idées. Sans téléchargement.
+                Des applis qui simplifient votre quotidien et boost vos projets. Sans téléchargement, avec aides à l'emploi.
               </p>
               
               {/* Boutons d'action */}

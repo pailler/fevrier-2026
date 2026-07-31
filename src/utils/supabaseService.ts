@@ -251,7 +251,8 @@ export const getSupabaseClient = (): SupabaseClient => {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: true, // IMPORTANT: Doit être true pour que PKCE fonctionne
+        // Désactivé : l’échange PKCE est fait explicitement sur /auth/callback (évite double consommation du code).
+        detectSessionInUrl: false,
         storage: authStorage,
         storageKey: AUTH_STORAGE_KEY,
         flowType: 'pkce', // Utiliser PKCE (recommandé par Supabase pour une meilleure fiabilité)

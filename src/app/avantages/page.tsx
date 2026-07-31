@@ -46,8 +46,8 @@ export default function AvantagesPage() {
     {
       icon: '💰',
       title: 'Meilleur Rapport Qualité/Prix',
-      description: 'Système de tokens dégressif. Économisez jusqu\'à 80% en achetant en volume.',
-      details: 'Pack Standard PROMO : 0,005€/token vs 0,0099€/token pour le pack basique'
+      description: 'Système de crédits dégressif. Économisez jusqu\'à 80% en achetant en volume.',
+      details: 'Pack Standard PROMO : 0,005€/crédit vs 0,0099€/crédit pour le pack basique'
     },
     {
       icon: '⚡',
@@ -84,19 +84,19 @@ export default function AvantagesPage() {
   const serviceComparison = [
     {
       service: 'Whisper (Transcription)',
-      iahome: '100 tokens (0,49€ - 1,99€ selon pack)',
+      iahome: '100 crédits (0,49€ - 1,99€ selon pack)',
       competitors: '5-20€ par fichier',
       savings: 'Économisez jusqu\'à 90%'
     },
     {
       service: 'Stable Diffusion (Images)',
-      iahome: '100 tokens (0,49€ - 1,99€ selon pack)',
+      iahome: '100 crédits (0,49€ - 1,99€ selon pack)',
       competitors: '10-50€ par mois',
       savings: 'Payez uniquement ce que vous utilisez'
     },
     {
       service: 'Traitement PDF',
-      iahome: '10 tokens (0,10€ - 0,20€ selon pack)',
+      iahome: '10 crédits (0,10€ - 0,20€ selon pack)',
       competitors: '15-30€ par mois',
       savings: 'Jusqu\'à 99% d\'économie'
     }
@@ -361,7 +361,7 @@ export default function AvantagesPage() {
                 </div>
               </div>
               <p className="text-gray-700 mb-4 italic">
-                "Le système de tokens est génial ! Je paye uniquement ce que j'utilise, sans engagement. C'est exactement ce que je cherchais. Et avec le pack Standard, j'économise vraiment beaucoup."
+                "Le système de crédits est génial ! Je paye uniquement ce que j'utilise, sans engagement. C'est exactement ce que je cherchais. Et avec le pack Standard, j'économise vraiment beaucoup."
               </p>
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center mr-3">

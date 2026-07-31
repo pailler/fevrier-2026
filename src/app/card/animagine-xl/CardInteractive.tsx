@@ -2,6 +2,7 @@
 import type { CardInteractiveProps, CardModuleData } from '@/types/cardModule';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { loginHrefFromWindow } from '@/utils/loginRedirect';
 import { supabase } from '../../../utils/supabaseClient';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -40,7 +41,7 @@ export default function AnimagineXLPage({ initialModule }: CardInteractiveProps)
     subtitle: 'Modèle SDXL super-optimisé pour l\'anime et les mangas',
     description: 'Animagine XL 3.1 est un modèle Stable Diffusion XL spécialement entraîné pour la génération d\'images de type anime et manga. Développé par Cagliostro Research Lab, ce modèle a été entraîné avec plus de 1,25 million d\'images et 500+ heures d\'entraînement. Il connaît près de 5000 personnages d\'anime et peut générer des images de haute qualité sans nécessiter de LoRA supplémentaires.',
     category: 'AI GENERATION',
-    price: '100 tokens',
+    price: '100 crédits',
     image_url: '/images/animagine-xl.jpg',
     github_url: 'https://github.com/cagliostro-research-lab/animagine-xl',
     features: [
@@ -363,7 +364,7 @@ export default function AnimagineXLPage({ initialModule }: CardInteractiveProps)
             <div className="space-y-6">
               {/* Boutons d'action */}
               <div className="space-y-4">
-                {/* Bouton d'accès avec tokens */}
+                {/* Bouton d'accès avec crédits */}
                 <div className="w-3/4 mx-auto">
                   <ModuleAccessButton
                     moduleId={card.id}
@@ -385,7 +386,7 @@ export default function AnimagineXLPage({ initialModule }: CardInteractiveProps)
                     className="w-3/4 font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                     onClick={async () => {
                       if (!session) {
-                        window.location.href = '/login';
+                        window.location.href = loginHrefFromWindow();
                         return;
                       }
 
@@ -582,7 +583,7 @@ export default function AnimagineXLPage({ initialModule }: CardInteractiveProps)
                         <div>
                           <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à Animagine XL</h3>
                           <p className="text-gray-700 leading-relaxed">
-                            Accédez à Animagine XL avec 100 tokens. L'accès est immédiat, le service est accessible depuis vos applications via animagine-xl.iahome.fr.
+                            Accédez à Animagine XL avec 100 crédits. L'accès est immédiat, le service est accessible depuis vos applications via animagine-xl.iahome.fr.
                           </p>
                         </div>
                       </div>
@@ -692,7 +693,7 @@ export default function AnimagineXLPage({ initialModule }: CardInteractiveProps)
                           </tr>
                           <tr className="bg-white">
                             <td className="border border-gray-300 p-4 font-semibold">Prix</td>
-                            <td className="border border-gray-300 p-4 text-center">✅ 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez</td>
+                            <td className="border border-gray-300 p-4 text-center">✅ 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez</td>
                             <td className="border border-gray-300 p-4 text-center">⚠️ Coûts variables</td>
                           </tr>
                         </tbody>
@@ -721,7 +722,7 @@ export default function AnimagineXLPage({ initialModule }: CardInteractiveProps)
                     <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-l-4 border-purple-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser Animagine XL ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        Pour utiliser Animagine XL, accédez directement au service avec 100 tokens. L'accès est immédiat, accédez à l'interface via animagine-xl.iahome.fr. Utilisez la structure de prompt recommandée (1girl/1boy, nom du personnage, tags descriptifs, tags de qualité) et générez vos images d'anime de haute qualité.
+                        Pour utiliser Animagine XL, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via animagine-xl.iahome.fr. Utilisez la structure de prompt recommandée (1girl/1boy, nom du personnage, tags descriptifs, tags de qualité) et générez vos images d'anime de haute qualité.
                       </p>
                     </div>
                     
@@ -735,7 +736,7 @@ export default function AnimagineXLPage({ initialModule }: CardInteractiveProps)
                     <div className="bg-gradient-to-r from-indigo-50 to-violet-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Animagine XL est-il gratuit ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        L'accès d'Animagine XL coûte 100 tokens par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : génération d'anime de haute qualité, connaissance de 5000+ personnages, pas de LoRA requis pour les personnages connus, et génération optimisée.
+                        L'accès d'Animagine XL coûte 100 crédits par accès. Utilisez l'application aussi longtemps que vous souhaitez. L'accès est immédiat, vous avez accès à toutes les fonctionnalités : génération d'anime de haute qualité, connaissance de 5000+ personnages, pas de LoRA requis pour les personnages connus, et génération optimisée.
                       </p>
                     </div>
                     
@@ -829,7 +830,7 @@ export default function AnimagineXLPage({ initialModule }: CardInteractiveProps)
                       <div>
                         <h5 className="font-semibold text-gray-900">Prix</h5>
                         <p className="text-gray-600 text-sm">
-                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 tokens par accès. Utilisez l\'application aussi longtemps que vous souhaitez'}
+                          {card.price === 0 || card.price === '0' ? 'Gratuit' : '100 crédits par accès. Utilisez l\'application aussi longtemps que vous souhaitez'}
                         </p>
                       </div>
                     </div>

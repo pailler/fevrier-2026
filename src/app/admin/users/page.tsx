@@ -23,8 +23,6 @@ interface User {
   createdAt: string;
   lastLogin: string | null;
   status: 'active' | 'inactive' | 'suspended';
-  activeModules?: string[];
-  activeApplications?: UserApplication[];
   modules: string[];
   applications: UserApplication[];
   tokens?: number;
@@ -253,7 +251,7 @@ export default function AdminUsers() {
       console.log('✅ Tokens mis à jour avec succès');
     } catch (error) {
       console.error('❌ Erreur lors de la mise à jour des tokens:', error);
-      alert(error instanceof Error ? error.message : 'Erreur lors de la mise à jour des tokens');
+      alert(error instanceof Error ? error.message : 'Erreur lors de la mise à jour des crédits');
     } finally {
       setTokensLoading(null);
     }
@@ -395,22 +393,6 @@ export default function AdminUsers() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Avec applis sur le compte</p>
-              <p className="text-3xl font-bold text-amber-600 mt-2">
-                {users.filter(u => (u.activeModules || []).length > 0).length}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
               <p className="text-sm font-medium text-gray-600">Sans applis visitées</p>
               <p className="text-3xl font-bold text-orange-600 mt-2">
                 {users.filter(u => u.modules.length === 0).length}
@@ -470,13 +452,10 @@ export default function AdminUsers() {
                   Utilisateur
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Applis référencées
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Applis visitées
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tokens restants
+                  Crédits restants
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Dernière activité
@@ -511,32 +490,6 @@ export default function AdminUsers() {
                         </div>
                       </div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex flex-wrap gap-1">
-                      {(user.activeModules || []).length > 0 ? (
-                        (user.activeModules || []).map((module) => (
-                          <span
-                            key={module}
-                            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800"
-                          >
-                            {module}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-xs text-gray-400">Aucune appli référencée</span>
-                      )}
-                    </div>
-                    {(user.activeApplications || []).length > 0 && (
-                      <div className="mt-2 text-xs text-gray-500">
-                        {(user.activeApplications || []).map((app, index) => (
-                          <div key={index} className="flex items-center gap-2">
-                            <span>{app.moduleId}:</span>
-                            <span className="font-medium">{app.usageCount}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-wrap gap-1">

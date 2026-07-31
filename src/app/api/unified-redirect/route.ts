@@ -28,6 +28,7 @@ const MODULE_URLS: { [key: string]: string } = {
   'photo-vivante': 'https://photo-vivante.iahome.fr',
   'florence-2': 'https://florence2.iahome.fr',
   'animagine-xl': 'https://animaginexl.iahome.fr',
+  'reveil-intelligent': 'https://reveil-intelligent.iahome.fr',
 };
 
 /**

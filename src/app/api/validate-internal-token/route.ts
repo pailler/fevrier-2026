@@ -12,10 +12,15 @@ const JWT_SECRET = process.env.JWT_SECRET || 'iahome-jwt-secret-2024-production-
 function getCorsHeaders(origin: string | null): Record<string, string> {
   const allowedOrigins = [
     'https://apprendre-autrement.iahome.fr',
+    'https://reveil-intelligent.iahome.fr',
+    'https://vote.iahome.fr',
     'https://musetalk.iahome.fr',
     'https://photo-vivante.iahome.fr',
     'https://iahome.fr',
     'http://localhost:9001',
+    'http://localhost:7890',
+    'http://localhost:7891',
+    'http://127.0.0.1:7891',
     'http://localhost:3000',
     'http://localhost:7886',
     'http://127.0.0.1:7886',

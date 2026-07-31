@@ -4,6 +4,35 @@ import { useState, useEffect } from 'react';
 import { getSupabaseClient } from '../../../utils/supabaseService';
 import { useCustomAuth } from '@/hooks/useCustomAuth';
 import { getLocalDevUrlForModule } from '@/utils/moduleLocalDevUrl';
+import {
+  getTokenCostForModuleId,
+  isFreeUnlimitedModule,
+  FREE_UNLIMITED_ACCESS_LABEL,
+} from '@/utils/tokenActionService';
+
+/** Modules plateforme garantis dans l’admin même absents de Supabase */
+const PLATFORM_MODULE_FALLBACKS: Array<{
+  id: string;
+  title: string;
+  name: string;
+  category: string;
+  created_at: string;
+}> = [
+  {
+    id: 'vote',
+    title: 'Vote en ligne',
+    name: 'Vote en ligne',
+    category: 'OUTILS ÉVÉNEMENT',
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'reveil-intelligent',
+    title: 'Réveil Intelligent',
+    name: 'Réveil Intelligent',
+    category: 'OUTILS QUOTIDIEN',
+    created_at: new Date().toISOString(),
+  },
+];
 
 interface Application {
   id: string;
@@ -170,6 +199,13 @@ export default function AdminApplications() {
         console.error('❌ Erreur lors de la récupération des modules:', modulesError);
       }
 
+      const mergedModulesData = [...(modulesData || [])];
+      for (const fallback of PLATFORM_MODULE_FALLBACKS) {
+        if (!mergedModulesData.some((m) => m.id === fallback.id)) {
+          mergedModulesData.push(fallback);
+        }
+      }
+
       const { data: usageData, error: usageError } = await supabase
         .from('user_applications')
         .select(`
@@ -211,7 +247,7 @@ export default function AdminApplications() {
 
       // Créer une map de tous les modules pour accéder facilement aux noms
       const allModulesMap = {};
-      (modulesData || []).forEach(module => {
+      mergedModulesData.forEach(module => {
         allModulesMap[module.id] = module;
       });
 
@@ -255,7 +291,7 @@ export default function AdminApplications() {
       }, {} as Record<string, any>);
 
       // Utiliser TOUS les modules de la table modules, pas seulement ceux avec des utilisations actives
-      const allModuleIds = (modulesData || []).map(module => module.id);
+      const allModuleIds = mergedModulesData.map(module => module.id);
       
       const applicationsWithRealData = allModuleIds.map(moduleId => {
         const stats = applicationStats[moduleId] || {
@@ -272,69 +308,63 @@ export default function AdminApplications() {
         }
 
         let estimatedRevenue = 0;
-        let tokenCost = 0;
+        let tokenCost = getTokenCostForModuleId(moduleId);
         let description = '';
+        const costLabel = isFreeUnlimitedModule(moduleId)
+          ? FREE_UNLIMITED_ACCESS_LABEL
+          : `${tokenCost} crédits par accès`;
         
         if (moduleId.includes('cogstudio') || moduleId.includes('stablediffusion') || moduleId.includes('ruinedfooocus')) {
-          tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Application d'intelligence artificielle pour la génération d'images. Coût: ${tokenCost} crédits par accès, et utilisez l'application aussi longtemps que vous souhaitez.`;
+          description = `Application d'intelligence artificielle pour la génération d'images. Coût: ${costLabel}, et utilisez l'application aussi longtemps que vous souhaitez.`;
         } else if (moduleId.includes('metube') || moduleId.includes('librespeed')) {
-          tokenCost = 10;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
           if (moduleId.includes('metube')) {
-            description = `Téléchargeur de vidéos YouTube. Coût: ${tokenCost} crédits par téléchargement.`;
+            description = `Téléchargeur de vidéos YouTube. Coût: ${costLabel}.`;
           } else {
-            description = `Test de vitesse de connexion internet. Coût: ${tokenCost} crédits par test.`;
+            description = `Test de vitesse de connexion internet. ${costLabel}.`;
           }
         } else if (moduleId.includes('pdf') || moduleId.includes('psitransfer')) {
-          tokenCost = 10;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
           if (moduleId.includes('pdf')) {
-            description = `Convertisseur de documents PDF. Coût: ${tokenCost} crédits par conversion.`;
+            description = `Convertisseur de documents PDF. ${costLabel}.`;
           } else {
-            description = `Service de transfert de fichiers sécurisé. Coût: ${tokenCost} crédits par transfert.`;
+            description = `Service de transfert de fichiers sécurisé. Coût: ${costLabel}.`;
           }
         } else if (moduleId.includes('code-learning')) {
-          tokenCost = 10;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Application d'apprentissage du code pour enfants. Coût: ${tokenCost} crédits par accès.`;
+          description = `Application d'apprentissage du code pour enfants. ${costLabel}.`;
         } else if (moduleId.includes('qrcodes')) {
-          tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Générateur de codes QR dynamiques. Coût: ${tokenCost} crédits par génération.`;
+          description = `Générateur de codes QR dynamiques. Coût: ${costLabel}.`;
         } else if (moduleId === 'vote') {
-          tokenCost = 10;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Votes en ligne : PIN organisateur, participants et QR code (vote.iahome.fr). Coût: ${tokenCost} crédits par accès.`;
+          description = `Votes en ligne : PIN organisateur, participants et QR code (vote.iahome.fr). Coût: ${costLabel}.`;
+        } else if (moduleId === 'reveil-intelligent') {
+          estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
+          description = `Réveil mobile (reveil-intelligent.iahome.fr) : alarmes récurrentes, musiques, prévisions météo horaires, jours fériés et vacances scolaires A/B/C, sync compte IAHome. ${costLabel}.`;
         } else if (moduleId.includes('home-assistant') || moduleId.includes('homeassistant')) {
-          tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Manuel utilisateur ultra complet pour domotiser votre habitat. Coût: ${tokenCost} crédits par accès.`;
+          description = `Manuel utilisateur ultra complet pour domotiser votre habitat. Coût: ${costLabel}.`;
         } else if (moduleId.includes('administration')) {
-          tokenCost = 10;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Portail centralisé pour accéder rapidement aux principaux services de l'administration française. Coût: ${tokenCost} crédits par accès.`;
+          description = `Portail centralisé pour accéder rapidement aux principaux services de l'administration française. ${costLabel}.`;
         } else if (moduleId.includes('prompt-generator')) {
-          tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Générateur de prompts optimisés pour ChatGPT et autres modèles de langage. Coût: ${tokenCost} crédits par accès.`;
+          description = `Générateur de prompts optimisés pour ChatGPT et autres modèles de langage. Coût: ${costLabel}.`;
         } else if (moduleId.includes('ai-detector') || moduleId.includes('detecteur')) {
-          tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Détecteur de contenu généré par IA. Analyse les documents texte, PDF, DOCX et images. Coût: ${tokenCost} crédits par accès.`;
+          description = `Détecteur de contenu généré par IA. Analyse les documents texte, PDF, DOCX et images. Coût: ${costLabel}.`;
         } else if (moduleId.includes('musetalk') || moduleId.includes('photo-vivante')) {
-          tokenCost = 100;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
           if (moduleId.includes('musetalk')) {
-            description = `MuseTalk (lip-sync vidéo, audio + visage). Coût: ${tokenCost} crédits par accès.`;
+            description = `MuseTalk (lip-sync vidéo, audio + visage). Coût: ${costLabel}.`;
           } else {
-            description = `Photo Vivante (animation de photo). Coût: ${tokenCost} crédits par accès.`;
+            description = `Photo Vivante (animation de photo). Coût: ${costLabel}.`;
           }
         } else {
-          tokenCost = 10;
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Application utilitaire. Coût: ${tokenCost} crédits par accès, et utilisez l'application aussi longtemps que vous souhaitez.`;
+          description = `Application utilitaire. Coût: ${costLabel}, et utilisez l'application aussi longtemps que vous souhaitez.`;
         }
 
         // Utiliser le nom du module depuis modulesData si disponible, sinon utiliser la logique de fallback
@@ -359,6 +389,10 @@ export default function AdminApplications() {
             moduleName = 'MuseTalk';
           } else if (moduleId.includes('photo-vivante')) {
             moduleName = 'Photo Vivante';
+          } else if (moduleId === 'vote') {
+            moduleName = 'Vote en ligne';
+          } else if (moduleId === 'reveil-intelligent') {
+            moduleName = 'Réveil Intelligent';
           }
         }
 
@@ -1144,7 +1178,9 @@ export default function AdminApplications() {
                             </div>
                             <div className="flex items-center">
                               <span className="mr-1">🪙</span>
-                              {(application as any).tokenCost} crédits/utilisation
+                              {(application as any).tokenCost === 0
+                                ? FREE_UNLIMITED_ACCESS_LABEL
+                                : `${(application as any).tokenCost} crédits/utilisation`}
                             </div>
                             <div className="flex items-center">
                               <span className="mr-1">💰</span>

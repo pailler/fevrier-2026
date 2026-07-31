@@ -11,6 +11,7 @@ const HOSTS_SKIP_DOCUMENT_TOKEN = new Set([
 ]);
 
 const MUSE_TALK_HOSTS = new Set(['musetalk.iahome.fr', 'www.musetalk.iahome.fr']);
+const REVEIL_HOSTS = new Set(['reveil-intelligent.iahome.fr', 'www.reveil-intelligent.iahome.fr']);
 
 function clientHostname(request) {
   let fromUrl = '';
@@ -91,8 +92,10 @@ async function handleRequest(request) {
     const cookieHeader = request.headers.get('Cookie') || '';
     const musetalkSession =
       MUSE_TALK_HOSTS.has(host) && cookieHeader.includes('musetalk_iahome_gate=');
+    const reveilSession =
+      REVEIL_HOSTS.has(host) && cookieHeader.includes('reveil_iahome_gate=');
 
-    if (!hasToken && !musetalkSession) {
+    if (!hasToken && !musetalkSession && !reveilSession) {
       return Response.redirect('https://iahome.fr/encours?error=direct_access_denied', 302);
     }
     return fetch(request);
