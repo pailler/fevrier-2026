@@ -1,0 +1,409 @@
+tunnel: iahome-new
+credentials-file: C:\Users\AAA\.cloudflared\02a960c5-edd6-4b3f-844f-410b16247262.json
+# Origines PC : IP LAN (192.168.1.39) — requis si plusieurs connecteurs tunnel (PC + NAS/Linux).
+# localhost/127.0.0.1 depuis le connecteur NAS → 502 sur les applis iahome.fr.
+
+ingress:
+  # Uptime Kuma (NAS) — aussi a ajouter en Public Hostname Zero Trust (tunnel remote-managed)
+  - hostname: kuma.regispailler.fr
+    service: http://192.168.1.130:3001
+    originRequest:
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  # Domaine principal - iahome.fr
+  - hostname: iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: iahome.fr
+      noTLSVerify: true
+      disableChunkedEncoding: false
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+      
+  - hostname: www.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: www.iahome.fr
+      noTLSVerify: true
+      disableChunkedEncoding: false
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  # Code Learning — landing SEO publique (Next.js, rewrite middleware)
+  - hostname: code-learning.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: code-learning.iahome.fr
+      noTLSVerify: true
+      disableChunkedEncoding: false
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  # Photobooth — landing SEO publique (Next.js, rewrite middleware)
+  - hostname: photobooth.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: photobooth.iahome.fr
+      noTLSVerify: true
+      disableChunkedEncoding: false
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  - hostname: www.photobooth.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: www.photobooth.iahome.fr
+      noTLSVerify: true
+      disableChunkedEncoding: false
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  # QR Codes - Correction du port
+  - hostname: qrcodes.iahome.fr
+    service: http://192.168.1.39:7006
+    originRequest:
+      httpHostHeader: qrcodes.iahome.fr
+      noTLSVerify: true
+
+  # Autres sous-domaines
+  # LibreSpeed - Protection via Cloudflare Workers (ne bloque pas les fonctionnalités)
+  # Le Worker vérifie uniquement la requête principale, les ressources passent directement
+  - hostname: librespeed.iahome.fr
+    service: http://192.168.1.39:8085
+    originRequest:
+      httpHostHeader: librespeed.iahome.fr
+      noTLSVerify: true
+      
+  - hostname: whisper.iahome.fr
+    service: http://192.168.1.39:8093
+    originRequest:
+      httpHostHeader: whisper.iahome.fr
+      noTLSVerify: true
+      
+  - hostname: psitransfer.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: psitransfer.iahome.fr
+      noTLSVerify: true
+
+  - hostname: www.psitransfer.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: www.psitransfer.iahome.fr
+      noTLSVerify: true
+      
+  - hostname: metube.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: metube.iahome.fr
+      noTLSVerify: true
+
+  - hostname: www.metube.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: www.metube.iahome.fr
+      noTLSVerify: true
+      
+  # PDF - Comme Metube et PsiTransfer (routage direct vers le service)
+  - hostname: pdf.iahome.fr
+    service: http://192.168.1.39:8086
+    originRequest:
+      httpHostHeader: pdf.iahome.fr
+      noTLSVerify: true
+
+  # Apps Gradio - PhotoMaker, BiRefNet, Animagine XL, Florence-2
+  - hostname: photomaker.iahome.fr
+    service: http://192.168.1.39:7881
+    originRequest:
+      httpHostHeader: photomaker.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  - hostname: birefnet.iahome.fr
+    service: http://192.168.1.39:7882
+    originRequest:
+      httpHostHeader: birefnet.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  - hostname: musetalk.iahome.fr
+    service: http://192.168.1.39:7886
+    originRequest:
+      httpHostHeader: musetalk.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  - hostname: animaginexl.iahome.fr
+    service: http://192.168.1.39:7883
+    originRequest:
+      httpHostHeader: animaginexl.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  - hostname: florence2.iahome.fr
+    service: http://192.168.1.39:7884
+    originRequest:
+      httpHostHeader: florence2.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  - hostname: photo-vivante.iahome.fr
+    service: http://192.168.1.39:7887
+    originRequest:
+      httpHostHeader: photo-vivante.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  # Services IA - StableDiffusion (localhost)
+  - hostname: stablediffusion.iahome.fr
+    service: http://192.168.1.39:7880
+    originRequest:
+      httpHostHeader: stablediffusion.iahome.fr
+      noTLSVerify: true
+      
+  # Stability Matrix (PC local 192.168.1.39 — apps sur 127.0.0.1 + portproxy LAN)
+  - hostname: comfyui.iahome.fr
+    service: http://192.168.1.39:8188
+    originRequest:
+      httpHostHeader: comfyui.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 60s
+      tcpKeepAlive: 30s
+      
+  - hostname: ruinedfooocus.iahome.fr
+    service: http://192.168.1.39:7870
+    originRequest:
+      httpHostHeader: ruinedfooocus.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 60s
+      tcpKeepAlive: 30s
+      
+  - hostname: cogstudio.iahome.fr
+    service: http://192.168.1.39:8080
+    originRequest:
+      httpHostHeader: cogstudio.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 60s
+      tcpKeepAlive: 30s
+
+  # Meeting Reports
+  - hostname: meeting-reports.iahome.fr
+    service: http://192.168.1.39:3050
+    originRequest:
+      httpHostHeader: meeting-reports.iahome.fr
+      noTLSVerify: true
+
+  # Hunyuan 3D (Hi3DGen — servi par Next.js iahome, rewrite middleware)
+  - hostname: hunyuan3d.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: hunyuan3d.iahome.fr
+      noTLSVerify: true
+
+  # Home Assistant (codes statiques iahome.fr)
+  - hostname: homeassistant.iahome.fr
+    service: http://192.168.1.39:8123
+    originRequest:
+      httpHostHeader: homeassistant.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tlsTimeout: 10s
+      tcpKeepAlive: 30s
+
+  # Portail regispailler.fr (NAS Synology - conteneur portail port 8880)
+  - hostname: regispailler.fr
+    service: http://192.168.1.130:8880
+    originRequest:
+      httpHostHeader: regispailler.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  - hostname: www.regispailler.fr
+    service: http://192.168.1.130:8880
+    originRequest:
+      httpHostHeader: www.regispailler.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  # NAS DSM via proxy HTTP Synology (port 6401) — voir portail/demarrer-nas-proxy.ps1
+  - hostname: nas.regispailler.fr
+    service: http://192.168.1.130:6401
+    originRequest:
+      httpHostHeader: nas.regispailler.fr
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  # Portainer NAS
+  - hostname: portainer.regispailler.fr
+    service: http://192.168.1.130:9000
+    originRequest:
+      httpHostHeader: portainer.regispailler.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  # Portainer PC (conteneurs Docker sur cette machine — port hôte 9002)
+  - hostname: portainerpc.regispailler.fr
+    service: http://192.168.1.39:9002
+    originRequest:
+      httpHostHeader: portainerpc.regispailler.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  # Vaultwarden (NAS)
+  - hostname: vaultwarden.regispailler.fr
+    service: http://192.168.1.130:8222
+    originRequest:
+      httpHostHeader: vaultwarden.regispailler.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  # n8n (NAS)
+  - hostname: n8n.regispailler.fr
+    service: http://192.168.1.130:5678
+    originRequest:
+      httpHostHeader: n8n.regispailler.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  # Immo (PC Docker — port publie 3054)
+  - hostname: immo.regispailler.fr
+    service: http://192.168.1.39:3054
+    originRequest:
+      httpHostHeader: immo.regispailler.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  # Home Assistant (instance VM sur le NAS)
+  - hostname: ha.regispailler.fr
+    service: http://192.168.1.51:8123
+    originRequest:
+      httpHostHeader: ha.regispailler.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tlsTimeout: 10s
+      tcpKeepAlive: 30s
+
+  # Music Assistant (instance sur le NAS / HA 192.168.1.51)
+  - hostname: ma.regispailler.fr
+    service: http://192.168.1.51:8095
+    originRequest:
+      httpHostHeader: ma.regispailler.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tlsTimeout: 10s
+      tcpKeepAlive: 30s
+      keepAliveTimeout: 90s
+
+  # Apprendre Autrement
+  - hostname: apprendre-autrement.iahome.fr
+    service: http://192.168.1.39:9001
+    originRequest:
+      httpHostHeader: apprendre-autrement.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tlsTimeout: 10s
+      tcpKeepAlive: 30s
+
+  # Prompt Generator
+  - hostname: prompt-generator.iahome.fr
+    service: http://192.168.1.39:3002
+    originRequest:
+      httpHostHeader: prompt-generator.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tlsTimeout: 10s
+      tcpKeepAlive: 30s
+
+  # Voice Isolation (Isolation Vocale)
+  - hostname: voice-isolation.iahome.fr
+    service: http://192.168.1.39:8100
+    originRequest:
+      httpHostHeader: voice-isolation.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tlsTimeout: 10s
+      tcpKeepAlive: 30s
+
+  # TTS (Synthèse vocale XTTS v2)
+  - hostname: tts.iahome.fr
+    service: http://192.168.1.39:8101
+    originRequest:
+      httpHostHeader: tts.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tlsTimeout: 10s
+      tcpKeepAlive: 30s
+
+  # Vote en ligne
+  - hostname: vote.iahome.fr
+    service: http://192.168.1.39:7890
+    originRequest:
+      httpHostHeader: vote.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tlsTimeout: 10s
+      tcpKeepAlive: 30s
+
+  # Réveil Intelligent
+  - hostname: reveil-intelligent.iahome.fr
+    service: http://192.168.1.39:7891
+    originRequest:
+      httpHostHeader: reveil-intelligent.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tlsTimeout: 10s
+      tcpKeepAlive: 30s
+
+  # Portainer - Interface de gestion Docker (PC local - port 9002)
+  # Note: Port 9000 = Portainer sur le NAS, Port 9002 = Portainer sur le PC
+  - hostname: portainer.iahome.fr
+    service: http://192.168.1.39:9002
+    originRequest:
+      httpHostHeader: portainer.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tlsTimeout: 10s
+      tcpKeepAlive: 30s
+
+
+  - hostname: resas.iahome.fr
+    service: http://192.168.1.39:5000
+    originRequest:
+      httpHostHeader: resas.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  - hostname: game.iahome.fr
+    service: http://192.168.1.39:5000
+    originRequest:
+      httpHostHeader: game.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  # Minecraft Java (serveur local :25565)
+  - hostname: minecraft.iahome.fr
+    service: tcp://192.168.1.39:25565
+    originRequest:
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  # Catch-all pour les requêtes non reconnues
+  - service: http_status:404
+
