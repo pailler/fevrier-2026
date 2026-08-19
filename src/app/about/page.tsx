@@ -21,8 +21,8 @@ export default function AboutPage() {
                 un outil que chacun peut utiliser et comprendre.
               </p>
               <p className="text-gray-600">
-                Notre plateforme propose des formations interactives, des outils pratiques 
-                et un accompagnement personnalisé pour vous aider à maîtriser l'IA.
+                Notre écosystème propose des formations interactives, des outils pratiques 
+                et un accompagnement personnalisé pour vous aider à maîtriser l&apos;IA.
               </p>
             </div>
 

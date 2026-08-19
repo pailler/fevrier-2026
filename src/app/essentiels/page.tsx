@@ -310,10 +310,10 @@ export default function Essentiels() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
-                Outils essentiels IAHome
+                Ecosystème d&apos;outils essentiels IAHome
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Les outils indispensables pour votre productivité : téléchargement de vidéos, transfert de fichiers, conversion PDF, test de vitesse internet, QR codes dynamiques, apprentissage du code, domotique, votes en ligne (PIN + QR), réservation de matériel, Photobooth/Videobooth connecté et services administratifs. Tous accessibles directement depuis votre navigateur, sans téléchargement ni installation.
+                L&apos;écosystème d&apos;outils indispensables pour votre productivité : téléchargement de vidéos, transfert de fichiers, conversion PDF, test de vitesse internet, QR codes dynamiques, apprentissage du code, domotique, votes en ligne (PIN + QR), réservation de matériel, Photobooth/Videobooth connecté et services administratifs. Tous accessibles directement depuis votre navigateur, sans téléchargement ni installation.
               </p>
               
               {/* Barre de recherche et bouton Mes applis */}

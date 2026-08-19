@@ -3,9 +3,9 @@ import { buildPageSeo } from '@/utils/pageMetadata';
 
 export const metadata: Metadata = buildPageSeo({
   path: '/applications',
-  title: 'Applications IA et services en ligne — tout-en-un',
+  title: 'Ecosystème d\'applications IA et services en ligne — tout-en-un',
   description:
-    'Whisper, Stable Diffusion, PDF+IA, Home Assistant, QR codes, transcription, images et plus encore. Une plateforme française : un compte, des crédits, accès aux services, interface en français.',
+    'Whisper, Stable Diffusion, PDF+IA, Home Assistant, QR codes, transcription, images et plus encore. Un écosystème français : un compte, des crédits, accès aux services, interface en français.',
   keywords: [
     'applications IA',
     'plateforme IA France',

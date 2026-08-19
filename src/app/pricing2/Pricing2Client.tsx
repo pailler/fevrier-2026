@@ -208,7 +208,7 @@ export default function Pricing2Client() {
                   <span className="text-yellow-300 mr-2 text-xl">✓</span>
                   <div>
                     <div className="font-semibold text-white">12+ Outils IA</div>
-                    <div className="text-sm text-green-100">Une plateforme complète, sans téléchargement</div>
+                    <div className="text-sm text-green-100">Un écosystème complet, sans téléchargement</div>
                   </div>
                 </div>
                 <div className="flex items-start">

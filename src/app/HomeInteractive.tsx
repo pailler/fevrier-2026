@@ -217,7 +217,7 @@ export default function HomeInteractive() {
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
               <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
-                Outils essentiels, toutes plateformes, sans install
+                Ecosystème d&apos;outils essentiels, toutes plateformes, sans install
               </h1>
               <p className="text-xl text-gray-700 mb-6">
                 Apprenez, pratiquez et grandissez : l'IA simplifie votre quotidien, boost vos projets et décuple vos idées. Sans téléchargement.
@@ -241,7 +241,7 @@ export default function HomeInteractive() {
                 
               {/* Texte supplémentaire */}
               <div className="mt-6 text-sm text-gray-600">
-                <p className="font-medium">Explorez notre collection complète d'outils conçus pour simplifier votre travail et booster votre productivité. Tous nos services sont des web-services accessibles directement depuis votre navigateur, sans installation ni téléchargement.</p>
+                <p className="font-medium">Explorez notre écosystème complet d&apos;outils conçus pour simplifier votre travail et booster votre productivité. Tous nos services sont des web-services accessibles directement depuis votre navigateur, sans installation ni téléchargement.</p>
               </div>
             </div>
             
@@ -489,7 +489,7 @@ export default function HomeInteractive() {
               Prêt à commencer ?
             </h2>
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Découvrez la puissance de l'IA avec nos outils professionnels et rejoignez une communauté en pleine croissance.
+              Découvrez la puissance de notre écosystème IA et rejoignez une communauté en pleine croissance.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
