@@ -8,10 +8,10 @@ export const dynamic = 'force-dynamic';
 
 export default function MarketingPage() {
   useEffect(() => {
-    document.title = 'IA Home - Découvrez la Puissance de l\'IA | Plateforme Complète';
+    document.title = 'IA Home - Découvrez la Puissance de l\'IA | Ecosystème Complet';
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', 'IA Home : La plateforme française complète d\'intelligence artificielle. Outils IA professionnels, formations, et services de productivité. Rejoignez des milliers d\'utilisateurs qui font confiance à IA Home.');
+      metaDescription.setAttribute('content', 'IA Home : L\'écosystème français complet d\'intelligence artificielle. Outils IA professionnels, formations, et services de productivité. Rejoignez des milliers d\'utilisateurs qui font confiance à IA Home.');
     }
   }, []);
 
@@ -116,13 +116,13 @@ export default function MarketingPage() {
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center max-w-4xl mx-auto animate-fade-in-up">
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-6 leading-tight animate-text-glow">
-              La Plateforme IA Complète
+              L&apos;Ecosystème IA Complet
               <br />
               <span className="text-yellow-300">Pour Tous Vos Besoins</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-blue-100 animate-fade-in-up-delayed">
-              En plus des applis essentielles pour vos usages numériques courants, découvrez nos outils d'intelligence artificielle professionnels. 
-              Transcription, génération d'images, traitement de documents et bien plus.
+              En plus des applis essentielles pour vos usages numériques courants, découvrez notre écosystème d&apos;outils d&apos;intelligence artificielle professionnels. 
+              Transcription, génération d&apos;images, traitement de documents et bien plus.
               <br />
               <span className="text-yellow-200 font-semibold">Tous nos services sont accessibles directement depuis votre navigateur, sans téléchargement ni installation.</span>
             </p>
@@ -168,7 +168,7 @@ export default function MarketingPage() {
               Pourquoi Choisir IA Home ?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Une plateforme complète, sécurisée et accessible pour tous vos besoins en intelligence artificielle
+              Un écosystème complet, sécurisé et accessible pour tous vos besoins en intelligence artificielle
             </p>
           </div>
 
@@ -353,7 +353,7 @@ export default function MarketingPage() {
               Nos Services Populaires
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Découvrez nos outils les plus utilisés par des milliers d'utilisateurs. Tous accessibles directement depuis votre navigateur, sans téléchargement ni installation.
+              Découvrez les outils les plus utilisés de notre écosystème. Tous accessibles directement depuis votre navigateur, sans téléchargement ni installation.
             </p>
           </div>
 

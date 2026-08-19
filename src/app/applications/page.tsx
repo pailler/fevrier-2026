@@ -354,7 +354,7 @@ export default function Home() {
                 Utilisez à distance la puissance GPU des ordinateurs IAHome
               </h1>
               <p className="text-xl text-gray-700 mb-6">
-                Le numérique à portée de main, pour une utilisation simple et directe de l'IA. Sans téléchargement.
+                Notre écosystème numérique à portée de main, pour une utilisation simple et directe de l&apos;IA. Sans téléchargement.
               </p>
               
               {/* Barre de recherche et bouton Mes applis */}

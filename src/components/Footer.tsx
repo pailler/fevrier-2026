@@ -21,7 +21,7 @@ export default function Footer() {
               <span className="text-2xl font-bold text-blue-400">IAhome</span>
             </div>
             <p className="text-gray-300 mb-4">
-              Accès direct à la puissance et aux outils IA.
+              Votre écosystème d&apos;outils IA essentiels.
             </p>
             <div className="flex space-x-4">
               <a href="https://www.youtube.com/@pailleradamhome" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-500 transition-colors" title="Chaîne YouTube d'Adam Pailler">

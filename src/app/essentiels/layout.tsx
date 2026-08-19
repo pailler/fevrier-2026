@@ -3,11 +3,11 @@ import { buildPageSeo } from '@/utils/pageMetadata';
 
 export const metadata: Metadata = buildPageSeo({
   path: '/essentiels',
-  title: 'Essentiels — hub de démarrage des services IAHome',
+  title: 'Ecosystème d\'outils essentiels — services IAHome',
   description:
-    'Accès centralisé aux essentiels IAHome : lancer vos applications, scripts et services associés à la plateforme.',
+    'Accès centralisé à l\'écosystème d\'outils essentiels IAHome : lancer vos applications, scripts et services associés à la plateforme.',
   keywords: [
-    'essentiels IAHome',
+    'écosystème outils essentiels IAHome',
     'démarrer services IAHome',
     'hub applications',
     'lancer outils IA',

@@ -12,13 +12,13 @@ import { JsonLd } from '../components/JsonLd'
 import { getDefaultJsonLdGraph } from '../utils/structuredData'
 
 export const metadata: Metadata = {
-  title: 'IAHome — Toutes les applications et la puissance des serveurs IAHome chez vous',
+  title: 'IAHome — Ecosystème d\'outils essentiels, toutes plateformes, sans install',
   description:
-    'Toutes les applications et la puissance des serveurs IAHome chez vous : Whisper, images IA, PDF, domotique, QR codes et plus. Interface en français, crédits transparents.',
+    'Votre écosystème d\'outils d\'intelligence artificielle : Whisper, images IA, PDF, domotique, QR codes et plus. Toutes plateformes, sans installation. Interface en français, crédits transparents.',
   applicationName: 'IA Home',
   authors: [{ name: 'IA Home', url: 'https://iahome.fr' }],
   keywords: [
-    'plateforme IA France',
+    'écosystème IA France',
     'intelligence artificielle',
     'outils IA en ligne',
     'IA française',
@@ -77,9 +77,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'IAHome — Toutes les applications et la puissance des serveurs IAHome chez vous',
+    title: 'IAHome — Ecosystème d\'outils essentiels, toutes plateformes, sans install',
     description:
-      'Whisper, Stable Diffusion, PDF+IA, Home Assistant et plus : une plateforme en français, avec crédits clairs.',
+      'Whisper, Stable Diffusion, PDF+IA, Home Assistant et plus : un écosystème en français, avec crédits clairs.',
     url: 'https://iahome.fr',
     siteName: 'IA Home',
     locale: 'fr_FR',
@@ -89,7 +89,7 @@ export const metadata: Metadata = {
         url: 'https://iahome.fr/images/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'IA Home - Plateforme d\'Intelligence Artificielle - Formation et Outils IA',
+        alt: 'IA Home - Ecosystème d\'Intelligence Artificielle - Formation et Outils IA',
         type: 'image/jpeg',
       },
     ],
@@ -99,9 +99,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@iahome_fr',
     creator: '@iahome_fr',
-    title: 'IAHome — Toutes les applications et la puissance des serveurs IAHome chez vous',
+    title: 'IAHome — Ecosystème d\'outils essentiels, toutes plateformes, sans install',
     description:
-      'Toutes les applications et la puissance des serveurs IAHome chez vous. Interface en français, crédits transparents.',
+      'Votre écosystème d\'outils IA au même endroit : interface en français, crédits transparents.',
     images: ['https://iahome.fr/images/og-image.jpg'],
   },
   icons: {

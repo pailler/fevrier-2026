@@ -5,10 +5,10 @@ import { subdomainsConfig } from '../../utils/subdomainsConfig';
 
 export default function AvantagesPage() {
   useEffect(() => {
-    document.title = 'Avantages IA Home - Pourquoi Choisir Notre Plateforme IA';
+    document.title = 'Avantages IA Home - Pourquoi Choisir Notre Ecosystème IA';
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', 'Découvrez tous les avantages de la plateforme IA Home : offres compétitives, outils professionnels, sécurité maximale, support français. Comparez et choisissez la meilleure solution IA.');
+      metaDescription.setAttribute('content', 'Découvrez tous les avantages de l\'écosystème IA Home : offres compétitives, outils professionnels, sécurité maximale, support français. Comparez et choisissez la meilleure solution IA.');
     }
   }, []);
 
@@ -112,7 +112,7 @@ export default function AvantagesPage() {
               Pourquoi Choisir IA Home ?
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-blue-100">
-              La plateforme IA française complète avec les meilleures offres du marché
+              L&apos;écosystème IA français complet avec les meilleures offres du marché
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
