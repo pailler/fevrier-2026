@@ -18,8 +18,8 @@ export type CardProductInput = {
 export function getSoftwareApplicationJsonLd(input: CardProductInput) {
   const url = `${SITE_URL}/card/${input.slug}`;
   return {
-    '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
+    '@id': `${url}#software`,
     name: input.name,
     applicationCategory: input.applicationCategory ?? 'WebApplication',
     operatingSystem: 'Web',
@@ -27,7 +27,7 @@ export function getSoftwareApplicationJsonLd(input: CardProductInput) {
     description: input.description,
     inLanguage: 'fr-FR',
     ...(input.features?.length ? { featureList: input.features } : {}),
-    ...(input.priceTokens
+    ...(input.priceTokens !== undefined
       ? {
           offers: {
             '@type': 'Offer',
@@ -42,6 +42,21 @@ export function getSoftwareApplicationJsonLd(input: CardProductInput) {
   };
 }
 
+export function getWebPageJsonLd(input: CardProductInput) {
+  const url = `${SITE_URL}/card/${input.slug}`;
+  return {
+    '@type': 'WebPage',
+    '@id': `${url}#webpage`,
+    url,
+    name: input.name,
+    description: input.description,
+    inLanguage: 'fr-FR',
+    isPartOf: { '@id': `${SITE_URL}/#website` },
+    about: { '@id': `${url}#software` },
+    primaryImageOfPage: { '@type': 'ImageObject', url: `${SITE_URL}/og-image.jpg` },
+  };
+}
+
 export function getCardBreadcrumbJsonLd(slug: string, productName: string) {
   const items: BreadcrumbItem[] = [
     { name: 'Accueil', path: '/' },
@@ -51,9 +66,10 @@ export function getCardBreadcrumbJsonLd(slug: string, productName: string) {
   return getBreadcrumbListJsonLd(items);
 }
 
-/** Graphe JSON-LD complet pour une fiche produit (SoftwareApplication + BreadcrumbList + FAQ optionnelle). */
+/** Graphe JSON-LD complet pour une fiche produit (WebPage + SoftwareApplication + BreadcrumbList + FAQ). */
 export function getCardPageJsonLdGraph(product: CardProductInput, faqs?: FaqPair[]) {
   const graph: Record<string, unknown>[] = [
+    getWebPageJsonLd(product),
     getSoftwareApplicationJsonLd(product),
     getCardBreadcrumbJsonLd(product.slug, product.name),
   ];

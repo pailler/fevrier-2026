@@ -11,7 +11,7 @@ interface PromotionalBannerProps {
 }
 
 export default function PromotionalBanner({
-  message = "🎉 Nouveau : Découvrez nos outils IA professionnels !",
+  message = "🇫🇷 Plateforme française · RGPD · Support en français — 30+ outils sur PC et smartphone",
   ctaText = "Voir les applications",
   ctaLink = "/applications",
   variant = 'default',

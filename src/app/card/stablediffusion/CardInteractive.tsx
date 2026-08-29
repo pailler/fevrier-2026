@@ -60,9 +60,9 @@ export default function StableDiffusionPage({ initialModule }: CardInteractivePr
     }
 
     try {
-      // Rediriger directement vers stablediffusion via sous-domaine
-      const accessUrl = 'https://stablediffusion.iahome.fr';
-      console.log('🔗 stablediffusion: Accès direct à:', accessUrl);
+      // Passerelle token IAHome (landing SEO reste stablediffusion.iahome.fr)
+      const accessUrl = '/stablediffusion';
+      console.log('🔗 stablediffusion: Accès passerelle:', accessUrl);
       window.open(accessUrl, '_blank');
     } catch (error) {
       alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
@@ -534,7 +534,7 @@ export default function StableDiffusionPage({ initialModule }: CardInteractivePr
                         <div>
                           <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à Stable Diffusion</h3>
                           <p className="text-gray-700 leading-relaxed">
-                            Accédez à Stable Diffusion avec 100 crédits. L'accès est immédiat, le service est accessible depuis vos applications via stablediffusion.iahome.fr.
+                            Accédez à Stable Diffusion avec 100 crédits. L'accès est immédiat, le service est accessible depuis vos applications via iahome.fr/stablediffusion.
                           </p>
                         </div>
                       </div>
@@ -673,7 +673,7 @@ export default function StableDiffusionPage({ initialModule }: CardInteractivePr
                     <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser Stable Diffusion ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        Pour utiliser Stable Diffusion, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via stablediffusion.iahome.fr. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis.
+                        Pour utiliser Stable Diffusion, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via iahome.fr/stablediffusion. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis.
                       </p>
                     </div>
                     

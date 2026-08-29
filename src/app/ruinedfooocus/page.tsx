@@ -2,89 +2,103 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '../../utils/supabaseClient';
 
-export default function RuinedFooocusPage() {
+import { RUINEDFOOOCUS_LANDING_URL } from '@/utils/productLandingHosts';
+import { consumeStashedModuleToken } from '@/utils/moduleAppUrl';
+
+/**
+ * Passerelle auth par token (bouton d'accès carte / compte).
+ * Landing publique : https://ruinedfooocus.iahome.fr
+ * App : https://iahome.fr/ruinedfooocus?token=...
+ * Embed Gradio (interne) : /ruinedfooocus/embed — distinct, chargé en iframe après validation.
+ */
+export default function RuinedFooocusAppPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  const [tokenValidated, setTokenValidated] = useState(false);
+  const [tokenError, setTokenError] = useState<string | null>(null);
+  const [embedSrc, setEmbedSrc] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkAuthAndRedirect = async () => {
+    const validateToken = async () => {
+      if (typeof window === 'undefined') return;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = consumeStashedModuleToken('ruinedfooocus') || urlParams.get('token');
+
+      if (!token) {
+        window.location.replace(`${RUINEDFOOOCUS_LANDING_URL}/`);
+        return;
+      }
+
       try {
-        ;
-
-        ;
-
-        // Vérifier la session
-        const { data: { session }, error } = await supabase.auth.getSession();
-
-        console.log('🔍 Résultat vérification session:', { session: !!session, error });
-
-        if (error || !session) {
-          console.log('❌ Erreur session:', error);
-          console.log('❌ Session:', session);
-          ;
-          router.push('/access-denied');
-          return;
-        }
-
-        console.log('✅ Utilisateur authentifié:', session.user.email);
-
-        // Utilisateur authentifié
-        const user = session.user;
-        const moduleName = 'ruinedfooocus';
-
-        console.log('🔍 Génération token pour module:', moduleName);
-
-        // Générer un token automatique via API
-        const response = await fetch('/api/generate-auto-token', {
+        const response = await fetch('/api/validate-internal-token', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userId: user.id,
-            moduleName: moduleName,
-          }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, moduleId: 'ruinedfooocus' }),
         });
 
-        console.log('🔍 Réponse API generate-auto-token:', response.status);
-
         if (!response.ok) {
-          console.error('❌ Erreur lors de la génération du token');
-          router.push('/access-denied');
+          const errorData = await response.json().catch(() => ({}));
+          setTokenError(
+            (errorData as { error?: string }).error ||
+              'Token invalide ou expiré. Ouvrez RuinedFooocus depuis votre espace IAHome.'
+          );
           return;
         }
 
-        const { token } = await response.json();
-        ;
-
-        // Rediriger vers le wrapper sécurisé
-        const wrapperUrl = `/api/secure-app-wrapper?app=ruinedfooocus&auth_token=${token}&user_id=${user.id}&module=${moduleName}`;
-        console.log('🔍 Redirection vers:', wrapperUrl);
-        window.location.href = wrapperUrl;
-
-      } catch (error) {
-        console.error('❌ Erreur lors de la vérification d\'authentification:', error);
-        router.push('/access-denied');
-      } finally {
-        setIsLoading(false);
+        // Sans slash final : Next strippe /embed/ → /embed ; le root Gradio (proxy) garde le /
+        setEmbedSrc(`/ruinedfooocus/embed?token=${encodeURIComponent(token)}`);
+        setTokenValidated(true);
+        window.history.replaceState(
+          {},
+          document.title,
+          `${window.location.pathname}?token=${encodeURIComponent(token)}`
+        );
+      } catch {
+        setTokenError('Erreur lors de la validation du token. Veuillez réessayer.');
       }
     };
 
-    checkAuthAndRedirect();
-  }, [router]);
+    validateToken();
+  }, []);
 
-  if (isLoading) {
+  if (tokenError) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Vérification de l'authentification...</p>
+      <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 flex items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <p className="text-red-800 font-medium mb-2">Accès refusé</p>
+            <p className="text-red-600 mb-4">{tokenError}</p>
+            <button
+              type="button"
+              onClick={() => router.push('/account')}
+              className="bg-fuchsia-600 text-white px-4 py-2 rounded-lg hover:bg-fuchsia-700"
+            >
+              Retour aux modules
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  return null;
+  if (!tokenValidated || !embedSrc) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-fuchsia-600 mb-4" />
+          <p className="text-gray-600">Vérification de l&apos;accès RuinedFooocus…</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <iframe
+      title="RuinedFooocus IAHome"
+      src={embedSrc}
+      className="fixed inset-0 w-full h-full border-0 bg-white"
+      allow="clipboard-write; fullscreen"
+    />
+  );
 }

@@ -7,6 +7,7 @@ import Breadcrumb from '../../../components/Breadcrumb';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
 import YouTubeEmbed from '../../../components/YouTubeEmbed';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
+import { openModuleAppWithToken } from '@/utils/moduleAppUrl';
 
 export default function PsiTransferPage({ initialModule }: CardInteractiveProps) {
   const router = useRouter();
@@ -60,7 +61,7 @@ export default function PsiTransferPage({ initialModule }: CardInteractiveProps)
         const tokenRes = await fetch('/api/generate-access-token', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user.id, userEmail: user.email, moduleId: 'psitransfer' }) });
         const tokenData = await tokenRes.json();
         if (tokenData?.token) {
-          window.open(`https://psitransfer.iahome.fr?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
+          openModuleAppWithToken('psitransfer', tokenData.token);
           window.history.replaceState({}, document.title, '/card/psitransfer');
         }
       } catch (e) {
@@ -269,7 +270,7 @@ export default function PsiTransferPage({ initialModule }: CardInteractiveProps)
                         if (!tokenData?.token) {
                           throw new Error('Token d\'accès manquant');
                         }
-                        window.open(`https://psitransfer.iahome.fr?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
+                        openModuleAppWithToken('psitransfer', tokenData.token);
                       } else {
                         console.error('❌ Erreur accès PsiTransfer:', result.error);
                         alert(`Erreur lors de l'accès: ${result.error}`);

@@ -1,11 +1,11 @@
 # Configuration Traefik pour Portainer
-# Route portainer.iahome.fr vers portainer:9000
+# portainer.iahome.fr · portainerpc.regispailler.fr → iahome-portainer:9000
 
 http:
   routers:
     # Route principale HTTP (Cloudflare SSL - HTTP vers Traefik)
     portainer-main:
-      rule: "Host(`portainer.iahome.fr`)"
+      rule: "Host(`portainer.iahome.fr`) || Host(`portainerpc.regispailler.fr`)"
       entryPoints: ["web"]
       service: portainer-service
       middlewares: ["security-headers@file", "portainer-proxy-headers@file"]
@@ -13,7 +13,7 @@ http:
 
     # Route HTTPS (si SSL direct sans Cloudflare)
     portainer-https:
-      rule: "Host(`portainer.iahome.fr`)"
+      rule: "Host(`portainer.iahome.fr`) || Host(`portainerpc.regispailler.fr`)"
       entryPoints: ["websecure"]
       service: portainer-service
       tls:

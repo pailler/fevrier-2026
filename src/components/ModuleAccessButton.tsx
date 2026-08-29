@@ -1,14 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { loginHrefFromWindow, loginUrlWithReturn } from '../utils/loginRedirect';
-import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import { useTokenContext } from '../contexts/TokenContext';
-import { getHunyuan3dAppUrl } from '../utils/hunyuan3dAppUrl';
-import { isBrowserLocalIahomeDev } from '../utils/isBrowserLocalIahomeDev';
 import { FREE_UNLIMITED_ACCESS_LABEL } from '../utils/tokenActionService';
+import { getModuleAppUrl, openModuleAppWithToken, openPendingModuleTab, redirectToLogin } from '../utils/moduleAppUrl';
 
 interface ModuleAccessButtonProps {
   moduleId: string;
@@ -34,83 +31,20 @@ export default function ModuleAccessButton({
   const [error, setError] = useState<string | null>(null);
   const { user, isAuthenticated } = useCustomAuth();
   const { tokens, refreshTokens } = useTokenContext();
-  const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const loginHref = loginUrlWithReturn(pathname, searchParams);
 
   const resolveModuleUrl = () => {
     if (accessUrl) return accessUrl;
-    const normalizedModuleId = (moduleId || '').trim().toLowerCase();
-    const isDevelopment = isBrowserLocalIahomeDev();
-    const urlMap: Record<string, string> = isDevelopment
-      ? {
-          'librespeed': 'http://localhost:8085',
-          'qrcodes': 'http://localhost:7006',
-          'photomaker': 'http://localhost:7881',
-          'birefnet': 'http://localhost:7882',
-          'animagine-xl': 'http://localhost:7883',
-          'sentinelle-numerique': 'http://localhost:3000/sentinelle-numerique',
-          'florence-2': 'http://localhost:7884',
-          'musetalk': 'http://localhost:7886',
-          'photo-vivante': 'http://localhost:7887',
-          'home-assistant': 'http://localhost:8123',
-          'hunyuan3d': getHunyuan3dAppUrl(),
-          'stablediffusion': 'http://localhost:7880',
-          'meeting-reports': 'http://localhost:3050',
-          'whisper': 'http://localhost:8093',
-          'ruinedfooocus': 'http://localhost:7870',
-          'comfyui': 'http://localhost:8188',
-          'photobooth': 'http://localhost:7885',
-          'vote': 'http://localhost:7890',
-          'reveil-intelligent': 'http://localhost:7891',
-        }
-        : {
-          'librespeed': 'https://librespeed.iahome.fr',
-          'qrcodes': 'https://qrcodes.iahome.fr',
-          'photomaker': 'https://photomaker.iahome.fr',
-          'birefnet': 'https://birefnet.iahome.fr',
-          'animagine-xl': 'https://animaginexl.iahome.fr',
-          'sentinelle-numerique': 'https://iahome.fr/sentinelle-numerique',
-          'florence-2': 'https://florence2.iahome.fr',
-          'musetalk': 'https://musetalk.iahome.fr',
-          'photo-vivante': 'https://photo-vivante.iahome.fr',
-          'home-assistant': 'https://homeassistant.iahome.fr',
-          'hunyuan3d': getHunyuan3dAppUrl(),
-          'stablediffusion': 'https://stablediffusion.iahome.fr',
-          'meeting-reports': 'https://meeting-reports.iahome.fr',
-          'whisper': 'https://whisper.iahome.fr',
-          'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
-          'comfyui': 'https://comfyui.iahome.fr',
-          'photobooth': 'https://photobooth.iahome.fr',
-          'vote': 'https://vote.iahome.fr',
-          'reveil-intelligent': 'https://reveil-intelligent.iahome.fr',
-        };
-
-    if (urlMap[normalizedModuleId]) {
-      return urlMap[normalizedModuleId];
-    }
-
-    const subdomainAliases: Record<string, string> = {
-      'animagine-xl': 'animaginexl',
-      'florence-2': 'florence2',
-      'home-assistant': 'homeassistant',
-    };
-
-    const computedSubdomain = subdomainAliases[normalizedModuleId] || normalizedModuleId;
-    return computedSubdomain ? `https://${computedSubdomain}.iahome.fr` : '';
+    return getModuleAppUrl(moduleId);
   };
 
   const handleAccess = async () => {
     if (!isAuthenticated) {
-      if (typeof window !== 'undefined') {
-        const q = window.location.search.replace(/^\?/, '');
-        router.push(
-          loginUrlWithReturn(pathname || window.location.pathname, { toString: () => q })
-        );
-      } else {
-        router.push(loginHrefFromWindow());
-      }
+      const returnPath =
+        typeof window !== 'undefined'
+          ? `${pathname || window.location.pathname}${window.location.search || ''}`
+          : pathname || '/';
+      redirectToLogin(returnPath);
       return;
     }
 
@@ -127,6 +61,9 @@ export default function ModuleAccessButton({
 
     setIsLoading(true);
     setError(null);
+
+    const targetUrlPreview = resolveModuleUrl();
+    const pendingTab = openPendingModuleTab();
 
     try {
       const response = await fetch('/api/generate-access-token', {
@@ -158,12 +95,11 @@ export default function ModuleAccessButton({
       }
 
       const targetUrl = resolveModuleUrl();
-      if (targetUrl) {
-        const separator = targetUrl.includes('?') ? '&' : '?';
-        window.open(`${targetUrl}${separator}token=${encodeURIComponent(token)}`, '_blank');
-      } else {
+      if (!targetUrl) {
         throw new Error(`URL d'accès introuvable pour le module ${moduleId}`);
       }
+
+      openModuleAppWithToken(moduleId, token, targetUrl, pendingTab);
       
       try {
         await refreshTokens();
@@ -173,6 +109,9 @@ export default function ModuleAccessButton({
       
       onAccessSuccess?.();
     } catch (err) {
+      if (pendingTab && !pendingTab.closed) {
+        pendingTab.close();
+      }
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
       console.error(`❌ Erreur accès module ${moduleName}:`, errorMessage);
       setError(errorMessage);
@@ -182,13 +121,17 @@ export default function ModuleAccessButton({
     }
   };
 
+  const insufficientCredits =
+    moduleCost > 0 && tokens !== null && tokens < moduleCost;
+  const buttonDisabled = isLoading || insufficientCredits;
+
   return (
     <div className={`flex flex-col items-center space-y-2 ${className}`}>
       <button
         onClick={handleAccess}
-        disabled={isLoading || !isAuthenticated || (moduleCost > 0 && tokens !== null && tokens < moduleCost)}
+        disabled={buttonDisabled}
         className={`w-full font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 shadow-lg ${
-          isLoading || !isAuthenticated || (moduleCost > 0 && tokens !== null && tokens < moduleCost)
+          buttonDisabled
             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
             : 'bg-[#16a34a] hover:bg-[#15803d] text-white hover:shadow-xl transform hover:-translate-y-1'
         }`}
@@ -200,12 +143,14 @@ export default function ModuleAccessButton({
           </>
         ) : (
           <>
-            <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+            <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
               <polyline points="10 17 15 12 10 7" />
               <line x1="15" y1="12" x2="3" y2="12" />
             </svg>
-            <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">Accéder à {moduleName}</span>
+            <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">
+              {isAuthenticated && user ? `Accéder à ${moduleName}` : `Connectez-vous pour accéder`}
+            </span>
             <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">
               {moduleCost === 0 ? FREE_UNLIMITED_ACCESS_LABEL : `${moduleCost} crédits par accès`}
             </span>
@@ -219,13 +164,7 @@ export default function ModuleAccessButton({
         </div>
       )}
       
-      {!isAuthenticated && (
-        <Link href={loginHref} className="text-blue-600 hover:text-blue-800 text-sm underline">
-          Connectez-vous pour accéder
-        </Link>
-      )}
-      
-      {isAuthenticated && moduleCost > 0 && tokens !== null && tokens < moduleCost && (
+      {isAuthenticated && insufficientCredits && (
         <div className="text-red-600 text-sm text-center max-w-xs">
           Crédits insuffisants ({tokens}/{moduleCost})
         </div>

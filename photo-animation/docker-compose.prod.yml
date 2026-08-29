@@ -20,7 +20,7 @@ services:
       - "7887:7887"
     volumes:
       - ./outputs:/app/outputs
-      - photo_vivante_models_cache:/ai-models-cache/huggingface
+      - ../../StabilityMatrix-win-x64/Data/Models/Diffusers:/ai-models-cache/huggingface:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:7887')"]
       interval: 30s
@@ -35,6 +35,3 @@ services:
         reservations:
           memory: 512M
           cpus: "0.25"
-
-volumes:
-  photo_vivante_models_cache:

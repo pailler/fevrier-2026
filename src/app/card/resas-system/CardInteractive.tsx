@@ -9,6 +9,7 @@ import CardPageActivationSection from '@/components/CardPageActivationSection';
 import { useCustomAuth } from '@/hooks/useCustomAuth';
 import { supabase } from '@/utils/supabaseClient';
 import { getTokenCostForModuleId } from '@/utils/tokenActionService';
+import { RESAS_SYSTEM_APP_URL } from '@/utils/productLandingHosts';
 
 interface Card {
   id: string;
@@ -34,13 +35,6 @@ const DEFAULT_RESAS: Card = {
 export default function ResasSystemCardPage({ initialModule }: CardInteractiveProps) {
   const { loading: authLoading } = useCustomAuth();
   const [card, setCard] = useState<Card | null>(DEFAULT_RESAS);
-  const [resasAccessUrl, setResasAccessUrl] = useState('https://resas.iahome.fr');
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-      setResasAccessUrl('http://localhost:5000');
-    }
-  }, []);
 
   useEffect(() => {
     const fetchCard = async () => {
@@ -187,7 +181,7 @@ export default function ResasSystemCardPage({ initialModule }: CardInteractivePr
                   moduleName={card.title}
                   moduleCost={moduleCost}
                   moduleDescription={card.description}
-                  accessUrl={resasAccessUrl}
+                  accessUrl={RESAS_SYSTEM_APP_URL}
                   onAccessSuccess={() => {}}
                   onAccessError={(err) => console.error('Resas access:', err)}
                 />
@@ -239,7 +233,8 @@ export default function ResasSystemCardPage({ initialModule }: CardInteractivePr
             <p className="text-gray-700 leading-relaxed">
               Utilisez le bouton d&apos;accès pour ouvrir l&apos;application. Les crédits sont débités selon le tarif du
               module ({moduleCost} crédits par accès). Connectez-vous avec votre compte IAHome ; en cas de solde
-              insuffisant, rechargez depuis la page Tarifs.
+              insuffisant, rechargez depuis la page Tarifs. L&apos;URL d&apos;accès est sécurisée par token
+              (`iahome.fr/resas-system?token=…`).
             </p>
           </div>
         </div>
@@ -254,7 +249,7 @@ export default function ResasSystemCardPage({ initialModule }: CardInteractivePr
         icon="📅"
         moduleTitle={card.title}
         moduleDescription={card.description}
-        accessUrl={resasAccessUrl}
+        accessUrl={RESAS_SYSTEM_APP_URL}
       />
     </div>
   );

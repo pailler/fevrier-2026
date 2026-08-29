@@ -1,12 +1,9 @@
-import { CardPageJsonLd } from '@/components/CardPageJsonLd'
-import type { Metadata } from 'next';
+import { CardPageJsonLd } from '@/components/CardPageJsonLd';
+import { buildToolCardMetadata } from '@/utils/buildToolCardSeo';
 
-export const metadata: Metadata = {
-  title: 'Hi3DGen — Image vers 3D | IA Home',
-  description: 'Générez des modèles 3D à partir d\'images avec Hi3DGen. Haute fidélité géométrique via ComfyUI.',
-};
+export const metadata = buildToolCardMetadata('hi3dgen');
 
-export default function Hi3DGenLayout({ children }: { children: React.ReactNode }) {
+export default function Hi3dgenLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <CardPageJsonLd slug="hi3dgen" />

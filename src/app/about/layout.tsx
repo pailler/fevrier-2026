@@ -1,15 +1,17 @@
 import type { Metadata } from 'next';
 import { buildPageSeo } from '@/utils/pageMetadata';
+import { getValueProposition } from '@/data/ecosystemValueProposition';
+
+const aboutVp = getValueProposition('about');
 
 export const metadata: Metadata = buildPageSeo({
   path: '/about',
   title: 'À propos — mission et vision IAHome',
-  description:
-    'IAHome démocratise l’intelligence artificielle en France : formations, outils pratiques et plateforme centralisée. Notre mission, notre équipe et nos valeurs.',
+  description: `${aboutVp.subheadline} ${aboutVp.oneLiner}`,
   keywords: [
     'à propos IAHome',
     'mission IAHome',
-    'plateforme IA France',
+    'écosystème IA France',
     'démocratiser intelligence artificielle',
     'équipe IAHome',
     'valeurs IAHome',

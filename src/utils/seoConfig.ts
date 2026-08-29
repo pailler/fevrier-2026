@@ -45,11 +45,11 @@ export const seoConfig = {
   
   pages: {
     home: {
-      title: "IAHome — Outils essentiels, toutes plateformes, sans install",
+      title: "IAHome — Ecosystème d'outils essentiels, toutes plateformes, sans install",
       description:
-        "Outils essentiels, toutes plateformes, sans install : Whisper, Stable Diffusion, PDF+IA, Home Assistant, QR codes. Interface en français, crédits transparents.",
+        "Ecosystème d'outils essentiels, toutes plateformes, sans install : Whisper, Stable Diffusion, PDF+IA, Home Assistant, QR codes. Interface en français, crédits transparents.",
       keywords: [
-        "plateforme IA France",
+        "écosystème IA France",
         "outils IA en ligne",
         "transcription IA",
         "génération images IA",

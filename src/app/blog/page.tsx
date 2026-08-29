@@ -126,14 +126,6 @@ export default function BlogPage() {
     })),
   ];
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
   const handleEditArticle = (article: BlogArticle) => {
     router.push(`/admin/blog?edit=${article.id}`);
   };
@@ -388,8 +380,6 @@ export default function BlogPage() {
 
                   <div className="flex items-center text-sm text-gray-500">
                     <span>Par {article.author}</span>
-                    <span className="mx-2">•</span>
-                    <span>{formatDate(article.published_at)}</span>
                   </div>
                 </div>
               </article>

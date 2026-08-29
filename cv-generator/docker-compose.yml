@@ -1,0 +1,36 @@
+services:
+  cv-generator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cv-generator
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+      - HOSTNAME=0.0.0.0
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    ports:
+      - "3003:3003"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - cv-generator-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3003/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+
+networks:
+  cv-generator-network:
+    driver: bridge

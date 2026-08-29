@@ -15,17 +15,17 @@ if (-not (Test-Path (Join-Path $ProjectRoot "package.json"))) {
 }
 Set-Location $ProjectRoot
 . (Join-Path $PSScriptRoot "port-utils.ps1")
+. (Join-Path $PSScriptRoot "models-path.config.ps1")
 
 $ConfigFile = Join-Path $PSScriptRoot "apps-hosts.config.ps1"
 if (Test-Path $ConfigFile) { . $ConfigFile }
 
-# Cache Hugging Face
-$DefaultModelsCache = Join-Path $ProjectRoot "models-cache"
-if (-not $ModelsCachePath) { $ModelsCachePath = $DefaultModelsCache }
-if (-not (Test-Path $ModelsCachePath)) { New-Item -ItemType Directory -Path $ModelsCachePath -Force | Out-Null }
-$env:HF_HOME = $ModelsCachePath
-$env:HF_HUB_CACHE = Join-Path $ModelsCachePath "hub"
-$env:TRANSFORMERS_CACHE = Join-Path $ModelsCachePath "transformers"
+# Cache Hugging Face — Stability Matrix (Forge diffusers)
+if (-not (Set-IaHomeModelsEnv -Quiet)) {
+    Write-Host "[ERREUR] Stability Matrix introuvable. Installez Stability Matrix ou verifiez scripts\models-path.config.ps1" -ForegroundColor Red
+    exit 1
+}
+$ModelsCachePath = Get-IaHomeModelsCachePath
 $env:NO_PROXY = "localhost,127.0.0.1,::1"
 $env:no_proxy = $env:NO_PROXY
 

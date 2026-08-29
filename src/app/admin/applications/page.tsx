@@ -32,6 +32,13 @@ const PLATFORM_MODULE_FALLBACKS: Array<{
     category: 'OUTILS QUOTIDIEN',
     created_at: new Date().toISOString(),
   },
+  {
+    id: 'cv-generator',
+    title: 'Générateur de CV IA',
+    name: 'Générateur de CV IA',
+    category: 'PRODUCTIVITÉ',
+    created_at: new Date().toISOString(),
+  },
 ];
 
 interface Application {
@@ -107,6 +114,26 @@ interface ApplicationHealthCheck {
   errorMessage?: string;
   responseTime?: number;
   isCloudflareError?: boolean;
+  gateOk?: boolean;
+  originOk?: boolean;
+}
+
+interface CardAccessCheck {
+  module_id: string;
+  module_name: string;
+  card_slug: string;
+  card_page_url: string;
+  expected_app_url: string | null;
+  isValid: boolean;
+  isSkipped?: boolean;
+  issues: string[];
+  checks: {
+    cardPageExists: boolean;
+    hasAccessButtonInSource: boolean;
+    appUrlConfigured: boolean;
+    appUrlNotRedirectingToCard: boolean;
+  };
+  responseTimeMs?: number;
 }
 
 export default function AdminApplications() {
@@ -133,6 +160,8 @@ export default function AdminApplications() {
   const [loading, setLoading] = useState(true);
   const [healthChecks, setHealthChecks] = useState<Record<string, ApplicationHealthCheck>>({});
   const [checkingHealth, setCheckingHealth] = useState(false);
+  const [cardAccessChecks, setCardAccessChecks] = useState<Record<string, CardAccessCheck>>({});
+  const [checkingCardAccess, setCheckingCardAccess] = useState(false);
   
   // Services admin state
   const [activeTab, setActiveTab] = useState<'categories' | 'services' | 'url-checks'>('categories');
@@ -342,7 +371,7 @@ export default function AdminApplications() {
           description = `Votes en ligne : PIN organisateur, participants et QR code (vote.iahome.fr). Coût: ${costLabel}.`;
         } else if (moduleId === 'reveil-intelligent') {
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
-          description = `Réveil mobile (reveil-intelligent.iahome.fr) : alarmes récurrentes, musiques, prévisions météo horaires, jours fériés et vacances scolaires A/B/C, sync compte IAHome. ${costLabel}.`;
+          description = `Réveil mobile (landing reveil.iahome.fr, app iahome.fr/reveil) : alarmes récurrentes, musiques, prévisions météo horaires, jours fériés et vacances scolaires A/B/C, sync compte IAHome. ${costLabel}.`;
         } else if (moduleId.includes('home-assistant') || moduleId.includes('homeassistant')) {
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
           description = `Manuel utilisateur ultra complet pour domotiser votre habitat. Coût: ${costLabel}.`;
@@ -352,6 +381,9 @@ export default function AdminApplications() {
         } else if (moduleId.includes('prompt-generator')) {
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
           description = `Générateur de prompts optimisés pour ChatGPT et autres modèles de langage. Coût: ${costLabel}.`;
+        } else if (moduleId.includes('cv-generator')) {
+          estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
+          description = `Générateur de CV IA optimisé ATS, lettre de motivation et export PDF. Coût: ${costLabel}.`;
         } else if (moduleId.includes('ai-detector') || moduleId.includes('detecteur')) {
           estimatedRevenue = stats.totalUsage * tokenCost * 0.01;
           description = `Détecteur de contenu généré par IA. Analyse les documents texte, PDF, DOCX et images. Coût: ${costLabel}.`;
@@ -383,6 +415,8 @@ export default function AdminApplications() {
             moduleName = 'Services de l\'Administration';
           } else if (moduleId.includes('prompt-generator')) {
             moduleName = 'Générateur de prompts';
+          } else if (moduleId.includes('cv-generator')) {
+            moduleName = 'Générateur de CV IA';
           } else if (moduleId.includes('ai-detector') || moduleId.includes('detecteur')) {
             moduleName = 'Détecteur de Contenu IA';
           } else if (moduleId.includes('musetalk')) {
@@ -686,7 +720,9 @@ export default function AdminApplications() {
               statusCode: data.statusCode,
               errorMessage: data.errorMessage,
               responseTime: data.responseTime,
-              isCloudflareError: data.isCloudflareError
+              isCloudflareError: data.isCloudflareError,
+              gateOk: data.gateOk,
+              originOk: data.originOk,
             }
           }));
         }
@@ -698,6 +734,53 @@ export default function AdminApplications() {
       alert('Erreur lors de la vérification de la santé des applications');
     } finally {
       setCheckingHealth(false);
+    }
+  };
+
+  const handleCheckCardAccessButtons = async (moduleId?: string) => {
+    setCheckingCardAccess(true);
+    try {
+      if (!user || !isAuthenticated) {
+        alert('Vous devez être connecté pour effectuer cette action');
+        return;
+      }
+
+      const res = await fetch('/api/admin/applications/check-card-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          module_id: moduleId,
+          check_all: !moduleId,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        if (data.results) {
+          const map: Record<string, CardAccessCheck> = {};
+          data.results.forEach((row: CardAccessCheck) => {
+            map[row.module_id] = row;
+            map[row.card_slug] = row;
+          });
+          setCardAccessChecks(map);
+        } else if (data.result) {
+          const row = data.result as CardAccessCheck;
+          setCardAccessChecks((prev) => ({
+            ...prev,
+            [row.module_id]: row,
+            [row.card_slug]: row,
+          }));
+        }
+      } else {
+        alert('Erreur: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+      alert('Erreur lors de la vérification des boutons d\'accès');
+    } finally {
+      setCheckingCardAccess(false);
     }
   };
 
@@ -862,7 +945,7 @@ export default function AdminApplications() {
       return '📺';
     } else if (appName.includes('librespeed')) {
       return '⚡';
-    } else if (appName.includes('pdf')) {
+    } else if (appName.includes('pdf') || appName.toLowerCase().includes('cv')) {
       return '📄';
     } else if (appName.includes('qrcodes')) {
       return '📱';
@@ -897,6 +980,12 @@ export default function AdminApplications() {
   const skippedHealthChecks = healthCheckValues.filter((h) => h.isSkipped);
   const failedHealthChecks = healthCheckValues.filter((h) => !h.isValid && !h.isSkipped);
   const validHealthChecks = healthCheckValues.filter((h) => h.isValid && !h.isSkipped);
+
+  const cardAccessValues = Object.values(cardAccessChecks).filter(
+    (row, index, arr) => arr.findIndex((r) => r.card_slug === row.card_slug) === index
+  );
+  const failedCardAccessChecks = cardAccessValues.filter((r) => !r.isValid && !r.isSkipped);
+  const validCardAccessChecks = cardAccessValues.filter((r) => r.isValid);
 
   return (
     <div className="space-y-6">
@@ -1031,25 +1120,107 @@ export default function AdminApplications() {
                       </div>
                     )}
                   </div>
-                  <button
-                    onClick={() => handleCheckApplicationsHealth()}
-                    disabled={checkingHealth}
-                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium shadow-md hover:shadow-lg transition-all shrink-0"
-                  >
-                    {checkingHealth ? (
-                      <>
-                        <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        Vérification en cours...
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-xl">🔍</span>
-                        Vérifier toutes les applications
-                      </>
-                    )}
-                  </button>
+                  <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+                    <button
+                      onClick={() => handleCheckApplicationsHealth()}
+                      disabled={checkingHealth || checkingCardAccess}
+                      className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium shadow-md hover:shadow-lg transition-all"
+                    >
+                      {checkingHealth ? (
+                        <>
+                          <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          Vérification en cours...
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-xl">🔍</span>
+                          Vérifier toutes les applications
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleCheckCardAccessButtons()}
+                      disabled={checkingCardAccess || checkingHealth}
+                      className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium shadow-md hover:shadow-lg transition-all"
+                      title="Vérifie les fiches /card/* : bouton d'accès présent et URL app sans redirect vers la fiche"
+                    >
+                      {checkingCardAccess ? (
+                        <>
+                          <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          Vérification accès...
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-xl">🔗</span>
+                          Vérifier boutons d&apos;accès
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
+
+              {/* Résultats vérification boutons d'accès fiches /card */}
+              {cardAccessValues.length > 0 && (
+                <div className="mb-6 bg-gradient-to-r from-indigo-50 to-violet-50 rounded-lg border border-indigo-200 p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    🔗 Boutons d&apos;accès des fiches produit (/card/*)
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Vérifie que chaque fiche a un composant d&apos;accès dans le code et que l&apos;URL applicative ne
+                    redirige pas vers la fiche (ex. /code-learning → /card/code-learning).
+                  </p>
+                  <div className="flex items-center gap-4 text-sm mb-3">
+                    <span className="text-green-600 font-medium">✅ {validCardAccessChecks.length} OK</span>
+                    <span className="text-red-600 font-medium">❌ {failedCardAccessChecks.length} en erreur</span>
+                    <span className="text-gray-600">Total: {cardAccessValues.length} fiches</span>
+                  </div>
+                  {failedCardAccessChecks.length > 0 && (
+                    <ul className="space-y-2 list-none m-0 p-0">
+                      {failedCardAccessChecks.map((row) => (
+                        <li
+                          key={row.card_slug}
+                          className="rounded-md border border-red-200 bg-white/90 px-3 py-2 text-sm"
+                        >
+                          <div className="font-medium text-red-900">
+                            {row.module_name}{' '}
+                            <span className="font-normal text-red-700/90">({row.card_slug})</span>
+                          </div>
+                          <div className="mt-1 text-xs text-gray-700 break-all">
+                            Fiche:{' '}
+                            <a href={row.card_page_url} target="_blank" rel="noopener noreferrer" className="underline">
+                              {row.card_page_url}
+                            </a>
+                            {row.expected_app_url ? (
+                              <>
+                                {' '}
+                                · App:{' '}
+                                <a
+                                  href={
+                                    row.expected_app_url.startsWith('/')
+                                      ? `https://iahome.fr${row.expected_app_url}`
+                                      : row.expected_app_url
+                                  }
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="underline"
+                                >
+                                  {row.expected_app_url}
+                                </a>
+                              </>
+                            ) : null}
+                          </div>
+                          <ul className="mt-2 space-y-1 text-xs text-red-800">
+                            {row.issues.map((issue) => (
+                              <li key={issue}>• {issue}</li>
+                            ))}
+                          </ul>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
 
               {/* Statistiques des applications */}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
@@ -1229,6 +1400,16 @@ export default function AdminApplications() {
                                     {healthChecks[application.id].statusCode && (
                                       <p className="text-xs text-gray-600">
                                         Status: {healthChecks[application.id].statusCode}
+                                      </p>
+                                    )}
+                                    {(healthChecks[application.id].gateOk !== undefined ||
+                                      healthChecks[application.id].originOk !== undefined) && (
+                                      <p className="text-xs text-gray-600">
+                                        Gate worker:{' '}
+                                        {healthChecks[application.id].gateOk ? 'OK' : '—'}
+                                        {' · '}
+                                        Origine:{' '}
+                                        {healthChecks[application.id].originOk ? 'OK' : '—'}
                                       </p>
                                     )}
                                     {healthChecks[application.id].errorMessage && (

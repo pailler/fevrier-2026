@@ -1,16 +1,9 @@
-import { CardPageJsonLd } from '@/components/CardPageJsonLd'
-import type { Metadata } from 'next';
-import { buildPageSeo } from '@/utils/pageMetadata';
+import { CardPageJsonLd } from '@/components/CardPageJsonLd';
+import { buildToolCardMetadata } from '@/utils/buildToolCardSeo';
 
-export const metadata: Metadata = buildPageSeo({
-  path: '/card/vote',
-  title: 'Vote en ligne — PIN et QR code',
-  description:
-    'Créez un vote avec code PIN, participants et QR code pour voter en ligne. Module IAHome.',
-  keywords: ['vote en ligne', 'QR code', 'IAHome', 'événement'],
-});
+export const metadata = buildToolCardMetadata('vote');
 
-export default function CardVoteLayout({ children }: { children: React.ReactNode }) {
+export default function VoteLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <CardPageJsonLd slug="vote" />

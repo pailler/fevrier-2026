@@ -2,87 +2,102 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { getFeaturedSubdomains } from '../../utils/subdomainsConfig';
+import EcosystemValueBlock from '../../components/marketing/EcosystemValueBlock';
+import GpuInfrastructureBlock from '../../components/marketing/GpuInfrastructureBlock';
+import FrenchTrustBlock from '../../components/marketing/FrenchTrustBlock';
+import AudienceSegmentsBlock from '../../components/marketing/AudienceSegmentsBlock';
+import { getValueProposition } from '../../data/ecosystemValueProposition';
 
 // Désactiver le cache pour cette page
 export const dynamic = 'force-dynamic';
 
 export default function MarketingPage() {
   useEffect(() => {
-    document.title = 'IA Home - Découvrez la Puissance de l\'IA | Plateforme Complète';
+    const vp = getValueProposition('marketing');
+    document.title = 'IAHome — Un compte, 30+ outils IA, zéro installation';
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', 'IA Home : La plateforme française complète d\'intelligence artificielle. Outils IA professionnels, formations, et services de productivité. Rejoignez des milliers d\'utilisateurs qui font confiance à IA Home.');
+      metaDescription.setAttribute(
+        'content',
+        `${vp.subheadline} ${vp.oneLiner}`
+      );
     }
   }, []);
 
   const benefits = [
     {
-      icon: '🚀',
-      title: 'Accès Immédiat',
-      description: 'Aucun téléchargement, aucune installation. Tous nos outils sont des web-services accessibles directement depuis votre navigateur. Il suffit d\'un navigateur pour les utiliser !'
+      icon: '🎙️',
+      title: 'Synthétiser une réunion',
+      description:
+        'Enregistrement ou fichier audio → texte structuré. Idéal pour les comptes rendus, interviews et prises de notes.',
     },
     {
-      icon: '💰',
-      title: 'Offres Transparentes',
-      description: 'Système de crédits dégressif. Plus vous achetez, plus vous économisez.'
+      icon: '🎨',
+      title: 'Produire un visuel',
+      description:
+        'Affiche, illustration, photo stylisée : partez d’une idée, obtenez une image utilisable tout de suite.',
     },
     {
-      icon: '🔒',
-      title: 'Sécurité Maximale',
-      description: 'Paiements sécurisés Stripe, données chiffrées, conformité RGPD. Vos données sont protégées.'
+      icon: '📄',
+      title: 'Finaliser un dossier PDF',
+      description:
+        'Fusion, conversion, préparation à l’envoi — sans ouvrir cinq logiciels différents.',
     },
     {
-      icon: '⚡',
-      title: 'Performance Optimale',
-      description: 'Infrastructure cloud haute performance. Traitement rapide et résultats de qualité professionnelle.'
+      icon: '📤',
+      title: 'Partager un gros fichier',
+      description:
+        'Envoi sécurisé à un client ou un proche, depuis le PC ou le smartphone, sans limite de messagerie.',
     },
     {
-      icon: '🌍',
-      title: '100% Français',
-      description: 'Plateforme française, support en français, conformité RGPD. Une solution de confiance.'
+      icon: '🎉',
+      title: 'Animer un événement',
+      description:
+        'QR codes, photobooth, votes en direct : des outils pensés pour l’instant présent, pas pour la vitrine tech.',
     },
     {
       icon: '🎁',
-      title: '200 crédits offerts',
-      description: '200 crédits offerts pour tout nouvel utilisateur. Commencez à utiliser nos services immédiatement sans dépenser un centime.'
-    }
+      title: 'Tester sans risque',
+      description:
+        '200 crédits offerts à l’inscription : essayez un cas d’usage réel avant de vous engager.',
+    },
   ];
 
   const useCases = [
     {
+      category: 'Grand public',
+      examples: [
+        'Créer une illustration pour les réseaux sociaux',
+        'Transcrire un podcast ou un cours',
+        'Télécharger ou convertir une vidéo',
+        'Initier un enfant au code',
+      ],
+    },
+    {
       category: 'Professionnels',
       examples: [
-        'Transcrire vos réunions automatiquement',
-        'Générer des visuels pour vos présentations',
-        'Traiter vos documents PDF en masse',
-        'Créer des QR codes pour vos campagnes'
-      ]
-    },
-    {
-      category: 'Créateurs de Contenu',
-      examples: [
-        'Créer des sous-titres pour vos vidéos',
-        'Générer des images pour vos articles',
-        'Télécharger et convertir des vidéos',
-        'Automatiser vos workflows créatifs'
-      ]
-    },
-    {
-      category: 'Entreprises',
-      examples: [
         'Automatiser vos comptes-rendus de réunion',
-        'Traiter des documents en masse',
-        'Créer des workflows IA personnalisés',
-        'Optimiser votre productivité'
-      ]
-    }
+        'Produire un visuel pour une présentation client',
+        'Préparer un CV optimisé et une candidature',
+        'Workflow créatif ou prototype 3D sur mesure',
+      ],
+    },
+    {
+      category: 'Événementiel',
+      examples: [
+        'Photobooth avec galerie et QR de récupération',
+        'Vote ou sondage en AG avec PIN',
+        'QR codes pour un salon ou une campagne',
+        'Réserver du matériel pour un événement',
+      ],
+    },
   ];
 
   const stats = [
-    { number: 'nos', label: 'Outils IA Disponibles' },
-    { number: '100%', label: 'Satisfaction Client' },
-    { number: '24/7', label: 'Disponibilité' },
-    { number: 'RGPD', label: 'Conforme' }
+    { number: '100%', label: 'Interface en français' },
+    { number: 'RGPD', label: 'Conforme UE' },
+    { number: '💬', label: 'Support en français' },
+    { number: '🇫🇷', label: 'Hébergé en France' },
   ];
 
   return (
@@ -114,19 +129,17 @@ export default function MarketingPage() {
         </div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="text-center max-w-4xl mx-auto animate-fade-in-up">
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-6 leading-tight animate-text-glow">
-              La Plateforme IA Complète
-              <br />
-              <span className="text-yellow-300">Pour Tous Vos Besoins</span>
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100 animate-fade-in-up-delayed">
-              En plus des applis essentielles pour vos usages numériques courants, découvrez nos outils d'intelligence artificielle professionnels. 
-              Transcription, génération d'images, traitement de documents et bien plus.
-              <br />
-              <span className="text-yellow-200 font-semibold">Tous nos services sont accessibles directement depuis votre navigateur, sans téléchargement ni installation.</span>
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up-delayed">
+          <div className="text-center max-w-4xl mx-auto animate-fade-in-up text-white">
+            <EcosystemValueBlock
+              variant="marketing"
+              layout="hero"
+              theme="dark"
+              showPillars={false}
+              showAudiences={true}
+              showProof={true}
+              className="max-w-4xl mx-auto text-center [&_p]:mx-auto"
+            />
+            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up-delayed mt-4">
               <Link
                 href="https://iahome.fr/applications"
                 className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg"
@@ -143,6 +156,14 @@ export default function MarketingPage() {
           </div>
         </div>
       </section>
+
+      <EcosystemValueBlock variant="marketing" useCasesOnly />
+
+      <AudienceSegmentsBlock />
+
+      <GpuInfrastructureBlock variant="marketing" />
+
+      <FrenchTrustBlock variant="marketing" />
 
       {/* Stats Section */}
       <section className="py-12 bg-white border-b border-gray-200">
@@ -165,10 +186,10 @@ export default function MarketingPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Pourquoi Choisir IA Home ?
+              Des situations concrètes, des outils adaptés
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Une plateforme complète, sécurisée et accessible pour tous vos besoins en intelligence artificielle
+              Chaque carte ci-dessous part d’un besoin réel — pas d’une fiche technique.
             </p>
           </div>
 
@@ -214,7 +235,7 @@ export default function MarketingPage() {
                 </div>
               </div>
               <p className="text-gray-700 mb-4 italic">
-                "IA Home a révolutionné mon travail ! J'utilise Whisper pour transcrire mes réunions et j'économise des heures chaque semaine. La qualité de transcription est excellente et les tarifs sont vraiment compétitifs."
+                "Après chaque réunion, je récupère un compte rendu structuré en quelques minutes. J'économise des heures chaque semaine — et je peux le faire depuis mon téléphone entre deux rendez-vous."
               </p>
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-3">
@@ -237,7 +258,7 @@ export default function MarketingPage() {
                 </div>
               </div>
               <p className="text-gray-700 mb-4 italic">
-                "En tant que créateur de contenu, j'utilise Stable Diffusion et ComfyUI quotidiennement. La plateforme est intuitive, rapide et les résultats sont de qualité professionnelle. Je recommande vivement !"
+                "Pour mes vidéos et articles, je produis visuels et sous-titres sans quitter le navigateur. Résultat pro, interface simple — exactement ce qu'il me fallait pour tenir mon rythme de publication."
               </p>
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-3">
@@ -306,7 +327,7 @@ export default function MarketingPage() {
                 </div>
               </div>
               <p className="text-gray-700 mb-4 italic">
-                "La plateforme est vraiment complète ! J'utilise les QR codes pour mes campagnes marketing, Whisper pour mes podcasts, et Stable Diffusion pour mes visuels. Tout en un seul endroit, c'est parfait !"
+                "QR codes pour mes campagnes, transcription pour mes podcasts, visuels pour mes posts : tout part du même compte. Je pars d'un besoin précis, pas d'une liste d'outils à assembler."
               </p>
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-3">
@@ -329,7 +350,7 @@ export default function MarketingPage() {
                 </div>
               </div>
               <p className="text-gray-700 mb-4 italic">
-                "En tant que développeur, j'apprécie particulièrement ComfyUI pour créer des workflows automatisés. La documentation est claire, la communauté est active, et les mises à jour sont régulières. Excellent rapport qualité-prix !"
+                "Pour un projet client, j'ai enchaîné génération d'images et préparation de livrables sans installer quoi que ce soit. Documentation claire, tarifs lisibles — excellent rapport qualité-prix."
               </p>
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
@@ -350,10 +371,10 @@ export default function MarketingPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Nos Services Populaires
+              Quelques situations que nous couvrons
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Découvrez nos outils les plus utilisés par des milliers d'utilisateurs. Tous accessibles directement depuis votre navigateur, sans téléchargement ni installation.
+              Partez de votre besoin du moment — réunion, visuel, dossier, événement — et ouvrez l’outil adapté en un clic.
             </p>
           </div>
 
@@ -717,7 +738,7 @@ export default function MarketingPage() {
                 </li>
               </ul>
               <Link
-                href="/card/reveil-intelligent"
+                href="/card/reveil"
                 className="inline-flex items-center gap-2 bg-indigo-100 text-indigo-900 hover:bg-indigo-200 px-4 py-2 rounded-lg font-medium text-sm transition-colors"
               >
                 Découvrir le Réveil Intelligent →
@@ -815,10 +836,10 @@ export default function MarketingPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Cas d'Usage Populaires
+              Qui en profite, et pour quoi faire ?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Découvrez comment nos utilisateurs utilisent IA Home au quotidien
+              Des profils différents, les mêmes types de situations — transcrire, créer, organiser, partager.
             </p>
           </div>
 
@@ -864,39 +885,6 @@ export default function MarketingPage() {
             >
               Créer un Compte Gratuit
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Trust Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Pourquoi Nous Faire Confiance ?
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow text-center">
-              <div className="text-4xl mb-3">🔒</div>
-              <h3 className="font-bold text-gray-900 mb-2">Sécurisé</h3>
-              <p className="text-sm text-gray-600">Paiements Stripe, données chiffrées</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow text-center">
-              <div className="text-4xl mb-3">⚡</div>
-              <h3 className="font-bold text-gray-900 mb-2">Rapide</h3>
-              <p className="text-sm text-gray-600">Infrastructure cloud optimisée</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow text-center">
-              <div className="text-4xl mb-3">🌍</div>
-              <h3 className="font-bold text-gray-900 mb-2">Français</h3>
-              <p className="text-sm text-gray-600">Plateforme et support en français</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow text-center">
-              <div className="text-4xl mb-3">💬</div>
-              <h3 className="font-bold text-gray-900 mb-2">Support</h3>
-              <p className="text-sm text-gray-600">Assistance client réactive</p>
-            </div>
           </div>
         </div>
       </section>

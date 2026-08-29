@@ -2,10 +2,11 @@
 
 import { useEffect } from 'react';
 
+/** Ancienne route → passerelle token /reveil (même schéma que RuinedFooocus). */
 export default function ReveilIntelligentEntryPage() {
   useEffect(() => {
     const query = window.location.search || '';
-    window.location.replace(`/card/reveil-intelligent${query}`);
+    window.location.replace(`/reveil${query}`);
   }, []);
 
   return (

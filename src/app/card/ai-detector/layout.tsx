@@ -1,21 +1,9 @@
-import { CardPageJsonLd } from '@/components/CardPageJsonLd'
-import type { Metadata } from 'next';
-import { buildPageSeo } from '@/utils/pageMetadata';
+import { CardPageJsonLd } from '@/components/CardPageJsonLd';
+import { buildToolCardMetadata } from '@/utils/buildToolCardSeo';
 
-export const metadata: Metadata = buildPageSeo({
-  path: '/card/ai-detector',
-  title: 'Détecteur de contenu IA — analyse de texte',
-  description:
-    'Module Détecteur IA sur IAHome : collez un texte pour une estimation de probabilité de génération par intelligence artificielle.',
-  keywords: [
-    'détecteur contenu IA',
-    'analyse texte IA',
-    'module détecteur IAHome',
-    'texte généré intelligence artificielle',
-  ],
-});
+export const metadata = buildToolCardMetadata('ai-detector');
 
-export default function CardAiDetectorLayout({ children }: { children: React.ReactNode }) {
+export default function AiDetectorLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <CardPageJsonLd slug="ai-detector" />

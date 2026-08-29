@@ -20,7 +20,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         return {
           ...baseData,
           name: "IA Home",
-          description: "Plateforme d'Intelligence Artificielle - Formation IA, Outils IA, Whisper, Stable Diffusion, ComfyUI",
+          description: "Ecosystème d'Intelligence Artificielle - Formation IA, Outils IA, Whisper, Stable Diffusion, ComfyUI",
           url: "https://iahome.fr",
           potentialAction: {
             "@type": "SearchAction",
@@ -38,7 +38,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         return {
           ...baseData,
           name: "IA Home",
-          description: "Plateforme d'Intelligence Artificielle française spécialisée dans la formation et les outils IA",
+          description: "Ecosystème d'Intelligence Artificielle français spécialisé dans la formation et les outils IA",
           url: "https://iahome.fr",
           logo: "https://iahome.fr/logo.png",
           sameAs: [

@@ -65,7 +65,7 @@ MODEL_NAME = "htdemucs"  # Modèle Demucs v4 (HT = Hybrid Transformer)
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # S'assurer que le modèle utilise le cache existant (pas de re-téléchargement)
-# Le cache est monté dans /root/.cache/torch depuis ai-models-cache/torch
+# Le cache est monte depuis Stability Matrix (Models/IaHome-Services-Cache/torch)
 torch_cache_dir = os.environ.get("TORCH_HOME", "/root/.cache/torch")
 print(f"📁 Cache PyTorch: {torch_cache_dir}")
 

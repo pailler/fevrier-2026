@@ -116,7 +116,7 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
     if (!user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-accès', {
+      const response = await fetch('/api/check-module-activation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -156,19 +156,20 @@ export default function CardDetailPage({ initialModule }: CardInteractiveProps) 
         'librespeed': isDevelopment ? 'http://localhost:8085' : 'https://librespeed.iahome.fr',
         'metube': 'https://metube.iahome.fr',
         'whisper': 'https://whisper.iahome.fr',
-        'psitransfer': 'https://psitransfer.iahome.fr',
+        'psitransfer': 'https://iahome.fr/psitransfer',
         'qrcodes': isDevelopment ? 'http://localhost:7006' : 'https://qrcodes.iahome.fr',
         'pdf': 'https://pdf.iahome.fr',
-        'stablediffusion': 'https://stablediffusion.iahome.fr',
+        'stablediffusion': '/stablediffusion',
         'comfyui': 'https://comfyui.iahome.fr',
         'code-learning': '/code-learning',
         'meeting-reports': isDevelopment ? 'http://localhost:3050' : 'https://meeting-reports.iahome.fr',
-        'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
+        'ruinedfooocus': '/ruinedfooocus',
+        '8': '/ruinedfooocus',
         'cogstudio': 'https://cogstudio.iahome.fr',
         'home-assistant': isDevelopment ? 'http://localhost:8123' : 'https://homeassistant.iahome.fr',
         'prompt-generator': 'https://prompt-generator.iahome.fr',
-        'apprendre-autrement': isDevelopment ? 'http://localhost:9001' : 'https://apprendre-autrement.iahome.fr',
-        'photobooth': isDevelopment ? 'http://localhost:7885' : 'https://photobooth.iahome.fr',
+        'apprendre-autrement': '/apprendre-autrement',
+        'photobooth': isDevelopment ? 'http://localhost:7885' : 'https://iahome.fr/photobooth',
         'administration': '/administration',
         'ai-detector': isDevelopment ? 'http://localhost:3000/ai-detector' : 'https://iahome.fr/ai-detector',
         'sentinelle-numerique': isDevelopment ? 'http://localhost:3000/sentinelle-numerique' : 'https://iahome.fr/sentinelle-numerique',

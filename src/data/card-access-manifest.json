@@ -1,0 +1,175 @@
+{
+  "generatedAt": "2026-08-29T22:41:22.810Z",
+  "entries": [
+    {
+      "slug": "administration",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "ai-detector",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "animagine-xl",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "apprendre-autrement",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "birefnet",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "code-learning",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "cogstudio",
+      "hasAccessButton": false,
+      "hasCardPage": true
+    },
+    {
+      "slug": "comfyui",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "cv-generator",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "florence-2",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "hi3dgen",
+      "hasAccessButton": false,
+      "hasCardPage": true
+    },
+    {
+      "slug": "home-assistant",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "hunyuan3d",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "librespeed",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "meeting-reports",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "metube",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "musetalk",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "pdf",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "photo-vivante",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "photobooth",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "photomaker",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "prompt-generator",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "psitransfer",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "qrcodes",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "resas-system",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "reveil",
+      "hasAccessButton": false,
+      "hasCardPage": true
+    },
+    {
+      "slug": "reveil-intelligent",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "ruinedfooocus",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "sentinelle-numerique",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "stablediffusion",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "tts",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "voice-isolation",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "vote",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    },
+    {
+      "slug": "whisper",
+      "hasAccessButton": true,
+      "hasCardPage": true
+    }
+  ]
+}

@@ -8,15 +8,14 @@ Write-Host ""
 $RootPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $RootPath
 
-# Vérifier le cache
-$cacheDir = Join-Path (Split-Path -Parent $RootPath) "ai-models-cache\huggingface"
-Write-Host "Cache des modeles: $cacheDir" -ForegroundColor Yellow
-if (Test-Path $cacheDir) {
-    Write-Host "[OK] Dossier cache existe" -ForegroundColor Green
-} else {
-    Write-Host "[WARNING] Dossier cache n'existe pas, creation..." -ForegroundColor Yellow
-    New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
+# Cache Stability Matrix
+. (Join-Path (Split-Path -Parent $RootPath) "scripts\models-path.config.ps1")
+if (-not (Set-IaHomeModelsEnv -Quiet)) {
+    Write-Host "[ERREUR] Stability Matrix introuvable pour le cache modeles." -ForegroundColor Red
+    exit 1
 }
+$cacheDir = Get-IaHomeModelsCachePath
+Write-Host "Cache des modeles (Stability Matrix): $cacheDir" -ForegroundColor Yellow
 
 # Arrêter les processus existants sur le port 7860
 Write-Host ""

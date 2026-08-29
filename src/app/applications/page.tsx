@@ -1,46 +1,23 @@
 'use client';
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "../../utils/supabaseClient";
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from "next/link";
 import { useCustomAuth } from '../../hooks/useCustomAuth';
 import ModuleCard from '../../components/ModuleCard';
+import EcosystemValueBlock from '../../components/marketing/EcosystemValueBlock';
+import GpuInfrastructureBlock from '../../components/marketing/GpuInfrastructureBlock';
+import FrenchTrustBlock from '../../components/marketing/FrenchTrustBlock';
+import AudienceSegmentsBlock from '../../components/marketing/AudienceSegmentsBlock';
+import {
+  AUDIENCE_EMPTY_REDIRECT,
+  AUDIENCE_SEGMENTS,
+  getApplicationAudienceSegment,
+  isAudienceSegmentId,
+  type AudienceSegmentId,
+} from '../../data/audienceSegments';
 
 type OfferLevel = 'autonome' | 'accompagnement' | 'specialise';
-
-const OFFER_LEVELS: Array<{
-  id: OfferLevel;
-  title: string;
-  shortTitle: string;
-  description: string;
-  badge: string;
-  accent: string;
-}> = [
-  {
-    id: 'autonome',
-    title: 'IA prête à utiliser',
-    shortTitle: 'Autonomie',
-    description: 'Des applications ciblées avec un parcours direct pour obtenir rapidement un premier résultat.',
-    badge: 'Utilisation directe',
-    accent: 'border-emerald-300 bg-emerald-50 text-emerald-900',
-  },
-  {
-    id: 'accompagnement',
-    title: 'IA avec prise en main accompagnée',
-    shortTitle: 'Accompagnement',
-    description: 'Des outils plus créatifs ou professionnels, adaptés à un atelier guidé autour de votre projet.',
-    badge: 'Atelier et conseils',
-    accent: 'border-blue-300 bg-blue-50 text-blue-900',
-  },
-  {
-    id: 'specialise',
-    title: 'Création et réalisation spécialisées',
-    shortTitle: 'Sur mesure',
-    description: 'Des workflows avancés pour une vidéo, un prototype ou un objet 3D préparé selon votre besoin.',
-    badge: 'Projet personnalisé',
-    accent: 'border-purple-300 bg-purple-50 text-purple-900',
-  },
-];
 
 const AI_OFFER_LEVELS: Record<string, OfferLevel> = {
   whisper: 'autonome',
@@ -48,6 +25,7 @@ const AI_OFFER_LEVELS: Record<string, OfferLevel> = {
   birefnet: 'autonome',
   'florence-2': 'autonome',
   'prompt-generator': 'autonome',
+  'cv-generator': 'autonome',
   'ai-detector': 'autonome',
   tts: 'autonome',
   stablediffusion: 'accompagnement',
@@ -69,6 +47,7 @@ const AI_OFFER_NOTES: Record<string, string> = {
   birefnet: 'Détourez une image et récupérez un fond transparent en quelques clics.',
   'florence-2': 'Analysez une image, extrayez son texte ou obtenez une description automatiquement.',
   'prompt-generator': 'Transformez une idée courte en prompt structuré prêt à réutiliser.',
+  'cv-generator': 'Créez un CV optimisé ATS et une lettre de motivation avec l\'IA.',
   'ai-detector': 'Analysez un texte et utilisez le score comme indication, avec recul critique.',
   tts: 'Collez un texte, choisissez une voix et générez votre piste audio.',
   stablediffusion: 'Un atelier aide à maîtriser les prompts, modèles et paramètres de génération.',
@@ -84,11 +63,64 @@ const AI_OFFER_NOTES: Record<string, string> = {
   cogstudio: 'La réalisation combine scénario, génération, sélection des plans et préparation de la vidéo.',
 };
 
+/** Toujours affichés sur /applications (même si absents ou masqués en base). */
+const GUARANTEED_APPLICATIONS = [
+  {
+    id: 'cv-generator',
+    title: 'Générateur de CV IA',
+    subtitle: 'Import CV / LinkedIn · score ATS · export PDF',
+    description:
+      'Créez un CV professionnel optimisé pour les ATS avec l\'IA : import depuis PDF ou LinkedIn, adaptation au poste, lettre de motivation.',
+    category: 'Productivité',
+    price: 100,
+    url: '/card/cv-generator',
+    image_url: '/images/cv-generator.svg',
+    is_visible: true,
+  },
+];
+
+function mergeApplicationModules(dbModules: any[], fallbacks: any[]) {
+  const map = new Map<string, any>();
+  const norm = (id: unknown) => String(id ?? '').trim().toLowerCase();
+
+  for (const m of dbModules) {
+    const id = norm(m.id);
+    if (!id || m.is_visible === false) continue;
+    map.set(id, m);
+  }
+  for (const m of fallbacks) {
+    const id = norm(m.id);
+    if (!id || map.has(id)) continue;
+    map.set(id, m);
+  }
+  for (const g of GUARANTEED_APPLICATIONS) {
+    const id = norm(g.id);
+    const existing = map.get(id);
+    map.set(
+      id,
+      existing
+        ? {
+            ...g,
+            ...existing,
+            url: existing.url || g.url,
+            subtitle: existing.subtitle || g.subtitle,
+            description: existing.description || g.description,
+            is_visible: true,
+          }
+        : { ...g }
+    );
+  }
+  return Array.from(map.values());
+}
+
 function getAiOfferLevel(module: { id?: unknown; title?: string }): OfferLevel {
   const id = String(module.id ?? '').trim().toLowerCase();
   if (AI_OFFER_LEVELS[id]) return AI_OFFER_LEVELS[id];
 
   const title = (module.title ?? '').toLowerCase().replace(/\s+/g, '');
+  if (title.includes('générateurdecv') || title.includes('curriculum') || title.includes('cvia')) {
+    return 'autonome';
+  }
   if (title.includes('comfy') || title.includes('3d') || title.includes('cogstudio')) return 'specialise';
   if (
     title.includes('stable') ||
@@ -108,6 +140,7 @@ function getAiOfferNote(module: { id?: unknown; title?: string }): string {
 
 export default function Home() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, isAuthenticated, loading: authLoading } = useCustomAuth();
   const [role, setRole] = useState<string | null>(null);
   const [selectedModules, setSelectedModules] = useState<any[]>([]);
@@ -116,10 +149,17 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [forceShowContent, setForceShowContent] = useState(false);
-  const [offerFilter, setOfferFilter] = useState<'all' | OfferLevel>('all');
+  const [segmentFilter, setSegmentFilter] = useState<'all' | AudienceSegmentId>('all');
 
   const [userSubscriptions, setUserSubscriptions] = useState<{[key: string]: boolean}>({});
   const [showScrollToTop, setShowScrollToTop] = useState(false);
+
+  useEffect(() => {
+    const segment = searchParams.get('segment');
+    if (isAudienceSegmentId(segment)) {
+      setSegmentFilter(segment);
+    }
+  }, [searchParams]);
 
   // Vérification de l'authentification (optionnelle pour cette page)
   useEffect(() => {
@@ -272,12 +312,12 @@ export default function Home() {
                     'Réveil mobile : alarmes récurrentes, prévisions météo, jours fériés et vacances scolaires (zones A, B, C).',
                   category: 'OUTILS QUOTIDIEN',
                   price: 0,
-                  url: '/card/reveil-intelligent',
+                  url: '/card/reveil',
                   image_url: '/images/reveil-intelligent.svg',
                 }]
               : []),
           ];
-          const modulesToProcess = [...platformFallbacks, ...allModules];
+          const modulesToProcess = mergeApplicationModules(allModules, platformFallbacks);
 
           // Traiter les modules avec la structure simple
           const modulesWithRoles = modulesToProcess.map((module: any) => {
@@ -406,15 +446,15 @@ export default function Home() {
 
   const groupedModules = useMemo(
     () =>
-      OFFER_LEVELS.map((offer) => ({
-        ...offer,
+      AUDIENCE_SEGMENTS.map((segment) => ({
+        ...segment,
         modules: displayedModules.filter(
           (module) =>
-            getAiOfferLevel(module) === offer.id &&
-            (offerFilter === 'all' || offerFilter === offer.id)
+            getApplicationAudienceSegment(module) === segment.id &&
+            (segmentFilter === 'all' || segmentFilter === segment.id)
         ),
-      })).filter((offer) => offer.modules.length > 0),
-    [displayedModules, offerFilter]
+      })).filter((segment) => segment.modules.length > 0 || segmentFilter === segment.id),
+    [displayedModules, segmentFilter]
   );
   
   // Calculer les indices pour la pagination (pour référence future)
@@ -480,12 +520,13 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
-                Bénéficiez de la puissance des serveurs IAHome avec un accompagnement individuel
-              </h1>
-              <p className="text-xl text-gray-700 mb-6">
-                Le numérique à portée de main, pour une utilisation simple et directe de l&apos;IA. Sans téléchargement.
-              </p>
+              <EcosystemValueBlock
+                variant="applications"
+                layout="hero"
+                showPillars={false}
+                showAudiences={true}
+                showProof={true}
+              />
               
               {/* Barre de recherche et bouton Mes applis */}
               <div className="flex flex-col sm:flex-row gap-4 max-w-lg">
@@ -543,43 +584,32 @@ export default function Home() {
         </div>
       </section>
 
+      <GpuInfrastructureBlock variant="applications" />
+
+      <FrenchTrustBlock variant="applications" density="band" />
+
+      <EcosystemValueBlock variant="applications" useCasesOnly />
+
+      <AudienceSegmentsBlock />
+
       {/* Section principale avec contenu */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-6">
           {/* Contenu principal */}
           <div className="w-full">
 
-              {/* Lecture commerciale des applications */}
-              <div className="mb-10">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  {OFFER_LEVELS.map((offer) => (
-                    <button
-                      key={offer.id}
-                      type="button"
-                      onClick={() => setOfferFilter(offerFilter === offer.id ? 'all' : offer.id)}
-                      aria-pressed={offerFilter === offer.id}
-                      className={`text-left rounded-xl border-2 p-5 transition-all ${offer.accent} ${
-                        offerFilter === offer.id ? 'ring-2 ring-offset-2 ring-blue-500' : 'hover:-translate-y-0.5'
-                      }`}
-                    >
-                      <span className="block text-xs font-bold uppercase tracking-wide opacity-75 mb-2">{offer.badge}</span>
-                      <span className="block text-lg font-bold mb-2">{offer.shortTitle}</span>
-                      <span className="block text-sm opacity-85">{offer.description}</span>
-                    </button>
-                  ))}
-                </div>
-                {offerFilter !== 'all' && (
-                  <button
-                    type="button"
-                    onClick={() => setOfferFilter('all')}
+              {segmentFilter !== 'all' && (
+                <div className="mb-8">
+                  <Link
+                    href="/applications"
                     className="text-sm font-semibold text-blue-700 hover:text-blue-900"
                   >
-                    Afficher les trois niveaux
-                  </button>
-                )}
-              </div>
+                    ← Afficher les trois univers
+                  </Link>
+                </div>
+              )}
 
-              {/* Applications classées par niveau d'offre */}
+              {/* Applications classées par univers */}
               <div>
                 {loading && !forceShowContent ? (
                   <div className="text-center py-12">
@@ -617,19 +647,38 @@ export default function Home() {
                   </div>
                 ) : (
                   <div className="space-y-14">
-                    {groupedModules.map((offer) => (
-                      <section key={offer.id} aria-labelledby={`offer-${offer.id}`}>
-                        <div className={`rounded-xl border-l-4 p-5 mb-6 ${offer.accent}`}>
+                    {groupedModules.map((segment) => (
+                      <section key={segment.id} aria-labelledby={`segment-${segment.id}`}>
+                        <div className={`rounded-xl border-l-4 p-5 mb-6 ${segment.accent}`}>
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <div>
-                              <p className="text-xs font-bold uppercase tracking-wide opacity-75 mb-1">{offer.badge}</p>
-                              <h2 id={`offer-${offer.id}`} className="text-2xl font-bold">{offer.title}</h2>
+                              <p className="text-xs font-bold uppercase tracking-wide opacity-75 mb-1">{segment.badge}</p>
+                              <h2 id={`segment-${segment.id}`} className="text-2xl font-bold">{segment.title}</h2>
                             </div>
-                            <p className="text-sm max-w-xl sm:text-right opacity-85">{offer.description}</p>
+                            <p className="text-sm max-w-xl sm:text-right opacity-85">{segment.catalogHint}</p>
                           </div>
                         </div>
+                        {segment.modules.length === 0 ? (
+                          (() => {
+                            const redirect = AUDIENCE_EMPTY_REDIRECT[segment.id];
+                            if (!redirect) return null;
+                            return (
+                              <div className="rounded-xl border border-dashed border-purple-300 bg-purple-50/50 p-8 text-center">
+                                <p className="text-gray-700 mb-4">{redirect.message}</p>
+                                <Link
+                                  href={redirect.href}
+                                  className="inline-flex font-semibold text-purple-800 underline underline-offset-4 hover:opacity-80"
+                                >
+                                  {redirect.label}
+                                </Link>
+                              </div>
+                            );
+                          })()
+                        ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 items-stretch gap-6">
-                          {offer.modules.map((module) => (
+                          {segment.modules.map((module) => {
+                            const offerLevel = getAiOfferLevel(module);
+                            return (
                             <div key={module.id} className="flex h-full flex-col">
                               <div className="flex-1 [&>div]:h-full">
                                 <ModuleCard
@@ -637,12 +686,9 @@ export default function Home() {
                                   userEmail={user?.email}
                                 />
                               </div>
-                              <div className={`mt-3 flex min-h-28 flex-col rounded-lg border px-4 py-3 text-sm ${offer.accent}`}>
-                                <p>
-                                  <span className="font-semibold">{offer.shortTitle} : </span>
-                                  {getAiOfferNote(module)}
-                                </p>
-                                {offer.id === 'accompagnement' && (
+                              <div className={`mt-3 flex min-h-28 flex-col rounded-lg border px-4 py-3 text-sm ${segment.accent}`}>
+                                <p>{getAiOfferNote(module)}</p>
+                                {offerLevel === 'accompagnement' && (
                                   <Link
                                     href={`/contact?type=help&app=${encodeURIComponent(module.title)}`}
                                     className="mt-auto pt-3 font-bold underline decoration-2 underline-offset-4 hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
@@ -650,7 +696,7 @@ export default function Home() {
                                     Demander une aide à l&apos;utilisation →
                                   </Link>
                                 )}
-                                {offer.id === 'specialise' && (
+                                {offerLevel === 'specialise' && (
                                   <Link
                                     href={`/contact?type=project&app=${encodeURIComponent(module.title)}`}
                                     className="mt-auto pt-3 font-bold underline decoration-2 underline-offset-4 hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
@@ -660,8 +706,10 @@ export default function Home() {
                                 )}
                               </div>
                             </div>
-                          ))}
+                          );
+                          })}
                         </div>
+                        )}
                       </section>
                     ))}
                   </div>

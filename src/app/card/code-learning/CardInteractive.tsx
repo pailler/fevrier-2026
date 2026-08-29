@@ -7,6 +7,7 @@ import Breadcrumb from '../../../components/Breadcrumb';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
 import { FREE_UNLIMITED_ACCESS_LABEL } from '../../../utils/tokenActionService';
+import { getModuleAppUrl, openModuleAppWithToken, openPendingModuleTab, redirectToLogin } from '@/utils/moduleAppUrl';
 
 export default function CodeLearningCardPage({ initialModule }: CardInteractiveProps) {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function CodeLearningCardPage({ initialModule }: CardInteractiveP
   const [checkingActivation, setCheckingActivation] = useState(false);
 
   const moduleId = 'code-learning';
+  const appUrl = getModuleAppUrl(moduleId);
   const isFreeModule = true;
 
   // Fonction pour vérifier si un module est déjà accessible
@@ -23,7 +25,7 @@ export default function CodeLearningCardPage({ initialModule }: CardInteractiveP
     if (!user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-accès', {
+      const response = await fetch('/api/check-module-activation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,13 +68,15 @@ export default function CodeLearningCardPage({ initialModule }: CardInteractiveP
     const manageLoading = options?.manageLoading ?? true;
 
     if (!isAuthenticated || !user) {
-      router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}`)}`);
+      redirectToLogin(`/card/${moduleId}`);
       return;
     }
 
     if (manageLoading) {
       setLoading(true);
     }
+
+    const pendingTab = openPendingModuleTab();
 
     try {
       const tokenResponse = await fetch('/api/generate-access-token', {
@@ -97,9 +101,12 @@ export default function CodeLearningCardPage({ initialModule }: CardInteractiveP
         throw new Error('Token d\'accès manquant');
       }
 
-      const codeLearningUrl = `/code-learning?token=${encodeURIComponent(tokenData.token)}`;
-      window.open(codeLearningUrl, '_blank', 'noopener,noreferrer');
+      openModuleAppWithToken(moduleId, tokenData.token, appUrl, pendingTab);
+      setAlreadyActivatedModules((prev) => (prev.includes(moduleId) ? prev : [...prev, moduleId]));
     } catch (error) {
+      if (pendingTab && !pendingTab.closed) {
+        pendingTab.close();
+      }
       console.error('❌ Erreur ouverture Code Learning avec token:', error);
       alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     } finally {
@@ -250,57 +257,15 @@ export default function CodeLearningCardPage({ initialModule }: CardInteractiveP
               {!isModuleActivated && (
                 <div className="w-full">
                   <button
-                    onClick={async () => {
-                      if (isAuthenticated && user) {
-                        // Utilisateur connecté : Accéder à code-learning via API
-                        try {
-                          setLoading(true);
-                          const response = await fetch('/api/activate-code-learning', {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                              userId: user.id,
-                              email: user.email
-                            }),
-                          });
-
-                          if (response.ok) {
-                            const data = await response.json();
-                            if (data.success) {
-                              console.log('✅ Code Learning accessible avec succès');
-                              setAlreadyActivatedModules(prev => [...prev, moduleId]);
-                              await openCodeLearningWithToken({ manageLoading: false });
-                            } else {
-                              console.error('❌ Erreur accès Code Learning:', data.error);
-                              alert('Erreur lors de l\'accès: ' + (data.error || 'Erreur inconnue'));
-                            }
-                          } else {
-                            const errorData = await response.json().catch(() => ({ error: 'Erreur inconnue' }));
-                            console.error('❌ Erreur réponse API:', response.status, errorData);
-                            alert('Erreur lors de l\'accès: ' + (errorData.error || 'Erreur inconnue'));
-                          }
-                        } catch (error) {
-                          console.error('❌ Erreur lors de l\'accès de Code Learning:', error);
-                          alert('Erreur lors de l\'accès');
-                        } finally {
-                          setLoading(false);
-                        }
-                      } else {
-                        // Utilisateur non connecté : aller à la page de connexion puis retour à la page actuelle
-                        console.log('🔒 Accès Code Learning - Redirection vers connexion');
-                        router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}`)}`);
-                      }
-                    }}
-                    disabled={loading || checkingActivation}
+                    onClick={() => openCodeLearningWithToken()}
+                    disabled={loading}
                     className={`w-full font-semibold py-6 px-8 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2
-                      ${loading || checkingActivation
+                      ${loading
                         ? 'bg-gray-400 cursor-not-allowed'
                         : 'bg-[#16a34a] hover:bg-[#15803d] text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1'
                       }`}
                   >
-                    {loading || checkingActivation ? (
+                    {loading ? (
                       <>
                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
                         <span className="font-semibold text-base sm:text-lg">Ouverture en cours...</span>
@@ -591,11 +556,9 @@ export default function CodeLearningCardPage({ initialModule }: CardInteractiveP
         moduleName="Apprendre le Code aux Enfants"
         tokenCost={0}
         tokenUnit="par accès"
-        apiEndpoint="/api/activate-code-learning"
+        accessUrl={appUrl}
         gradientColors="from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
         icon="💻"
-        isModuleActivated={isModuleActivated}
-        onActivationSuccess={() => setAlreadyActivatedModules(prev => [...prev, moduleId])}
       />
     </div>
   );

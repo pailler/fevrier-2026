@@ -70,41 +70,10 @@ async function getFormationArticles() {
   }
 }
 
+import { CARD_TOOL_SLUGS } from '@/data/toolSeoManifest'
+
 /** Fiches produit / services (routes réelles sous /card/...) */
-const CARD_SLUGS = [
-  'administration',
-  'ai-detector',
-  'animagine-xl',
-  'apprendre-autrement',
-  'birefnet',
-  'code-learning',
-  'comfyui',
-  'cogstudio',
-  'florence-2',
-  'hi3dgen',
-  'home-assistant',
-  'hunyuan3d',
-  'librespeed',
-  'meeting-reports',
-  'metube',
-  'musetalk',
-  'photo-vivante',
-  'pdf',
-  'photobooth',
-  'photomaker',
-  'prompt-generator',
-  'psitransfer',
-  'qrcodes',
-  'ruinedfooocus',
-  'sentinelle-numerique',
-  'stablediffusion',
-  'voice-isolation',
-  'tts',
-  'vote',
-  'reveil-intelligent',
-  'resas-system',
-  'whisper',
-] as const
+const CARD_SLUGS = CARD_TOOL_SLUGS
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://iahome.fr'

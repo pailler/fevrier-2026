@@ -189,6 +189,119 @@ const nextConfig: NextConfig = {
           }
         ]
       },
+      // Après /(.*) pour écraser le CSP : Gradio CDN S3 requis pour /ruinedfooocus/embed
+      {
+        source: '/ruinedfooocus/embed',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value:
+              "default-src 'self' https://iahome.fr https://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://gradio.s3-us-west-2.amazonaws.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://iahome.fr https://*.iahome.fr; style-src 'self' 'unsafe-inline' https: data:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https://iahome.fr https://*.iahome.fr wss://iahome.fr wss://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; worker-src 'self' blob:; media-src 'self' blob: data: https:; frame-ancestors 'self' https://iahome.fr",
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'unsafe-none',
+          },
+        ],
+      },
+      {
+        source: '/ruinedfooocus/embed/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value:
+              "default-src 'self' https://iahome.fr https://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://gradio.s3-us-west-2.amazonaws.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://iahome.fr https://*.iahome.fr; style-src 'self' 'unsafe-inline' https: data:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https://iahome.fr https://*.iahome.fr wss://iahome.fr wss://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; worker-src 'self' blob:; media-src 'self' blob: data: https:; frame-ancestors 'self' https://iahome.fr",
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'unsafe-none',
+          },
+        ],
+      },
+      {
+        source: '/stablediffusion/embed',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value:
+              "default-src 'self' https://iahome.fr https://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://gradio.s3-us-west-2.amazonaws.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://iahome.fr https://*.iahome.fr; style-src 'self' 'unsafe-inline' https: data:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https://iahome.fr https://*.iahome.fr wss://iahome.fr wss://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; worker-src 'self' blob:; media-src 'self' blob: data: https:; frame-ancestors 'self' https://iahome.fr",
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'unsafe-none',
+          },
+        ],
+      },
+      {
+        source: '/stablediffusion/embed/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value:
+              "default-src 'self' https://iahome.fr https://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://gradio.s3-us-west-2.amazonaws.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://iahome.fr https://*.iahome.fr; style-src 'self' 'unsafe-inline' https: data:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https://iahome.fr https://*.iahome.fr wss://iahome.fr wss://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; worker-src 'self' blob:; media-src 'self' blob: data: https:; frame-ancestors 'self' https://iahome.fr",
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'unsafe-none',
+          },
+        ],
+      },
+      {
+        source: '/api/proxy-ruinedfooocus',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value:
+              "default-src 'self' https://iahome.fr https://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://gradio.s3-us-west-2.amazonaws.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://iahome.fr https://*.iahome.fr; style-src 'self' 'unsafe-inline' https: data:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https://iahome.fr https://*.iahome.fr wss://iahome.fr wss://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; worker-src 'self' blob:; media-src 'self' blob: data: https:; frame-ancestors 'self' https://iahome.fr",
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'unsafe-none',
+          },
+        ],
+      },
+      {
+        source: '/api/proxy-ruinedfooocus/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value:
+              "default-src 'self' https://iahome.fr https://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://gradio.s3-us-west-2.amazonaws.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://iahome.fr https://*.iahome.fr; style-src 'self' 'unsafe-inline' https: data:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https://iahome.fr https://*.iahome.fr wss://iahome.fr wss://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; worker-src 'self' blob:; media-src 'self' blob: data: https:; frame-ancestors 'self' https://iahome.fr",
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'unsafe-none',
+          },
+        ],
+      },
+      {
+        source: '/api/proxy-stablediffusion',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value:
+              "default-src 'self' https://iahome.fr https://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://gradio.s3-us-west-2.amazonaws.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://iahome.fr https://*.iahome.fr; style-src 'self' 'unsafe-inline' https: data:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https://iahome.fr https://*.iahome.fr wss://iahome.fr wss://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; worker-src 'self' blob:; media-src 'self' blob: data: https:; frame-ancestors 'self' https://iahome.fr",
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'unsafe-none',
+          },
+        ],
+      },
+      {
+        source: '/api/proxy-stablediffusion/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value:
+              "default-src 'self' https://iahome.fr https://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://gradio.s3-us-west-2.amazonaws.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://iahome.fr https://*.iahome.fr; style-src 'self' 'unsafe-inline' https: data:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https://iahome.fr https://*.iahome.fr wss://iahome.fr wss://*.iahome.fr https://gradio.s3-us-west-2.amazonaws.com https://*.amazonaws.com blob: data:; worker-src 'self' blob:; media-src 'self' blob: data: https:; frame-ancestors 'self' https://iahome.fr",
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'unsafe-none',
+          },
+        ],
+      },
       {
         source: '/_next/static/css/(.*)',
         headers: [
@@ -403,13 +516,12 @@ const nextConfig: NextConfig = {
       { source: '/applications/stable-diffusion', destination: '/card/stablediffusion', permanent: true },
       { source: '/applications/comfyui', destination: '/card/comfyui', permanent: true },
       // URLs courtes dupliquées → fiche produit canonique /card/{slug}
-      // Note: /administration sert l'application (token requis) ; la fiche produit est /card/administration
-      { source: '/ai-detector', destination: '/card/ai-detector', permanent: true },
-      { source: '/code-learning', destination: '/card/code-learning', permanent: true },
-      { source: '/photobooth', destination: '/card/photobooth', permanent: true },
+      // Ne pas rediriger les routes applicatives internes (token requis) :
+      // /administration, /code-learning, /photobooth, /ai-detector, /sentinelle-numerique, /resas-system → src/app/{slug}/page.tsx
       { source: '/photo-vivante', destination: '/card/photo-vivante', permanent: true },
-      { source: '/resas-system', destination: '/card/resas-system', permanent: true },
-      { source: '/sentinelle-numerique', destination: '/card/sentinelle-numerique', permanent: true },
+      // Fiche Trellis supprimée
+      { source: '/card/trellis', destination: '/404', permanent: true },
+      { source: '/trellis', destination: '/404', permanent: true },
       { source: '/my-tokens', destination: '/mes-credits', permanent: true },
       { source: '/admin/tokens', destination: '/admin/credits', permanent: true },
     ];
@@ -417,12 +529,132 @@ const nextConfig: NextConfig = {
 
   // Configuration pour optimiser le préchargement
   async rewrites() {
+    const psitransferHosts = ['psitransfer.iahome.fr', 'www.psitransfer.iahome.fr'];
+    const psitransferAssetRewrites = psitransferHosts.flatMap((host) => [
+      {
+        source: '/assets/:path*',
+        has: [{ type: 'host' as const, value: host }],
+        destination: '/api/proxy-psitransfer/assets/:path*',
+      },
+      {
+        source: '/app/:path*',
+        has: [{ type: 'host' as const, value: host }],
+        destination: '/api/proxy-psitransfer/app/:path*',
+      },
+      {
+        source: '/config.json',
+        has: [{ type: 'host' as const, value: host }],
+        destination: '/api/proxy-psitransfer/config.json',
+      },
+      {
+        source: '/lang.json',
+        has: [{ type: 'host' as const, value: host }],
+        destination: '/api/proxy-psitransfer/lang.json',
+      },
+      {
+        source: '/:sid.json',
+        has: [{ type: 'host' as const, value: host }],
+        destination: '/api/proxy-psitransfer/:sid.json',
+      },
+      {
+        source: '/files/:path*',
+        has: [{ type: 'host' as const, value: host }],
+        destination: '/api/proxy-psitransfer/files/:path*',
+      },
+    ]);
+
+    const cvGeneratorHosts = ['cv.iahome.fr', 'www.cv.iahome.fr'];
+    const cvGeneratorAssetRewrites = cvGeneratorHosts.flatMap((host) => [
+      {
+        source: '/_next/:path*',
+        has: [{ type: 'host' as const, value: host }],
+        destination: '/api/proxy-cv-generator/_next/:path*',
+      },
+      {
+        source: '/images/:path*',
+        has: [{ type: 'host' as const, value: host }],
+        destination: '/api/proxy-cv-generator/images/:path*',
+      },
+      {
+        source: '/favicon.ico',
+        has: [{ type: 'host' as const, value: host }],
+        destination: '/api/proxy-cv-generator/favicon.ico',
+      },
+    ]);
+
     return [
       {
         source: '/fonts/:path*',
         destination: '/fonts/:path*',
       },
-      // Éviter 502 sur favicon / apple-touch-icon si les fichiers manquent
+      // Proxies embed : assets avec extension (.css, .js) ignorés par le matcher middleware
+      {
+        source: '/psitransfer/embed/:path*',
+        destination: '/api/proxy-psitransfer/:path*',
+      },
+      {
+        source: '/photobooth/embed/:path*',
+        destination: '/api/proxy-photobooth/:path*',
+      },
+      {
+        source: '/metube/embed/:path*',
+        destination: '/api/proxy-metube-embed/:path*',
+      },
+      {
+        source: '/metube/embedsocket.io/:path*',
+        destination: '/api/proxy-metube-socket',
+      },
+      {
+        source: '/ruinedfooocus/embed',
+        destination: '/api/proxy-ruinedfooocus',
+      },
+      {
+        source: '/ruinedfooocus/embed/',
+        destination: '/api/proxy-ruinedfooocus',
+      },
+      {
+        source: '/ruinedfooocus/embed/:path*',
+        destination: '/api/proxy-ruinedfooocus/:path*',
+      },
+      {
+        source: '/stablediffusion/embed',
+        destination: '/api/proxy-stablediffusion',
+      },
+      {
+        source: '/stablediffusion/embed/',
+        destination: '/api/proxy-stablediffusion',
+      },
+      {
+        source: '/stablediffusion/embed/:path*',
+        destination: '/api/proxy-stablediffusion/:path*',
+      },
+      {
+        source: '/resas-system/embed/:path*',
+        destination: '/api/proxy-resas-system/:path*',
+      },
+      {
+        source: '/apprendre-autrement/embed/:path*',
+        destination: '/api/proxy-apprendre-autrement/:path*',
+      },
+      {
+        source: '/reveil/embed',
+        destination: '/api/proxy-reveil',
+      },
+      {
+        source: '/reveil/embed/',
+        destination: '/api/proxy-reveil',
+      },
+      {
+        source: '/reveil/embed/:path*',
+        destination: '/api/proxy-reveil/:path*',
+      },
+      {
+        source: '/socket.io/:path*',
+        destination: '/api/proxy-metube-socket',
+      },
+      ...psitransferAssetRewrites,
+      ...cvGeneratorAssetRewrites,
+      // Éviter 502 sur favicon / apple-touch-icon si les fichiers manquent (iahome.fr uniquement)
       { source: '/favicon.ico', destination: '/iahome-logo.svg' },
       { source: '/apple-touch-icon.png', destination: '/iahome-logo.svg' },
     ];

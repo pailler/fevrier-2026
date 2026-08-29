@@ -1,14 +1,16 @@
 import type { Metadata } from 'next';
-import { buildPageSeo } from '@/utils/pageMetadata';
 
-export const metadata: Metadata = buildPageSeo({
-  path: '/apprendre-autrement',
-  title: 'Apprendre Autrement — redirection',
-  description: 'Accès à l’application Apprendre Autrement IAHome.',
-  keywords: ['Apprendre Autrement', 'IAHome éducation'],
-  noindex: true,
-});
+/** Toujours dynamiquer : le jeton d’accès est dans ?token= */
+export const dynamic = 'force-dynamic';
 
-export default function ApprendreAutrementRootLayout({ children }: { children: React.ReactNode }) {
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
+
+export default function ApprendreAutrementAppLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return children;
 }

@@ -89,14 +89,6 @@ export default function BlogArticlePage() {
     }
   }, [slug]);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -188,8 +180,6 @@ export default function BlogArticlePage() {
               
               <div className="flex items-center text-sm text-gray-500">
                 <span>Par {article.author}</span>
-                <span className="mx-2">•</span>
-                <span>{formatDate(article.published_at)}</span>
               </div>
             </header>
 

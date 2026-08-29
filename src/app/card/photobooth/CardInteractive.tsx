@@ -15,7 +15,7 @@ export default function PhotoboothPage({ initialModule }: CardInteractiveProps) 
   const photoboothAppUrl =
     hydrated && window.location.hostname === 'localhost'
       ? 'http://localhost:7885'
-      : 'https://photobooth.iahome.fr';
+      : 'https://iahome.fr/photobooth';
   /** Même valeur SSR + 1er rendu client → pas d’écart d’hydratation ; puis origine réelle (localhost, preview, etc.). */
   const discoverPageHref = hydrated
     ? `${window.location.origin}/photobooth-decouverte.html`
@@ -77,7 +77,7 @@ export default function PhotoboothPage({ initialModule }: CardInteractiveProps) 
                 <li>⚡ Ouverture rapide sans installation</li>
               </ul>
               <div className="mt-6 text-sm text-gray-500">
-                URL applicative: <span className="font-medium">photobooth.iahome.fr</span>
+                URL applicative: <span className="font-medium">iahome.fr/photobooth</span>
               </div>
             </div>
           </div>

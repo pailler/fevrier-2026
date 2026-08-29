@@ -1,22 +1,9 @@
-import { CardPageJsonLd } from '@/components/CardPageJsonLd'
-import type { Metadata } from 'next';
-import { buildPageSeo } from '@/utils/pageMetadata';
+import { CardPageJsonLd } from '@/components/CardPageJsonLd';
+import { buildToolCardMetadata } from '@/utils/buildToolCardSeo';
 
-export const metadata: Metadata = buildPageSeo({
-  path: '/card/photo-vivante',
-  title: 'Photo Vivante — animation photo realiste',
-  description:
-    'Photo Vivante sur IAHome : animez une photo fixe avec un rendu naturel, accès par crédits et ouverture sécurisée.',
-  keywords: [
-    'Photo Vivante IAHome',
-    'animation photo IA',
-    'photo animee realiste',
-    'portrait anime IA',
-    'module photo vivante',
-  ],
-});
+export const metadata = buildToolCardMetadata('photo-vivante');
 
-export default function CardPhotoVivanteLayout({ children }: { children: React.ReactNode }) {
+export default function PhotoVivanteLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <CardPageJsonLd slug="photo-vivante" />

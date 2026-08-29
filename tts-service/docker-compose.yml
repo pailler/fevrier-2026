@@ -7,8 +7,8 @@ services:
       - "8101:7860"
     volumes:
       - ./outputs:/app/outputs
-      - ../ai-models-cache/coqui:/root/.local/share/tts
-      - ../ai-models-cache/huggingface:/root/.cache/huggingface
+      - ../../StabilityMatrix-win-x64/Data/Models/IaHome-Services-Cache/coqui:/root/.local/share/tts
+      - ../../StabilityMatrix-win-x64/Data/Models/Diffusers:/root/.cache/huggingface
     environment:
       - COQUI_TOS_AGREED=1
       - GRADIO_SERVER_NAME=0.0.0.0

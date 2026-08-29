@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken';
+import { decodeModuleAccessToken } from '@/utils/moduleAccessJwt';
+import { normalizeModuleIdForAccessJwt } from '@/utils/moduleAccessJwtIssue';
 import { getSupabaseServiceRoleKey, getSupabaseUrl } from '@/utils/supabaseConfig';
 
 /** Côté serveur sans session utilisateur : service role pour user_applications (RLS). */
 const supabaseAdmin = createClient(getSupabaseUrl(), getSupabaseServiceRoleKey());
-
-const JWT_SECRET = process.env.JWT_SECRET || 'iahome-jwt-secret-2024-production-secure-key';
 
 // Fonction helper pour obtenir les en-têtes CORS
 function getCorsHeaders(origin: string | null): Record<string, string> {
@@ -17,6 +16,9 @@ function getCorsHeaders(origin: string | null): Record<string, string> {
     'https://musetalk.iahome.fr',
     'https://photo-vivante.iahome.fr',
     'https://iahome.fr',
+    'https://metube.iahome.fr',
+    'https://www.metube.iahome.fr',
+    'https://psitransfer.iahome.fr',
     'http://localhost:9001',
     'http://localhost:7890',
     'http://localhost:7891',
@@ -92,49 +94,15 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`🔍 Validation token pour module ${moduleId}`);
-    console.log(`🔍 Token reçu (premiers 50 caractères): ${token.substring(0, 50)}...`);
 
-    // Décoder le token (essayer JWT d'abord, puis Base64)
-    let tokenPayload: any;
-    try {
-      // Essayer d'abord JWT
-      try {
-        tokenPayload = jwt.verify(token, JWT_SECRET) as any;
-        console.log('✅ Token JWT décodé avec succès');
-        console.log('📋 Payload JWT:', JSON.stringify(tokenPayload, null, 2));
-      } catch (jwtError: any) {
-        console.log('⚠️ Échec décodage JWT, tentative Base64...');
-        console.log('⚠️ Erreur JWT:', jwtError.message);
-        // Si JWT échoue, essayer Base64 simple
-        try {
-          // Jetons generate-access-token : Base64 URL-safe (sans padding) — atob() ne suffit pas
-          const padLength = (4 - (token.length % 4)) % 4;
-          const padded = token.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat(padLength);
-          const decoded = Buffer.from(padded, 'base64').toString('utf8');
-          tokenPayload = JSON.parse(decoded);
-          console.log('✅ Token Base64 décodé avec succès');
-          console.log('📋 Payload Base64:', JSON.stringify(tokenPayload, null, 2));
-        } catch (base64Error: any) {
-          console.error('❌ Erreur décodage token (JWT et Base64 échoués)');
-          console.error('❌ Erreur JWT:', jwtError.message);
-          console.error('❌ Erreur Base64:', base64Error.message);
-          return NextResponse.json(
-            { error: 'Token invalide - format non reconnu' },
-            { 
-              status: 401,
-              headers: corsHeaders
-            }
-          );
-        }
-      }
-    } catch (error: any) {
-      console.error('❌ Erreur décodage token:', error);
-      console.error('❌ Détails:', error.message, error.stack);
+    const tokenPayload = decodeModuleAccessToken(token);
+    if (!tokenPayload) {
+      console.error('❌ Erreur décodage token (JWT et Base64 échoués)');
       return NextResponse.json(
-        { error: `Erreur décodage token: ${error.message || 'Erreur inconnue'}` },
-        { 
+        { error: 'Token invalide - format non reconnu' },
+        {
           status: 401,
-          headers: corsHeaders
+          headers: corsHeaders,
         }
       );
     }
@@ -142,7 +110,7 @@ export async function POST(request: NextRequest) {
     // Pas de rejet sur date d’expiration : l’accès est binaire (token valide + droits module).
 
     // Vérifier que le moduleId correspond
-    if (tokenPayload.moduleId !== moduleId) {
+    if (tokenPayload.moduleId !== normalizeModuleIdForAccessJwt(moduleId)) {
       return NextResponse.json(
         { error: 'Token invalide pour ce module' },
         { 

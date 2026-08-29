@@ -1,14 +1,18 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { useIframeDetection } from '../utils/useIframeDetection';
+import { shouldHideSiteChrome } from '@/utils/siteChrome';
 import ChatAI from './ChatAI';
 import CookieConsent from './CookieConsent';
 
 export default function ConditionalComponents() {
+  const pathname = usePathname();
   const isInIframe = useIframeDetection();
 
-  // Masquer ChatAI et CookieConsent en iframe
-  if (isInIframe) {
+  const host = typeof window !== 'undefined' ? window.location.hostname : '';
+
+  if (isInIframe || shouldHideSiteChrome(pathname, host)) {
     return null;
   }
 

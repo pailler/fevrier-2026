@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
       
       // Rediriger vers PsiTransfer
       console.log('🔗 Redirection vers PsiTransfer');
-      return NextResponse.redirect('https://psitransfer.iahome.fr', 302);
+      return NextResponse.redirect(`https://iahome.fr/psitransfer?token=${encodeURIComponent(token)}`, 302);
     }
     
     // Si pas de token, vérifier l'origine de la requête
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
     
     // Rediriger vers PsiTransfer
     console.log('🔗 Redirection vers PsiTransfer');
-    return NextResponse.redirect('https://psitransfer.iahome.fr', 302);
+    return NextResponse.redirect('https://iahome.fr/card/psitransfer', 302);
     
   } catch (error) {
     console.error('❌ Erreur PsiTransfer Redirect:', error);

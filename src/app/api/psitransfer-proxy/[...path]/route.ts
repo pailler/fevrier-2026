@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const PSITRANSFER_SERVICE_URL = process.env.PSITRANSFER_SERVICE_URL || 'http://localhost:8084';
+const PSITRANSFER_SERVICE_URL = process.env.PSITRANSFER_SERVICE_URL || 'http://localhost:8087';
 
 function rewritePsitransferUrls(html: string): string {
   let modified = html;

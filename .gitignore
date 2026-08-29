@@ -57,8 +57,10 @@ ai-models-cache/
 models-cache/
 
 # Fichiers d'environnement
+.env
 .env.local
 .env.google-mcp
+.env.home-assistant
 .env.production
 .env.production.local
 env.production.local
@@ -127,6 +129,7 @@ hi3dgen-app/**/__pycache__/
 
 # Gradio apps — venvs locaux
 gradio-apps/**/.venv/
+gradio-apps/**/.venv-*/
 
 # Artefacts build / runtime local
 tsconfig.tsbuildinfo
@@ -158,6 +161,9 @@ scripts/**/__pycache__/
 # Vidéos promo — WAV régénérables via scripts/promo_*.py
 public/videos/**/*.wav
 public/videos/**/_verify_promo_face.jpg
+
+# Stable Diffusion WebUI (clone local volumineux)
+docker-services/essentiels/automatic1111/
 
 # QR codes — secrets locaux (modèle : config.env.example)
 docker-services/essentiels/qrcodes/config.env

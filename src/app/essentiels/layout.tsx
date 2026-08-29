@@ -1,16 +1,20 @@
 import type { Metadata } from 'next';
 import { buildPageSeo } from '@/utils/pageMetadata';
+import { getValueProposition } from '@/data/ecosystemValueProposition';
+
+const essVp = getValueProposition('essentiels');
 
 export const metadata: Metadata = buildPageSeo({
   path: '/essentiels',
-  title: 'Essentiels — hub de démarrage des services IAHome',
-  description:
-    'Accès centralisé aux essentiels IAHome : lancer vos applications, scripts et services associés à la plateforme.',
+  title: 'Outils essentiels — plateforme française, RGPD, support FR',
+  description: `${essVp.subheadline} ${essVp.oneLiner}`,
   keywords: [
-    'essentiels IAHome',
-    'démarrer services IAHome',
-    'hub applications',
-    'lancer outils IA',
+    'outils numériques français',
+    'RGPD',
+    'support français',
+    'partager fichier en ligne',
+    'QR code événement',
+    'PDF en ligne',
   ],
 });
 

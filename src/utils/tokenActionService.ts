@@ -62,6 +62,8 @@ export const TOKEN_COSTS = {
   'home-assistant': 100,
   'voice-isolation': 100,
   'tts': 100,
+  /** Générateur de CV IA (optimisation ATS) */
+  'cv-generator': 100,
   /** Vote en ligne (PIN + QR, Supabase) */
   'vote': 10,
   /** Réveil intelligent (météo, jours fériés) */

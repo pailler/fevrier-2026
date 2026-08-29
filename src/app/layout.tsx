@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { TokenProvider } from '../contexts/TokenContext'
 import ConditionalHeader from '../components/ConditionalHeader'
-import Footer from '../components/Footer'
+import ConditionalFooter from '../components/ConditionalFooter'
 import ConditionalComponents from '../components/ConditionalComponents'
 import ClientOnly from '../components/ClientOnly'
 import ScrollToTop from '../components/ScrollToTop'
@@ -10,15 +10,15 @@ import ClientRedirectHandler from '../components/ClientRedirectHandler'
 import Analytics from '../components/Analytics'
 import { JsonLd } from '../components/JsonLd'
 import { getDefaultJsonLdGraph } from '../utils/structuredData'
+import { ECOSYSTEM_SEO } from '../data/ecosystemValueProposition'
 
 export const metadata: Metadata = {
-  title: 'IAHome — Toutes les applications et la puissance des serveurs IAHome chez vous',
-  description:
-    'Toutes les applications et la puissance des serveurs IAHome chez vous : Whisper, images IA, PDF, domotique, QR codes et plus. Interface en français, crédits transparents.',
+  title: ECOSYSTEM_SEO.defaultTitle,
+  description: ECOSYSTEM_SEO.defaultDescription,
   applicationName: 'IA Home',
   authors: [{ name: 'IA Home', url: 'https://iahome.fr' }],
   keywords: [
-    'plateforme IA France',
+    'écosystème IA France',
     'intelligence artificielle',
     'outils IA en ligne',
     'IA française',
@@ -77,9 +77,8 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'IAHome — Toutes les applications et la puissance des serveurs IAHome chez vous',
-    description:
-      'Whisper, Stable Diffusion, PDF+IA, Home Assistant et plus : une plateforme en français, avec crédits clairs.',
+    title: ECOSYSTEM_SEO.defaultTitle,
+    description: ECOSYSTEM_SEO.defaultDescription,
     url: 'https://iahome.fr',
     siteName: 'IA Home',
     locale: 'fr_FR',
@@ -89,7 +88,7 @@ export const metadata: Metadata = {
         url: 'https://iahome.fr/images/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'IA Home - Plateforme d\'Intelligence Artificielle - Formation et Outils IA',
+        alt: 'IA Home - Ecosystème d\'Intelligence Artificielle - Formation et Outils IA',
         type: 'image/jpeg',
       },
     ],
@@ -99,9 +98,8 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@iahome_fr',
     creator: '@iahome_fr',
-    title: 'IAHome — Toutes les applications et la puissance des serveurs IAHome chez vous',
-    description:
-      'Toutes les applications et la puissance des serveurs IAHome chez vous. Interface en français, crédits transparents.',
+    title: ECOSYSTEM_SEO.defaultTitle,
+    description: ECOSYSTEM_SEO.defaultDescription,
     images: ['https://iahome.fr/images/og-image.jpg'],
   },
   icons: {
@@ -150,7 +148,7 @@ export default function RootLayout({
           <main className="flex-1">
             {children}
           </main>
-          <Footer />
+          <ConditionalFooter />
           <ClientOnly>
             <ConditionalComponents />
             <ScrollToTop />

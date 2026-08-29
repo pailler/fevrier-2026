@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+:root {
+  --foreground-rgb: 15, 23, 42;
+  --background-start-rgb: 241, 245, 249;
+  --background-end-rgb: 255, 255, 255;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(to bottom, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
+}
+
+@media print {
+  body {
+    background: white;
+  }
+  .no-print {
+    display: none !important;
+  }
+  #cv-preview-print {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+}

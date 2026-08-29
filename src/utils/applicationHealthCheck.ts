@@ -1,26 +1,35 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import jwt from 'jsonwebtoken';
 import { getHunyuan3dAppUrl } from '@/utils/hunyuan3dAppUrl';
+import { PRODUCT_LANDING_PUBLIC_HOSTS } from '@/utils/productLandingHosts';
+import { RUINEDFOOOCUS_INTERNAL_URL } from '@/utils/ruinedFooocusProxy';
+import { STABLEDIFFUSION_INTERNAL_URL } from '@/utils/stableDiffusionProxy';
+import { APPRENDRE_AUTREMENT_INTERNAL_URL } from '@/utils/apprendreAutrementProxy';
+import { RESAS_SYSTEM_INTERNAL_URL } from '@/utils/resasSystemProxy';
+import { REVEIL_INTERNAL_URL } from '@/utils/reveilProxy';
 
 const MODULE_URLS: Record<string, string> = {
   librespeed: 'https://librespeed.iahome.fr',
-  metube: 'https://metube.iahome.fr',
+  metube: 'https://iahome.fr/metube',
   pdf: 'https://pdf.iahome.fr',
-  psitransfer: 'https://psitransfer.iahome.fr',
+  psitransfer: 'https://iahome.fr/psitransfer',
   qrcodes: 'https://qrcodes.iahome.fr',
   whisper: 'https://whisper.iahome.fr',
-  stablediffusion: 'https://stablediffusion.iahome.fr',
+  stablediffusion: STABLEDIFFUSION_INTERNAL_URL,
   comfyui: 'https://comfyui.iahome.fr',
   'meeting-reports': 'https://meeting-reports.iahome.fr',
-  ruinedfooocus: 'https://ruinedfooocus.iahome.fr',
+  // Internes : mêmes URL que les proxies (host.docker.internal depuis iahome-app)
+  ruinedfooocus: RUINEDFOOOCUS_INTERNAL_URL,
   cogstudio: 'https://cogstudio.iahome.fr',
   hunyuan3d: getHunyuan3dAppUrl(),
   'home-assistant': 'https://homeassistant.iahome.fr',
   homeassistant: 'https://homeassistant.iahome.fr',
   'prompt-generator': 'https://prompt-generator.iahome.fr',
-  'apprendre-autrement': 'https://apprendre-autrement.iahome.fr',
+  'cv-generator': 'https://cv.iahome.fr',
+  'apprendre-autrement': APPRENDRE_AUTREMENT_INTERNAL_URL,
   'ai-detector': 'https://iahome.fr/ai-detector',
   'sentinelle-numerique': 'https://iahome.fr/sentinelle-numerique',
-  'code-learning': 'https://iahome.fr/code-learning',
+  'code-learning': 'https://code-learning.iahome.fr',
   administration: 'https://iahome.fr/administration',
   'voice-isolation': 'https://voice-isolation.iahome.fr',
   photomaker: 'https://photomaker.iahome.fr',
@@ -31,7 +40,9 @@ const MODULE_URLS: Record<string, string> = {
   'photo-vivante': 'https://photo-vivante.iahome.fr',
   'florence-2': 'https://florence2.iahome.fr',
   vote: 'https://vote.iahome.fr',
-  'reveil-intelligent': 'https://reveil-intelligent.iahome.fr',
+  'reveil-intelligent': REVEIL_INTERNAL_URL,
+  tts: 'https://tts.iahome.fr',
+  'resas-system': RESAS_SYSTEM_INTERNAL_URL,
 };
 
 const MODULE_ID_MAPPING: Record<string, string> = {
@@ -45,6 +56,25 @@ const MODULE_ID_MAPPING: Record<string, string> = {
   '10': 'comfyui',
   '11': 'cogstudio',
 };
+
+/** Aligné sur cloudflare-worker-protect-sous-domaines.js (landings publiques). */
+const WORKER_PUBLIC_LANDING_HOSTS = new Set<string>([
+  ...(PRODUCT_LANDING_PUBLIC_HOSTS as readonly string[]),
+  'game.iahome.fr',
+  'www.game.iahome.fr',
+]);
+
+const WORKER_SKIP_ALWAYS_HOSTS = new Set([
+  'portainer.iahome.fr',
+  'www.portainer.iahome.fr',
+  'minecraft.iahome.fr',
+  'www.minecraft.iahome.fr',
+]);
+
+const DENY_LOCATION_MARKER = 'direct_access_denied';
+
+const JWT_SECRET =
+  process.env.JWT_SECRET || 'votre-jwt-secret-tres-securise-changez-cela-immediatement';
 
 export function getModuleSlug(moduleId: string, moduleTitle: string): string {
   if (MODULE_ID_MAPPING[moduleId]) {
@@ -99,6 +129,9 @@ export function getModuleSlug(moduleId: string, moduleTitle: string): string {
   }
   if (titleLower.includes('prompt generator') || titleLower.includes('prompt-generator')) {
     return 'prompt-generator';
+  }
+  if (titleLower.includes('générateur de cv') || titleLower.includes('cv ia') || titleLower.includes('cv-generator')) {
+    return 'cv-generator';
   }
   if (titleLower.includes('photomaker') || titleLower.includes('photo maker')) {
     return 'photomaker';
@@ -157,6 +190,20 @@ export function getModuleSlug(moduleId: string, moduleTitle: string): string {
   if (titleLower.includes('réveil intelligent') || titleLower.includes('reveil intelligent')) {
     return 'reveil-intelligent';
   }
+  if (
+    titleLower.includes('synthèse vocale') ||
+    titleLower.includes('synthese vocale') ||
+    titleLower === 'tts'
+  ) {
+    return 'tts';
+  }
+  if (
+    titleLower.includes('réservation matériel') ||
+    titleLower.includes('reservation materiel') ||
+    titleLower.includes('resas')
+  ) {
+    return 'resas-system';
+  }
 
   return slug;
 }
@@ -166,46 +213,240 @@ export function getModuleUrlForSlug(moduleId: string, moduleTitle: string): stri
   return MODULE_URLS[slug];
 }
 
-export async function checkApplicationUrl(url: string): Promise<{
+function isCloudflareEdgeError(status: number): boolean {
+  return (
+    status === 502 ||
+    status === 503 ||
+    status === 524 ||
+    status === 520 ||
+    status === 521 ||
+    status === 522 ||
+    status === 523 ||
+    status === 525 ||
+    status === 526 ||
+    status === 527
+  );
+}
+
+function isReachableAppStatus(status: number): boolean {
+  // 401 = joignable mais auth app / Access ; 405 = HEAD non supporté
+  return (
+    ((status >= 200 && status < 400) || status === 401 || status === 405) &&
+    !isCloudflareEdgeError(status)
+  );
+}
+
+export function isWorkerPublicLandingHost(hostname: string): boolean {
+  return WORKER_PUBLIC_LANDING_HOSTS.has(hostname.toLowerCase());
+}
+
+/**
+ * Sous-domaine *.iahome.fr protégé par le worker (hors landings / infra).
+ */
+export function isWorkerTokenGatedHost(hostname: string): boolean {
+  const host = hostname.toLowerCase();
+  if (!host.endsWith('.iahome.fr')) return false;
+  if (host === 'iahome.fr' || host === 'www.iahome.fr') return false;
+  if (WORKER_SKIP_ALWAYS_HOSTS.has(host)) return false;
+  if (isWorkerPublicLandingHost(host)) return false;
+  return true;
+}
+
+function issueHealthCheckToken(moduleSlug: string): string {
+  return jwt.sign(
+    {
+      userId: 'iahome-health-check',
+      userEmail: 'health-check@iahome.fr',
+      moduleId: moduleSlug || 'health-check',
+    },
+    JWT_SECRET,
+    { algorithm: 'HS256' }
+  );
+}
+
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit & { timeoutMs?: number } = {}
+): Promise<Response> {
+  const { timeoutMs = 15000, ...rest } = init;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...rest, signal: controller.signal });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+/**
+ * Vérifie un sous-domaine protégé par le worker Cloudflare :
+ * 1) sans token → 302 direct_access_denied (gate OK)
+ * 2) avec JWT + Sec-Fetch-Site same-site → app joignable
+ */
+async function checkTokenGatedSubdomain(
+  url: string,
+  moduleSlug: string
+): Promise<{
   isValid: boolean;
   statusCode?: number;
   errorMessage?: string;
   responseTime?: number;
   isCloudflareError?: boolean;
+  gateOk?: boolean;
+  originOk?: boolean;
 }> {
+  const startTime = Date.now();
+  const parsed = new URL(url);
+  const bareUrl = `${parsed.origin}${parsed.pathname || '/'}`;
+
+  try {
+    const gateResp = await fetchWithTimeout(bareUrl, {
+      method: 'GET',
+      redirect: 'manual',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; IAHome-Health-Checker/1.0)',
+        Accept: 'text/html',
+      },
+    });
+
+    const location = gateResp.headers.get('location') || '';
+    const gateOk =
+      [301, 302, 303, 307, 308].includes(gateResp.status) &&
+      location.includes(DENY_LOCATION_MARKER);
+
+    if (!gateOk) {
+      const responseTime = Date.now() - startTime;
+      if (isReachableAppStatus(gateResp.status)) {
+        return {
+          isValid: false,
+          statusCode: gateResp.status,
+          responseTime,
+          gateOk: false,
+          originOk: true,
+          errorMessage:
+            'Worker: accès direct ouvert (attendu 302 direct_access_denied sans token)',
+        };
+      }
+      return {
+        isValid: false,
+        statusCode: gateResp.status,
+        responseTime,
+        gateOk: false,
+        isCloudflareError: isCloudflareEdgeError(gateResp.status),
+        errorMessage: `Worker: gate inattendu (HTTP ${gateResp.status}${location ? ` → ${location}` : ''})`,
+      };
+    }
+
+    const token = issueHealthCheckToken(moduleSlug);
+    const probeUrl = `${bareUrl}${bareUrl.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`;
+    const originResp = await fetchWithTimeout(probeUrl, {
+      method: 'GET',
+      redirect: 'manual',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; IAHome-Health-Checker/1.0)',
+        Accept: 'text/html',
+        'Sec-Fetch-Site': 'same-site',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Dest': 'document',
+        Referer: 'https://iahome.fr/admin/applications',
+      },
+    });
+
+    const responseTime = Date.now() - startTime;
+    const originStatus = originResp.status;
+    // Après unlock le worker peut 302 vers une autre page app, ou 200
+    let originOk = isReachableAppStatus(originStatus);
+    if (
+      !originOk &&
+      [301, 302, 303, 307, 308].includes(originStatus)
+    ) {
+      const loc = originResp.headers.get('location') || '';
+      // Redirection vers encours = token / same-site refusés
+      originOk = !loc.includes(DENY_LOCATION_MARKER);
+    }
+
+    if (!originOk) {
+      return {
+        isValid: false,
+        statusCode: originStatus,
+        responseTime,
+        gateOk: true,
+        originOk: false,
+        isCloudflareError: isCloudflareEdgeError(originStatus),
+        errorMessage: isCloudflareEdgeError(originStatus)
+          ? `Erreur Cloudflare origine (${originStatus}) — gate OK`
+          : `Origine injoignable (HTTP ${originStatus}) — gate OK`,
+      };
+    }
+
+    return {
+      isValid: true,
+      statusCode: originStatus,
+      responseTime,
+      gateOk: true,
+      originOk: true,
+    };
+  } catch (error: unknown) {
+    const responseTime = Date.now() - startTime;
+    const err = error as { message?: string; name?: string };
+    let errorMessage = err.message || 'Erreur inconnue';
+    if (err.name === 'AbortError') {
+      errorMessage = 'Timeout (dépassement de 15 secondes)';
+    } else if (err.message?.includes('fetch failed')) {
+      errorMessage = 'Erreur de connexion réseau';
+    }
+    return {
+      isValid: false,
+      errorMessage,
+      responseTime,
+      gateOk: false,
+      originOk: false,
+    };
+  }
+}
+
+export async function checkApplicationUrl(
+  url: string,
+  options?: { moduleSlug?: string }
+): Promise<{
+  isValid: boolean;
+  statusCode?: number;
+  errorMessage?: string;
+  responseTime?: number;
+  isCloudflareError?: boolean;
+  gateOk?: boolean;
+  originOk?: boolean;
+}> {
+  let hostname = '';
+  try {
+    hostname = new URL(url).hostname.toLowerCase();
+  } catch {
+    return { isValid: false, errorMessage: 'URL invalide' };
+  }
+
+  const moduleSlug =
+    options?.moduleSlug ||
+    hostname.replace(/^www\./, '').replace(/\.iahome\.fr$/, '') ||
+    'health-check';
+
+  if (isWorkerTokenGatedHost(hostname)) {
+    return checkTokenGatedSubdomain(url, moduleSlug);
+  }
+
   const startTime = Date.now();
 
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-    const response = await fetch(url, {
+    const response = await fetchWithTimeout(url, {
       method: 'HEAD',
-      signal: controller.signal,
       redirect: 'follow',
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; IAHome-Health-Checker/1.0)',
       },
     });
 
-    clearTimeout(timeoutId);
     const responseTime = Date.now() - startTime;
-
-    const isCloudflareErrorCode =
-      response.status === 502 ||
-      response.status === 503 ||
-      response.status === 524 ||
-      response.status === 520 ||
-      response.status === 521 ||
-      response.status === 522 ||
-      response.status === 523 ||
-      response.status === 525 ||
-      response.status === 526 ||
-      response.status === 527;
-
-    const isValid =
-      ((response.status >= 200 && response.status < 400) || response.status === 405) &&
-      !isCloudflareErrorCode;
+    const isCloudflareErrorCode = isCloudflareEdgeError(response.status);
+    const isValid = isReachableAppStatus(response.status);
 
     let errorMessage: string | undefined;
     let isCloudflareError = false;
@@ -223,6 +464,15 @@ export async function checkApplicationUrl(url: string): Promise<{
       } else {
         errorMessage = `Status code: ${response.status}`;
       }
+    } else if (isWorkerPublicLandingHost(hostname)) {
+      // Landing publique : 200 attendu (pas de gate)
+      return {
+        isValid: true,
+        statusCode: response.status,
+        responseTime,
+        gateOk: false,
+        originOk: true,
+      };
     }
 
     return {
@@ -260,6 +510,8 @@ export type ModuleHealthRow = {
   responseTime?: number;
   statusCode?: number;
   isCloudflareError?: boolean;
+  gateOk?: boolean;
+  originOk?: boolean;
 };
 
 export async function runAllModulesHealthCheck(
@@ -292,7 +544,7 @@ export async function runAllModulesHealthCheck(
       continue;
     }
 
-    const checkResult = await checkApplicationUrl(moduleUrl);
+    const checkResult = await checkApplicationUrl(moduleUrl, { moduleSlug });
 
     results.push({
       module_id: moduleEntry.id,

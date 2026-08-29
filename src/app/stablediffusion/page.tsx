@@ -1,74 +1,106 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function StableDiffusionPage() {
-  const searchParams = useSearchParams();
-  
+import { STABLEDIFFUSION_LANDING_URL } from '@/utils/productLandingHosts';
+import { consumeStashedModuleToken } from '@/utils/moduleAppUrl';
+
+/**
+ * Passerelle auth par token (bouton d'accès carte / compte).
+ * Landing publique : https://stablediffusion.iahome.fr
+ * App : https://iahome.fr/stablediffusion?token=...
+ * Embed Gradio (interne) : /stablediffusion/embed — chargé en iframe après validation.
+ */
+export default function StableDiffusionAppPage() {
+  const router = useRouter();
+  const [tokenValidated, setTokenValidated] = useState(false);
+  const [tokenError, setTokenError] = useState<string | null>(null);
+  const [embedSrc, setEmbedSrc] = useState<string | null>(null);
+
   useEffect(() => {
-    const token = searchParams.get('token');
-    const service = 'stablediffusion';
-    
-    if (token) {
-      // Rediriger vers le proxy Gradio avec le token
-      window.location.href = `/api/gradio-proxy?service=${service}&token=${token}`;
-    } else {
-      // Rediriger vers la page de connexion
-      window.location.href = '/login?redirect=/stablediffusion';
-    }
-  }, [searchParams]);
-  
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
-        <p className="mt-4 text-lg">Redirection vers Stable Diffusion...</p>
+    const validateToken = async () => {
+      if (typeof window === 'undefined') return;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const token =
+        consumeStashedModuleToken('stablediffusion') ||
+        consumeStashedModuleToken('7') ||
+        urlParams.get('token');
+
+      if (!token) {
+        window.location.replace(`${STABLEDIFFUSION_LANDING_URL}/`);
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/validate-internal-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, moduleId: 'stablediffusion' }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          setTokenError(
+            (errorData as { error?: string }).error ||
+              'Token invalide ou expiré. Ouvrez Stable Diffusion depuis votre espace IAHome.'
+          );
+          return;
+        }
+
+        setEmbedSrc(`/stablediffusion/embed?token=${encodeURIComponent(token)}`);
+        setTokenValidated(true);
+        window.history.replaceState(
+          {},
+          document.title,
+          `${window.location.pathname}?token=${encodeURIComponent(token)}`
+        );
+      } catch {
+        setTokenError('Erreur lors de la validation du token. Veuillez réessayer.');
+      }
+    };
+
+    void validateToken();
+  }, []);
+
+  if (tokenError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50 flex items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <p className="text-red-800 font-medium mb-2">Accès refusé</p>
+            <p className="text-red-600 mb-4">{tokenError}</p>
+            <button
+              type="button"
+              onClick={() => router.push('/account')}
+              className="bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700"
+            >
+              Retour aux modules
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
+    );
+  }
+
+  if (!tokenValidated || !embedSrc) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mb-4" />
+          <p className="text-gray-600">Vérification de l&apos;accès Stable Diffusion…</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <iframe
+      title="Stable Diffusion IAHome"
+      src={embedSrc}
+      className="fixed inset-0 w-full h-full border-0 bg-white"
+      allow="clipboard-write; fullscreen"
+    />
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

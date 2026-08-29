@@ -13,12 +13,14 @@ const supabase = createClient(
 // Mapping des modules vers leurs URLs de destination
 const MODULE_URLS: { [key: string]: string } = {
   'librespeed': 'https://librespeed.iahome.fr',
-  'metube': 'https://metube.iahome.fr',
+  'metube': 'https://iahome.fr/metube',
   'pdf': 'https://pdf.iahome.fr',
-  'psitransfer': 'https://psitransfer.iahome.fr',
   'qrcodes': 'https://qrcodes.iahome.fr',
-  'stablediffusion': 'https://stablediffusion.iahome.fr',
-  'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
+  'stablediffusion': 'https://iahome.fr/stablediffusion',
+  'ruinedfooocus': 'https://iahome.fr/ruinedfooocus', // passerelle ?token= → /ruinedfooocus/embed
+  'resas-system': 'https://iahome.fr/resas-system', // passerelle ?token= → /resas-system/embed
+  'apprendre-autrement': 'https://iahome.fr/apprendre-autrement',
+  'ai-detector': 'https://iahome.fr/ai-detector',
   'comfyui': 'https://comfyui.iahome.fr',
   'cogstudio': 'https://cogstudio.iahome.fr',
   'hunyuan3d': getHunyuan3dAppUrl(),
@@ -28,14 +30,16 @@ const MODULE_URLS: { [key: string]: string } = {
   'photo-vivante': 'https://photo-vivante.iahome.fr',
   'florence-2': 'https://florence2.iahome.fr',
   'animagine-xl': 'https://animaginexl.iahome.fr',
-  'reveil-intelligent': 'https://reveil-intelligent.iahome.fr',
+  'reveil-intelligent': 'https://iahome.fr/reveil',
+  'psitransfer': 'https://iahome.fr/psitransfer',
+  'photobooth': 'https://iahome.fr/photobooth',
 };
 
 /**
  * Sous-domaines *.iahome.fr : on ajoute ?token= (JWT + débit) pour passer le worker Cloudflare.
  * MuseTalk : même URL ?token= que Florence-2 ; le worker accepte aussi le cookie musetalk_iahome_gate
  * sur GET / pour les revisites sans query.
- * Hors photobooth et hors site principal.
+ * Hors landing photobooth (mode invité) et hors site principal.
  */
 function subdomainRequiresFirstPartyJwt(moduleId: string): boolean {
   const base = MODULE_URLS[moduleId];

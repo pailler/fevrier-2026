@@ -54,6 +54,7 @@ COOKIE_NAME = "musetalk_iahome_gate"
 MODULE_ID = "musetalk"
 DEFAULT_API_BASE = "https://iahome.fr"
 MAX_AGE_SEC = 60 * 60 * 24 * 7
+REQUEST_STATE_USER_KEY = "musetalk_iahome_user_id"
 
 AUTH_MESSAGE_FR = (
     "Accès réservé : ouvrez MuseTalk depuis votre espace IA Home "
@@ -193,11 +194,35 @@ def _is_gradio_realtime_path(path: str) -> bool:
     return p.startswith("/gradio_api")
 
 
+def _set_request_user(request: Request, user_id: str) -> None:
+    """Expose l'utilisateur validé à auth_dependency Gradio (même requête, avant Set-Cookie)."""
+    if user_id:
+        setattr(request.state, REQUEST_STATE_USER_KEY, user_id)
+
+
+def _request_user_id(request: Request) -> str | None:
+    uid = getattr(request.state, REQUEST_STATE_USER_KEY, None)
+    if isinstance(uid, str) and uid:
+        return uid
+    return verify_gate_cookie(request.cookies.get(COOKIE_NAME))
+
+
 def make_auth_dependency() -> Callable[[Request], str | None]:
     def auth_dependency(request: Request) -> str | None:
         if gate_disabled_for_request(request):
             return "dev-local"
-        return verify_gate_cookie(request.cookies.get(COOKIE_NAME))
+        uid = _request_user_id(request)
+        if uid:
+            return uid
+        # Première visite ?token= : le cookie n’est posé qu’après call_next ; valider le JWT ici aussi.
+        token_qp = request.query_params.get("token")
+        if token_qp:
+            data = validate_module_token(token_qp)
+            if data:
+                user_id = str(data.get("userId") or "")
+                if user_id:
+                    return user_id
+        return None
 
     return auth_dependency
 
@@ -301,6 +326,9 @@ class MuseTalkIahomeGateMiddleware(BaseHTTPMiddleware):
             return response
         if gate_disabled_for_request(request):
             return response
+        # Jeton ou session déjà validés sur cette requête : ne pas renvoyer vers /login.
+        if getattr(request.state, REQUEST_STATE_USER_KEY, None):
+            return response
         if request.method != "GET" and request.method != "HEAD":
             return response
         path = normalize_url_path(request.url.path or "/")
@@ -309,6 +337,12 @@ class MuseTalkIahomeGateMiddleware(BaseHTTPMiddleware):
         accept = (request.headers.get("accept") or "").lower()
         if "text/html" not in accept:
             return response
+        # Visite avec ?token= mais Gradio a quand même répondu 401 : fiche module, pas boucle login.
+        if request.query_params.get("token"):
+            return RedirectResponse(
+                url=f"{_app_public_base()}/card/musetalk",
+                status_code=302,
+            )
         dest = f"{_app_public_base()}/login?redirect={quote(str(request.url), safe='')}"
         return RedirectResponse(url=dest, status_code=302)
 
@@ -361,6 +395,7 @@ class MuseTalkIahomeGateMiddleware(BaseHTTPMiddleware):
                     "Access denied: token validation returned no user.",
                     status_code=403,
                 )
+            _set_request_user(request, user_id)
             response = await call_next(request)
             response.set_cookie(
                 key=COOKIE_NAME,
@@ -373,11 +408,15 @@ class MuseTalkIahomeGateMiddleware(BaseHTTPMiddleware):
             )
             return self._maybe_browser_redirect_on_401(request, response)
 
-        if verify_gate_cookie(request.cookies.get(COOKIE_NAME)):
+        cookie_uid = verify_gate_cookie(request.cookies.get(COOKIE_NAME))
+        if cookie_uid:
+            _set_request_user(request, cookie_uid)
             response = await call_next(request)
             return self._maybe_browser_redirect_on_401(request, response)
 
         if request.method in ("GET", "HEAD") and path == "/":
+            if request.method == "HEAD":
+                return Response(status_code=401)
             return self._redirect_to_card_or_login(request)
 
         response = await call_next(request)

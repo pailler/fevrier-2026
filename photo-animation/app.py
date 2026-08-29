@@ -17,15 +17,25 @@ warnings.filterwarnings("ignore")
 # Configuration
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-# Configuration du cache des modèles
+# Configuration du cache des modèles — Stability Matrix (Forge diffusers)
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(ROOT_DIR)  # Remonter d'un niveau depuis photo-animation
-MODELS_CACHE_DIR = os.path.join(PROJECT_ROOT, "ai-models-cache", "huggingface")
+PROJECT_ROOT = os.path.dirname(ROOT_DIR)
+_sm_default = os.path.join(
+    os.path.expanduser("~"),
+    "Documents", "StabilityMatrix-win-x64", "Data",
+    "Models", "Diffusers",
+)
+MODELS_CACHE_DIR = (
+    os.environ.get("IAHOME_SM_DIFFUSERS")
+    or os.environ.get("IAHOME_SM_HF_CACHE")
+    or os.environ.get("HF_HUB_CACHE")
+    or (_sm_default if os.path.isdir(_sm_default) else os.path.join(PROJECT_ROOT, "ai-models-cache", "huggingface"))
+)
 
-# Configurer les variables d'environnement pour utiliser le cache personnalisé
 os.environ["HF_HOME"] = MODELS_CACHE_DIR
 os.environ["HUGGINGFACE_HUB_CACHE"] = MODELS_CACHE_DIR
 os.environ["TRANSFORMERS_CACHE"] = MODELS_CACHE_DIR
+os.environ.setdefault("IAHOME_SM_FORGE_DIFFUSERS", MODELS_CACHE_DIR)
 
 print(f"[INFO] Cache des modeles configure: {MODELS_CACHE_DIR}")
 

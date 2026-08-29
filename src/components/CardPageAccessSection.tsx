@@ -3,9 +3,14 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCustomAuth } from '../hooks/useCustomAuth';
-import { getHunyuan3dAppUrl } from '../utils/hunyuan3dAppUrl';
-import { isBrowserLocalIahomeDev } from '../utils/isBrowserLocalIahomeDev';
+import { useTokenContext } from '../contexts/TokenContext';
 import { FREE_UNLIMITED_ACCESS_LABEL, formatCreditsAmount } from '../utils/tokenActionService';
+import {
+  getModuleAppUrl,
+  openModuleAppWithToken,
+  openPendingModuleTab,
+  redirectToLogin,
+} from '../utils/moduleAppUrl';
 
 interface CardPageAccessSectionProps {
   moduleId: string;
@@ -41,90 +46,30 @@ export default function CardPageAccessSection({
 }: CardPageAccessSectionProps) {
   const router = useRouter();
   const { user, isAuthenticated } = useCustomAuth();
+  const { refreshTokens } = useTokenContext();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const resolveModuleUrl = () => {
     if (accessUrl) return accessUrl;
     if (moduleUrl) return moduleUrl;
-    const normalizedModuleId = (moduleId || '').trim().toLowerCase();
-    const isDevelopment = isBrowserLocalIahomeDev();
-    const urlMap: Record<string, string> = isDevelopment
-      ? {
-          'librespeed': 'http://localhost:8085',
-          'qrcodes': 'http://localhost:7006',
-          'photomaker': 'http://localhost:7881',
-          'birefnet': 'http://localhost:7882',
-          'animagine-xl': 'http://localhost:7883',
-          'sentinelle-numerique': 'http://localhost:3000/sentinelle-numerique',
-          'florence-2': 'http://localhost:7884',
-          'musetalk': 'http://localhost:7886',
-          'photo-vivante': 'http://localhost:7887',
-          'home-assistant': 'http://localhost:8123',
-          'hunyuan3d': getHunyuan3dAppUrl(),
-          'stablediffusion': 'http://localhost:7880',
-          'meeting-reports': 'http://localhost:3050',
-          'whisper': 'http://localhost:8093',
-          'ruinedfooocus': 'http://localhost:7870',
-          'comfyui': 'http://localhost:8188',
-          'apprendre-autrement': 'http://localhost:9001',
-          'photobooth': 'http://localhost:7885',
-          'vote': 'http://localhost:7890',
-          'reveil-intelligent': 'http://localhost:7891',
-          'prompt-generator': 'https://prompt-generator.iahome.fr',
-          'code-learning': '/code-learning',
-          'administration': '/administration',
-          'pdf': 'http://localhost:8080',
-        }
-      : {
-          'librespeed': 'https://librespeed.iahome.fr',
-          'qrcodes': 'https://qrcodes.iahome.fr',
-          'photomaker': 'https://photomaker.iahome.fr',
-          'birefnet': 'https://birefnet.iahome.fr',
-          'animagine-xl': 'https://animaginexl.iahome.fr',
-          'sentinelle-numerique': 'https://iahome.fr/sentinelle-numerique',
-          'florence-2': 'https://florence2.iahome.fr',
-          'musetalk': 'https://musetalk.iahome.fr',
-          'photo-vivante': 'https://photo-vivante.iahome.fr',
-          'home-assistant': 'https://homeassistant.iahome.fr',
-          'hunyuan3d': getHunyuan3dAppUrl(),
-          'stablediffusion': 'https://stablediffusion.iahome.fr',
-          'meeting-reports': 'https://meeting-reports.iahome.fr',
-          'whisper': 'https://whisper.iahome.fr',
-          'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
-          'comfyui': 'https://comfyui.iahome.fr',
-          'apprendre-autrement': 'https://apprendre-autrement.iahome.fr',
-          'photobooth': 'https://photobooth.iahome.fr',
-          'vote': 'https://vote.iahome.fr',
-          'reveil-intelligent': 'https://reveil-intelligent.iahome.fr',
-          'prompt-generator': 'https://prompt-generator.iahome.fr',
-          'code-learning': '/code-learning',
-          'administration': '/administration',
-          'pdf': 'https://pdf.iahome.fr',
-        };
-
-    if (urlMap[normalizedModuleId]) {
-      return urlMap[normalizedModuleId];
-    }
-
-    const subdomainAliases: Record<string, string> = {
-      'animagine-xl': 'animaginexl',
-      'florence-2': 'florence2',
-      'home-assistant': 'homeassistant',
-    };
-
-    const computedSubdomain = subdomainAliases[normalizedModuleId] || normalizedModuleId;
-    return computedSubdomain ? `https://${computedSubdomain}.iahome.fr` : '';
+    return getModuleAppUrl(moduleId);
   };
 
   const handleDirectAccess = async () => {
     const loginReturnPath = `/card/${(moduleId || '').trim().toLowerCase()}`;
     if (!isAuthenticated || !user) {
-      router.push(`/login?redirect=${encodeURIComponent(loginReturnPath)}`);
+      redirectToLogin(loginReturnPath);
       return;
     }
 
+    const targetUrlPreview = resolveModuleUrl();
+    // Toujours ouvrir un onglet au clic (évite le bloqueur popup après le fetch token)
+    const pendingTab = openPendingModuleTab();
+
     try {
       setLoading(true);
+      setError(null);
       const normalizedModuleId = (moduleId || '').trim().toLowerCase();
       const response = await fetch('/api/generate-access-token', {
         method: 'POST',
@@ -150,16 +95,25 @@ export default function CardPageAccessSection({
       }
 
       const targetUrl = resolveModuleUrl();
-      if (targetUrl) {
-        const u = new URL(targetUrl, typeof window !== 'undefined' ? window.location.origin : 'https://iahome.fr');
-        u.searchParams.set('token', token);
-        window.open(u.toString(), '_blank', 'noopener,noreferrer');
-      } else {
+      if (!targetUrl) {
         throw new Error(`URL d'accès introuvable pour le module ${moduleId}`);
       }
-    } catch (error) {
-      console.error(`❌ Erreur lors de l'accès à ${moduleName}:`, error);
-      alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+
+      openModuleAppWithToken(normalizedModuleId, token, targetUrl, pendingTab);
+
+      try {
+        await refreshTokens();
+      } catch {
+        // Non bloquant
+      }
+    } catch (err) {
+      if (pendingTab && !pendingTab.closed) {
+        pendingTab.close();
+      }
+      const message = err instanceof Error ? err.message : 'Erreur inconnue';
+      console.error(`❌ Erreur lors de l'accès à ${moduleName}:`, err);
+      setError(message);
+      alert(`Erreur lors de l'accès: ${message}`);
     } finally {
       setLoading(false);
     }
@@ -240,6 +194,9 @@ export default function CardPageAccessSection({
                     </>
                   )}
                 </button>
+                {error ? (
+                  <p className="mt-3 text-sm text-red-600 text-center max-w-md">{error}</p>
+                ) : null}
               </div>
             </div>
           </div>

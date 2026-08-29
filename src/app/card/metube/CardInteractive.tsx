@@ -9,6 +9,7 @@ import { trackCTAClick, trackModuleActivation, trackMeTubePageView, getUTMParams
 import Analytics from '../../../components/Analytics';
 import YouTubeEmbed from '../../../components/YouTubeEmbed';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
+import { openModuleAppWithToken } from '@/utils/moduleAppUrl';
 
 export default function MeTubePage({ initialModule }: CardInteractiveProps) {
   const router = useRouter();
@@ -78,7 +79,7 @@ export default function MeTubePage({ initialModule }: CardInteractiveProps) {
       if (response.ok) {
         const data = await response.json();
         if (data?.token) {
-          window.open(`https://metube.iahome.fr?token=${encodeURIComponent(data.token)}`, '_blank');
+          openModuleAppWithToken('metube', data.token);
         } else {
           throw new Error('Token d\'accès manquant');
         }

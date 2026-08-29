@@ -32,10 +32,10 @@ const APPLICATION_PORTS: { [key: string]: number } = {
 
 // Mapping des modules vers leurs hôtes locaux (si différent de localhost)
 const APPLICATION_HOSTS: { [key: string]: string } = {
-  'stablediffusion': '192.168.1.150',
-  'comfyui': '192.168.1.150',
-  'ruinedfooocus': '192.168.1.150',
-  'cogstudio': '192.168.1.150',
+  'stablediffusion': '192.168.1.39',
+  'comfyui': '192.168.1.39',
+  'ruinedfooocus': '192.168.1.39',
+  'cogstudio': '192.168.1.39',
 };
 
 export async function GET(request: Request) {

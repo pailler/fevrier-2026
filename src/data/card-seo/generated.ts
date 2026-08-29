@@ -867,7 +867,7 @@ export const cardSeoData: Record<string, CardSeoEntry | null> = {
       },
       {
         "question": "Comment utiliser RuinedFooocus ?",
-        "answer": "Pour utiliser RuinedFooocus, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via ruinedfooocus.iahome.fr. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis."
+        "answer": "Pour utiliser RuinedFooocus, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via iahome.fr/ruinedfooocus. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis."
       },
       {
         "question": "Quelle est la différence entre RuinedFooocus et Stable Diffusion ?",

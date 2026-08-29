@@ -81,6 +81,7 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost: _token
         'meeting-reports': 'meeting-reports', // Meeting Reports -> meeting-reports
         'hunyuan3d': 'hunyuan3d', // Hunyuan 3D -> hunyuan3d
         'prompt-generator': 'prompt-generator', // Générateur de prompts -> prompt-generator
+        'cv-generator': 'cv-generator',
         'apprendre-autrement': 'apprendre-autrement', // Apprendre Autrement -> apprendre-autrement
         'photomaker': 'photomaker', // PhotoMaker -> photomaker
         'animagine-xl': 'animagine-xl', // Animagine XL -> animagine-xl
@@ -95,16 +96,21 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost: _token
       
       const moduleSubdomains: Record<string, string> = {
         'librespeed': isDevelopment ? 'http://localhost:8085' : 'https://librespeed.iahome.fr',
-        'metube': 'https://metube.iahome.fr',
+        'metube': isDevelopment ? 'http://localhost:3000/metube' : 'https://iahome.fr/metube',
         'pdf': 'https://pdf.iahome.fr',
-        'psitransfer': 'https://psitransfer.iahome.fr',
         'qrcodes': isDevelopment ? 'http://localhost:7006' : 'https://qrcodes.iahome.fr',
         'whisper': 'https://whisper.iahome.fr',
-        'stablediffusion': 'https://stablediffusion.iahome.fr',
         'comfyui': 'https://comfyui.iahome.fr',
         // Meeting Reports : localhost:3050 en dev, meeting-reports.iahome.fr en prod
         'meeting-reports': isDevelopment ? 'http://localhost:3050' : 'https://meeting-reports.iahome.fr',
-        'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
+        // App via passerelle Next (landing SEO reste ruinedfooocus.iahome.fr)
+        'ruinedfooocus': '/ruinedfooocus',
+        // App via passerelle Next (landing SEO reste stablediffusion.iahome.fr)
+        'stablediffusion': '/stablediffusion',
+        // App via passerelle Next (landing SEO reste resas.iahome.fr)
+        'resas-system': '/resas-system',
+        // App via passerelle Next (landing SEO reste apprendre-autrement.iahome.fr)
+        'apprendre-autrement': '/apprendre-autrement',
         'cogstudio': 'https://cogstudio.iahome.fr',
         // Hunyuan 3D (carte) → app Image→3D Hi3DGen sur le domaine principal
         'hunyuan3d': getHunyuan3dAppUrl(),
@@ -112,11 +118,10 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost: _token
         'home-assistant': isDevelopment ? 'http://localhost:8123' : 'https://homeassistant.iahome.fr',
         // Générateur de prompts : utiliser directement l'URL de production (via Traefik)
         'prompt-generator': 'https://prompt-generator.iahome.fr',
-        // Apprendre Autrement : redirection directe vers l'application (racine)
-        'apprendre-autrement': isDevelopment ? 'http://localhost:9001' : 'https://apprendre-autrement.iahome.fr',
+        'cv-generator': 'https://cv.iahome.fr',
         // Détecteur de Contenu IA : sur le domaine principal
-        'ai-detector': isDevelopment ? 'http://localhost:3000/ai-detector' : 'https://iahome.fr/ai-detector',
-        // Sentinelle Numérique : même backend que ai-detector
+        'ai-detector': '/ai-detector',
+        // Sentinelle Numérique : guide cybersécurité (indépendant du détecteur IA)
         'sentinelle-numerique': isDevelopment ? 'http://localhost:3000/sentinelle-numerique' : 'https://iahome.fr/sentinelle-numerique',
         // PhotoMaker : sous-domaine comme les autres modules IA
         'photomaker': isDevelopment ? 'http://localhost:7881' : 'https://photomaker.iahome.fr',
@@ -129,11 +134,12 @@ export function useModuleAccess({ user, moduleId, moduleTitle, tokenCost: _token
         'musetalk': isDevelopment ? 'http://localhost:7886' : 'https://musetalk.iahome.fr',
         'photo-vivante': isDevelopment ? 'http://localhost:7887' : 'https://photo-vivante.iahome.fr',
         // Photobooth : sous-domaine dedie
-        'photobooth': isDevelopment ? 'http://localhost:7885' : 'https://photobooth.iahome.fr',
+        'photobooth': isDevelopment ? 'http://localhost:7885' : 'https://iahome.fr/photobooth',
+        'psitransfer': isDevelopment ? 'http://localhost:3000/psitransfer' : 'https://iahome.fr/psitransfer',
         // Vote en ligne : service Express dédié (Docker / local)
         'vote': isDevelopment ? 'http://localhost:7890' : 'https://vote.iahome.fr',
-        // Réveil intelligent : Next.js standalone (Docker / local)
-        'reveil-intelligent': isDevelopment ? 'http://localhost:7891' : 'https://reveil-intelligent.iahome.fr',
+        // Réveil intelligent : passerelle Next (landing SEO reveil.iahome.fr)
+        'reveil-intelligent': '/reveil',
       };
       
       // Convertir module_id numérique en slug si nécessaire

@@ -35,7 +35,7 @@ export default function LibreSpeedCardPage({ initialModule }: CardInteractivePro
     if (!user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-accès', {
+      const response = await fetch('/api/check-module-activation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

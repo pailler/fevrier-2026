@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { getValueProposition } from '@/data/ecosystemValueProposition';
 
 // Éviter le chargement de MenuService/Supabase côté serveur (cause possible de 500 sur /login)
 const DynamicNavigation = dynamic(
@@ -10,6 +11,7 @@ const DynamicNavigation = dynamic(
 );
 
 export default function Footer() {
+  const vp = getValueProposition('home');
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -21,8 +23,18 @@ export default function Footer() {
               <span className="text-2xl font-bold text-blue-400">IAhome</span>
             </div>
             <p className="text-gray-300 mb-4">
-              Accès direct à la puissance et aux outils IA.
+              {vp.oneLiner}
             </p>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {['🇫🇷 100 % français', '🛡️ RGPD', '💬 Support FR', '🏠 Hébergé en France'].map((badge) => (
+                <span
+                  key={badge}
+                  className="inline-flex items-center rounded-full bg-gray-800 border border-gray-700 text-gray-200 text-xs font-medium px-3 py-1"
+                >
+                  {badge}
+                </span>
+              ))}
+            </div>
             <div className="flex space-x-4">
               <a href="https://www.youtube.com/@pailleradamhome" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-500 transition-colors" title="Chaîne YouTube d'Adam Pailler">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

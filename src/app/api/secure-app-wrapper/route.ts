@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     // Configuration des applications via sous-domaines
     const APP_CONFIGS = {
       'ruinedfooocus': {
-        url: 'https://ruinedfooocus.iahome.fr',
+        url: 'https://iahome.fr/ruinedfooocus/embed',
         name: 'RuinedFooocus',
         description: 'Application de génération d\'images IA'
       },
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
         description: 'Téléchargeur de vidéos'
       },
       'stablediffusion': {
-        url: 'https://stablediffusion.iahome.fr',
+        url: 'https://iahome.fr/stablediffusion/embed',
         name: 'Stable Diffusion',
         description: 'Générateur d\'images Stable Diffusion'
       }

@@ -36,6 +36,28 @@ from transformers import WhisperModel
 ProjectDir = os.path.abspath(os.path.dirname(__file__))
 CheckpointsDir = os.path.join(ProjectDir, "models")
 
+from voice_chatterbox import (
+    chatterbox_available,
+    chatterbox_status_message,
+    generate_cloned_voice,
+)
+
+CHATTERBOX_LANGS = [
+    ("Français", "fr"),
+    ("English", "en"),
+    ("Español", "es"),
+    ("Deutsch", "de"),
+    ("Italiano", "it"),
+    ("Português", "pt"),
+    ("日本語", "ja"),
+    ("中文", "zh"),
+]
+CHATTERBOX_MODELS = [
+    ("Turbo (rapide, recommandé)", "turbo"),
+    ("Multilingue (23 langues)", "multilingual"),
+    ("English", "english"),
+]
+
 
 def _filepath_from_gradio_media(val):
     """Normalize Gradio 5 outputs: FileData (.path), str/Path, VideoData (.video), dict."""
@@ -593,6 +615,76 @@ def inference(audio_path, video_path, bbox_shift, extra_margin=10, parsing_mode=
     return output_vid_name, bbox_shift_text
 
 
+def _musetalk_config_summary() -> str:
+    """Résumé config MuseTalk + Chatterbox pour l'UI."""
+    lines = []
+    v15 = os.path.join(CheckpointsDir, "musetalkV15", "unet.pth")
+    if os.path.isfile(v15):
+        lines.append("MuseTalk v1.5 : poids OK")
+    else:
+        lines.append("MuseTalk v1.5 : poids manquants (download_weights.bat)")
+    lines.append(f"Device : {device.type}" + (f" ({torch.cuda.get_device_name(0)})" if device.type == "cuda" else ""))
+    lines.append(f"Précision : {'float16' if weight_dtype == torch.float16 else 'float32'}")
+    lines.append(chatterbox_status_message())
+    return "\n".join(lines)
+
+
+@_catch_gradio_inference_errors
+def generate_chatterbox_audio(text, voice_ref, lang_label, model_label, exaggeration):
+    ref = _filepath_from_gradio_media(voice_ref)
+    if not ref:
+        raise gr.Error("Chargez un échantillon vocal (5–20 s, voix claire, sans bruit de fond).")
+    text = (text or "").strip()
+    if not text:
+        raise gr.Error("Saisissez le texte à synthétiser.")
+    lang_map = dict(CHATTERBOX_LANGS)
+    model_map = dict(CHATTERBOX_MODELS)
+    lang = lang_map.get(lang_label, "fr")
+    model = model_map.get(model_label, "turbo")
+    if device.type == "cuda":
+        torch.cuda.empty_cache()
+    out, status = generate_cloned_voice(
+        text,
+        ref,
+        language=lang,
+        model=model,
+        exaggeration=float(exaggeration),
+    )
+    print(f"[Chatterbox] audio généré : {out} — {status}", flush=True)
+    return out, status
+
+
+@_catch_gradio_inference_errors
+def generate_voice_and_lipsync(
+    text,
+    voice_ref,
+    lang_label,
+    model_label,
+    exaggeration,
+    video_path,
+    bbox_shift,
+    extra_margin,
+    parsing_mode,
+    left_cheek_width,
+    right_cheek_width,
+):
+    audio_path, voice_status = generate_chatterbox_audio(
+        text, voice_ref, lang_label, model_label, exaggeration
+    )
+    video_out, bbox_info = inference(
+        audio_path,
+        video_path,
+        bbox_shift,
+        extra_margin,
+        parsing_mode,
+        left_cheek_width,
+        right_cheek_width,
+    )
+    combined_info = voice_status
+    if bbox_info:
+        combined_info = f"{voice_status}\n{bbox_info}" if voice_status else bbox_info
+    return video_out, combined_info
+
 
 # load model weights
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -874,54 +966,140 @@ function () {
                 <a style='font-size:18px;color: #000000' href='https://arxiv.org/abs/2410.10122'> [Technical report] </a>"""
     )
 
-    with gr.Row():
-        with gr.Column():
-            audio = gr.Audio(label="Drving Audio",type="filepath")
-            video = gr.Video(label="Reference Video",sources=['upload'])
-            bbox_shift = gr.Number(label="BBox_shift value, px", value=0)
-            extra_margin = gr.Slider(label="Extra Margin", minimum=0, maximum=40, value=10, step=1)
-            parsing_mode = gr.Radio(label="Parsing Mode", choices=["jaw", "raw"], value="jaw")
-            left_cheek_width = gr.Slider(label="Left Cheek Width", minimum=20, maximum=160, value=90, step=5)
-            right_cheek_width = gr.Slider(label="Right Cheek Width", minimum=20, maximum=160, value=90, step=5)
-            bbox_shift_scale = gr.Textbox(label="'left_cheek_width' and 'right_cheek_width' parameters determine the range of left and right cheeks editing when parsing model is 'jaw'. The 'extra_margin' parameter determines the movement range of the jaw. Users can freely adjust these three parameters to obtain better inpainting results.")
+    config_box = gr.Textbox(
+        label="Configuration",
+        value=_musetalk_config_summary(),
+        lines=4,
+        interactive=False,
+    )
 
+    with gr.Tabs():
+        with gr.Tab("Lip-sync (audio existant)"):
             with gr.Row():
-                debug_btn = gr.Button("1. Test Inpainting ")
-                btn = gr.Button("2. Generate")
-        with gr.Column():
-            debug_image = gr.Image(label="Test Inpainting Result (First Frame)")
-            debug_info = gr.Textbox(label="Parameter Information", lines=5)
-            out1 = gr.Video()
+                with gr.Column():
+                    audio = gr.Audio(label="Piste audio (lip-sync)", type="filepath")
+                    video = gr.Video(label="Vidéo / image de référence", sources=["upload"])
+                    bbox_shift = gr.Number(label="BBox_shift value, px", value=0)
+                    extra_margin = gr.Slider(label="Extra Margin", minimum=0, maximum=40, value=10, step=1)
+                    parsing_mode = gr.Radio(label="Parsing Mode", choices=["jaw", "raw"], value="jaw")
+                    left_cheek_width = gr.Slider(label="Left Cheek Width", minimum=20, maximum=160, value=90, step=5)
+                    right_cheek_width = gr.Slider(label="Right Cheek Width", minimum=20, maximum=160, value=90, step=5)
+                    bbox_shift_scale = gr.Textbox(
+                        label="'left_cheek_width' and 'right_cheek_width' parameters determine the range of left and right cheeks editing when parsing model is 'jaw'. The 'extra_margin' parameter determines the movement range of the jaw. Users can freely adjust these three parameters to obtain better inpainting results."
+                    )
+
+                    with gr.Row():
+                        debug_btn = gr.Button("1. Test Inpainting")
+                        btn = gr.Button("2. Generate")
+                with gr.Column():
+                    debug_image = gr.Image(label="Test Inpainting Result (First Frame)")
+                    debug_info = gr.Textbox(label="Parameter Information", lines=5)
+                    out1 = gr.Video()
+
+            video.change(fn=check_video, inputs=[video], outputs=[video])
+            btn.click(
+                fn=inference,
+                inputs=[
+                    audio,
+                    video,
+                    bbox_shift,
+                    extra_margin,
+                    parsing_mode,
+                    left_cheek_width,
+                    right_cheek_width,
+                ],
+                outputs=[out1, bbox_shift_scale],
+                show_progress="full",
+            )
+            debug_btn.click(
+                fn=debug_inpainting,
+                inputs=[
+                    video,
+                    bbox_shift,
+                    extra_margin,
+                    parsing_mode,
+                    left_cheek_width,
+                    right_cheek_width,
+                ],
+                outputs=[debug_image, debug_info],
+            )
+
+        with gr.Tab("Voix Chatterbox + avatar"):
+            gr.Markdown(
+                "**Clonage vocal zero-shot** (Chatterbox) puis lip-sync MuseTalk. "
+                "Chatterbox tourne sur **CPU** pendant que MuseTalk utilise le GPU (évite les crashs mémoire). "
+                "Modèle **Turbo** recommandé. Si vous avez déjà un fichier audio, utilisez l’onglet « Lip-sync (audio existant) »."
+            )
+            with gr.Row():
+                with gr.Column():
+                    cb_text = gr.Textbox(
+                        label="Texte à dire",
+                        lines=4,
+                        placeholder="Bonjour, je suis votre avatar numérique…",
+                        value="Bonjour ! Ceci est un test de clonage vocal avec Chatterbox et MuseTalk.",
+                    )
+                    cb_voice_ref = gr.Audio(
+                        label="Échantillon vocal de référence (5–20 s)",
+                        type="filepath",
+                    )
+                    cb_lang = gr.Dropdown(
+                        label="Langue",
+                        choices=[x[0] for x in CHATTERBOX_LANGS],
+                        value="Français",
+                    )
+                    cb_model = gr.Dropdown(
+                        label="Modèle Chatterbox",
+                        choices=[x[0] for x in CHATTERBOX_MODELS],
+                        value="Turbo (rapide, recommandé)",
+                    )
+                    cb_exaggeration = gr.Slider(
+                        label="Expressivité",
+                        minimum=0.0,
+                        maximum=1.0,
+                        value=0.5,
+                        step=0.05,
+                    )
+                    cb_video = gr.Video(label="Vidéo / image de référence (avatar)", sources=["upload"])
+                    cb_bbox_shift = gr.Number(label="BBox_shift value, px", value=0)
+                    cb_extra_margin = gr.Slider(label="Extra Margin", minimum=0, maximum=40, value=10, step=1)
+                    cb_parsing_mode = gr.Radio(label="Parsing Mode", choices=["jaw", "raw"], value="jaw")
+                    cb_left_cheek = gr.Slider(label="Left Cheek Width", minimum=20, maximum=160, value=90, step=5)
+                    cb_right_cheek = gr.Slider(label="Right Cheek Width", minimum=20, maximum=160, value=90, step=5)
+                    with gr.Row():
+                        cb_gen_audio_btn = gr.Button("1. Générer la voix")
+                        cb_full_btn = gr.Button("2. Voix + lip-sync (tout-en-un)", variant="primary")
+                with gr.Column():
+                    cb_audio_out = gr.Audio(label="Voix générée (Chatterbox)", type="filepath")
+                    cb_video_out = gr.Video(label="Vidéo lip-sync")
+                    cb_info = gr.Textbox(label="Statut / BBox", lines=4)
+
+            cb_video.change(fn=check_video, inputs=[cb_video], outputs=[cb_video])
+            cb_gen_audio_btn.click(
+                fn=generate_chatterbox_audio,
+                inputs=[cb_text, cb_voice_ref, cb_lang, cb_model, cb_exaggeration],
+                outputs=[cb_audio_out, cb_info],
+                show_progress="full",
+            )
+            cb_full_btn.click(
+                fn=generate_voice_and_lipsync,
+                inputs=[
+                    cb_text,
+                    cb_voice_ref,
+                    cb_lang,
+                    cb_model,
+                    cb_exaggeration,
+                    cb_video,
+                    cb_bbox_shift,
+                    cb_extra_margin,
+                    cb_parsing_mode,
+                    cb_left_cheek,
+                    cb_right_cheek,
+                ],
+                outputs=[cb_video_out, cb_info],
+                show_progress="full",
+            )
     
-    video.change(
-        fn=check_video, inputs=[video], outputs=[video]
-    )
-    btn.click(
-        fn=inference,
-        inputs=[
-            audio,
-            video,
-            bbox_shift,
-            extra_margin,
-            parsing_mode,
-            left_cheek_width,
-            right_cheek_width
-        ],
-        outputs=[out1, bbox_shift_scale],
-        show_progress="full",
-    )
-    debug_btn.click(
-        fn=debug_inpainting,
-        inputs=[
-            video,
-            bbox_shift,
-            extra_margin,
-            parsing_mode,
-            left_cheek_width,
-            right_cheek_width
-        ],
-        outputs=[debug_image, debug_info]
-    )
+    # Legacy bindings removed — controls live in tabs above.
 
 # Solve asynchronous IO issues on Windows
 if sys.platform == 'win32':

@@ -14,13 +14,18 @@ if (-not $iahomeNetwork) {
     docker network create iahome-network
 }
 
-$cacheDir = Join-Path (Split-Path $PSScriptRoot -Parent) "ai-models-cache"
-foreach ($sub in @("coqui", "huggingface")) {
-    $path = Join-Path $cacheDir $sub
-    if (-not (Test-Path $path)) {
+. (Join-Path (Split-Path $PSScriptRoot -Parent) "scripts\models-path.config.ps1")
+if (-not (Set-IaHomeModelsEnv -Quiet)) {
+    Write-Host "Stability Matrix introuvable pour le cache modeles." -ForegroundColor Red
+    exit 1
+}
+foreach ($path in @(Get-IaHomeCoquiCachePath, Get-IaHomeModelsCachePath)) {
+    if (-not (Test-Path -LiteralPath $path)) {
         New-Item -ItemType Directory -Path $path -Force | Out-Null
     }
 }
+Write-Host "Cache Coqui : $(Get-IaHomeCoquiCachePath)" -ForegroundColor DarkGray
+Write-Host "Cache HF    : $(Get-IaHomeModelsCachePath)" -ForegroundColor DarkGray
 
 Write-Host "Construction de l'image Docker (peut prendre plusieurs minutes)..." -ForegroundColor Yellow
 docker compose build

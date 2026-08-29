@@ -197,7 +197,7 @@ export default function Pricing2Client() {
               Nos Offres IA Home
             </h1>
             <p className="text-xl md:text-2xl text-green-100 max-w-3xl mx-auto mb-6 pricing2-animate-fade-in-up-delayed">
-              Tous nos outils sont accessibles directement depuis votre navigateur, sans téléchargement.
+              PC, tablette ou smartphone : tous nos outils s’ouvrent dans votre navigateur — sans application à installer.
             </p>
             <div className="bg-white/10 backdrop-blur-sm border-2 border-white/30 rounded-lg p-6 max-w-4xl mx-auto pricing2-animate-fade-in-up-delayed">
               <h2 className="text-2xl font-bold text-white mb-3">
@@ -208,7 +208,7 @@ export default function Pricing2Client() {
                   <span className="text-yellow-300 mr-2 text-xl">✓</span>
                   <div>
                     <div className="font-semibold text-white">12+ Outils IA</div>
-                    <div className="text-sm text-green-100">Une plateforme complète, sans téléchargement</div>
+                    <div className="text-sm text-green-100">Ordinateur et mobile, sans app native</div>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -519,22 +519,21 @@ export default function Pricing2Client() {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="bg-white rounded-lg p-4">
-                <div className="text-lg font-bold text-blue-600 mb-2">Applications IA complètes</div>
+                <div className="text-lg font-bold text-blue-600 mb-2">Projets créatifs & média</div>
                 <div className="text-gray-600 space-y-1">
-                  <div>• Génération d'images (StableDiffusion, ComfyUI)</div>
-                  <div>• Transcription audio/vidéo (Whisper)</div>
-                  <div>• Génération 3D (Hunyuan3D)</div>
-                  <div>• Isolation vocale</div>
+                  <div>• Créer une illustration ou une affiche</div>
+                  <div>• Transcrire un enregistrement audio ou vidéo</div>
+                  <div>• Modéliser un objet à partir d’une photo</div>
+                  <div>• Isoler une voix ou préparer une piste</div>
                 </div>
               </div>
               <div className="bg-white rounded-lg p-4">
-                <div className="text-lg font-bold text-blue-600 mb-2">Actions simples</div>
+                <div className="text-lg font-bold text-blue-600 mb-2">Quotidien & organisation</div>
                 <div className="text-gray-600 space-y-1">
-                  <div>• Résumés et reformulations</div>
-                  <div>• Traitement PDF</div>
-                  <div>• QR codes dynamiques</div>
-                  <div>• Téléchargements YouTube (MeTube)</div>
-                  <div>• Partage de fichiers (PsiTransfer)</div>
+                  <div>• Résumer ou reformuler un texte</div>
+                  <div>• Fusionner ou convertir des PDF</div>
+                  <div>• Générer un QR code pour un événement</div>
+                  <div>• Télécharger ou partager un gros fichier</div>
                 </div>
               </div>
             </div>

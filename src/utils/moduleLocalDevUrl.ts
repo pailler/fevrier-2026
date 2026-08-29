@@ -17,6 +17,7 @@ const KNOWN_MODULE_SLUGS = new Set([
   'home-assistant',
   'homeassistant',
   'prompt-generator',
+  'cv-generator',
   'apprendre-autrement',
   'ai-detector',
   'sentinelle-numerique',
@@ -75,6 +76,7 @@ export function getModuleSlugForAdminLocalUrl(moduleId: string, moduleTitle: str
   if (titleLower.includes('meeting reports') || titleLower.includes('meeting-reports')) return 'meeting-reports';
   if (titleLower.includes('hunyuan') || titleLower.includes('3d')) return 'hunyuan3d';
   if (titleLower.includes('prompt generator') || titleLower.includes('prompt-generator')) return 'prompt-generator';
+  if (titleLower.includes('générateur de cv') || titleLower.includes('cv ia') || titleLower.includes('cv-generator')) return 'cv-generator';
   if (titleLower.includes('photomaker') || titleLower.includes('photo maker')) return 'photomaker';
   if (titleLower.includes('photobooth') || titleLower.includes('photo booth')) return 'photobooth';
   if (titleLower.includes('apprendre autrement') || titleLower.includes('apprendre-autrement')) return 'apprendre-autrement';
@@ -113,6 +115,7 @@ const SLUG_TO_LOCAL: Record<string, string> = {
   'home-assistant': 'http://localhost:8123',
   homeassistant: 'http://localhost:8123',
   'prompt-generator': 'http://localhost:3002',
+  'cv-generator': 'http://localhost:3003',
   'apprendre-autrement': 'http://localhost:9001',
   'ai-detector': 'http://localhost:3000/ai-detector',
   'sentinelle-numerique': 'http://localhost:3000/sentinelle-numerique',

@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: 'Module non trouvé' }, { status: 404 });
       }
 
+      const moduleSlug = getModuleSlug(module.id, module.title);
       const moduleUrl = getModuleUrlForSlug(module.id, module.title);
 
       if (!moduleUrl) {
@@ -48,12 +49,12 @@ export async function POST(request: NextRequest) {
           url: null,
           isValid: true,
           isSkipped: true,
-          errorMessage: `Module ignoré (hors périmètre IAHome) - slug: ${getModuleSlug(module.id, module.title)}`,
+          errorMessage: `Module ignoré (hors périmètre IAHome) - slug: ${moduleSlug}`,
           responseTime: 0,
         });
       }
 
-      const checkResult = await checkApplicationUrl(moduleUrl);
+      const checkResult = await checkApplicationUrl(moduleUrl, { moduleSlug });
 
       return NextResponse.json({
         success: true,

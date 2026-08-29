@@ -187,6 +187,28 @@ export const subdomainsConfig: SubdomainInfo[] = [
     ]
   },
   {
+    subdomain: 'cv.iahome.fr',
+    url: 'https://cv.iahome.fr',
+    title: 'Générateur de CV IA – CV optimisé ATS | IA Home',
+    description: 'Créez un CV professionnel optimisé pour les ATS avec l\'intelligence artificielle. Adaptation au poste, score ATS, lettre de motivation et export PDF.',
+    keywords: ['générateur cv', 'cv ia', 'cv ats', 'curriculum vitae', 'lettre de motivation', 'cv professionnel', 'optimisation cv'],
+    category: 'productivity',
+    icon: '📄',
+    features: [
+      'CV optimisé pour les ATS',
+      'Adaptation à l\'offre d\'emploi',
+      'Score ATS et conseils',
+      'Lettre de motivation IA',
+      'Export PDF'
+    ],
+    useCases: [
+      'Créer un CV pour une candidature',
+      'Adapter son CV à une annonce',
+      'Générer une lettre de motivation',
+      'Optimiser son profil pour les recruteurs'
+    ]
+  },
+  {
     subdomain: 'stablediffusion.iahome.fr',
     url: 'https://stablediffusion.iahome.fr',
     title: 'Stable Diffusion - Génération d\'Images par IA | IA Home',

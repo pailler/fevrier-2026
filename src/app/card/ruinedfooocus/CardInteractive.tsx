@@ -10,6 +10,8 @@ import Breadcrumb from '../../../components/Breadcrumb';
 import ModuleAccessButton from '../../../components/ModuleAccessButton';
 import YouTubeEmbed from '../../../components/YouTubeEmbed';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
+import RuinedFooocusPromptGuide from '../../../components/RuinedFooocusPromptGuide';
+import { RUINEDFOOOCUS_APP_URL } from '@/utils/productLandingHosts';
 
 interface Card {
   id: string;
@@ -358,10 +360,11 @@ export default function RuinedFooocusPage({ initialModule }: CardInteractiveProp
                 {/* Bouton d'accès avec crédits */}
                 <div className="w-3/4 mx-auto">
                   <ModuleAccessButton
-                    moduleId={card.id}
+                    moduleId="ruinedfooocus"
                     moduleName={card.title}
                     moduleCost={100}
                     moduleDescription={card.description}
+                    accessUrl={RUINEDFOOOCUS_APP_URL}
                     onAccessSuccess={() => {
                       alert(`✅ Application ${card.title} accessible avec succès !`);
                     }}
@@ -527,7 +530,7 @@ export default function RuinedFooocusPage({ initialModule }: CardInteractiveProp
                         <div>
                           <h3 className="text-xl font-bold text-gray-900 mb-2">Accéder à RuinedFooocus</h3>
                           <p className="text-gray-700 leading-relaxed">
-                            Accédez à RuinedFooocus avec 100 crédits. L'accès est immédiat, le service est accessible depuis vos applications via ruinedfooocus.iahome.fr.
+                            Accédez à RuinedFooocus avec 100 crédits. L'accès est immédiat, le service est accessible depuis vos applications via iahome.fr/ruinedfooocus.
                           </p>
                         </div>
                       </div>
@@ -649,6 +652,9 @@ export default function RuinedFooocusPage({ initialModule }: CardInteractiveProp
                   </div>
                 </div>
 
+                {/* Guide prompt — chargé uniquement à l'ouverture (pas dans le HTML initial) */}
+                <RuinedFooocusPromptGuide />
+
                 {/* H2 - Questions fréquentes sur RuinedFooocus (FAQ) */}
                 <div className="mb-12">
                   <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 bg-clip-text text-transparent mb-6">
@@ -666,7 +672,7 @@ export default function RuinedFooocusPage({ initialModule }: CardInteractiveProp
                     <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border-l-4 border-indigo-500">
                       <h3 className="text-xl font-bold text-gray-900 mb-3">Comment utiliser RuinedFooocus ?</h3>
                       <p className="text-gray-700 leading-relaxed">
-                        Pour utiliser RuinedFooocus, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via ruinedfooocus.iahome.fr. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis.
+                        Pour utiliser RuinedFooocus, accédez directement au service avec 100 crédits. L'accès est immédiat, accédez à l'interface via iahome.fr/ruinedfooocus. Entrez une description textuelle détaillée de l'image que vous souhaitez créer, ajustez les paramètres de génération (style, composition, ambiance) si nécessaire, et l'IA génère automatiquement votre image. Plus votre description est détaillée, plus le résultat sera précis.
                       </p>
                     </div>
                     
@@ -1068,7 +1074,7 @@ export default function RuinedFooocusPage({ initialModule }: CardInteractiveProp
 
       {/* Section d'accès en bas de page */}
       <CardPageActivationSection
-        moduleId={card?.id || 'ruinedfooocus'}
+        moduleId="ruinedfooocus"
         moduleName="RuinedFooocus"
         tokenCost={100}
         tokenUnit="par accès. Utilisez l'application aussi longtemps que vous souhaitez"
@@ -1077,6 +1083,7 @@ export default function RuinedFooocusPage({ initialModule }: CardInteractiveProp
         icon="🎨"
         moduleTitle={card?.title}
         moduleDescription={card?.description}
+        accessUrl={RUINEDFOOOCUS_APP_URL}
         customRequestBody={(userId, email, moduleId) => ({
           moduleId: moduleId,
           moduleName: card?.title || 'RuinedFooocus',

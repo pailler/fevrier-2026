@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       category: 'Fichier',
       price: 0,
       youtube_url: '',
-      url: 'https://psitransfer.iahome.fr',
+      url: 'https://iahome.fr/psitransfer',
       image_url: '/images/psitransfer.jpg',
       is_visible: true, // Important : rendre le module visible dans /account
       created_at: new Date().toISOString(),

@@ -41,6 +41,23 @@ ingress:
       connectTimeout: 30s
       tcpKeepAlive: 30s
 
+  # Détecteur IA — landing SEO (app via iahome.fr/ai-detector?token= après auth)
+  - hostname: detecteur-ia.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: detecteur-ia.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 60s
+      tcpKeepAlive: 30s
+
+  - hostname: www.detecteur-ia.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: www.detecteur-ia.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 60s
+      tcpKeepAlive: 30s
+
   # Photobooth — landing SEO publique (Next.js, rewrite middleware)
   - hostname: photobooth.iahome.fr
     service: http://192.168.1.39:3000
@@ -162,12 +179,22 @@ ingress:
       connectTimeout: 30s
       tcpKeepAlive: 30s
 
-  # Services IA - StableDiffusion (localhost)
+  # Landing SEO Stable Diffusion (Gradio via iahome.fr/stablediffusion/embed après auth)
   - hostname: stablediffusion.iahome.fr
-    service: http://192.168.1.39:7880
+    service: http://192.168.1.39:3000
     originRequest:
       httpHostHeader: stablediffusion.iahome.fr
       noTLSVerify: true
+      connectTimeout: 60s
+      tcpKeepAlive: 30s
+
+  - hostname: www.stablediffusion.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: www.stablediffusion.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 60s
+      tcpKeepAlive: 30s
       
   # Stability Matrix (PC local 192.168.1.39 — apps sur 127.0.0.1 + portproxy LAN)
   - hostname: comfyui.iahome.fr
@@ -178,10 +205,19 @@ ingress:
       connectTimeout: 60s
       tcpKeepAlive: 30s
       
+  # Landing SEO RuinedFooocus (Gradio via iahome.fr/ruinedfooocus/embed après auth)
   - hostname: ruinedfooocus.iahome.fr
-    service: http://192.168.1.39:7870
+    service: http://192.168.1.39:3000
     originRequest:
       httpHostHeader: ruinedfooocus.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 60s
+      tcpKeepAlive: 30s
+
+  - hostname: www.ruinedfooocus.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: www.ruinedfooocus.iahome.fr
       noTLSVerify: true
       connectTimeout: 60s
       tcpKeepAlive: 30s
@@ -218,9 +254,9 @@ ingress:
       tlsTimeout: 10s
       tcpKeepAlive: 30s
 
-  # Portail regispailler.fr (NAS Synology - conteneur portail port 8880)
+  # Portail regispailler.fr (PC local — Documents\portail via docker portail-local :8880)
   - hostname: regispailler.fr
-    service: http://192.168.1.130:8880
+    service: http://192.168.1.39:8880
     originRequest:
       httpHostHeader: regispailler.fr
       noTLSVerify: true
@@ -228,7 +264,7 @@ ingress:
       tcpKeepAlive: 30s
 
   - hostname: www.regispailler.fr
-    service: http://192.168.1.130:8880
+    service: http://192.168.1.39:8880
     originRequest:
       httpHostHeader: www.regispailler.fr
       noTLSVerify: true
@@ -309,11 +345,20 @@ ingress:
       tcpKeepAlive: 30s
       keepAliveTimeout: 90s
 
-  # Apprendre Autrement
+  # Apprendre Autrement — landing Next (:3000) ; app via /apprendre-autrement/embed → :9001
   - hostname: apprendre-autrement.iahome.fr
-    service: http://192.168.1.39:9001
+    service: http://192.168.1.39:3000
     originRequest:
       httpHostHeader: apprendre-autrement.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tlsTimeout: 10s
+      tcpKeepAlive: 30s
+
+  - hostname: www.apprendre-autrement.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: www.apprendre-autrement.iahome.fr
       noTLSVerify: true
       connectTimeout: 30s
       tlsTimeout: 10s
@@ -324,6 +369,16 @@ ingress:
     service: http://192.168.1.39:3002
     originRequest:
       httpHostHeader: prompt-generator.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tlsTimeout: 10s
+      tcpKeepAlive: 30s
+
+  # Générateur de CV IA (proxy iahome → cv-generator :3003)
+  - hostname: cv.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: cv.iahome.fr
       noTLSVerify: true
       connectTimeout: 30s
       tlsTimeout: 10s
@@ -359,14 +414,39 @@ ingress:
       tlsTimeout: 10s
       tcpKeepAlive: 30s
 
-  # Réveil Intelligent
+  # Landing SEO Réveil Intelligent (app via iahome.fr/reveil/embed après auth)
+  - hostname: reveil.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: reveil.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 60s
+      tcpKeepAlive: 30s
+
+  - hostname: www.reveil.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: www.reveil.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 60s
+      tcpKeepAlive: 30s
+
+  # Ancien host → Next (redirect middleware vers reveil.iahome.fr)
   - hostname: reveil-intelligent.iahome.fr
-    service: http://192.168.1.39:7891
+    service: http://192.168.1.39:3000
     originRequest:
       httpHostHeader: reveil-intelligent.iahome.fr
       noTLSVerify: true
       connectTimeout: 30s
       tlsTimeout: 10s
+      tcpKeepAlive: 30s
+
+  - hostname: www.reveil-intelligent.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: www.reveil-intelligent.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
       tcpKeepAlive: 30s
 
   # Portainer - Interface de gestion Docker (PC local - port 9002)
@@ -382,9 +462,17 @@ ingress:
 
 
   - hostname: resas.iahome.fr
-    service: http://192.168.1.39:5000
+    service: http://192.168.1.39:3000
     originRequest:
       httpHostHeader: resas.iahome.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+
+  - hostname: www.resas.iahome.fr
+    service: http://192.168.1.39:3000
+    originRequest:
+      httpHostHeader: www.resas.iahome.fr
       noTLSVerify: true
       connectTimeout: 30s
       tcpKeepAlive: 30s
@@ -403,6 +491,34 @@ ingress:
     originRequest:
       connectTimeout: 30s
       tcpKeepAlive: 30s
+
+  # Portfolio Ambiances Photos (PC port 9003 — pas 127.0.0.1, pas le NAS)
+  - hostname: photo.regispailler.fr
+    service: http://192.168.1.39:9003
+    originRequest:
+      httpHostHeader: photo.regispailler.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+      proxyConnectTimeout: 30s
+
+  - hostname: ambiancesphotos.fr
+    service: http://192.168.1.39:9003
+    originRequest:
+      httpHostHeader: ambiancesphotos.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+      proxyConnectTimeout: 30s
+
+  - hostname: www.ambiancesphotos.fr
+    service: http://192.168.1.39:9003
+    originRequest:
+      httpHostHeader: www.ambiancesphotos.fr
+      noTLSVerify: true
+      connectTimeout: 30s
+      tcpKeepAlive: 30s
+      proxyConnectTimeout: 30s
 
   # Catch-all pour les requêtes non reconnues
   - service: http_status:404

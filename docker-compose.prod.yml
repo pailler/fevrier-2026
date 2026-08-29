@@ -7,9 +7,16 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
-      - RUINEDFOOOCUS_INTERNAL_URL=${RUINEDFOOOCUS_INTERNAL_URL:-http://matrix-stability:7870}
+      - RUINEDFOOOCUS_INTERNAL_URL=${RUINEDFOOOCUS_INTERNAL_URL:-http://host.docker.internal:7870}
+      - STABLEDIFFUSION_INTERNAL_URL=${STABLEDIFFUSION_INTERNAL_URL:-http://host.docker.internal:7880}
       # Hôte du conteneur « apprendre-autrement » (réseau Docker) — évite localhost:9001 depuis iahome-app
       - APPRENDRE_AUTREMENT_HTTP_HOST=apprendre-autrement
+      - APPRENDRE_AUTREMENT_INTERNAL_URL=${APPRENDRE_AUTREMENT_INTERNAL_URL:-http://apprendre-autrement:9001}
+      - REVEIL_INTERNAL_URL=${REVEIL_INTERNAL_URL:-http://iahome-reveil:7891}
+      - RESAS_SYSTEM_INTERNAL_URL=${RESAS_SYSTEM_INTERNAL_URL:-http://host.docker.internal:5000}
+      - PSITRANSFER_INTERNAL_URL=${PSITRANSFER_INTERNAL_URL:-http://psitransfer-iahome:3000}
+      - METUBE_INTERNAL_URL=${METUBE_INTERNAL_URL:-http://metube-iahome:8081}
+      - CV_GENERATOR_INTERNAL_URL=${CV_GENERATOR_INTERNAL_URL:-http://host.docker.internal:3003}
       - PORT=3000
       - HOSTNAME=0.0.0.0
     # Fichier d'env sur l'hôte (à côté de ce docker-compose).
@@ -62,7 +69,7 @@ services:
       - ./apprendre-autrement/public/sounds:/app/public/sounds:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
-      - "127.0.0.1:9001:9001"
+      - "9001:9001"
     networks:
       - iahome-network
     healthcheck:
@@ -160,7 +167,11 @@ services:
     image: portainer/portainer-ce:latest
     container_name: iahome-portainer
     restart: unless-stopped
-    command: -H unix:///var/run/docker.sock
+    command:
+      - -H
+      - unix:///var/run/docker.sock
+      - --trusted-origins
+      - portainerpc.regispailler.fr,portainer.iahome.fr
     ports:
       - "9002:9000"
     volumes:
@@ -179,7 +190,7 @@ services:
           cpus: '0.1'
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.portainer.rule=Host(`portainer.iahome.fr`)"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.iahome.fr`) || Host(`portainerpc.regispailler.fr`)"
       - "traefik.http.routers.portainer.entrypoints=web"
       - "traefik.http.routers.portainer.service=portainer-service"
       - "traefik.http.services.portainer-service.loadbalancer.server.port=9000"

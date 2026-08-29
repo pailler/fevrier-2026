@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import { buildPageSeo } from '@/utils/pageMetadata';
 
+/** Toujours dynamiquer : le jeton d’accès est dans ?token= */
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = buildPageSeo({
   path: '/ai-detector',
   title: 'Détecteur de texte IA — identifier un contenu généré',
@@ -14,6 +17,7 @@ export const metadata: Metadata = buildPageSeo({
     'IA détection plagiat',
     'IAHome détecteur',
   ],
+  noindex: true,
 });
 
 export default function AiDetectorLayout({ children }: { children: React.ReactNode }) {

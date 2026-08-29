@@ -3,7 +3,7 @@
 .SYNOPSIS
   Lance en parallèle les services de développement / Docker attendus par iahome.
 .DESCRIPTION
-  - Next.js (iahome, prompt-generator, apprendre-autrement, photobooth) via npm
+  - Next.js (iahome, prompt-generator, cv-generator, apprendre-autrement, photobooth) via npm
   - Apps Python Gradio (PhotoMaker, BiRefNet, Florence-2, Animagine XL, MuseTalk) via .venv ou python
   - Home Assistant (fichiers statiques) via python -m http.server
   - Stacks docker compose (meeting-reports, PDF, essentiels, etc.)
@@ -36,6 +36,7 @@ if (-not (Test-Path (Join-Path $ProjectRoot "package.json"))) {
 }
 Set-Location -LiteralPath $ProjectRoot
 . (Join-Path $ScriptRoot "port-utils.ps1")
+. (Join-Path $ScriptRoot "models-path.config.ps1")
 
 $ConfigFile = Join-Path $ScriptRoot "apps-hosts.config.ps1"
 if (Test-Path -LiteralPath $ConfigFile) {
@@ -47,17 +48,12 @@ $script:SkipGradioApps = $CmdLineSkipGradio -or (
     $null -ne (Get-Variable -Name "SkipGradioApps" -Scope 0 -ErrorAction SilentlyContinue) -and [bool]$SkipGradioApps
 )
 
-# --- Cache modèles Hugging Face (sauf mode PhotoMakerOnly : ~/.cache par défaut) ---
-$DefaultModelsCache = Join-Path $ProjectRoot "models-cache"
-if (-not $ModelsCachePath) { $ModelsCachePath = $DefaultModelsCache }
-if (-not (Test-Path -LiteralPath $ModelsCachePath)) {
-    $null = New-Item -ItemType Directory -Path $ModelsCachePath -Force
+# --- Cache modeles Hugging Face — Stability Matrix ---
+if (-not (Set-IaHomeModelsEnv -Quiet)) {
+    Write-Host "[ERREUR] Stability Matrix introuvable pour le cache modeles." -ForegroundColor Red
+    exit 1
 }
-if (-not $PhotoMakerOnly) {
-    $env:HF_HOME = $ModelsCachePath
-    $env:HF_HUB_CACHE = Join-Path $ModelsCachePath "hub"
-    $env:TRANSFORMERS_CACHE = Join-Path $ModelsCachePath "transformers"
-}
+$ModelsCachePath = Get-IaHomeModelsCachePath
 
 # Évite l’erreur « localhost is not accessible » côté clients Gradio (proxy Windows)
 $env:NO_PROXY = "localhost,127.0.0.1,::1"
@@ -74,6 +70,7 @@ if (-not $MuseTalkPath)     { $MuseTalkPath     = Join-Path $ProjectRoot "gradio
 $Ports = [ordered]@{
     Iahome         = 3000
     PromptGen      = 3002
+    CvGenerator    = 3003
     # Compte rendu (Meeting Reports) : port unique 3050 (nginx Docker / npm) — pas 3051/3052.
     MeetingReports = 3050
     # Photobooth en dev : port 7885 (3050 réservé au compte rendu).
@@ -86,9 +83,11 @@ $Ports = [ordered]@{
     MuseTalk       = 7886
     HomeAssistant  = 8123
     VoiceIsolation = 8100
+    AmbiancesPhotos = 9003
 }
 $PortIahome         = $Ports.Iahome
 $PortPromptGen      = $Ports.PromptGen
+$PortCvGenerator    = $Ports.CvGenerator
 $PortMeetingReports = $Ports.MeetingReports
 $PortPhotobooth     = $Ports.Photobooth
 $PortApprendre      = $Ports.Apprendre
@@ -99,13 +98,16 @@ $PortFlorence2      = $Ports.Florence2
 $PortMuseTalk       = $Ports.MuseTalk
 $PortHomeAssistant  = $Ports.HomeAssistant
 $PortVoiceIsolation = $Ports.VoiceIsolation
+$PortAmbiancesPhotos = $Ports.AmbiancesPhotos
 
 $PathPromptGen  = Join-Path $ProjectRoot "prompt-generator"
+$PathCvGenerator = Join-Path $ProjectRoot "cv-generator"
 $PathApprendre  = Join-Path $ProjectRoot "apprendre-autrement"
 $PathPhotobooth = Join-Path $ProjectRoot "photobooth"
 $PathCodesHa    = Join-Path $ProjectRoot "essentiels\codes-ha"
 
 $ParentDir = Split-Path -Parent $ProjectRoot
+$PathAmbiancesPhotos = Join-Path $ParentDir "ambiancesphotos"
 $DockerMeetingReports   = Join-Path $ProjectRoot "meeting-reports"
 $DockerPdf              = Join-Path $ProjectRoot "docker-services\essentiels\pdf"
 $DockerEssentielsRoot   = Join-Path $ProjectRoot "docker-services\essentiels"
@@ -306,6 +308,27 @@ function Start-GradioApp {
     }
 }
 
+function Start-AmbiancesPhotos {
+    $script = Join-Path $PathAmbiancesPhotos "serve-ambiancesphotos.py"
+    if (-not (Test-Path -LiteralPath $script)) {
+        Write-Host "  [SKIP] Ambiances Photos : dossier introuvable." -ForegroundColor DarkGray
+        return
+    }
+    if (Test-PortInUse -Port $PortAmbiancesPhotos) {
+        Write-Host "  [OK]   Ambiances Photos : déjà en cours (port $PortAmbiancesPhotos)." -ForegroundColor Green
+        return
+    }
+    $pythonCmd = Get-Command python -ErrorAction SilentlyContinue
+    $pythonw = if ($pythonCmd) { Join-Path (Split-Path $pythonCmd.Source) "pythonw.exe" } else { "pythonw" }
+    if (-not (Test-Path -LiteralPath $pythonw)) { $pythonw = "pythonw" }
+    try {
+        $p = Start-ChildProcessInDir -FileName $pythonw -Arguments "`"$script`"" -WorkingDirectory $PathAmbiancesPhotos
+        Write-Host "  [OK]   Ambiances Photos démarre (port $PortAmbiancesPhotos, PID $($p.Id))." -ForegroundColor Green
+    } catch {
+        Write-Host "  [ERREUR] Ambiances Photos : $($_.Exception.Message)" -ForegroundColor Red
+    }
+}
+
 function Start-HomeAssistant {
     if (-not (Test-Path -LiteralPath $PathCodesHa)) {
         Write-Host "  [SKIP] Home Assistant : essentiels\codes-ha introuvable." -ForegroundColor DarkGray
@@ -383,8 +406,8 @@ function Stop-IahomeLocalPorts {
         $portList = @($PortPhotomaker)
     } else {
         $portList = @(
-            $PortIahome, $PortPromptGen, $PortApprendre, $PortPhotobooth,
-            $PortMeetingReports, $PortHomeAssistant
+            $PortIahome, $PortPromptGen, $PortCvGenerator, $PortApprendre, $PortPhotobooth,
+            $PortMeetingReports, $PortHomeAssistant, $PortAmbiancesPhotos
         )
         if (-not $IsSkipGradio) {
             $portList += @(
@@ -465,6 +488,9 @@ Start-NpmApp -Name "iahome" -Path $ProjectRoot -Port $PortIahome
 Write-Host "`n• Prompt Generator :$PortPromptGen …" -ForegroundColor Yellow
 Start-NpmApp -Name "Prompt Generator" -Path $PathPromptGen -Port $PortPromptGen
 
+Write-Host "`n• Générateur de CV :$PortCvGenerator …" -ForegroundColor Yellow
+Start-NpmApp -Name "CV Generator" -Path $PathCvGenerator -Port $PortCvGenerator
+
 Write-Host "`n• Apprendre Autrement :$PortApprendre …" -ForegroundColor Yellow
 Start-NpmApp -Name "Apprendre Autrement" -Path $PathApprendre -Port $PortApprendre
 
@@ -473,6 +499,9 @@ Start-NpmApp -Name "Photobooth" -Path $PathPhotobooth -Port $PortPhotobooth -Scr
 
 Write-Host "`n• Home Assistant :$PortHomeAssistant …" -ForegroundColor Yellow
 Start-HomeAssistant
+
+Write-Host "`n• Ambiances Photos :$PortAmbiancesPhotos …" -ForegroundColor Yellow
+Start-AmbiancesPhotos
 
 Write-Host "`n• PhotoMaker :$PortPhotomaker …" -ForegroundColor Yellow
 Start-GradioApp -Name "PhotoMaker" -Path $PhotomakerPath -Port $PortPhotomaker
@@ -532,9 +561,11 @@ Write-Host @"
   URLs principales :
     iahome              http://localhost:$PortIahome
     Prompt Generator    http://localhost:$PortPromptGen
+    Générateur de CV    http://localhost:$PortCvGenerator/cv
     Apprendre Autrement http://localhost:$PortApprendre
     Photobooth          http://localhost:$PortPhotobooth
     Home Assistant      http://localhost:$PortHomeAssistant
+    Ambiances Photos    http://localhost:$PortAmbiancesPhotos / https://ambiancesphotos.fr/
     PhotoMaker          http://localhost:$PortPhotomaker
     BiRefNet            http://localhost:$PortBirefnet
     Florence-2          http://localhost:$PortFlorence2

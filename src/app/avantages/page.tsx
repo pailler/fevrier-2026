@@ -2,13 +2,18 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { subdomainsConfig } from '../../utils/subdomainsConfig';
+import EcosystemValueBlock from '../../components/marketing/EcosystemValueBlock';
+import GpuInfrastructureBlock from '../../components/marketing/GpuInfrastructureBlock';
+import FrenchTrustBlock from '../../components/marketing/FrenchTrustBlock';
+import { getValueProposition } from '../../data/ecosystemValueProposition';
 
 export default function AvantagesPage() {
   useEffect(() => {
-    document.title = 'Avantages IA Home - Pourquoi Choisir Notre Plateforme IA';
+    const vp = getValueProposition('marketing');
+    document.title = 'Avantages IAHome — Pourquoi choisir notre écosystème IA';
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', 'Découvrez tous les avantages de la plateforme IA Home : offres compétitives, outils professionnels, sécurité maximale, support français. Comparez et choisissez la meilleure solution IA.');
+      metaDescription.setAttribute('content', vp.oneLiner);
     }
   }, []);
 
@@ -16,7 +21,7 @@ export default function AvantagesPage() {
     {
       title: 'vs Solutions Cloud Génériques',
       advantages: [
-        'Offres transparentes et prévisibles',
+        'Infrastructure GPU NVIDIA dédiée — pas un revendeur d’API opaque',
         'Pas de limite cachée',
         'Support en français',
         'Conformité RGPD garantie'
@@ -44,62 +49,62 @@ export default function AvantagesPage() {
 
   const valuePropositions = [
     {
-      icon: '💰',
-      title: 'Meilleur Rapport Qualité/Prix',
-      description: 'Système de crédits dégressif. Économisez jusqu\'à 80% en achetant en volume.',
-      details: 'Pack Standard PROMO : 0,005€/crédit vs 0,0099€/crédit pour le pack basique'
+      icon: '🎙️',
+      title: 'Synthétiser l’oral',
+      description: 'Réunion, cours, podcast : obtenez un texte exploitable sans retranscrire à la main.',
+      details: 'Compte rendu structuré en quelques minutes, depuis le PC ou le smartphone',
     },
     {
-      icon: '⚡',
-      title: 'Performance Optimale',
-      description: 'Infrastructure cloud haute performance pour des résultats rapides.',
-      details: 'Traitement en quelques secondes, même pour les fichiers volumineux'
+      icon: '🎨',
+      title: 'Produire un visuel',
+      description: 'Affiche, illustration, photo stylisée — à partir d’une idée, pas d’un logiciel complexe.',
+      details: 'Livrable prêt à publier ou à intégrer dans une présentation',
     },
     {
-      icon: '🔒',
-      title: 'Sécurité de Niveau Entreprise',
-      description: 'Paiements Stripe, données chiffrées, conformité RGPD.',
-      details: 'Vos données sont protégées et ne sont jamais partagées avec des tiers'
+      icon: '📄',
+      title: 'Finaliser un dossier',
+      description: 'Fusion, conversion, préparation à l’envoi : le PDF devient simple.',
+      details: 'Une seule interface pour les tâches que vous repoussez d’habitude',
     },
     {
-      icon: '🌍',
-      title: '100% Français',
-      description: 'Plateforme française avec support client en français.',
-      details: 'Équipe basée en France, conformité totale avec la réglementation européenne'
+      icon: '📱',
+      title: 'Agir en déplacement',
+      description: 'Même compte, mêmes actions sur smartphone — sans app à installer.',
+      details: 'Partager un fichier, générer un QR code ou consulter un résultat où que vous soyez',
     },
     {
       icon: '📚',
-      title: 'Formations Incluses',
-      description: 'Apprenez à utiliser l\'IA efficacement avec nos formations.',
-      details: 'Tutoriels, guides et exemples pratiques pour tous les niveaux'
+      title: 'Apprendre en faisant',
+      description: 'Formations et guides pour chaque situation — pas pour chaque moteur technique.',
+      details: 'Tutoriels orientés résultat : « je veux transcrire », « je veux créer un visuel »',
     },
     {
-      icon: '🔄',
-      title: 'Mises à Jour Régulières',
-      description: 'Nouveaux outils et fonctionnalités ajoutés régulièrement.',
-      details: 'Évoluez avec les dernières technologies IA sans frais supplémentaires'
-    }
+      icon: '🇫🇷',
+      title: 'Une plateforme de confiance',
+      description: 'Français, RGPD, paiements Stripe, support réactif.',
+      details: 'Vous savez où vont vos fichiers et combien coûte chaque action',
+    },
   ];
 
   const serviceComparison = [
     {
-      service: 'Whisper (Transcription)',
+      service: 'Transcrire une réunion (1 h)',
       iahome: '100 crédits (0,49€ - 1,99€ selon pack)',
       competitors: '5-20€ par fichier',
-      savings: 'Économisez jusqu\'à 90%'
+      savings: 'Économisez jusqu\'à 90%',
     },
     {
-      service: 'Stable Diffusion (Images)',
+      service: 'Créer un visuel professionnel',
       iahome: '100 crédits (0,49€ - 1,99€ selon pack)',
       competitors: '10-50€ par mois',
-      savings: 'Payez uniquement ce que vous utilisez'
+      savings: 'Payez uniquement ce que vous utilisez',
     },
     {
-      service: 'Traitement PDF',
+      service: 'Traiter un lot de PDF',
       iahome: '10 crédits (0,10€ - 0,20€ selon pack)',
       competitors: '15-30€ par mois',
-      savings: 'Jusqu\'à 99% d\'économie'
-    }
+      savings: 'Jusqu\'à 99% d\'économie',
+    },
   ];
 
   return (
@@ -107,14 +112,17 @@ export default function AvantagesPage() {
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white py-20">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Pourquoi Choisir IA Home ?
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100">
-              La plateforme IA française complète avec les meilleures offres du marché
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="max-w-4xl mx-auto">
+            <EcosystemValueBlock
+              variant="marketing"
+              layout="hero"
+              theme="dark"
+              showPillars={false}
+              showAudiences={false}
+              showProof={true}
+              className="text-center [&_p]:mx-auto"
+            />
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-4">
               <Link
                 href="/pricing2"
                 className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-8 py-4 rounded-lg font-bold text-lg transition-all"
@@ -132,15 +140,21 @@ export default function AvantagesPage() {
         </div>
       </section>
 
+      <EcosystemValueBlock variant="marketing" useCasesOnly />
+
+      <GpuInfrastructureBlock variant="marketing" density="compact" showCta={false} />
+
+      <FrenchTrustBlock variant="marketing" density="compact" />
+
       {/* Value Propositions */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Nos Avantages Clés
+              Ce que vous faites concrètement
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Tout ce dont vous avez besoin pour réussir avec l'IA
+              Chaque avantage part d’une situation réelle — pas d’une fiche technique.
             </p>
           </div>
 

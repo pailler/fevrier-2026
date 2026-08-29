@@ -4,6 +4,11 @@ import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import { useCustomAuth } from '../hooks/useCustomAuth';
 import Breadcrumb from '../components/Breadcrumb';
+import EcosystemValueBlock from '../components/marketing/EcosystemValueBlock';
+import GpuInfrastructureBlock from '../components/marketing/GpuInfrastructureBlock';
+import FrenchTrustBlock from '../components/marketing/FrenchTrustBlock';
+import AudienceSegmentsBlock from '../components/marketing/AudienceSegmentsBlock';
+import UserApplicationsBlock from '../components/UserApplicationsBlock';
 
 export default function HomeInteractive() {
   const router = useRouter();
@@ -148,21 +153,19 @@ export default function HomeInteractive() {
                   </h2>
                 </div>
                 <p className="text-lg text-gray-600 mb-6">
-                  Retrouvez les services que vous avez ouverts avec vos crédits, et parcourez le catalogue pour en découvrir d&apos;autres.
+                  Consultez vos crédits, votre profil et l&apos;historique de votre compte IAHome.
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Link 
                     href="/account" 
-                    className="bg-[#16a34a] hover:bg-[#15803d] text-white px-8 py-6 rounded-2xl font-semibold transition-colors inline-flex flex-col items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                    className="bg-[#16a34a] hover:bg-[#15803d] text-white px-8 py-5 rounded-2xl font-semibold transition-colors inline-flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
                   >
-                    <svg className="w-8 h-8 sm:w-9 sm:h-9 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
-                      <polyline points="10 17 15 12 10 7" />
-                      <line x1="15" y1="12" x2="3" y2="12" />
+                    <svg className="w-7 h-7 shrink-0" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
                     </svg>
-                    <span className="font-bold text-base sm:text-lg md:text-xl text-center drop-shadow-sm">Mon compte — applis visitées</span>
-                    <span className="text-sm sm:text-base font-normal text-white/95 text-center drop-shadow-sm">Crédits, historique et accès aux services</span>
+                    <span className="font-bold text-base sm:text-lg text-center drop-shadow-sm">Mon compte</span>
                   </Link>
                 </div>
               </div>
@@ -216,33 +219,14 @@ export default function HomeInteractive() {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             {/* Contenu texte */}
             <div className="flex-1 max-w-2xl">
-              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-yellow-800 via-green-800 to-green-900 bg-clip-text text-transparent leading-tight mb-4">
-                Outils essentiels, toutes plateformes, sans install
-              </h1>
-              <p className="text-xl text-gray-700 mb-6">
-                Des applis qui simplifient votre quotidien et boost vos projets. Sans téléchargement, avec aides à l'emploi.
-              </p>
-              
-              {/* Boutons d'action */}
-              <div className="flex flex-col sm:flex-row gap-4 max-w-lg">
-                <Link 
-                  href="/applications" 
-                  className="bg-gradient-to-r from-yellow-500 to-green-600 text-white px-6 py-4 rounded-xl hover:from-yellow-600 hover:to-green-700 transition-all font-medium text-center"
-                >
-                  Explorer les applications &gt;
-                </Link>
-                <Link 
-                  href="/essentiels" 
-                  className="text-orange-600 hover:text-orange-700 font-medium px-6 py-4 transition-colors text-center"
-                >
-                  Voir les essentiels &gt;
-                </Link>
-                </div>
-                
-              {/* Texte supplémentaire */}
-              <div className="mt-6 text-sm text-gray-600">
-                <p className="font-medium">Explorez notre collection complète d'outils conçus pour simplifier votre travail et booster votre productivité. Tous nos services sont des web-services accessibles directement depuis votre navigateur, sans installation ni téléchargement.</p>
-              </div>
+              <EcosystemValueBlock
+                variant="home"
+                layout="hero"
+                showPillars={false}
+                showAudiences={true}
+                primaryCta={{ href: '/applications', label: 'Explorer les applications →' }}
+                secondaryCta={{ href: '/essentiels', label: 'Voir les essentiels →' }}
+              />
             </div>
             
             {/* Illustration avec bannière blanche */}
@@ -281,6 +265,16 @@ export default function HomeInteractive() {
           </div>
         </div>
       </section>
+
+      <UserApplicationsBlock />
+
+      <EcosystemValueBlock variant="home" useCasesOnly />
+
+      <AudienceSegmentsBlock />
+
+      <GpuInfrastructureBlock variant="home" />
+
+      <FrenchTrustBlock variant="home" />
 
       {/* Section Formation */}
       <section className="py-8 bg-gradient-to-r from-blue-50 to-green-50 relative overflow-hidden">
@@ -489,7 +483,7 @@ export default function HomeInteractive() {
               Prêt à commencer ?
             </h2>
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Découvrez la puissance de l'IA avec nos outils professionnels et rejoignez une communauté en pleine croissance.
+              Découvrez la puissance de notre écosystème IA et rejoignez une communauté en pleine croissance.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

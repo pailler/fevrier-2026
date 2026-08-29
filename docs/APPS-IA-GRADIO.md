@@ -18,7 +18,21 @@ Le script réinstalle PyTorch et torchvision dans le venv de chaque app Gradio.
 
 ## Cache des modèles
 
-Les scripts utilisent `iahome/models-cache`. Les modèles ne sont téléchargés qu'une fois. Pour changer : décommentez `$ModelsCachePath` dans `scripts/apps-hosts.config.ps1`.
+Les scripts utilisent le dossier **Stability Matrix** standard pour les modèles HF :
+
+`Documents\StabilityMatrix-win-x64\Data\Models\Diffusers`
+
+Migration depuis l'ancien `iahome/models-cache` :
+
+```powershell
+.\scripts\migrate-models-to-stabilitymatrix.ps1 -DeleteOldCache
+```
+
+Migration `iahome/ai-models-cache` (TTS Coqui, photo-animation SD 1.5, voice isolation) :
+
+```powershell
+.\scripts\migrate-ai-models-cache.ps1 -DeleteOldCache
+```
 
 ## 2. Lancer les apps IA en parallèle
 
@@ -31,6 +45,8 @@ Démarre en parallèle :
 - **Florence-2**   → http://localhost:7884
 - **BiRefNet**     → http://localhost:7882
 - **MuseTalk**     → http://localhost:7886 (lip-sync vidéo ; GPU + poids requis, voir `scripts/setup-musetalk-local.ps1`)
+  - Voix clonée : `setup-musetalk-local.ps1 -WithChatterbox` (Chatterbox dans `.venv-chatterbox`)
+  - CUDA RTX : `setup-musetalk-cuda.ps1` puis `restart-musetalk.ps1`
 
 ## 3. Si l’erreur persiste : passer à Python 3.11
 

@@ -10,6 +10,7 @@ import DynamicNavigation from './DynamicNavigation';
 import { useTokenContext } from '../contexts/TokenContext';
 import { NotificationServiceClient } from '../utils/notificationServiceClient';
 import { useIframeDetection } from '../utils/useIframeDetection';
+import { isPathWithoutSiteChrome } from '../utils/siteChrome';
 
 // Version du Header - Incrémenter pour forcer le rechargement
 const HEADER_VERSION = '4.0.0';
@@ -25,13 +26,7 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isInIframe = useIframeDetection();
 
-  // Pages où le Header ne doit pas être affiché
-  const PAGES_WITHOUT_HEADER = ['/code-learning', '/administration', '/ai-detector', '/sentinelle-numerique'];
-  
-  // Vérifier si le Header doit être masqué
-  const shouldHideHeader = pathname && PAGES_WITHOUT_HEADER.some(page => 
-    pathname === page || pathname.startsWith(`${page}/`)
-  );
+  const shouldHideHeader = isPathWithoutSiteChrome(pathname);
 
   // Masquer le Header sur les pages spécifiées
   if (shouldHideHeader) {
@@ -321,7 +316,7 @@ export default function Header() {
               <span className="text-lg sm:text-xl font-bold text-white">IAhome</span>
             </Link>
             
-            {/* Bouton "Mes applis" avec crédits - Desktop et Mobile - VERSION 4.0.0 */}
+            {/* Bouton « Mon compte » - Desktop et Mobile */}
             {isAuthenticated && user && (
               <div className="flex items-center space-x-1 md:space-x-3 flex-shrink-0 relative z-0 mr-3 md:mr-0" data-button-version="4.0.0">
                 <Link
@@ -329,7 +324,7 @@ export default function Header() {
                   data-active={pathname === '/account' || pathname?.startsWith('/account/') ? 'true' : 'false'}
                   data-button-type="mes-applis-compte"
                   className="group relative bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 text-white font-bold px-2.5 py-2 md:px-5 md:py-3 rounded-lg md:rounded-2xl text-sm md:text-base hover:from-green-600 hover:via-emerald-600 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 flex items-center space-x-1 md:space-x-3 border-2 border-white/20 hover:border-white/40 animate-pulse-subtle"
-                  title="Cliquez pour accéder à vos applications"
+                  title="Accéder à mon compte"
                   onClick={(e) => {
                     e.stopPropagation();
                   }}
@@ -349,7 +344,7 @@ export default function Header() {
                   <div className="absolute inset-0 rounded-lg md:rounded-2xl bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
                   
                   <span className="text-base md:text-xl relative z-10">📱</span>
-                  <span className="relative z-10 text-sm md:text-base font-semibold">Mes applis</span>
+                  <span className="relative z-10 text-sm md:text-base font-semibold">Mon compte</span>
                   <svg className="w-3 h-3 md:w-5 md:h-5 relative z-10 group-hover:translate-x-1 transition-transform hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>

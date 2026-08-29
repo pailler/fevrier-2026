@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         subtitle: 'Transfert de fichiers sécurisé et anonyme',
         category: 'Fichier',
         price: 0,
-        url: 'https://psitransfer.iahome.fr',
+        url: 'https://iahome.fr/psitransfer',
         image_url: '/images/psitransfer.jpg',
         is_visible: true, // Important : rendre le module visible dans /account
         created_at: new Date().toISOString(),

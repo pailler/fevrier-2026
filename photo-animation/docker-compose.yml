@@ -1,9 +1,9 @@
 services:
-  photobooth:
+  photo-vivante:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: photobooth-iahome
+    container_name: photo-vivante-iahome
     restart: unless-stopped
     environment:
       - PHOTOBOOTH_PORT=7887
@@ -12,13 +12,10 @@ services:
     ports:
       - "7887:7887"
     volumes:
-      - photobooth_models_cache:/ai-models-cache/huggingface
+      - ../../StabilityMatrix-win-x64/Data/Models/Diffusers:/ai-models-cache/huggingface:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:7887')"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 60s
-
-volumes:
-  photobooth_models_cache:

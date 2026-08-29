@@ -88,8 +88,14 @@ Write-Step 1 "Arrêt des processus Node.js..."
 $nodeProcs = Get-Process -Name "node" -ErrorAction SilentlyContinue
 if ($nodeProcs) {
     $count = ($nodeProcs | Measure-Object).Count
-    $nodeProcs | Stop-Process -Force
-    Write-Ok "$count processus Node.js arrêtés"
+    foreach ($proc in $nodeProcs) {
+        try {
+            Stop-Process -Id $proc.Id -Force -ErrorAction Stop
+        } catch {
+            Write-Warn "Impossible d'arrêter PID $($proc.Id) : $_"
+        }
+    }
+    Write-Ok "Processus Node.js traités ($count trouvés)"
 } else {
     Write-Host "   (aucun processus Node.js en cours)" -ForegroundColor Gray
 }

@@ -1,118 +1,280 @@
 /**
  * Cloudflare Worker — protect-sous-domaines-iahome
- * (format Service Worker : addEventListener — coller tel quel dans le dashboard « Quick edit » classique.)
+ * Format modules (export default) — secrets via wrangler : JWT_SECRET
  *
- * Si votre worker Cloudflare est en **Modules** (export default), copiez plutôt le fichier
- * `cloudflare-worker-protect-sous-domaines.modules.js` du même dépôt.
+ * Route Cloudflare : *.iahome.fr/*
  *
- * - JWT : iahome.fr → generate-access-token / unified-redirect.
- * - Hôtes dans HOSTS_SKIP_DOCUMENT_TOKEN : pas de ?token= sur GET / (ex. photobooth).
- * - reveil-intelligent.iahome.fr : ?token= requis sur GET / **ou** cookie reveil_iahome_gate
- *   (session après première visite avec JWT).
- * - Autres sous-domaines protégés : GET / sans ?token= → https://iahome.fr/encours?error=direct_access_denied
+ * - Landings SEO (HOSTS_SKIP_DOCUMENT_TOKEN) : publiques
+ * - Infra (HOSTS_SKIP_ALWAYS) : publiques
+ * - Autres sous-domaines : navigation HTML exige JWT IAHome valide (?token=)
+ *   provenant d’iahome.fr (Sec-Fetch-Site same-site) OU cookie de session gate
+ *   → un lien ?token= collé dans un autre navigateur est refusé
+ * - Assets / API / WS / SSE : laissés passer
  */
 
+/** Landings produit / démos publiques — pas de gate token. */
 const HOSTS_SKIP_DOCUMENT_TOKEN = new Set([
   'photobooth.iahome.fr',
   'www.photobooth.iahome.fr',
   'resas.iahome.fr',
+  'www.resas.iahome.fr',
   'game.iahome.fr',
+  'code-learning.iahome.fr',
+  'www.code-learning.iahome.fr',
+  'psitransfer.iahome.fr',
+  'www.psitransfer.iahome.fr',
+  'metube.iahome.fr',
+  'www.metube.iahome.fr',
+  'cv.iahome.fr',
+  'www.cv.iahome.fr',
+  'ruinedfooocus.iahome.fr',
+  'www.ruinedfooocus.iahome.fr',
+  'apprendre-autrement.iahome.fr',
+  'www.apprendre-autrement.iahome.fr',
+  'reveil.iahome.fr',
+  'www.reveil.iahome.fr',
+  // Ancien host : Next redirige vers reveil.iahome.fr (pas de gate)
+  'reveil-intelligent.iahome.fr',
+  'www.reveil-intelligent.iahome.fr',
+  'stablediffusion.iahome.fr',
+  'www.stablediffusion.iahome.fr',
+  'detecteur-ia.iahome.fr',
+  'www.detecteur-ia.iahome.fr',
+]);
+
+/** Infra / hors apps utilisateur — laisser passer. */
+const HOSTS_SKIP_ALWAYS = new Set([
+  'portainer.iahome.fr',
+  'www.portainer.iahome.fr',
+  'minecraft.iahome.fr',
+  'www.minecraft.iahome.fr',
 ]);
 
 const MUSE_TALK_HOSTS = new Set(['musetalk.iahome.fr', 'www.musetalk.iahome.fr']);
-const REVEIL_HOSTS = new Set(['reveil-intelligent.iahome.fr', 'www.reveil-intelligent.iahome.fr']);
+
+const GATE_COOKIE = 'iahome_gate';
+const GATE_MAX_AGE_SEC = 60 * 60 * 24; // 24h
+const DENY_URL = 'https://iahome.fr/encours?error=direct_access_denied';
+
+/** Fallback aligné sur Next si le secret Worker n’est pas encore configuré. */
+const JWT_SECRET_FALLBACK = 'votre-jwt-secret-tres-securise-changez-cela-immediatement';
+
+const RESOURCE_EXTENSIONS = [
+  '.js', '.css', '.jpg', '.jpeg', '.png', '.gif', '.svg', '.ico',
+  '.woff', '.woff2', '.ttf', '.eot', '.mp4', '.webm', '.json',
+  '.xml', '.pdf', '.zip', '.txt', '.map', '.webp', '.avif',
+  '.otf', '.wasm', '.mp3', '.wav', '.ogg', '.webmanifest',
+];
 
 function clientHostname(request) {
-  let fromUrl = '';
   try {
-    fromUrl = new URL(request.url).hostname.toLowerCase();
+    const fromUrl = new URL(request.url).hostname.toLowerCase().replace(/\.$/, '');
+    if (fromUrl) return fromUrl;
   } catch {
-    fromUrl = '';
+    // ignore
   }
   const raw =
     request.headers.get('x-forwarded-host') ||
-    request.headers.get('X-Forwarded-Host') ||
     request.headers.get('host') ||
-    request.headers.get('Host') ||
     '';
-  let h = raw.split(',')[0].trim().split(':')[0].toLowerCase() || fromUrl;
+  let h = raw.split(',')[0].trim().split(':')[0].toLowerCase();
   if (h.endsWith('.')) h = h.slice(0, -1);
-  return h || fromUrl;
+  return h;
 }
 
-async function handleRequest(request) {
-  const url = new URL(request.url);
-  const method = request.method;
-  const host = clientHostname(request);
+function base64UrlToBytes(b64url) {
+  const pad = '='.repeat((4 - (b64url.length % 4)) % 4);
+  const b64 = (b64url + pad).replace(/-/g, '+').replace(/_/g, '/');
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
 
-  if (HOSTS_SKIP_DOCUMENT_TOKEN.has(host)) {
-    return fetch(request);
+async function verifyHs256Jwt(token, secret) {
+  if (!token || typeof token !== 'string') return null;
+  const parts = token.split('.');
+  if (parts.length !== 3) return null;
+  const [headerB64, payloadB64, sigB64] = parts;
+
+  let header;
+  try {
+    header = JSON.parse(new TextDecoder().decode(base64UrlToBytes(headerB64)));
+  } catch {
+    return null;
   }
+  if (header.alg !== 'HS256') return null;
 
-  if (url.pathname.startsWith('/api/')) {
-    return fetch(request);
-  }
-
-  if (method === 'POST' || method === 'PUT' || method === 'DELETE' || method === 'OPTIONS') {
-    return fetch(request);
-  }
-
-  const resourceExtensions = [
-    '.js', '.css', '.jpg', '.jpeg', '.png', '.gif', '.svg', '.ico',
-    '.woff', '.woff2', '.ttf', '.eot', '.mp4', '.webm', '.json',
-    '.xml', '.pdf', '.zip', '.txt', '.map', '.webp', '.avif',
-    '.otf',
-  ];
-
-  const isResource = resourceExtensions.some((ext) =>
-    url.pathname.toLowerCase().endsWith(ext)
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['verify']
   );
+  const data = new TextEncoder().encode(`${headerB64}.${payloadB64}`);
+  const sig = base64UrlToBytes(sigB64);
+  const ok = await crypto.subtle.verify('HMAC', key, sig, data);
+  if (!ok) return null;
 
-  const isStaticPath =
+  try {
+    return JSON.parse(new TextDecoder().decode(base64UrlToBytes(payloadB64)));
+  } catch {
+    return null;
+  }
+}
+
+function getCookie(cookieHeader, name) {
+  if (!cookieHeader) return null;
+  const parts = cookieHeader.split(';');
+  for (const part of parts) {
+    const idx = part.indexOf('=');
+    if (idx === -1) continue;
+    const k = part.slice(0, idx).trim();
+    if (k === name) return part.slice(idx + 1).trim();
+  }
+  return null;
+}
+
+function hasGateSession(host, cookieHeader) {
+  if (getCookie(cookieHeader, GATE_COOKIE) === '1') return true;
+  if (MUSE_TALK_HOSTS.has(host) && cookieHeader.includes('musetalk_iahome_gate=')) return true;
+  return false;
+}
+
+/**
+ * Premier déverrouillage via ?token= : uniquement depuis une navigation IAHome
+ * (clic / redirect), pas un copier-coller dans un autre navigateur.
+ *
+ * - Coller l’URL → Sec-Fetch-Site: none → refusé
+ * - Clic depuis iahome.fr → same-site (même si noreferrer)
+ * - Fallback Referer apex si Sec-Fetch-* absent
+ */
+function isTokenUnlockFromIaHome(request) {
+  const site = (request.headers.get('Sec-Fetch-Site') || '').toLowerCase();
+  if (site === 'same-site' || site === 'same-origin') return true;
+  // Collé / saisi / favori
+  if (site === 'none') return false;
+
+  const referer = request.headers.get('Referer') || '';
+  if (!referer) return false;
+  try {
+    const rh = new URL(referer).hostname.toLowerCase();
+    return rh === 'iahome.fr' || rh === 'www.iahome.fr';
+  } catch {
+    return false;
+  }
+}
+
+function gateSetCookieHeader(host) {
+  // Host-only cookie (pas de Domain=) → limité au sous-domaine courant
+  return `${GATE_COOKIE}=1; Path=/; Max-Age=${GATE_MAX_AGE_SEC}; Secure; HttpOnly; SameSite=Lax`;
+}
+
+function isExemptPath(url, request) {
+  if (url.pathname.startsWith('/api/')) return true;
+  if (url.pathname.startsWith('/cdn-cgi/')) return true;
+
+  const pathLower = url.pathname.toLowerCase();
+  if (RESOURCE_EXTENSIONS.some((ext) => pathLower.endsWith(ext))) return true;
+
+  if (
     url.pathname.startsWith('/static/') ||
     url.pathname.startsWith('/assets/') ||
     url.pathname.startsWith('/_next/') ||
-    url.pathname.startsWith('/favicon.ico');
+    url.pathname.startsWith('/gradio_api/') ||
+    url.pathname.startsWith('/file=') ||
+    url.pathname.startsWith('/queue/') ||
+    url.pathname.startsWith('/favicon.ico') ||
+    url.pathname.startsWith('/robots.txt') ||
+    url.pathname.startsWith('/sitemap')
+  ) {
+    return true;
+  }
 
-  const isWebSocket =
-    request.headers.get('Upgrade') === 'websocket' ||
-    (request.headers.get('Connection') || '').includes('Upgrade');
+  const upgrade = request.headers.get('Upgrade') || '';
+  const connection = request.headers.get('Connection') || '';
+  if (upgrade.toLowerCase() === 'websocket' || connection.toLowerCase().includes('upgrade')) {
+    return true;
+  }
 
-  const isSSE = (request.headers.get('Accept') || '').includes('text/event-stream');
+  const accept = request.headers.get('Accept') || '';
+  if (accept.includes('text/event-stream')) return true;
 
-  const isHealthCheck =
+  if (
     url.pathname.includes('/health') ||
     url.pathname.includes('/ping') ||
-    url.pathname.includes('/status');
-
-  if (isResource || isStaticPath || isWebSocket || isSSE || isHealthCheck) {
-    return fetch(request);
+    url.pathname.includes('/status')
+  ) {
+    return true;
   }
 
-  const isMainRequest =
-    method === 'GET' &&
-    (url.pathname === '/' ||
-      url.pathname === '' ||
-      url.pathname.toLowerCase() === '/index.html' ||
-      url.pathname.toLowerCase().endsWith('/index'));
-
-  if (isMainRequest) {
-    const hasToken = url.searchParams.has('token');
-    const cookieHeader = request.headers.get('Cookie') || '';
-    const musetalkSession =
-      MUSE_TALK_HOSTS.has(host) && cookieHeader.includes('musetalk_iahome_gate=');
-    const reveilSession =
-      REVEIL_HOSTS.has(host) && cookieHeader.includes('reveil_iahome_gate=');
-
-    if (!hasToken && !musetalkSession && !reveilSession) {
-      return Response.redirect('https://iahome.fr/encours?error=direct_access_denied', 302);
-    }
-    return fetch(request);
-  }
-
-  return fetch(request);
+  return false;
 }
 
-addEventListener('fetch', (event) => {
-  event.respondWith(handleRequest(event.request));
-});
+/**
+ * Requête « document » à protéger : GET/HEAD hors assets/API.
+ * (plus seulement GET / — ferme /docs, /login, /pdf, etc.)
+ */
+function isProtectedNavigation(method, url, request) {
+  if (method !== 'GET' && method !== 'HEAD') return false;
+  if (isExemptPath(url, request)) return false;
+
+  const dest = (request.headers.get('Sec-Fetch-Dest') || '').toLowerCase();
+  if (dest === 'script' || dest === 'style' || dest === 'image' || dest === 'font' || dest === 'worker') {
+    return false;
+  }
+
+  return true;
+}
+
+async function handleRequest(request, env) {
+  const url = new URL(request.url);
+  const host = clientHostname(request);
+  const method = request.method;
+  const jwtSecret = (env && env.JWT_SECRET) || JWT_SECRET_FALLBACK;
+
+  if (host === 'iahome.fr' || host === 'www.iahome.fr') {
+    return fetch(request);
+  }
+
+  if (HOSTS_SKIP_ALWAYS.has(host) || HOSTS_SKIP_DOCUMENT_TOKEN.has(host)) {
+    return fetch(request);
+  }
+
+  if (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE' || method === 'OPTIONS') {
+    return fetch(request);
+  }
+
+  if (!isProtectedNavigation(method, url, request)) {
+    return fetch(request);
+  }
+
+  const cookieHeader = request.headers.get('Cookie') || '';
+  if (hasGateSession(host, cookieHeader)) {
+    return fetch(request);
+  }
+
+  const rawToken = url.searchParams.get('token');
+  if (rawToken) {
+    const payload = await verifyHs256Jwt(rawToken, jwtSecret);
+    if (payload && isTokenUnlockFromIaHome(request)) {
+      const originResp = await fetch(request);
+      const headers = new Headers(originResp.headers);
+      headers.append('Set-Cookie', gateSetCookieHeader(host));
+      return new Response(originResp.body, {
+        status: originResp.status,
+        statusText: originResp.statusText,
+        headers,
+      });
+    }
+  }
+
+  return Response.redirect(DENY_URL, 302);
+}
+
+export default {
+  async fetch(request, env) {
+    return handleRequest(request, env);
+  },
+};

@@ -9,6 +9,7 @@ if (-not (Test-Path (Join-Path $ProjectRoot "package.json"))) {
 }
 Set-Location $ProjectRoot
 . (Join-Path $PSScriptRoot "port-utils.ps1")
+. (Join-Path $PSScriptRoot "models-path.config.ps1")
 
 # ========== CONFIGURATION : chemins des apps Gradio ==========
 # Si vous avez les projets en local, definissez les chemins ci-dessous (ou creez scripts\apps-hosts.config.ps1).
@@ -27,14 +28,12 @@ if (Test-Path $ConfigFile) {
     . $ConfigFile
 }
 
-# Cache Hugging Face pour BiRefNet, Animagine XL - evite les telechargements repetes
-$ProjectRootForCache = if ($ProjectRoot) { $ProjectRoot } else { Split-Path -Parent $PSScriptRoot }
-$DefaultModelsCache = Join-Path $ProjectRootForCache "models-cache"
-if (-not $ModelsCachePath) { $ModelsCachePath = $DefaultModelsCache }
-if (-not (Test-Path $ModelsCachePath)) { New-Item -ItemType Directory -Path $ModelsCachePath -Force | Out-Null }
-$env:HF_HOME = $ModelsCachePath
-$env:HF_HUB_CACHE = Join-Path $ModelsCachePath "hub"
-$env:TRANSFORMERS_CACHE = Join-Path $ModelsCachePath "transformers"
+# Cache Hugging Face — Stability Matrix (Forge diffusers)
+if (-not (Set-IaHomeModelsEnv -Quiet)) {
+    Write-Host "[ERREUR] Stability Matrix introuvable pour le cache modeles." -ForegroundColor Red
+    exit 1
+}
+$ModelsCachePath = Get-IaHomeModelsCachePath
 
 # URL publique Gradio PhotoMaker (optionnel ; surchargeable via apps-hosts.config.ps1)
 if (-not $PhotoMakerGradioRootUrl) { $PhotoMakerGradioRootUrl = "" }

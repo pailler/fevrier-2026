@@ -17,7 +17,7 @@ function getModuleInternalUrl(moduleId: string): string | null {
     'stablediffusion': process.env.STABLEDIFFUSION_INTERNAL_URL || 'https://stablediffusion.iahome.fr',
     'comfyui': process.env.COMFYUI_INTERNAL_URL || 'https://comfyui.iahome.fr',
     'meeting-reports': process.env.MEETING_REPORTS_INTERNAL_URL || 'https://meeting-reports.iahome.fr',
-    'ruinedfooocus': process.env.RUINEDFOOOCUS_INTERNAL_URL || 'https://ruinedfooocus.iahome.fr',
+    'ruinedfooocus': process.env.RUINEDFOOOCUS_INTERNAL_URL || 'http://192.168.1.39:7870',
     'cogstudio': process.env.COGSTUDIO_INTERNAL_URL || 'https://cogstudio.iahome.fr',
   };
   return moduleUrls[moduleId] || null;

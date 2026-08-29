@@ -1,6 +1,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { validateAccessToken, hasPermission } from '../../../utils/accessToken';
+import { decodeModuleAccessToken } from '@/utils/moduleAccessJwt';
+import { normalizeModuleIdForAccessJwt } from '@/utils/moduleAccessJwtIssue';
 
 // Configuration du module Metube
 const METUBE_CONFIG = {
@@ -169,15 +171,18 @@ async function testMetubeAccess(): Promise<{ accessible: boolean; status: number
 // Fonction pour authentifier automatiquement l'utilisateur sur Metube
 async function authenticateMetubeUser(token: string): Promise<{ success: boolean; method: string; html?: string; error?: string; setCookie?: string | null }> {
   try {
-    // Valider le token d'accès
-    const accessData = await validateAccessToken(token);
-    if (!accessData) {
-      return { success: false, method: 'token-validation', error: 'Token invalide' };
-    }
+    const jwtPayload = decodeModuleAccessToken(token);
+    if (jwtPayload && jwtPayload.moduleId === normalizeModuleIdForAccessJwt('metube')) {
+      // Jeton module IAHome (generate-access-token) — pas de magic_links requis
+    } else {
+      const accessData = await validateAccessToken(token);
+      if (!accessData) {
+        return { success: false, method: 'token-validation', error: 'Token invalide' };
+      }
 
-    // Vérifier les permissions
-    if (!hasPermission(accessData, 'access')) {
-      return { success: false, method: 'permissions', error: 'Permissions insuffisantes' };
+      if (!hasPermission(accessData, 'access')) {
+        return { success: false, method: 'permissions', error: 'Permissions insuffisantes' };
+      }
     }
 
     // Test d'accès initial

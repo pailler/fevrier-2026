@@ -9,7 +9,7 @@ param(
 
 $ErrorActionPreference = "Continue"
 $ProjectRoot = $PSScriptRoot | Split-Path -Parent
-$ExcludeDirs = @('node_modules', '.venv', '.git', 'models-cache', 'ai-models-cache')
+$ExcludeDirs = @('node_modules', '.venv', '.git')
 
 $minBytes = $MinSizeMB * 1MB
 $totalSaved = 0

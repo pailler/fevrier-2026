@@ -360,7 +360,7 @@ function SearchContent() {
                       >
                         Voir plus →
                       </Link>
-                      {result.published_at && (
+                      {result.published_at && result.type !== 'blog' && (
                         <span className="text-sm text-gray-500">
                           {new Date(result.published_at).toLocaleDateString('fr-FR')}
                         </span>

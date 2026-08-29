@@ -7,6 +7,8 @@ interface YouTubeEmbedProps {
   videoId: string;
   title?: string;
   className?: string;
+  /** 16:9 classique ou Shorts vertical 9:16 */
+  layout?: 'video' | 'shorts';
   autoplay?: boolean;
   rel?: number;
   modestbranding?: number;
@@ -19,6 +21,7 @@ export default function YouTubeEmbed({
   videoId,
   title = 'Vidéo YouTube',
   className = '',
+  layout = 'video',
   autoplay = false,
   rel = 0,
   modestbranding = 1,
@@ -134,16 +137,25 @@ export default function YouTubeEmbed({
     }
   };
 
+  const isShorts = layout === 'shorts';
+  const aspectClass = isShorts ? 'aspect-[9/16]' : 'aspect-video';
+  const resolvedVideoId =
+    videoId.includes('http') || videoId.includes('youtube.com') || videoId.includes('youtu.be')
+      ? extractYouTubeVideoId(videoId) || videoId
+      : videoId;
+
   // Si erreur après tous les essais
   if (error) {
     return (
-      <div className={`w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center ${className}`}>
+      <div
+        className={`w-full ${aspectClass} bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center ${className}`}
+      >
         <div className="text-center p-8">
           <div className="text-6xl mb-4">📺</div>
           <h3 className="text-xl font-bold text-gray-800 mb-2">Vidéo non disponible</h3>
           <p className="text-gray-600 mb-4">{error}</p>
           <a
-            href={`https://www.youtube.com/watch?v=${videoId}`}
+            href={`https://www.youtube.com/watch?v=${resolvedVideoId}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
@@ -156,12 +168,13 @@ export default function YouTubeEmbed({
   }
 
   return (
-    <div 
+    <div
       ref={containerRef}
-      className={`w-full aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 relative ${className}`}
+      className={`w-full ${isShorts ? 'max-w-[300px] mx-auto' : ''} ${aspectClass} bg-black rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 relative ${className}`}
+      style={isShorts ? { aspectRatio: '9 / 16' } : undefined}
     >
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
+        <div className={`absolute inset-0 flex items-center justify-center ${isShorts ? 'bg-black' : 'bg-gray-200'}`}>
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
             <p className="text-gray-600">Chargement de la vidéo...</p>
@@ -171,7 +184,11 @@ export default function YouTubeEmbed({
       {shouldLoad && (
         <iframe
           ref={iframeRef}
-          className="w-full h-full rounded-2xl"
+          className={
+            isShorts
+              ? 'h-full w-full border-0'
+              : 'h-full w-full rounded-2xl'
+          }
           title={title}
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

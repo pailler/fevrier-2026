@@ -2,7 +2,7 @@
   "version": "0.1.0",
   "scripts": {
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
-    "build": "node --max-old-space-size=8192 ./node_modules/next/dist/bin/next build",
+    "build": "node scripts/generate-card-access-manifest.mjs && node --max-old-space-size=8192 ./node_modules/next/dist/bin/next build",
     "dev": "next dev -p 3000",
     "dev:clean": "node scripts/clean-next-cache.mjs && next dev -p 3000",
     "hi3dgen": "next dev -p 8095",
@@ -10,6 +10,8 @@
     "vote:start": "npm --prefix vote start",
     "monitor": "node scripts/monitor-localhost.js",
     "monitor:check": "node scripts/monitor-localhost.js --once",
+    "check:card-access": "node scripts/check-card-access-buttons.mjs",
+    "check:card-access:prod": "node scripts/check-card-access-buttons.mjs --base https://iahome.fr",
     "monitor:schedule-install": "powershell -ExecutionPolicy Bypass -File ./scripts/register-localhost-health-scheduled-task.ps1",
     "test:monitor-email": "node scripts/test-resend-monitor-alert.mjs",
     "test:telegram": "node scripts/telegram-test-send.mjs",

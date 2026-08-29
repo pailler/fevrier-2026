@@ -19,6 +19,7 @@ function supabaseAdmin(): SupabaseClient {
 export function normalizeModuleIdForAccessJwt(moduleId: string): string {
   const raw = (moduleId || '').trim().toLowerCase();
   const aliases: Record<string, string> = {
+    '8': 'ruinedfooocus',
     animaginexl: 'animagine-xl',
     florence2: 'florence-2',
     homeassistant: 'home-assistant',

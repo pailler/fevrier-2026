@@ -1,23 +1,21 @@
 import type { Metadata } from 'next';
 import { buildPageSeo } from '@/utils/pageMetadata';
+import { getValueProposition } from '@/data/ecosystemValueProposition';
+
+const appsVp = getValueProposition('applications');
 
 export const metadata: Metadata = buildPageSeo({
   path: '/applications',
-  title: 'Applications IA et services en ligne — tout-en-un',
-  description:
-    'Whisper, Stable Diffusion, PDF+IA, Home Assistant, QR codes, transcription, images et plus encore. Une plateforme française : un compte, des crédits, accès aux services, interface en français.',
+  title: 'Applications IA — GPU CUDA dédié, zéro installation',
+  description: `${appsVp.subheadline} ${appsVp.oneLiner}`,
   keywords: [
-    'applications IA',
-    'plateforme IA France',
-    'outils IA en ligne',
-    'Whisper transcription',
-    'Stable Diffusion en ligne',
-    'PDF IA',
-    'Home Assistant cloud',
-    'services IAHome',
-    'activer application IA',
-    'IA française',
-    'RGPD',
+    'applications IA GPU',
+    'plateforme IA française',
+    'RGPD IA',
+    'support français',
+    'CUDA en ligne France',
+    'génération image IA',
+    'GPU distant navigateur',
   ],
 });
 

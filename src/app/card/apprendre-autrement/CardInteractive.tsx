@@ -7,6 +7,8 @@ import Breadcrumb from '../../../components/Breadcrumb';
 import Link from 'next/link';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
+import { APPRENDRE_AUTREMENT_APP_URL } from '@/utils/productLandingHosts';
+import { openModuleAppWithToken, openPendingModuleTab, redirectToLogin } from '@/utils/moduleAppUrl';
 
 export default function ApprendreAutrementCardPage({ initialModule }: CardInteractiveProps) {
   const router = useRouter();
@@ -23,7 +25,7 @@ export default function ApprendreAutrementCardPage({ initialModule }: CardIntera
     if (!user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-accès', {
+      const response = await fetch('/api/check-module-activation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -200,9 +202,10 @@ export default function ApprendreAutrementCardPage({ initialModule }: CardIntera
                     <button
                       onClick={async () => {
                         if (!user?.id || !user?.email) {
-                          router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}`)}`);
+                          redirectToLogin(`/card/${moduleId}`);
                           return;
                         }
+                        const pendingTab = openPendingModuleTab();
                         try {
                           const tokenResponse = await fetch('/api/generate-access-token', {
                             method: 'POST',
@@ -223,8 +226,9 @@ export default function ApprendreAutrementCardPage({ initialModule }: CardIntera
                           if (!tokenData?.token) {
                             throw new Error('Token d\'accès manquant');
                           }
-                          window.open(`https://apprendre-autrement.iahome.fr?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
+                          openModuleAppWithToken('apprendre-autrement', tokenData.token, APPRENDRE_AUTREMENT_APP_URL, pendingTab);
                         } catch (error) {
+                          pendingTab?.close();
                           alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
                         }
                       }}
@@ -280,7 +284,7 @@ export default function ApprendreAutrementCardPage({ initialModule }: CardIntera
                               if (!tokenData?.token) {
                                 throw new Error('Token d\'accès manquant');
                               }
-                              window.open(`https://apprendre-autrement.iahome.fr?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
+                              openModuleAppWithToken('apprendre-autrement', tokenData.token, APPRENDRE_AUTREMENT_APP_URL);
                             } else {
                               console.error('❌ Erreur accès Apprendre Autrement:', data.error);
                               alert('Erreur lors de l\'accès: ' + (data.error || 'Erreur inconnue'));
@@ -588,6 +592,7 @@ export default function ApprendreAutrementCardPage({ initialModule }: CardIntera
         icon="🌈"
         isModuleActivated={isModuleActivated}
         onActivationSuccess={() => setAlreadyActivatedModules(prev => [...prev, moduleId])}
+        accessUrl={APPRENDRE_AUTREMENT_APP_URL}
       />
     </div>
   );

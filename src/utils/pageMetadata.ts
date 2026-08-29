@@ -34,6 +34,10 @@ export function buildPageSeo({
     title: fullTitle,
     description,
     keywords: [...keywords],
+    applicationName: SITE_NAME,
+    authors: [{ name: SITE_NAME, url: SITE_URL }],
+    creator: SITE_NAME,
+    publisher: SITE_NAME,
     alternates: { canonical: canonicalUrl },
     openGraph: {
       title: fullTitle,
@@ -51,6 +55,11 @@ export function buildPageSeo({
       title: fullTitle,
       description,
       images: [image],
+    },
+    other: {
+      'geo.region': 'FR',
+      'geo.placename': 'France',
+      'content-language': 'fr',
     },
     robots: noindex
       ? { index: false, follow: true }

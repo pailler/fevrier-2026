@@ -54,11 +54,17 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
       'administration': 'administration',
       'apprendre-autrement': 'apprendre-autrement',
       'prompt-generator': 'prompt-generator',
+      'cv-generator': 'cv-generator',
       'voice-isolation': 'voice-isolation',
       'tts': 'tts',
       'photomaker': 'photomaker',
       'animagine-xl': 'animagine-xl',
       'animaginexl': 'animagine-xl',
+      'florence-2': 'florence-2',
+      'florence2': 'florence-2',
+      'birefnet': 'birefnet',
+      'musetalk': 'musetalk',
+      'photo-vivante': 'photo-vivante',
       'sentinelle-numerique': 'sentinelle-numerique',
       'sentinellenumerique': 'sentinelle-numerique',
       'vote': 'vote',
@@ -125,6 +131,9 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     if (titleLower.includes('prompt') || titleLower.includes('générateur de prompts') || titleLower.includes('prompt-generator')) {
       return 'prompt-generator';
     }
+    if (titleLower.includes('générateur de cv') || titleLower.includes('cv ia') || titleLower.includes('cv-generator')) {
+      return 'cv-generator';
+    }
     if (titleLower.includes('sentinelle') || titleLower.includes('sentinelle numérique')) {
       return 'sentinelle-numerique';
     }
@@ -142,6 +151,18 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     }
     if (titleLower.includes('animagine') || titleLower.includes('animaginexl') || titleLower.includes('animagine-xl')) {
       return 'animagine-xl';
+    }
+    if (titleLower.includes('florence-2') || titleLower.includes('florence 2') || titleLower.includes('florence2')) {
+      return 'florence-2';
+    }
+    if (titleLower.includes('birefnet') || titleLower.includes('bi ref net')) {
+      return 'birefnet';
+    }
+    if (titleLower.includes('musetalk') || titleLower.includes('muse talk')) {
+      return 'musetalk';
+    }
+    if (titleLower.includes('photo vivante') || titleLower.includes('photo-vivante')) {
+      return 'photo-vivante';
     }
 
     // Fallback: utiliser l'ID tel quel (peut-être déjà un slug valide)
@@ -286,6 +307,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
     if (idLower === 'resas-system' || titleLower.includes('réservation matériel') || titleLower.includes('reservation materiel')) {
       return '/images/resas-system.svg';
     }
+
+    if (idLower === 'cv-generator' || titleLower.includes('générateur de cv') || titleLower.includes('cv ia')) {
+      return '/images/cv-generator.svg';
+    }
     
     // Image par défaut pour tous les autres modules
     return '/images/module-visuals/generic-module.svg';
@@ -373,6 +398,11 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
   
   // Vérifier si c'est le module Générateur de prompts pour appliquer un style spécial
   const isPromptGenerator = module.title.toLowerCase().includes('prompt') || module.title.toLowerCase().includes('générateur de prompts') || module.id === 'prompt-generator';
+
+  const isCvGenerator =
+    module.id === 'cv-generator' ||
+    module.title.toLowerCase().includes('générateur de cv') ||
+    module.title.toLowerCase().includes('cv ia');
   
   // Vérifier si c'est le module BiRefNet pour appliquer un style spécial
   const isBiRefNet = module.title.toLowerCase().includes('birefnet') || module.title.toLowerCase().includes('bi-refnet') || module.title.toLowerCase().includes('bi refnet') || module.id === 'birefnet';
@@ -510,12 +540,14 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                                   ? '/images/reveil-intelligent.svg'
                                   : isResasSystem
                                   ? '/images/resas-system.svg'
+                                  : isCvGenerator
+                                    ? '/images/cv-generator.svg'
                                 : '/images/animagine-xl.jpg';
 
     // Déterminer les badges selon le type de module (style Claid.ai : badge violet "New")
     const getBadgeLabel = () => {
       if (isStableDiffusion || isComfyUI || isAnimagineXL) return { text: 'Top seller', show: true };
-      if (isRuinedFooocus || isCogStudio || isMeetingReports || isHunyuan3D || isSentinelleNumerique) return { text: 'New', show: true };
+      if (isRuinedFooocus || isCogStudio || isMeetingReports || isHunyuan3D || isSentinelleNumerique || isCvGenerator) return { text: 'New', show: true };
       return { text: null, show: false };
     };
     
@@ -627,6 +659,7 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
             isCodeLearning ? 'bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600' : 
             isApprendreAutrement ? 'bg-gradient-to-br from-purple-500 via-pink-600 to-orange-500' : 
             isPromptGenerator ? 'bg-gradient-to-br from-purple-500 via-pink-600 to-orange-500' : 
+            isCvGenerator ? 'bg-gradient-to-br from-blue-600 via-indigo-600 to-slate-800' :
             isHomeAssistant ? 'bg-gradient-to-br from-orange-400 via-red-500 to-blue-600' : 
             isAdministration ? 'bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600' :
             isSentinelleNumerique ? 'bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-600' :
@@ -720,6 +753,14 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
                 </div>
               </div>
             </>
+          )}
+          
+          {isCvGenerator && (
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <div className="bg-white/95 backdrop-blur-sm rounded-full p-6 shadow-2xl border-4 border-blue-500/20">
+                <span className="text-6xl">📄</span>
+              </div>
+            </div>
           )}
           
           {module.youtube_url && (
@@ -2507,10 +2548,10 @@ export default function ModuleCard({ module, userEmail }: ModuleCardProps) {
         <Link href={`/card/${moduleSlug}`} prefetch={false} className="block group">
           {/* Titre du module - affiché pour tous les modules */}
           <h3 className="text-3xl sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
-            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isAnimagineXL ? "Génération d'anime et manga par IA" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : isHunyuan3D ? "Hunyuan 3D - Génération 3D par IA" : isCodeLearning ? "Apprendre le Code aux enfants" : isApprendreAutrement ? "Apprendre Autrement" : isPromptGenerator ? "Générateur de prompts" : isHomeAssistant ? "Domotisez votre habitat" : isAdministration ? "Services de l'Administration" : isAIDetector ? "Détecteur de Contenu IA" : displayTitle}
+            {isLibrespeed ? "Testez votre connection" : isMeTube ? "Téléchargez Youtube sans pub" : isPdfPlus ? "Transformez vos PDF" : isPsitransfer ? "Transférez vos fichiers" : isQRCodes ? "QR Codes Dynamiques" : isStableDiffusion ? "Génération d'images par IA pour créateurs" : isComfyUI ? "Votre flux IA sur mesure" : isWhisper ? "l'IA transcrit vos fichiers en texte" : isRuinedFooocus ? "Création d'images IA, simple et précise" : isAnimagineXL ? "Génération d'anime et manga par IA" : isCogStudio ? "Générez des vidéos IA uniques" : isMeetingReports ? "Compte-rendus automatiques" : isHunyuan3D ? "Hunyuan 3D - Génération 3D par IA" : isCodeLearning ? "Apprendre le Code aux enfants" : isApprendreAutrement ? "Apprendre Autrement" : isPromptGenerator ? "Générateur de prompts" : isCvGenerator ? "Générateur de CV IA" : isHomeAssistant ? "Domotisez votre habitat" : isAdministration ? "Services de l'Administration" : isAIDetector ? "Détecteur de Contenu IA" : displayTitle}
           </h3>
           {/* Pour les modules spéciaux, afficher seulement la description si pas de sous-titre */}
-          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isAnimagineXL || isQRCodes || isWhisper || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports || isHunyuan3D || isCodeLearning || isApprendreAutrement || isPromptGenerator || isHomeAssistant || isAdministration || isAIDetector ? (
+          {isLibrespeed || isPsitransfer || isPdfPlus || isMeTube || isCogStudio || isComfyUI || isStableDiffusion || isRuinedFooocus || isAnimagineXL || isQRCodes || isWhisper || isIAPhoto || isIATube || isStirlingPDF || isMeetingReports || isHunyuan3D || isCodeLearning || isApprendreAutrement || isPromptGenerator || isCvGenerator || isHomeAssistant || isAdministration || isAIDetector ? (
             !module.subtitle && (
               <p className="text-gray-600 text-sm mb-4 line-clamp-3 group-hover:text-gray-700 transition-colors duration-200">
                 {isComfyUI ? "ComfyUI : contrôle total sur chaque étape de la création d'image" : isAnimagineXL ? "Animagine XL : modèle SDXL super-optimisé pour la génération d'images de type anime et manga avec connaissance de 5000+ personnages" : isMeetingReports ? "Transformez automatiquement vos réunions en rapports professionnels avec l'IA" : isHunyuan3D ? "Hunyuan 3D : Générez des modèles 3D à partir d'images avec l'intelligence artificielle" : isHomeAssistant ? (module.description?.toLowerCase().startsWith('avec home assistant') ? module.description : `Avec Home Assistant, ${module.description || 'domotisez votre habitat (maison, garage, lieu de vacances, lieu de travail, etc.) sans frais d\'installation, ni frais de logiciels puisque tout est open-source. Des centaines de codes prêts à l\'emploi sont aussi mis à disposition gratuitement.'}`) : module.description}

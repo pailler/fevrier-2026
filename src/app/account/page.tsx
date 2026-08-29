@@ -1,14 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '../../utils/supabaseClient';
 import { useCustomAuth } from '../../hooks/useCustomAuth';
 import Breadcrumb from '../../components/Breadcrumb';
 import { useTokenContext } from '../../contexts/TokenContext';
-import { getHunyuan3dAppUrl } from '../../utils/hunyuan3dAppUrl';
-import { isBrowserLocalIahomeDev } from '../../utils/isBrowserLocalIahomeDev';
+import { type UserApplication } from '../../utils/moduleDescriptions';
 
 interface UserProfile {
   id: string;
@@ -22,45 +21,6 @@ interface UserProfile {
   last_sign_in_at?: string | null;
 }
 
-interface UserApplication {
-  id: string;
-  module_id: string;
-  module_title: string;
-  is_active: boolean;
-  created_at: string;
-  usage_count: number;
-}
-
-const MODULE_DESCRIPTIONS: Record<string, string> = {
-  'photomaker': 'Generation de portraits styles et photorealistes.',
-  'birefnet': 'Suppression de fond et detourage rapide.',
-  'animagine-xl': 'Generation d\'images style anime.',
-  'florence-2': 'Analyse visuelle et description intelligente d\'images.',
-  'musetalk': 'Lip-sync video : synchroniser les levres sur une piste audio.',
-  'photo-vivante': 'Anime une photo fixe avec un rendu naturel et realiste.',
-  'home-assistant': 'Ressources et manuels pour votre domotique HA.',
-  'hunyuan3d': 'Generation et exploration d\'objets 3D.',
-  'stablediffusion': 'Creation d\'images IA depuis vos prompts.',
-  'meeting-reports': 'Synthese automatique de reunions.',
-  'whisper': 'Transcription audio et video en texte.',
-  'ruinedfooocus': 'Generation creative d\'images rapide.',
-  'comfyui': 'Workflows visuels avances pour l\'image IA.',
-  'apprendre-autrement': 'Apprentissage assiste par IA.',
-  'prompt-generator': 'Generation de prompts optimises.',
-  'qrcodes': 'Creation et gestion de QR codes.',
-  'librespeed': 'Test de vitesse internet complet.',
-  'metube': 'Telechargement et gestion de videos.',
-  'psitransfer': 'Transfert securise de fichiers.',
-  'pdf': 'Outils PDF : convertir, fusionner, optimiser.',
-  'voice-isolation': 'Isolation vocale et nettoyage audio.',
-  'administration': 'Outils d\'administration de la plateforme.',
-  'ai-detector': 'Detection de contenus generes par IA.',
-  'code-learning': 'Apprendre le code avec parcours guides.',
-  vote: 'Votes en ligne avec PIN organisateur et QR code.',
-  'reveil-intelligent':
-    'Réveil mobile : alarmes récurrentes, musiques, prévisions météo, jours fériés et vacances scolaires — accès gratuit.',
-};
-
 export default function AccountPage() {
   const router = useRouter();
   const { user, isAuthenticated, loading: authLoading, signOut, token } = useCustomAuth();
@@ -73,7 +33,6 @@ export default function AccountPage() {
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
-  const [accessingModuleId, setAccessingModuleId] = useState<string | null>(null);
   const [subdomainAccessNotice, setSubdomainAccessNotice] = useState<string | null>(null);
 
   useEffect(() => {
@@ -81,7 +40,7 @@ export default function AccountPage() {
     const sp = new URLSearchParams(window.location.search);
     if (sp.get('error') !== 'direct_access_denied') return;
     setSubdomainAccessNotice(
-      'Accès direct au sous-domaine refusé (sécurité). Ouvrez l’application depuis la liste ci-dessous : un code d’accès sera ajouté à l’URL, comme pour les autres apps protégées.'
+      'Accès direct au sous-domaine refusé (sécurité). Ouvrez l’application depuis « Vos applications » sur l’accueil : un code d’accès sera ajouté à l’URL.'
     );
     const u = new URL(window.location.href);
     u.searchParams.delete('error');
@@ -155,123 +114,6 @@ export default function AccountPage() {
       return dateString;
     }
   };
-
-  const resolveModuleUrl = useCallback((moduleId: string) => {
-    const normalizedModuleId = (moduleId || '').trim().toLowerCase();
-    const isDevelopment = isBrowserLocalIahomeDev();
-    const urlMap: Record<string, string> = isDevelopment
-      ? {
-          'photomaker': 'http://localhost:7881',
-          'birefnet': 'http://localhost:7882',
-          'animagine-xl': 'http://localhost:7883',
-          'florence-2': 'http://localhost:7884',
-          'musetalk': 'http://localhost:7886',
-          'photo-vivante': 'http://localhost:7887',
-          'home-assistant': 'http://localhost:8123/',
-          'hunyuan3d': getHunyuan3dAppUrl(),
-          'stablediffusion': 'http://localhost:7880',
-          'meeting-reports': 'http://localhost:3050',
-          'whisper': 'http://localhost:8093',
-          'ruinedfooocus': 'http://localhost:7870',
-          'comfyui': 'http://localhost:8188',
-          'apprendre-autrement': 'http://localhost:9001',
-          'prompt-generator': 'http://localhost:3002',
-          'qrcodes': 'http://localhost:7006',
-          'librespeed': 'http://localhost:8085',
-          'metube': 'http://localhost:8081',
-          'psitransfer': 'http://localhost:8087',
-          'pdf': 'http://localhost:8086',
-          'voice-isolation': 'http://localhost:8100',
-          'photobooth': 'http://localhost:7885',
-          'vote': 'http://localhost:7890',
-          'reveil-intelligent': 'http://localhost:7891',
-        }
-      : {
-          'photomaker': 'https://photomaker.iahome.fr',
-          'birefnet': 'https://birefnet.iahome.fr',
-          'animagine-xl': 'https://animaginexl.iahome.fr',
-          'florence-2': 'https://florence2.iahome.fr',
-          'musetalk': 'https://musetalk.iahome.fr',
-          'photo-vivante': 'https://photo-vivante.iahome.fr',
-          'home-assistant': 'https://homeassistant.iahome.fr',
-          'hunyuan3d': getHunyuan3dAppUrl(),
-          'stablediffusion': 'https://stablediffusion.iahome.fr',
-          'meeting-reports': 'https://meeting-reports.iahome.fr',
-          'whisper': 'https://whisper.iahome.fr',
-          'ruinedfooocus': 'https://ruinedfooocus.iahome.fr',
-          'comfyui': 'https://comfyui.iahome.fr',
-          'apprendre-autrement': 'https://apprendre-autrement.iahome.fr',
-          'prompt-generator': 'https://prompt-generator.iahome.fr',
-          'qrcodes': 'https://qrcodes.iahome.fr',
-          'librespeed': 'https://librespeed.iahome.fr',
-          'metube': 'https://metube.iahome.fr',
-          'psitransfer': 'https://psitransfer.iahome.fr',
-          'pdf': 'https://pdf.iahome.fr',
-          'voice-isolation': 'https://voice-isolation.iahome.fr',
-          'photobooth': 'https://photobooth.iahome.fr',
-          'vote': 'https://vote.iahome.fr',
-          'reveil-intelligent': 'https://reveil-intelligent.iahome.fr',
-        };
-
-    if (urlMap[normalizedModuleId]) {
-      return urlMap[normalizedModuleId];
-    }
-
-    const subdomainAliases: Record<string, string> = {
-      'animagine-xl': 'animaginexl',
-      'florence-2': 'florence2',
-      'home-assistant': 'homeassistant',
-    };
-
-    const computedSubdomain = subdomainAliases[normalizedModuleId] || normalizedModuleId;
-    return computedSubdomain ? `https://${computedSubdomain}.iahome.fr` : '';
-  }, []);
-
-  const handleDirectAccess = useCallback(async (app: UserApplication) => {
-    if (!user?.id || !user?.email) {
-      router.push('/login?redirect=/account');
-      return;
-    }
-
-    const targetUrl = resolveModuleUrl(app.module_id);
-    if (!targetUrl) {
-      alert(`URL d'accès introuvable pour le module ${app.module_id}`);
-      return;
-    }
-
-    try {
-      setAccessingModuleId(app.id);
-      const tokenResponse = await fetch('/api/generate-access-token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          userEmail: user.email,
-          moduleId: (app.module_id || '').trim().toLowerCase(),
-        }),
-      });
-
-      if (!tokenResponse.ok) {
-        const tokenError = await tokenResponse.json().catch(() => ({ error: 'Erreur inconnue' }));
-        throw new Error(tokenError.error || 'Erreur génération token');
-      }
-
-      const tokenData = await tokenResponse.json();
-      if (!tokenData?.token) {
-        throw new Error('Token d\'accès manquant');
-      }
-
-      const separator = targetUrl.includes('?') ? '&' : '?';
-      window.open(`${targetUrl}${separator}token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
-      await fetchUserData();
-    } catch (error) {
-      alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
-    } finally {
-      setAccessingModuleId(null);
-    }
-  }, [resolveModuleUrl, router, user?.email, user?.id]);
 
   const handleDeleteAccount = async () => {
     if (deleteConfirm !== 'SUPPRIMER') return;
@@ -440,51 +282,6 @@ export default function AccountPage() {
                 )}
               </div>
             </div>
-
-            {/* Applis visitées (consommation de crédits) */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <span className="mr-3">📱</span>
-                Applis les plus visitées ({applications.length})
-              </h2>
-              
-              {applications.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <p>Aucune appli visitée pour l&apos;instant</p>
-                  <Link href="/applications" className="text-blue-600 hover:text-blue-800 mt-2 inline-block">
-                    Découvrir les applications →
-                  </Link>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {applications.map((app) => (
-                      <div
-                        key={app.id}
-                        className="p-4 rounded-lg border bg-gray-50 border-gray-200"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-gray-900">{app.module_title}</h3>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {MODULE_DESCRIPTIONS[app.module_id] || 'Application IA disponible avec accès direct sécurisé.'}
-                            </p>
-                            <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                              <span>Utilisations: {app.usage_count}</span>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => handleDirectAccess(app)}
-                            disabled={accessingModuleId === app.id}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-                          >
-                            {accessingModuleId === app.id ? 'Ouverture...' : 'Accéder'}
-                          </button>
-                        </div>
-                      </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
 
           {/* Colonne latérale - Statistiques */}
@@ -551,10 +348,10 @@ export default function AccountPage() {
               <h2 className="text-xl font-bold text-gray-900 mb-4">⚡ Actions rapides</h2>
               <div className="space-y-2">
                 <Link
-                  href="/account"
+                  href="/#vos-applications"
                   className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center font-medium transition-colors"
                 >
-                  Mon compte — applis
+                  Vos applications
                 </Link>
                 <Link
                   href="/applications"

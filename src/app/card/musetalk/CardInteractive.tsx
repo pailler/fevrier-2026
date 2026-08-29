@@ -1,12 +1,16 @@
 'use client';
-import type { CardInteractiveProps, CardModuleData } from '@/types/cardModule';
+
+import type { CardInteractiveProps } from '@/types/cardModule';
 
 import Image from 'next/image';
 import Link from 'next/link';
 import Breadcrumb from '../../../components/Breadcrumb';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
+import { getModuleAppUrl } from '@/utils/moduleAppUrl';
 
-export default function MuseTalkPage({ initialModule }: CardInteractiveProps) {
+export default function MuseTalkPage({ initialModule: _initialModule }: CardInteractiveProps) {
+  const appUrl = getModuleAppUrl('musetalk');
+
   const moduleData = {
     id: 'musetalk',
     title: 'MuseTalk',
@@ -44,7 +48,6 @@ export default function MuseTalkPage({ initialModule }: CardInteractiveProps) {
               <p className="text-sky-100">{moduleData.subtitle}</p>
             </div>
 
-            {/* Visuel : w-full + min-w-0 évite une largeur 0 en grille (Image fill invisible). */}
             <div className="bg-white rounded-xl shadow-2xl border border-white/50 overflow-hidden w-full max-w-lg min-w-0 mx-auto lg:mx-0 lg:ml-auto">
               <div className="relative w-full aspect-[16/10] min-h-[14rem] sm:min-h-[15rem] overflow-hidden bg-gray-100">
                 <Image
@@ -66,17 +69,19 @@ export default function MuseTalkPage({ initialModule }: CardInteractiveProps) {
 
       <section className="max-w-7xl mx-auto px-6 py-10">
         <div className="bg-white/95 rounded-2xl border border-gray-200 p-8 shadow-lg">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">Accès et crédits</h3>
-          <p className="text-gray-700 mb-4">
-            Comme les autres apps Gradio IAHome : connexion, solde de crédits, ouverture sécurisée avec token
-            d’accès.
-          </p>
-          <p className="text-gray-700">
-            Retrouvez l’app dans{' '}
-            <Link href="/account" className="text-indigo-700 hover:text-indigo-900 font-medium underline">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">Fonctionnalités</h3>
+          <ul className="space-y-2 text-gray-700 mb-6">
+            <li>🎬 Lip-sync sur vidéo ou image de référence</li>
+            <li>🎤 Clonage vocal Chatterbox intégré (texte → voix → avatar)</li>
+            <li>🔒 Accès sécurisé avec vos crédits IAHome</li>
+          </ul>
+          <p className="text-gray-600 text-sm">
+            Application :{' '}
+            <span className="font-medium">{appUrl || 'musetalk.iahome.fr'}</span>
+            {' · '}
+            <Link href="/account" className="text-indigo-700 hover:text-indigo-900 underline">
               Mon compte
-            </Link>{' '}
-            après ajout du module dans Supabase (script SQL fourni).
+            </Link>
           </p>
         </div>
       </section>
@@ -87,7 +92,7 @@ export default function MuseTalkPage({ initialModule }: CardInteractiveProps) {
         tokenCost={100}
         tokenUnit="par accès. Utilisez l'application aussi longtemps que vous souhaitez"
         showCostSummaryOnButton={false}
-        apiEndpoint="/api/activate-module"
+        accessUrl={appUrl}
         gradientColors="from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700"
         icon="🎬"
       />

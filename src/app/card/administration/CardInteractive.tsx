@@ -7,6 +7,7 @@ import Breadcrumb from '../../../components/Breadcrumb';
 import { useCustomAuth } from '../../../hooks/useCustomAuth';
 import CardPageActivationSection from '../../../components/CardPageActivationSection';
 import { FREE_UNLIMITED_ACCESS_LABEL } from '../../../utils/tokenActionService';
+import { getModuleAppUrl, openModuleAppWithToken, openPendingModuleTab, redirectToLogin } from '@/utils/moduleAppUrl';
 
 export default function AdministrationPage({ initialModule }: CardInteractiveProps) {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function AdministrationPage({ initialModule }: CardInteractivePro
   const [checkingActivation, setCheckingActivation] = useState(false);
 
   const moduleId = 'administration';
+  const appUrl = getModuleAppUrl(moduleId);
   const isFreeModule = true;
 
   // Fonction pour vérifier si un module est déjà accessible
@@ -23,7 +25,7 @@ export default function AdministrationPage({ initialModule }: CardInteractivePro
     if (!user?.id || !moduleId) return false;
     
     try {
-      const response = await fetch('/api/check-module-accès', {
+      const response = await fetch('/api/check-module-activation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,13 +68,15 @@ export default function AdministrationPage({ initialModule }: CardInteractivePro
     const manageLoading = options?.manageLoading ?? true;
 
     if (!isAuthenticated || !user) {
-      router.push(`/login?redirect=${encodeURIComponent(`/card/${moduleId}`)}`);
+      redirectToLogin(`/card/${moduleId}`);
       return;
     }
 
     if (manageLoading) {
       setLoading(true);
     }
+
+    const pendingTab = openPendingModuleTab();
 
     try {
       const tokenResponse = await fetch('/api/generate-access-token', {
@@ -97,8 +101,12 @@ export default function AdministrationPage({ initialModule }: CardInteractivePro
         throw new Error('Token d\'accès manquant');
       }
 
-      window.open(`/administration?token=${encodeURIComponent(tokenData.token)}`, '_blank', 'noopener,noreferrer');
+      openModuleAppWithToken(moduleId, tokenData.token, appUrl, pendingTab);
+      setAlreadyActivatedModules((prev) => (prev.includes(moduleId) ? prev : [...prev, moduleId]));
     } catch (error) {
+      if (pendingTab && !pendingTab.closed) {
+        pendingTab.close();
+      }
       console.error('❌ Erreur ouverture Administration avec token:', error);
       alert(`Erreur lors de l'accès: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     } finally {
@@ -786,11 +794,9 @@ export default function AdministrationPage({ initialModule }: CardInteractivePro
         moduleName="Administration"
         tokenCost={0}
         tokenUnit={FREE_UNLIMITED_ACCESS_LABEL}
-        apiEndpoint="/api/activate-administration"
+        accessUrl={appUrl}
         gradientColors="from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
         icon="⚙️"
-        isModuleActivated={alreadyActivatedModules.includes(moduleId)}
-        onActivationSuccess={() => setAlreadyActivatedModules(prev => [...prev, moduleId])}
       />
     </div>
   );

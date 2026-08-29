@@ -7,6 +7,7 @@ import ModuleAccessButton from '@/components/ModuleAccessButton';
 import CardPageActivationSection from '@/components/CardPageActivationSection';
 import { useCustomAuth } from '@/hooks/useCustomAuth';
 import { supabase } from '@/utils/supabaseClient';
+import { getModuleAppUrl } from '@/utils/moduleAppUrl';
 import { getTokenCostForModuleId, FREE_UNLIMITED_ACCESS_LABEL } from '@/utils/tokenActionService';
 
 interface Card {
@@ -33,13 +34,7 @@ const DEFAULT_REVEIL: Card = {
 export default function ReveilCardPage({ initialModule }: CardInteractiveProps) {
   const { loading: authLoading } = useCustomAuth();
   const [card, setCard] = useState<Card>(DEFAULT_REVEIL);
-  const [accessUrl, setAccessUrl] = useState('https://reveil-intelligent.iahome.fr');
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-      setAccessUrl('http://localhost:7891');
-    }
-  }, []);
+  const appUrl = getModuleAppUrl('reveil-intelligent');
 
   useEffect(() => {
     const fetchCard = async () => {
@@ -163,7 +158,7 @@ export default function ReveilCardPage({ initialModule }: CardInteractiveProps) 
                 moduleName={card.title}
                 moduleCost={moduleCost}
                 moduleDescription={card.description}
-                accessUrl={accessUrl}
+                accessUrl={appUrl}
                 onAccessSuccess={() => {}}
                 onAccessError={(err) => console.error('Réveil access:', err)}
               />
@@ -208,7 +203,7 @@ export default function ReveilCardPage({ initialModule }: CardInteractiveProps) 
         icon="⏰"
         moduleTitle={card.title}
         moduleDescription={card.description}
-        accessUrl={accessUrl}
+        accessUrl={appUrl}
       />
     </div>
   );

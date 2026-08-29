@@ -9,6 +9,8 @@ export interface YouTubeEmbedOptions {
   modestbranding?: number;
   enablejsapi?: number;
   origin?: string;
+  /** Recommandé pour les Shorts YouTube */
+  playsinline?: number;
 }
 
 /**
@@ -30,13 +32,14 @@ export function extractYouTubeVideoId(url: string): string | null {
       return urlObj.pathname.substring(1).split('?')[0];
     }
     
-    // Format youtube.com/watch?v=VIDEO_ID
+    // Format youtube.com/watch?v=VIDEO_ID, /shorts/VIDEO_ID, /embed/VIDEO_ID
     if (urlObj.hostname.includes('youtube.com')) {
-      // Format embed
-      const embedMatch = url.match(/\/embed\/([^?&]+)/);
+      const embedMatch = url.match(/\/embed\/([^?&/]+)/);
       if (embedMatch) return embedMatch[1];
-      
-      // Format watch
+
+      const shortsMatch = url.match(/\/shorts\/([^?&/]+)/);
+      if (shortsMatch) return shortsMatch[1];
+
       return urlObj.searchParams.get('v') || null;
     }
     
@@ -65,7 +68,8 @@ export function normalizeYouTubeEmbedUrl(
     rel = 0,
     modestbranding = 1,
     enablejsapi = 0,
-    origin
+    origin,
+    playsinline = 1,
   } = options;
 
   const params = new URLSearchParams();
@@ -73,6 +77,7 @@ export function normalizeYouTubeEmbedUrl(
   params.set('rel', String(rel));
   params.set('modestbranding', String(modestbranding));
   params.set('enablejsapi', String(enablejsapi));
+  params.set('playsinline', String(playsinline));
   
   if (origin) {
     params.set('origin', origin);
